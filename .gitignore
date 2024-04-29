@@ -21,3 +21,4 @@ storage/logs/*
 storage/clockwork/*
 .cache/
 .husky
+*.tmp
