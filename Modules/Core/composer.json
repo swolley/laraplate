@@ -1,0 +1,31 @@
+{
+    "name": "willbit/core",
+    "description": "Core Module contains all the necessary functionalities for build up a new Laravel application.",
+    "authors": [
+        {
+            "name": "Marco Panzanaro",
+            "email": "marco.panzanaro@willbit.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": []
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Core\\": "app/",
+            "Modules\\Core\\Database\\Factories\\": "database/factories/",
+            "Modules\\Core\\Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "App/Helpers/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Core\\Tests\\": "tests/"
+        }
+    }
+}

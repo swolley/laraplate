@@ -1,0 +1,201 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Core\App\Providers;
+
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Modules\Core\Locking\Locked;
+use Modules\Core\App\Models\User;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Gate;
+use Modules\Core\App\Models\CronJob;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\RateLimiter;
+use Modules\Core\Locking\LockedModelSubscriber;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+
+class CoreServiceProvider extends ServiceProvider
+{
+    protected string $moduleName = 'Core';
+
+    protected string $moduleNameLower = 'core';
+
+    protected $subscribe = [
+        LockedModelSubscriber::class,
+    ];
+
+    protected $listen = [
+        Registered::class => [
+            SendEmailVerificationNotification::class,
+        ],
+    ];
+
+    /**
+     * Boot the application events.
+     */
+    public function boot(): void
+    {
+        $this->registerCommands();
+        $this->registerCommandSchedules();
+        $this->registerTranslations();
+        $this->registerConfig();
+        $this->registerViews();
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->registerAuths();
+
+        /** @var \Illuminate\Foundation\Application */
+        $app = $this->app;
+        $is_production = $app->isProduction();
+
+        if ($is_production && config('core.force_https')) {
+            URL::forceScheme('https');
+        }
+
+        Model::preventSilentlyDiscardingAttributes(!$is_production);
+    }
+
+    /**
+     * Register the service provider.
+     */
+    public function register(): void
+    {
+        /** @var \Illuminate\Foundation\Application */
+        $app = $this->app;
+
+        $app->register(RouteServiceProvider::class);
+
+        $app->singleton(Locked::class, function () {
+            return new Locked();
+        });
+
+        $app->alias(Locked::class, 'locked');
+
+        if ($app->isLocal()) {
+            $app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        }
+    }
+
+    public function registerAuths(): void
+    {
+        // bypass all other checks if user is super admin
+        Gate::before(fn (?User $user) => $user && $user->isSuperAdmin() ? true : null);
+    }
+
+    /**
+     * Register translations.
+     */
+    public function registerTranslations(): void
+    {
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
+            $this->loadJsonTranslationsFrom($langPath);
+        } else {
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
+            $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'lang'));
+        }
+    }
+
+    /**
+     * Register views.
+     */
+    public function registerViews(): void
+    {
+        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
+        $sourcePath = module_path($this->moduleName, 'resources/views');
+
+        $this->publishes([$sourcePath => $viewPath], ['views', $this->moduleNameLower . '-module-views']);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
+
+        $componentNamespace = str_replace('/', '\\', config('modules.namespace') . '\\' . $this->moduleName . '\\' . config('modules.paths.generator.component-class.path'));
+        Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
+    }
+
+    /**
+     * Get the services provided by the provider.
+     */
+    public function provides(): array
+    {
+        return [];
+    }
+
+    /**
+     * Register commands in the format of Command::class.
+     */
+    protected function registerCommands(): void
+    {
+        // App
+        $module_commands_subpath = config('modules.paths.generator.command.path');
+        $commands = $this->inspectFolderCommands($module_commands_subpath);
+        // Locking
+        $locking_commands_subpath = Str::replace('App', 'Locking', $module_commands_subpath);
+        $locking_commands = $this->inspectFolderCommands($locking_commands_subpath);
+        array_push($commands, ...$locking_commands);
+
+        $cache_commands_subpath = Str::replace('App', 'Cache', $module_commands_subpath);
+        $cache_commands = $this->inspectFolderCommands($cache_commands_subpath);
+        array_push($commands, ...$cache_commands);
+
+        $this->commands($commands);
+    }
+
+    /**
+     * Register command Schedules.
+     */
+    protected function registerCommandSchedules(): void
+    {
+        $this->app->booted(function (): void {
+            $schedule = $this->app->make(Schedule::class);
+            if (Schema::hasTable(((new CronJob))->getTable())) {
+                $crons = CronJob::where('is_active', true)->get();
+                foreach ($crons as $cron) {
+                    $schedule->command($cron->command)->cron($cron->schedule);
+                }
+            }
+        });
+    }
+
+    /**
+     * Register config.
+     */
+    protected function registerConfig(): void
+    {
+        $this->publishes([module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower . '.php')], 'config');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
+    }
+
+    private function inspectFolderCommands(string $commandsSubpath)
+    {
+        $modules_namespace = config('modules.namespace');
+        $files = glob(module_path($this->moduleName, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
+
+        return array_map(
+            fn ($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->moduleName, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
+            $files,
+        );
+    }
+
+    private function getPublishableViewPaths(): array
+    {
+        $paths = [];
+
+        foreach (config('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+
+        return $paths;
+    }
+}
