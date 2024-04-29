@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+		$table_name = "$ModelTable";
+        Schema::table($table_name, function (Blueprint $table) {
+			$lock_version_column = config('core.locking.lock_version_column');
+			if (Schema::hasColumn($table_name, $lock_version_column) {
+				$table->dropColumn($lock_version_column);
+			}
+        });
+    }
+
+    public function down()
+    {
+		$table_name = "$ModelTable";
+        Schema::table($table_name, function (Blueprint $table) {
+			$lock_version_column = config('core.locking.lock_version_column');
+			if (!Schema::hasColumn($table_name, $lock_version_column) {
+				$table->integer($lock_version_column)->unsigned()->nullable();
+			}
+        });
+    }
+};

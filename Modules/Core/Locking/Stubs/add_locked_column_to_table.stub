@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+		$table_name = "$ModelTable";
+        Schema::table($table_name, function (Blueprint $table) {
+			$lock_at_column = config('core.locking.lock_at_column');
+			if (!Schema::hasColumn($table_name, $lock_at_column) {
+				$table->timestamp($lock_at_column)->nullable();
+			}
+			$lock_by_column = config('core.locking.lock_by_column');
+			if (!Schema::hasColumn($table_name, $lock_by_column) {
+            	$table->timestamp($lock_by_column)->nullable();
+			}
+        });
+    }
+
+    public function down()
+    {
+        $table_name = "$ModelTable";
+        Schema::table($table_name, function (Blueprint $table) {
+			$lock_at_column = config('core.locking.lock_at_column');
+			if (Schema::hasColumn($table_name, $lock_at_column) {
+				$table->dropColumn($lock_at_column);
+			}
+			$lock_by_column = config('core.locking.lock_by_column');
+			if (Schema::hasColumn($table_name, $lock_by_column) {
+            	$table->dropColumn($lock_by_column);
+			}
+        });
+    }
+};
