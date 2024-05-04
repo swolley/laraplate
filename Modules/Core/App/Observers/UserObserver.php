@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Observers;
 
+use Hash;
+use Illuminate\Support\Str;
 use Modules\Core\App\Models\User;
 use Illuminate\Support\Facades\App;
 
@@ -20,6 +22,10 @@ class UserObserver
 
         if (!$user->lang) {
             $user->lang = App::getLocale();
+        }
+
+        if (!$user->password) {
+            $user->password = Hash::make(Str::password());
         }
     }
 

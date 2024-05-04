@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Models;
 
+use Illuminate\Validation\Rule;
 use Approval\Models\Modification;
 use Approval\Traits\ApprovesChanges;
 use Illuminate\Auth\Authenticatable;
@@ -69,6 +70,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'username',
         'email',
         'password',
+        'lang'
     ];
 
     /**
@@ -103,11 +105,23 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         parent::__construct($attributes);
 
         $this->rules[static::DEFAULT_RULE] = [
+            'lang' => 'nullable|in:' . implode(',', translations()),
+            'locked_at' => 'date|nullable',
+        ];
+        $this->rules['create'] = [
             'name' => 'string|required|max:255',
             'username' => 'max:255|unique:' . static::class,
-            'email' => 'required|max:255|email',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users'),
+            ],
             'password' => [Password::required()],
-            'locked_at' => 'date|nullable',
+        ];
+        $this->rules['update'] = [
+            'name' => 'string|max:255',
         ];
     }
 

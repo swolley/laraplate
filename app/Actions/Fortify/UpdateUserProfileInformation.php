@@ -2,10 +2,12 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
@@ -19,28 +21,39 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(Model&Authenticatable $user, array $input): void
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+        if (class_uses_trait($user, HasValidations::class)) {
+            $rules = $user->getOperationRules('update');
+        } else {
+            $rules = [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => [
+                    // 'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users')->ignore($user->id),
+                ],
+            ];
+        }
 
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
-        ])->validateWithBag('updateProfileInformation');
+        $rules = array_merge($rules, [
+            'password' => ['sometimes|password|confirmed'],
+            'current_password' => ['current_password:web|required_with:password|exclude_without:password'],
+        ]);
+
+        $validated = Validator::make($input, $rules)->validate();
+        Arr::forget($validated, ['current_password', 'password_confirmation']);
+        if (isset($valdiated['password'])) {
+            $valdiated['password'] = Hash::make($valdiated['password']);
+        }
 
         if (
-            $input['email'] !== $user->email &&
+            isset($validated['email']) && $validated['email'] !== $user->email &&
             $user instanceof MustVerifyEmail
         ) {
-            $this->updateVerifiedUser($user, $input);
+            $this->updateVerifiedUser($user, $validated);
         } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
+            $user->forceFill($validated)->save();
         }
     }
 

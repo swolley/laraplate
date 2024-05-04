@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Core\App\Providers;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Modules\Core\Locking\Locked;
 use Modules\Core\App\Models\User;
 use Illuminate\Support\Facades\URL;
@@ -16,10 +15,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\RateLimiter;
 use Modules\Core\Locking\LockedModelSubscriber;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 
@@ -44,10 +41,10 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerConfig();
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
-        $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
         $this->registerAuths();
@@ -61,6 +58,15 @@ class CoreServiceProvider extends ServiceProvider
         }
 
         Model::preventSilentlyDiscardingAttributes(!$is_production);
+
+        Password::defaults(function () {
+            return Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised();
+        });
     }
 
     /**

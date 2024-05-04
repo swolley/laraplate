@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use Monolog\Handler\GelfHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Processor\PsrLogMessageProcessor;
+// use Modules\Core\Logging\GelfAdditionalInfoProcessor;
 
 return [
     /*
@@ -54,7 +57,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'daily')),
+            'channels' => env('LOG_STACK') ? explode(',', env('LOG_STACK')) : ['daily'],
             'ignore_exceptions' => false,
         ],
 
@@ -92,6 +95,20 @@ return [
                 'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'graylog' => [
+            'driver' => 'monolog',
+            'level' => env('GRAYLOG_LEVEL', 'error'),
+            'handler' => GelfHandler::class,
+            'handler_with' => [
+                'host' => env('GRAYLOG_URL'),
+                'port' => env('GRAYLOG_PORT', 12201),
+            ],
+            'formatter' => GelfMessageFormatter::class,
+            // 'processors' => [
+            //     GelfAdditionalInfoProcessor::class,
+            // ],
         ],
 
         'stderr' => [

@@ -73,7 +73,7 @@ class DocsController extends OpenApiJsonController
 
     public function phpinfo(): void
     {
-        echo phpinfo();
+        phpinfo();
     }
 
     /**

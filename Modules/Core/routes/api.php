@@ -19,3 +19,5 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
 //     Route::get('core', fn (Request $request) => $request->user())->name('core');
 // });
+
+require('./crud.php');

@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.2.0.
+ * Generated for Laravel 11.6.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2914,6 +2914,33 @@ namespace Illuminate\Support\Facades {
                         return $instance->socket($request);
         }
                     /**
+         * Begin sending an anonymous broadcast to the given channels.
+         *
+         * @static 
+         */        public static function on($channels)
+        {
+                        /** @var \Illuminate\Broadcasting\BroadcastManager $instance */
+                        return $instance->on($channels);
+        }
+                    /**
+         * Begin sending an anonymous broadcast to the given private channels.
+         *
+         * @static 
+         */        public static function private($channel)
+        {
+                        /** @var \Illuminate\Broadcasting\BroadcastManager $instance */
+                        return $instance->private($channel);
+        }
+                    /**
+         * Begin sending an anonymous broadcast to the given presence channels.
+         *
+         * @static 
+         */        public static function presence($channel)
+        {
+                        /** @var \Illuminate\Broadcasting\BroadcastManager $instance */
+                        return $instance->presence($channel);
+        }
+                    /**
          * Begin broadcasting an event.
          *
          * @param mixed|null $event
@@ -4521,6 +4548,30 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Log\Context\Repository $instance */
                         return $instance->getHidden($key, $default);
+        }
+                    /**
+         * Retrieve the given key's value and then forget it.
+         *
+         * @param string $key
+         * @param mixed $default
+         * @return mixed 
+         * @static 
+         */        public static function pull($key, $default = null)
+        {
+                        /** @var \Illuminate\Log\Context\Repository $instance */
+                        return $instance->pull($key, $default);
+        }
+                    /**
+         * Retrieve the given key's hidden value and then forget it.
+         *
+         * @param string $key
+         * @param mixed $default
+         * @return mixed 
+         * @static 
+         */        public static function pullHidden($key, $default = null)
+        {
+                        /** @var \Illuminate\Log\Context\Repository $instance */
+                        return $instance->pullHidden($key, $default);
         }
                     /**
          * Retrieve only the values of the given keys.
@@ -6692,6 +6743,16 @@ namespace Illuminate\Support\Facades {
                         /** @var \Illuminate\Support\Testing\Fakes\EventFake $instance */
                         return $instance->hasDispatched($event);
         }
+                    /**
+         * Get the events that have been dispatched.
+         *
+         * @return array 
+         * @static 
+         */        public static function dispatchedEvents()
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\EventFake $instance */
+                        return $instance->dispatchedEvents();
+        }
             }
             /**
      * 
@@ -7843,7 +7904,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Http\Client\PendingRequest withResponseMiddleware(callable $middleware)
      * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
      * @method static \Illuminate\Http\Client\PendingRequest throw(callable|null $callback = null)
-     * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition, callable|null $throwCallback = null)
+     * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition)
      * @method static \Illuminate\Http\Client\PendingRequest throwUnless(bool $condition)
      * @method static \Illuminate\Http\Client\PendingRequest dump()
      * @method static \Illuminate\Http\Client\PendingRequest dd()
@@ -8082,6 +8143,16 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Http\Client\Factory $instance */
                         return $instance->recorded($callback);
+        }
+                    /**
+         * Create a new pending request instance for this factory.
+         *
+         * @return \Illuminate\Http\Client\PendingRequest 
+         * @static 
+         */        public static function createPendingRequest()
+        {
+                        /** @var \Illuminate\Http\Client\Factory $instance */
+                        return $instance->createPendingRequest();
         }
                     /**
          * Get the current event dispatcher implementation.
@@ -9441,6 +9512,17 @@ namespace Illuminate\Support\Facades {
                         return $instance->hasSent($notifiable, $notification);
         }
                     /**
+         * Specify if notification should be serialized and restored when being "pushed" to the queue.
+         *
+         * @param bool $serializeAndRestore
+         * @return \Illuminate\Support\Testing\Fakes\NotificationFake 
+         * @static 
+         */        public static function serializeAndRestore($serializeAndRestore = true)
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\NotificationFake $instance */
+                        return $instance->serializeAndRestore($serializeAndRestore);
+        }
+                    /**
          * Get the notifications that have been sent.
          *
          * @return array 
@@ -10497,6 +10579,19 @@ namespace Illuminate\Support\Facades {
                         return $instance->increment($key, $decaySeconds, $amount);
         }
                     /**
+         * Decrement the counter for a given key for a given decay time by a given amount.
+         *
+         * @param string $key
+         * @param int $decaySeconds
+         * @param int $amount
+         * @return int 
+         * @static 
+         */        public static function decrement($key, $decaySeconds = 60, $amount = 1)
+        {
+                        /** @var \Illuminate\Cache\RateLimiter $instance */
+                        return $instance->decrement($key, $decaySeconds, $amount);
+        }
+                    /**
          * Get the number of attempts for the given key.
          *
          * @param string $key
@@ -11101,7 +11196,7 @@ namespace Illuminate\Support\Facades {
                         return $instance->mergeIfMissing($input);
         }
                     /**
-         * Replace the input for the current request.
+         * Replace the input values for the current request.
          *
          * @param array $input
          * @return \Illuminate\Http\Request 
@@ -12990,6 +13085,7 @@ namespace Illuminate\Support\Facades {
          * @param array $headers
          * @param string|null $disposition
          * @return \Symfony\Component\HttpFoundation\StreamedResponse 
+         * @throws \Illuminate\Routing\Exceptions\StreamedResponseException
          * @static 
          */        public static function streamDownload($callback, $name = null, $headers = [], $disposition = 'attachment')
         {
@@ -13573,7 +13669,7 @@ namespace Illuminate\Support\Facades {
                         $instance->substituteImplicitBindings($route);
         }
                     /**
-         * Register a callback to to run after implicit bindings are substituted.
+         * Register a callback to run after implicit bindings are substituted.
          *
          * @param callable $callback
          * @return \Illuminate\Routing\Router 
@@ -14901,7 +14997,7 @@ namespace Illuminate\Support\Facades {
                         return $instance->missing($key);
         }
                     /**
-         * Checks if a key is present and not null.
+         * Determine if a key is present and not null.
          *
          * @param string|array $key
          * @return bool 
@@ -14910,6 +15006,17 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Session\Store $instance */
                         return $instance->has($key);
+        }
+                    /**
+         * Determine if any of the given keys are present and not null.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function hasAny($key)
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        return $instance->hasAny($key);
         }
                     /**
          * Get an item from the session.
@@ -16204,6 +16311,20 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Routing\UrlGenerator $instance */
                         return $instance->to($path, $extra, $secure);
+        }
+                    /**
+         * Generate an absolute URL with the given query parameters.
+         *
+         * @param string $path
+         * @param array $query
+         * @param mixed $extra
+         * @param bool|null $secure
+         * @return string 
+         * @static 
+         */        public static function query($path, $query = [], $extra = [], $secure = null)
+        {
+                        /** @var \Illuminate\Routing\UrlGenerator $instance */
+                        return $instance->query($path, $query, $extra, $secure);
         }
                     /**
          * Generate a secure, absolute URL to the given path.
@@ -18822,10 +18943,10 @@ namespace Spatie\LaravelIgnition\Facades {
          * 
          *
          * @static 
-         */        public static function registerErrorHandler()
+         */        public static function registerErrorHandler($errorLevels = null)
         {
                         /** @var \Spatie\FlareClient\Flare $instance */
-                        return $instance->registerErrorHandler();
+                        return $instance->registerErrorHandler($errorLevels);
         }
                     /**
          * 
@@ -18893,10 +19014,19 @@ namespace Spatie\LaravelIgnition\Facades {
          * 
          *
          * @static 
-         */        public static function report($throwable, $callback = null, $report = null)
+         */        public static function report($throwable, $callback = null, $report = null, $handled = null)
         {
                         /** @var \Spatie\FlareClient\Flare $instance */
-                        return $instance->report($throwable, $callback, $report);
+                        return $instance->report($throwable, $callback, $report, $handled);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */        public static function reportHandled($throwable)
+        {
+                        /** @var \Spatie\FlareClient\Flare $instance */
+                        return $instance->reportHandled($throwable);
         }
                     /**
          * 
@@ -20002,6 +20132,28 @@ namespace  {
                                 return $instance->eagerLoadRelations($models);
             }
                             /**
+             * Register a closure to be invoked after the query is executed.
+             *
+             * @param \Closure $callback
+             * @return \Illuminate\Database\Eloquent\Builder|static 
+             * @static 
+             */            public static function afterQuery($callback)
+            {
+                                /** @var \Illuminate\Database\Eloquent\Builder $instance */
+                                return $instance->afterQuery($callback);
+            }
+                            /**
+             * Invoke the "after query" modification callbacks.
+             *
+             * @param mixed $result
+             * @return mixed 
+             * @static 
+             */            public static function applyAfterQueryCallbacks($result)
+            {
+                                /** @var \Illuminate\Database\Eloquent\Builder $instance */
+                                return $instance->applyAfterQueryCallbacks($result);
+            }
+                            /**
              * Get a lazy collection for the given query.
              *
              * @return \Illuminate\Support\LazyCollection 
@@ -20421,6 +20573,7 @@ namespace  {
              * @param string|null $alias
              * @param bool $descending
              * @return bool 
+             * @throws \RuntimeException
              * @static 
              */            public static function orderedChunkById($count, $callback, $column = null, $alias = null, $descending = false)
             {

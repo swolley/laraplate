@@ -6,40 +6,21 @@ namespace Modules\Core\App\Http\Controllers;
 
 use Throwable;
 use TypeError;
-use RuntimeException;
-use BadMethodCallException;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Modules\Core\App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Auth\Events\Verified;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Modules\Core\App\Models\License;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Auth\AuthenticationException;
 use Modules\Core\App\Helpers\ResponseBuilder;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
-use Modules\Core\App\Http\Requests\LoginRequest;
-use Modules\Core\App\Http\Requests\NewUserRequest;
 use Modules\Core\App\Listeners\AfterLoginListener;
 use Modules\Core\App\Http\Resources\UserInfoResponse;
-use Illuminate\Database\Eloquent\InvalidCastException;
 use Modules\Core\App\Http\Requests\UserConfigsRequest;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Modules\Core\App\Http\Requests\ImpersonationRequest;
-use Modules\Core\App\Http\Requests\ResetPasswordRequest;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Modules\Core\App\Http\Requests\ChangePasswordRequest;
-use Illuminate\Database\Eloquent\MissingAttributeException;
-use Modules\Core\App\Http\Requests\ResetPasswordLinkRequest;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
@@ -139,22 +120,22 @@ class UserController extends Controller
             ->json();
     }
 
-    /**
-     * Update user preferences.
-     *
-     *
-     * @throws ValidationException
-     * @throws BindingResolutionException
-     * @throws Throwable
-     * @throws UnexpectedValueException
-     */
-    public function updateConfigs(UserConfigsRequest $request): HttpFoundationResponse
-    {
-        $validated = $request->validated();
-        $request->user()->update($validated);
+    // /**
+    //  * Update user preferences.
+    //  *
+    //  *
+    //  * @throws ValidationException
+    //  * @throws BindingResolutionException
+    //  * @throws Throwable
+    //  * @throws UnexpectedValueException
+    //  */
+    // public function updateConfigs(UserConfigsRequest $request): HttpFoundationResponse
+    // {
+    //     $validated = $request->validated();
+    //     $request->user()->update($validated);
 
-        return (new ResponseBuilder($request))
-            ->setData($validated)
-            ->json();
-    }
+    //     return (new ResponseBuilder($request))
+    //         ->setData($validated)
+    //         ->json();
+    // }
 }

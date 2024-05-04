@@ -10,6 +10,7 @@ use Doctrine\DBAL\Exception;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use UnexpectedValueException;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\App\Models\Setting;
 use Modules\Core\App\Helpers\ResponseBuilder;

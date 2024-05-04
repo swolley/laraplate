@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Modules\Core\App\Providers;
 
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Log;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -54,13 +54,10 @@ class RouteServiceProvider extends ServiceProvider
             ->namespace($this->moduleNamespace)
             ->prefix('app')
             ->name('core.')
-            ->group([
-                module_path('Core', '/routes/crud.php'),
-                module_path('Core', '/routes/web.php'),
-            ]);
+            ->group(module_path('Core', '/routes/web.php'));
 
         Route::middleware('auth')
-            ->prefix('app/user')
+            ->prefix('app/auth')
             ->name('core.')
             ->namespace($this->moduleNamespace)
             ->group(module_path('Core', '/routes/auth.php'));

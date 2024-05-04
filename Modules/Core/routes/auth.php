@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\Core\App\Http\Controllers\UserController;
 
 Route::controller(UserController::class)->name('auth.')->group(function (): void {
-    Route::get('/info', 'userInfo')->name('userInfo');
+    Route::get('/user/profile-information', 'userInfo')->name('userInfo');
     Route::post('/impersonate', 'impersonate')->can('impersonate')->name('impersonate');
     Route::post('/leave-impersonate', 'leaveImpersonate')->can('impersonate')->name('leaveImpersonate');
-    Route::patch('/configs', 'updateConfigs')->can('edit')->name('updateConfigs');
+    // Route::patch('/configs', 'updateConfigs')->can('edit')->name('updateConfigs');
 });
