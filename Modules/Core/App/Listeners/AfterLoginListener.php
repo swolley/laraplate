@@ -26,14 +26,14 @@ class AfterLoginListener
 
         if (class_uses_trait($user, Impersonate::class) && $user->isImpersonated()) {
             $impersonator = $user->getImpersonator();
-            Log::info("{$impersonator->username} is impersonating {$user->username}");
+            Log::info('{impersonator} is impersonating {impersonated}', ['impersonator' => $impersonator->username, 'impersonated' => $user->username]);
         } else {
             $this->checkUserLicense($user);
             $user->update(['last_login_at' => Carbon::now()]);
             if ($user->isUnlocked()) {
                 Auth::logoutOtherDevices($user->password);
             }
-            Log::info("{$user->username} logged in");
+            Log::info('{username} logged in', ['username' => $user->username]);
         }
     }
 

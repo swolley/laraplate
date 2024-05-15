@@ -27,11 +27,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $rules = [
                 'name' => ['required', 'string', 'max:255'],
                 'email' => [
-                    // 'required',
                     'string',
                     'email',
                     'max:255',
-                    Rule::unique('users')->ignore($user->id),
+                    Rule::unique(user_class())->ignore($user->id),
                 ],
             ];
         }

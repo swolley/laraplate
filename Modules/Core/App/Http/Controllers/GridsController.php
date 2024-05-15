@@ -9,6 +9,7 @@ use UnexpectedValueException;
 use Exception as GlobalException;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Grids\Components\Grid;
 use Modules\Core\Grids\Casts\GridAction;
 use Modules\Core\App\Models\DynamicEntity;
 use Modules\Core\Grids\Traits\HasGridUtils;

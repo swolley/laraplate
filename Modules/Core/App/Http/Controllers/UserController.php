@@ -18,7 +18,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\App\Listeners\AfterLoginListener;
 use Modules\Core\App\Http\Resources\UserInfoResponse;
-use Modules\Core\App\Http\Requests\UserConfigsRequest;
 use Modules\Core\App\Http\Requests\ImpersonationRequest;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -119,23 +118,4 @@ class UserController extends Controller
             ->setData(static::parseUserInfo())
             ->json();
     }
-
-    // /**
-    //  * Update user preferences.
-    //  *
-    //  *
-    //  * @throws ValidationException
-    //  * @throws BindingResolutionException
-    //  * @throws Throwable
-    //  * @throws UnexpectedValueException
-    //  */
-    // public function updateConfigs(UserConfigsRequest $request): HttpFoundationResponse
-    // {
-    //     $validated = $request->validated();
-    //     $request->user()->update($validated);
-
-    //     return (new ResponseBuilder($request))
-    //         ->setData($validated)
-    //         ->json();
-    // }
 }

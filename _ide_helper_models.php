@@ -47,7 +47,7 @@ namespace Modules\Core\App\Models{
  * @property int $id
  * @property string $name
  * @property string $command
- * @property string $paremeters
+ * @property array $parameters
  * @property \Cron\CronExpression $schedule
  * @property bool $is_active
  * @property string|null $description
@@ -73,7 +73,7 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereParemeters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereParameters($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereSchedule($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob withTrashed()
@@ -564,8 +564,6 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $responsible_user
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $versionable
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version query()

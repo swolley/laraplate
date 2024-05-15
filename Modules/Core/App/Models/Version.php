@@ -6,13 +6,10 @@ namespace Modules\Core\App\Models;
 
 use Override;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Core\App\Helpers\HasCommonObserver;
+use Modules\Core\App\Models\DynamicEntity;
 
 class Version extends \Mpociot\Versionable\Version
 {
-    // non mi serve per creare la griglia ma per avere le relations dai record delle griglie alle preview delle modifiche
-    use HasCommonObserver;
-
     /**
      * @var string[]
      *
@@ -28,9 +25,7 @@ class Version extends \Mpociot\Versionable\Version
 
     private static function isDynamicEntity(Model $model): bool
     {
-        $dynamic_entity_class = 'Modules\\Crud\\App\\Models\\DynamicEntity';
-
-        return class_exists($dynamic_entity_class) && $model instanceof $dynamic_entity_class;
+        return class_exists(DynamicEntity::class) && $model instanceof DynamicEntity;
     }
 
     // /**

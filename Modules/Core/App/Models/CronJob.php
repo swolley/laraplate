@@ -35,6 +35,10 @@ class CronJob extends Model
         'is_active',
     ];
 
+    protected $attributes = [
+        'parameters' => '{}',
+    ];
+
     protected function casts()
     {
         return [
@@ -55,7 +59,7 @@ class CronJob extends Model
             'name' => 'string|required|max:255',
             'command' => 'string|required|max:255',
             'parameters' => 'json|required',
-            'schedule' => ['required', CronExpressionRule::class],
+            'schedule' => ['required', new CronExpressionRule],
             'description' => 'string|max:255|nullable',
             'is_active' => 'boolean|required',
         ];

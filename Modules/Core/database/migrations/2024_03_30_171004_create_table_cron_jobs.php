@@ -7,7 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Modules\Core\App\Helpers\CommonMigrationColumns;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -17,7 +18,7 @@ return new class () extends Migration {
             $table->id();
             $table->string('name')->nullable(false);
             $table->string('command')->nullable(false);
-            $table->json('paremeters')->nullable(false);
+            $table->json('parameters')->nullable(false);
             $table->string('schedule')->nullable(false);
             $table->boolean('is_active')->nullable(false);
             $table->string('description')->nullable();

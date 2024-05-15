@@ -21,8 +21,6 @@ use Modules\Core\App\Casts\SettingTypeEnum;
 
 class CoreDatabaseSeeder extends Seeder
 {
-    private ?Setting $defaultLanguage;
-
     private $groups = [];
 
     /**
@@ -44,11 +42,11 @@ class CoreDatabaseSeeder extends Seeder
     private function defaultPermissions(): void
     {
         // il comando ha già le transaction
-
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         $already_exists = config('permission.models.permission')::exists();
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>permissions</>');
         Artisan::call('permission:refresh');
+        $this->command->line("    - permissions updated");
     }
 
     private function defaultRoles(): void
@@ -65,36 +63,39 @@ class CoreDatabaseSeeder extends Seeder
         $admin = 'admin';
         $guest = 'guest';
 
-        $this->groups['superadmin'] = $role_class::whereName($superadmin)->first();
-        $this->groups['admin'] = $role_class::whereName($admin)->first();
-        $this->groups['guest'] = $role_class::whereName($guest)->first();
+        $this->groups[$superadmin] = $role_class::whereName($superadmin)->first();
+        $this->groups[$admin] = $role_class::whereName($admin)->first();
+        $this->groups[$guest] = $role_class::whereName($guest)->first();
 
-        DB::transaction(function () use ($role_class, $superadmin, $admin, $permission_class, $user_class, $role_table, $user_table, $guest) {
-            if (!$this->groups['superadmin']) {
-                $this->groups['superadmin'] = $this->create($role_class, ['name' => $superadmin, 'locked_at' => now()]);
-                // $this->groups['superadmin']->lock();
+        DB::transaction(function () use ($role_class, $superadmin, $admin, $permission_class, $role_table, $user_table, $guest) {
+            if (!$this->groups[$superadmin]) {
+                $this->groups[$superadmin] = $this->create($role_class, ['name' => $superadmin, 'locked_at' => now()]);
             }
 
-            if (!$this->groups['admin']) {
-                $this->groups['admin'] = $this->create($role_class, ['name' => $admin, 'locked_at' => now()]);
-                $this->groups['admin']->givePermissionTo(
+            if (!$this->groups[$admin]) {
+                $this->groups[$admin] = $this->create($role_class, ['name' => $admin, 'locked_at' => now()]);
+                $this->groups[$admin]->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
                         ->orWhere('name', 'like', '%.' . ActionEnum::SELECT->value)
                         ->get()
                 );
-                // $this->groups['admin']->lock();
+                $this->command->line("    - $admin created");
+            } else {
+                $this->command->line("    - $admin already exists");
             }
 
-            if (!$this->groups['guest']) {
-                $this->groups['guest'] = $this->create($role_class, ['name' => $guest, 'locked_at' => now()]);
-                $this->groups['guest']->givePermissionTo(
+            if (!$this->groups[$guest]) {
+                $this->groups[$guest] = $this->create($role_class, ['name' => $guest, 'locked_at' => now()]);
+                $this->groups[$guest]->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
                         ->orWhere('name', 'like', '%.' . ActionEnum::SELECT->value)
                         ->get()
                 );
-                // $this->groups['guest']->lock();
+                $this->command->line("    - $guest created");
+            } else {
+                $this->command->line("    - $guest already exists");
             }
         });
     }
@@ -116,12 +117,13 @@ class CoreDatabaseSeeder extends Seeder
                     'username' => $root,
                     'email' => 'sviluppo@willbit.com',
                     'password' => Hash::make('WillBit07!!'),
-                    // 'lang' => $this->defaultLanguage->value,
                     'email_verified_at' => now(),
                     'locked_at' => now(),
                 ]);
                 $root_user->assignRole($this->groups['superadmin']);
-                // $root_user->lock();
+                $this->command->line("    - $root created");
+            } else {
+                $this->command->line("    - $root already exists");
             }
 
             if (!$user_class::whereName($admin)->exists()) {
@@ -130,10 +132,12 @@ class CoreDatabaseSeeder extends Seeder
                     'username' => $admin,
                     'email' => "$admin@" . str_replace('_', '', Str::slug(config('app.name'))) . '.com',
                     'password' => Hash::make(config('app.name')),
-                    // 'lang' => $this->defaultLanguage->value,
                     'email_verified_at' => now(),
                 ]);
-                $admin_user->assignRole($this->groups['admin']);
+                $admin_user->assignRole($this->groups[$admin]);
+                $this->command->line("    - $admin created");
+            } else {
+                $this->command->line("    - $admin already exists");
             }
 
             if (!$user_class::whereName($anonymous)->exists()) {
@@ -142,10 +146,12 @@ class CoreDatabaseSeeder extends Seeder
                     'username' => $anonymous,
                     'email' => "$anonymous@" . str_replace('_', '', Str::slug(config('app.name'))) . '.com',
                     'password' => Hash::make(config('app.name')),
-                    // 'lang' => $this->defaultLanguage->value,
                     'email_verified_at' => now(),
                 ]);
                 $anonymous_user->assignRole($this->groups['guest']);
+                $this->command->line("    - $anonymous created");
+            } else {
+                $this->command->line("    - $anonymous already exists");
             }
         });
     }
@@ -161,11 +167,14 @@ class CoreDatabaseSeeder extends Seeder
             if (!Setting::whereName($defaultLanguage)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $defaultLanguage,
-                    'value' => 'it',
+                    'value' => config('app.locale'),
                     'type' => SettingTypeEnum::STRING,
                     'group_name' => 'base',
                     'description' => 'Lingua default',
                 ]);
+                $this->command->line("    - $defaultLanguage created");
+            } else {
+                $this->command->line("    - $defaultLanguage already exists");
             }
 
             if (!Setting::whereName($pagination)->exists()) {
@@ -176,6 +185,9 @@ class CoreDatabaseSeeder extends Seeder
                     'group_name' => 'base',
                     'description' => 'Paginazione default chiamate',
                 ]);
+                $this->command->line("    - $pagination created");
+            } else {
+                $this->command->line("    - $pagination already exists");
             }
 
             // ModuleDatabaseActivator::seedBackendModules();
@@ -184,21 +196,24 @@ class CoreDatabaseSeeder extends Seeder
 
     private function defaultCrons(): void
     {
-        $clearUserAssigneLicenses = 'clearUserAssignedLicenses';
+        $clearUserAssignedLicenses = 'clearUserAssignedLicenses';
         $clearResetTokens = 'clearResetTokens';
         $already_exists = CronJob::exists();
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>cron jobs</>');
 
-        DB::transaction(function () use ($clearUserAssigneLicenses, $clearResetTokens) {
-            if (!CronJob::whereName($clearUserAssigneLicenses)->exists()) {
+        DB::transaction(function () use ($clearUserAssignedLicenses, $clearResetTokens) {
+            if (!CronJob::whereName($clearUserAssignedLicenses)->exists()) {
                 $this->create(CronJob::class, [
-                    'name' => $clearUserAssigneLicenses,
+                    'name' => $clearUserAssignedLicenses,
                     'command' => 'auth:clear-licenses',
                     'parameters' => [],
                     'schedule' => '@midnight',
                     'description' => 'Resetta assegnazione licenze login a utenti',
                     'is_active' => config('core.enable_user_licenses'),
                 ]);
+                $this->command->line("    - $clearUserAssignedLicenses created");
+            } else {
+                $this->command->line("    - $clearUserAssignedLicenses already exists");
             }
 
             if (!CronJob::whereName($clearResetTokens)->exists()) {
@@ -210,6 +225,9 @@ class CoreDatabaseSeeder extends Seeder
                     'description' => 'Rimuove reset password tokens scaduti',
                     'is_active' => true,
                 ]);
+                $this->command->line("    - $clearResetTokens created");
+            } else {
+                $this->command->line("    - $clearResetTokens already exists");
             }
         });
     }

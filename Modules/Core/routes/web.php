@@ -30,7 +30,7 @@ Route::name('crud.')->prefix('/crud')->group(function () {
 		Route::delete('/cache-clear/{entity}', 'clearModelCache')->name('cache-clear');
 	});
 
-	Route::controller(GridsController::class)->group(function () {
+	Route::controller(GridsController::class)->prefix('grid')->group(function () {
 		Route::get('/get-configs/{entity?}', 'getGridsConfigs')->name('grids.getGridsConfigs');
 		Route::match(['get', 'post', 'patch', 'delete'], '/{entity}', 'grid')->name('grids.grid');
 	});
