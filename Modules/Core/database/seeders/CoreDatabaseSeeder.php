@@ -6,6 +6,7 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
+use Modules\Core\App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\App\Models\CronJob;

@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.6.0.
+ * Generated for Laravel 11.10.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -658,6 +658,26 @@ namespace Illuminate\Support\Facades {
                         return $instance->handleCommand($input);
         }
                     /**
+         * Determine if the framework's base configuration should be merged.
+         *
+         * @return bool 
+         * @static 
+         */        public static function shouldMergeFrameworkConfiguration()
+        {
+                        /** @var \Illuminate\Foundation\Application $instance */
+                        return $instance->shouldMergeFrameworkConfiguration();
+        }
+                    /**
+         * Indicate that the framework's base configuration should not be merged.
+         *
+         * @return \Illuminate\Foundation\Application 
+         * @static 
+         */        public static function dontMergeFrameworkConfiguration()
+        {
+                        /** @var \Illuminate\Foundation\Application $instance */
+                        return $instance->dontMergeFrameworkConfiguration();
+        }
+                    /**
          * Determine if middleware has been disabled for the application.
          *
          * @return bool 
@@ -817,7 +837,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Get the service providers that have been loaded.
          *
-         * @return array 
+         * @return array<string, boolean> 
          * @static 
          */        public static function getLoadedProviders()
         {
@@ -1498,6 +1518,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -2356,6 +2377,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -4076,6 +4098,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -4440,6 +4463,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -4803,6 +4827,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -5007,6 +5032,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -5467,6 +5493,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -6614,6 +6641,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -7344,6 +7372,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -8179,6 +8208,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -8504,6 +8534,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -8844,7 +8875,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Contracts\View\Factory getViewFactory()
      * @method static void setSymfonyTransport(\Symfony\Component\Mailer\Transport\TransportInterface $transport)
      * @method static \Illuminate\Mail\Mailer setQueue(\Illuminate\Contracts\Queue\Factory $queue)
-     * @method static void macro(string $name, object|callable $macro)
+     * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
      * @method static void mixin(object $mixin, bool $replace = true)
      * @method static bool hasMacro(string $name)
      * @method static void flushMacros()
@@ -9537,6 +9568,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -9846,6 +9878,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -10874,6 +10907,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -12876,6 +12910,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -13193,6 +13228,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -14092,6 +14128,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -14267,6 +14304,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -14733,6 +14771,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -15428,6 +15467,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -16201,6 +16241,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -16729,6 +16770,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -17310,6 +17352,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -18017,6 +18060,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -18467,6 +18511,7 @@ namespace Nwidart\Modules\Facades {
          *
          * @param string $name
          * @param object|callable $macro
+         * @param-closure-this static  $macro
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
@@ -21848,6 +21893,57 @@ namespace  {
                                 return $instance->orWhereJsonDoesntContain($column, $value);
             }
                             /**
+             * Add a "where JSON overlaps" clause to the query.
+             *
+             * @param string $column
+             * @param mixed $value
+             * @param string $boolean
+             * @param bool $not
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function whereJsonOverlaps($column, $value, $boolean = 'and', $not = false)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->whereJsonOverlaps($column, $value, $boolean, $not);
+            }
+                            /**
+             * Add an "or where JSON overlaps" clause to the query.
+             *
+             * @param string $column
+             * @param mixed $value
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function orWhereJsonOverlaps($column, $value)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->orWhereJsonOverlaps($column, $value);
+            }
+                            /**
+             * Add a "where JSON not overlap" clause to the query.
+             *
+             * @param string $column
+             * @param mixed $value
+             * @param string $boolean
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function whereJsonDoesntOverlap($column, $value, $boolean = 'and')
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->whereJsonDoesntOverlap($column, $value, $boolean);
+            }
+                            /**
+             * Add an "or where JSON not overlap" clause to the query.
+             *
+             * @param string $column
+             * @param mixed $value
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function orWhereJsonDoesntOverlap($column, $value)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->orWhereJsonDoesntOverlap($column, $value);
+            }
+                            /**
              * Add a clause that determines if a JSON path exists to the query.
              *
              * @param string $column
@@ -22660,7 +22756,7 @@ namespace  {
              * Insert or update a record matching the attributes, and fill it with values.
              *
              * @param array $attributes
-             * @param array $values
+             * @param array|callable $values
              * @return bool 
              * @static 
              */            public static function updateOrInsert($attributes, $values = [])
@@ -22912,6 +23008,7 @@ namespace  {
              *
              * @param string $name
              * @param object|callable $macro
+             * @param-closure-this static  $macro
              * @return void 
              * @static 
              */            public static function macro($name, $macro)

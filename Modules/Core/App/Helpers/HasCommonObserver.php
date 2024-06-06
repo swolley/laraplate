@@ -7,20 +7,20 @@ namespace Modules\Core\App\Helpers;
 use function class_uses_trait;
 
 use Illuminate\Database\Eloquent\Model;
-use Mpociot\Versionable\VersionableTrait;
+use Overtrue\LaravelVersionable\Versionable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\Locking\HasOptimisticLocking;
 use Illuminate\Validation\UnauthorizedException;
 
 trait HasCommonObserver
 {
-    use VersionableTrait, HasOptimisticLocking;
+    use Versionable, HasOptimisticLocking;
 
     // protected static bool $useCache = false;
 
     // protected $guarded = ['id'];
 
-    protected array $dontVersionFields = ['created_at', 'updated_at', 'deleted_at', 'last_login_at'];
+    protected array $dontVersionable = ['created_at', 'updated_at', 'deleted_at', 'last_login_at'];
 
     protected static function bootHasCommonObserver(): void
     {

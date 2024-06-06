@@ -1063,7 +1063,7 @@ class Grid extends Entity
             $data = $callback($data);
         }
         if ($data === false) {
-            Log::info('Insert blocked by preInsert hook', [static::class]);
+            Log::info('Insert blocked by preInsert hook');
 
             return false;
         }

@@ -1,12 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     /*
-     * The version model to use.
-     * Feel free to change this, if you need specific version
-     * model logic.
+     * Keep versions, you can redefine in target model.
+     * Default: 0 - Keep all versions.
+     */
+    'keep_versions' => 0,
+
+    /*
+     * User foreign key name of versions table.
+     */
+    'user_foreign_key' => 'user_id',
+
+    /*
+     * The model class for store versions.
      */
     'version_model' => Modules\Core\App\Models\Version::class,
+
+    /**
+     * The model class for user.
+     */
+    'user_model' => user_class(),
+
+    /**
+     * Use uuid for version id.
+     */
+    'uuid' => false,
 ];

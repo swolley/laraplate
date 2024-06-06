@@ -22,23 +22,31 @@ class DocsController extends OpenApiJsonController
         $all_modules = modules(true, false, false);
         $all_models = models(false);
         $all_controllers = controllers(false);
+        $all_routes = routes(false);
 
         $grouped = [];
 
         foreach ($all_modules as $module) {
             if (!array_key_exists($module, $grouped)) {
-                $grouped[$module] = ['models' => [], 'controllers' => [], 'authors' => []];
+                $grouped[$module] = ['models' => [], 'controllers' => [], 'routes' => [], 'authors' => []];
             }
 
             foreach ($all_models as $i => $model) {
-                if (Str::startsWith($model, $module) || Str::startsWith($model, 'Modules\\' . $module)) {
+                if (Str::startsWith($model, $module) || Str::startsWith($model, "Modules\\$module")) {
                     $grouped[$module]['models'][] = $model;
                     unset($all_models[$i]);
                 }
             }
 
+            foreach ($all_routes as $i => $route) {
+                if ((!$route['namespace'] && $module === 'App') || Str::startsWith($model, "Modules\\$module")) {
+                    $grouped[$module]['routes'][] = $route;
+                    unset($all_routes[$i]);
+                }
+            }
+
             foreach ($all_controllers as $i => $controller) {
-                if (Str::startsWith($controller, $module) || Str::startsWith($controller, 'Modules\\' . $module)) {
+                if (Str::startsWith($controller, $module) || Str::startsWith($controller, "Modules\\$module")) {
                     $grouped[$module]['controllers'][] = $controller;
                     unset($all_controllers[$i]);
                 }

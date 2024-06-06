@@ -15,13 +15,13 @@ if (!function_exists('modules')) {
      *
      * @param  bool  $showMainApp  add main app into modules list
      * @param  bool  $fullpath  return only module name or full path on file system
-     * @param  bool  $onlyActives  return only active modules
+     * @param  bool  $onlyActive  return only active modules
      * @return string[]
      */
-    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActives = true, ?string $module = null): array
+    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $module = null): array
     {
         $module_class = 'Nwidart\\Modules\\Facades\\Module';
-        $modules = class_exists($module_class) ? ($onlyActives ? $module_class::allEnabled() : $module_class::all()) : [];
+        $modules = class_exists($module_class) ? ($onlyActive ? $module_class::allEnabled() : $module_class::all()) : [];
 
         if ($module) {
             $module = ucfirst($module);
@@ -61,11 +61,11 @@ if (!function_exists('connections')) {
      *
      * @return array<string>
      */
-    function connections(bool $onlyActives = true): array
+    function connections(bool $onlyActive = true): array
     {
         $connections = [];
 
-        if (!$onlyActives) {
+        if (!$onlyActive) {
             foreach (config('database.connections', []) as $connection) {
                 $driver = $connection->getDriverName();
 
@@ -77,7 +77,7 @@ if (!function_exists('connections')) {
             return $connections;
         }
 
-        foreach (models($onlyActives) as $model) {
+        foreach (models($onlyActive) as $model) {
             $connection = (new $model())->getConnection();
             $driver = $connection->getDriverName();
 
@@ -97,7 +97,7 @@ if (!function_exists('translations')) {
      * @param  bool  $fullpath  return only unique translation code or full all paths on file system
      * @return array<string>
      */
-    function translations(bool $fullpath = false, bool $onlyActives = true): array
+    function translations(bool $fullpath = false, bool $onlyActive = true): array
     {
         $app_dir = base_path('lang');
         $app_languages = glob($app_dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
@@ -105,7 +105,7 @@ if (!function_exists('translations')) {
 
         $modules_languages = $fullpath ? $app_languages : array_map(fn (string $l) => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
 
-        foreach (modules(false, true, $onlyActives) as $module) {
+        foreach (modules(false, true, $onlyActive) as $module) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $module);
             $path = $module . DIRECTORY_SEPARATOR . ($is_app ? 'lang' : $langs_subpath) . DIRECTORY_SEPARATOR;
             $files = glob("{$path}*", GLOB_ONLYDIR);
@@ -137,12 +137,12 @@ if (!function_exists('migrations')) {
      * @param  bool  $count  return inly count or full list
      * @return false|int|string[] number if count requested, string[] if list requested, false if error occured
      */
-    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActives = true): array|int|false
+    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true): array|int|false
     {
         try {
             $found = [];
 
-            foreach (modules(true, false, $onlyActives) as $m) {
+            foreach (modules(true, false, $onlyActive) as $m) {
                 $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
 
                 if ($m === 'App') {
@@ -175,10 +175,10 @@ if (!function_exists('models')) {
      *
      * @return list<class-string<Illuminate\Database\Eloquent\Model>>
      */
-    function models(bool $onlyActives = true, ?string $module = null): array
+    function models(bool $onlyActive = true, ?string $module = null): array
     {
         $models = [];
-        $modules = modules(true, true, $onlyActives, $module);
+        $modules = modules(true, true, $onlyActive, $module);
 
         foreach ($modules as $m) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $m);
@@ -226,34 +226,69 @@ if (!function_exists('controllers')) {
      *
      * @psalm-return list{0?: string,...}
      */
-    function controllers(bool $onlyActives = true): array
+    function controllers(bool $onlyActive = true): array
     {
-        $models = [];
-        $modules = modules(true, true, $onlyActives);
+        $controllers = [];
+        $modules = modules(true, true, $onlyActive);
 
         foreach ($modules as $m) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $m);
-            $modules_models_folder = config('modules.paths.generator.controller.path');
-            $controllers_path = $m . DIRECTORY_SEPARATOR . ($is_app ? 'Http' . DIRECTORY_SEPARATOR . 'Controllers' : $modules_models_folder);
+            $modules_controllers_folder = config('modules.paths.generator.controller.path');
+            $controllers_path = $m . DIRECTORY_SEPARATOR . ($is_app ? 'Http' . DIRECTORY_SEPARATOR . 'Controllers' : $modules_controllers_folder);
             $controllers_files = File::allFiles($controllers_path);
 
             if ($is_app) {
                 $namespace = 'App\\Http\\Controllers\\';
             } else {
                 $module_name = basename($m);
-                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, str_replace(DIRECTORY_SEPARATOR, '\\', $modules_models_folder));
+                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, str_replace(DIRECTORY_SEPARATOR, '\\', $modules_controllers_folder));
             }
 
             foreach ($controllers_files as $controller_file) {
                 $name = $controller_file->getFilenameWithoutExtension();
 
                 if ($name !== 'Controller' && mb_strpos($name, 'Abstract') === false) {
-                    $models[] = $namespace . $name;
+                    $controllers[] = $namespace . $name;
                 }
             }
         }
 
-        return $models;
+        return $controllers;
+    }
+}
+
+if (!function_exists('routes')) {
+    /**
+     * list all Controllers.
+     *
+     * @return string[]
+     *
+     * @psalm-return list{0?: string,...}
+     */
+    function routes(bool $onlyActive = true): array
+    {
+        $routes = [];
+        $modules = modules(true, false, $onlyActive);
+
+        $all_routes = array_map(fn ($route) => [
+            'uri' => $route->uri,
+            'methods' => implode('|', $route->methods),
+            'name' => $route->action['as'] ?? null,
+            'namespace' => $route->action['namespace'] ?? null
+        ], app('router')->getRoutes()->getRoutes());
+
+        foreach ($all_routes as $route) {
+            if (!$route['namespace']) {
+                $routes[] = $route;
+            } else {
+                $exploded = explode('\\', $route['namespace']);
+                if ($exploded[0] !== 'Modules' || in_array($exploded[1], $modules)) {
+                    $routes[] = $route;
+                }
+            }
+        }
+
+        return $routes;
     }
 }
 

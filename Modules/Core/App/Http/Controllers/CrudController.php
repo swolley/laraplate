@@ -30,13 +30,13 @@ use Modules\Core\App\Casts\FiltersGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\App\Models\Modification;
 use Modules\Core\Locking\Traits\HasLocks;
-use Mpociot\Versionable\VersionableTrait;
 use Modules\Core\App\Casts\FilterOperator;
 use Modules\Core\App\Casts\CrudRequestData;
 use Modules\Core\App\Casts\ListRequestData;
 use Modules\Core\App\Casts\TreeRequestData;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Core\App\Casts\IParsableRequest;
+use Overtrue\LaravelVersionable\Versionable;
 use Modules\Core\App\Casts\DetailRequestData;
 use Modules\Core\App\Casts\ModifyRequestData;
 use Modules\Core\App\Casts\SelectRequestData;
@@ -84,7 +84,7 @@ class CrudController extends Controller
      */
     private function hasHistory(Model $model): bool
     {
-        return class_uses_trait($model, VersionableTrait::class);
+        return class_uses_trait($model, Versionable::class);
     }
 
     private function isParsableRequest(Request $request): bool

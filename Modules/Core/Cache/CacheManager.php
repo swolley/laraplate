@@ -153,7 +153,6 @@ class CacheManager
     {
         $tags = ['U' . $user->id];
 
-        // FIXME: fa schifo ma nell'immediato non ho altre idee
         if (method_exists($user, 'groups')) {
             $group_method = 'groups';
         } elseif (method_exists($user, 'user_groups')) {
