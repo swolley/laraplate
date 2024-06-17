@@ -8,6 +8,8 @@ use ArrayAccess;
 use Illuminate\Support\Str;
 use UnexpectedValueException;
 use Nwidart\Modules\Facades\Module;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use NextApps\SwaggerUi\Http\Controllers\OpenApiJsonController;
 
 class DocsController extends OpenApiJsonController
@@ -22,7 +24,6 @@ class DocsController extends OpenApiJsonController
         $all_modules = modules(true, false, false);
         $all_models = models(false);
         $all_controllers = controllers(false);
-        $all_routes = routes(false);
 
         $grouped = [];
 
@@ -35,13 +36,6 @@ class DocsController extends OpenApiJsonController
                 if (Str::startsWith($model, $module) || Str::startsWith($model, "Modules\\$module")) {
                     $grouped[$module]['models'][] = $model;
                     unset($all_models[$i]);
-                }
-            }
-
-            foreach ($all_routes as $i => $route) {
-                if ((!$route['namespace'] && $module === 'App') || Str::startsWith($model, "Modules\\$module")) {
-                    $grouped[$module]['routes'][] = $route;
-                    unset($all_routes[$i]);
                 }
             }
 
@@ -91,32 +85,38 @@ class DocsController extends OpenApiJsonController
      *
      * @psalm-return \ArrayAccess|array{paths: mixed,...}
      */
-    protected function getJson(string $path): array
+    protected function getJson(string $version): array
     {
-        $assets = resource_path('swagger') . DIRECTORY_SEPARATOR;
-        $files = glob($assets . '*-swagger.json');
-        $modules = modules(false, false, true);
+        /** @var array */
+        $main_json = Cache::remember(RequestFacade::route()->getName() . $version, config('cache.duration'), function () use ($version) {
+            $assets = resource_path('swagger') . DIRECTORY_SEPARATOR;
+            $files = glob($assets . '*-swagger.json');
+            $modules = modules(true, false, true);
 
-        $additionalPaths = [];
+            $additionalPaths = [];
 
-        foreach ($files as $file) {
-            $short_name = str_replace($assets, '', $file);
+            foreach ($files as $file) {
+                $short_name = str_replace($assets, '', $file);
 
-            /** @var array{paths: mixed,...} */
-            $json = json_decode(file_get_contents($file), true);
-            $json['paths'] = array_filter($json['paths'], fn ($k) => Str::contains($k, $path) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY);
+                /** @var array{paths: mixed,...} */
+                $json = json_decode(file_get_contents($file), true);
+                $json['paths'] = array_filter($json['paths'], function ($k) use ($version) {
+                    return Str::contains($k, $version) || !Str::contains($k, '/api/');
+                }, ARRAY_FILTER_USE_KEY);
 
-            if (mb_strpos($short_name, 'App') === 0) {
-                $main_json = $json;
-            } elseif (in_array(str_replace([$assets, '-swagger.json'], '', $file), $modules, true)) {
-                $additionalPaths = array_merge($additionalPaths, array_filter($json['paths'], fn (string $k) => Str::contains($k, $path) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY));
+                if (mb_strpos($short_name, 'App') === 0) {
+                    $main_json = $json;
+                } elseif (in_array(str_replace([$assets, '-swagger.json'], '', $file), $modules, true)) {
+                    $additionalPaths = array_merge($additionalPaths, array_filter($json['paths'], fn (string $k) => Str::contains($k, $version) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY));
+                }
             }
-        }
 
-        if (!empty($additionalPaths)) {
-            $main_json['paths'] = array_merge($main_json['paths'], $additionalPaths);
-        }
-        // if (!$main_json || empty($main_json['paths'])) throw new \UnexpectedValueException("No documentation found");
+            if (!empty($additionalPaths)) {
+                $main_json['paths'] = array_merge($main_json['paths'], $additionalPaths);
+            }
+
+            return $main_json;
+        });
 
         return $main_json;
     }

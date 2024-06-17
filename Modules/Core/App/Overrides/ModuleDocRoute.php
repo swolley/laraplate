@@ -26,12 +26,14 @@ class ModuleDocRoute extends Route
 
     public function name(): ?string
     {
-        return $this->reflectedRoute->action['as'];
+        return $this->reflectedRoute->action['as'] ?? null;
     }
 
     public function group()
     {
-        $exploded = explode('.', $this->name());
+        $name = $this->name();
+        if (!$name) return '';
+        $exploded = explode('.', $name);
 
         return array_shift($exploded);
     }

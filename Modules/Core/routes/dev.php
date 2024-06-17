@@ -9,5 +9,6 @@ Route::controller(DocsController::class)->name('docs.')->group(function (): void
 		Route::get('/', 'welcome')->name('welcome');
 		Route::get('/phpinfo', 'phpinfo')->name('phpinfo');
 	}
-	Route::get('app/swagger/{filename}', 'mergeDocs')->name('swaggerDocs');
+
+	Route::get('docs/{filename}', 'mergeDocs')->name('swaggerDocs')->where('filename', 'v\d');
 });

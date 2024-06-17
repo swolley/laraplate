@@ -7,7 +7,6 @@ namespace Modules\Core\App\Providers;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use Log;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -42,7 +41,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware(['web'])
+        Route::middleware('web')
             ->namespace($this->moduleNamespace)
             // ->prefix('app')
             ->name('core.')
@@ -50,7 +49,7 @@ class RouteServiceProvider extends ServiceProvider
                 module_path('Core', '/routes/dev.php'),
             ]);
 
-        Route::middleware(['web', 'verified'])
+        Route::middleware(['web'/*, 'verified'*/])
             ->namespace($this->moduleNamespace)
             ->prefix('app')
             ->name('core.')
@@ -68,8 +67,8 @@ class RouteServiceProvider extends ServiceProvider
             ->namespace($this->moduleNamespace)
             ->group(module_path('Core', '/routes/info.php'));
 
-        // fake reset password for fortify notifications geneation. Url can be modified, but name must be 'password.reset' !!
-        Route::get('/reset-password', function () {
+        // fake reset password for fortify notifications generation. Url can be modified, but name must be 'password.reset' !!
+        Route::get('/app/auth/reset-password', function () {
             return abort(Response::HTTP_MOVED_PERMANENTLY);
         })->name('password.reset');
     }
@@ -84,7 +83,7 @@ class RouteServiceProvider extends ServiceProvider
         if (config('core.expose_crud_api')) {
             Route::prefix('api/v1')
                 ->middleware(['api'])
-                ->name('api.')
+                ->name('core.api.')
                 ->namespace($this->moduleNamespace)
                 ->group([
                     module_path('Core', '/routes/crud.php'),

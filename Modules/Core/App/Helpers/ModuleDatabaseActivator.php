@@ -64,7 +64,7 @@ class ModuleDatabaseActivator implements ActivatorInterface
 
             if (!Setting::where('name', static::RECORD_NAME)->exists()) {
                 static::seedBackendModules();
-                Log::info('Created Setting \'{name}\' config record', ['name' => static::RECORD_NAME]);
+                Log::info("Created Setting '{name}' config record", ['name' => static::RECORD_NAME]);
             }
 
             return true;

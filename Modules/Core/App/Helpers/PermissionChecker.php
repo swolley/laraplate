@@ -39,7 +39,7 @@ class PermissionChecker
             }
 
             if (!$user) {
-                // TEMP: temporaneo da eliminare dopo lo sviluppo dei componenti e i test
+                // TODO: temporaneo da eliminare dopo lo sviluppo dei componenti e i test
                 $user = user_class()::whereName('root')->first();
 
                 // $user = user_class()::whereName('anonymous')->first();

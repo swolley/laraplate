@@ -43,6 +43,44 @@ npx husky add .husky\commit-msg "npx --no -- commitlint --edit $1"
 npx commitizen init cz-conventional-changelog --save-dev --save-exact
 ```
 
+### Elasticsearch Configurations
+
+https://jeroeng.dev/blog/exploring-elasticsearch-with-laravel-scout/
+
+```php
+// config/explorer.php
+
+'indexes' => [
+    \App\Models\...::class
+],
+```
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use JeroenG\Explorer\Application\Explored;
+use Laravel\Scout\Searchable;
+
+class ... extends Model implements Explored
+{
+    use Searchable;
+
+    public function mappableAs(): array
+    {
+        return [
+            'id' => 'keyword',
+            'title' => 'text',
+            'published' => 'boolean',
+            'created_at' => 'date',
+        ];
+    }
+}
+```
+
 ### Laravel-boilerplate Modules
 
 -   Core: main common boilerplate funzionalities. About [Core Module](./Modules/Core/README.md).

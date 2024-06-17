@@ -24,13 +24,13 @@ class ModuleDocGenerator extends Generator
      */
     protected function getAppRoutes(): array
     {
-        $all_routes = app('router')->getRoutes()->getRoutes();
+        $module = Str::replace('Modules\\', '', $this->module);
+        $all_module_routes = routes(false, $module);
         $module_routes = [];
 
-        foreach ($all_routes as $route) {
+        foreach ($all_module_routes as $route) {
             if (
-                mb_strpos($route->getControllerClass(), $this->module) === 0
-                && (!isset($this->config['ignoredRoutes']) || !in_array($route->getName(), $this->config['ignoredRoutes'], true))
+                !isset($this->config['ignoredRoutes']) || !in_array($route->getName(), $this->config['ignoredRoutes'], true)
             ) {
                 $module_routes[] = new ModuleDocRoute($route);
             }
@@ -42,25 +42,25 @@ class ModuleDocGenerator extends Generator
     protected function generatePath(): void
     {
         parent::generatePath();
-        $operationId = $this->method . '.' . $this->route->name();
-        $group = $this->route->group();
-        $module = Str::replace('Modules\\', '', $this->module);
+        $uri = $this->route->uri();
+        $operationId = $this->method . str_replace(['/', '{', '}'], ['-', '', ''], $uri);
+        $group = Str::contains($uri, '/app/') ? 'App' : (Str::contains($uri, '/api/') ? 'Api' : 'Others');
         $path_method = &$this->docs['paths'][$this->route->uri()][$this->method];
         $path_method['operationId'] = $operationId;
-        $path_method['tags'] = [$module . ($group && mb_strtolower($group) !== mb_strtolower($module) ? '/' . ucfirst($group) : '')];
+        $path_method['tags'] = [$group];
 
-        if (Str::contains($this->route->uri(), '/api/')) {
+        /*if (Str::contains($this->route->uri(), '/api/')) {
             $path_method['responses']['200']['content'] = [
                 'application/json' => [
                     'schema' => [
                         'type' => 'object',
                     ],
                 ],
-                'application/xml' => [
-                    'schema' => [
-                        'type' => 'object',
-                    ],
-                ],
+            ];
+        } else*/
+        if ($this->route->uri() === '/up') {
+            $path_method['responses']['200']['content'] = [
+                'text/html' => [],
             ];
         }
     }

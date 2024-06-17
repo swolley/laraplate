@@ -11,18 +11,6 @@
  */
 
 
-namespace App\Models{
-/**
- * this can result in a remarkable loss of performances
- *
- * @package App\Models
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Accumulator newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Accumulator newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Accumulator query()
- */
-	class Accumulator extends \Eloquent {}
-}
-
 namespace Modules\Core\App\Models{
 /**
  * 
@@ -290,57 +278,6 @@ namespace Modules\Core\App\Models{
 	class Permission extends \Eloquent {}
 }
 
-namespace Modules\Core\App\Models\Pivot{
-/**
- * Modules\Core\App\Models\Pivot\ModelHasPermissions.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasPermissions newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasPermissions newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasPermissions query()
- * @mixin \Eloquent
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read int|null $versions_count
- */
-	class ModelHasPermissions extends \Eloquent {}
-}
-
-namespace Modules\Core\App\Models\Pivot{
-/**
- * Modules\Core\App\Models\Pivot\ModelHasRoles.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasRoles newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasRoles newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|ModelHasRoles query()
- * @mixin \Eloquent
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read int|null $versions_count
- */
-	class ModelHasRoles extends \Eloquent {}
-}
-
-namespace Modules\Core\App\Models\Pivot{
-/**
- * Modules\Core\App\Models\Pivot\RoleHasPermissions.
- *
- * @method static \Illuminate\Database\Eloquent\Builder|RoleHasPermissions newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RoleHasPermissions newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|RoleHasPermissions query()
- * @mixin \Eloquent
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read int|null $versions_count
- */
-	class RoleHasPermissions extends \Eloquent {}
-}
-
 namespace Modules\Core\App\Models{
 /**
  * 
@@ -585,43 +522,5 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereUserId($value)
  */
 	class UserGridConfig extends \Eloquent {}
-}
-
-namespace Modules\Core\App\Models{
-/**
- * 
- *
- * @property int $id
- * @property string|null $table_ref
- * @property string|null $connection_ref
- * @property int|null $user_id
- * @property string $versionable_type
- * @property int $versionable_id
- * @property array|null $contents
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Modules\Core\App\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $versionable
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Overtrue\LaravelVersionable\Version orderLatestFirst()
- * @method static \Illuminate\Database\Eloquent\Builder|\Overtrue\LaravelVersionable\Version orderOldestFirst()
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version query()
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereConnectionRef($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereContents($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereTableRef($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereVersionableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version whereVersionableType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Version withoutTrashed()
- */
-	class Version extends \Eloquent {}
 }
 

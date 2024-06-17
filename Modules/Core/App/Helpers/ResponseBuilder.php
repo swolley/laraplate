@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\Response;
@@ -95,7 +96,7 @@ class ResponseBuilder
             } elseif (is_object($data)) {
                 $this->setClass($data);
             }
-        } elseif ($data instanceof Collection || Arr::isList($data)) {
+        } elseif ($data instanceof Collection || (is_array($data) && Arr::isList($data))) {
             $this->resourceResponse = new ResourceCollection($data);
 
             if (!empty($data)) {
@@ -371,7 +372,7 @@ class ResponseBuilder
         return $this->resourceResponse->toArray($this->request);
     }
 
-    public function json(): Response
+    public function json(): JsonResponse
     {
         return response()->json($this->toArray(), $this->status, $this->headers);
     }

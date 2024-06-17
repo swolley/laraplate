@@ -27,14 +27,13 @@ class ListRequest extends SelectRequest
         return $rules;
     }
 
-
-
     #[\Override]
     protected function prepareForValidation()
     {
         parent::prepareForValidation();
 
         $to_merge = [];
+
         if (isset($this->sort)) {
             $to_merge['sort'] = is_string($this->sort) && is_json($this->sort) ? json_decode($this->sort, true) : (is_string($this->sort) ? preg_split("/,\s?/", $this->sort) : $this->sort);
         }

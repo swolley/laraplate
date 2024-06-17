@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Modules\Core\App\Helpers\CommonMigrationColumns;
 
-class CreateDisapprovalsTable extends Migration
+return new class() extends Migration
 {
     /**
      * Run the migrations.
@@ -36,4 +36,4 @@ class CreateDisapprovalsTable extends Migration
     {
         Schema::dropIfExists('disapprovals');
     }
-}
+};

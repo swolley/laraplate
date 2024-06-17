@@ -154,7 +154,9 @@ return [
     |
     */
 
-    'ignored_models' => [],
+    'ignored_models' => [
+        'Modules\\Core\\App\\Models\\Version'
+    ],
 
     /*
     |--------------------------------------------------------------------------

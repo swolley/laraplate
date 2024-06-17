@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Models;
 
-use Override;
 use Illuminate\Support\Collection;
 use Modules\Core\Locking\Traits\HasLocks;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Role as BaseRole;
 use Modules\Core\App\Helpers\HasCommonObserver;
-use Modules\Core\App\Models\Pivot\ModelHasRoles;
+use Modules\Core\Database\Factories\RoleFactory;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Modules\Core\App\Models\Pivot\RoleHasPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Modules\Core\Database\Factories\RoleFactory;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Role extends BaseRole
@@ -108,17 +104,5 @@ class Role extends BaseRole
         }
 
         return false;
-    }
-
-    #[Override]
-    public function permissions(): BelongsToMany
-    {
-        return parent::permissions()->using(RoleHasPermissions::class)->withTimestamps();
-    }
-
-    #[Override]
-    public function users(): BelongsToMany
-    {
-        return parent::users()->using(ModelHasRoles::class)->withTimestamps();
     }
 }

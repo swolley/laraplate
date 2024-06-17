@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\App\Models\DynamicEntity;
 use Overtrue\LaravelVersionable\Versionable;
+use Overtrue\LaravelVersionable\VersionStrategy;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Overtrue\LaravelVersionable\Version as OvertrueVersion;
 
 class Version extends OvertrueVersion
@@ -38,8 +40,9 @@ class Version extends OvertrueVersion
      * @psalm-suppress MoreSpecificReturnType
      */
     #[\Override]
-    public static function createForModel(Model|Versionable $model, $attributes = [], $time = null): static
+    public static function createForModel(Model|Versionable $model, $replacements = [], $time = null): Version
     {
+        /** @var \Overtrue\LaravelVersionable\Versionable|Model $model */
         $versionClass = $model->getVersionModel();
         $versionConnection = $model->getConnectionName();
 
@@ -53,7 +56,8 @@ class Version extends OvertrueVersion
             $version->table_ref = $model->getTable();
         }
         $version->{\config('versionable.user_foreign_key')} = $model->getVersionUserId();
-        $version->contents = $model->getVersionableAttributes($attributes);
+        $version->contents = $model->getVersionableAttributes($replacements);
+
         /** @var \DateTimeInterface|null|string $time */
         if ($time) {
             $version->created_at = Carbon::parse($time);
@@ -65,10 +69,12 @@ class Version extends OvertrueVersion
         return $version;
     }
 
-    private function getCompleteVersionable(): Model
+    private function getCompleteVersionable(): ?Model
     {
         /** @var Model */
         $versionable = $this->versionable;
+        if (!$versionable) return null;
+
         if ($this->versionable_type) {
             if ($this->connection_ref) {
                 $versionable->setConnection($this->connection_ref);
@@ -81,33 +87,60 @@ class Version extends OvertrueVersion
         return $versionable;
     }
 
+    #[\Override]
     public function revertWithoutSaving(): ?Model
     {
         $versionable = $this->getCompleteVersionable();
+        if (!$versionable) return null;
 
-        return $versionable->forceFill($this->contents ?? []);
+        $original = $versionable->getRawOriginal();
+        switch ($versionable->getVersionStrategy()) {
+            case VersionStrategy::DIFF:
+                // v1 + ... + vN
+                $versionsBeforeThis = $this->previousVersions()->orderOldestFirst()->get();
+                foreach ($versionsBeforeThis as $version) {
+                    if (!empty($version->contents)) {
+                        $versionable->setRawAttributes(array_merge($original, $version->contents));
+                    }
+                }
+                break;
+            case VersionStrategy::SNAPSHOT:
+                // v1 + vN
+                /** @var \Overtrue\LaravelVersionable\Version $initVersion */
+                $initVersion = $versionable->versions()->first();
+                if (!empty($initVersion->contents)) {
+                    $versionable->setRawAttributes(array_merge($original, $initVersion->contents));
+                }
+        }
+
+        if (!empty($this->contents)) {
+            $versionable->setRawAttributes(array_merge($original, $this->contents));
+        }
+
+        return $versionable;
     }
 
-    public function previousVersion(): ?static
+    #[\Override]
+    public function previousVersions(): MorphMany
     {
         $versionable = $this->getCompleteVersionable();
 
-        return $versionable->history()
+        return $versionable->latestVersions()
             ->where(function (Builder $query) {
                 $query->where('created_at', '<', $this->created_at)
                     ->orWhere(function (Builder $q) {
                         $q->where('id', '<', $this->getKey())
                             ->where('created_at', '<=', $this->created_at);
                     });
-            })
-            ->first();
+            });
     }
 
+    #[\Override]
     public function nextVersion(): ?static
     {
         $versionable = $this->getCompleteVersionable();
 
-        return $versionable->versions()
+        return $versionable?->versions()
             ->where(function (Builder $query) {
                 $query->where('created_at', '>', $this->created_at)
                     ->orWhere(function (Builder $q) {

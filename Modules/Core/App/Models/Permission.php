@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Models;
 
-use Modules\Core\Database\Factories\PermissionFactory;
-use Override;
 use Modules\Core\App\Casts\ActionEnum;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\App\Helpers\HasCommonObserver;
-use Modules\Core\App\Models\Pivot\RoleHasPermissions;
-use Modules\Core\App\Models\Pivot\ModelHasPermissions;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Core\Database\Factories\PermissionFactory;
 use Spatie\Permission\Models\Permission as ModelsPermission;
 
 class Permission extends ModelsPermission
@@ -63,18 +59,6 @@ class Permission extends ModelsPermission
     protected static function newFactory(): PermissionFactory
     {
         return PermissionFactory::new();
-    }
-
-    #[Override]
-    public function roles(): BelongsToMany
-    {
-        return parent::roles()->using(RoleHasPermissions::class)->withTimestamps();
-    }
-
-    #[Override]
-    public function users(): BelongsToMany
-    {
-        return parent::users()->using(ModelHasPermissions::class)->withTimestamps();
     }
 
     protected function getActionAttribute(): ?ActionEnum

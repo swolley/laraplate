@@ -6,14 +6,18 @@ namespace Modules\Core\App\Http\Controllers;
 
 use Throwable;
 use RuntimeException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Doctrine\DBAL\Exception;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Modules\Core\App\Models\Setting;
+use Illuminate\Support\Facades\Cache;
 use Modules\Core\App\Helpers\ResponseBuilder;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
 
@@ -32,31 +36,46 @@ class SettingController extends Controller
         if ($lang) {
             $lang = mb_substr($lang, 0, 2);
         }
-        $languages = translations(true);
-        $translations = [];
 
-        foreach ($languages as $language) {
-            $short_name = explode(DIRECTORY_SEPARATOR, $language);
-            $short_name = array_pop($short_name);
+        $translations = Cache::remember(RequestFacade::route()->getName() . $lang, config('cache.duration'), function () use ($lang) {
+            $languages = translations(true, true);
+            $translations = [];
 
-            if ($lang && $short_name !== $lang) {
-                continue;
-            }
+            $default_locale = App::getLocale();
+            usort($languages, function ($a, $b) use ($default_locale) {
+                if (Str::endsWith($a, DIRECTORY_SEPARATOR . $default_locale)) return -1;
+                if (Str::endsWith($b, DIRECTORY_SEPARATOR . $default_locale)) return 1;
+                return $a <=> $b;
+            });
 
-            /** @var string[] */
-            $files = glob($language . '/*.php');
+            foreach ($languages as $language) {
+                $short_name = explode(DIRECTORY_SEPARATOR, $language);
+                $short_name = array_pop($short_name);
 
-            foreach ($files as $file) {
-                /** @psalm-suppress UnresolvableInclude */
-                $contents = include $file;
-
-                if ($lang) {
-                    $translations[basename($file, '.php')] = $contents;
-                } else {
-                    $translations[$short_name][basename($file, '.php')] = $contents;
+                if ($lang && $short_name !== $lang) {
+                    continue;
                 }
+
+                /** @var string[] */
+                $files = glob($language . '/*.php');
+
+                foreach ($files as $file) {
+                    $contents = include $file;
+
+                    if ($lang) {
+                        $translations[basename($file, '.php')] = $contents;
+                    } else {
+                        $translations[$short_name][basename($file, '.php')] = $contents;
+                    }
+                }
+
+                $translations[$short_name] = Arr::dot($translations[$short_name]);
+                // key always exists because $languages is sorted with $default_locale as the first item
+                if ($short_name !== $default_locale && array_key_exists($default_locale, $translations)) $translations[$short_name] = array_merge($translations[$default_locale], $translations[$short_name]);
             }
-        }
+
+            return $translations;
+        });
 
         return (new ResponseBuilder($request))
             ->setData($translations)
@@ -73,14 +92,15 @@ class SettingController extends Controller
      */
     public function getSiteConfigs(Request $request): HttpFoundationResponse
     {
-        $settings = [];
+        $settings = Cache::remember(RequestFacade::route()->getName(), config('cache.duration'), function () {
+            $settings = [];
+            foreach (Setting::get() as $s) {
+                $settings[$s->name] = $s->value;
+            }
 
-        foreach (Setting::get() as $s) {
-            $settings[$s->name] = $s->value;
-        }
-
-        $settings['modules'] = modules();
-        $settings['app_name'] = config('app.name');
+            $settings['active_modules'] = modules();
+            return $settings;
+        });
 
         return (new ResponseBuilder($request))
             ->setData($settings)
@@ -101,31 +121,12 @@ class SettingController extends Controller
     public function siteInfo(Request $request): HttpFoundationResponse
     {
         $data = [
+            'name' => config('app.name'),
             'version' => version(),
-            'db' => $this->db(),
         ];
 
         return (new ResponseBuilder($request))
             ->setData($data)
             ->json();
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     * @throws Exception
-     * @throws RuntimeException
-     *
-     * @psalm-return array{driver: mixed, dbname: mixed}
-     */
-    private function db(): array
-    {
-        $connection = DB::connection();
-
-        $config = $connection->getConfig();
-
-        return [
-            'driver' => $config['driver'],
-            'dbname' => $config['database'],
-        ];
     }
 }

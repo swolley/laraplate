@@ -22,14 +22,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Modules\Core\App\Helpers\HasCommonObserver;
-use Modules\Core\App\Models\Pivot\ModelHasRoles;
 use Modules\Core\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Lab404\Impersonate\Services\ImpersonateManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Core\App\Models\Pivot\ModelHasPermissions;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -152,12 +150,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function permissions(): BelongsToMany
     {
-        return $this->defaultPermissions()->using(ModelHasPermissions::class)->withTimestamps();
+        return $this->defaultPermissions();
     }
 
     public function roles(): BelongsToMany
     {
-        return $this->defaultRoles()->using(ModelHasRoles::class)->withTimestamps();
+        return $this->defaultRoles();
     }
 
     public function grid_configs(): HasMany

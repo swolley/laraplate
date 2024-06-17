@@ -120,9 +120,8 @@ class CrudController extends Controller
      */
     private function executeOperation(Request|IParsableRequest $request, Closure $operation): Response
     {
-        $filters = $this->isParsableRequest($request) ? $request->parsed() : $request->validated();
-
         $response_builder = new ResponseBuilder($request);
+        $filters = $this->isParsableRequest($request) ? $request->parsed() : $request->validated();
 
         try {
             $response_builder = $operation($response_builder, $filters);
@@ -285,7 +284,7 @@ class CrudController extends Controller
      */
     private function applyRelations(Builder $query, array $relations, array &$relations_columns, array &$relations_sorts): void
     {
-        $merged_relations = array_unique(array_merge($relations, array_keys($relations_columns), array_keys($relations_sorts)));
+        $merged_relations = array_unique(array_merge($relations, array_keys($relations_sorts), array_keys($relations_columns)));
         $this->cleanRelations($relations);
 
         $withs = [];
@@ -359,17 +358,34 @@ class CrudController extends Controller
         $main_model = $query->getModel();
         $main_entity = $main_model->getTable();
         $relations_sorts = [];
+        $relations_columns = [];
 
         $columns = static::groupColumns($main_entity, $filters->columns);
-        if (!empty($columns['main'])) {
-            static::sortColumns($query, $columns['main']);
-            $only_standard_columns = [];
-            foreach ($columns['main'] as $column) {
-                if ($column->type === ColumnType::COLUMN) {
-                    $only_standard_columns[] = $column->name;
+        foreach ($columns as $type => $cols) {
+            if ($type === 'main' && !empty($cols)) {
+                static::sortColumns($query, $cols);
+                $only_standard_columns = [];
+                foreach ($cols as $column) {
+                    if ($column->type === ColumnType::COLUMN) {
+                        $only_standard_columns[] = $column->name;
+                    }
+                }
+                $query->select($only_standard_columns);
+            } else if ($type === 'relations' && !empty($cols)) {
+                foreach ($cols as $relation => $relation_cols) {
+                    // static::sortColumns($query, $relation_cols);
+                    $only_relation_columns = [];
+                    foreach ($relation_cols as $column) {
+                        if ($column->type === ColumnType::COLUMN) {
+                            $only_relation_columns[] = $column;
+                        }
+                    }
+                    $relations_columns[$relation] = $only_relation_columns;
+                    if (!in_array($relation, $filters->relations)) {
+                        $filters->relations[] = $relation;
+                    }
                 }
             }
-            $query->select($only_standard_columns);
         }
 
         if ($filters instanceof ListRequestData) {
@@ -389,15 +405,16 @@ class CrudController extends Controller
                     }
                 }
             }
-            if (isset($filters->group_by)) {
-                $filters->group_by = array_map(fn (string $group) => str_replace($main_entity . '.', '', $group), $filters->group_by);
-            }
-            if (isset($filters->filters)) {
-                $this->recursivelyApplyFilters($query, $filters->filters, $columns['relations']);
-            }
-            if (isset($filters->relations) || !empty($relations_columns)) {
-                $this->applyRelations($query, $filters->relations ?? [], $relations_columns, $relations_sorts);
-            }
+            // if (isset($filters->group_by)) {
+            //     $filters->group_by = array_map(fn (string $group) => str_replace($main_entity . '.', '', $group), $filters->group_by);
+            // }
+        }
+
+        // if (isset($filters->filters)) {
+        //     $this->recursivelyApplyFilters($query, $filters->filters, $columns['relations']);
+        // }
+        if (!empty($filters->relations)) {
+            $this->applyRelations($query, $filters->relations, $relations_columns, $relations_sorts);
         }
     }
 
@@ -470,7 +487,7 @@ class CrudController extends Controller
      */
     public function list(ListRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ListRequestData $filters): JsonResponse {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ListRequestData $filters): ResponseBuilder {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
@@ -507,7 +524,7 @@ class CrudController extends Controller
      */
     public function detail(DetailRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, DetailRequestData $filters): JsonResponse {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, DetailRequestData $filters): ResponseBuilder {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
@@ -531,7 +548,7 @@ class CrudController extends Controller
      */
     public function history(HistoryRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, HistoryRequestData $filters): JsonResponse {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, HistoryRequestData $filters): ResponseBuilder {
             $model = $filters->model;
             if (!$this->hasHistory($model)) {
                 throw new BadMethodCallException("'$filters->mainEntity' doesn't have history handling");
@@ -567,7 +584,7 @@ class CrudController extends Controller
      */
     public function tree(TreeRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, TreeRequestData $filters): JsonResponse {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, TreeRequestData $filters): ResponseBuilder {
             $model = $filters->model;
             if (!$this->useRecursiveRelationships($model)) {
                 throw new UnexpectedValueException("'$filters->mainEntity' is not a hierarchical class");

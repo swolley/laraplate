@@ -467,7 +467,7 @@ class Grid extends Entity
     {
         $model_class = lcfirst($this->getModelName());
         foreach ($list as $name => &$field_info) {
-            $field_info = is_callable($field_info) ? $field_info : Field::create(strpos($name, $model_class) === 0 ? $name : "$model_class.$name", readable: $field_info['readable'], writable: $field_info['writable']);
+            $field_info = is_callable($field_info) ? $field_info : Field::create(mb_strpos($name, $model_class) === 0 ? $name : "$model_class.$name", readable: $field_info['readable'], writable: $field_info['writable']);
         }
     }
 

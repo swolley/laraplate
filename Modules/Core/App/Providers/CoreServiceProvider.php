@@ -18,6 +18,12 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Console\Scheduling\Schedule;
 use Modules\Core\Locking\LockedModelSubscriber;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Modules\Core\App\Http\Middleware\PreviewMiddleware;
+use Modules\Core\App\Http\Middleware\ConvertStringToBoolean;
+use Modules\Core\App\Http\Middleware\LocalizationMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 
 class CoreServiceProvider extends ServiceProvider
@@ -48,6 +54,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
         $this->registerAuths();
+        $this->registerMiddlewares();
 
         /** @var \Illuminate\Foundation\Application */
         $app = $this->app;
@@ -166,7 +173,7 @@ class CoreServiceProvider extends ServiceProvider
             if (Schema::hasTable(((new CronJob))->getTable())) {
                 $crons = CronJob::where('is_active', true)->get();
                 foreach ($crons as $cron) {
-                    $schedule->command($cron->command)->cron($cron->schedule);
+                    $schedule->command($cron->command)->cron($cron->schedule)->onOneServer();
                 }
             }
         });
@@ -179,6 +186,17 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->publishes([module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower . '.php')], 'config');
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
+    }
+
+    protected function registerMiddlewares()
+    {
+        $router = app('router');
+        $router->middleware(LocalizationMiddleware::class);
+        $router->middleware(PreviewMiddleware::class);
+        $router->middleware(ConvertStringToBoolean::class);
+        $router->aliasMiddleware('role', RoleMiddleware::class);
+        $router->aliasMiddleware('permission', PermissionMiddleware::class);
+        $router->aliasMiddleware('role_or_permission', RoleOrPermissionMiddleware::class);
     }
 
     private function inspectFolderCommands(string $commandsSubpath)

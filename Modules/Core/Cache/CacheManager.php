@@ -24,7 +24,7 @@ class CacheManager
         return base64_encode($path . ($user ? implode('_', $user) . '_' : '') . serialize($params));
     }
 
-    public static function tryByRequest(Model|string|array|null $entity, Request $request, Closure $callback, int $duration = null): JsonResponse
+    public static function tryByRequest(Model|string|array|null $entity, Request $request, Closure $callback, int $duration = null): mixed
     {
         $tags = [];
         if ($entity) {

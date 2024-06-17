@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Console;
 
+use Illuminate\Support\Str;
 use Nwidart\Modules\Facades\Module;
 use Mtrajano\LaravelSwagger\FormatterManager;
 use Modules\Core\App\Overrides\ModuleDocGenerator;
@@ -36,9 +37,7 @@ class SwaggerGenerateCommand extends BaseGenerateSwaggerDoc
             if (
                 ($module_name !== 'App' && !class_exists(Module::class))
                 || ($module_filter && $module_name !== $module_filter)
-            ) {
-                continue;
-            }
+            ) continue;
 
             $this->moduleHandle($module_name);
         }
@@ -79,6 +78,8 @@ class SwaggerGenerateCommand extends BaseGenerateSwaggerDoc
             ->format();
 
         if ($file) {
+            $folder = Str::beforeLast($file, DIRECTORY_SEPARATOR);
+            if (!file_exists($folder)) mkdir($folder, recursive: true);
             file_put_contents($file, $formattedDocs);
         } else {
             $this->line($formattedDocs);

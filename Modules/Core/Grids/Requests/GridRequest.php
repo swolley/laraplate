@@ -17,7 +17,7 @@ class GridRequest extends FormRequest implements IParsableRequest
 
     public function rules()
     {
-        $actions = implode(',', array_filter(GridAction::values(), fn ($action) => $action !== GridAction::COUNT));
+        $actions = implode(',', GridAction::values());
 
         $grid_rules = [
             'action' => ["in:$actions"],
@@ -52,7 +52,6 @@ class GridRequest extends FormRequest implements IParsableRequest
             case GridAction::OPTIONS:
                 $this->realRequest = ListRequest::createFrom($this);
                 break;
-
                 // case GridAction::LAYOUT:
                 // case GridAction::COUNT:
             case GridAction::INSERT:
@@ -62,7 +61,7 @@ class GridRequest extends FormRequest implements IParsableRequest
             case GridAction::CHECK:
             case GridAction::FORCE_DELETE:
             case GridAction::DELETE:
-            case GridAction::RESTORE:
+                // case GridAction::RESTORE:
                 break;
         }
     }

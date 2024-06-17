@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nwidart\Modules\Module;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
@@ -16,21 +17,22 @@ if (!function_exists('modules')) {
      * @param  bool  $showMainApp  add main app into modules list
      * @param  bool  $fullpath  return only module name or full path on file system
      * @param  bool  $onlyActive  return only active modules
+     * @param  string|null  $onlyModule  filter for specified module
      * @return string[]
      */
-    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $module = null): array
+    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $onlyModule = null): array
     {
         $module_class = 'Nwidart\\Modules\\Facades\\Module';
         $modules = class_exists($module_class) ? ($onlyActive ? $module_class::allEnabled() : $module_class::all()) : [];
 
-        if ($module) {
-            $module = ucfirst($module);
-            $modules = array_filter($modules, fn ($k) => $k === $module || $module === null, ARRAY_FILTER_USE_KEY);
+        if ($onlyModule) {
+            $onlyModule = ucfirst($onlyModule);
+            $modules = array_filter($modules, fn ($k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
 
         $modules = $fullpath ? array_map(fn (Module $m) => $m->getPath(), $modules) : array_keys($modules);
 
-        if ($showMainApp && !$module) {
+        if ($showMainApp && !$onlyModule) {
             if ($fullpath) {
                 $modules['App'] = app_path();
             } else {
@@ -134,15 +136,18 @@ if (!function_exists('migrations')) {
     /**
      * check if there are pending migrations.
      *
-     * @param  bool  $count  return inly count or full list
+     * @param  bool  $count  return only count or full list
+     * @param  bool  $onlyPending  return only pending migrations
+     * @param  bool  $onlyActive  filter for only active modules
+     * @param  string|null  $onlyModule  filter for specified module
      * @return false|int|string[] number if count requested, string[] if list requested, false if error occured
      */
-    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true): array|int|false
+    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true, ?bool $onlyModule = null): array|int|false
     {
         try {
             $found = [];
 
-            foreach (modules(true, false, $onlyActive) as $m) {
+            foreach (modules(true, false, $onlyActive, $onlyModule) as $m) {
                 $output = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true);
 
                 if ($m === 'App') {
@@ -173,12 +178,14 @@ if (!function_exists('models')) {
     /**
      * list all Models.
      *
+     * @param bool $onlyActive filter for only active modules
+     * @param string|null $onlyModule filter for specified module
      * @return list<class-string<Illuminate\Database\Eloquent\Model>>
      */
-    function models(bool $onlyActive = true, ?string $module = null): array
+    function models(bool $onlyActive = true, ?string $onlyModule = null): array
     {
         $models = [];
-        $modules = modules(true, true, $onlyActive, $module);
+        $modules = modules(true, true, $onlyActive, $onlyModule);
 
         foreach ($modules as $m) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $m);
@@ -222,18 +229,21 @@ if (!function_exists('controllers')) {
     /**
      * list all Controllers.
      *
+     * @param bool $onlyActive filter for only active modules
+     * @param string|null $onlyModule filter for specified module
      * @return string[]
      *
      * @psalm-return list{0?: string,...}
      */
-    function controllers(bool $onlyActive = true): array
+    function controllers(bool $onlyActive = true, ?string $onlyModule = null): array
     {
+        $modules_controllers_folder = config('modules.paths.generator.controller.path');
+        $modules = modules(true, true, $onlyActive, $onlyModule);
         $controllers = [];
-        $modules = modules(true, true, $onlyActive);
 
         foreach ($modules as $m) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $m);
-            $modules_controllers_folder = config('modules.paths.generator.controller.path');
+
             $controllers_path = $m . DIRECTORY_SEPARATOR . ($is_app ? 'Http' . DIRECTORY_SEPARATOR . 'Controllers' : $modules_controllers_folder);
             $controllers_files = File::allFiles($controllers_path);
 
@@ -261,28 +271,27 @@ if (!function_exists('routes')) {
     /**
      * list all Controllers.
      *
-     * @return string[]
+     * @param bool $onlyActive filter for only active modules
+     * @param string|null $onlyModule filter for specified module
+     * @return Route[]
      *
      * @psalm-return list{0?: string,...}
      */
-    function routes(bool $onlyActive = true): array
+    function routes(bool $onlyActive = true, ?string $onlyModule = null): array
     {
         $routes = [];
-        $modules = modules(true, false, $onlyActive);
-
-        $all_routes = array_map(fn ($route) => [
-            'uri' => $route->uri,
-            'methods' => implode('|', $route->methods),
-            'name' => $route->action['as'] ?? null,
-            'namespace' => $route->action['namespace'] ?? null
-        ], app('router')->getRoutes()->getRoutes());
+        $modules = modules(true, false, $onlyActive, $onlyModule);
+        $all_routes = app('router')->getRoutes()->getRoutes();
+        usort($all_routes, fn (Route $a, Route $b) => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
-            if (!$route['namespace']) {
-                $routes[] = $route;
+            if (!isset($route->action['namespace'])) {
+                if ((!$onlyModule || $onlyModule === 'App')) {
+                    $routes[] = $route;
+                }
             } else {
-                $exploded = explode('\\', $route['namespace']);
-                if ($exploded[0] !== 'Modules' || in_array($exploded[1], $modules)) {
+                $exploded = explode('\\', $route->action['namespace']);
+                if (($exploded[0] !== 'Modules' && (!$onlyModule || $onlyModule === 'App')) || (in_array($exploded[1], $modules) && (!$onlyModule || $exploded[1] === $onlyModule))) {
                     $routes[] = $route;
                 }
             }

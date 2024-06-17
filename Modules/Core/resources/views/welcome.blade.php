@@ -215,7 +215,7 @@
         dialog {
             padding: 0
         }
-        Str::startsWith($route['namespace'], "Modules\\
+        
         textarea {
             resize: vertical
         }
@@ -1123,7 +1123,7 @@
                                 </div>
 
                                 <div id="docs-card-content" class="flex flex-col gap-2 w-full">
-                                    <a href="./swagger" class="flex items-center justify-center gap-2">
+                                    <a href="{{route('docs.index')}}" class="flex items-center justify-center gap-2">
                                         <div class="flex items-center justify-center" style="min-width:60px;">
                                             @include('core::components.swagger-icon')
                                         </div>
@@ -1131,7 +1131,7 @@
                                         @include('core::components.arrow-icon')
                                     </a>
 
-                                    <a href="./phpinfo" class="flex items-center justify-center gap-2">
+                                    <a href="{{route('core.docs.phpinfo')}}" class="flex items-center justify-center gap-2">
                                         <div class="flex items-center justify-center" style="min-width:60px;">
                                             @include('core::components.php-icon')
                                         </div>
@@ -1152,10 +1152,12 @@
 
                                 <div class="w-full flex flex-col h-full">
                                     <div>
-                                        <h2 class="text-xl font-semibold text-black dark:text-white">{{ $module }}</h2>
-                                        @if (isset($data['version']))
-                                            <span class="text-sm/relaxed">v{{ $data['version'] }}</span>
-                                        @endif
+                                        <h2 class="text-xl font-semibold text-black dark:text-white">
+                                            {{ $module }}
+                                            @if (isset($data['version']))
+                                                <span class="text-sm/relaxed dark:text-white/50">v{{ $data['version'] }}</span>
+                                            @endif
+                                        </h2>
                                     </div>
 
                                     @if (isset($data['description']))
@@ -1164,7 +1166,7 @@
 
                                     <div class="mt-4 text-sm/relaxed flex grow">
                                         <!-- models -->
-                                        <div class="w-1/3 flex flex-col gap-2">
+                                        <div class="w-1/2 flex flex-col gap-2">
                                             <div class="flex items-center justify-center gap-2 py-2">
                                                 @include('core::components.barcode-icon')
                                                 <div>Models</div>
@@ -1183,7 +1185,7 @@
                                         </div>
 
                                         <!-- controllers -->
-                                        <div class="w-1/3 flex flex-col gap-2">
+                                        <div class="w-1/2 flex flex-col gap-2">
                                             <div class="flex items-center justify-center gap-2 py-2">
                                                 @include('core::components.route-icon')
                                                 <div>Controllers</div>
@@ -1202,7 +1204,7 @@
                                         </div>
 
                                         <!-- routes -->
-                                        <div class="w-1/3 flex flex-col gap-2">
+                                        {{-- <div class="w-1/2 flex flex-col gap-2">
                                             <div class="flex items-center justify-center gap-2 py-2">
                                                 @include('core::components.route-icon')
                                                 <div>Routes</div>
@@ -1219,7 +1221,7 @@
                                                     </div>
                                                 @endforeach
                                             @endif
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     @if ($data['authors'] && !empty($data['authors']))

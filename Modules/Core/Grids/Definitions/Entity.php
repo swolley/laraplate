@@ -676,7 +676,7 @@ abstract class Entity
                 } else {
                     $method = lcfirst($method . 'Where');
                     if ($operator === 'like' && is_string($value)) {
-                        $percent_pos = strpos($value, '%');
+                        $percent_pos = mb_strpos($value, '%');
                         if ($percent_pos == false || ($percent_pos !== 0 && $percent_pos !== strlen($value) - 1)) {
                             $value = '%' . strtolower($value) . '%';
                         }
@@ -709,7 +709,7 @@ abstract class Entity
     protected function addSortsIntoQuery(Builder|Relation $query, array $sorts): void
     {
         foreach ($sorts as $order) {
-            if (strpos($order['property'], '.') !== false) {
+            if (mb_strpos($order['property'], '.') !== false) {
                 $exploded = explode('.', $order['property']);
                 $order['property'] = array_pop($exploded);
             }

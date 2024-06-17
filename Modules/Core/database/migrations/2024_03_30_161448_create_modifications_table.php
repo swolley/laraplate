@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Modules\Core\App\Helpers\CommonMigrationColumns;
 
-class CreateModificationsTable extends Migration
+return new class() extends Migration
 {
     /**
      * Run the migrations.
@@ -41,4 +41,4 @@ class CreateModificationsTable extends Migration
     {
         Schema::dropIfExists('modifications');
     }
-}
+};

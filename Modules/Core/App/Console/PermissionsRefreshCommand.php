@@ -123,7 +123,7 @@ class PermissionsRefreshCommand extends Command
                         $permission_class::where('name', $permission_name)->withTrashed()->restore();
 
                         if (!$quiet_mode) {
-                            $this->info("Restored '{$permission_name}' permission" . $new_model_suffix);
+                            $this->info("Restored '{$permission_name}' permission {$new_model_suffix}");
                         }
                         $changes = true;
                     } else {
@@ -132,7 +132,7 @@ class PermissionsRefreshCommand extends Command
                         ]);
 
                         if (!$quiet_mode) {
-                            $this->info("Created '{$permission_name}' permission" . $new_model_suffix);
+                            $this->info("Created '{$permission_name}' permission {$new_model_suffix}");
                         }
                         $changes = true;
                     }
@@ -148,7 +148,7 @@ class PermissionsRefreshCommand extends Command
                     'name' => $permission_name,
                 ])) {
                     if (!$quiet_mode) {
-                        $this->info("Created '{$permission_name}' permission" . $new_model_suffix);
+                        $this->info("Created '{$permission_name}' permission {$new_model_suffix}");
                     }
                     $changes = true;
                 }

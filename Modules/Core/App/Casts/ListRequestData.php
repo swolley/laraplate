@@ -6,7 +6,7 @@ namespace Modules\Core\App\Casts;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Modules\Core\Models\Setting;
+use Modules\Core\App\Models\Setting;
 use Modules\Core\App\Http\Requests\ListRequest;
 
 class ListRequestData extends SelectRequestData

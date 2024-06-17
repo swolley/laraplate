@@ -2,4 +2,11 @@
 
 declare(strict_types=1);
 
-return array_merge(require (__DIR__ . '/../it/pagination.php'), []);
+return [
+	"all" => "Alle",
+	"next" => "Nächste &raquo;",
+	"previous" => "&laquo; Vorherige",
+	"rowsForPage" => "Zeilen pro Seite",
+	"rowsOf" => "Zeilen von",
+	"selected" => "ausgewählt"
+];
