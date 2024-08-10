@@ -1,10 +1,10 @@
 {
-    "name": "willbit/core",
+    "name": "swolley/laraplate-core",
     "description": "Core Module contains all the necessary functionalities for build up a new Laravel application.",
     "authors": [
         {
-            "name": "Marco Panzanaro",
-            "email": "marco.panzanaro@willbit.com"
+            "name": "Swolley",
+            "email": "myentity@inwind.it"
         }
     ],
     "extra": {

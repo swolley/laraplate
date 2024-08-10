@@ -174,10 +174,10 @@ return [
     */
 
     'composer' => [
-        'vendor' => 'willbit',
+        'vendor' => 'swolley',
         'author' => [
-            'name' => 'Marco Panzanaro',
-            'email' => 'marco.panzanaro@willbit.com',
+            'name' => 'Swolley',
+            'email' => 'myentity@inwind.it',
         ],
         'composer-output' => false,
     ],

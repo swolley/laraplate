@@ -6,15 +6,19 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
+
+use function Laravel\Prompts\text;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\App\Models\CronJob;
 use Modules\Core\App\Models\Setting;
+use function Laravel\Prompts\password;
 use Modules\Core\App\Casts\ActionEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
 use Modules\Core\App\Helpers\HasApprovals;
 use Spatie\Permission\PermissionRegistrar;
+
 use Modules\Core\App\Casts\SettingTypeEnum;
 
 class CoreDatabaseSeeder extends Seeder
@@ -112,11 +116,14 @@ class CoreDatabaseSeeder extends Seeder
 
         DB::transaction(function () use ($admin, $root, $anonymous, $user_class) {
             if (!$user_class::whereName($root)->exists()) {
+                $email = text("Please specify a root user email", required: true);
+                $password = password("Please specify a root user password", required: true);
+                password("Please confirm the password", required: true, validate: fn(string $value) => $password !== $value ? 'Passwords don\'t match' : null);
                 $root_user = $this->create($user_class, [
                     'name' => $root,
                     'username' => $root,
-                    'email' => 'sviluppo@willbit.com',
-                    'password' => Hash::make('WillBit07!!'),
+                    'email' => $email,
+                    'password' => Hash::make($password),
                     'email_verified_at' => now(),
                     'locked_at' => now(),
                 ]);

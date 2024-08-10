@@ -1,7 +1,7 @@
 {
-    "name": "willbit/laravel-boilerplate",
+    "name": "swolley/laravel-boilerplate",
     "version": "2.2.0",
-    "vendor": "willbit",
+    "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": [
@@ -10,8 +10,8 @@
     ],
     "authors": [
         {
-            "name": "Marco Panzanaro",
-            "email": "marco.panzanaro@willbit.com"
+            "name": "Swolley",
+            "email": "myentity@inwind.it"
         }
     ],
     "license": "MIT",
