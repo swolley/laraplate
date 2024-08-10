@@ -20,12 +20,14 @@ class DetailRequest extends SelectRequest
             $to_merge['filters'][] = ['property' => $key, 'value' => $this->$key];
         }
 
+        /** @phpstan-ignore method.notFound */
         $this->merge($to_merge);
     }
 
     #[\Override]
     public function parsed(): DetailRequestData
     {
+        /** @phpstan-ignore method.notFound */
         return new DetailRequestData($this, $this->route()->entity, $this->validated(), $this->primaryKey);
     }
 }

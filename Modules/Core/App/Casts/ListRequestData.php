@@ -11,42 +11,66 @@ use Modules\Core\App\Http\Requests\ListRequest;
 
 class ListRequestData extends SelectRequestData
 {
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly int $pagination;
-
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?int $page;
-
     public readonly ?int $skip;
-
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?int $take;
-
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?int $from;
-
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?int $to;
-
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?int $limit;
-
     public readonly bool $count;
-
     public readonly array $sort;
-
     public readonly ?FiltersGroup $filters;
-
-    public array $group_by;
+    public array $group_by = [];
 
     /**
-     * @var string|string[] $primaryKey
+     * @param string|string[] $primaryKey
      */
     public function __construct(ListRequest $request, string $mainEntity, array $validated, string|array $primaryKey)
     {
         parent::__construct($request, $mainEntity, $validated, $primaryKey);
-        $this->conformAndSetPagination($validated);
-        $this->limit = $validated['limit'] ?? $this->pagination;
+        if (isset($validated['pagination']) || isset($validated['page'])) {
+            $this->take = $this->pagination = $validated['pagination'] ?? self::getDefaultPagination();
+            $this->page = $validated['page'] ?? 1;
+            $this->skip = ($this->page - 1) * $this->pagination;
+            $this->from = $this->skip + 1;
+            $this->to = $this->from + $this->pagination;
+        } elseif (isset($validated['from']) || isset($validated['to'])) {
+            $this->from = $validated['from'] ?? 1;
+            $this->skip = $this->from - 1;
+            if ($this->to = $validated['to'] ?? null) {
+                $this->take = $this->pagination = $this->to - $this->from;
+            }
+        } elseif (isset($validated['limit'])) {
+            $this->take = $this->limit = $validated['limit'];
+            $this->page = 0;
+            $this->skip = 0;
+            $this->pagination = $validated['limit'];
+        } else {
+            $this->page = 0;
+            $this->skip = 0;
+            $this->take = $this->pagination = self::getDefaultPagination();
+        }
+        /** @phpstan-ignore property.uninitializedReadonly */
+        if (!isset($this->limit)) {
+            /** @phpstan-ignore property.uninitializedReadonly, assign.readOnlyProperty */
+            $this->limit = $validated['limit'] ?? $this->pagination;
+        }
+
         $this->count = $validated['count'] ?? false;
         $this->sort = $this->conformSorts($validated['sorts'] ?? []);
 
         if (isset($validated['filters'])) {
             $this->conformFiltersToQueryBuilderFormat($validated['filters']);
             $this->filters = $validated['filters'];
+        } else {
+            $this->filters = null;
         }
 
         if (isset($validated['group_by'])) {
@@ -55,9 +79,9 @@ class ListRequestData extends SelectRequestData
         }
     }
 
-    private static function getDefaultPagination(): ?int
+    private static function getDefaultPagination(): int
     {
-        return Setting::whereName('pagination')->first('value')?->value ?? 25;
+        return Setting::where('name', 'pagination')->first('value')?->value ?? 25;
     }
 
     public function calculateTotalPages(int $totalRecords): int
@@ -75,7 +99,7 @@ class ListRequestData extends SelectRequestData
     }
 
     /**
-     * @param array{property: string; value: mixed; operator: FilterOperator} $filter
+     * @param array{property: string, value: mixed, operator: FilterOperator} $filter
      */
     protected function conformFilterValue(array &$filter): void
     {
@@ -109,34 +133,6 @@ class ListRequestData extends SelectRequestData
         }
     }
 
-    private function conformAndSetPagination(array $validated): void
-    {
-        if (isset($validated['pagination']) || isset($validated['page'])) {
-            $this->take = $this->pagination = $validated['pagination'] ?? static::getDefaultPagination();
-            $this->page = $validated['page'] ?? 1;
-            $this->skip = ($this->page - 1) * $this->pagination;
-            $this->from = $this->skip + 1;
-            $this->to = $this->from + $this->pagination;
-        } elseif (isset($validated['from']) || isset($validated['to'])) {
-            $this->from = $validated['from'] ?? 1;
-            $this->skip = $this->from - 1;
-            $this->to = $validated['to'] ?? null;
-
-            if ($this->to) {
-                $this->take = $this->pagination = $this->to - $this->from;
-            }
-        } elseif (isset($validated['limit'])) {
-            $this->take = $this->limit = $validated['limit'];
-            $this->page = 0;
-            $this->skip = 0;
-            $this->pagination = $validated['limit'];
-        } else {
-            $this->page = 0;
-            $this->skip = 0;
-            $this->take = $this->pagination = static::getDefaultPagination();
-        }
-    }
-
     /**
      *
      * @return Sort[]
@@ -156,12 +152,11 @@ class ListRequestData extends SelectRequestData
 
     /**
      * @param  string[]  $groups
-     * @return string[]
      */
     private function addGroupsToColumns(array $groups): void
     {
         if (!empty($this->columns)) {
-            $all_columns_name = array_map(fn ($column) => is_string($column) ? $column : $column['name'], $this->columns);
+            $all_columns_name = array_map(fn (Column $column) => /*is_string($column) ? $column : $column['name']*/ $column->name, $this->columns);
 
             foreach ($groups as $group) {
                 if (!in_array($group, $all_columns_name, true)) {

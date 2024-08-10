@@ -14,6 +14,9 @@ use Overtrue\LaravelVersionable\VersionStrategy;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Overtrue\LaravelVersionable\Version as OvertrueVersion;
 
+/**
+ * @mixin IdeHelperVersion
+ */
 class Version extends OvertrueVersion
 {
     /**
@@ -40,7 +43,7 @@ class Version extends OvertrueVersion
      * @psalm-suppress MoreSpecificReturnType
      */
     #[\Override]
-    public static function createForModel(Model|Versionable $model, $replacements = [], $time = null): Version
+    public static function createForModel(Model $model, $replacements = [], $time = null): Version
     {
         /** @var \Overtrue\LaravelVersionable\Versionable|Model $model */
         $versionClass = $model->getVersionModel();
@@ -56,7 +59,7 @@ class Version extends OvertrueVersion
             $version->table_ref = $model->getTable();
         }
         $version->{\config('versionable.user_foreign_key')} = $model->getVersionUserId();
-        $version->contents = $model->getVersionableAttributes($replacements);
+        $version->contents = $model->getVersionableAttributes(VersionStrategy::DIFF, $replacements);
 
         /** @var \DateTimeInterface|null|string $time */
         if ($time) {
@@ -71,14 +74,17 @@ class Version extends OvertrueVersion
 
     private function getCompleteVersionable(): ?Model
     {
-        /** @var Model */
+        /** @var Model $versionable */
         $versionable = $this->versionable;
         if (!$versionable) return null;
 
+        /** @phpstan-ignore property.notFound */
         if ($this->versionable_type) {
+            /** @phpstan-ignore property.notFound */
             if ($this->connection_ref) {
                 $versionable->setConnection($this->connection_ref);
             }
+            /** @phpstan-ignore property.notFound */
             if ($this->table_ref) {
                 $versionable->setTable($this->table_ref);
             }

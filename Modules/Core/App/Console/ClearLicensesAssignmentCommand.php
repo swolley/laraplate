@@ -5,8 +5,6 @@ namespace Modules\Core\App\Console;
 use Illuminate\Console\Command;
 use Modules\Core\App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ClearLicensesAssignmentCommand extends Command
 {

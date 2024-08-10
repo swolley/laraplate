@@ -56,7 +56,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerAuths();
         $this->registerMiddlewares();
 
-        /** @var \Illuminate\Foundation\Application */
+        /** @var \Illuminate\Foundation\Application $app */
         $app = $this->app;
         $is_production = $app->isProduction();
 
@@ -81,7 +81,7 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        /** @var \Illuminate\Foundation\Application */
+        /** @var \Illuminate\Foundation\Application $app */
         $app = $this->app;
 
         $app->register(RouteServiceProvider::class);

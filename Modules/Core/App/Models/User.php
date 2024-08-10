@@ -35,6 +35,9 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 #[ObservedBy([UserObserver::class])]
+/**
+ * @mixin IdeHelperUser
+ */
 class User extends Model implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
     use ApprovesChanges,
@@ -135,6 +138,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function canImpersonate(): bool
     {
+        /** @phpstan-ignore staticMethod.notFound */
         return $this->isSuperAdmin() || $this->hasPermissionViaRole(Permission::findByName(($this->getConnectionName() ?? 'default') . $this->getTable() . '.impersonate'));
     }
 

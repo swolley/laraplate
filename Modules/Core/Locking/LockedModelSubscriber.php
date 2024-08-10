@@ -36,9 +36,11 @@ class LockedModelSubscriber
             return true;
         }
 
-        $lockedColumnName = app('locked')->getLockedColumnName();
+        /** @var Locked $locked */
+        $locked = app('locked');
+        $lockedAtColumnName = $locked->lockedAtColumn();
 
-        if ($model->wasUnlocked() && $model->isDirty($lockedColumnName)) {
+        if ($model->wasUnlocked() && $model->isDirty($lockedAtColumnName)) {
             // we are locking a model
             return true;
         }
@@ -57,7 +59,9 @@ class LockedModelSubscriber
         }
         $model = $this->getModelFromPassedParams($entity);
 
-        if (app('locked')->doesNotUseHasLocks($model)) {
+        /** @var Locked $locked */
+        $locked = app('locked');
+        if ($locked->doesNotUseHasLocks($model)) {
             return true;
         }
 
@@ -70,12 +74,14 @@ class LockedModelSubscriber
 
     public function replicating(string $event, $entity): bool
     {
-        if (app(Locked::class)->allowsModificationsOnLockedObjects()) {
+        /** @var Locked $locked */
+        $locked = app('locked');
+        if ($locked->allowsModificationsOnLockedObjects()) {
             return true;
         }
         $model = $this->getModelFromPassedParams($entity);
 
-        if (app('locked')->doesNotUseHasLocks($model)) {
+        if ($locked->doesNotUseHasLocks($model)) {
             return true;
         }
 
@@ -88,12 +94,14 @@ class LockedModelSubscriber
 
     public function notificationSending(NotificationSending $event)
     {
-        if (app(Locked::class)->allowsNotificationsToLockedObjects()) {
+        /** @var Locked $locked */
+        $locked = app('locked');
+        if ($locked->allowsNotificationsToLockedObjects()) {
             return false;
         }
         $model = $event->notifiable;
 
-        if (app('locked')->doesNotUseHasLocks($model)) {
+        if ($locked->doesNotUseHasLocks($model)) {
             return true;
         }
 

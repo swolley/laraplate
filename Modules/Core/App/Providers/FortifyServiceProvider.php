@@ -85,13 +85,14 @@ class FortifyServiceProvider extends ServiceProvider
             $email = $request->request->get('email');
             $password = $request->request->get('password');
 
+            /** @phpstan-ignore larastan.relationExistence */
             $query = User::has('roles');
             if ($username) {
                 $query->where('username', $username);
             } else {
                 $query->where('email', $email);
             }
-            /** @var User|null */
+            /** @var User|null $user */
             $user = $query->first();
 
             if (!$user || !Hash::check($password, $user->password)) return null;
@@ -104,6 +105,7 @@ class FortifyServiceProvider extends ServiceProvider
 
             // verify user license
             if (config('core.enable_user_licenses')) {
+                /** @phpstan-ignore larastan.relationExistence */
                 $available_license = License::doesntHave('user')->first();
                 if (!$user->license_id && !$available_license && $user->roles->filter(fn ($role) => $role->name === 'superadmin')->isEmpty()) {
                     Log::warning("No free licenses available for user login");

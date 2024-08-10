@@ -119,6 +119,16 @@ class ResponseBuilder
         return $this;
     }
 
+    public function isEmpty(): bool
+    {
+        return !isset($this->resourceResponse) || !isset($this->resourceResponse->resource);
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return !$this->isEmpty();
+    }
+
     /**
      * Set the value of status.
      */

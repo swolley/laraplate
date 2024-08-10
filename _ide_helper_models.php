@@ -15,6 +15,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperApproval
  * @property int $id
  * @property int $modification_id
  * @property int $approver_id
@@ -47,6 +48,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperCronJob
  * @property int $id
  * @property string $name
  * @property string $command
@@ -91,6 +93,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperDisapproval
  * @property int $id
  * @property int $modification_id
  * @property int $disapprover_id
@@ -121,30 +124,29 @@ namespace Modules\Core\App\Models{
 
 namespace Modules\Core\App\Models{
 /**
- * Modules\Core\App\Models\DynamicEntity.
+ * 
  *
- * @property-read null|Version $firstVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $history
- * @property-read null|int $history_count
- * @property-read null|Version $lastVersion
- * @property-read null|Version $latestVersion
+ * @mixin IdeHelperDynamicEntity
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read null|int $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity query()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity withoutTrashed()
- * @mixin \Eloquent
+ * @property-read int|null $versions_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withoutTrashed()
  */
-	class DynamicEntity extends \Eloquent {}
+	final class DynamicEntity extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperLicense
  * @property string $id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -158,7 +160,7 @@ namespace Modules\Core\App\Models{
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License expiredAt(\Illuminate\Support\Carbon $date)
- * @method static \Modules\Core\database\factories\LicenseFactory factory($count = null, $state = [])
+ * @method static \Modules\Core\Database\Factories\LicenseFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License free()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License newQuery()
@@ -178,6 +180,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperModification
  * @property int $id
  * @property int|null $modifiable_id
  * @property string|null $modifiable_type
@@ -202,14 +205,14 @@ namespace Modules\Core\App\Models{
  * @property-read int $disapprovers_remaining
  * @property-read \Modules\Core\App\Models\Version|null $lastVersion
  * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $modifiable
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $modifier
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifiable
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder|\Approval\Models\Modification activeOnly()
- * @method static \Illuminate\Database\Eloquent\Builder|\Approval\Models\Modification changes()
- * @method static \Illuminate\Database\Eloquent\Builder|\Approval\Models\Modification creations()
- * @method static \Illuminate\Database\Eloquent\Builder|\Approval\Models\Modification inactiveOnly()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification activeOnly()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification changes()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification creations()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification inactiveOnly()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification query()
@@ -234,6 +237,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperPermission
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -258,9 +262,9 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Spatie\Permission\Models\Permission permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission query()
- * @method static \Illuminate\Database\Eloquent\Builder|\Spatie\Permission\Models\Permission role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission role($roles, $guard = null, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission whereConnectionName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission whereDeletedAt($value)
@@ -271,8 +275,8 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission whereTableName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|\Spatie\Permission\Models\Permission withoutPermission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder|\Spatie\Permission\Models\Permission withoutRole($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutPermission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutTrashed()
  */
 	class Permission extends \Eloquent {}
@@ -282,6 +286,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperRole
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -339,7 +344,7 @@ namespace Modules\Core\App\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role newModelQuery()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role onlyTrashed()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Spatie\Permission\Models\Role permission($permissions, $without = false)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role permission($permissions, $without = false)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role query()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role tree($maxDepth = null)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role treeOf(\Illuminate\Database\Eloquent\Model|callable $constraint, $maxDepth = null)
@@ -359,7 +364,7 @@ namespace Modules\Core\App\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role withGlobalScopes(array $scopes)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role withRelationshipExpression($direction, callable $constraint, $initialDepth, $from = null, $maxDepth = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withTrashed()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Spatie\Permission\Models\Role withoutPermission($permissions)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withoutTrashed()
  */
 	class Role extends \Eloquent {}
@@ -369,6 +374,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperSetting
  * @property int $id
  * @property string $name
  * @property array $value
@@ -414,6 +420,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperUser
  * @property int $id
  * @property string $name
  * @property string $email
@@ -427,7 +434,7 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string $username
  * @property string|null $lang
- * @property string $last_login_at
+ * @property string|null $last_login_at
  * @property string|null $license_id
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $locked_at
@@ -495,6 +502,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperUserGridConfig
  * @property int $id
  * @property int|null $user_id
  * @property string $grid_name

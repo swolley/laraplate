@@ -44,12 +44,14 @@ class ListRequest extends SelectRequest
             $to_merge['group_by'] = (is_string($this->group_by) && is_json($this->group_by)) ? json_decode($this->group_by, true) : $this->group_by;
         }
 
+        /** @phpstan-ignore method.notFound */
         $this->merge($to_merge);
     }
 
     #[\Override]
     public function parsed(): ListRequestData
     {
+        /** @phpstan-ignore method.notFound */
         return new ListRequestData($this, $this->route()->entity, $this->validated(), $this->primaryKey);
     }
 }

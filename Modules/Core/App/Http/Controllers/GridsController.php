@@ -65,6 +65,8 @@ class GridsController extends Controller
      */
     public function getGridsConfigs(Request $request, ?string $entity = null)
     {
+        $response_builder = new ResponseBuilder($request);
+
         try {
             $grids = [];
             $permissions = $request->user()->getAllPermissions();
@@ -78,7 +80,7 @@ class GridsController extends Controller
             }
 
             foreach (models() as $model) {
-                /** @var Model */
+                /** @var Model $instance */
                 $instance = new $model;
                 $table = $instance->getTable();
                 if ((!$entity || $instance::class === $entity::class) && Grid::useGridUtils($instance) && PermissionChecker::ensurePermissions($request, $table, connection: $instance->getConnectionName(), permissions: $permissions)) {
@@ -96,7 +98,7 @@ class GridsController extends Controller
                 $grids = head($grids);
             }
 
-            $response_builder = (new ResponseBuilder($request))->setData($grids);
+            $response_builder->setData($grids);
         } catch (UnexpectedValueException $ex) {
             $response_builder
                 ->setData($ex)
@@ -122,19 +124,10 @@ class GridsController extends Controller
         try {
             $filters = $request->validated();
             $model = DynamicEntity::resolve($entity, $filters['connection'] ?? null, request: $request);
-            if (!Grid::useGridUtils($model)) {
-                // throw new UnexpectedValueException("'$entity' is not a Grid");
-                // TODO: da verificare, solo imbastito
-                $class = $model::class;
-                $model = eval(<<<PHP_EOL
-                    new class extends $class {
-                        use HasGridUtils;
-                    }
-                PHP_EOL);
-            }
             PermissionChecker::ensurePermissions($request, $model->getTable(), $this->findOperation($request), $model->getConnectionName());
+            $grid = new Grid($model);
 
-            return $model->getGrid()->process($request);
+            return $grid->process($request);
         } catch (UnexpectedValueException | UnauthorizedException $ex) {
             return (new ResponseBuilder($request))
                 ->setData($ex)

@@ -53,8 +53,18 @@ readonly class GridRequestData implements \JsonSerializable
             $this->orders = static::extractOrdersFilters($filters);
             $this->relations = static::extractRelations($filters, $entityName);
             $this->changes = static::extractChanges($filters);
+            $this->primaryKey = null;
         } else {
             $this->primaryKey = static::extractPrimaryKey($filters);
+            $this->pagination = null;
+            $this->globalSearch = null;
+            $this->columns = null;
+            $this->columnsFilters = null;
+            $this->orders = null;
+            $this->funnelsFilters = null;
+            $this->optionsFilters = null;
+            $this->relations = null;
+            $this->changes = null;
         }
     }
 
@@ -179,19 +189,20 @@ readonly class GridRequestData implements \JsonSerializable
      *
      * @return (int|mixed)[]
      *
-     * @psalm-return array{from: int|mixed, to: int|mixed}
+     * @return array{from: int|mixed, to: int|mixed}
      */
     private function extractPagination(array $filters): array
     {
+        /** @var int|null $page */
         $page = $filters['page'] ?? null;
         $pagination = $filters['pagination'] ?? 25;
         $from = $filters['from'] ?? 1;
         $to = $filters['to'] ?? null;
 
-        if ($page !== null) {
-            return ['from' => (($page ?? 1) - 1) * $pagination, 'to' => ($page * $pagination) - 1];
+        if ($page !== null && $page >= 1) {
+            return ['from' => ($page - 1) * $pagination, 'to' => ($page * $pagination) - 1];
         }
-        if ($to !== null) {
+        if ($to !== null  && $to >= 1) {
             return ['from' => (int) $from, 'to' => (int) $to];
         }
 
@@ -394,7 +405,7 @@ readonly class GridRequestData implements \JsonSerializable
         if (is_string($modelPrimaryKey)) {
             $modelPrimaryKey = [$modelPrimaryKey];
         }
-        /** @var string[] */
+        /** @var string[] $replaced */
         $replaced = static::replacePrimaryKeyUnderscores($modelPrimaryKey);
         if (($this->action === GridAction::UPDATE || $this->action === GridAction::DELETE || $this->action === GridAction::FORCE_DELETE) && empty($replaced)) {
             throw new \BadMethodCallException('PrimaryKey is mandatory for update and delete actions');

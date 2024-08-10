@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\Core\Locking\Console;
 
-use function Laravel\Prompts\confirm;
-
 use Illuminate\Console\Command;
+
+use function Laravel\Prompts\confirm;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Locking\Traits\HasLocks;
@@ -40,7 +40,7 @@ class ModelLockingRefreshCommand extends Command
         $this->quiet_mode = $this->option('quiet');
 
         $all_models = models();
-        $parental_class = "Parental\HasParent";
+        $parental_class = "Parental\\HasParent";
         $this->changes = false;
 
         foreach ($all_models as $model) {
@@ -54,7 +54,7 @@ class ModelLockingRefreshCommand extends Command
                 continue;
             }
 
-            /** @var Model */
+            /** @var Model $instance */
             $instance = new $model();
             $table = $instance->getTable();
 
@@ -90,11 +90,11 @@ class ModelLockingRefreshCommand extends Command
 
         $has_optimistic_locking_column = Schema::hasColumn($table, $optimistic_locking_column);
 
-        if ($has_optimistic_locking && !$has_optimistic_locking) {
+        if ($has_optimistic_locking_column && !$has_optimistic_locking) {
             if ($this->askConfirmForOperation(
                 "Model {$model} doesn't use optimistic locking but column {$optimistic_locking_column} found. Would you like to remove it from the schema?",
                 $model,
-                fn () => $this->call('lock:optimistic-remove', ['model' => $model]),
+                fn() => $this->call('lock:optimistic-remove', ['model' => $model]),
             )) {
                 $this->changes = true;
             }
@@ -102,7 +102,7 @@ class ModelLockingRefreshCommand extends Command
             if ($this->askConfirmForOperation(
                 "Model {$model} uses optimistic locking but column {$optimistic_locking_column} is missing. Would you like to create it into the schema?",
                 $model,
-                fn () => $this->call('lock:optimistic-add', ['model' => $model]),
+                fn() => $this->call('lock:optimistic-add', ['model' => $model]),
             )) {
                 $this->changes = true;
             }
@@ -123,7 +123,7 @@ class ModelLockingRefreshCommand extends Command
             if ($this->askConfirmForOperation(
                 "Model {$model} doesn't use locks but column {$lock_at_column} found. Would you like to remove it from the schema?",
                 $model,
-                fn () => $this->call('lock:remove', ['model' => $model]),
+                fn() => $this->call('lock:remove', ['model' => $model]),
             )) {
                 $this->changes = true;
             }
@@ -131,7 +131,7 @@ class ModelLockingRefreshCommand extends Command
             if ($this->askConfirmForOperation(
                 "Model {$model} uses locks but column {$lock_at_column} is missing. Would you like to create it into the schema?",
                 $model,
-                fn () => $this->call('lock:add', ['model' => $model]),
+                fn() => $this->call('lock:add', ['model' => $model]),
             )) {
                 $this->changes = true;
             }

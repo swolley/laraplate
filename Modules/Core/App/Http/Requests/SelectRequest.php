@@ -34,12 +34,14 @@ abstract class SelectRequest extends CrudRequest
             $to_merge['relations'] = static::decode($this->relations);
         }
 
+        /** @phpstan-ignore method.notFound */
         $this->merge($to_merge);
     }
 
     #[\Override]
     public function parsed(): SelectRequestData
     {
+        /** @phpstan-ignore method.notFound */
         return new SelectRequestData($this, $this->route()->entity, $this->validated(), $this->primaryKey);
     }
 }

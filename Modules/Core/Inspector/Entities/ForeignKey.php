@@ -8,15 +8,18 @@ use Illuminate\Support\Collection;
 
 class ForeignKey
 {
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly ?string $foreignConnection;
 
+    /** 
+     * @param Collection<string> $columns 
+     * @param Collection<string> $foreignColumns
+     */
     public function __construct(
         public readonly string $name,
-        /** @param Collection<string> */
         public readonly Collection $columns,
         public readonly ?string $foreignSchema,
         public readonly string $foreignTable,
-        /** @param Collection<string> */
         public readonly Collection $foreignColumns,
         public readonly string $localSchema,
         public readonly ?string $localConnection,
@@ -32,6 +35,11 @@ class ForeignKey
 
                     break;
                 }
+            }
+            /** @phpstan-ignore property.uninitializedReadonly */
+            if (!isset($this->foreignConnection)) {
+                /** @phpstan-ignore assign.readOnlyProperty */
+                $this->foreignConnection = null;
             }
         }
     }

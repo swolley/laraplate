@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Core\Grids\Components;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Grids\Definitions\ListEntity;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class Funnel extends ListEntity
 {
@@ -111,7 +111,7 @@ class Funnel extends ListEntity
         $data = $query->get();
         $totals = $query->count();
 
-        // Log::debug(static::dumpQuery($query), [static::class]);
+        // Log::debug(static::dumpQuery($query));
         return [$data, $totals];
     }
 }

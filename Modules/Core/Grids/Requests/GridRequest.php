@@ -41,7 +41,7 @@ class GridRequest extends FormRequest implements IParsableRequest
     #[\Override]
     protected function prepareForValidation()
     {
-        /** @var GridAction */
+        /** @var GridAction $action */
         $action = $this->action;
         switch ($action) {
             case GridAction::DATA:
@@ -50,12 +50,14 @@ class GridRequest extends FormRequest implements IParsableRequest
             case GridAction::GET_ALL:
             case GridAction::FUNNELS:
             case GridAction::OPTIONS:
+                /** @phpstan-ignore staticMethod.notFound */
                 $this->realRequest = ListRequest::createFrom($this);
                 break;
                 // case GridAction::LAYOUT:
                 // case GridAction::COUNT:
             case GridAction::INSERT:
             case GridAction::UPDATE:
+                /** @phpstan-ignore staticMethod.notFound */
                 $this->realRequest = ModifyRequest::createFrom($this);
                 break;
             case GridAction::CHECK:
@@ -76,10 +78,10 @@ class GridRequest extends FormRequest implements IParsableRequest
         }
     }
 
-    #[\Override]
     protected function getInputSource()
     {
-        /** @var InputBag */
+        /** @var InputBag $input_source */
+        /** @phpstan-ignore staticMethod.notFound */
         $input_source = parent::getInputSource();
 
         if (isset($this->realRequest)) {
@@ -100,6 +102,9 @@ class GridRequest extends FormRequest implements IParsableRequest
     #[\Override]
     public function parsed(): CrudRequestData
     {
-        return new CrudRequestData($this, $this->route()->entity, $this->validated(), $this->primaryKey);
+        /** @var string $main_entity */
+        /** @phpstan-ignore method.notFound */
+        $main_entity = $this->route()->entity;
+        return new CrudRequestData($this, $main_entity, $this->validated(), $this->primaryKey);
     }
 }

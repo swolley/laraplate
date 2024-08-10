@@ -56,7 +56,7 @@ class SettingController extends Controller
                     continue;
                 }
 
-                /** @var string[] */
+                /** @var string[] $files */
                 $files = glob($language . '/*.php');
 
                 foreach ($files as $file) {

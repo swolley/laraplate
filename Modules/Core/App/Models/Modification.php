@@ -7,6 +7,9 @@ namespace Modules\Core\App\Models;
 use Modules\Core\App\Helpers\HasCommonObserver;
 use Approval\Models\Modification as ApprovalModification;
 
+/**
+ * @mixin IdeHelperModification
+ */
 class Modification extends ApprovalModification
 {
     use HasCommonObserver;

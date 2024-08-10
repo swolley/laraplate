@@ -36,7 +36,7 @@ class CreateUserCommand extends Command
         $total_users_created = 0;
 
         try {
-            /** @var User */
+            /** @var User $user */
             $user = new (user_class());
             $fillables = $user->getFillable();
             $validations = $user->getOperationRules('create');

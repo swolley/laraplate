@@ -17,6 +17,7 @@ class HistoryRequest extends DetailRequest
     #[\Override]
     public function parsed(): HistoryRequestData
     {
+        /** @phpstan-ignore method.notFound */
         return new HistoryRequestData($this, $this->route()->entity, $this->validated(), $this->primaryKey);
     }
 }

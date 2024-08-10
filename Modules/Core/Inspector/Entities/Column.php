@@ -12,9 +12,11 @@ class Column
 {
     public readonly DoctrineTypeEnum $type;
 
+    /** 
+     * @param Collection<string> $attributes 
+     */
     public function __construct(
         public readonly string $name,
-        /** @param Collection<string> */
         public readonly Collection $attributes,
         public readonly mixed $default,
         string $type,
@@ -40,14 +42,14 @@ class Column
      */
     public function isUnsigned(): bool
     {
-        return Str::contains($this->type, 'unsigned');
+        return Str::contains($this->type->value, 'unsigned');
     }
 
     /**
      */
     public function getLength(): ?int
     {
-        $length = filter_var($this->type, FILTER_SANITIZE_NUMBER_INT);
+        $length = filter_var($this->type->value, FILTER_SANITIZE_NUMBER_INT);
 
         return !empty($length) ? (int) $length : null;
     }

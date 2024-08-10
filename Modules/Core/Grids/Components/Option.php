@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Grids\Components;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Modules\Core\App\Casts\FilterOperator;
 use Modules\Core\Grids\Definitions\ListEntity;
@@ -26,9 +27,12 @@ class Option extends ListEntity
         } elseif ($relation = $this->getRelationDeeply($field_path)) {
             $model = $relation->getModel();
         } else {
-            Log::warning('No model found for grid option ' . $name, [static::class]);
+            Log::warning('No model found for grid option ' . $name);
 
-            return [];
+            return [
+                new Collection(),
+                0,
+            ];
         }
 
         // TODO: da rivedere
@@ -48,7 +52,7 @@ class Option extends ListEntity
             static::applyCorrectWhereMethod($query, $subfix, FilterOperator::tryFrom($option_data['operator']), $option_data['value']);
         }
 
-        // Log::debug(static::dumpQuery($query), [static::class]);
+        // Log::debug(static::dumpQuery($query));
 
         $data = $query->get($columns);
         $totals = $data->count();

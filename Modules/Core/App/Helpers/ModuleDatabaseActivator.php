@@ -165,7 +165,7 @@ class ModuleDatabaseActivator implements ActivatorInterface
         // static::checkSettingTable();
         $model = static::MODEL_NAME;
 
-        /** @var Builder */
+        /** @var Builder $query */
         $query = $model::query();
 
         return $query->where('name', static::RECORD_NAME);

@@ -27,7 +27,7 @@ if (!function_exists('modules')) {
 
         if ($onlyModule) {
             $onlyModule = ucfirst($onlyModule);
-            $modules = array_filter($modules, fn ($k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
+            $modules = array_filter($modules, fn (string $k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
 
         $modules = $fullpath ? array_map(fn (Module $m) => $m->getPath(), $modules) : array_keys($modules);
@@ -142,7 +142,7 @@ if (!function_exists('migrations')) {
      * @param  string|null  $onlyModule  filter for specified module
      * @return false|int|string[] number if count requested, string[] if list requested, false if error occured
      */
-    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true, ?bool $onlyModule = null): array|int|false
+    function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true, ?string $onlyModule = null): array|int|false
     {
         try {
             $found = [];
@@ -279,6 +279,7 @@ if (!function_exists('routes')) {
      */
     function routes(bool $onlyActive = true, ?string $onlyModule = null): array
     {
+        /** @var Route[] $routes */
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
         $all_routes = app('router')->getRoutes()->getRoutes();

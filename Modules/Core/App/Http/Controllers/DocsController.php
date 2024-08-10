@@ -87,18 +87,19 @@ class DocsController extends OpenApiJsonController
      */
     protected function getJson(string $version): array
     {
-        /** @var array */
+        /** @var array $main_json */
         $main_json = Cache::remember(RequestFacade::route()->getName() . $version, config('cache.duration'), function () use ($version) {
             $assets = resource_path('swagger') . DIRECTORY_SEPARATOR;
             $files = glob($assets . '*-swagger.json');
             $modules = modules(true, false, true);
 
             $additionalPaths = [];
+            $main_json = [];
 
             foreach ($files as $file) {
                 $short_name = str_replace($assets, '', $file);
 
-                /** @var array{paths: mixed,...} */
+                /** @var array{paths: mixed,...} $json */
                 $json = json_decode(file_get_contents($file), true);
                 $json['paths'] = array_filter($json['paths'], function ($k) use ($version) {
                     return Str::contains($k, $version) || !Str::contains($k, '/api/');

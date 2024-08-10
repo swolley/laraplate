@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\Core\Database\Factories;
 
 use Modules\Core\App\Casts\ActionEnum;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Core\App\Models\Permission;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PermissionFactory extends Factory
 {

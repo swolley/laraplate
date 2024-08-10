@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Modules\Core\Database\Factories\LicenseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @mixin IdeHelperLicense
+ */
 class License extends Model
 {
     use HasFactory, HasUuids, HasCommonObserver, HasValidity, HasValidations;
@@ -22,14 +25,6 @@ class License extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-
-    protected function casts()
-    {
-        return [
-            'valid_from' => 'date',
-            'valid_to' => 'date',
-        ];
-    }
 
     public function __construct($attributes = [])
     {

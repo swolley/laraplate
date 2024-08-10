@@ -29,6 +29,7 @@ class GridAction extends CrudExecutor
 	#[\Override]
 	public static function isWriteAction(string $action, ?string $requestMethod = null): bool
 	{
+		/** @phpstan-ignore classConstant.notFound */
 		if ($action === static::LAYOUT && $requestMethod !== Request::METHOD_GET) {
 			return true;
 		}

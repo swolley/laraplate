@@ -23,6 +23,7 @@
         "algolia/algoliasearch-client-php": "^3.4",
         "amphp/amp": "^3.0",
         "doctrine/dbal": "*",
+        "hedii/laravel-gelf-logger": "^9.0",
         "jeroen-g/explorer": "^3.14",
         "lab404/laravel-impersonate": "^1.7",
         "laravel/fortify": "^1.21",
@@ -74,6 +75,7 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:models -MN",
             "@php artisan ide-helper:meta"
         ],
         "post-root-package-install": [
@@ -84,7 +86,7 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
-        "check": "vendor/bin/phpstan analyse --memory-limit=2G",
+        "check": "vendor/bin/phpstan analyse --memory-limit=2G -v",
         "lint": [
             "vendor/bin/pint --dirty"
         ],

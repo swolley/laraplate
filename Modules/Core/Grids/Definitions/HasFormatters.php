@@ -5,14 +5,22 @@ declare(strict_types=1);
 namespace Modules\Core\Grids\Definitions;
 
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Grids\Components\Field;
 
+/** @phpstan-type FormatterCallable null|callable(mixed, Model): void */
 trait HasFormatters
 {
-    /** @var null|callable(mixed, Model) */
+    /** 
+     * @var null|callable
+     * @phpstan-var FormatterCallable
+     */
     private $getFormatter = null;
 
-    /** @var null|callable(mixed, Model) */
+    /** 
+     * @var null|callable 
+     * @phpstan-var FormatterCallable
+     */
     private $setFormatter = null;
 
     /**
@@ -26,8 +34,7 @@ trait HasFormatters
     /**
      * gets read formatter if set
      *
-     *
-     * @psalm-return callable(mixed, \Illuminate\Database\Eloquent\Model)|null
+     * @psalm-return callable(mixed, Model)|null
      */
     public function getReadFormatter(): ?callable
     {
@@ -53,7 +60,6 @@ trait HasFormatters
     /**
      * gets write formatter if set
      *
-     *
      * @psalm-return callable(mixed, array)|null
      */
     public function getWriteFormatter(): ?callable
@@ -72,7 +78,7 @@ trait HasFormatters
     /**
      * alias for write formatter getter that returns static for pipes
      *
-     * @param callable|null read formatter callback
+     * @param callable|null $callback read formatter callback
      * @return static
      */
     public function getFormatter(?callable $callback)
@@ -85,7 +91,7 @@ trait HasFormatters
     /**
      * alias for write formatter getter that returns static for pipes
      *
-     * @param callable|null write formatter callback
+     * @param callable|null $callback write formatter callback
      * @return static
      */
     public function setFormatter(?callable $callback)
@@ -97,9 +103,11 @@ trait HasFormatters
 
     /**
      * apply massively write formatter
-     *
+     * 
+     * @template T of array<string, mixed>
      * @param  Collection<string, Field>  $fields  fields to format
-     * @param  array  $values  to be formatted
+     * @param  T  $data  to be formatted
+     * @return  T
      */
     public static function applySetFormatter(Collection $fields, array $data): array
     {

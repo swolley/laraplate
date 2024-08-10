@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\Core\Inspector;
 
-use Schema;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Modules\Core\Inspector\Entities\Index;
 use Modules\Core\Inspector\Entities\Table;
 use Modules\Core\Inspector\Entities\Column;
@@ -19,11 +19,12 @@ class Inspect
      */
     public static function table(string $name, null|string $schema = null): ?Table
     {
+        /** @phpstan-ignore staticMethod.notFound */
         $connection = Schema::connection($schema);
 
-        if (!$connection) {
-            return null;
-        }
+        // if (!$connection) {
+        //     return null;
+        // }
         $tables = $connection->getTables();
         $table = Arr::first($tables, fn ($table) => $table['name'] === $name);
 

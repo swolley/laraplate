@@ -7,7 +7,6 @@ namespace Modules\Core\App\Console;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Modules\Core\App\Models\User;
-
 use function Laravel\Prompts\text;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\table;
@@ -38,9 +37,9 @@ class HandleLicensesCommand extends Command
                 table(
                     ['Status', 'Expiration', 'Licenses Qt.'],
                     $licenses_groups->map(fn ($data) => [
-                        'status' => $data->valid_to && today()->greaterThan($data->valid_to) ? $data->valid_to : (!$data->valid_to ? 'perpetual' : 'expired'),
-                        'valid_to' => $data->valid_to,
-                        'count' => $data->count,
+                        $data->valid_to && today()->greaterThan($data->valid_to) ? $data->valid_to : (!$data->valid_to ? 'perpetual' : 'expired'),
+                        $data->valid_to,
+                        $data->count,
                     ]),
                 );
             }
@@ -81,7 +80,9 @@ class HandleLicensesCommand extends Command
                     break;
             }
 
-            User::whereNotNull('license_id')->update(['license_id' => null]);
+            User::whereNotNull('license_id')->update([
+                'license_id' => null
+            ]);
 
             DB::commit();
 
@@ -104,7 +105,7 @@ class HandleLicensesCommand extends Command
         $this->output->info($message);
         Log::info($message);
         if ($licensesCount > $number) {
-            $closed = License::offset($number)->where->update([
+            $closed = License::offset($number)->update([
                 'valid_to' => $validTo ?? today()
             ]);
             $message = "Closed $closed licenses";
@@ -162,8 +163,8 @@ class HandleLicensesCommand extends Command
         if (!array_key_exists($attribute, $validations)) {
             return null;
         }
-        $validator = Validator::make([$attribute => $value], array_filter($validations, fn ($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
 
+        $validator = Validator::make([$attribute => $value], array_filter($validations, fn ($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
         if (!$validator->passes()) {
             return $validator->messages()->first();
         }

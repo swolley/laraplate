@@ -23,7 +23,7 @@ class PermissionChecker
      */
     public static function checkPermissions(Request $request, string $entity, ?string $operation = null, ?string $connection = null, ?Collection $permissions = null): bool
     {
-        /** @var SessionGuard */
+        /** @var SessionGuard $guard */
         $guard = Auth::guard();
         $guard_name = $guard->name;
 
@@ -70,10 +70,12 @@ class PermissionChecker
      * @throws BindingResolutionException
      * @throws UnauthorizedException
      */
-    public static function ensurePermissions(Request $request, string $entity, ?string $operation = null, ?string $connection = null, ?Collection $permissions = null): void
+    public static function ensurePermissions(Request $request, string $entity, ?string $operation = null, ?string $connection = null, ?Collection $permissions = null): true
     {
         if (!static::checkPermissions($request, $entity, $operation, $connection, $permissions)) {
             throw new UnauthorizedException('User not allowed to access this resource');
         }
+
+        return true;
     }
 }

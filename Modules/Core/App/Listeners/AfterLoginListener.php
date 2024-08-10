@@ -21,7 +21,7 @@ class AfterLoginListener
      */
     public function handle(Login $login): void
     {
-        /** @var Authenticatable */
+        /** @var Authenticatable $user */
         $user = $login->user;
 
         if (class_uses_trait($user, Impersonate::class) && $user->isImpersonated()) {

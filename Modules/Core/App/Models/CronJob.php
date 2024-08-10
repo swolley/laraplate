@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Core\App\Casts\CronExpression as CronExpressionCast;
 use Modules\Core\App\Rules\CronExpression as CronExpressionRule;
 
+/**
+ * @mixin IdeHelperCronJob
+ */
 class CronJob extends Model
 {
     use HasCommonObserver, HasFactory, HasLocks, HasValidations, SoftDeletes;

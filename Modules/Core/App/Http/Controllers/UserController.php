@@ -110,7 +110,7 @@ class UserController extends Controller
      */
     public function leaveImpersonate(Request $request): HttpFoundationResponse
     {
-        /** @var User */
+        /** @var User $current_user */
         $current_user = Auth::user();
         $current_user->leaveImpersonation();
 

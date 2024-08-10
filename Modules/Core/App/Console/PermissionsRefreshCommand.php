@@ -62,7 +62,7 @@ class PermissionsRefreshCommand extends Command
         $all_permissions = [];
 
         $permission_class = config('permission.models.permission');
-        $parental_class = "Parental\HasChildren";
+        $parental_class = "Parental\\HasChildren";
 
         DB::beginTransaction();
 

@@ -6,7 +6,6 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Modules\Core\App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\App\Models\CronJob;
@@ -17,8 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 use Modules\Core\App\Helpers\HasApprovals;
 use Spatie\Permission\PermissionRegistrar;
 use Modules\Core\App\Casts\SettingTypeEnum;
-
-// use Modules\Core\App\Helpers\ModuleDatabaseActivator;
 
 class CoreDatabaseSeeder extends Seeder
 {
@@ -75,6 +72,7 @@ class CoreDatabaseSeeder extends Seeder
 
             if (!$this->groups[$admin]) {
                 $this->groups[$admin] = $this->create($role_class, ['name' => $admin, 'locked_at' => now()]);
+                // @phpstan-ignore-next-line
                 $this->groups[$admin]->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
@@ -88,6 +86,7 @@ class CoreDatabaseSeeder extends Seeder
 
             if (!$this->groups[$guest]) {
                 $this->groups[$guest] = $this->create($role_class, ['name' => $guest, 'locked_at' => now()]);
+                // @phpstan-ignore-next-line
                 $this->groups[$guest]->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
@@ -121,6 +120,7 @@ class CoreDatabaseSeeder extends Seeder
                     'email_verified_at' => now(),
                     'locked_at' => now(),
                 ]);
+                // @phpstan-ignore-next-line
                 $root_user->assignRole($this->groups['superadmin']);
                 $this->command->line("    - $root created");
             } else {
@@ -135,6 +135,7 @@ class CoreDatabaseSeeder extends Seeder
                     'password' => Hash::make(config('app.name')),
                     'email_verified_at' => now(),
                 ]);
+                // @phpstan-ignore-next-line
                 $admin_user->assignRole($this->groups[$admin]);
                 $this->command->line("    - $admin created");
             } else {
@@ -149,6 +150,7 @@ class CoreDatabaseSeeder extends Seeder
                     'password' => Hash::make(config('app.name')),
                     'email_verified_at' => now(),
                 ]);
+                // @phpstan-ignore-next-line
                 $anonymous_user->assignRole($this->groups['guest']);
                 $this->command->line("    - $anonymous created");
             } else {
@@ -165,7 +167,7 @@ class CoreDatabaseSeeder extends Seeder
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>settings</>');
 
         DB::transaction(function () use ($defaultLanguage, $pagination) {
-            if (!Setting::whereName($defaultLanguage)->exists()) {
+            if (!Setting::where('name', $defaultLanguage)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $defaultLanguage,
                     'value' => config('app.locale'),
@@ -178,7 +180,7 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $defaultLanguage already exists");
             }
 
-            if (!Setting::whereName($pagination)->exists()) {
+            if (!Setting::where('name', $pagination)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $pagination,
                     'value' => 20,
@@ -203,7 +205,7 @@ class CoreDatabaseSeeder extends Seeder
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>cron jobs</>');
 
         DB::transaction(function () use ($clearUserAssignedLicenses, $clearResetTokens) {
-            if (!CronJob::whereName($clearUserAssignedLicenses)->exists()) {
+            if (!CronJob::where('name', $clearUserAssignedLicenses)->exists()) {
                 $this->create(CronJob::class, [
                     'name' => $clearUserAssignedLicenses,
                     'command' => 'auth:clear-licenses',
@@ -217,7 +219,7 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $clearUserAssignedLicenses already exists");
             }
 
-            if (!CronJob::whereName($clearResetTokens)->exists()) {
+            if (!CronJob::where('name', $clearResetTokens)->exists()) {
                 $this->create(CronJob::class, [
                     'name' => $clearResetTokens,
                     'command' => 'auth:clear-resets',
@@ -233,7 +235,9 @@ class CoreDatabaseSeeder extends Seeder
         });
     }
 
-    /** @var class-string $class */
+    /** 
+     * @param class-string $class 
+     */
     private function create(string $class, array $attributes): Model
     {
         $model = $class::make($attributes);

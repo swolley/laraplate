@@ -15,6 +15,7 @@ use Modules\Core\Inspector\Inspect;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Inspector\Entities\Index;
+use Modules\Core\Grids\Traits\HasGridUtils;
 use Modules\Core\Inspector\Entities\Column;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,28 +25,11 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 /**
- * Modules\Core\App\Models\DynamicEntity.
- *
- * @property-read null|Version $firstVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $history
- * @property-read null|int $history_count
- * @property-read null|Version $lastVersion
- * @property-read null|Version $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
- * @property-read null|int $versions_count
- *
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity query()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|DynamicEntity withoutTrashed()
- *
- * @mixin \Eloquent
+ * @mixin IdeHelperDynamicEntity
  */
-class DynamicEntity extends Model
+final class DynamicEntity extends Model
 {
-    use HasCommonObserver, HasValidations, SoftDeletes /* , HasAcl? */;
+    use HasCommonObserver, HasValidations, SoftDeletes, HasGridUtils /* , HasAcl? */;
 
     /**
      * @var bool
@@ -106,7 +90,7 @@ class DynamicEntity extends Model
      */
     private static function findModel(array $models, string $modelName): ?string
     {
-        $found = array_filter($models, fn ($c) => Str::endsWith($c, '\\' . Str::studly($modelName)));
+        $found = array_filter($models, fn($c) => Str::endsWith($c, '\\' . Str::studly($modelName)));
 
         if (count($found) > 1) {
             throw new Exception("Too many models found for '{$modelName}'");
@@ -146,13 +130,14 @@ class DynamicEntity extends Model
         $serialized = $this->toArray();
 
         // removing hashed values from json_encode
-        return array_filter($serialized, fn ($v) => gettype($v) !== 'string' || !(mb_strlen($v) === 60 && preg_match('/^\$2y\$/', $v)));
+        return array_filter($serialized, fn($v) => gettype($v) !== 'string' || !(mb_strlen($v) === 60 && preg_match('/^\$2y\$/', $v)));
     }
 
     /**
      */
     private function verifyTableEsistance(): void
     {
+        /** @phpstan-ignore staticMethod.notFound */
         if (!Schema::connection($this->connection)->hasTable($this->table)) {
             throw new UnexpectedValueException("Table '{$this->table}' doesn't exists on '{$this->connection}' connection");
         }

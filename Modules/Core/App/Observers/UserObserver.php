@@ -36,8 +36,11 @@ class UserObserver
         }
     }
 
-    public function deleting(User $user): void
+    public function deleted(User $user): void
     {
-        if (config('core.enable_user_licenses') && $user->license_id) $user->license_id = null;
+        if (config('core.enable_user_licenses') && $user->license_id) {
+            $user->license_id = null;
+            $user->save();
+        }
     }
 }

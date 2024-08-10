@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Modules\Core\Grids\Components;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Grids\Definitions\HasPath;
+use Modules\Core\Grids\Traits\HasGridUtils;
 use Modules\Core\Grids\Definitions\FieldType;
 use Modules\Core\Grids\Definitions\HasFormatters;
-use Modules\Core\Grids\Definitions\HasPath;
 use Modules\Core\Grids\Definitions\HasValidations;
-use Modules\Core\Grids\Models\HasGridUtils;
 
 class Field implements \JsonSerializable
 {
@@ -56,7 +56,7 @@ class Field implements \JsonSerializable
     {
         [$path, $name] = static::splitPath($fullpath);
 
-        return fn (Model $model): static => (new static($path, $name, $alias ?? $name, $fieldType, $model))->readable($readable)->writable($writable);
+        return fn(Model $model): static => (new self($path, $name, $alias ?? $name, $fieldType, $model))->readable($readable)->writable($writable);
     }
 
     public function getModel(): ?Model
@@ -72,7 +72,7 @@ class Field implements \JsonSerializable
     public function setModel(Model $model)
     {
         if (!Grid::useGridUtils($model)) {
-            throw new \UnexpectedValueException('Model ' . $model::class . " doesn't use " . HasGridUtils::class);
+            throw new \UnexpectedValueException('Model ' . $model::class . ' doesn\'t use ' . HasGridUtils::class);
         }
         $this->model = &$model;
     }

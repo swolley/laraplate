@@ -11,6 +11,9 @@ use Modules\Core\App\Helpers\HasCommonObserver;
 use Modules\Core\Database\Factories\PermissionFactory;
 use Spatie\Permission\Models\Permission as ModelsPermission;
 
+/**
+ * @mixin IdeHelperPermission
+ */
 class Permission extends ModelsPermission
 {
     use HasCommonObserver, HasValidations, SoftDeletes;

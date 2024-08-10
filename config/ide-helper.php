@@ -108,7 +108,7 @@ return [
     |
     */
 
-    'write_eloquent_model_mixins' => false,
+    'write_eloquent_model_mixins' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +120,7 @@ return [
     |
     */
 
-    'include_helpers' => false,
+    'include_helpers' => true,
 
     'helper_files' => [
         base_path() . '/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
@@ -141,7 +141,7 @@ return [
     */
 
     'model_locations' => [
-        'app',
+        'app/Models',
         'Modules/**/App/Models',
     ],
 
@@ -309,6 +309,6 @@ return [
     |
     */
     'post_migrate' => [
-        'ide-helper:models --nowrite',
+        'ide-helper:models -M',
     ],
 ];

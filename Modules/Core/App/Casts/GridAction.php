@@ -33,7 +33,7 @@ enum GridAction: string
 	public static function isReadAction(string $action): bool
 	{
 		return match ($action) {
-			static::INSERT, static::UPDATE, static::DELETE, static::FORCE_DELETE, static::APPROVE, static::LOCK => false,
+			static::INSERT->value, static::UPDATE->value, static::DELETE->value, static::FORCE_DELETE->value, static::APPROVE->value, static::LOCK->value => false,
 			default => true,
 		};
 	}

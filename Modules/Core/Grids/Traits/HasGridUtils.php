@@ -6,11 +6,11 @@ use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Grids\Components\Grid;
 use Modules\Core\Locking\Traits\HasLocks;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Core\Grids\Components\Grid;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Modules\Core\Grids\Definitions\RelationInfo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Modules\Core\Grids\Definitions\PivotRelationInfo;
 
 trait HasGridUtils
@@ -37,7 +37,7 @@ trait HasGridUtils
 
         DB::beginTransaction();
 
-        /** @var array<string, RelationInfo> */
+        /** @var array<string, RelationInfo> $relations */
         $relations = [];
         foreach ($methods as $method) {
             $methodName = $method->getName();

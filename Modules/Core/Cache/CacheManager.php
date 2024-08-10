@@ -6,7 +6,6 @@ namespace Modules\Core\Cache;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Cache;
@@ -152,6 +151,7 @@ class CacheManager
     private static function getKeyFromUser(User $user): ?array
     {
         $tags = ['U' . $user->id];
+        $group_method = null;
 
         if (method_exists($user, 'groups')) {
             $group_method = 'groups';
@@ -163,9 +163,11 @@ class CacheManager
             $group_method = 'user_roles';
         }
 
-        $groups = $user->{$group_method}->map(fn (Model $r): string => 'R' . (int) $r->id)->toArray();
-        sort($groups);
-        array_push($tags, ...$groups);
+        if ($group_method) {
+            $groups = $user->{$group_method}->map(fn (Model $r): string => 'R' . (int) $r->id)->toArray();
+            sort($groups);
+            array_push($tags, ...$groups);
+        }
 
         return $tags;
     }

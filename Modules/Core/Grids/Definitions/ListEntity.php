@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\Core\Grids\Definitions;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Modules\Core\App\Helpers\ResponseBuilder;
-use Modules\Core\Grids\Casts\GridRequestData;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Grids\Components\Field;
 use Modules\Core\Grids\Requests\GridRequest;
+use Modules\Core\App\Helpers\ResponseBuilder;
+use Modules\Core\Grids\Casts\GridRequestData;
 
 /**
  * enanched entity class with common funcionalities for value/label lists
@@ -23,7 +23,7 @@ abstract class ListEntity extends Entity
     /**
      * @param  Field|Field[]  $labelField
      */
-    public function __construct(Model|string $model, Field $valueField, Field|array $labelField)
+    final public function __construct(Model|string $model, Field $valueField, Field|array $labelField)
     {
         parent::__construct($model);
         $this->setValueField($valueField);
@@ -36,12 +36,12 @@ abstract class ListEntity extends Entity
      * @param  Field|string|string[]|Field[]|null  $labelField
      * @return \Closure construct callback
      *
-     * @psalm-return \Closure(Model, Field):static
+     * @return \Closure(Model, Field): static
      */
     public static function create(Field|string|array|null $labelField = null): \Closure
     {
         if ($labelField && !($labelField instanceof Field)) {
-            $labelField = is_string($labelField) ? static::createField($labelField) : array_map(fn ($label) => static::createField($label), $labelField);
+            $labelField = is_string($labelField) ? self::createField($labelField) : array_map(fn ($label) => self::createField($label), $labelField);
         }
 
         return fn (Model $model, Field $valueField) => new static($model, $valueField, $labelField ?? $valueField);
@@ -98,8 +98,7 @@ abstract class ListEntity extends Entity
     /**
      * gets field used for label data
      *
-     *
-     * @psalm-return Field|array<string, mixed>|null
+     * @return Field|array<string, mixed>|null
      */
     public function getLabelField(): array|Field|null
     {
@@ -127,7 +126,7 @@ abstract class ListEntity extends Entity
      * gets funnel additional fields
      *
      *
-     * @psalm-return Collection<string, Field>
+     * @return Collection<string, Field>
      */
     public function getAdditionalFields(): Collection
     {
@@ -153,7 +152,7 @@ abstract class ListEntity extends Entity
     /**
      * get entity data
      *
-     * @return [Collection, int]
+     * @return array{0: Collection, 1: int}
      */
     abstract protected function getData(): array;
 
@@ -172,14 +171,8 @@ abstract class ListEntity extends Entity
 
         $response_builder = new ResponseBuilder($request);
         $data = $this->getData();
-
-        $total_records = 0;
-        if (!empty($data)) {
-            $total_records = $data[1];
-            $data = $data[0];
-        } else {
-            $data = new Collection();
-        }
+        $total_records = $data[1];
+        $data = $data[0];
 
         $this->setDataIntoResponse($response_builder, $data, $total_records);
         $response_builder->setClass($this->getModel());

@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Modules\Core\App\Casts\Sort;
-use Illuminate\Http\JsonResponse;
 use Modules\Core\App\Models\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -49,9 +48,7 @@ use Modules\Core\App\Http\Requests\TreeRequest;
 use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\App\Http\Requests\DetailRequest;
 use Modules\Core\App\Http\Requests\ModifyRequest;
-use Modules\Core\App\Http\Requests\SelectRequest;
 use Modules\Core\App\Http\Requests\HistoryRequest;
-use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\Core\Locking\Exceptions\LockedModelException;
@@ -97,7 +94,7 @@ class CrudController extends Controller
      */
     private function getModelKeyValue(CrudRequestData $filters): string|array
     {
-        /** @var string|string[] */
+        /** @var string|string[] $key */
         $key = $filters->model->getKeyName();
         if (is_string($key)) {
             return $filters->$key;
@@ -111,7 +108,7 @@ class CrudController extends Controller
     }
 
     /**
-     * @param  Closure(ResponseBuilder, Model, SelectRequestData): ResponseBuilder  $operation
+     * @param  Closure(ResponseBuilder, SelectRequestData): ResponseBuilder  $operation
      *
      * @throws UnexpectedValueException
      * @throws Exception
@@ -199,9 +196,9 @@ class CrudController extends Controller
      *
      * @psalm-return array{relation: string, connection: 'default'|mixed, table: mixed, field: null|string}
      */
-    private function splitProperty(Builder|Model $model, string &$property): array
+    private function splitProperty(Builder|Model $model, string $property): array
     {
-        /** @var string[] */
+        /** @var string[] $exploded */
         $exploded = explode('.', $property);
         if (!empty($exploded) && $exploded[0] === $model->getTable()) {
             array_shift($exploded);
@@ -222,10 +219,9 @@ class CrudController extends Controller
         if (substr_count($filter->property, '.') > 1) {
             // relations
             $splitted = $this->splitProperty($query->getModel(), $filter->property);
-            $query->{$method . 'Has'}($splitted['relation'], function ($q) use ($filter, $method, $splitted, $relations_columns) {
+            $query->{$method . 'Has'}($splitted['relation'], function (Builder $q) use ($filter, $method, $splitted, $relations_columns) {
                 if ($splitted['field'] === 'deleted_at') {
                     $permission = $splitted['connection'] . '.' . $splitted['table'] . '.' . 'delete';
-                    /** @var Authorizable */
                     $user = Auth::user();
                     if ($user->can($permission)) {
                         $q->withTrashed();
@@ -269,11 +265,11 @@ class CrudController extends Controller
     private static function sortColumns(BuilderContract $query, array &$columns)
     {
         usort($columns, fn (Column $a, Column $b) => $a->name <=> $b->name);
-        $all_columns_name = array_map(fn ($column) => $column->name, $columns);
+        $all_columns_name = array_map(fn (Column $column) => $column->name, $columns);
         // TODO: ancora da gestire le chiavi primarie multiple
         $primary_key = $query->getModel()->getKeyName();
         if (!in_array($primary_key, $all_columns_name)) {
-            array_unshift($columns, SelectRequest::createColumn($primary_key, ColumnType::COLUMN));
+            array_unshift($columns, new Column($primary_key, ColumnType::COLUMN));
         }
     }
 
@@ -291,7 +287,7 @@ class CrudController extends Controller
         foreach ($merged_relations as $relation) {
             $withs[$relation] = function (Relation $q) use ($relation, $relations_columns, $relations_sorts) {
                 if (!empty($relations_columns[$relation])) {
-                    static::sortColumns($q, $relations_columns[$relation]);
+                    self::sortColumns($q, $relations_columns[$relation]);
                     $q->select($relations_columns[$relation]);
                 }
                 if (!empty($relations_sorts[$relation])) {
@@ -320,9 +316,9 @@ class CrudController extends Controller
             'aggregates' => [],
         ];
 
-        if (isset($columns_filters) && !empty($columns_filters)) {
+        if (!empty($columns_filters)) {
             // used only for quick search instead of array_filter
-            /** @var string[] */
+            /** @var string[] $all_relations_columns_names */
             $all_relations_columns_names = [];
 
             /** @var object{name: string, type: ColumnType} $column */
@@ -335,7 +331,7 @@ class CrudController extends Controller
                         $columns['aggregates'][] = new Column($index, $column->type);
                     }
                 } else {
-                    $splitted = static::splitColumnNameOnLastDot($index);
+                    $splitted = self::splitColumnNameOnLastDot($index);
                     $remapped_column = new Column($splitted[1], $column->type);
                     if (!array_key_exists($index, $all_relations_columns_names)) {
                         $columns['relations'][$splitted[0]] = [$remapped_column];
@@ -360,10 +356,10 @@ class CrudController extends Controller
         $relations_sorts = [];
         $relations_columns = [];
 
-        $columns = static::groupColumns($main_entity, $filters->columns);
+        $columns = self::groupColumns($main_entity, $filters->columns);
         foreach ($columns as $type => $cols) {
             if ($type === 'main' && !empty($cols)) {
-                static::sortColumns($query, $cols);
+                self::sortColumns($query, $cols);
                 $only_standard_columns = [];
                 foreach ($cols as $column) {
                     if ($column->type === ColumnType::COLUMN) {
@@ -395,7 +391,7 @@ class CrudController extends Controller
                         $query->orderBy($column->property, $column->direction);
                     } else {
                         $index = str_replace($main_entity . '.', '', $column->property);
-                        $splitted = static::splitColumnNameOnLastDot($index);
+                        $splitted = self::splitColumnNameOnLastDot($index);
                         $column->property = $splitted[1];
                         if (!array_key_exists($index, $columns['relations'])) {
                             $relations_sorts[$splitted[0]] = [$column];
@@ -419,7 +415,7 @@ class CrudController extends Controller
     }
 
     /**
-     * @param  string[]|null  $groupBy
+     * @param  string[]  $groupBy
      * @return Collection
      */
     private function applyGroupBy(Collection &$data, array $groupBy)
@@ -615,6 +611,17 @@ class CrudController extends Controller
 
     //region WRITE OPERATIONS
 
+    private function removeNotFillableProperties(Model $model, array &$values): array
+    {
+        $non_fillables = [];
+        $non_fillables = array_diff(array_keys($model->getFillable()), array_keys($values));
+        foreach ($non_fillables as $property) {
+            unset($values[$property]);
+        }
+
+        return $non_fillables;
+    }
+
     /**
      * Insert the specified resource
      *
@@ -630,7 +637,7 @@ class CrudController extends Controller
             // $values = method_exists($model, 'getRules') ? $request->validate($model->getRules()) : $filters;
             // $values = $request->all();
             // se ci sono proprietà che non sono nei fillable devo restituire errore
-            $discarded_values = $this->removeNotFillableProperties($model, $values);
+            $discarded_values = $this->removeNotFillableProperties($model, $values->changes);
 
             $created = $model->create($values->changes);
             if (!$created) {
@@ -788,11 +795,11 @@ class CrudController extends Controller
         return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters, $request) use ($operation): ResponseBuilder {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($request, $model->getTable(), 'approve', $model->getConnectionName());
-            /** @var string|array */
+            /** @var string|array $key */
             $key = $model->getKeyName();
             $key_value = is_string($key) ? $filters->$key : array_map(fn ($k) => $filters->$k, $key);
             $found_record = $model->withTrashed()->findOrFail($key_value);
-            /** @var User */
+            /** @var User $user */
             $user = Auth::user();
             if ($filters['modification']) {
                 $modification = Modification::where(['modifiable_type' => $model::class, 'modifiable_id' => $filters->primaryKey])->findOrFail($filters['modification']);

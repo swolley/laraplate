@@ -25,8 +25,8 @@ class SelectRequestData extends CrudRequestData
     public function __construct(SelectRequest $request, string $mainEntity, array $validated, string|array $primaryKey)
     {
         parent::__construct($request, $mainEntity, $validated, $primaryKey);
-        $this->columns = static::conformColumns($validated['columns'] ?? []);
-        $this->relations = static::conformRelations($validated['relations'] ?? []);
+        $this->columns = $this->conformColumns($validated['columns'] ?? []);
+        $this->relations = $this->conformRelations($validated['relations'] ?? []);
     }
 
     private function conformColumnName(string $column): string

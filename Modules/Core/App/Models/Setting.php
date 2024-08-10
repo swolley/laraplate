@@ -14,6 +14,9 @@ use Modules\Core\App\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Core\Database\Factories\SettingFactory;
 
+/**
+ * @mixin IdeHelperSetting
+ */
 class Setting extends Model
 {
     use HasApprovals, HasCommonObserver, HasFactory, HasValidations, SoftDeletes;

@@ -30,6 +30,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                     'string',
                     'email',
                     'max:255',
+                    // @phpstan-ignore property.notFound
                     Rule::unique(user_class())->ignore($user->id),
                 ],
             ];
@@ -42,11 +43,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
         $validated = Validator::make($input, $rules)->validate();
         Arr::forget($validated, ['current_password', 'password_confirmation']);
-        if (isset($valdiated['password'])) {
-            $valdiated['password'] = Hash::make($valdiated['password']);
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
         }
 
         if (
+            // @phpstan-ignore property.notFound
             isset($validated['email']) && $validated['email'] !== $user->email &&
             $user instanceof MustVerifyEmail
         ) {

@@ -10,6 +10,9 @@ use Modules\Core\App\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @mixin IdeHelperUserGridConfig
+ */
 class UserGridConfig extends Model
 {
     use HasFactory, HasCommonObserver, HasValidations;

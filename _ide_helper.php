@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.10.0.
+ * Generated for Laravel 11.20.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -566,6 +566,7 @@ namespace Illuminate\Support\Facades {
          * @param string $abstract
          * @param array $parameters
          * @return mixed 
+         * @throws \Illuminate\Contracts\Container\BindingResolutionException
          * @static 
          */        public static function make($abstract, $parameters = [])
         {
@@ -1015,6 +1016,18 @@ namespace Illuminate\Support\Facades {
                         return $instance->when($concrete);
         }
                     /**
+         * Define a contextual binding based on an attribute.
+         *
+         * @param string $attribute
+         * @param \Closure $handler
+         * @return void 
+         * @static 
+         */        public static function whenHasAttribute($attribute, $handler)
+        {            //Method inherited from \Illuminate\Container\Container         
+                        /** @var \Illuminate\Foundation\Application $instance */
+                        $instance->whenHasAttribute($attribute, $handler);
+        }
+                    /**
          * Returns true if the container can return an entry for the given identifier.
          * 
          * Returns false otherwise.
@@ -1385,6 +1398,18 @@ namespace Illuminate\Support\Facades {
         {            //Method inherited from \Illuminate\Container\Container         
                         /** @var \Illuminate\Foundation\Application $instance */
                         $instance->afterResolving($abstract, $callback);
+        }
+                    /**
+         * Register a new after resolving attribute callback for all types.
+         *
+         * @param string $attribute
+         * @param \Closure $callback
+         * @return void 
+         * @static 
+         */        public static function afterResolvingAttribute($attribute, $callback)
+        {            //Method inherited from \Illuminate\Container\Container         
+                        /** @var \Illuminate\Foundation\Application $instance */
+                        $instance->afterResolvingAttribute($attribute, $callback);
         }
                     /**
          * Get the container's bindings.
@@ -3556,12 +3581,22 @@ namespace Illuminate\Support\Facades {
                         /** @var \Illuminate\Support\Testing\Fakes\BusFake $instance */
                         return $instance->serializeAndRestore($serializeAndRestore);
         }
+                    /**
+         * Get the batches that have been dispatched.
+         *
+         * @return array 
+         * @static 
+         */        public static function dispatchedBatches()
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\BusFake $instance */
+                        return $instance->dispatchedBatches();
+        }
             }
             /**
      * 
      *
      * @see \Illuminate\Cache\CacheManager
-     * @mixin \Illuminate\Cache\Repository
+     * @see \Illuminate\Cache\Repository
      */        class Cache {
                     /**
          * Get a cache store instance by name, wrapped in a repository.
@@ -4030,7 +4065,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Get the event dispatcher instance.
          *
-         * @return \Illuminate\Contracts\Events\Dispatcher 
+         * @return \Illuminate\Contracts\Events\Dispatcher|null 
          * @static 
          */        public static function getEventDispatcher()
         {
@@ -4714,6 +4749,34 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Log\Context\Repository $instance */
                         return $instance->pushHidden($key, ...$values);
+        }
+                    /**
+         * Determine if the given value is in the given stack.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @param bool $strict
+         * @return bool 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function stackContains($key, $value, $strict = false)
+        {
+                        /** @var \Illuminate\Log\Context\Repository $instance */
+                        return $instance->stackContains($key, $value, $strict);
+        }
+                    /**
+         * Determine if the given value is in the given hidden stack.
+         *
+         * @param string $key
+         * @param mixed $value
+         * @param bool $strict
+         * @return bool 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function hiddenStackContains($key, $value, $strict = false)
+        {
+                        /** @var \Illuminate\Log\Context\Repository $instance */
+                        return $instance->hiddenStackContains($key, $value, $strict);
         }
                     /**
          * Determine if the repository is empty.
@@ -5545,6 +5608,16 @@ namespace Illuminate\Support\Facades {
                         return $instance->macroCall($method, $parameters);
         }
                     /**
+         * Get a human-readable name for the given connection driver.
+         *
+         * @return string 
+         * @static 
+         */        public static function getDriverTitle()
+        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        return $instance->getDriverTitle();
+        }
+                    /**
          * Determine if the connected database is a MariaDB database.
          *
          * @return bool 
@@ -5585,6 +5658,29 @@ namespace Illuminate\Support\Facades {
         {            //Method inherited from \Illuminate\Database\MariaDbConnection         
                         /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
                         return $instance->getSchemaState($files, $processFactory);
+        }
+                    /**
+         * Run an insert statement against the database.
+         *
+         * @param string $query
+         * @param array $bindings
+         * @param string|null $sequence
+         * @return bool 
+         * @static 
+         */        public static function insert($query, $bindings = [], $sequence = null)
+        {            //Method inherited from \Illuminate\Database\MySqlConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        return $instance->insert($query, $bindings, $sequence);
+        }
+                    /**
+         * Get the connection's last insert ID.
+         *
+         * @return string|int|null 
+         * @static 
+         */        public static function getLastInsertId()
+        {            //Method inherited from \Illuminate\Database\MySqlConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        return $instance->getLastInsertId();
         }
                     /**
          * Set the query grammar to the default implementation.
@@ -5717,18 +5813,6 @@ namespace Illuminate\Support\Facades {
                         return $instance->cursor($query, $bindings, $useReadPdo);
         }
                     /**
-         * Run an insert statement against the database.
-         *
-         * @param string $query
-         * @param array $bindings
-         * @return bool 
-         * @static 
-         */        public static function insert($query, $bindings = [])
-        {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
-                        return $instance->insert($query, $bindings);
-        }
-                    /**
          * Run an update statement against the database.
          *
          * @param string $query
@@ -5786,6 +5870,16 @@ namespace Illuminate\Support\Facades {
         {            //Method inherited from \Illuminate\Database\Connection         
                         /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
                         return $instance->unprepared($query);
+        }
+                    /**
+         * Get the number of open connections for the database.
+         *
+         * @return int|null 
+         * @static 
+         */        public static function threadCount()
+        {            //Method inherited from \Illuminate\Database\Connection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        return $instance->threadCount();
         }
                     /**
          * Execute the given callback in "dry run" mode.
@@ -7832,6 +7926,18 @@ namespace Illuminate\Support\Facades {
                         return $instance->getDefaultDriver();
         }
                     /**
+         * Verifies that the configuration is less than or equal to what is configured.
+         *
+         * @param array $value
+         * @return bool 
+         * @internal 
+         * @static 
+         */        public static function verifyConfiguration($value)
+        {
+                        /** @var \Illuminate\Hashing\HashManager $instance */
+                        return $instance->verifyConfiguration($value);
+        }
+                    /**
          * Get a driver instance.
          *
          * @param string|null $driver
@@ -8995,7 +9101,7 @@ namespace Illuminate\Support\Facades {
          * Assert if a mailable was sent based on a truth-test callback.
          *
          * @param string|\Closure $mailable
-         * @param callable|int|null $callback
+         * @param callable|array|string|int|null $callback
          * @return void 
          * @static 
          */        public static function assertSent($mailable, $callback = null)
@@ -9019,7 +9125,7 @@ namespace Illuminate\Support\Facades {
          * Determine if a mailable was not sent based on a truth-test callback.
          *
          * @param string|\Closure $mailable
-         * @param callable|null $callback
+         * @param callable|array|string|null $callback
          * @return void 
          * @static 
          */        public static function assertNotSent($mailable, $callback = null)
@@ -9051,7 +9157,7 @@ namespace Illuminate\Support\Facades {
          * Assert if a mailable was queued based on a truth-test callback.
          *
          * @param string|\Closure $mailable
-         * @param callable|int|null $callback
+         * @param callable|array|string|int|null $callback
          * @return void 
          * @static 
          */        public static function assertQueued($mailable, $callback = null)
@@ -9063,7 +9169,7 @@ namespace Illuminate\Support\Facades {
          * Determine if a mailable was not queued based on a truth-test callback.
          *
          * @param string|\Closure $mailable
-         * @param callable|null $callback
+         * @param callable|array|string|null $callback
          * @return void 
          * @static 
          */        public static function assertNotQueued($mailable, $callback = null)
@@ -14180,6 +14286,17 @@ namespace Illuminate\Support\Facades {
                         return $instance->macroCall($method, $parameters);
         }
                     /**
+         * Call the given Closure with this instance then return the instance.
+         *
+         * @param \Illuminate\Routing\(callable($this):  mixed)|null  $callback
+         * @return \Illuminate\Routing\($callback is null ? \Illuminate\Support\HigherOrderTapProxy : $this)
+         * @static 
+         */        public static function tap($callback = null)
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        return $instance->tap($callback);
+        }
+                    /**
          * 
          *
          * @see \Lab404\Impersonate\ImpersonateServiceProvider::registerRoutesMacro()
@@ -15325,6 +15442,16 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Session\Store $instance */
                         $instance->setName($name);
+        }
+                    /**
+         * Get the current session ID.
+         *
+         * @return string 
+         * @static 
+         */        public static function id()
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        return $instance->id();
         }
                     /**
          * Get the current session ID.
@@ -18017,7 +18144,7 @@ namespace Illuminate\Support\Facades {
          * @param string $asset
          * @param string|null $buildDirectory
          * @return string 
-         * @throws \Exception
+         * @throws \Illuminate\Foundation\ViteException
          * @static 
          */        public static function content($asset, $buildDirectory = null)
         {
@@ -18120,7 +18247,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get all additional paths.
          *
-         * @return array 
          * @static 
          */        public static function getPaths()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18130,7 +18256,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get scanned modules paths.
          *
-         * @return array 
          * @static 
          */        public static function getScanPaths()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18150,7 +18275,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get all modules.
          *
-         * @return array 
          * @static 
          */        public static function all()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18170,7 +18294,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get all modules as collection instance.
          *
-         * @return \Nwidart\Modules\Collection 
          * @static 
          */        public static function toCollection()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18180,8 +18303,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get modules by status.
          *
-         * @param $status
-         * @return array 
          * @static 
          */        public static function getByStatus($status)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18191,8 +18312,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Determine whether the given module exist.
          *
-         * @param $name
-         * @return bool 
          * @static 
          */        public static function has($name)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18202,7 +18321,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get list of enabled modules.
          *
-         * @return array 
          * @static 
          */        public static function allEnabled()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18212,7 +18330,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get list of disabled modules.
          *
-         * @return array 
          * @static 
          */        public static function allDisabled()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18222,7 +18339,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get count from all modules.
          *
-         * @return int 
          * @static 
          */        public static function count()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18233,7 +18349,6 @@ namespace Nwidart\Modules\Facades {
          * Get all ordered modules.
          *
          * @param string $direction
-         * @return array 
          * @static 
          */        public static function getOrdered($direction = 'asc')
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18241,9 +18356,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->getOrdered($direction);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function getPath()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18251,9 +18365,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->getPath();
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function register()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18261,9 +18374,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->register();
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function boot()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18271,9 +18383,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->boot();
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function find($name)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18283,7 +18394,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Find a specific module, if there return that, otherwise throw exception.
          *
-         * @param $name
          * @return \Module 
          * @throws ModuleNotFoundException
          * @static 
@@ -18295,8 +18405,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get all modules as laravel collection instance.
          *
-         * @param $status
-         * @return \Nwidart\Modules\Collection 
          * @static 
          */        public static function collections($status = 1)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18306,7 +18414,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get module path for a specific module.
          *
-         * @param $module
          * @return string 
          * @static 
          */        public static function getModulePath($module)
@@ -18315,9 +18422,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->getModulePath($module);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function assetPath($module)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18325,9 +18431,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->assetPath($module);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function config($key, $default = null)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18337,7 +18442,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get storage path for module used.
          *
-         * @return string 
          * @static 
          */        public static function getUsedStoragePath()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18347,7 +18451,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Set module used for cli session.
          *
-         * @param $name
          * @throws ModuleNotFoundException
          * @static 
          */        public static function setUsed($name)
@@ -18367,7 +18470,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get module used for cli session.
          *
-         * @return string 
          * @throws \Nwidart\Modules\Exceptions\ModuleNotFoundException
          * @static 
          */        public static function getUsedNow()
@@ -18378,7 +18480,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get laravel filesystem instance.
          *
-         * @return \Nwidart\Modules\Filesystem 
          * @static 
          */        public static function getFiles()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18388,7 +18489,6 @@ namespace Nwidart\Modules\Facades {
                     /**
          * Get module assets path.
          *
-         * @return string 
          * @static 
          */        public static function getAssetsPath()
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18399,7 +18499,6 @@ namespace Nwidart\Modules\Facades {
          * Get asset url from a specific module.
          *
          * @param string $asset
-         * @return string 
          * @throws InvalidAssetPath
          * @static 
          */        public static function asset($asset)
@@ -18408,9 +18507,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->asset($asset);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function isEnabled($name)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18418,9 +18516,8 @@ namespace Nwidart\Modules\Facades {
                         return $instance->isEnabled($name);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function isDisabled($name)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18452,9 +18549,8 @@ namespace Nwidart\Modules\Facades {
                         $instance->disable($name);
         }
                     /**
-         * 
+         * {@inheritDoc}
          *
-         * @inheritDoc 
          * @static 
          */        public static function delete($name)
         {            //Method inherited from \Nwidart\Modules\FileRepository         
@@ -18661,10 +18757,10 @@ namespace Spatie\LaravelIgnition\Facades {
          * 
          *
          * @static 
-         */        public static function withStackFrameArguments($withStackFrameArguments = true)
+         */        public static function withStackFrameArguments($withStackFrameArguments = true, $forcePHPIniSetting = false)
         {
                         /** @var \Spatie\FlareClient\Flare $instance */
-                        return $instance->withStackFrameArguments($withStackFrameArguments);
+                        return $instance->withStackFrameArguments($withStackFrameArguments, $forcePHPIniSetting);
         }
                     /**
          * 
@@ -19511,7 +19607,7 @@ namespace  {
              * Create and return an un-saved model instance.
              *
              * @param array $attributes
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function make($attributes = [])
             {
@@ -19587,7 +19683,7 @@ namespace  {
                             /**
              * Add a basic where clause to the query.
              *
-             * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
+             * @param \Illuminate\Database\Eloquent\(\Closure(static):  mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
              * @param mixed $operator
              * @param mixed $value
              * @param string $boolean
@@ -19601,11 +19697,11 @@ namespace  {
                             /**
              * Add a basic where clause to the query, and return the first result.
              *
-             * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
+             * @param \Illuminate\Database\Eloquent\(\Closure(static):  mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
              * @param mixed $operator
              * @param mixed $value
              * @param string $boolean
-             * @return \Illuminate\Database\Eloquent\Model|static|null 
+             * @return \Illuminate\Database\Eloquent\TModel|null 
              * @static 
              */            public static function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
             {
@@ -19615,7 +19711,7 @@ namespace  {
                             /**
              * Add an "or where" clause to the query.
              *
-             * @param \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression $column
+             * @param \Illuminate\Database\Eloquent\(\Closure(static):  mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
              * @param mixed $operator
              * @param mixed $value
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -19628,7 +19724,7 @@ namespace  {
                             /**
              * Add a basic "where not" clause to the query.
              *
-             * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
+             * @param \Illuminate\Database\Eloquent\(\Closure(static):  mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
              * @param mixed $operator
              * @param mixed $value
              * @param string $boolean
@@ -19642,7 +19738,7 @@ namespace  {
                             /**
              * Add an "or where not" clause to the query.
              *
-             * @param \Closure|array|string|\Illuminate\Contracts\Database\Query\Expression $column
+             * @param \Illuminate\Database\Eloquent\(\Closure(static):  mixed)|array|string|\Illuminate\Contracts\Database\Query\Expression  $column
              * @param mixed $operator
              * @param mixed $value
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -19678,7 +19774,7 @@ namespace  {
              * Create a collection of models from plain arrays.
              *
              * @param array $items
-             * @return \Illuminate\Database\Eloquent\Collection 
+             * @return \Illuminate\Database\Eloquent\Collection<int, TModel> 
              * @static 
              */            public static function hydrate($items)
             {
@@ -19690,7 +19786,7 @@ namespace  {
              *
              * @param string $query
              * @param array $bindings
-             * @return \Illuminate\Database\Eloquent\Collection 
+             * @return \Illuminate\Database\Eloquent\Collection<int, TModel> 
              * @static 
              */            public static function fromQuery($query, $bindings = [])
             {
@@ -19702,7 +19798,7 @@ namespace  {
              *
              * @param mixed $id
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null 
+             * @return \Illuminate\Database\Eloquent\($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel|null)
              * @static 
              */            public static function find($id, $columns = [])
             {
@@ -19714,7 +19810,7 @@ namespace  {
              *
              * @param \Illuminate\Contracts\Support\Arrayable|array $ids
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Collection 
+             * @return \Illuminate\Database\Eloquent\Collection<int, TModel> 
              * @static 
              */            public static function findMany($ids, $columns = [])
             {
@@ -19726,8 +19822,8 @@ namespace  {
              *
              * @param mixed $id
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[] 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+             * @return \Illuminate\Database\Eloquent\($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel)
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
              * @static 
              */            public static function findOrFail($id, $columns = [])
             {
@@ -19739,7 +19835,7 @@ namespace  {
              *
              * @param mixed $id
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel)
              * @static 
              */            public static function findOrNew($id, $columns = [])
             {
@@ -19749,10 +19845,14 @@ namespace  {
                             /**
              * Find a model by its primary key or call a callback.
              *
+             * @template TValue
              * @param mixed $id
-             * @param \Closure|array|string $columns
-             * @param \Closure|null $callback
-             * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|mixed 
+             * @param \Illuminate\Database\Eloquent\(\Closure():  TValue)|list<string>|string  $columns
+             * @param \Illuminate\Database\Eloquent\(\Closure():  TValue)|null  $callback
+             * @return \Illuminate\Database\Eloquent\( $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
+             *     ? \Illuminate\Database\Eloquent\Collection<int, TModel>
+             *     : TModel|TValue
+             * )
              * @static 
              */            public static function findOr($id, $columns = [], $callback = null)
             {
@@ -19764,7 +19864,7 @@ namespace  {
              *
              * @param array $attributes
              * @param array $values
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function firstOrNew($attributes = [], $values = [])
             {
@@ -19776,7 +19876,7 @@ namespace  {
              *
              * @param array $attributes
              * @param array $values
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function firstOrCreate($attributes = [], $values = [])
             {
@@ -19788,7 +19888,7 @@ namespace  {
              *
              * @param array $attributes
              * @param array $values
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function createOrFirst($attributes = [], $values = [])
             {
@@ -19800,7 +19900,7 @@ namespace  {
              *
              * @param array $attributes
              * @param array $values
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function updateOrCreate($attributes, $values = [])
             {
@@ -19811,8 +19911,8 @@ namespace  {
              * Execute the query and get the first result or throw an exception.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|static 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+             * @return \Illuminate\Database\Eloquent\TModel 
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
              * @static 
              */            public static function firstOrFail($columns = [])
             {
@@ -19822,9 +19922,10 @@ namespace  {
                             /**
              * Execute the query and get the first result or call a callback.
              *
-             * @param \Closure|array|string $columns
-             * @param \Closure|null $callback
-             * @return \Illuminate\Database\Eloquent\Model|static|mixed 
+             * @template TValue
+             * @param \Illuminate\Database\Eloquent\(\Closure():  TValue)|list<string>  $columns
+             * @param \Illuminate\Database\Eloquent\(\Closure():  TValue)|null  $callback
+             * @return \Illuminate\Database\Eloquent\TModel|\Illuminate\Database\Eloquent\TValue 
              * @static 
              */            public static function firstOr($columns = [], $callback = null)
             {
@@ -19835,8 +19936,8 @@ namespace  {
              * Execute the query and get the first result if it's the sole matching record.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+             * @return \Illuminate\Database\Eloquent\TModel 
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
              * @throws \Illuminate\Database\MultipleRecordsFoundException
              * @static 
              */            public static function sole($columns = [])
@@ -19860,7 +19961,7 @@ namespace  {
              *
              * @param string|\Illuminate\Contracts\Database\Query\Expression $column
              * @return mixed 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
              * @throws \Illuminate\Database\MultipleRecordsFoundException
              * @static 
              */            public static function soleValue($column)
@@ -19873,7 +19974,7 @@ namespace  {
              *
              * @param string|\Illuminate\Contracts\Database\Query\Expression $column
              * @return mixed 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
              * @static 
              */            public static function valueOrFail($column)
             {
@@ -19884,7 +19985,7 @@ namespace  {
              * Execute the query as a "select" statement.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Collection|static[] 
+             * @return \Illuminate\Database\Eloquent\Collection<int, TModel> 
              * @static 
              */            public static function get($columns = [])
             {
@@ -19895,7 +19996,7 @@ namespace  {
              * Get the hydrated models without eager loading.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model[]|static[] 
+             * @return array<int, TModel> 
              * @static 
              */            public static function getModels($columns = [])
             {
@@ -19905,8 +20006,8 @@ namespace  {
                             /**
              * Eager load the relationships for the models.
              *
-             * @param array $models
-             * @return array 
+             * @param array<int, TModel> $models
+             * @return array<int, TModel> 
              * @static 
              */            public static function eagerLoadRelations($models)
             {
@@ -19938,7 +20039,7 @@ namespace  {
                             /**
              * Get a lazy collection for the given query.
              *
-             * @return \Illuminate\Support\LazyCollection 
+             * @return \Illuminate\Support\LazyCollection<int, TModel> 
              * @static 
              */            public static function cursor()
             {
@@ -19950,7 +20051,7 @@ namespace  {
              *
              * @param string|\Illuminate\Contracts\Database\Query\Expression $column
              * @param string|null $key
-             * @return \Illuminate\Support\Collection 
+             * @return \Illuminate\Support\Collection<array-key, mixed> 
              * @static 
              */            public static function pluck($column, $key = null)
             {
@@ -20005,7 +20106,7 @@ namespace  {
              * Save a new model and return the instance.
              *
              * @param array $attributes
-             * @return \Illuminate\Database\Eloquent\Model|$this 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function create($attributes = [])
             {
@@ -20016,7 +20117,7 @@ namespace  {
              * Save a new model and return the instance. Allow mass-assignment.
              *
              * @param array $attributes
-             * @return \Illuminate\Database\Eloquent\Model|$this 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function forceCreate($attributes)
             {
@@ -20027,7 +20128,7 @@ namespace  {
              * Save a new model instance with mass assignment without raising model events.
              *
              * @param array $attributes
-             * @return \Illuminate\Database\Eloquent\Model|$this 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function forceCreateQuietly($attributes = [])
             {
@@ -20105,7 +20206,7 @@ namespace  {
              * Create a new instance of the model being queried.
              *
              * @param array $attributes
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function newModelInstance($attributes = [])
             {
@@ -20211,7 +20312,7 @@ namespace  {
                             /**
              * Get the model instance being queried.
              *
-             * @return \Illuminate\Database\Eloquent\Model|static 
+             * @return \Illuminate\Database\Eloquent\TModel 
              * @static 
              */            public static function getModel()
             {
@@ -20221,8 +20322,9 @@ namespace  {
                             /**
              * Set a model instance for the model being queried.
              *
-             * @param \Illuminate\Database\Eloquent\Model $model
-             * @return \Illuminate\Database\Eloquent\Builder|static 
+             * @template TModelNew of \Illuminate\Database\Eloquent\Model
+             * @param \Illuminate\Database\Eloquent\TModelNew $model
+             * @return \Illuminate\Database\Eloquent\static<TModelNew> 
              * @static 
              */            public static function setModel($model)
             {
@@ -20285,7 +20387,7 @@ namespace  {
              * Chunk the results of the query.
              *
              * @param int $count
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(\Illuminate\Support\Collection<int, TValue>,  int): mixed  $callback
              * @return bool 
              * @static 
              */            public static function chunk($count, $callback)
@@ -20296,9 +20398,10 @@ namespace  {
                             /**
              * Run a map over each item while chunking.
              *
-             * @param callable $callback
+             * @template TReturn
+             * @param \Illuminate\Database\Eloquent\callable(TValue):  TReturn  $callback
              * @param int $count
-             * @return \Illuminate\Support\Collection 
+             * @return \Illuminate\Support\Collection<int, TReturn> 
              * @static 
              */            public static function chunkMap($callback, $count = 1000)
             {
@@ -20308,7 +20411,7 @@ namespace  {
                             /**
              * Execute a callback over each item while chunking.
              *
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(TValue,  int): mixed  $callback
              * @param int $count
              * @return bool 
              * @throws \RuntimeException
@@ -20322,7 +20425,7 @@ namespace  {
              * Chunk the results of a query by comparing IDs.
              *
              * @param int $count
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(\Illuminate\Support\Collection<int, TValue>,  int): mixed  $callback
              * @param string|null $column
              * @param string|null $alias
              * @return bool 
@@ -20336,7 +20439,7 @@ namespace  {
              * Chunk the results of a query by comparing IDs in descending order.
              *
              * @param int $count
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(\Illuminate\Support\Collection<int, TValue>,  int): mixed  $callback
              * @param string|null $column
              * @param string|null $alias
              * @return bool 
@@ -20350,7 +20453,7 @@ namespace  {
              * Chunk the results of a query by comparing IDs in a given order.
              *
              * @param int $count
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(\Illuminate\Support\Collection<int, TValue>,  int): mixed  $callback
              * @param string|null $column
              * @param string|null $alias
              * @param bool $descending
@@ -20365,7 +20468,7 @@ namespace  {
                             /**
              * Execute a callback over each item while chunking by ID.
              *
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable(TValue,  int): mixed  $callback
              * @param int $count
              * @param string|null $column
              * @param string|null $alias
@@ -20420,7 +20523,7 @@ namespace  {
              * Execute the query and get the first result.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|object|static|null 
+             * @return \Illuminate\Database\Eloquent\TValue|null 
              * @static 
              */            public static function first($columns = [])
             {
@@ -20431,7 +20534,7 @@ namespace  {
              * Execute the query and get the first result if it's the sole matching record.
              *
              * @param array|string $columns
-             * @return \Illuminate\Database\Eloquent\Model|object|static|null 
+             * @return \Illuminate\Database\Eloquent\TValue 
              * @throws \Illuminate\Database\RecordsNotFoundException
              * @throws \Illuminate\Database\MultipleRecordsFoundException
              * @static 
@@ -20443,7 +20546,7 @@ namespace  {
                             /**
              * Pass the query to a given callback.
              *
-             * @param callable $callback
+             * @param \Illuminate\Database\Eloquent\callable($this):  mixed  $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
              */            public static function tap($callback)
@@ -20484,7 +20587,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\Relation|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param string $operator
              * @param int $count
              * @param string $boolean
@@ -20500,7 +20603,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with an "or".
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param string $operator
              * @param int $count
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -20513,7 +20616,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param string $boolean
              * @param \Closure|null $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -20526,7 +20629,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with an "or".
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
              */            public static function orDoesntHave($relation)
@@ -20537,7 +20640,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with where clauses.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|null $callback
              * @param string $operator
              * @param int $count
@@ -20553,7 +20656,7 @@ namespace  {
              * 
              * Also load the relationship with same condition.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|null $callback
              * @param string $operator
              * @param int $count
@@ -20567,7 +20670,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with where clauses and an "or".
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|null $callback
              * @param string $operator
              * @param int $count
@@ -20581,7 +20684,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with where clauses.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|null $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20593,7 +20696,7 @@ namespace  {
                             /**
              * Add a relationship count / exists condition to the query with where clauses and an "or".
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|null $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20605,7 +20708,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param string $operator
              * @param int $count
@@ -20621,7 +20724,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with an "or".
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param string $operator
              * @param int $count
@@ -20635,7 +20738,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param string $boolean
              * @param \Closure|null $callback
@@ -20649,7 +20752,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with an "or".
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20661,7 +20764,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with where clauses.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|null $callback
              * @param string $operator
@@ -20676,7 +20779,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with where clauses and an "or".
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|null $callback
              * @param string $operator
@@ -20691,7 +20794,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with where clauses.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|null $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -20704,7 +20807,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship count / exists condition to the query with where clauses and an "or".
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|null $callback
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -20717,7 +20820,7 @@ namespace  {
                             /**
              * Add a basic where clause to a relationship query.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
              * @param mixed $operator
              * @param mixed $value
@@ -20731,7 +20834,7 @@ namespace  {
                             /**
              * Add an "or where" clause to a relationship query.
              *
-             * @param string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\Relation<*,  *, *>|string  $relation
              * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
              * @param mixed $operator
              * @param mixed $value
@@ -20745,7 +20848,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship condition to the query with a where clause.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
              * @param mixed $operator
@@ -20760,7 +20863,7 @@ namespace  {
                             /**
              * Add a polymorphic relationship condition to the query with an "or where" clause.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param string|array $types
              * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $column
              * @param mixed $operator
@@ -20775,7 +20878,7 @@ namespace  {
                             /**
              * Add a morph-to relationship condition to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param \Illuminate\Database\Eloquent\Model|string|null $model
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20787,7 +20890,7 @@ namespace  {
                             /**
              * Add a not morph-to relationship condition to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param \Illuminate\Database\Eloquent\Model|string $model
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20799,7 +20902,7 @@ namespace  {
                             /**
              * Add a morph-to relationship condition to the query with an "or where" clause.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param \Illuminate\Database\Eloquent\Model|string|null $model
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20811,7 +20914,7 @@ namespace  {
                             /**
              * Add a not morph-to relationship condition to the query with an "or where" clause.
              *
-             * @param \Illuminate\Database\Eloquent\Relations\MorphTo|string $relation
+             * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
              * @param \Illuminate\Database\Eloquent\Model|string $model
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
@@ -20823,7 +20926,7 @@ namespace  {
                             /**
              * Add a "belongs to" relationship where clause to the query.
              *
-             * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model> $related
+             * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $related
              * @param string|null $relationshipName
              * @param string $boolean
              * @return \Illuminate\Database\Eloquent\Builder|static 
@@ -20933,7 +21036,7 @@ namespace  {
                             /**
              * Merge the where constraints from another query to the current query.
              *
-             * @param \Illuminate\Database\Eloquent\Builder $from
+             * @param \Illuminate\Database\Eloquent\Builder<*> $from
              * @return \Illuminate\Database\Eloquent\Builder|static 
              * @static 
              */            public static function mergeConstraintsFrom($from)
@@ -20955,7 +21058,7 @@ namespace  {
                             /**
              * Add a subselect expression to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @return \Illuminate\Database\Query\Builder 
              * @throws \InvalidArgumentException
@@ -20980,7 +21083,7 @@ namespace  {
                             /**
              * Makes "from" fetch from a subquery.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @return \Illuminate\Database\Query\Builder 
              * @throws \InvalidArgumentException
@@ -21026,7 +21129,7 @@ namespace  {
                             /**
              * Set the table which the query is targeting.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $table
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $table
              * @param string|null $as
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21102,7 +21205,7 @@ namespace  {
                             /**
              * Add a subquery join clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
              * @param string|null $operator
@@ -21120,7 +21223,7 @@ namespace  {
                             /**
              * Add a lateral join clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @param string $type
              * @return \Illuminate\Database\Query\Builder 
@@ -21133,7 +21236,7 @@ namespace  {
                             /**
              * Add a lateral left join to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21173,7 +21276,7 @@ namespace  {
                             /**
              * Add a subquery left join to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
              * @param string|null $operator
@@ -21216,7 +21319,7 @@ namespace  {
                             /**
              * Add a subquery right join to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
              * @param string|null $operator
@@ -21245,7 +21348,7 @@ namespace  {
                             /**
              * Add a subquery cross join to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @param string $as
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21331,6 +21434,61 @@ namespace  {
             {
                                 /** @var \Illuminate\Database\Query\Builder $instance */
                                 return $instance->orWhereRaw($sql, $bindings);
+            }
+                            /**
+             * Add a "where like" clause to the query.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param string $value
+             * @param bool $caseSensitive
+             * @param string $boolean
+             * @param bool $not
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function whereLike($column, $value, $caseSensitive = false, $boolean = 'and', $not = false)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->whereLike($column, $value, $caseSensitive, $boolean, $not);
+            }
+                            /**
+             * Add an "or where like" clause to the query.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param string $value
+             * @param bool $caseSensitive
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function orWhereLike($column, $value, $caseSensitive = false)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->orWhereLike($column, $value, $caseSensitive);
+            }
+                            /**
+             * Add a "where not like" clause to the query.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param string $value
+             * @param bool $caseSensitive
+             * @param string $boolean
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function whereNotLike($column, $value, $caseSensitive = false, $boolean = 'and')
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->whereNotLike($column, $value, $caseSensitive, $boolean);
+            }
+                            /**
+             * Add an "or where not like" clause to the query.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param string $value
+             * @param bool $caseSensitive
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function orWhereNotLike($column, $value, $caseSensitive = false)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->orWhereNotLike($column, $value, $caseSensitive);
             }
                             /**
              * Add a "where in" clause to the query.
@@ -21755,7 +21913,7 @@ namespace  {
                             /**
              * Add an exists clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $callback
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
              * @param string $boolean
              * @param bool $not
              * @return \Illuminate\Database\Query\Builder 
@@ -21768,7 +21926,7 @@ namespace  {
                             /**
              * Add an or exists clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $callback
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
              * @param bool $not
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21780,7 +21938,7 @@ namespace  {
                             /**
              * Add a where not exists clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $callback
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
              * @param string $boolean
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21792,7 +21950,7 @@ namespace  {
                             /**
              * Add a where not exists clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $callback
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
              * @return \Illuminate\Database\Query\Builder 
              * @static 
              */            public static function orWhereNotExists($callback)
@@ -22057,7 +22215,7 @@ namespace  {
                             /**
              * Add a "where" clause to the query for multiple columns with "and" conditions between them.
              *
-             * @param string[] $columns
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
              * @param mixed $operator
              * @param mixed $value
              * @param string $boolean
@@ -22071,8 +22229,8 @@ namespace  {
                             /**
              * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
              *
-             * @param string[] $columns
-             * @param string $operator
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
+             * @param mixed $operator
              * @param mixed $value
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -22082,10 +22240,10 @@ namespace  {
                                 return $instance->orWhereAll($columns, $operator, $value);
             }
                             /**
-             * Add an "where" clause to the query for multiple columns with "or" conditions between them.
+             * Add a "where" clause to the query for multiple columns with "or" conditions between them.
              *
-             * @param string[] $columns
-             * @param string $operator
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
+             * @param mixed $operator
              * @param mixed $value
              * @param string $boolean
              * @return \Illuminate\Database\Query\Builder 
@@ -22098,8 +22256,8 @@ namespace  {
                             /**
              * Add an "or where" clause to the query for multiple columns with "or" conditions between them.
              *
-             * @param string[] $columns
-             * @param string $operator
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
+             * @param mixed $operator
              * @param mixed $value
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -22107,6 +22265,33 @@ namespace  {
             {
                                 /** @var \Illuminate\Database\Query\Builder $instance */
                                 return $instance->orWhereAny($columns, $operator, $value);
+            }
+                            /**
+             * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
+             * @param mixed $operator
+             * @param mixed $value
+             * @param string $boolean
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function whereNone($columns, $operator = null, $value = null, $boolean = 'and')
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->whereNone($columns, $operator, $value, $boolean);
+            }
+                            /**
+             * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
+             *
+             * @param \Illuminate\Contracts\Database\Query\Expression[]|string[] $columns
+             * @param mixed $operator
+             * @param mixed $value
+             * @return \Illuminate\Database\Query\Builder 
+             * @static 
+             */            public static function orWhereNone($columns, $operator = null, $value = null)
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->orWhereNone($columns, $operator, $value);
             }
                             /**
              * Add a "group by" clause to the query.
@@ -22271,7 +22456,7 @@ namespace  {
                             /**
              * Add an "order by" clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $column
              * @param string $direction
              * @return \Illuminate\Database\Query\Builder 
              * @throws \InvalidArgumentException
@@ -22284,7 +22469,7 @@ namespace  {
                             /**
              * Add a descending "order by" clause to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Expression|string $column
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $column
              * @return \Illuminate\Database\Query\Builder 
              * @static 
              */            public static function orderByDesc($column)
@@ -22424,7 +22609,7 @@ namespace  {
                             /**
              * Add a union statement to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $query
              * @param bool $all
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -22436,7 +22621,7 @@ namespace  {
                             /**
              * Add a union all statement to the query.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $query
              * @return \Illuminate\Database\Query\Builder 
              * @static 
              */            public static function unionAll($query)
@@ -22721,7 +22906,7 @@ namespace  {
              * Insert new records into the table using a subquery.
              *
              * @param array $columns
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @return int 
              * @static 
              */            public static function insertUsing($columns, $query)
@@ -22733,7 +22918,7 @@ namespace  {
              * Insert new records into the table using a subquery while ignoring errors.
              *
              * @param array $columns
-             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $query
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string $query
              * @return int 
              * @static 
              */            public static function insertOrIgnoreUsing($columns, $query)
@@ -23086,5 +23271,516 @@ namespace  {
 
 
 
+namespace {
+    
+
+use Illuminate\Contracts\Support\DeferringDisplayableValue;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Env;
+use Illuminate\Support\Fluent;
+use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\Once;
+use Illuminate\Support\Onceable;
+use Illuminate\Support\Optional;
+use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
+
+if (! function_exists('append_config')) {
+    /**
+     * Assign high numeric IDs to a config item to force appending.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    function append_config(array $array)
+    {
+        $start = 9999;
+
+        foreach ($array as $key => $value) {
+            if (is_numeric($key)) {
+                $start++;
+
+                $array[$start] = Arr::pull($array, $key);
+            }
+        }
+
+        return $array;
+    }
+}
+
+if (! function_exists('blank')) {
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @phpstan-assert-if-false !=null|'' $value
+     *
+     * @phpstan-assert-if-true !=numeric|bool $value
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function blank($value)
+    {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        if ($value instanceof Stringable) {
+            return trim((string) $value) === '';
+        }
+
+        return empty($value);
+    }
+}
+
+if (! function_exists('class_basename')) {
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_basename($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        return basename(str_replace('\\', '/', $class));
+    }
+}
+
+if (! function_exists('class_uses_recursive')) {
+    /**
+     * Returns all traits used by a class, its parent classes and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @return array
+     */
+    function class_uses_recursive($class)
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $results = [];
+
+        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
+            $results += trait_uses_recursive($class);
+        }
+
+        return array_unique($results);
+    }
+}
+
+if (! function_exists('e')) {
+    /**
+     * Encode HTML special characters in a string.
+     *
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    function e($value, $doubleEncode = true)
+    {
+        if ($value instanceof DeferringDisplayableValue) {
+            $value = $value->resolveDisplayableValue();
+        }
+
+        if ($value instanceof Htmlable) {
+            return $value->toHtml();
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
+        }
+
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
+    }
+}
+
+if (! function_exists('env')) {
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function env($key, $default = null)
+    {
+        return Env::get($key, $default);
+    }
+}
+
+if (! function_exists('filled')) {
+    /**
+     * Determine if a value is "filled".
+     *
+     * @phpstan-assert-if-true !=null|'' $value
+     *
+     * @phpstan-assert-if-false !=numeric|bool $value
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function filled($value)
+    {
+        return ! blank($value);
+    }
+}
+
+if (! function_exists('fluent')) {
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param  object|array  $value
+     * @return \Illuminate\Support\Fluent
+     */
+    function fluent($value)
+    {
+        return new Fluent($value);
+    }
+}
+
+if (! function_exists('literal')) {
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @return \stdClass
+     */
+    function literal(...$arguments)
+    {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
+    }
+}
+
+if (! function_exists('object_get')) {
+    /**
+     * Get an item from an object using "dot" notation.
+     *
+     * @template TValue of object
+     *
+     * @param  TValue  $object
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return ($key is empty ? TValue : mixed)
+     */
+    function object_get($object, $key, $default = null)
+    {
+        if (is_null($key) || trim($key) === '') {
+            return $object;
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (! is_object($object) || ! isset($object->{$segment})) {
+                return value($default);
+            }
+
+            $object = $object->{$segment};
+        }
+
+        return $object;
+    }
+}
+
+if (! function_exists('once')) {
+    /**
+     * Ensures a callable is only called once, and returns the result on subsequent calls.
+     *
+     * @template  TReturnType
+     *
+     * @param  callable(): TReturnType  $callback
+     * @return TReturnType
+     */
+    function once(callable $callback)
+    {
+        $onceable = Onceable::tryFromTrace(
+            debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2),
+            $callback,
+        );
+
+        return $onceable ? Once::instance()->value($onceable) : call_user_func($callback);
+    }
+}
+
+if (! function_exists('optional')) {
+    /**
+     * Provide access to optional objects.
+     *
+     * @template TValue
+     * @template TReturn
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): TReturn)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\Optional : ($value is null ? null : TReturn))
+     */
+    function optional($value = null, ?callable $callback = null)
+    {
+        if (is_null($callback)) {
+            return new Optional($value);
+        } elseif (! is_null($value)) {
+            return $callback($value);
+        }
+    }
+}
+
+if (! function_exists('preg_replace_array')) {
+    /**
+     * Replace a given pattern with each value in the array in sequentially.
+     *
+     * @param  string  $pattern
+     * @param  array  $replacements
+     * @param  string  $subject
+     * @return string
+     */
+    function preg_replace_array($pattern, array $replacements, $subject)
+    {
+        return preg_replace_callback($pattern, function () use (&$replacements) {
+            foreach ($replacements as $value) {
+                return array_shift($replacements);
+            }
+        }, $subject);
+    }
+}
+
+if (! function_exists('retry')) {
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @template TValue
+     *
+     * @param  int|array<int, int>  $times
+     * @param  callable(int): TValue  $callback
+     * @param  int|\Closure(int, \Throwable): int  $sleepMilliseconds
+     * @param  (callable(\Throwable): bool)|null  $when
+     * @return TValue
+     *
+     * @throws \Throwable
+     */
+    function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null)
+    {
+        $attempts = 0;
+
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+
+            $times = count($times) + 1;
+        }
+
+        beginning:
+        $attempts++;
+        $times--;
+
+        try {
+            return $callback($attempts);
+        } catch (Throwable $e) {
+            if ($times < 1 || ($when && ! $when($e))) {
+                throw $e;
+            }
+
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
+
+            if ($sleepMilliseconds) {
+                Sleep::usleep(value($sleepMilliseconds, $attempts, $e) * 1000);
+            }
+
+            goto beginning;
+        }
+    }
+}
+
+if (! function_exists('str')) {
+    /**
+     * Get a new stringable object from the given string.
+     *
+     * @param  string|null  $string
+     * @return ($string is null ? object : \Illuminate\Support\Stringable)
+     */
+    function str($string = null)
+    {
+        if (func_num_args() === 0) {
+            return new class
+            {
+                public function __call($method, $parameters)
+                {
+                    return Str::$method(...$parameters);
+                }
+
+                public function __toString()
+                {
+                    return '';
+                }
+            };
+        }
+
+        return Str::of($string);
+    }
+}
+
+if (! function_exists('tap')) {
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): mixed)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
+     */
+    function tap($value, $callback = null)
+    {
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value);
+        }
+
+        $callback($value);
+
+        return $value;
+    }
+}
+
+if (! function_exists('throw_if')) {
+    /**
+     * Throw the given exception if the given condition is true.
+     *
+     * @template TValue
+     * @template TException of \Throwable
+     *
+     * @param  TValue  $condition
+     * @param  TException|class-string<TException>|string  $exception
+     * @param  mixed  ...$parameters
+     * @return TValue
+     *
+     * @throws TException
+     */
+    function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
+    {
+        if ($condition) {
+            if (is_string($exception) && class_exists($exception)) {
+                $exception = new $exception(...$parameters);
+            }
+
+            throw is_string($exception) ? new RuntimeException($exception) : $exception;
+        }
+
+        return $condition;
+    }
+}
+
+if (! function_exists('throw_unless')) {
+    /**
+     * Throw the given exception unless the given condition is true.
+     *
+     * @template TValue
+     * @template TException of \Throwable
+     *
+     * @param  TValue  $condition
+     * @param  TException|class-string<TException>|string  $exception
+     * @param  mixed  ...$parameters
+     * @return TValue
+     *
+     * @throws TException
+     */
+    function throw_unless($condition, $exception = 'RuntimeException', ...$parameters)
+    {
+        throw_if(! $condition, $exception, ...$parameters);
+
+        return $condition;
+    }
+}
+
+if (! function_exists('trait_uses_recursive')) {
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param  object|string  $trait
+     * @return array
+     */
+    function trait_uses_recursive($trait)
+    {
+        $traits = class_uses($trait) ?: [];
+
+        foreach ($traits as $trait) {
+            $traits += trait_uses_recursive($trait);
+        }
+
+        return $traits;
+    }
+}
+
+if (! function_exists('transform')) {
+    /**
+     * Transform the given value if it is present.
+     *
+     * @template TValue
+     * @template TReturn
+     * @template TDefault
+     *
+     * @param  TValue  $value
+     * @param  callable(TValue): TReturn  $callback
+     * @param  TDefault|callable(TValue): TDefault  $default
+     * @return ($value is empty ? TDefault : TReturn)
+     */
+    function transform($value, callable $callback, $default = null)
+    {
+        if (filled($value)) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+}
+
+if (! function_exists('windows_os')) {
+    /**
+     * Determine whether the current environment is Windows based.
+     *
+     * @return bool
+     */
+    function windows_os()
+    {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+}
+
+if (! function_exists('with')) {
+    /**
+     * Return the given value, optionally passed through the given callback.
+     *
+     * @template TValue
+     * @template TReturn
+     *
+     * @param  TValue  $value
+     * @param  (callable(TValue): (TReturn))|null  $callback
+     * @return ($callback is null ? TValue : TReturn)
+     */
+    function with($value, ?callable $callback = null)
+    {
+        return is_null($callback) ? $value : $callback($value);
+    }
+}
+}
 
 

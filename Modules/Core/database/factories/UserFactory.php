@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\Core\Database\Factories;
 
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Core\App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Modules\Core\App\Models\User>
@@ -16,7 +16,7 @@ class UserFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     * @var class-string<User>
      */
     protected $model = User::class;
 

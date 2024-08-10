@@ -8,14 +8,15 @@ use Illuminate\Support\Collection;
 
 class Index
 {
+    /** 
+     * @param Collection<string> $columns 
+     * @param Collection<string> $attributes
+     */
     public function __construct(
         public readonly string $name,
-        /** @param Collection<string> */
         public readonly Collection $columns,
-        /** @param Collection<string> */
         public readonly Collection $attributes,
-    ) {
-    }
+    ) {}
 
     public function isComposite(): bool
     {

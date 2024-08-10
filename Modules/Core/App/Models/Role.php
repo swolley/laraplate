@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
+/**
+ * @mixin IdeHelperRole
+ */
 class Role extends BaseRole
 {
     use HasCommonObserver, HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes;

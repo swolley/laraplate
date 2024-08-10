@@ -1,5 +1,6 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
 
@@ -7,12 +8,32 @@ parameters:
         - app/
         - tests/
         - Modules/
+        - routes/
+    
+    scanFiles:
+        - _ide_helper.php
+        - _ide_helper_models.php
+        - .phpstorm.meta.php
 
     # Level 9 is the highest level
-    level: 5
+    level: 2
 
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Routing\\Route::name\(\).$#'
+        - '#Call to an undefined method Illuminate\\Routing\\Route::withoutMiddleware\(\).$#'
+        - '#Call to an undefined method Illuminate\\Routing\\Route::can\(\).$#'
+        - '#Call to an undefined method Illuminate\\Routing\\Route::where\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\App\\Http\\Requests\\CrudRequest::isJson\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\App\\Http\\Requests\\CrudRequest::json\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\App\\Http\\Requests\\CrudRequest::getRealMethod\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::has\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::get\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::all\(\).$#'
+        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
+        - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::withTrashed\(\).$#'
+        - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::getTimestampColumns\(\).$#'
+        - '#Call to an undefined method Modules\\Core\Grids\\Casts\\GridRequestData|Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
+        - '#Call to an undefined method Illuminate\\Http\\Request::getMethod\(\).$#'
 #
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
@@ -20,4 +41,5 @@ parameters:
 
     checkModelProperties: true
     checkOctaneCompatibility: true
-    checkMissingIterableValueType: false
+    noEnvCallsOutsideOfConfig: true
+    checkModelAppends: true

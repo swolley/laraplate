@@ -15,6 +15,14 @@ trait HasValidity
 
     protected static $valid_to_column = 'valid_to';
 
+    protected function casts()
+    {
+        return [
+            'valid_from' => 'date',
+            'valid_to' => 'date',
+        ];
+    }
+
     public static function validFromKey(): string
     {
         return static::$valid_from_column;

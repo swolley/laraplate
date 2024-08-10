@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Monolog\Handler\GelfHandler;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Modules\Core\Logging\GelfLoggerFactory;
 use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Processor\PsrLogMessageProcessor;
-// use Modules\Core\Logging\GelfAdditionalInfoProcessor;
+use Modules\Core\Logging\GelfAdditionalInfoProcessor;
 
 return [
     /*
@@ -98,17 +98,18 @@ return [
         ],
 
         'graylog' => [
-            'driver' => 'monolog',
+            'driver' => 'custom',
             'level' => env('GRAYLOG_LEVEL', 'error'),
-            'handler' => GelfHandler::class,
-            'handler_with' => [
-                'host' => env('GRAYLOG_URL'),
-                'port' => env('GRAYLOG_PORT', 12201),
-            ],
+            'via' => GelfLoggerFactory::class,
+            'host' => env('GRAYLOG_URL'),
+            'port' => env('GRAYLOG_PORT', 12201),
             'formatter' => GelfMessageFormatter::class,
-            // 'processors' => [
-            //     GelfAdditionalInfoProcessor::class,
-            // ],
+            'processors' => [
+                [
+                    'processor' => GelfAdditionalInfoProcessor::class,
+                    // 'with' => ['channel' => $channel],
+                ],
+            ],
         ],
 
         'stderr' => [
