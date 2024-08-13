@@ -31,7 +31,10 @@ class ModifyRequest extends CrudRequest implements IParsableRequest
         // force remove unwanted keys if insert and autoincrement
         if (!$is_autoincrement || !$is_insert) {
             $validation = ['required'];
-            if ($this->model->getKeyType() === 'int') $validation[] = 'integer';
+            if ($this->model->getKeyType() === 'int') {
+                $validation[] = 'integer';
+                $validation[] = 'numeric';
+            }
         } else {
             $validation = ['forget'];
         }

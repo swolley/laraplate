@@ -86,14 +86,6 @@ npx commitizen init cz-conventional-changelog --save-dev --save-exact
 https://jeroeng.dev/blog/exploring-elasticsearch-with-laravel-scout/
 
 ```php
-// config/explorer.php
-
-'indexes' => [
-    \App\Models\...::class
-],
-```
-
-```php
 <?php
 
 namespace App\Models;

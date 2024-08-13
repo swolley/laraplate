@@ -11,11 +11,11 @@ class ListRequest extends SelectRequest
     public function rules()
     {
         $rules = parent::rules() + [
-            'pagination' => ['integer', 'min:1', 'exclude_if:count,true'],
-            'page' => ['integer', 'min:1', 'exclude_if:count,true'],
-            'from' => ['integer', 'min:1', 'exclude_if:count,true'],
-            'to' => ['integer', 'min:1', 'exclude_if:count,true'],
-            'limit' => ['integer', 'min:1', 'exclude_if:count,true'],
+            'pagination' => ['integer', 'numeric', 'min:1', 'exclude_if:count,true'],
+            'page' => ['integer', 'numeric', 'min:1', 'exclude_if:count,true'],
+            'from' => ['integer', 'numeric', 'min:1', 'exclude_if:count,true'],
+            'to' => ['integer', 'numeric', 'min:1', 'exclude_if:count,true'],
+            'limit' => ['integer', 'numeric', 'min:1', 'exclude_if:count,true'],
             'count' => ['boolean'],
             'sort.*.property' => ['string'],
             'sort.*.direction' => ['in:asc,desc,ASC,DESC'],

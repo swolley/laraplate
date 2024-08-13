@@ -36,35 +36,35 @@ class ListRequestData extends SelectRequestData
     {
         parent::__construct($request, $mainEntity, $validated, $primaryKey);
         if (isset($validated['pagination']) || isset($validated['page'])) {
-            $this->take = $this->pagination = $validated['pagination'] ?? self::getDefaultPagination();
-            $this->page = $validated['page'] ?? 1;
+            $this->take = $this->pagination = (int) ($validated['pagination'] ?? self::getDefaultPagination());
+            $this->page = (int) ($validated['page'] ?? 1);
             $this->skip = ($this->page - 1) * $this->pagination;
             $this->from = $this->skip + 1;
             $this->to = $this->from + $this->pagination;
         } elseif (isset($validated['from']) || isset($validated['to'])) {
-            $this->from = $validated['from'] ?? 1;
+            $this->from = (int) ($validated['from'] ?? 1);
             $this->skip = $this->from - 1;
-            if ($this->to = $validated['to'] ?? null) {
+            if ($this->to = isset($validated['to']) ? (int) $validated['to'] : null) {
                 $this->take = $this->pagination = $this->to - $this->from;
             }
         } elseif (isset($validated['limit'])) {
-            $this->take = $this->limit = $validated['limit'];
-            $this->page = 0;
+            $this->take = $this->limit = (int) $validated['limit'];
+            $this->page = 1;
             $this->skip = 0;
-            $this->pagination = $validated['limit'];
+            $this->pagination = $this->limit;
         } else {
-            $this->page = 0;
+            $this->page = 1;
             $this->skip = 0;
             $this->take = $this->pagination = self::getDefaultPagination();
         }
         /** @phpstan-ignore property.uninitializedReadonly */
         if (!isset($this->limit)) {
             /** @phpstan-ignore property.uninitializedReadonly, assign.readOnlyProperty */
-            $this->limit = $validated['limit'] ?? $this->pagination;
+            $this->limit = (int) ($validated['limit'] ?? $this->pagination);
         }
 
-        $this->count = $validated['count'] ?? false;
-        $this->sort = $this->conformSorts($validated['sorts'] ?? []);
+        $this->count = isset($validated['count']) ? (int) $validated['count'] : false;
+        $this->sort = $this->conformSorts($validated['sort'] ?? []);
 
         if (isset($validated['filters'])) {
             $this->conformFiltersToQueryBuilderFormat($validated['filters']);
@@ -112,7 +112,7 @@ class ListRequestData extends SelectRequestData
         }
     }
 
-    protected function conformFiltersToQueryBuilderFormat(array &$filters, int $level = 0): void
+    protected function conformFiltersToQueryBuilderFormat(array|FiltersGroup|Filter &$filters, int $level = 0): void
     {
         if (Arr::isList($filters)) {
             foreach ($filters as &$filter) {
@@ -125,10 +125,10 @@ class ListRequestData extends SelectRequestData
         } else {
             $this->conformFilterOperators($filters);
             $this->conformFilterValue($filters);
-            $filter = new Filter($filters['property'], $filters['value'], $filters['operator']);
+            $filters = new Filter($filters['property'], $filters['value'], $filters['operator']);
         }
 
-        if ($level === 0 && Arr::isList($filters)) {
+        if ($level === 0 && !($filters instanceof FiltersGroup) && Arr::isList($filters)) {
             $filters = new FiltersGroup($filters);
         }
     }
@@ -156,7 +156,7 @@ class ListRequestData extends SelectRequestData
     private function addGroupsToColumns(array $groups): void
     {
         if (!empty($this->columns)) {
-            $all_columns_name = array_map(fn (Column $column) => /*is_string($column) ? $column : $column['name']*/ $column->name, $this->columns);
+            $all_columns_name = array_map(fn(Column $column) => /*is_string($column) ? $column : $column['name']*/ $column->name, $this->columns);
 
             foreach ($groups as $group) {
                 if (!in_array($group, $all_columns_name, true)) {

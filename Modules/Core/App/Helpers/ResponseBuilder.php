@@ -298,10 +298,8 @@ class ResponseBuilder
         return $this->resourceResponse->resource;
     }
 
-    /**
-     * @return array{data: mixed, meta: array{status: int, preview: bool, totalRecords?: int, currentRecords?: int, currentPage?: int, totalPages?: int, pagination?: int, from?: int, to?: int|mixed, class?: string, table?: string, cachedAt?: Carbon}, error?: mixed|string, exception?: array{code: int|string, file: string, line: int, trace: list<array{args?: array, class?: class-string, file?: string, function?: string, line?: int, type?: '->'|'::'}>}}
-     */
-    public function toArray(): array
+    // TODO: E' una soluzione ma non mi piace
+    public function toArray(): JsonResponse
     {
         $payload = [
             'meta' => [
@@ -379,11 +377,18 @@ class ResponseBuilder
 
         $this->resourceResponse->with = $payload;
 
-        return $this->resourceResponse->toArray($this->request);
+        $response = $this->resourceResponse->toResponse($this->request);
+        $response->setStatusCode($this->status);
+        foreach ($this->headers as $key => $value) {
+            $response->headers->set($key, $value);
+        }
+
+        return $response;
     }
 
+    // TODO: E' una soluzione ma non mi piace
     public function json(): JsonResponse
     {
-        return response()->json($this->toArray(), $this->status, $this->headers);
+        return $this->toArray();
     }
 }
