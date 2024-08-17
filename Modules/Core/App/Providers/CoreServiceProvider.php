@@ -100,7 +100,7 @@ class CoreServiceProvider extends ServiceProvider
     public function registerAuths(): void
     {
         // bypass all other checks if user is super admin
-        Gate::before(fn (?User $user) => $user && $user->isSuperAdmin() ? true : null);
+        Gate::before(fn(?User $user) => $user && $user->isSuperAdmin() ? true : null);
     }
 
     /**
@@ -186,6 +186,8 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->publishes([module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower . '.php')], 'config');
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
+        // additional gelf logger for graylog
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/logging.php'), 'logging');
     }
 
     protected function registerMiddlewares()
@@ -205,7 +207,7 @@ class CoreServiceProvider extends ServiceProvider
         $files = glob(module_path($this->moduleName, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
 
         return array_map(
-            fn ($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->moduleName, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
+            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->moduleName, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
             $files,
         );
     }

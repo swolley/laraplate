@@ -116,8 +116,8 @@ class CoreDatabaseSeeder extends Seeder
 
         DB::transaction(function () use ($admin, $root, $anonymous, $user_class) {
             if (!$user_class::whereName($root)->exists()) {
-                $email = text("Please specify a root user email", required: true);
-                $password = password("Please specify a root user password", required: true);
+                $email = text("Please specify a $root user email", required: true, validate: fn(string $value) => filter_var($value, FILTER_VALIDATE_EMAIL) ? null : 'Please type a valid email');
+                $password = password("Please specify a $root user password", required: true);
                 password("Please confirm the password", required: true, validate: fn(string $value) => $password !== $value ? 'Passwords don\'t match' : null);
                 $root_user = $this->create($user_class, [
                     'name' => $root,
@@ -135,10 +135,13 @@ class CoreDatabaseSeeder extends Seeder
             }
 
             if (!$user_class::whereName($admin)->exists()) {
+                $email = text("Please specify a $admin user email", required: true, validate: fn(string $value) => filter_var($value, FILTER_VALIDATE_EMAIL) ? null : 'Please type a valid email');
+                $password = password("Please specify a $admin user password", required: true);
+                password("Please confirm the password", required: true, validate: fn(string $value) => $password !== $value ? 'Passwords don\'t match' : null);
                 $admin_user = $this->create($user_class, [
                     'name' => $admin,
                     'username' => $admin,
-                    'email' => "$admin@" . str_replace('_', '', Str::slug(config('app.name'))) . '.com',
+                    'email' => $email,
                     'password' => Hash::make(config('app.name')),
                     'email_verified_at' => now(),
                 ]);

@@ -7,6 +7,22 @@
             "email": "myentity@inwind.it"
         }
     ],
+    "license": "MIT",
+    "require": {
+        "doctrine/dbal": "*",
+        "amphp/amp": "^3.0",
+        "laravel/fortify": "^1.21",
+        "hedii/laravel-gelf-logger": "^9.0",
+        "lab404/laravel-impersonate": "^1.7",
+        "nextapps/laravel-swagger-ui": "^0.9.2",
+        "overtrue/laravel-versionable": "^5.2",
+        "spatie/laravel-permission": "^6.4",
+        "staudenmeir/laravel-adjacency-list": "*",
+        "stephenlake/laravel-approval": "^1.1"
+    },
+    "require-dev": {
+        "mtrajano/laravel-swagger": "^0.6.4"
+    },
     "extra": {
         "laravel": {
             "providers": [],

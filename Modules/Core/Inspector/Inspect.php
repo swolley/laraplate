@@ -6,6 +6,7 @@ namespace Modules\Core\Inspector;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Modules\Core\Inspector\Entities\Index;
 use Modules\Core\Inspector\Entities\Table;
@@ -19,14 +20,15 @@ class Inspect
      */
     public static function table(string $name, null|string $schema = null): ?Table
     {
+        $key_name = ($schema ?? 'default') . '_' . $name;
+        if ($inspected_data = Cache::tags(['inspector', $schema ?? 'default'])->get($key_name)) {
+            return $inspected_data;
+        }
+
         /** @phpstan-ignore staticMethod.notFound */
         $connection = Schema::connection($schema);
-
-        // if (!$connection) {
-        //     return null;
-        // }
         $tables = $connection->getTables();
-        $table = Arr::first($tables, fn ($table) => $table['name'] === $name);
+        $table = Arr::first($tables, fn($table) => $table['name'] === $name);
 
         if (!$table) {
             return null;
@@ -37,7 +39,7 @@ class Inspect
         $indexes = self::parseIndexes($connection->getIndexes($table['name']));
         $foreignKeys = self::parseForeignKeys($connection->getForeignKeys($table['name']), $database_name, $schema);
 
-        return new Table(
+        $inspected_data =  new Table(
             $table['name'],
             $columns,
             $indexes,
@@ -45,6 +47,10 @@ class Inspect
             $database_name,
             $schema,
         );
+
+        Cache::tags(['inspector', $schema])->forever($key_name, $inspected_data);
+
+        return $inspected_data;
     }
 
     /**
@@ -92,7 +98,7 @@ class Inspect
     {
         $columns = self::columns($table, $schema);
 
-        return Arr::first($columns, fn ($column) => $column['name'] === $name);
+        return Arr::first($columns, fn($column) => $column['name'] === $name);
     }
 
     /**
@@ -104,7 +110,7 @@ class Inspect
     {
         $indexes = self::indexes($table, $schema);
 
-        return Arr::first($indexes, fn ($index) => $index['name'] === $name);
+        return Arr::first($indexes, fn($index) => $index['name'] === $name);
     }
 
     /**
@@ -116,8 +122,9 @@ class Inspect
     {
         $foreigns = self::foreignKeys($table, $schema);
 
-        return Arr::first($foreigns, fn ($foreign) => $foreign['name'] === $name);
+        return Arr::first($foreigns, fn($foreign) => $foreign['name'] === $name);
     }
+
     private static function getAttributesForColumn(array $column): Collection
     {
         return collect([
@@ -134,7 +141,7 @@ class Inspect
      */
     private static function parseColumns(array $columns): Collection
     {
-        return collect($columns)->map(fn ($column) => new Column(
+        return collect($columns)->map(fn($column) => new Column(
             $column['name'],
             self::getAttributesForColumn($column),
             $column['default'],
@@ -158,7 +165,7 @@ class Inspect
      */
     private static function parseIndexes(array $indexes): Collection
     {
-        return collect($indexes)->map(fn ($index) => new Index(
+        return collect($indexes)->map(fn($index) => new Index(
             $index['name'],
             collect($index['columns']),
             self::getAttributesForIndex($index),
@@ -170,7 +177,7 @@ class Inspect
      */
     private static function parseForeignKeys(array $keys, string $schema, ?string $connection = null): Collection
     {
-        return collect($keys)->map(fn ($foreignKey) => new ForeignKey(
+        return collect($keys)->map(fn($foreignKey) => new ForeignKey(
             $foreignKey['name'],
             collect($foreignKey['columns']),
             $foreignKey['foreign_schema'],

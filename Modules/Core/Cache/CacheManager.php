@@ -13,16 +13,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class CacheManager
 {
+    /**
+     * contruct a cache key by request info
+     */
     public static function getKeyFromRequest(Request $request): string
     {
         $path = $request->getPathInfo();
         $params = $request->query();
-        $user = static::getKeyFromUser($request->user());
+        $user = static::getKeyPartsFromUser($request->user());
         static::recursiveKSort($params);
 
         return base64_encode($path . ($user ? implode('_', $user) . '_' : '') . serialize($params));
     }
 
+    /**
+     * Try to extract from cache or by specified callback using request info
+     */
     public static function tryByRequest(Model|string|array|null $entity, Request $request, Closure $callback, int $duration = null): mixed
     {
         $tags = [];
@@ -41,7 +47,7 @@ class CacheManager
             }
         }
 
-        if ($user = static::getKeyFromUser($request->user())) {
+        if ($user = static::getKeyPartsFromUser($request->user())) {
             array_push($tags, ...$user);
         }
         $key = static::getKeyFromRequest($request);
@@ -53,6 +59,9 @@ class CacheManager
             : $cache->rememberForever($key, $callback);
     }
 
+    /**
+     * clear cache by specified entity
+     */
     public static function clearByEntity(Model|string|array $entity): void
     {
         $models = is_array($entity) ? $entity : [$entity];
@@ -68,6 +77,9 @@ class CacheManager
         }
     }
 
+    /**
+     * clear cache by request extracted info
+     */
     public static function clearByRequest(Request $request, Model|string|array|null $entity = null): void
     {
         $key = static::getKeyFromRequest($request);
@@ -88,6 +100,9 @@ class CacheManager
         }
     }
 
+    /**
+     * clear cache elements by user and only by entity if specified
+     */
     public static function clearByUser(User $user, Model|string|array|null $entity = null): void
     {
         $user_key = 'U' . $user->id;
@@ -108,6 +123,9 @@ class CacheManager
         }
     }
 
+    /**
+     * clear cache elements by user group and only by entity if specified
+     */
     public static function clearByGroup(Role $role, Model|string|array|null $entity = null): void
     {
         $role_key = 'R' . $role->id;
@@ -127,11 +145,15 @@ class CacheManager
             Cache::tags([$role_key])->flush();
         }
     }
+
     private static function getTableName(string|Model $entity): string
     {
         return is_string($entity) ? $entity : $entity->getTable();
     }
 
+    /** 
+     * recursively sorts array by keys
+     */
     private static function recursiveKSort(array|string|null &$array): void
     {
         if (is_array($array)) {
@@ -144,11 +166,12 @@ class CacheManager
     }
 
     /**
+     * compose key parts by user and groups
+     * 
      * @return null|(mixed|string)[]
-     *
      * @psalm-return list{0?: mixed|string,...}|null
      */
-    private static function getKeyFromUser(User $user): ?array
+    private static function getKeyPartsFromUser(User $user): ?array
     {
         $tags = ['U' . $user->id];
         $group_method = null;
@@ -164,7 +187,7 @@ class CacheManager
         }
 
         if ($group_method) {
-            $groups = $user->{$group_method}->map(fn (Model $r): string => 'R' . (int) $r->id)->toArray();
+            $groups = $user->{$group_method}->map(fn(Model $r): string => 'R' . (int) $r->id)->toArray();
             sort($groups);
             array_push($tags, ...$groups);
         }

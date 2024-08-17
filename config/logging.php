@@ -5,10 +5,7 @@ declare(strict_types=1);
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
-use Modules\Core\Logging\GelfLoggerFactory;
-use Monolog\Formatter\GelfMessageFormatter;
 use Monolog\Processor\PsrLogMessageProcessor;
-use Modules\Core\Logging\GelfAdditionalInfoProcessor;
 
 return [
     /*
@@ -95,21 +92,6 @@ return [
                 'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
-        ],
-
-        'graylog' => [
-            'driver' => 'custom',
-            'level' => env('GRAYLOG_LEVEL', 'error'),
-            'via' => GelfLoggerFactory::class,
-            'host' => env('GRAYLOG_URL'),
-            'port' => env('GRAYLOG_PORT', 12201),
-            'formatter' => GelfMessageFormatter::class,
-            'processors' => [
-                [
-                    'processor' => GelfAdditionalInfoProcessor::class,
-                    // 'with' => ['channel' => $channel],
-                ],
-            ],
         ],
 
         'stderr' => [

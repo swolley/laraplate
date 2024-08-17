@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Modules\Core\App\Console;
 
 use Throwable;
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Modules\Core\App\Models\Role;
 use Modules\Core\App\Models\User;
 use function Laravel\Prompts\text;
+use function Laravel\Prompts\table;
 use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
 use Modules\Core\App\Models\Permission;
 use function Laravel\Prompts\multiselect;
+
 use Illuminate\Support\Facades\Validator;
 
 class CreateUserCommand extends Command
@@ -43,13 +46,23 @@ class CreateUserCommand extends Command
             $all_roles = Role::get(['id', 'name'])->pluck('name', 'id');
             $all_permissions = Permission::get(['id', 'name'])->pluck('name', 'id');
 
+            $created_users = [];
+
             do {
+                /** @var User $user */
+                $user = new (user_class());
+
                 foreach ($fillables as $attribute) {
                     if ($attribute !== 'password') {
-                        $answer = text(ucfirst($attribute), required: true, validate: fn ($value) => $this->validationCallback($attribute, $value, $validations));
+                        $answer = text(ucfirst($attribute), required: true, validate: fn(string $value) => $this->validationCallback($attribute, $value, $validations));
                     } else {
-                        $answer = password(ucfirst($attribute), required: true, validate: fn ($value) => $this->validationCallback($attribute, $value, $validations));
-                        password("Confirm {$attribute}", required: true, validate: fn ($value) => $this->validationCallback($attribute, $value, ['password' => "in:{$answer}"]));
+                        $answer = password(ucfirst($attribute), 'Type a password or let blank to randomly generate it', false, fn(string $value) => $value === '' ? null : $this->validationCallback($attribute, $value, $validations));
+                        if ($answer !== '') {
+                            password("Confirm {$attribute}", required: true, validate: fn($value) => $this->validationCallback($attribute, $value, ['password' => "in:{$answer}"]));
+                        } else {
+                            $answer = Str::password();
+                        }
+                        $password = $answer;
                         $answer = Hash::make($answer);
                     }
 
@@ -68,9 +81,17 @@ class CreateUserCommand extends Command
                 }
                 $this->output->info("User created");
                 $total_users_created++;
+
+                $created_users[] = [
+                    'user' => $user->name,
+                    'email' => $user->email,
+                    'password' => $password,
+                ];
             } while (confirm('Do you want to create another user?', false));
 
             $this->output->info("Creatd {$total_users_created} users");
+
+            table(['User', 'Email', 'Password'], $created_users);
 
             return static::SUCCESS;
         } catch (Throwable $ex) {
@@ -84,7 +105,7 @@ class CreateUserCommand extends Command
         if (!array_key_exists($attribute, $validations)) {
             return null;
         }
-        $validator = Validator::make([$attribute => $value], array_filter($validations, fn ($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
+        $validator = Validator::make([$attribute => $value], array_filter($validations, fn($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
 
         if (!$validator->passes()) {
             return $validator->messages()->first();

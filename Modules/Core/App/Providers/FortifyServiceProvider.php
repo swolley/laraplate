@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\App\Models\License;
-use App\Actions\Fortify\CreateNewUser;
+use Modules\Core\App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
-use App\Actions\Fortify\ResetUserPassword;
-use App\Actions\Fortify\UpdateUserPassword;
+use Modules\Core\App\Actions\Fortify\ResetUserPassword;
+use Modules\Core\App\Actions\Fortify\UpdateUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Modules\Core\App\Http\Requests\LoginRequest;
-use App\Actions\Fortify\UpdateUserProfileInformation;
+use Modules\Core\App\Actions\Fortify\UpdateUserProfileInformation;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -107,7 +107,7 @@ class FortifyServiceProvider extends ServiceProvider
             if (config('core.enable_user_licenses')) {
                 /** @phpstan-ignore larastan.relationExistence */
                 $available_license = License::doesntHave('user')->first();
-                if (!$user->license_id && !$available_license && $user->roles->filter(fn ($role) => $role->name === 'superadmin')->isEmpty()) {
+                if (!$user->license_id && !$available_license && $user->roles->filter(fn($role) => $role->name === 'superadmin')->isEmpty()) {
                     Log::warning("No free licenses available for user login");
                     return null;
                 }
@@ -116,7 +116,7 @@ class FortifyServiceProvider extends ServiceProvider
                 }
             }
 
-            $request->setUserResolver(fn () => $user);
+            $request->setUserResolver(fn() => $user);
             return $user;
         });
     }
