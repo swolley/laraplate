@@ -15,7 +15,6 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperApproval
  * @property int $id
  * @property int $modification_id
  * @property int $approver_id
@@ -24,11 +23,11 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approver
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Approval\Models\Modification $modification
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval newQuery()
@@ -40,15 +39,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereModificationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Approval extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperApproval {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperCronJob
  * @property int $id
  * @property string $name
  * @property string $command
@@ -59,10 +59,10 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\CronJobFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob locked()
@@ -85,15 +85,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob withoutTrashed()
+ * @mixin \Eloquent
  */
-	class CronJob extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCronJob {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperDisapproval
  * @property int $id
  * @property int $modification_id
  * @property int $disapprover_id
@@ -102,11 +103,11 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approver
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Approval\Models\Modification $modification
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval newQuery()
@@ -118,19 +119,20 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereModificationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Disapproval extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperDisapproval {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperDynamicEntity
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity newQuery()
@@ -138,25 +140,26 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity query()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withoutTrashed()
+ * @mixin \Eloquent
  */
-	final class DynamicEntity extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	final class IdeHelperDynamicEntity {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperLicense
  * @property string $id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon $valid_from
  * @property \Illuminate\Support\Carbon|null $valid_to
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License expiredAt(\Illuminate\Support\Carbon $date)
@@ -172,15 +175,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereValidTo($value)
+ * @mixin \Eloquent
  */
-	class License extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperLicense {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperModification
  * @property int $id
  * @property int|null $modifiable_id
  * @property string|null $modifiable_type
@@ -198,16 +202,16 @@ namespace Modules\Core\App\Models{
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
  * @property-read int|null $disapprovals_count
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
  * @property-read int $approvals_remaining
  * @property-read int $approvers_remaining
  * @property-read int $disapprovals_remaining
  * @property-read int $disapprovers_remaining
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifiable
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifier
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification activeOnly()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification changes()
@@ -229,15 +233,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereModifierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereModifierType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Modification extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperModification {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperPermission
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -247,17 +252,17 @@ namespace Modules\Core\App\Models{
  * @property string|null $connection_name
  * @property string|null $table_name
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
  * @property-read \Modules\Core\App\Casts\ActionEnum|null $action
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\User> $users
  * @property-read int|null $users_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission newQuery()
@@ -278,15 +283,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Permission extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperPermission {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperRole
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -299,15 +305,15 @@ namespace Modules\Core\App\Models{
  * @property int|null $parent_id
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\App\Models\Role[] $children
  * @property-read int|null $children_count
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\Role|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\User> $users
  * @property-read int|null $users_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\App\Models\Role[] $ancestors The model's recursive parents.
  * @property-read int|null $ancestors_count
@@ -366,15 +372,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withTrashed()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Role extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperRole {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperSetting
  * @property int $id
  * @property string $name
  * @property array $value
@@ -386,13 +393,13 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
  * @property-read array|null $preview
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
  * @property-read int|null $modifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\SettingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting newModelQuery()
@@ -412,15 +419,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting whereValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Setting extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperSetting {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperUser
  * @property int $id
  * @property string $name
  * @property string $email
@@ -441,25 +449,25 @@ namespace Modules\Core\App\Models{
  * @property string|null $locked_user_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $defaultPermissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $defaultPermissions
  * @property-read int|null $default_permissions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $defaultRoles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $defaultRoles
  * @property-read int|null $default_roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
  * @property-read int|null $disapprovals_count
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\UserGridConfig> $grid_configs
  * @property-read int|null $grid_configs_count
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\License|null $license
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
  * @property-read int|null $roles_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User locked()
@@ -494,15 +502,16 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutTrashed()
+ * @mixin \Eloquent
  */
-	class User extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperUser {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @mixin IdeHelperUserGridConfig
  * @property int $id
  * @property int|null $user_id
  * @property string $grid_name
@@ -511,11 +520,11 @@ namespace Modules\Core\App\Models{
  * @property array $config
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \Modules\Core\App\Models\Version|null $firstVersion
- * @property-read \Modules\Core\App\Models\Version|null $lastVersion
- * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
+ * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig newQuery()
@@ -528,7 +537,9 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereLayoutName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereUserId($value)
+ * @mixin \Eloquent
  */
-	class UserGridConfig extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperUserGridConfig {}
 }
 

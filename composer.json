@@ -93,21 +93,6 @@
                 "barryvdh/laravel-ide-helper"
             ]
         },
-        "ramsey/conventional-commits": {
-            "config": {
-                "types": [
-                    "chore",
-                    "docs",
-                    "style",
-                    "refactor",
-                    "perf",
-                    "test",
-                    "config",
-                    "merge"
-                ],
-                "scopeRequired": true
-            }
-        },
         "merge-plugin": {
             "include": [
                 "Modules/*/composer.json"
@@ -129,7 +114,6 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
-            "captainhook/plugin-composer": true,
             "wikimedia/composer-merge-plugin": true,
             "joshbrw/laravel-module-installer": true
         }
