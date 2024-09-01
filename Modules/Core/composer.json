@@ -14,7 +14,7 @@
         "laravel/fortify": "^1.21",
         "hedii/laravel-gelf-logger": "^9.0",
         "lab404/laravel-impersonate": "^1.7",
-        "nextapps/laravel-swagger-ui": "^0.9.2",
+        "nextapps/laravel-swagger-ui": "^0.10",
         "overtrue/laravel-versionable": "^5.2",
         "spatie/laravel-permission": "^6.4",
         "staudenmeir/laravel-adjacency-list": "*",

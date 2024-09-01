@@ -20,7 +20,7 @@
         "ext-curl": "*",
         "ext-json": "*",
         "ext-redis": "*",
-        "algolia/algoliasearch-client-php": "^3.4",
+        "algolia/algoliasearch-client-php": "^4.3",
         "jeroen-g/explorer": "^3.14",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^11.0",
