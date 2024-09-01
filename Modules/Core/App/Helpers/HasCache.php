@@ -17,6 +17,7 @@ trait HasCache
             }
         });
     }
+
     public function usesCache(): bool
     {
         return true;

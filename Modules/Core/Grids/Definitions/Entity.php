@@ -135,6 +135,7 @@ abstract class Entity
 
             $model = new $model;
         }
+
         if (!Grid::useGridUtils($model)) {
             if (!config('core.dynamic_gridutils')) {
                 throw new \UnexpectedValueException('Model ' . $model::class . ' doesn\'t use ' . HasGridUtils::class);
@@ -142,13 +143,13 @@ abstract class Entity
 
             // TODO: da verificare, solo imbastito
             $class = $model::class;
-            $class_definition = <<<PHP_EOL
-                \$model = new class extends $class {
-                    use HasGridUtils;
-                };
-                PHP_EOL;
-            eval($class_definition);
+            $extended_class_name = $class . config('core.extended_class_suffix');
+            if (!class_exists($extended_class_name)) {
+                eval("class $extended_class_name extends $class { use HasGridUtils; }");
+            }
+            $model = new $extended_class_name;
         }
+
         $this->model = $model;
     }
 

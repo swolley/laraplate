@@ -51,13 +51,14 @@ class ResponseBuilder
 
     protected ?Carbon $cachedAt = null;
 
-    private ResourceCollection | JsonResource $resourceResponse;
+    private ResourceCollection|JsonResource|null $resourceResponse = null;
 
     private Request $request;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->preview = preview();
     }
 
     public static function getHttpErrorStatus(int|string $errorCode): int
@@ -78,6 +79,11 @@ class ResponseBuilder
         $https_statuses[419] = 'Session expired';
 
         return array_flip($https_statuses);
+    }
+
+    public function getResourceResponse(): ResourceCollection|JsonResource|null
+    {
+        return $this->resourceResponse ?? null;
     }
 
     /**
@@ -119,6 +125,16 @@ class ResponseBuilder
         return $this;
     }
 
+    public function isOk(): bool
+    {
+        return !$this->error && $this->getStatus() < 400;
+    }
+
+    public function isError(): bool
+    {
+        return !$this->isOk();
+    }
+
     public function isEmpty(): bool
     {
         return !isset($this->resourceResponse) || !isset($this->resourceResponse->resource);
@@ -127,6 +143,11 @@ class ResponseBuilder
     public function isNotEmpty(): bool
     {
         return !$this->isEmpty();
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
     }
 
     /**
@@ -140,6 +161,11 @@ class ResponseBuilder
         $this->status = $status;
 
         return $this;
+    }
+
+    public function getError(): mixed
+    {
+        return $this->error;
     }
 
     /**
@@ -164,6 +190,11 @@ class ResponseBuilder
         return $this;
     }
 
+    public function getTotalRecords(): ?int
+    {
+        return $this->totalRecords;
+    }
+
     /**
      * Set the value of totalRecords.
      */
@@ -172,6 +203,11 @@ class ResponseBuilder
         $this->totalRecords = $totalRecords;
 
         return $this;
+    }
+
+    public function getCurrentRecords(): ?int
+    {
+        return $this->currentRecords;
     }
 
     /**
@@ -184,6 +220,11 @@ class ResponseBuilder
         return $this;
     }
 
+    public function getCurrentPage(): ?int
+    {
+        return $this->currentPage;
+    }
+
     /**
      * Set the value of currentPage.
      */
@@ -192,6 +233,12 @@ class ResponseBuilder
         $this->currentPage = $currentPage;
 
         return $this;
+    }
+
+
+    public function getTotalPages(): ?int
+    {
+        return $this->totalPages;
     }
 
     /**
@@ -204,6 +251,12 @@ class ResponseBuilder
         return $this;
     }
 
+
+    public function getPagination(): ?int
+    {
+        return $this->pagination;
+    }
+
     /**
      * Set the value of pagination.
      */
@@ -212,6 +265,12 @@ class ResponseBuilder
         $this->pagination = $pagination;
 
         return $this;
+    }
+
+
+    public function getFrom(): ?int
+    {
+        return $this->from;
     }
 
     /**
@@ -224,6 +283,12 @@ class ResponseBuilder
         return $this;
     }
 
+
+    public function getTo(): ?int
+    {
+        return $this->to;
+    }
+
     /**
      * Set the value of to.
      */
@@ -232,6 +297,12 @@ class ResponseBuilder
         $this->to = $to;
 
         return $this;
+    }
+
+
+    public function getClass(): ?string
+    {
+        return $this->class;
     }
 
     /**
@@ -250,6 +321,12 @@ class ResponseBuilder
         return $this;
     }
 
+
+    public function getTable(): ?string
+    {
+        return $this->table;
+    }
+
     /**
      * Set the value of table.
      */
@@ -258,6 +335,11 @@ class ResponseBuilder
         $this->table = $table;
 
         return $this;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
     }
 
     /**
@@ -283,6 +365,11 @@ class ResponseBuilder
         return $this;
     }
 
+    public function getCachedAt(): ?Carbon
+    {
+        return $this->cachedAt;
+    }
+
     /**
      * Set the value of cachedAt.
      */
@@ -293,18 +380,27 @@ class ResponseBuilder
         return $this;
     }
 
+    public function getPreview(): bool
+    {
+        return $this->preview;
+    }
+
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
+
     public function data(): mixed
     {
         return $this->resourceResponse->resource;
     }
 
-    // TODO: E' una soluzione ma non mi piace
-    public function toArray(): JsonResponse
+    private function getResponseData(): array
     {
         $payload = [
             'meta' => [
                 'status' => $this->status,
-                'preview' => preview(),
+                'preview' => $this->preview,
             ],
         ];
 
@@ -377,18 +473,76 @@ class ResponseBuilder
 
         $this->resourceResponse->with = $payload;
 
-        $response = $this->resourceResponse->toResponse($this->request);
-        $response->setStatusCode($this->status);
-        foreach ($this->headers as $key => $value) {
+        return [
+            'payload' => $this->resourceResponse,
+            'statusCode' => $this->status,
+            'headers' => $this->headers,
+        ];
+    }
+
+    public function getResponse(): JsonResponse
+    {
+        $data = $this->getResponseData();
+
+        $response = $data['payload']->toResponse($this->request);
+        $response->setStatusCode($data['statusCode']);
+        foreach ($data['headers'] as $key => $value) {
             $response->headers->set($key, $value);
         }
 
         return $response;
     }
-
     // TODO: E' una soluzione ma non mi piace
     public function json(): JsonResponse
     {
-        return $this->toArray();
+        return $this->getResponse();
+    }
+
+    // public function toArray()
+    // {
+    //     $descriptor = new \ReflectionClass(get_class($this));
+    //     /** @var \ReflectionMethod[] $methods */
+    //     $methods = $descriptor->getMethods(\ReflectionMethod::IS_PUBLIC);
+    //     $array   = [];
+    //     foreach ($methods as $method) {
+    //         if (!$method->isStatic() && substr_compare('get', $method->getName(), 0, 3) === 0) {
+    //             $property         = lcfirst(substr($method->getName(), 3));
+    //             $value            = $method->invoke($this);
+    //             $array[$property] = $value;
+    //         }
+    //     }
+
+    //     return $array;
+    // }
+
+    public function serialize(): string
+    {
+        // Request object is not serializable
+        // Temporarily unset the request object before serialization
+        $request = $this->request;
+        $this->request = null;
+
+        $serialized = serialize($this->getResponseData());
+
+        // Restore the request object
+        $this->request = $request;
+
+        return $serialized;
+    }
+
+    public function unserialize(string $serializedResponse): JsonResponse
+    {
+        $responseProperties = unserialize($serializedResponse);
+
+        $response = $this->buildResponse($responseProperties);
+
+        // $response->headers = $responseProperties['headers'];
+
+        return $response;
+    }
+
+    private function buildResponse(array $responseProperties): JsonResponse
+    {
+        return new JsonResponse($responseProperties['content'], $responseProperties['statusCode'], $responseProperties['headers']);
     }
 }

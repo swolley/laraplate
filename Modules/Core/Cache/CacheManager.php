@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\App\Helpers\ResponseBuilder;
 
 class CacheManager
 {
@@ -31,7 +32,7 @@ class CacheManager
      */
     public static function tryByRequest(Model|string|array|null $entity, Request $request, Closure $callback, int $duration = null): mixed
     {
-        $tags = [];
+        $tags = [config('APP_NAME')];
         if ($entity) {
             $models = is_array($entity) ? $entity : [$entity];
 
@@ -54,9 +55,18 @@ class CacheManager
         $cache = Cache::tags($tags);
         $duration = $duration !== null ? $duration : config('cache.duration');
 
-        return $duration
-            ? $cache->remember($key, $duration, $callback)
-            : $cache->rememberForever($key, $callback);
+        if ($cache->has($key)) {
+            return $cache->get($key);
+        }
+
+        $data = $callback();
+        if ($data instanceof ResponseBuilder) {
+            $data = $data->getResponse();
+        }
+
+        $cache->put($key, $data, $duration ?: config('cache.duration'));
+
+        return $data;
     }
 
     /**
@@ -72,7 +82,7 @@ class CacheManager
             }
 
             if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                Cache::tags([static::getTableName($model)])->flush();
+                Cache::tags([config('APP_NAME'), static::getTableName($model)])->flush();
             }
         }
     }
@@ -92,11 +102,11 @@ class CacheManager
                 }
 
                 if (!method_exists($model, 'usesCache') || $model->usesCache()) {
-                    Cache::tags([static::getTableName($model)])->forget($key);
+                    Cache::tags([config('APP_NAME'), static::getTableName($model)])->forget($key);
                 }
             }
         } else {
-            Cache::forget($key);
+            Cache::tags([config('APP_NAME')])->forget($key);
         }
     }
 
@@ -115,11 +125,11 @@ class CacheManager
                 }
 
                 if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                    Cache::tags([static::getTableName($model), $user_key])->flush();
+                    Cache::tags([config('APP_NAME'), static::getTableName($model), $user_key])->flush();
                 }
             }
         } else {
-            Cache::tags([$user_key])->flush();
+            Cache::tags([config('APP_NAME'), $user_key])->flush();
         }
     }
 
@@ -138,11 +148,11 @@ class CacheManager
                 }
 
                 if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                    Cache::tags([static::getTableName($model), $role_key])->flush();
+                    Cache::tags([config('APP_NAME'), static::getTableName($model), $role_key])->flush();
                 }
             }
         } else {
-            Cache::tags([$role_key])->flush();
+            Cache::tags([config('APP_NAME'), $role_key])->flush();
         }
     }
 

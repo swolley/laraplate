@@ -188,6 +188,12 @@ class CoreServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
         // additional gelf logger for graylog
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/logging.php'), 'logging');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/auth.php'), 'auth');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/approval.php'), 'approval');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/fortify.php'), 'fortify');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/laravel-swagger.php'), 'laravel-swagger');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/swagger-ui.php'), 'swagger-ui');
+        $this->mergeConfigFrom(module_path($this->moduleName, 'config/versionable.php'), 'versionable');
     }
 
     protected function registerMiddlewares()

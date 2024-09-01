@@ -15,6 +15,7 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperApproval
  * @property int $id
  * @property int $modification_id
  * @property int $approver_id
@@ -39,16 +40,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereModificationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Approval whereUpdatedAt($value)
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperApproval {}
+	class Approval extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperCronJob
  * @property int $id
  * @property string $name
  * @property string $command
@@ -85,16 +85,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\CronJob withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperCronJob {}
+	class CronJob extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperDisapproval
  * @property int $id
  * @property int $modification_id
  * @property int $disapprover_id
@@ -119,16 +118,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereModificationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Disapproval whereUpdatedAt($value)
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperDisapproval {}
+	class Disapproval extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperDynamicEntity
  * @property-read \Modules\Core\App\Models\Version|null $firstVersion
  * @property-read \Modules\Core\App\Models\Version|null $lastVersion
  * @property-read \Modules\Core\App\Models\Version|null $latestVersion
@@ -140,16 +138,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity query()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\DynamicEntity withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	final class IdeHelperDynamicEntity {}
+	final class DynamicEntity extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperLicense
  * @property string $id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -175,16 +172,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\License whereValidTo($value)
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperLicense {}
+	class License extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperModification
  * @property int $id
  * @property int|null $modifiable_id
  * @property string|null $modifiable_type
@@ -233,16 +229,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereModifierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereModifierType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Modification whereUpdatedAt($value)
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperModification {}
+	class Modification extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperPermission
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -283,16 +278,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Permission withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperPermission {}
+	class Permission extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperRole
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -372,16 +366,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withTrashed()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder|\Modules\Core\App\Models\Role withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Role withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperRole {}
+	class Role extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperSetting
  * @property int $id
  * @property string $name
  * @property array $value
@@ -419,16 +412,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting whereValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\Setting withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperSetting {}
+	class Setting extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperUser
  * @property int $id
  * @property string $name
  * @property string $email
@@ -502,16 +494,15 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\User withoutTrashed()
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperUser {}
+	class User extends \Eloquent {}
 }
 
 namespace Modules\Core\App\Models{
 /**
  * 
  *
+ * @mixin IdeHelperUserGridConfig
  * @property int $id
  * @property int|null $user_id
  * @property string $grid_name
@@ -537,9 +528,7 @@ namespace Modules\Core\App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereLayoutName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Core\App\Models\UserGridConfig whereUserId($value)
- * @mixin \Eloquent
  */
-	#[\AllowDynamicProperties]
-	class IdeHelperUserGridConfig {}
+	class UserGridConfig extends \Eloquent {}
 }
 

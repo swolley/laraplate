@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\App\Models;
 
 use Modules\Core\App\Casts\ActionEnum;
+use Modules\Core\App\Helpers\HasCache;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\App\Helpers\HasCommonObserver;
@@ -16,7 +17,7 @@ use Spatie\Permission\Models\Permission as ModelsPermission;
  */
 class Permission extends ModelsPermission
 {
-    use HasCommonObserver, HasValidations, SoftDeletes;
+    use HasCommonObserver, HasValidations, SoftDeletes, HasCache;
 
     /**
      * @var string[]

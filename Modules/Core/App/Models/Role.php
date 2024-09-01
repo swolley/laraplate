@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\App\Models;
 
 use Illuminate\Support\Collection;
+use Modules\Core\App\Helpers\HasCache;
 use Modules\Core\Locking\Traits\HasLocks;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +22,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
  */
 class Role extends BaseRole
 {
-    use HasCommonObserver, HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes;
+    use HasCommonObserver, HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes, HasCache;
 
     /**
      * @var string[]

@@ -35,4 +35,6 @@ return [
     'enable_user_licenses' => env('ENABLE_USER_LICENSE', false),
     // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig
     'force_https' => env('FORCE_HTTPS', false),
+
+    'extended_class_suffix' => '_extended',
 ];

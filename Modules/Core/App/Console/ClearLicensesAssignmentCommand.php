@@ -10,7 +10,7 @@ class ClearLicensesAssignmentCommand extends Command
 {
     protected $signature = 'auth:clear-licenses';
 
-    protected $description = 'Clear the user assigned licenses.';
+    protected $description = 'Clear the user assigned licenses. <comment>(Modules\Core)</comment>';
 
     /**
      * Execute the console command.

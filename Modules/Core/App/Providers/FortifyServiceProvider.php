@@ -10,16 +10,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\App\Models\License;
-use Modules\Core\App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
-use Modules\Core\App\Actions\Fortify\ResetUserPassword;
-use Modules\Core\App\Actions\Fortify\UpdateUserPassword;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Modules\Core\App\Http\Requests\LoginRequest;
+use Modules\Core\App\Actions\Fortify\CreateNewUser;
+use Modules\Core\App\Actions\Fortify\ResetUserPassword;
+use Modules\Core\App\Actions\Fortify\UpdateUserPassword;
 use Modules\Core\App\Actions\Fortify\UpdateUserProfileInformation;
 
 class FortifyServiceProvider extends ServiceProvider

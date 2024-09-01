@@ -20,7 +20,7 @@ class HandleLicensesCommand extends Command
 {
     protected $signature = 'auth:handle-licenses';
 
-    protected $description = 'Renew, add or delete user licenses.';
+    protected $description = 'Renew, add or delete user licenses. <comment>(Modules\Core)</comment>';
 
     public function handle()
     {
@@ -28,7 +28,7 @@ class HandleLicensesCommand extends Command
             $licenses_groups = License::withoutGlobalScopes()->groupBy('valid_to')
                 ->select(DB::raw("valid_to"), \DB::raw('count(*) as count'))
                 ->get();
-            $licenses_count = (int) $licenses_groups->reduce(fn (int $total, object $current) => $total + $current->count, 0);
+            $licenses_count = (int) $licenses_groups->reduce(fn(int $total, object $current) => $total + $current->count, 0);
 
             if ($licenses_groups->isEmpty()) {
                 $this->output->info('No licenses found');
@@ -36,7 +36,7 @@ class HandleLicensesCommand extends Command
                 $this->output->info('Current licenses status');
                 table(
                     ['Status', 'Expiration', 'Licenses Qt.'],
-                    $licenses_groups->map(fn ($data) => [
+                    $licenses_groups->map(fn($data) => [
                         $data->valid_to && today()->greaterThan($data->valid_to) ? $data->valid_to : (!$data->valid_to ? 'perpetual' : 'expired'),
                         $data->valid_to,
                         $data->count,
@@ -52,7 +52,7 @@ class HandleLicensesCommand extends Command
 
             $number = (int) text(
                 "Number of licenses to $action",
-                validate: fn ($value) => $this->validationCallback('number', $value, ['number' => 'numeric|min:0'])
+                validate: fn($value) => $this->validationCallback('number', $value, ['number' => 'numeric|min:0'])
             );
 
             if ($number === 0) return static::SUCCESS;
@@ -62,7 +62,7 @@ class HandleLicensesCommand extends Command
             $valid_to = text(
                 "Specify an expiring date, otherwise it'll be " . ($action === 'close' ? 'today' : 'perpetual'),
                 'yyyy-mm-dd',
-                validate: fn ($value) => $this->validationCallback('valid_to', $value, $validations)
+                validate: fn($value) => $this->validationCallback('valid_to', $value, $validations)
             );
             $valid_to = $valid_to ? new Carbon($valid_to) : null;
 
@@ -164,7 +164,7 @@ class HandleLicensesCommand extends Command
             return null;
         }
 
-        $validator = Validator::make([$attribute => $value], array_filter($validations, fn ($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
+        $validator = Validator::make([$attribute => $value], array_filter($validations, fn($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
         if (!$validator->passes()) {
             return $validator->messages()->first();
         }

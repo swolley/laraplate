@@ -28,7 +28,7 @@ class VendorPublishCommand extends BaseVendorPublishCommand
             $this->modules[$module_name] = [
                 'path' => $module,
                 'migrations' => glob(module_path($module_name, $migrations_subpath . DIRECTORY_SEPARATOR . '*.php')),
-                'config' => array_filter(glob(module_path($module_name, $configs_subpath . DIRECTORY_SEPARATOR . '*.php')), fn (string $c) => !Str::endsWith($c, 'config.php')),
+                'config' => array_filter(glob(module_path($module_name, $configs_subpath . DIRECTORY_SEPARATOR . '*.php')), fn(string $c) => !Str::endsWith($c, 'config.php')),
             ];
         }
     }

@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace Modules\Core\App\Models;
 
 use Illuminate\Validation\Rules\Enum;
+use Modules\Core\App\Helpers\HasCache;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\App\Helpers\HasApprovals;
 use Modules\Core\App\Casts\SettingTypeEnum;
 use Modules\Core\App\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\App\Helpers\HasCommonObserver;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Core\Database\Factories\SettingFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @mixin IdeHelperSetting
  */
 class Setting extends Model
 {
-    use HasApprovals, HasCommonObserver, HasFactory, HasValidations, SoftDeletes;
+    use HasApprovals, HasCommonObserver, HasFactory, HasValidations, SoftDeletes, HasCache;
 
     /**
      * @var string[]
@@ -77,7 +78,7 @@ class Setting extends Model
     protected function requiresApprovalWhen($modifications): bool
     {
         return !empty(array_intersect(
-            array_filter($this->getFillable(), fn ($field) => $field !== 'description'),
+            array_filter($this->getFillable(), fn($field) => $field !== 'description'),
             array_keys($modifications),
         ));
         // return !empty($modifications);

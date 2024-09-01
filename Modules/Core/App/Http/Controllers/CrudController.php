@@ -18,6 +18,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\App\Casts\Column;
 use Modules\Core\App\Casts\Filter;
+use Modules\Core\Inspector\Inspect;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Cache\CacheManager;
 use Approval\Traits\RequiresApproval;
@@ -122,38 +123,37 @@ class CrudController extends Controller
         $filters = $this->isParsableRequest($request) ? $request->parsed() : $request->validated();
 
         try {
-            $response_builder = $operation($response_builder, $filters);
+            return $operation($response_builder, $filters);
         } catch (QueryException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->setStatus(Response::HTTP_INTERNAL_SERVER_ERROR)
+                ->getResponse();
         } catch (LockedModelException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_LOCKED);
+                ->setStatus(Response::HTTP_LOCKED)->getResponse();
         } catch (UnexpectedValueException | BadMethodCallException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_BAD_REQUEST);
+                ->setStatus(Response::HTTP_BAD_REQUEST)->getResponse();
         } catch (\LogicException | AlreadyLockedException | CannotUnlockException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_NOT_MODIFIED);
+                ->setStatus(Response::HTTP_NOT_MODIFIED)->getResponse();
         } catch (ModelNotFoundException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_NO_CONTENT);
+                ->setStatus(Response::HTTP_NO_CONTENT)->getResponse();
         } catch (UnauthorizedException $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_UNAUTHORIZED);
+                ->setStatus(Response::HTTP_UNAUTHORIZED)->getResponse();
         } catch (Throwable $ex) {
-            $response_builder
+            return $response_builder
                 ->setData($ex)
-                ->setStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+                ->setStatus(Response::HTTP_INTERNAL_SERVER_ERROR)->getResponse();
         }
-
-        return $response_builder->json();
     }
 
     //region DA RENDERE COMUNE
@@ -316,9 +316,25 @@ class CrudController extends Controller
         }
     }
 
+    private function addForeignKeysToSelectedColumns(Builder|Relation $query, array &$selectColumns, Model $model = null, string $table = null)
+    {
+        if (!$model) {
+            $model = $query->getModel();
+        }
+        if (!$table) {
+            $table = $model->getTable();
+        }
+        foreach (Inspect::foreignKeys($table, $model->getConnection()->getName()) as $foreign) {
+            foreach ($foreign->columns as $column) {
+                $selectColumns[] = new Column($column);
+            }
+        }
+    }
+
     private function createRelationCallback(Relation $query, string $relation, array &$relations_columns, array &$relations_sorts, array &$relations_aggregates, array &$relations_filters): void
     {
         if (!empty($relations_columns[$relation])) {
+            $this->addForeignKeysToSelectedColumns($query, $relations_columns[$relation]);
             $this->applyColumnsToSelect($query, $relations_columns[$relation]);
         }
 
@@ -446,6 +462,7 @@ class CrudController extends Controller
                     }
                 }
                 // TODO: qui mancano ancora le colonne utili a fare le relation se la foreign key si trova sulla main table
+                $this->addForeignKeysToSelectedColumns($query, $only_standard_columns, $main_model, $main_entity);
                 $query->select($only_standard_columns);
             } else if ($type === 'relations' && !empty($cols)) {
                 foreach ($cols as $relation => $relation_cols) {
@@ -582,7 +599,7 @@ class CrudController extends Controller
      */
     public function list(ListRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ListRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ListRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
@@ -620,7 +637,7 @@ class CrudController extends Controller
      */
     public function detail(DetailRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, DetailRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, DetailRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
@@ -645,7 +662,7 @@ class CrudController extends Controller
      */
     public function history(HistoryRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, HistoryRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, HistoryRequestData $filters): Response {
             $model = $filters->model;
             if (!$this->hasHistory($model)) {
                 throw new BadMethodCallException("'$filters->mainEntity' doesn't have history handling");
@@ -682,7 +699,7 @@ class CrudController extends Controller
      */
     public function tree(TreeRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, TreeRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, TreeRequestData $filters): Response {
             $model = $filters->model;
             if (!$this->useRecursiveRelationships($model)) {
                 throw new UnexpectedValueException("'$filters->mainEntity' is not a hierarchical class");
@@ -734,7 +751,7 @@ class CrudController extends Controller
      */
     public function insert(Request $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values, $request): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values, $request): Response {
             $model = $values->model;
             PermissionChecker::ensurePermissions($request, $model->getTable(), 'insert', $model->getConnectionName());
             // $values = method_exists($model, 'getRules') ? $request->validate($model->getRules()) : $filters;
@@ -765,7 +782,7 @@ class CrudController extends Controller
      */
     public function update(ModifyRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values): Response {
             $model = $values->model;
             PermissionChecker::ensurePermissions($values->request, $model->getTable(), 'update', $model->getConnectionName());
             // if $filters->request->method() == 'PUT' devo sovrascrivere tutto il record quindi devono esserci tutti i fillable e devo fare le validazioni
@@ -814,7 +831,7 @@ class CrudController extends Controller
     public function delete(ModifyRequest $request): Response
     {
         // delete deve bypassare le preview
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'forceDelete', $model->getConnectionName());
             $key_value = $this->getModelKeyValue($filters);
@@ -847,7 +864,7 @@ class CrudController extends Controller
     public function doActivateOperation(ModifyRequest $request, string $operation): Response
     {
         // activate deve bypassare le preview
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters, $request) use ($operation): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters, $request) use ($operation): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($request, $model->getTable(), 'restore', $model->getConnectionName());
             $key = $filters->primaryKey;
@@ -895,7 +912,7 @@ class CrudController extends Controller
      */
     private function doApproveOperation(ModifyRequest $request, string $operation): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters, $request) use ($operation): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters, $request) use ($operation): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($request, $model->getTable(), 'approve', $model->getConnectionName());
             /** @var string|array $key */
@@ -965,7 +982,7 @@ class CrudController extends Controller
      */
     private function doLockOperation(ModifyRequest $request, string $operation): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters) use ($operation): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters) use ($operation): Response {
             $model = $filters->model;
             if (!class_uses_trait($model, HasLocks::class)) {
                 throw new BadMethodCallException($model::class . ' doesn\'t support locks');
@@ -1044,10 +1061,10 @@ class CrudController extends Controller
      */
     public function clearModelCache(Request $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters): ResponseBuilder {
+        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters): Response {
             $model = $filters->model;
             $table = $model->getTable();
-            Cache::tags([$table])->flush();
+            Cache::tags([config('app.name'), $table])->flush();
 
             return $response_builder->setData("$table cached cleared")->setStatus(Response::HTTP_OK);
         });

@@ -7,11 +7,8 @@ namespace Modules\Core\App\Models;
 use Illuminate\Validation\Rule;
 use Approval\Models\Modification;
 use Approval\Traits\ApprovesChanges;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Auth\MustVerifyEmail;
 use Modules\Core\App\Models\License;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Validation\Rules\Password;
 use Modules\Core\Locking\Traits\HasLocks;
@@ -20,37 +17,29 @@ use Modules\Core\App\Helpers\HasValidations;
 use Modules\Core\App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Illuminate\Auth\Passwords\CanResetPassword;
 use Modules\Core\App\Helpers\HasCommonObserver;
 use Modules\Core\Database\Factories\UserFactory;
+use  Illuminate\Foundation\Auth\User as BaseUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\Access\Authorizable;
 use Lab404\Impersonate\Services\ImpersonateManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 #[ObservedBy([UserObserver::class])]
 /**
  * @mixin IdeHelperUser
  */
-class User extends Model implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
+class User extends BaseUser
 {
     use ApprovesChanges,
-        Authenticatable,
-        Authorizable,
-        CanResetPassword,
         // HasApiTokens,
         HasCommonObserver,
         HasFactory,
         HasLocks,
         HasValidations,
         Impersonate,
-        MustVerifyEmail,
         TwoFactorAuthenticatable,
         Notifiable,
         SoftDeletes,

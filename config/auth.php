@@ -116,7 +116,4 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
-
-    'verify_new_user' => env('VERIFY_NEW_USER', false),
-    'enable_user_registration' => env('ENABLE_USER_REGISTRATION', false),
 ];

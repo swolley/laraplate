@@ -37,7 +37,7 @@ class SettingController extends Controller
             $lang = mb_substr($lang, 0, 2);
         }
 
-        $translations = Cache::remember(RequestFacade::route()->getName() . $lang, config('cache.duration'), function () use ($lang) {
+        $translations = Cache::tags([config('APP_NAME')])->remember(RequestFacade::route()->getName() . $lang, config('cache.duration'), function () use ($lang) {
             $languages = translations(true, true);
             $translations = [];
 
@@ -92,7 +92,7 @@ class SettingController extends Controller
      */
     public function getSiteConfigs(Request $request): HttpFoundationResponse
     {
-        $settings = Cache::remember(RequestFacade::route()->getName(), config('cache.duration'), function () {
+        $settings = Cache::tags([config('APP_NAME')])->remember(RequestFacade::route()->getName(), config('cache.duration'), function () {
             $settings = [];
             foreach (Setting::get() as $s) {
                 $settings[$s->name] = $s->value;

@@ -13,10 +13,12 @@ use UnexpectedValueException;
 use Modules\Core\App\Models\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 use Modules\Core\App\Helpers\ResponseBuilder;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\App\Listeners\AfterLoginListener;
+use Laravel\Socialite\Contracts\User as SocialUser;
 use Modules\Core\App\Http\Resources\UserInfoResponse;
 use Modules\Core\App\Http\Requests\ImpersonationRequest;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
@@ -117,5 +119,32 @@ class UserController extends Controller
         return (new ResponseBuilder($request))
             ->setData(static::parseUserInfo())
             ->json();
+    }
+
+    public function socialLoginRedirect(Request $request, string $service): \Symfony\Component\HttpFoundation\RedirectResponse|\Illuminate\Http\RedirectResponse
+    {
+        return Socialite::driver($service)->redirect();
+    }
+
+    public function socialLoginCallback(Request $request, string $service)
+    {
+        /** @var SocialUser $user */
+        $social_user = Socialite::driver($service)->user();
+
+        $user = User::updateOrCreate([
+            'social_id' => $social_user->getId(),
+        ], [
+            'name' => $social_user->getName(),
+            'username' => $social_user->getNickname(),
+            'email' => $social_user->getEmail(),
+            'social_service' => $service,
+            'social_token' => $social_user->token,
+            'social_refresh_token' => $social_user->refreshToken ?? null,
+            'social_token_secret' => $social_user->tokenSecret ?? null,
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/dashboard');
     }
 }

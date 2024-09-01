@@ -88,7 +88,7 @@ class DocsController extends OpenApiJsonController
     protected function getJson(string $version): array
     {
         /** @var array $main_json */
-        $main_json = Cache::remember(RequestFacade::route()->getName() . $version, config('cache.duration'), function () use ($version) {
+        $main_json = Cache::tags([config('APP_NAME')])->remember(RequestFacade::route()->getName() . $version, config('cache.duration'), function () use ($version) {
             $assets = resource_path('swagger') . DIRECTORY_SEPARATOR;
             $files = glob($assets . '*-swagger.json');
             $modules = modules(true, false, true);
@@ -108,7 +108,7 @@ class DocsController extends OpenApiJsonController
                 if (mb_strpos($short_name, 'App') === 0) {
                     $main_json = $json;
                 } elseif (in_array(str_replace([$assets, '-swagger.json'], '', $file), $modules, true)) {
-                    $additionalPaths = array_merge($additionalPaths, array_filter($json['paths'], fn (string $k) => Str::contains($k, $version) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY));
+                    $additionalPaths = array_merge($additionalPaths, array_filter($json['paths'], fn(string $k) => Str::contains($k, $version) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY));
                 }
             }
 
