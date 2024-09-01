@@ -74,8 +74,9 @@ class ListRequestData extends SelectRequestData
         }
 
         if (isset($validated['group_by'])) {
-            $this->group_by = $validated['group_by'];
             $this->addGroupsToColumns($validated['group_by']);
+            $validated['group_by'] = array_map(fn(string $group) => preg_replace("/^$mainEntity\./", '', $group), $validated['group_by']);
+            $this->group_by = $validated['group_by'];
         }
     }
 
