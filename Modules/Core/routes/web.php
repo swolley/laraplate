@@ -31,7 +31,15 @@ Route::name('crud.')->prefix('/crud')->group(function () {
 	});
 
 	Route::controller(GridsController::class)->prefix('grid')->group(function () {
-		Route::get('/get-configs/{entity?}', 'getGridsConfigs')->name('grids.getGridsConfigs');
-		Route::match(['get', 'post', 'patch', 'delete'], '/{entity}', 'grid')->name('grids.grid');
+		Route::get('/configs/{entity?}', 'getGridsConfigs')->name('grids.getGridsConfigs');
+		// Route::match(['get', 'post', 'patch', 'delete'], '/{entity}', 'grid')->name('grids.grid');
+		Route::match(['get', 'post'], '/select/{entity}', 'grid')->name('select');
+		Route::match(['get', 'post'], '/data/{entity}', 'grid')->name('data');
+		Route::get('/check/{entity}', 'grid')->name('check');
+		Route::match(['get', 'post', 'put', 'patch', 'delete'], '/layout/{entity}', 'grid')->name('layout');
+		Route::match(['get', 'post'], '/export/{entity}', 'grid')->name('export');
+		Route::post('/insert/{entity}', 'grid')->name('insert');
+		Route::match(['patch', 'put'], '/update/{entity}', 'grid')->name('replace');
+		Route::match(['delete', 'post'], '/delete/{entity}', 'grid')->name('delete');
 	});
 });

@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Core\Grids\Components;
 
-use Closure;
-use Throwable;
-use RuntimeException;
-use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use InvalidArgumentException;
-use UnexpectedValueException;
 use PHPUnit\Framework\Exception;
-use Exception as GlobalException;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\App\Models\User;
 use Illuminate\Support\Collection;
@@ -72,7 +65,7 @@ class Grid extends Entity
     //region [CONFIGS]
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws BadRequestException
      * @throws BindingResolutionException
      */
@@ -87,13 +80,13 @@ class Grid extends Entity
     }
 
     /**
-     * @throws GlobalException
+     * @throws \Exception
      * @throws Exception
      * @throws ExpectationFailedException
      * @throws UnknownClassOrInterfaceException
      * @throws DBALException
-     * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function getConfigs(): array
     {
@@ -129,7 +122,7 @@ class Grid extends Entity
      */
     private function completeFromRequestData(array &$necessary_fields)
     {
-        if ($columns = $this->requestData->getColumns()) {
+        if ($columns = $this->requestData->columns) {
             foreach ($columns as $column) {
                 $this->appendFieldIntoList($necessary_fields, $column, false);
             }
@@ -145,25 +138,25 @@ class Grid extends Entity
             }
         }
 
-        if ($filters = $this->requestData->getColumnsFilters()) {
+        if ($filters = $this->requestData->filters) {
             foreach (array_keys($filters) as $column) {
                 $this->appendFieldIntoList($necessary_fields, $column, true);
             }
         }
 
-        if ($options = $this->requestData->getOptionsFilters()) {
+        if ($options = $this->requestData->optionsFilters) {
             foreach (array_keys($options) as $column) {
                 $this->appendFieldIntoList($necessary_fields, $column, true);
             }
         }
 
-        if ($funnels = $this->requestData->getFunnelsFilters()) {
+        if ($funnels = $this->requestData->funnelsFilters) {
             foreach (array_keys($funnels) as $column) {
                 $this->appendFieldIntoList($necessary_fields, $column, true);
             }
         }
 
-        if ($orders = $this->requestData->getOrders()) {
+        if ($orders = $this->requestData->sort) {
             foreach ($orders as $order) {
                 $this->appendFieldIntoList($necessary_fields, $order['property'], true);
             }
@@ -190,7 +183,7 @@ class Grid extends Entity
                 $funnels = null;
 
                 if (isset($this->requestData)) {
-                    $action = $this->requestData->getAction();
+                    $action = $this->requestData->action;
                     if ($action === GridAction::CHECK || $action === GridAction::LAYOUT) {
                         return;
                     }
@@ -220,11 +213,11 @@ class Grid extends Entity
 
     /**
      * @throws DBALException
-     * @throws GlobalException
+     * @throws \Exception
      * @throws Exception
      * @throws ExpectationFailedException
      * @throws UnknownClassOrInterfaceException
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
     private function initOptions(array $options): void
     {
@@ -258,11 +251,11 @@ class Grid extends Entity
 
     /**
      * @throws DBALException
-     * @throws GlobalException
+     * @throws \Exception
      * @throws Exception
      * @throws ExpectationFailedException
      * @throws UnknownClassOrInterfaceException
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
     private function initFunnels(array $funnels): void
     {
@@ -415,19 +408,19 @@ class Grid extends Entity
     /**
      * alias of setFields for pipe
      *
-     * @param array<Closure(Model $model): Field>
+     * @param array<\Closure(Model $model): Field>
      */
-    public function fields(Closure ...$fields)
+    public function fields(\Closure ...$fields)
     {
         $this->prepareFieldsCallbacks = $fields;
     }
 
     /**
-     * @throws GlobalException
+     * @throws \Exception
      * @throws Exception
      * @throws ExpectationFailedException
      * @throws UnknownClassOrInterfaceException
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      * @throws BindingResolutionException
      */
     private function prepareFields(): void
@@ -439,11 +432,11 @@ class Grid extends Entity
 
     /**
      * @throws BindingResolutionException
-     * @throws GlobalException
+     * @throws \Exception
      * @throws Exception
      * @throws ExpectationFailedException
      * @throws UnknownClassOrInterfaceException
-     * @throws UnexpectedValueException
+     * @throws \UnexpectedValueException
      */
     private function prepareNecessaryFields(): void
     {
@@ -490,7 +483,7 @@ class Grid extends Entity
         $this->checkGridConfigs();
 
         $response_builder = new ResponseBuilder($request);
-        $response_builder->setAction($this->requestData->getAction());
+        $response_builder->setAction($this->requestData->action->value);
         $response_builder->setPrimaryKey($this->getModel()->getKeyName());
 
         foreach ($this->getModel()::getTimestampColumns($this->getModel()) as $key => $value) {
@@ -498,7 +491,7 @@ class Grid extends Entity
             $response_builder->$method($value);
         }
 
-        $action = $this->requestData->getAction();
+        $action = $this->requestData->action;
         // TODO: solo imbastito, da testare
         if (!in_array($action, [GridAction::CHECK, GridAction::LAYOUT])) {
             if (!in_array($action, [GridAction::DELETE, GridAction::FORCE_DELETE])) {
@@ -508,9 +501,9 @@ class Grid extends Entity
             }
         }
 
-        if (GridAction::isReadAction($this->requestData->getAction(), $request->getMethod())) {
+        if (GridAction::isReadAction($this->requestData->action, $request->getMethod())) {
             // validation rules
-            if ($this->requestData->getAction() === GridAction::GET_ALL) {
+            if ($this->requestData->action === GridAction::SELECT) {
                 $all_rules = [];
                 foreach ($this->getAllFields() as $name => $field) {
                     $rules = $field->getRules();
@@ -531,20 +524,20 @@ class Grid extends Entity
     }
 
     /**
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      * @throws BindingResolutionException
-     * @throws Throwable
-     * @throws UnexpectedValueException
+     * @throws \Throwable
+     * @throws \UnexpectedValueException
      * @throws BadRequestException
      * @throws SuspiciousOperationException
      * @throws QueryException
      */
     private function callbackToReadAction(ResponseBuilder $responseBuilder, Request $request): ResponseBuilder
     {
-        $action = GridAction::tryFrom($this->requestData->getAction());
+        $action = GridAction::tryFrom($this->requestData->action);
         if (!$action) {
-            throw new UnexpectedValueException('Unexpected action');
+            throw new \UnexpectedValueException('Unexpected action');
         }
 
         // concurrency checks
@@ -561,17 +554,17 @@ class Grid extends Entity
         // $promises = [];
 
         // data
-        if (in_array($action, [GridAction::GET_ALL, GridAction::SELECT, GridAction::DATA])) {
+        if (in_array($action, [GridAction::SELECT, GridAction::DATA])) {
             $this->processData($responseBuilder);
         }
 
         // options
-        if ($action === GridAction::GET_ALL || $action === GridAction::OPTIONS) {
+        if ($action === GridAction::SELECT || $action === GridAction::OPTIONS) {
             $this->processOptions($responseBuilder);
         }
 
         // funnels
-        if ($action === GridAction::GET_ALL || $action === GridAction::FUNNELS) {
+        if ($action === GridAction::SELECT || $action === GridAction::FUNNELS) {
             $this->processFunnels($responseBuilder);
         }
 
@@ -581,9 +574,9 @@ class Grid extends Entity
     }
 
     /**
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      * @throws BadRequestException
      * @throws SuspiciousOperationException
      * @throws QueryException
@@ -598,11 +591,11 @@ class Grid extends Entity
     }
 
     /**
-     * @throws RuntimeException
-     * @throws InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      * @throws BindingResolutionException
-     * @throws Throwable
-     * @throws UnexpectedValueException
+     * @throws \Throwable
+     * @throws \UnexpectedValueException
      * @throws BadRequestException
      */
     private function processData(ResponseBuilder $responseBuilder): ResponseBuilder
@@ -632,7 +625,7 @@ class Grid extends Entity
 
     /**
      * @throws QueryException
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function processLayouts(ResponseBuilder $responseBuilder): ResponseBuilder
     {
@@ -642,10 +635,10 @@ class Grid extends Entity
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws BindingResolutionException
-     * @throws Throwable
-     * @throws UnexpectedValueException
+     * @throws \Throwable
+     * @throws \UnexpectedValueException
      */
     private function processConcurrencies(ResponseBuilder $responseBuilder): ResponseBuilder
     {
@@ -660,18 +653,18 @@ class Grid extends Entity
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws BadRequestException
      * @throws SuspiciousOperationException
-     * @throws BadMethodCallException
-     * @throws GlobalException
-     * @throws UnexpectedValueException
+     * @throws \BadMethodCallException
+     * @throws \Exception
+     * @throws \UnexpectedValueException
      * @throws BindingResolutionException
-     * @throws Throwable
+     * @throws \Throwable
      */
     private function processWriteActions(ResponseBuilder $responseBuilder, GridRequest $request): ResponseBuilder
     {
-        $data = match ($this->requestData->getAction()) {
+        $data = match ($this->requestData->action) {
             /** @phpstan-ignore classConstant.notFound */
             GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST => $this->createUserLayout(),
             /** @phpstan-ignore classConstant.notFound, classConstant.notFound */
@@ -683,12 +676,12 @@ class Grid extends Entity
             GridAction::DELETE => $this->softDeleteRecords(),
             GridAction::FORCE_DELETE => $this->forceDeleteRecords(),
             GridAction::RESTORE => $this->restoreRecords(),
-            default => throw new InvalidArgumentException('Not a valid action'),
+            default => throw new \InvalidArgumentException('Not a valid action'),
         };
 
         $responseBuilder->setData($data);
         /** @phpstan-ignore classConstant.notFound */
-        if ($this->requestData->getAction() === GridAction::INSERT || ($this->requestData->getAction() === GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST)) {
+        if ($this->requestData->action === GridAction::INSERT || ($this->requestData->action === GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST)) {
             $responseBuilder->setStatus(Response::HTTP_CREATED);
         }
 
@@ -710,7 +703,7 @@ class Grid extends Entity
 
     /**
      * @throws QueryException
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function getUserLayouts(): Collection
     {
@@ -724,44 +717,44 @@ class Grid extends Entity
                 $query->where('user_id', $user->id);
             }
             $query->orWhere('is_public', true);
-        })->where('grid_name', $this->requestData->getLayout()['grid_name'])->get();
+        })->where('grid_name', $this->requestData->layout['grid_name'])->get();
     }
 
     /**
      * @return mixed
      *
      * @throws QueryException
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
+     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
      * @throws BadRequestException
-     * @throws GlobalException
+     * @throws \Exception
      */
     private function createUserLayout()
     {
         if (!$this->checkGridLayoutsTableExists()) {
-            throw new BadMethodCallException("App doesn't support grid layouts");
+            throw new \BadMethodCallException("App doesn't support grid layouts");
         }
         $user = Auth::user();
         if (!$user) {
             throw new Exception('User must be logged in to update a grid layout');
         }
 
-        $id = DB::table(Grid::LAYOUTS_TABLE)->insertGetId($this->requestData->getLayout());
+        $id = DB::table(Grid::LAYOUTS_TABLE)->insertGetId($this->requestData->layout);
 
         return DB::table(Grid::LAYOUTS_TABLE)->find($id);
     }
 
     /**
      * @throws QueryException
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
+     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
      * @throws BadRequestException
-     * @throws GlobalException
+     * @throws \Exception
      */
     private function getLayoutWriteBuilder(): QueryBuilder
     {
         if (!$this->checkGridLayoutsTableExists()) {
-            throw new BadMethodCallException("App doesn't support grid layouts");
+            throw new \BadMethodCallException("App doesn't support grid layouts");
         }
         /** @var User|null $user */
         $user = Auth::user();
@@ -769,7 +762,7 @@ class Grid extends Entity
             throw new Exception('User must be logged in to update a grid layout');
         }
 
-        return DB::table(Grid::LAYOUTS_TABLE)->where('id', $this->requestData->getLayout()['id'])->where(function ($query) use ($user) {
+        return DB::table(Grid::LAYOUTS_TABLE)->where('id', $this->requestData->layout['id'])->where(function ($query) use ($user) {
             $query->where('user_id', $user->id);
             if ($user->isSuperAdmin()) {
                 $query->orWhere('is_public', true);
@@ -783,17 +776,17 @@ class Grid extends Entity
      * @return mixed
      *
      * @throws QueryException
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
+     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
      * @throws BadRequestException
-     * @throws GlobalException
-     * @throws RuntimeException
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     private function updateUserLayout()
     {
-        $updated = $this->getLayoutWriteBuilder()->update($this->requestData->getLayout());
+        $updated = $this->getLayoutWriteBuilder()->update($this->requestData->layout);
         if ($updated) {
-            return DB::table(Grid::LAYOUTS_TABLE)->find($this->requestData->getLayout()['id']);
+            return DB::table(Grid::LAYOUTS_TABLE)->find($this->requestData->layout['id']);
         }
 
         throw new Exception('unable to update layout');
@@ -802,16 +795,16 @@ class Grid extends Entity
     /**
      * @return mixed
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws QueryException
-     * @throws BadMethodCallException
+     * @throws \BadMethodCallException
      * @throws BadRequestException
-     * @throws GlobalException
-     * @throws RuntimeException
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     private function deleteUserLayout()
     {
-        $old = DB::table(Grid::LAYOUTS_TABLE)->find($this->requestData->getLayout()['id']);
+        $old = DB::table(Grid::LAYOUTS_TABLE)->find($this->requestData->layout['id']);
         $deleted = $this->getLayoutWriteBuilder()->delete();
         if ($deleted) {
             return $old;
@@ -856,10 +849,10 @@ class Grid extends Entity
     private function getData(): array
     {
         $all_fields = $this->getAllFields()->filter(fn(Field $f) => !$f->isAppend());
-        $request_columns = $this->requestData->getColumns();
+        $request_columns = $this->requestData->columns;
         $main_columns = ($request_columns ? $this->getFields() : $all_fields)->map(fn(Field $f) => $f->getName())->toArray();
-        $columns_filters = array_filter($this->requestData->getColumnsFilters() ?? [], fn($f) => $f['value'] !== '');
-        $funnels_filters = array_filter($this->requestData->getFunnelsFilters() ?? [], fn($f) => $f['value'] !== []);
+        $columns_filters = array_filter($this->requestData->filters ?? [], fn($f) => $f['value'] !== '');
+        $funnels_filters = array_filter($this->requestData->funnelsFilters ?? [], fn($f) => $f['value'] !== []);
         $model_filters = [
             ...$this->getEntityFilters(lcfirst($this->getModelName()), $columns_filters),
             ...$this->getEntityFilters(lcfirst($this->getModelName()), $funnels_filters),
@@ -905,14 +898,14 @@ class Grid extends Entity
         // count is calculated before pagination but after filters
         $count = $query->count();
 
-        if ($pagination = $this->requestData->getPagination()) {
+        if ($pagination = $this->requestData->pagination) {
             $query->skip((int) $pagination['from'] - 1);
             if (isset($pagination['to'])) {
                 $query->take((int) $pagination['to'] - (int) $pagination['from'] + 1);
             }
         }
 
-        if ($sorts = $this->requestData->getOrders()) {
+        if ($sorts = $this->requestData->sort) {
             $this->addSortsIntoQuery($query, $sorts);
         }
 
@@ -927,7 +920,7 @@ class Grid extends Entity
      */
     private function getFunnelsData(): ?Collection
     {
-        $request_funnels = $this->requestData->getFunnelsFilters();
+        $request_funnels = $this->requestData->funnelsFilters;
         if (!$request_funnels) {
             return null;
         }
@@ -953,7 +946,7 @@ class Grid extends Entity
      */
     private function getOptionsData(): ?Collection
     {
-        $request_options = $this->requestData->getOptionsFilters();
+        $request_options = $this->requestData->optionsFilters;
         if (!$request_options) {
             return null;
         }
@@ -976,11 +969,11 @@ class Grid extends Entity
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function checkRecordsConcurrency(): ?Collection
     {
-        $request_changes = $this->requestData->getChanges();
+        $request_changes = $this->requestData->changes;
         if (!$request_changes) {
             return null;
         }
@@ -998,10 +991,10 @@ class Grid extends Entity
         foreach ($request_changes as $record) {
             $query->orWhere(function ($q) use ($record, $primary_key_fields, &$fields) {
                 if (!is_array($record['record'])) {
-                    throw new InvalidArgumentException('Invalid record value');
+                    throw new \InvalidArgumentException('Invalid record value');
                 }
                 if ($primary_key_fields != array_keys($record['record'])) {
-                    throw new InvalidArgumentException('Invalid primary key fields');
+                    throw new \InvalidArgumentException('Invalid primary key fields');
                 }
 
                 static::applyCorrectWhereMethod($q, $record['property'], FilterOperator::NOT_EQUALS, $record['value']);
@@ -1053,12 +1046,12 @@ class Grid extends Entity
     {
         // DB::beginTransaction();
         $primary_key = $this->getPrimaryKey();
-        $primary_value = is_string($primary_key) ? $this->requestData->getRequest()->get($primary_key) : array_map(fn($key) => $this->requestData->getRequest()->get($key), $primary_key);
+        $primary_value = is_string($primary_key) ? $this->requestData->request->get($primary_key) : array_map(fn($key) => $this->requestData->request->get($key), $primary_key);
         if ($this->getModel()->incrementing && $primary_value !== null && $primary_value != []) {
-            throw new UnexpectedValueException('Cannot assign a value to the primary key because is an autoincrement field');
+            throw new \UnexpectedValueException('Cannot assign a value to the primary key because is an autoincrement field');
         }
         $full_primary_key = $this->getFullPrimaryKey();
-        $data = array_filter($this->requestData->getRequest()->all(), fn($k) => (is_array($full_primary_key) ? !in_array($k, $full_primary_key) : $k != $full_primary_key) && $k != 'action', ARRAY_FILTER_USE_KEY);
+        $data = array_filter($this->requestData->request->all(), fn($k) => (is_array($full_primary_key) ? !in_array($k, $full_primary_key) : $k != $full_primary_key) && $k != 'action', ARRAY_FILTER_USE_KEY);
         // $validator = Validator::make($data, $this->getAllFields()->getRules);
         // $validated = $validator->stopOnFirstFailure(false)->validate();
 
@@ -1093,9 +1086,9 @@ class Grid extends Entity
     // 				$key_value[] = $record[$key];
     // 			}
     // 	if (!$key_value || $key_value == []) {
-    // 		$message = "Primary key '$key' is mandatory in " . $this->requestData->getAction() . " requests";
+    // 		$message = "Primary key '$key' is mandatory in " . $this->requestData->action . " requests";
     // 		Log::warning($message);
-    // 		throw new \UnexpectedValueException($message);
+    // 		throw new \\UnexpectedValueException($message);
     // 	}
     // 	return $key_value;
     // }
@@ -1103,7 +1096,7 @@ class Grid extends Entity
     private function updateRecords()
     {
         $primary_key = $this->getPrimaryKey();
-        $primary_value = is_string($primary_key) ? $this->requestData->getRequest()->get($primary_key) : array_map(fn($key) => $this->requestData->getRequest()->get($key), $primary_key);
+        $primary_value = is_string($primary_key) ? $this->requestData->request->get($primary_key) : array_map(fn($key) => $this->requestData->request->get($key), $primary_key);
         $query = $this->withTrashed() ? $this->getModel()::withTrashed() : $this->getModel()::query();
         $query->findOrFail($primary_value);
 

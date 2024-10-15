@@ -18,8 +18,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ResponseBuilder
 {
-    // protected mixed $data = null;
-
     protected int $status = Response::HTTP_OK;
 
     protected mixed $error = null;
@@ -492,28 +490,11 @@ class ResponseBuilder
 
         return $response;
     }
-    // TODO: E' una soluzione ma non mi piace
+
     public function json(): JsonResponse
     {
         return $this->getResponse();
     }
-
-    // public function toArray()
-    // {
-    //     $descriptor = new \ReflectionClass(get_class($this));
-    //     /** @var \ReflectionMethod[] $methods */
-    //     $methods = $descriptor->getMethods(\ReflectionMethod::IS_PUBLIC);
-    //     $array   = [];
-    //     foreach ($methods as $method) {
-    //         if (!$method->isStatic() && substr_compare('get', $method->getName(), 0, 3) === 0) {
-    //             $property         = lcfirst(substr($method->getName(), 3));
-    //             $value            = $method->invoke($this);
-    //             $array[$property] = $value;
-    //         }
-    //     }
-
-    //     return $array;
-    // }
 
     public function serialize(): string
     {
@@ -535,8 +516,6 @@ class ResponseBuilder
         $responseProperties = unserialize($serializedResponse);
 
         $response = $this->buildResponse($responseProperties);
-
-        // $response->headers = $responseProperties['headers'];
 
         return $response;
     }

@@ -13,12 +13,13 @@ use function Laravel\Prompts\table;
 use Illuminate\Support\Facades\Log;
 use function Laravel\Prompts\select;
 use Modules\Core\App\Models\License;
+use Modules\Core\App\Models\Setting;
 use function Laravel\Prompts\confirm;
 use Illuminate\Support\Facades\Validator;
 
 class HandleLicensesCommand extends Command
 {
-    protected $signature = 'auth:handle-licenses';
+    protected $signature = 'auth:licenses';
 
     protected $description = 'Renew, add or delete user licenses. <comment>(Modules\Core)</comment>';
 
@@ -44,27 +45,30 @@ class HandleLicensesCommand extends Command
                 );
             }
 
-            $choices = ['add', 'close'];
+            $choices = ['list', 'add', 'close'];
             if ($licenses_groups->isNotEmpty()) {
                 $choices[] = 'renew';
             }
             $action = select('Choose an action', $choices);
 
-            $number = (int) text(
-                "Number of licenses to $action",
-                validate: fn($value) => $this->validationCallback('number', $value, ['number' => 'numeric|min:0'])
-            );
+            if ($action !== 'list') {
+                $number = (int) text(
+                    "Number of licenses to $action",
+                    validate: fn($value) => $this->validationCallback('number', $value, ['number' => 'numeric|min:0'])
+                );
 
-            if ($number === 0) return static::SUCCESS;
+                if ($number === 0) return static::SUCCESS;
 
-            $validations = (new License)->getOperationRules('create');
+                $validations = (new License)->getOperationRules('create');
 
-            $valid_to = text(
-                "Specify an expiring date, otherwise it'll be " . ($action === 'close' ? 'today' : 'perpetual'),
-                'yyyy-mm-dd',
-                validate: fn($value) => $this->validationCallback('valid_to', $value, $validations)
-            );
-            $valid_to = $valid_to ? new Carbon($valid_to) : null;
+                $valid_to = text(
+                    "Specify an expiring date, otherwise it'll be " . ($action === 'close' ? 'today' : 'perpetual'),
+                    'yyyy-mm-dd',
+                    validate: fn($value) => $this->validationCallback('valid_to', $value, $validations)
+                );
+                $valid_to = $valid_to ? new Carbon($valid_to) : null;
+            }
+
 
             DB::beginTransaction();
 
@@ -77,6 +81,9 @@ class HandleLicensesCommand extends Command
                     break;
                 case 'close':
                     $this->closeLicenses($number, $valid_to);
+                    break;
+                case 'list':
+                    $this->listLicenses();
                     break;
             }
 
@@ -93,6 +100,17 @@ class HandleLicensesCommand extends Command
             $this->output->error($message);
             return static::FAILURE;
         }
+    }
+
+    private function listLicenses()
+    {
+        $licenses = License::with('user')->get();
+        $remapped = [];
+        foreach ($licenses as $license) {
+            $remapped[] = [$license->id, $license->valid_to, $license->user->name];
+        }
+        table(['License', 'Expiration', 'User'], $remapped);
+        $this->output->info('Current max sessions available: ' . (Setting::where('name', 'maxConcurrentSessions')->first()?->value));
     }
 
     private function renewLicenses(int $number, int $licensesCount, ?Carbon $validTo)

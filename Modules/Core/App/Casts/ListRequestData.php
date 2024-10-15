@@ -35,6 +35,34 @@ class ListRequestData extends SelectRequestData
     public function __construct(ListRequest $request, string $mainEntity, array $validated, string|array $primaryKey)
     {
         parent::__construct($request, $mainEntity, $validated, $primaryKey);
+
+        $this->extractPagination($validated);
+
+        /** @phpstan-ignore property.uninitializedReadonly */
+        if (!isset($this->limit)) {
+            /** @phpstan-ignore property.uninitializedReadonly, assign.readOnlyProperty */
+            $this->limit = (int) ($validated['limit'] ?? $this->pagination);
+        }
+
+        $this->count = isset($validated['count']) ? (int) $validated['count'] : false;
+        $this->sort = $this->conformSorts($validated['sort'] ?? []);
+
+        if (isset($validated['filters'])) {
+            $this->conformFiltersToQueryBuilderFormat($validated['filters']);
+            $this->filters = $validated['filters'];
+        } else {
+            $this->filters = null;
+        }
+
+        if (isset($validated['group_by'])) {
+            $this->addGroupsToColumns($validated['group_by']);
+            $validated['group_by'] = array_map(fn(string $group) => preg_replace("/^$mainEntity\./", '', $group), $validated['group_by']);
+            $this->group_by = $validated['group_by'];
+        }
+    }
+
+    protected function extractPagination(array $validated)
+    {
         if (isset($validated['pagination']) || isset($validated['page'])) {
             $this->take = $this->pagination = (int) ($validated['pagination'] ?? self::getDefaultPagination());
             $this->page = (int) ($validated['page'] ?? 1);
@@ -56,27 +84,6 @@ class ListRequestData extends SelectRequestData
             $this->page = 1;
             $this->skip = 0;
             $this->take = $this->pagination = self::getDefaultPagination();
-        }
-        /** @phpstan-ignore property.uninitializedReadonly */
-        if (!isset($this->limit)) {
-            /** @phpstan-ignore property.uninitializedReadonly, assign.readOnlyProperty */
-            $this->limit = (int) ($validated['limit'] ?? $this->pagination);
-        }
-
-        $this->count = isset($validated['count']) ? (int) $validated['count'] : false;
-        $this->sort = $this->conformSorts($validated['sort'] ?? []);
-
-        if (isset($validated['filters'])) {
-            $this->conformFiltersToQueryBuilderFormat($validated['filters']);
-            $this->filters = $validated['filters'];
-        } else {
-            $this->filters = null;
-        }
-
-        if (isset($validated['group_by'])) {
-            $this->addGroupsToColumns($validated['group_by']);
-            $validated['group_by'] = array_map(fn(string $group) => preg_replace("/^$mainEntity\./", '', $group), $validated['group_by']);
-            $this->group_by = $validated['group_by'];
         }
     }
 

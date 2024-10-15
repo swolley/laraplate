@@ -2,68 +2,122 @@
 
 namespace Modules\Core\Grids\Requests;
 
-use Modules\Core\App\Casts\GridAction;
+use Illuminate\Support\Arr;
+use Modules\Core\Grids\Casts\GridAction;
 use Illuminate\Foundation\Http\FormRequest;
-use Modules\Core\App\Casts\CrudRequestData;
 use Modules\Core\App\Casts\IParsableRequest;
-use Symfony\Component\HttpFoundation\InputBag;
-use Modules\Core\App\Http\Requests\CrudRequest;
+use Modules\Core\Grids\Casts\GridRequestData;
 use Modules\Core\App\Http\Requests\ListRequest;
 use Modules\Core\App\Http\Requests\ModifyRequest;
 
 class GridRequest extends FormRequest implements IParsableRequest
 {
-    private CrudRequest $realRequest;
+    private GridAction $action;
+
+    private ListRequest|ModifyRequest $realMainRequest;
+    /**
+     * @var ListRequest[]
+     */
+    private array $realOptionRequests = [];
+    /**
+     * @var ListRequest[]
+     */
+    private array $realFunnelRequests = [];
 
     public function rules()
     {
-        $actions = implode(',', GridAction::values());
-
-        $grid_rules = [
-            'action' => ["in:$actions"],
-        ];
-
         if ($this->action === GridAction::FUNNELS) {
-            $grid_rules = array_merge($grid_rules, [
-                'funnels.*' => 'sometimes',
-                'options.*' => 'sometimes',
-            ]);
+            $grid_rules = $this->remapListRules('funnels.*');
         } else if ($this->action === GridAction::OPTIONS) {
-        }
-
-        if (isset($this->realRequest)) {
-            $grid_rules = array_merge($this->realRequest->rules(), $grid_rules);
+            $grid_rules = $this->remapListRules('options.*');
+        } else if ($this->action === GridAction::SELECT) {
+            $grid_rules = [
+                'options' => ['sometimes'],
+                'funnels' => ['sometimes'],
+                ...$this->remapListRules('funnels.*'),
+                ...$this->remapListRules('options.*'),
+            ];
+            // TODO: serve anche l'entità o parto da quella della griglia e poi guardo che colonne vengono chieste?
+        } else {
+            $common_rules = [
+                'exclude_if:action,' . GridAction::INSERT->value,
+                'exclude_if:action,' . GridAction::UPDATE->value,
+                'exclude_if:action,' . GridAction::DELETE->value,
+                'exclude_if:action,' . GridAction::FORCE_DELETE->value,
+                'exclude_if:action,' . GridAction::APPROVE->value,
+                'exclude_if:action,' . GridAction::LOCK->value,
+                'exclude_if:action,' . GridAction::CHECK->value,
+            ];
+            $grid_rules['options'] = $common_rules;
+            $grid_rules['funnels'] = $common_rules;
         }
 
         return $grid_rules;
     }
 
+    private function remapListRules(string $prefix): array
+    {
+        $list_rules = Arr::except((new ListRequest)->rules(), ['count', 'group_by.*']);
+        return $this->remapRules($list_rules, $prefix);
+    }
+
+    private function remapRules(array $rules, string $prefix): array
+    {
+        $remapped = [];
+        foreach ($rules as $name => $validations) {
+            $remapped["$prefix.$name"] = $validations;
+        }
+
+        return $remapped;
+    }
+
     #[\Override]
     protected function prepareForValidation()
     {
-        /** @var GridAction $action */
-        $action = $this->action;
-        switch ($action) {
+        parent::prepareForValidation();
+
+        $exploded_url = explode('/', $this->url());
+        $this->action = GridAction::from($exploded_url[count($exploded_url) - 2]);
+
+        switch ($this->action) {
             case GridAction::DATA:
             case GridAction::SELECT:
             case GridAction::EXPORT:
-            case GridAction::GET_ALL:
             case GridAction::FUNNELS:
             case GridAction::OPTIONS:
                 /** @phpstan-ignore staticMethod.notFound */
-                $this->realRequest = ListRequest::createFrom($this);
+                $this->realMainRequest = ListRequest::createFrom($this);
+                $this->realMainRequest->setContainer($this->container);
+                if (isset($this->funnels)) {
+                    foreach ($this->funnels as $funnel) {
+                        $sub_request = ListRequest::createFrom($this);
+                        $sub_request->setContainer($this->container);
+                        $sub_request->replace($funnel);
+                        $this->realFunnelRequests[] = $sub_request;
+                    }
+                }
+                if (isset($this->options)) {
+                    foreach ($this->options as $option) {
+                        $sub_request = ListRequest::createFrom($this);
+                        $sub_request->setContainer($this->container);
+                        $sub_request->replace($funnel);
+                        $this->realOptionRequests[] = $sub_request;
+                    }
+                }
                 break;
                 // case GridAction::LAYOUT:
                 // case GridAction::COUNT:
             case GridAction::INSERT:
             case GridAction::UPDATE:
                 /** @phpstan-ignore staticMethod.notFound */
-                $this->realRequest = ModifyRequest::createFrom($this);
-                break;
+                // $this->realMainRequest = ModifyRequest::createFrom($this);
+                // break;
             case GridAction::CHECK:
             case GridAction::FORCE_DELETE:
             case GridAction::DELETE:
                 // case GridAction::RESTORE:
+                $this->realMainRequest = ModifyRequest::createFrom($this);
+                $this->realMainRequest->setContainer($this->container);
                 break;
         }
     }
@@ -73,38 +127,46 @@ class GridRequest extends FormRequest implements IParsableRequest
     {
         parent::validateResolved();
 
-        if (isset($this->realRequest)) {
-            $this->realRequest->validateResolved();
+        if (isset($this->realMainRequest)) {
+            $this->realMainRequest->validateResolved();
+        }
+        if (!empty($this->realOptionRequests)) {
+            foreach ($this->realOptionRequests as $request) {
+                $request->validateResolved();
+            }
+        }
+        if (!empty($this->realFunnelRequests)) {
+            foreach ($this->realFunnelRequests as $request) {
+                $request->validateResolved();
+            }
         }
     }
 
-    protected function getInputSource()
+    public function validated($key = null, $default = null)
     {
-        /** @var InputBag $input_source */
-        /** @phpstan-ignore staticMethod.notFound */
-        $input_source = parent::getInputSource();
-
-        if (isset($this->realRequest)) {
-            if ($this->realRequest->isJson()) {
-                $real_input_source = $this->realRequest->json();
-            } else {
-                $real_input_source = in_array($this->realRequest->getRealMethod(), ['GET', 'HEAD'])
-                    ? $this->realRequest->query
-                    : $this->realRequest->request;
+        $validated = $this->realMainRequest->validated($key, $default);
+        if ($this->funnels) {
+            for ($i = 0; count($this->funnels); $i++) {
+                $validated['funnels'][$i] = $this->realFunnelRequests[$i]->validated();
             }
-
-            $input_source->add($real_input_source->all());
+        }
+        if ($this->options) {
+            for ($i = 0; count($this->options); $i++) {
+                $validated['options'][$i] = $this->realOptionRequests[$i]->validated();
+            }
         }
 
-        return $input_source;
+        return $validated;
     }
 
     #[\Override]
-    public function parsed(): CrudRequestData
+    public function parsed(): GridRequestData
     {
         /** @var string $main_entity */
         /** @phpstan-ignore method.notFound */
         $main_entity = $this->route()->entity;
-        return new CrudRequestData($this, $main_entity, $this->validated(), $this->primaryKey);
+        $remapped = $this->validated();
+
+        return new GridRequestData($this->action, $this, $main_entity, $remapped, $this->realMainRequest->getPrimaryKey());
     }
 }

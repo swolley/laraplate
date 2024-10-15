@@ -28,7 +28,7 @@ class ListRequest extends SelectRequest
     }
 
     #[\Override]
-    protected function prepareForValidation()
+    public function prepareForValidation()
     {
         parent::prepareForValidation();
 

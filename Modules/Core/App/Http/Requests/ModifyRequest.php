@@ -16,7 +16,7 @@ class ModifyRequest extends CrudRequest implements IParsableRequest
     }
 
     #[\Override]
-    protected function prepareForValidation()
+    public function prepareForValidation()
     {
         parent::prepareForValidation();
 

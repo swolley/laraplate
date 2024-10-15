@@ -173,10 +173,11 @@ class CoreDatabaseSeeder extends Seeder
     {
         $defaultLanguage = 'defaultLanguage';
         $pagination = 'pagination';
+        $maxConcurrentSessions = 'maxConcurrentSessions';
         $already_exists = Setting::exists();
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>settings</>');
 
-        DB::transaction(function () use ($defaultLanguage, $pagination) {
+        DB::transaction(function () use ($defaultLanguage, $pagination, $maxConcurrentSessions) {
             if (!Setting::where('name', $defaultLanguage)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $defaultLanguage,
@@ -201,6 +202,19 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $pagination created");
             } else {
                 $this->command->line("    - $pagination already exists");
+            }
+
+            if (!Setting::where('name', $maxConcurrentSessions)->exists()) {
+                $this->create(Setting::class, [
+                    'name' => $maxConcurrentSessions,
+                    'value' => PHP_INT_MAX,
+                    'type' => SettingTypeEnum::INTEGER,
+                    'group_name' => 'base',
+                    'description' => 'Numero massimo sessioni simultanee',
+                ]);
+                $this->command->line("    - $maxConcurrentSessions created");
+            } else {
+                $this->command->line("    - $maxConcurrentSessions already exists");
             }
 
             // ModuleDatabaseActivator::seedBackendModules();

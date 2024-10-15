@@ -10,7 +10,6 @@ use Exception as GlobalException;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Grids\Components\Grid;
-use Modules\Core\Grids\Casts\GridAction;
 use Modules\Core\App\Models\DynamicEntity;
 use Modules\Core\Grids\Traits\HasGridUtils;
 use Modules\Core\Grids\Requests\GridRequest;
@@ -26,30 +25,6 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 class GridsController extends Controller
 {
-    private function findOperation(GridRequest $request): string
-    {
-        switch ($request->get('action')) {
-            case GridAction::DELETE:
-                return 'delete';
-            case GridAction::RESTORE:
-                return 'restore';
-            case GridAction::INSERT:
-                return 'insert';
-                // TODO: manca la gestione della preview nelle griglie
-                // case GridAction::APPROVE:
-                //     return 'approve';
-                // case GridAction::DIAPPROVE:
-                //     return 'diapprove';
-        }
-
-        return match (strtolower($request->getMethod())) {
-            'get' => 'select',
-            'post' => 'insert',
-            'put', 'patch' => 'update',
-            'delete' => 'forceDelete',
-        };
-    }
-
     /**
      * get all grid models configurations
      *
@@ -83,7 +58,11 @@ class GridsController extends Controller
                 /** @var Model $instance */
                 $instance = new $model;
                 $table = $instance->getTable();
-                if ((!$entity || $instance::class === $entity::class) && Grid::useGridUtils($instance) && PermissionChecker::ensurePermissions($request, $table, connection: $instance->getConnectionName(), permissions: $permissions)) {
+                if (
+                    (!$entity || $instance::class === $entity::class) &&
+                    Grid::useGridUtils($instance) &&
+                    PermissionChecker::ensurePermissions($request, $table, connection: $instance->getConnectionName(), permissions: $permissions)
+                ) {
                     /** @var Model&HasGridUtils $instance */
                     /** @var Grid $grid */
                     $grid = $instance->getGrid();
@@ -122,9 +101,9 @@ class GridsController extends Controller
     public function grid(GridRequest $request, string $entity): Response
     {
         try {
-            $filters = $request->validated();
+            // $filters = $request->parsed();
             $model = DynamicEntity::resolve($entity, $filters['connection'] ?? null, request: $request);
-            PermissionChecker::ensurePermissions($request, $model->getTable(), $this->findOperation($request), $model->getConnectionName());
+            PermissionChecker::ensurePermissions($request, $model->getTable(), $request->action, $model->getConnectionName());
             $grid = new Grid($model);
 
             return $grid->process($request);

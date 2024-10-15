@@ -1,48 +1,50 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Modules\Core\Grids\Casts;
 
-use Illuminate\Http\Request;
-use Modules\Core\App\Casts\CrudExecutor;
+use Modules\Core\App\Casts\ActionEnum;
 
-class GridAction extends CrudExecutor
+enum GridAction: string
 {
-	const GET_ALL = parent::SELECT;
+	case SELECT = ActionEnum::SELECT->value;
+	case INSERT = ActionEnum::INSERT->value;
+	case UPDATE = ActionEnum::UPDATE->value;
+	case DELETE = ActionEnum::DELETE->value;
+		// case RESTORE = 'restore';
+	case FORCE_DELETE = ActionEnum::FORCE_DELETE->value;
+	case APPROVE = ActionEnum::APPROVE->value;
+		// case DISAPPROVE = 'disapprove';
+		// case IMPERSONATE = 'impersonate';
+	case LOCK = ActionEnum::LOCK->value;
+		// case UNLOCK = 'unlock';
+	case FUNNELS = 'funnels';
+	case OPTIONS = 'options';
+	case DATA = 'data';
+	case EXPORT = 'export';
+	case CHECK = 'check';
+	case GET_ALL = 'get_all';
 
-	const FUNNELS = 'funnels';
-
-	const OPTIONS = 'options';
-
-	const DATA = 'data';
-
-	const EXPORT = 'export';
-
-	const CHECK = 'check';
-
-	const LAYOUT = 'layout';
-
-	/**
-	 * returns if is a write action
-	 */
-	#[\Override]
-	public static function isWriteAction(string $action, ?string $requestMethod = null): bool
+	public static function values(): array
 	{
-		/** @phpstan-ignore classConstant.notFound */
-		if ($action === static::LAYOUT && $requestMethod !== Request::METHOD_GET) {
-			return true;
-		}
-
-		return parent::isWriteAction($action);
+		return array_map(fn($case) => $case->value, static::cases());
 	}
 
 	/**
 	 * returns if is a read action
 	 */
-	#[\Override]
-	public static function isReadAction(string $action, ?string $requestMethod = null): bool
+	public static function isReadAction(string $action): bool
 	{
-		return !static::isWriteAction($action, $requestMethod);
+		return match ($action) {
+			static::INSERT->value, static::UPDATE->value, static::DELETE->value, static::FORCE_DELETE->value, static::APPROVE->value, static::LOCK->value => false,
+			default => true,
+		};
+	}
+
+	/**
+	 * returns if is a write action
+	 */
+	public static function isWriteAction(string $action): bool
+	{
+		return !static::isReadAction($action);
 	}
 }

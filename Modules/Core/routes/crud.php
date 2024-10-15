@@ -12,8 +12,3 @@ Route::controller(CrudController::class)->group(function () {
 	Route::match(['patch', 'put'], '/update/{entity}', 'update')->name('replace');
 	Route::match(['delete', 'post'], '/delete/{entity}', 'delete')->name('delete');
 });
-
-// Route::controller(GridsController::class)->prefix('grid')->group(function () {
-// 	Route::get('/get-configs/{entity?}', 'getGridsConfigs')->name('grids.getGridsConfigs');
-// 	Route::match(['get', 'post', 'patch', 'delete'], '/{entity}', 'grid')->name('grids.grid');
-// });

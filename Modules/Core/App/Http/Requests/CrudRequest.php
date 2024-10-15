@@ -22,6 +22,11 @@ abstract class CrudRequest extends FormRequest implements IParsableRequest
         ];
     }
 
+    public function getPrimaryKey(): array|string
+    {
+        return $this->primaryKey;
+    }
+
     protected function prepareForValidation()
     {
         $connection = $this->connection ?? null;

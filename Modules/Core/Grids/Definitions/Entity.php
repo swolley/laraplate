@@ -6,6 +6,7 @@ namespace Modules\Core\Grids\Definitions;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -55,7 +56,7 @@ abstract class Entity
 
     protected function parseRequest(GridRequest $request): void
     {
-        $this->requestData = new GridRequestData($request, lcfirst($this->getModelName()), $this->getFullPrimaryKey());
+        $this->requestData = $request->parsed();
 
         Log::debug($this->requestData->jsonSerialize());
     }
@@ -143,9 +144,10 @@ abstract class Entity
 
             // TODO: da verificare, solo imbastito
             $class = $model::class;
-            $extended_class_name = $class . config('core.extended_class_suffix');
+            $extended_class_name = Str::afterLast($class . config('core.extended_class_suffix'), '\\');
+            $grid_utils = HasGridUtils::class;
             if (!class_exists($extended_class_name)) {
-                eval("class $extended_class_name extends $class { use HasGridUtils; }");
+                eval("class $extended_class_name extends $class { use $grid_utils; }");
             }
             $model = new $extended_class_name;
         }
