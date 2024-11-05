@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Models;
 
-use Override;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\App\Models\DynamicEntity;
-use Overtrue\LaravelVersionable\Versionable;
 use Overtrue\LaravelVersionable\VersionStrategy;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Overtrue\LaravelVersionable\Version as OvertrueVersion;
@@ -158,7 +156,7 @@ class Version extends OvertrueVersion
             ->first();
     }
 
-    #[Override]
+    #[\Override]
     public function toArray(): mixed
     {
         $serialized = parent::toArray();

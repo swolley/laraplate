@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\App\Models;
 
+use Cache;
 use Override;
 use Exception;
 use Illuminate\Support\Str;
@@ -45,9 +46,15 @@ final class DynamicEntity extends Model
         }
 
         if (config('crud.dynamic_entities', false)) {
+            $cache_key = sprintf('dynamic_entities.%s.%s', $connection ?? 'default', $tableName);
+            if (Cache::has($cache_key)) {
+                /** @var string $cached */
+                $cached = Cache::get($cache_key);
+                return unserialize($cached);
+            }
             $model = new static($attributes);
             $model->inspect($tableName, $connection, $request);
-
+            Cache::set($cache_key, serialize($model), config('cache.duration'));
             return $model;
         }
 
