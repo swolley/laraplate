@@ -186,6 +186,32 @@ namespace Modules\Core\App\Models{
  * 
  *
  * @property int $id
+ * @property string $model_type
+ * @property int $model_id
+ * @property array $embedding
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $model
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereEmbedding($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereModelId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereModelType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\ModelEmbedding whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperModelEmbedding {}
+}
+
+namespace Modules\Core\App\Models{
+/**
+ * 
+ *
+ * @property int $id
  * @property int|null $modifiable_id
  * @property string|null $modifiable_type
  * @property int|null $modifier_id

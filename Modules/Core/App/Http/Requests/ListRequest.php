@@ -40,7 +40,7 @@ class ListRequest extends SelectRequest
         if (isset($this->filters)) {
             $to_merge['filters'] = (is_string($this->filters) && is_json($this->filters)) ? json_decode($this->filters, true) : $this->filters;
         }
-        if (isset($this->filters)) {
+        if (isset($this->group_by)) {
             $to_merge['group_by'] = (is_string($this->group_by) && is_json($this->group_by)) ? json_decode($this->group_by, true) : $this->group_by;
         }
 

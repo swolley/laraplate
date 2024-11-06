@@ -18,7 +18,7 @@ abstract class CrudRequest extends FormRequest implements IParsableRequest
     public function rules()
     {
         return [
-            'connection' => ['string'],
+            'connection' => ['string', 'sometimes'],
         ];
     }
 

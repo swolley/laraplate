@@ -7,6 +7,7 @@ use Modules\Core\App\Casts\SelectRequestData;
 
 abstract class SelectRequest extends CrudRequest
 {
+    #[\Override]
     public function rules()
     {
         return parent::rules() + [

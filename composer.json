@@ -102,6 +102,11 @@
             "merge-extra-deep": false,
             "merge-replace": true,
             "merge-scripts": true
+        },
+        "installer-paths": {
+            "Modules/{$name}/": [
+                "type:module"
+            ]
         }
     },
     "config": {

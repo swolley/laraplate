@@ -13,15 +13,20 @@ use Modules\Core\App\Models\User;
 use Modules\Core\Crud\CrudHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\App\Casts\Filter;
+use Modules\Core\Cache\Searchable;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Cache\CacheManager;
 use Approval\Traits\RequiresApproval;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Elastic\Elasticsearch\ClientBuilder;
+use Modules\Core\App\Casts\FiltersGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\App\Models\Modification;
 use Modules\Core\Locking\Traits\HasLocks;
+use Modules\Core\App\Casts\FilterOperator;
 use Modules\Core\App\Casts\CrudRequestData;
 use Modules\Core\App\Casts\ListRequestData;
 use Modules\Core\App\Casts\TreeRequestData;
@@ -30,6 +35,7 @@ use Modules\Core\App\Casts\IParsableRequest;
 use Overtrue\LaravelVersionable\Versionable;
 use Modules\Core\App\Casts\DetailRequestData;
 use Modules\Core\App\Casts\ModifyRequestData;
+use Modules\Core\App\Casts\SearchRequestData;
 use Modules\Core\App\Casts\SelectRequestData;
 use Modules\Core\App\Helpers\ResponseBuilder;
 use Modules\Core\App\Casts\HistoryRequestData;
@@ -40,6 +46,7 @@ use Modules\Core\App\Http\Requests\TreeRequest;
 use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\App\Http\Requests\DetailRequest;
 use Modules\Core\App\Http\Requests\ModifyRequest;
+use Modules\Core\App\Http\Requests\SearchRequest;
 use Modules\Core\App\Http\Requests\HistoryRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\Core\Locking\Exceptions\LockedModelException;
@@ -47,6 +54,7 @@ use Modules\Core\Locking\Exceptions\CannotUnlockException;
 use Modules\Core\Locking\Exceptions\AlreadyLockedException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+use LLPhant\Embeddings\EmbeddingGenerator\OpenAI\OpenAI3SmallEmbeddingGenerator;
 
 class CrudController extends Controller
 {
@@ -239,29 +247,29 @@ class CrudController extends Controller
      */
     public function list(ListRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ListRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ListRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
-            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $response_builder) {
+            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $responseBuilder) {
                 $query = $model::query();
                 $crud_helper = new CrudHelper();
                 $crud_helper->prepareQuery($query, $filters);
 
                 $total_records = $query->count();
                 if (isset($filters->page)) {
-                    $data = $this->listByPagination($query, $filters, $response_builder, $total_records);
+                    $data = $this->listByPagination($query, $filters, $responseBuilder, $total_records);
                 } elseif (isset($filters->from)) {
-                    $data = $this->listByFromTo($query, $filters, $response_builder, $total_records);
+                    $data = $this->listByFromTo($query, $filters, $responseBuilder, $total_records);
                 } else {
-                    $data = $this->listByOthers($query, $filters, $response_builder, $total_records);
+                    $data = $this->listByOthers($query, $filters, $responseBuilder, $total_records);
                 }
 
                 if (isset($filters->group_by)) {
                     $data = $this->applyGroupBy($data, $filters->group_by);
                 }
 
-                return $response_builder
+                return $responseBuilder
                     ->setClass($model)
                     ->setData($data)
                     ->setCachedAt(Carbon::now());
@@ -278,20 +286,183 @@ class CrudController extends Controller
      */
     public function detail(DetailRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, DetailRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, DetailRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
-            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $response_builder) {
+            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $responseBuilder) {
                 $query = $model::query();
                 $crud_helper = new CrudHelper();
                 $crud_helper->prepareQuery($query, $filters);
 
-                return $response_builder
+                return $responseBuilder
                     ->setClass($model)
                     ->setData($query->sole())
                     ->setCachedAt(Carbon::now());
             });
+        });
+    }
+
+    private function getElasticSearchQuery(SearchRequestData $filters, array $embeddings = null)
+    {
+        $params = [
+            'body' => [
+                'query' => [
+                    'bool' => [],
+                ],
+            ],
+        ];
+
+        // Initialize must and should arrays
+        $must = [];
+        $should = [];
+
+        if ($embeddings) {
+            $should[] = [
+                'script_score' => [
+                    'query' => [
+                        'match_all' => (object) []
+                    ],
+                    'script' => [
+                        'source' => "cosineSimilarity(params.query_vector, 'embedding') + 1.0",
+                        'params' => [
+                            'query_vector' => $embeddings,
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        if ($filters->filters instanceof FiltersGroup) {
+            $must = $this->translateFiltersToElasticsearch($filters->filters);
+        }
+
+        // Combine must and should conditions
+        if (!empty($must)) {
+            $params['body']['query']['bool']['must'] = $must;
+        }
+
+        if (!empty($should)) {
+            $params['body']['query']['bool']['should'] = $should;
+        }
+
+        if ($filters->mainEntity) {
+            $params['index'] = $filters->mainEntity;
+        }
+
+        if ($filters->take) {
+            $params['size'] = $filters->take;
+        }
+
+        if ($filters->from) {
+            $params['from'] = $filters->from;
+        }
+
+        return $params;
+    }
+
+    private function translateFiltersToElasticsearch(FiltersGroup $filtersGroup): array
+    {
+        $mustClauses = [];
+
+        foreach ($filtersGroup->filters as $filter) {
+            if ($filter instanceof Filter) {
+                $mustClauses[] = $this->translateFilterToElasticsearch($filter);
+            } elseif ($filter instanceof FiltersGroup) {
+                $mustClauses[] = [
+                    'bool' => [
+                        'must' => $this->translateFiltersToElasticsearch($filter),
+                    ],
+                ];
+            }
+        }
+
+        return $mustClauses;
+    }
+
+    private function translateFilterToElasticsearch(Filter $filter): array
+    {
+        $query = [];
+
+        switch ($filter->operator) {
+            case FilterOperator::EQUALS:
+                $query = [
+                    'term' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+            case FilterOperator::NOT_EQUALS:
+                $query = [
+                    'bool' => [
+                        'must_not' => [
+                            'term' => [
+                                $filter->property => $filter->value,
+                            ],
+                        ],
+                    ],
+                ];
+                break;
+            case FilterOperator::LIKE:
+                $query = [
+                    'wildcard' => [
+                        $filter->property => '*' . $filter->value . '*',
+                    ],
+                ];
+                break;
+            case FilterOperator::NOT_LIKE:
+                $query = [
+                    'bool' => [
+                        'must_not' => [
+                            'wildcard' => [
+                                $filter->property => '*' . $filter->value . '*',
+                            ],
+                        ],
+                    ],
+                ];
+                break;
+            case FilterOperator::IN:
+                $query = [
+                    'terms' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+        }
+
+        return $query;
+    }
+
+    public function search(SearchRequest $request): Response
+    {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, SearchRequestData $filters): Response {
+            if (!isset($filters->model) || class_uses_trait($filters->model, Searchable::class)) {
+                $embeddedDocument = null;
+
+                if (isset($filters->model->embed) && !empty($filters->model->embed)) {
+                    $embeddingGenerator = new OpenAI3SmallEmbeddingGenerator();
+                    $embeddedDocument = $embeddingGenerator->embedText($filters->qs);
+                }
+
+                // Pass both embeddedDocument and filters->filters to the query
+                $elastic_query = $this->getElasticSearchQuery($filters, $embeddedDocument, $filters->filters ?? []);
+
+                $client = ClientBuilder::create()->build();
+                $response = $client->search($elastic_query);
+                $totalRecords = $response['hits']['total']['value'] ?? 0;
+                $data = $response['hits']['hits'] ?? [];
+
+                $responseBuilder
+                    ->setTotalRecords($totalRecords)
+                    ->setCurrentRecords(count($data))
+                    ->setPagination($filters->pagination)
+                    ->setCurrentPage($filters->page)
+                    ->setTotalPages($filters->calculateTotalPages($totalRecords));
+
+                return $responseBuilder
+                    ->setData($data)
+                    ->getResponse();
+            }
         });
     }
 
@@ -304,14 +475,14 @@ class CrudController extends Controller
      */
     public function history(HistoryRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, HistoryRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, HistoryRequestData $filters): Response {
             $model = $filters->model;
             if (!$this->hasHistory($model)) {
                 throw new BadMethodCallException("'$filters->mainEntity' doesn't have history handling");
             }
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
-            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $response_builder) {
+            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $responseBuilder) {
                 $query = $model::query();
                 $crud_helper = new CrudHelper();
                 $crud_helper->prepareQuery($query, $filters);
@@ -325,7 +496,7 @@ class CrudController extends Controller
                     $query->with('modifications');
                 }
 
-                return $response_builder
+                return $responseBuilder
                     ->setClass($model)
                     ->setData($query->sole())
                     ->setCachedAt(Carbon::now());
@@ -342,14 +513,14 @@ class CrudController extends Controller
      */
     public function tree(TreeRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, TreeRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, TreeRequestData $filters): Response {
             $model = $filters->model;
             if (!$this->useRecursiveRelationships($model)) {
                 throw new UnexpectedValueException("'$filters->mainEntity' is not a hierarchical class");
             }
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'select', $model->getConnectionName());
 
-            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $response_builder) {
+            return CacheManager::tryByRequest($model, $filters->request, function () use ($model, $filters, $responseBuilder) {
                 $tree_relation_type = [];
                 if ($filters->parents && $filters->children) {
                     $tree_relation_type = 'bloodline';
@@ -363,7 +534,7 @@ class CrudController extends Controller
                 $crud_helper = new CrudHelper();
                 $crud_helper->prepareQuery($query, $filters);
 
-                return $response_builder
+                return $responseBuilder
                     ->setClass($model)
                     ->setData($query->sole())
                     ->setCachedAt(Carbon::now());
@@ -395,7 +566,7 @@ class CrudController extends Controller
      */
     public function insert(Request $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values, $request): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $values, $request): Response {
             $model = $values->model;
             PermissionChecker::ensurePermissions($values->request, $model->getTable(), 'insert', $model->getConnectionName());
             // $values = method_exists($model, 'getRules') ? $request->validate($model->getRules()) : $filters;
@@ -410,7 +581,7 @@ class CrudController extends Controller
 
             $created->fresh();
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($created)
                 ->setStatus(Response::HTTP_CREATED)
                 ->setError(!empty($discarded_values) ? $discarded_values : null)
@@ -427,7 +598,7 @@ class CrudController extends Controller
      */
     public function update(ModifyRequest $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $values): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $values): Response {
             $model = $values->model;
             PermissionChecker::ensurePermissions($values->request, $model->getTable(), 'update', $model->getConnectionName());
             // if $filters->request->method() == 'PUT' devo sovrascrivere tutto il record quindi devono esserci tutti i fillable e devo fare le validazioni
@@ -459,10 +630,10 @@ class CrudController extends Controller
             });
 
             if (!empty($discarded_values)) {
-                $response_builder->setError($discarded_values);
+                $responseBuilder->setError($discarded_values);
             }
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($updated_records)
                 ->getResponse();
         });
@@ -478,7 +649,7 @@ class CrudController extends Controller
     public function delete(ModifyRequest $request): Response
     {
         // delete deve bypassare le preview
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $filters): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'forceDelete', $model->getConnectionName());
             $key_value = $this->getModelKeyValue($filters);
@@ -496,7 +667,7 @@ class CrudController extends Controller
                 }
             });
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($deleted_records)
                 ->getResponse();
         });
@@ -513,7 +684,7 @@ class CrudController extends Controller
     public function doActivateOperation(ModifyRequest $request, string $operation): Response
     {
         // activate deve bypassare le preview
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $filters) use ($operation): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $filters) use ($operation): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'restore', $model->getConnectionName());
             $key = $filters->primaryKey;
@@ -527,7 +698,7 @@ class CrudController extends Controller
 
             $found_record->fresh();
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($found_record)
                 ->getResponse();
         });
@@ -563,7 +734,7 @@ class CrudController extends Controller
      */
     private function doApproveOperation(ModifyRequest $request, string $operation): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $filters) use ($operation): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $filters) use ($operation): Response {
             $model = $filters->model;
             PermissionChecker::ensurePermissions($filters->request, $model->getTable(), 'approve', $model->getConnectionName());
             /** @var string|array $key */
@@ -595,7 +766,7 @@ class CrudController extends Controller
 
             $found_record->refresh();
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($found_record)
                 ->getResponse();
         });
@@ -635,7 +806,7 @@ class CrudController extends Controller
      */
     private function doLockOperation(ModifyRequest $request, string $operation): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, ModifyRequestData $filters) use ($operation): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, ModifyRequestData $filters) use ($operation): Response {
             $model = $filters->model;
             if (!class_uses_trait($model, HasLocks::class)) {
                 throw new BadMethodCallException($model::class . ' doesn\'t support locks');
@@ -661,7 +832,7 @@ class CrudController extends Controller
                 }
             });
 
-            return $response_builder
+            return $responseBuilder
                 ->setData($locked_records)
                 ->getResponse();
         });
@@ -716,12 +887,12 @@ class CrudController extends Controller
      */
     public function clearModelCache(Request $request): Response
     {
-        return $this->executeOperation($request, function (ResponseBuilder $response_builder, CrudRequestData $filters): Response {
+        return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, CrudRequestData $filters): Response {
             $model = $filters->model;
             $table = $model->getTable();
             Cache::tags([config('app.name'), $table])->flush();
 
-            return $response_builder
+            return $responseBuilder
                 ->setData("$table cached cleared")
                 ->setStatus(Response::HTTP_OK)
                 ->getResponse();

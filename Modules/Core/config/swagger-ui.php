@@ -1,6 +1,6 @@
 <?php
 
-use NextApps\SwaggerUi\Http\Middleware\EnsureUserIsAuthorized;
+use Wotz\SwaggerUi\Http\Middleware\EnsureUserIsAuthorized;
 
 return [
     'files' => [
@@ -9,6 +9,8 @@ return [
              * The path where the swagger file is served.
              */
             'path' => 'docs',
+
+            'title' => env('APP_NAME') . ' - Swagger',
 
             /*
              * The versions of the swagger file. The key is the version name and the value is the path to the file.
@@ -33,7 +35,7 @@ return [
             /*
              * Specify the validator URL. Set to false to disable validation.
              */
-            'validator_url' => env('SWAGGER_UI_VALIDATOR_URL'),
+            // 'validator_url' => env('SWAGGER_UI_VALIDATOR_URL'),
 
             /*
              * If enabled the file will be modified to set the server url and oauth urls.
@@ -43,14 +45,14 @@ return [
             /*
              * The oauth configuration for the swagger file.
              */
-            'oauth' => [
-                'token_path' => 'oauth/token',
-                'refresh_path' => 'oauth/token',
-                'authorization_path' => 'oauth/authorize',
+            // 'oauth' => [
+            //     'token_path' => 'oauth/token',
+            //     'refresh_path' => 'oauth/token',
+            //     'authorization_path' => 'oauth/authorize',
 
-                'client_id' => env('SWAGGER_UI_OAUTH_CLIENT_ID'),
-                'client_secret' => env('SWAGGER_UI_OAUTH_CLIENT_SECRET'),
-            ],
+            //     'client_id' => env('SWAGGER_UI_OAUTH_CLIENT_ID'),
+            //     'client_secret' => env('SWAGGER_UI_OAUTH_CLIENT_SECRET'),
+            // ],
 
             /*
              * Path to a custom stylesheet file if you want to customize the look and feel of swagger-ui.

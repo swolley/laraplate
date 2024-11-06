@@ -14,12 +14,14 @@
         "laravel/fortify": "^1.21",
         "hedii/laravel-gelf-logger": "^9.0",
         "lab404/laravel-impersonate": "^1.7",
-        "nextapps/laravel-swagger-ui": "^0.10",
         "overtrue/laravel-versionable": "^5.2",
         "spatie/laravel-permission": "^6.4",
         "staudenmeir/laravel-adjacency-list": "*",
         "laravel/socialite": "^5.15",
-        "stephenlake/laravel-approval": "^1.1"
+        "stephenlake/laravel-approval": "^1.1",
+        "wotz/laravel-swagger-ui": "^1.0",
+        "elasticsearch/elasticsearch": "^8.15",
+        "theodo-group/llphant": "^0.8.8"
     },
     "require-dev": {
         "mtrajano/laravel-swagger": "^0.6.4"

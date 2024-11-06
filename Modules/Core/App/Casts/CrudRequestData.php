@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\Core\App\Casts;
 
 use Illuminate\Http\Request;
-use Modules\Core\App\Models\DynamicEntity;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\App\Models\DynamicEntity;
 
 class CrudRequestData
 {
@@ -26,6 +26,8 @@ class CrudRequestData
         $this->mainEntity = $mainEntity;
         $this->primaryKey = $primaryKey;
         $this->connection = $validated['connection'] ?? null;
-        $this->model = DynamicEntity::resolve($this->mainEntity, $this->connection, request: $this->request);
+        if ($this->mainEntity !== '') {
+            $this->model = DynamicEntity::resolve($this->mainEntity, $this->connection, request: $this->request);
+        }
     }
 }
