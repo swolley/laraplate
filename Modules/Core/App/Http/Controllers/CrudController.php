@@ -21,6 +21,7 @@ use Approval\Traits\RequiresApproval;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Modules\Core\App\Casts\WhereClause;
 use Elastic\Elasticsearch\ClientBuilder;
 use Modules\Core\App\Casts\FiltersGroup;
 use Illuminate\Database\Eloquent\Builder;
@@ -369,9 +370,10 @@ class CrudController extends Controller
             if ($filter instanceof Filter) {
                 $mustClauses[] = $this->translateFilterToElasticsearch($filter);
             } elseif ($filter instanceof FiltersGroup) {
+                $clause = $filter->operator === WhereClause::AND ? 'must' : 'should';
                 $mustClauses[] = [
                     'bool' => [
-                        'must' => $this->translateFiltersToElasticsearch($filter),
+                        $clause => $this->translateFiltersToElasticsearch($filter),
                     ],
                 ];
             }
@@ -428,6 +430,44 @@ class CrudController extends Controller
                     ],
                 ];
                 break;
+            case FilterOperator::GREAT:
+                $query = [
+                    'gt' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+            case FilterOperator::GREAT_EQUALS:
+                $query = [
+                    'gte' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+            case FilterOperator::LESS:
+                $query = [
+                    'lt' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+            case FilterOperator::LESS_EQUALS:
+                $query = [
+                    'lte' => [
+                        $filter->property => $filter->value,
+                    ],
+                ];
+                break;
+            case FilterOperator::BETWEEN:
+                $query = [
+                    'range' => [
+                        $filter->property => [
+                            'gte' => $filter->value[0],
+                            'lte' => $filter->value[1],
+                        ],
+                    ],
+                ];
+                break;
         }
 
         return $query;
@@ -436,7 +476,8 @@ class CrudController extends Controller
     public function search(SearchRequest $request): Response
     {
         return $this->executeOperation($request, function (ResponseBuilder $responseBuilder, SearchRequestData $filters): Response {
-            if (!isset($filters->model) || class_uses_trait($filters->model, Searchable::class)) {
+            $is_searchable_class = class_uses_trait($filters->model, Searchable::class);
+            if (!isset($filters->model) || $is_searchable_class) {
                 $embeddedDocument = null;
 
                 if (isset($filters->model->embed) && !empty($filters->model->embed)) {
@@ -463,6 +504,8 @@ class CrudController extends Controller
                     ->setData($data)
                     ->getResponse();
             }
+
+            return $responseBuilder->setError('Full-search operation can be done only on Searchable entities');
         });
     }
 
