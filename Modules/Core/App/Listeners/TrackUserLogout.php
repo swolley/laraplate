@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Core\App\Listeners;
 
 use Illuminate\Auth\Events\Logout;

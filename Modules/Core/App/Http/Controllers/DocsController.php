@@ -10,7 +10,7 @@ use UnexpectedValueException;
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request as RequestFacade;
-use NextApps\SwaggerUi\Http\Controllers\OpenApiJsonController;
+use Wotz\SwaggerUi\Http\Controllers\OpenApiJsonController;
 
 class DocsController extends OpenApiJsonController
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Core\App\Http\Controllers;
 
 use Exception;
@@ -7,7 +9,6 @@ use Throwable;
 use Illuminate\Http\Request;
 use UnexpectedValueException;
 use Exception as GlobalException;
-use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Grids\Components\Grid;
 use Modules\Core\App\Models\DynamicEntity;

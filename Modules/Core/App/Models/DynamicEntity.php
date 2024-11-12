@@ -39,6 +39,16 @@ final class DynamicEntity extends Model
 
     private array $dynamic_relations = [];
 
+    private array $_casts = [];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return $this->_casts;
+    }
+
     public static function resolve(string $tableName, ?string $connection = null, $attributes = [], ?Request $request = null): Model
     {
         if ($model = static::tryResolveModel($tableName, $connection)) {
@@ -60,6 +70,8 @@ final class DynamicEntity extends Model
 
         throw new UnexpectedValueException('Dynamic tables mapping is not enabled');
     }
+
+
 
     /**
      * @psalm-suppress MoreSpecificReturnType
@@ -219,8 +231,8 @@ final class DynamicEntity extends Model
 
         // set correct cast
         $is_date = $column->type->value && mb_strpos($column->type->value, 'date') !== false;
-        // FIXME: in laravel 11 casts è diventato un metodo non si può più settare così
-        $this->casts[$column->name] = $column->type->value;
+
+        $this->_casts[$column->name] = $column->type->value;
 
         // validations
         $rules = $this->getRules();

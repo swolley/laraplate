@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Core\App\Http\Controllers;
 
 use Closure;
@@ -11,7 +13,6 @@ use UnexpectedValueException;
 use Illuminate\Support\Carbon;
 use Modules\Core\App\Models\User;
 use Modules\Core\Crud\CrudHelper;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\App\Casts\Filter;
 use Modules\Core\Cache\Searchable;

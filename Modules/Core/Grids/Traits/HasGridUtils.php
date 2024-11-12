@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Core\Grids\Traits;
 
 use ReflectionClass;
@@ -28,7 +30,7 @@ trait HasGridUtils
         $allMethods = (new ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
         $methods = array_filter(
             $allMethods,
-            fn ($method) => $method->isUserDefined() &&
+            fn($method) => $method->isUserDefined() &&
                 $method->hasReturnType() && (
                     $method->getReturnType()->__toString() === Relation::class ||
                     is_subclass_of($method->getReturnType()->__toString(), Relation::class)

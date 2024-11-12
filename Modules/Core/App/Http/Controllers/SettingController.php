@@ -12,7 +12,6 @@ use Doctrine\DBAL\Exception;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use UnexpectedValueException;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\App;
 use Modules\Core\App\Models\Setting;
 use Illuminate\Support\Facades\Cache;

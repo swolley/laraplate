@@ -11,7 +11,6 @@ use Illuminate\Http\Response;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Modules\Core\App\Models\User;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Modules\Core\App\Helpers\ResponseBuilder;
