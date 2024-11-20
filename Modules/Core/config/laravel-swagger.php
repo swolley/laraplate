@@ -51,7 +51,8 @@ return [
     'ignoredRoutes' => [
         'core.docs.welcome',
         'core.docs.phpinfo',
-        'docs.index',
+        'swagger.index',
+        'swagger.oauth2-redirect',
         'core.docs.swaggerDocs',
         'password.reset',
     ],

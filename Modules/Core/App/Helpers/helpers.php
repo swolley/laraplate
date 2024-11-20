@@ -24,24 +24,28 @@ if (!function_exists('modules')) {
     {
         $module_class = 'Nwidart\\Modules\\Facades\\Module';
         $modules = class_exists($module_class) ? ($onlyActive ? $module_class::allEnabled() : $module_class::all()) : [];
+        $remapped_modules = [];
+        foreach ($modules as $module => $class) {
+            $remapped_modules[ucfirst($module)] = $class;
+        }
 
         if ($onlyModule) {
             $onlyModule = ucfirst($onlyModule);
-            $modules = array_filter($modules, fn (string $k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
+            $remapped_modules = array_filter($remapped_modules, fn(string $k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
 
-        $modules = $fullpath ? array_map(fn (Module $m) => $m->getPath(), $modules) : array_keys($modules);
+        $remapped_modules = $fullpath ? array_map(fn(Module $m) => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
 
         if ($showMainApp && !$onlyModule) {
             if ($fullpath) {
-                $modules['App'] = app_path();
+                $remapped_modules['App'] = app_path();
             } else {
-                array_unshift($modules, 'App');
+                array_unshift($remapped_modules, 'App');
             }
-            ksort($modules);
+            ksort($remapped_modules);
         }
 
-        return $modules;
+        return $remapped_modules;
     }
 }
 
@@ -105,7 +109,7 @@ if (!function_exists('translations')) {
         $app_languages = glob($app_dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
         $langs_subpath = config('modules.paths.generator.lang.path');
 
-        $modules_languages = $fullpath ? $app_languages : array_map(fn (string $l) => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
+        $modules_languages = $fullpath ? $app_languages : array_map(fn(string $l) => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
 
         foreach (modules(false, true, $onlyActive) as $module) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $module);
@@ -283,7 +287,7 @@ if (!function_exists('routes')) {
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
         $all_routes = app('router')->getRoutes()->getRoutes();
-        usort($all_routes, fn (Route $a, Route $b) => $a->uri() <=> $b->uri());
+        usort($all_routes, fn(Route $a, Route $b) => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
             if (!isset($route->action['namespace'])) {

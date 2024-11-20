@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Modules\Core\Grids\Requests;
 
 use Illuminate\Support\Arr;
@@ -28,11 +26,12 @@ class GridRequest extends FormRequest implements IParsableRequest
 
     public function rules()
     {
-        if ($this->action === GridAction::FUNNELS) {
+        $url = $this->url();
+        if (strpos($url, '/' . GridAction::FUNNELS->value) !== false) {
             $grid_rules = $this->remapListRules('funnels.*');
-        } else if ($this->action === GridAction::OPTIONS) {
+        } else if (strpos($url, '/' . GridAction::OPTIONS->value) !== false) {
             $grid_rules = $this->remapListRules('options.*');
-        } else if ($this->action === GridAction::SELECT) {
+        } else if (strpos($url, '/' . GridAction::SELECT->value) !== false) {
             $grid_rules = [
                 'options' => ['sometimes'],
                 'funnels' => ['sometimes'],
@@ -40,18 +39,18 @@ class GridRequest extends FormRequest implements IParsableRequest
                 ...$this->remapListRules('options.*'),
             ];
             // TODO: serve anche l'entità o parto da quella della griglia e poi guardo che colonne vengono chieste?
+        } else if (
+            strpos($url, '/' . GridAction::INSERT->value) ||
+            strpos($url, '/' . GridAction::UPDATE->value) ||
+            strpos($url, '/' . GridAction::DELETE->value) ||
+            strpos($url, '/' . GridAction::FORCE_DELETE->value) ||
+            strpos($url, '/' . GridAction::APPROVE->value) ||
+            strpos($url, '/' . GridAction::LOCK->value) ||
+            strpos($url, '/' . GridAction::CHECK->value)
+        ) {
+            $grid_rules = ['funnels' => 'exclude', 'options' => 'exclude'];
         } else {
-            $common_rules = [
-                'exclude_if:action,' . GridAction::INSERT->value,
-                'exclude_if:action,' . GridAction::UPDATE->value,
-                'exclude_if:action,' . GridAction::DELETE->value,
-                'exclude_if:action,' . GridAction::FORCE_DELETE->value,
-                'exclude_if:action,' . GridAction::APPROVE->value,
-                'exclude_if:action,' . GridAction::LOCK->value,
-                'exclude_if:action,' . GridAction::CHECK->value,
-            ];
-            $grid_rules['options'] = $common_rules;
-            $grid_rules['funnels'] = $common_rules;
+            $grid_rules = [];
         }
 
         return $grid_rules;

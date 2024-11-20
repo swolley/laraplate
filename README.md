@@ -90,16 +90,15 @@ https://jeroeng.dev/blog/exploring-elasticsearch-with-laravel-scout/
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use JeroenG\Explorer\Application\Explored;
-use Laravel\Scout\Searchable;
+use Modules\Core\Cache\Searchable;
 
-class ... extends Model implements Explored
+class ... extends Model
 {
     use Searchable;
 
-    public function mappableAs(): array
+	#[\Override]
+    protected function prepareElasticDocument(): array
     {
         return [
             'id' => 'keyword',

@@ -1120,7 +1120,7 @@
                                 </div>
 
                                 <div id="docs-card-content" class="flex flex-col gap-2 w-full">
-                                    <a href="{{route('docs.index')}}" class="flex items-center justify-center gap-2">
+                                    <a href="{{route('swagger.index')}}" class="flex items-center justify-center gap-2">
                                         <div class="flex items-center justify-center" style="min-width:60px;">
                                             @include('core::components.swagger-icon')
                                         </div>

@@ -1,386 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laravel Boilerplate Core module",
+        "title": "Laraplate Core module",
         "description": "",
-        "version": "2.2.0"
+        "version": "1.0.0"
     },
-    "host": "127.0.0.1:8000",
+    "host": "http:\/\/127.0.0.1",
     "basePath": "\/",
     "paths": {
-        "\/api\/v1\/delete\/{entity}": {
-            "delete": {
-                "summary": "Remove the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "delete-api-v1-delete-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/detail\/{entity}": {
-            "get": {
-                "summary": "Show the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-detail-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/history\/{entity}": {
-            "get": {
-                "summary": "Show resource history",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-history-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/insert\/{entity}": {
-            "post": {
-                "summary": "Insert the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "post-api-v1-insert-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/select\/{entity}": {
-            "get": {
-                "summary": "List the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "count",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "sort",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "group_by",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-select-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/tree\/{entity}": {
-            "get": {
-                "summary": "Get the specified resource data",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "parents",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "children",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-tree-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
-        "\/api\/v1\/update\/{entity}": {
-            "patch": {
-                "summary": "Update the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "patch-api-v1-update-entity",
-                "tags": [
-                    "Api"
-                ]
-            }
-        },
         "\/app\/auth\/impersonate": {
             "post": {
                 "summary": "Impersonate a user.",
@@ -561,6 +188,29 @@
                 "tags": [
                     "App"
                 ]
+            },
+            "post": {
+                "summary": "Remove the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-delete-entity",
+                "tags": [
+                    "App"
+                ]
             }
         },
         "\/app\/crud\/detail\/{entity}": {
@@ -640,7 +290,32 @@
                 ]
             }
         },
-        "\/app\/crud\/grid\/get-configs\/{entity}": {
+        "\/app\/crud\/grid\/check\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-app-crud-grid-check-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/configs\/{entity}": {
             "get": {
                 "summary": "get all grid models configurations",
                 "description": "",
@@ -659,13 +334,13 @@
                         "description": ""
                     }
                 ],
-                "operationId": "get-app-crud-grid-get-configs-entity",
+                "operationId": "get-app-crud-grid-configs-entity",
                 "tags": [
                     "App"
                 ]
             }
         },
-        "\/app\/crud\/grid\/{entity}": {
+        "\/app\/crud\/grid\/data\/{entity}": {
             "get": {
                 "summary": "",
                 "description": "",
@@ -682,31 +357,9 @@
                         "type": "string",
                         "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "action",
-                        "type": "string",
-                        "required": false,
-                        "description": "",
-                        "enum": [
-                            "select",
-                            "insert",
-                            "update",
-                            "delete",
-                            "forceDelete",
-                            "approve",
-                            "lock",
-                            "funnels",
-                            "options",
-                            "data",
-                            "export",
-                            "check",
-                            "get_all"
-                        ]
                     }
                 ],
-                "operationId": "get-app-crud-grid-entity",
+                "operationId": "get-app-crud-grid-data-entity",
                 "tags": [
                     "App"
                 ]
@@ -727,37 +380,201 @@
                         "type": "string",
                         "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "action": {
-                                    "type": "string",
-                                    "enum": [
-                                        "select",
-                                        "insert",
-                                        "update",
-                                        "delete",
-                                        "forceDelete",
-                                        "approve",
-                                        "lock",
-                                        "funnels",
-                                        "options",
-                                        "data",
-                                        "export",
-                                        "check",
-                                        "get_all"
-                                    ]
-                                }
-                            }
-                        }
                     }
                 ],
-                "operationId": "post-app-crud-grid-entity",
+                "operationId": "post-app-crud-grid-data-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/delete\/{entity}": {
+            "delete": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "delete-app-crud-grid-delete-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-grid-delete-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/export\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-app-crud-grid-export-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-grid-export-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/insert\/{entity}": {
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-grid-insert-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/layout\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-app-crud-grid-layout-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-grid-layout-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "put": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "put-app-crud-grid-layout-entity",
                 "tags": [
                     "App"
                 ]
@@ -778,37 +595,9 @@
                         "type": "string",
                         "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "action": {
-                                    "type": "string",
-                                    "enum": [
-                                        "select",
-                                        "insert",
-                                        "update",
-                                        "delete",
-                                        "forceDelete",
-                                        "approve",
-                                        "lock",
-                                        "funnels",
-                                        "options",
-                                        "data",
-                                        "export",
-                                        "check",
-                                        "get_all"
-                                    ]
-                                }
-                            }
-                        }
                     }
                 ],
-                "operationId": "patch-app-crud-grid-entity",
+                "operationId": "patch-app-crud-grid-layout-entity",
                 "tags": [
                     "App"
                 ]
@@ -829,31 +618,105 @@
                         "type": "string",
                         "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "action",
-                        "type": "string",
-                        "required": false,
-                        "description": "",
-                        "enum": [
-                            "select",
-                            "insert",
-                            "update",
-                            "delete",
-                            "forceDelete",
-                            "approve",
-                            "lock",
-                            "funnels",
-                            "options",
-                            "data",
-                            "export",
-                            "check",
-                            "get_all"
-                        ]
                     }
                 ],
-                "operationId": "delete-app-crud-grid-entity",
+                "operationId": "delete-app-crud-grid-layout-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/select\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-app-crud-grid-select-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-app-crud-grid-select-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/crud\/grid\/update\/{entity}": {
+            "patch": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "patch-app-crud-grid-update-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "put": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "put-app-crud-grid-update-entity",
                 "tags": [
                     "App"
                 ]
@@ -993,6 +856,165 @@
                 ]
             }
         },
+        "\/app\/crud\/search\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "qs",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-app-crud-search-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "qs"
+                            ],
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "pagination": {
+                                    "type": "integer"
+                                },
+                                "page": {
+                                    "type": "integer"
+                                },
+                                "from": {
+                                    "type": "integer"
+                                },
+                                "to": {
+                                    "type": "integer"
+                                },
+                                "limit": {
+                                    "type": "integer"
+                                },
+                                "filters": {
+                                    "type": "string"
+                                },
+                                "qs": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-crud-search-entity",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
         "\/app\/crud\/select\/{entity}": {
             "get": {
                 "summary": "List the specified resource",
@@ -1112,6 +1134,109 @@
                 "tags": [
                     "App"
                 ]
+            },
+            "post": {
+                "summary": "List the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "relations": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "pagination": {
+                                    "type": "integer"
+                                },
+                                "page": {
+                                    "type": "integer"
+                                },
+                                "from": {
+                                    "type": "integer"
+                                },
+                                "to": {
+                                    "type": "integer"
+                                },
+                                "limit": {
+                                    "type": "integer"
+                                },
+                                "count": {
+                                    "type": "boolean"
+                                },
+                                "sort": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "property": {
+                                                    "type": "string"
+                                                },
+                                                "direction": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "asc",
+                                                        "desc",
+                                                        "ASC",
+                                                        "DESC"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "filters": {
+                                    "type": "string"
+                                },
+                                "group_by": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-crud-select-entity",
+                "tags": [
+                    "App"
+                ]
             }
         },
         "\/app\/crud\/tree\/{entity}": {
@@ -1225,6 +1350,29 @@
                     }
                 ],
                 "operationId": "patch-app-crud-update-entity",
+                "tags": [
+                    "App"
+                ]
+            },
+            "put": {
+                "summary": "Update the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "put-app-crud-update-entity",
                 "tags": [
                     "App"
                 ]
