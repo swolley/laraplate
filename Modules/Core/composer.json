@@ -24,7 +24,9 @@
         "theodo-group/llphant": "^0.8.8"
     },
     "require-dev": {
-        "mtrajano/laravel-swagger": "^0.6.4"
+        "mtrajano/laravel-swagger": "^0.6.4",
+        "pestphp/pest": "^3.5",
+        "pestphp/pest-plugin-laravel": "^3.0"
     },
     "extra": {
         "laravel": {
