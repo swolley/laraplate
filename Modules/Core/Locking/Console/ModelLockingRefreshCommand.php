@@ -85,10 +85,10 @@ class ModelLockingRefreshCommand extends Command
     private function optimisticLockingCheck(Model $instance, string $model, string $table): void
     {
         $optimistick_locking_class = HasOptimisticLocking::class;
-        $optimistic_locking_column = $instance->lockVersionColumn();
+        $optimistic_locking_column = method_exists($instance, 'lockVersionColumn') ? $instance->lockVersionColumn() : null;
         $has_optimistic_locking = class_uses_trait($instance, $optimistick_locking_class);
 
-        $has_optimistic_locking_column = Schema::hasColumn($table, $optimistic_locking_column);
+        $has_optimistic_locking_column = $optimistic_locking_column !== null && Schema::hasColumn($table, $optimistic_locking_column);
 
         if ($has_optimistic_locking_column && !$has_optimistic_locking) {
             if ($this->askConfirmForOperation(
@@ -112,12 +112,12 @@ class ModelLockingRefreshCommand extends Command
     private function lockableCheck(Model $instance, string $model, string $table): void
     {
         $locked_class = HasLocks::class;
-        $lock_at_column = $instance->lockedAtColumn();
-        $lock_by_column = $instance->lockedByColumn();
+        $lock_at_column = method_exists($instance, 'lockedAtColumn') ? $instance->lockedAtColumn() : null;
+        $lock_by_column = method_exists($instance, 'lockedByColumn') ? $instance->lockedByColumn() : null;
         $has_locking = class_uses_trait($instance, $locked_class);
 
-        $has_locked_at_column = Schema::hasColumn($table, $lock_at_column);
-        $has_locked_by_column = Schema::hasColumn($table, $lock_by_column);
+        $has_locked_at_column = $lock_at_column !== null && Schema::hasColumn($table, $lock_at_column);
+        $has_locked_by_column = $lock_by_column !== null && Schema::hasColumn($table, $lock_by_column);
 
         if (($has_locked_at_column || $has_locked_by_column) && !$has_locking) {
             if ($this->askConfirmForOperation(

@@ -1,11 +1,9 @@
 {
     "name": "Core",
     "alias": "core",
-    "description": "",
-    "keywords": [],
-    "priority": 0,
-    "providers": [
-        "Modules\\Core\\App\\Providers\\CoreServiceProvider"
-    ],
+    "description": "Common functionalisties for every Laravel application.",
+    "keywords": ["core", "common"],
+    "priority": 100,
+    "providers": ["Modules\\Core\\App\\Providers\\CoreServiceProvider"],
     "files": []
 }

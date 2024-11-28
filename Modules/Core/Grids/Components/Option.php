@@ -17,7 +17,7 @@ class Option extends ListEntity
     protected function getData(): array
     {
         $name = $this->getValueField()->getFullAlias();
-        $option_data = $this->requestData->getOptionsFilters()[$name];
+        $option_data = $this->requestData->optionsFilters[$name];
 
         $exploded = explode('.', $name);
         $subfix = array_pop($exploded);
@@ -44,7 +44,7 @@ class Option extends ListEntity
         $columns = $this->getAllQueryFields();
         $this->getAllFields()->diff($columns);
         $additional_columns = $this->getAllFields()->diff($columns);
-        $columns = $columns->map(fn ($field) => $field->getName())->toArray();
+        $columns = $columns->map(fn($field) => $field->getName())->toArray();
 
         $query = $model::query()->select($columns);
         $this->addSortsIntoQuery($query, $option_data['sort'] ?? $this->getDefaultSorts($columns, $model));

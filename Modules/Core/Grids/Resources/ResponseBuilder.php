@@ -35,12 +35,11 @@ class ResponseBuilder extends BaseResponseBuilder
     /**
      * @psalm-suppress LessSpecificImplementedReturnType
      */
-    #[\Override]
     public function toArray(): array
     {
-        $payload = parent::toArray();
-        $meta = $payload['meta'];
-        unset($payload['meta']);
+        $payload = [];
+        $meta = [];
+        // unset($payload['meta']);
 
         if (!empty($this->rules)) {
             $meta['validations'] = $this->rules;

@@ -54,7 +54,7 @@ class Field implements \JsonSerializable
      */
     public static function create(string $fullpath, ?string $alias = null, bool $readable = true, bool $writable = true, FieldType $fieldType = FieldType::COLUMN): \Closure
     {
-        [$path, $name] = static::splitPath($fullpath);
+        [$path, $name] = self::splitPath($fullpath);
 
         return fn(Model $model): static => (new self($path, $name, $alias ?? $name, $fieldType, $model))->readable($readable)->writable($writable);
     }
@@ -176,7 +176,7 @@ class Field implements \JsonSerializable
     /**
      * field funnel public setter (alias of setFunnel returning self for pipes)
      *
-     * @param @param callable(Model, Field):Funnel $funnel
+     * @param callable(Model, Field):Funnel $funnel
      */
     public function funnel(callable $funnel): static
     {

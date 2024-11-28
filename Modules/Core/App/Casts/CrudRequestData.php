@@ -16,6 +16,7 @@ class CrudRequestData
 
     public readonly ?string $connection;
 
+    /** @phpstan-ignore property.uninitializedReadonly */
     public readonly Model $model;
 
     public readonly string|array $primaryKey;

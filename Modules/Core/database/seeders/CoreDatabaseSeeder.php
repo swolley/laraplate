@@ -174,11 +174,11 @@ class CoreDatabaseSeeder extends Seeder
         $defaultLanguage = 'defaultLanguage';
         $pagination = 'pagination';
         $maxConcurrentSessions = 'maxConcurrentSessions';
-        $already_exists = Setting::exists();
+        $already_exists = Setting::query()->exists();
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>settings</>');
 
         DB::transaction(function () use ($defaultLanguage, $pagination, $maxConcurrentSessions) {
-            if (!Setting::where('name', $defaultLanguage)->exists()) {
+            if (!Setting::query()->where('name', $defaultLanguage)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $defaultLanguage,
                     'value' => config('app.locale'),
@@ -191,7 +191,7 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $defaultLanguage already exists");
             }
 
-            if (!Setting::where('name', $pagination)->exists()) {
+            if (!Setting::query()->where('name', $pagination)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $pagination,
                     'value' => 20,
@@ -204,7 +204,7 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $pagination already exists");
             }
 
-            if (!Setting::where('name', $maxConcurrentSessions)->exists()) {
+            if (!Setting::query()->where('name', $maxConcurrentSessions)->exists()) {
                 $this->create(Setting::class, [
                     'name' => $maxConcurrentSessions,
                     'value' => PHP_INT_MAX,
@@ -225,11 +225,11 @@ class CoreDatabaseSeeder extends Seeder
     {
         $clearUserAssignedLicenses = 'clearUserAssignedLicenses';
         $clearResetTokens = 'clearResetTokens';
-        $already_exists = CronJob::exists();
+        $already_exists = CronJob::query()->exists();
         $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>cron jobs</>');
 
         DB::transaction(function () use ($clearUserAssignedLicenses, $clearResetTokens) {
-            if (!CronJob::where('name', $clearUserAssignedLicenses)->exists()) {
+            if (!CronJob::query()->where('name', $clearUserAssignedLicenses)->exists()) {
                 $this->create(CronJob::class, [
                     'name' => $clearUserAssignedLicenses,
                     'command' => 'auth:clear-licenses',
@@ -243,7 +243,7 @@ class CoreDatabaseSeeder extends Seeder
                 $this->command->line("    - $clearUserAssignedLicenses already exists");
             }
 
-            if (!CronJob::where('name', $clearResetTokens)->exists()) {
+            if (!CronJob::query()->where('name', $clearResetTokens)->exists()) {
                 $this->create(CronJob::class, [
                     'name' => $clearResetTokens,
                     'command' => 'auth:clear-resets',

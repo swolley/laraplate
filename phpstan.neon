@@ -34,6 +34,10 @@ parameters:
         - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::getTimestampColumns\(\).$#'
         - '#Call to an undefined method Modules\\Core\Grids\\Casts\\GridRequestData|Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
         - '#Call to an undefined method Illuminate\\Http\\Request::getMethod\(\).$#'
+        - 
+          message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'.$#"
+          identifier: larastan.noEnvCallsOutsideOfConfig
+          path: Modules/*/config/*
 #
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php

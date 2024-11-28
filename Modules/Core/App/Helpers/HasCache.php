@@ -7,6 +7,9 @@ namespace Modules\Core\App\Helpers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @phpstan-type HasCacheType HasCache
+ */
 trait HasCache
 {
     protected static function bootHasCache(): void

@@ -34,8 +34,12 @@ enum GridAction: string
 	/**
 	 * returns if is a read action
 	 */
-	public static function isReadAction(string $action): bool
+	public static function isReadAction(GridAction | string $action): bool
 	{
+		if ($action instanceof GridAction) {
+			$action = $action->value;
+		}
+
 		return match ($action) {
 			static::INSERT->value, static::UPDATE->value, static::DELETE->value, static::FORCE_DELETE->value, static::APPROVE->value, static::LOCK->value => false,
 			default => true,
@@ -45,7 +49,7 @@ enum GridAction: string
 	/**
 	 * returns if is a write action
 	 */
-	public static function isWriteAction(string $action): bool
+	public static function isWriteAction(GridAction | string $action): bool
 	{
 		return !static::isReadAction($action);
 	}

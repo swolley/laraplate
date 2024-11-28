@@ -124,11 +124,11 @@ class Grid extends Entity
     {
         if ($columns = $this->requestData->columns) {
             foreach ($columns as $column) {
-                $this->appendFieldIntoList($necessary_fields, $column, false);
+                $this->appendFieldIntoList($necessary_fields, $column->name, false);
             }
         }
 
-        if ($relations = $this->requestData->getRelations()) {
+        if ($relations = $this->requestData->relations) {
             foreach ($relations as $relation) {
                 if (!$this->hasRelationDeeply($relation)) {
                     // @phpstan-ignore method.notFound
@@ -139,7 +139,7 @@ class Grid extends Entity
         }
 
         if ($filters = $this->requestData->filters) {
-            foreach (array_keys($filters) as $column) {
+            foreach (array_keys($filters->filters) as $column) {
                 $this->appendFieldIntoList($necessary_fields, $column, true);
             }
         }
@@ -184,7 +184,7 @@ class Grid extends Entity
 
                 if (isset($this->requestData)) {
                     $action = $this->requestData->action;
-                    if ($action === GridAction::CHECK || $action === GridAction::LAYOUT) {
+                    if ($action === GridAction::CHECK /*|| $action === GridAction::LAYOUT*/) {
                         return;
                     }
                     $this->completeFromRequestData($necessary_fields);
@@ -308,7 +308,7 @@ class Grid extends Entity
     private function addAndScrollDefaultFields(array &$allFields, bool $readable): void
     {
         $model = $this->getModel();
-        $fields = $model->getColumns(true, $readable, !$readable);
+        $fields = $model->getColumns();
         foreach ($fields as $name => $type) {
             if (array_key_exists($name, $allFields)) {
                 $allFields[$name][$readable ? 'readable' : 'writable'] = true;
@@ -493,12 +493,12 @@ class Grid extends Entity
 
         $action = $this->requestData->action;
         // TODO: solo imbastito, da testare
-        if (!in_array($action, [GridAction::CHECK, GridAction::LAYOUT])) {
-            if (!in_array($action, [GridAction::DELETE, GridAction::FORCE_DELETE])) {
-                $this->prepareFields();
-            } else {
-                $this->prepareNecessaryFields();
-            }
+        if ($action !== GridAction::CHECK) {
+            // if ($action !== GridAction::LAYOUT) {
+            $this->prepareFields();
+            // } else {
+            // $this->prepareNecessaryFields();
+            // }
         }
 
         if (GridAction::isReadAction($this->requestData->action, $request->getMethod())) {
@@ -535,10 +535,10 @@ class Grid extends Entity
      */
     private function callbackToReadAction(ResponseBuilder $responseBuilder, Request $request): ResponseBuilder
     {
-        $action = GridAction::tryFrom($this->requestData->action);
-        if (!$action) {
-            throw new \UnexpectedValueException('Unexpected action');
-        }
+        $action = $this->requestData->action;
+        // if (!$action) {
+        //     throw new \UnexpectedValueException('Unexpected action');
+        // }
 
         // concurrency checks
         if ($action === GridAction::CHECK) {
@@ -547,7 +547,7 @@ class Grid extends Entity
 
         // layouts
         /** @phpstan-ignore classConstant.notFound */
-        if (($action === GridAction::LAYOUT && $request->getMethod() === Request::METHOD_GET)) {
+        if ((/*$action === GridAction::LAYOUT &&*/$request->getMethod() === Request::METHOD_GET)) {
             return $this->processLayouts($responseBuilder);
         }
 
@@ -666,22 +666,23 @@ class Grid extends Entity
     {
         $data = match ($this->requestData->action) {
             /** @phpstan-ignore classConstant.notFound */
-            GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST => $this->createUserLayout(),
+            // GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST => $this->createUserLayout(),
             /** @phpstan-ignore classConstant.notFound, classConstant.notFound */
-            GridAction::LAYOUT && in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_PATCH]) => $this->updateUserLayout(),
+            // GridAction::LAYOUT && in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_PATCH]) => $this->updateUserLayout(),
             /** @phpstan-ignore classConstant.notFound */
-            GridAction::LAYOUT && $request->getMethod() === Request::METHOD_DELETE => $this->deleteUserLayout(),
+            // GridAction::LAYOUT && $request->getMethod() === Request::METHOD_DELETE => $this->deleteUserLayout(),
             GridAction::INSERT => $this->createRecord(),
             GridAction::UPDATE => $this->updateRecords(),
             GridAction::DELETE => $this->softDeleteRecords(),
             GridAction::FORCE_DELETE => $this->forceDeleteRecords(),
-            GridAction::RESTORE => $this->restoreRecords(),
+                // GridAction::RESTORE => $this->restoreRecords(),
             default => throw new \InvalidArgumentException('Not a valid action'),
         };
 
         $responseBuilder->setData($data);
         /** @phpstan-ignore classConstant.notFound */
-        if ($this->requestData->action === GridAction::INSERT || ($this->requestData->action === GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST)) {
+        if ($this->requestData->action === GridAction::INSERT) {
+            // || ($this->requestData->action === GridAction::LAYOUT && $request->getMethod() === Request::METHOD_POST)) {
             $responseBuilder->setStatus(Response::HTTP_CREATED);
         }
 

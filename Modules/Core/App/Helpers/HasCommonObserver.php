@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\Locking\HasOptimisticLocking;
 use Illuminate\Validation\UnauthorizedException;
 
+/**
+ * @phpstan-type HasCommonObserverType HasCommonObserver
+ */
 trait HasCommonObserver
 {
     use Versionable, HasOptimisticLocking;

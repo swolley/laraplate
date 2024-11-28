@@ -4,6 +4,9 @@ namespace Modules\Core\App\Actions\Fortify;
 
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * @phpstan-type PasswordValidationRulesType PasswordValidationRules
+ */
 trait PasswordValidationRules
 {
     /**

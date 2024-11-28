@@ -26,6 +26,9 @@ class HandleLicensesCommand extends Command
     public function handle()
     {
         try {
+            $number = 0;
+            $valid_to = null;
+
             $licenses_groups = License::withoutGlobalScopes()->groupBy('valid_to')
                 ->select(DB::raw("valid_to"), \DB::raw('count(*) as count'))
                 ->get();
@@ -110,7 +113,7 @@ class HandleLicensesCommand extends Command
             $remapped[] = [$license->id, $license->valid_to, $license->user->name];
         }
         table(['License', 'Expiration', 'User'], $remapped);
-        $this->output->info('Current max sessions available: ' . (Setting::where('name', 'maxConcurrentSessions')->first()?->value));
+        $this->output->info('Current max sessions available: ' . (Setting::where('name', 'maxConcurrentSessions')->first()?->value ?? 'unlimited'));
     }
 
     private function renewLicenses(int $number, int $licensesCount, ?Carbon $validTo)

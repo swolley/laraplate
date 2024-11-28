@@ -21,7 +21,6 @@ use Modules\Core\App\Casts\FilterOperator;
 use Modules\Core\App\Casts\ListRequestData;
 use Modules\Core\App\Casts\SelectRequestData;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 
 class CrudHelper
 {
@@ -51,7 +50,7 @@ class CrudHelper
 				$query->select($only_standard_columns);
 			} else if ($type === 'relations' && !empty($cols)) {
 				foreach ($cols as $relation => $relation_cols) {
-					static::sortColumns($query, $relation_cols);
+					self::sortColumns($query, $relation_cols);
 					$only_relation_columns = [];
 					foreach ($relation_cols as $column) {
 						if ($column->type === ColumnType::COLUMN) {
@@ -145,7 +144,7 @@ class CrudHelper
 					$columns['main'][] = new Column($index, $column->type);
 				} else {
 					$splitted = self::splitColumnNameOnLastDot($index);
-					if (!isset($splitte[1])) {
+					if (!isset($splitted[1])) {
 						$splitted[1] = '*';
 					}
 					if ($column->type === ColumnType::COLUMN) {
@@ -308,9 +307,10 @@ class CrudHelper
 	private function applyAggregatesToQuery(Builder|Relation $query, array &$relations_aggregates, string $relation)
 	{
 		foreach ($relations_aggregates as $aggregate_relation => $aggregates_cols) {
-			if (preg_match('/^' . preg_quote($relation) . '\.\w+$/', $aggregate_relation) !== 1) continue;
+			$escaped = preg_quote($relation);
+			if (preg_match('/^' . $escaped . '\.\w+$/', $aggregate_relation) !== 1) continue;
 
-			$subrelation = preg_replace('/^' . preg_quote($relation) . '\./', '', $aggregate_relation);
+			$subrelation = preg_replace('/^' . $escaped . '\./', '', $aggregate_relation);
 			foreach ($aggregates_cols as $col) {
 				$method = 'with' . ucfirst($col->type->value);
 				if ($col->type === ColumnType::SUM || $col->type === ColumnType::COUNT) {

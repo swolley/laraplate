@@ -145,7 +145,7 @@ trait HasGridUtils
         }
 
         $found = static::getRelationshipDeeply($relation);
-        if (!$found || empty($found)) {
+        if ($found === false || empty($found)) {
             return false;
         }
 
@@ -168,7 +168,7 @@ trait HasGridUtils
     }
 
     /**
-     * @var string $relation	relation method / table name / model class name
+     * @param string $relation	relation method / table name / model class name
      */
     public static function hasRelation(string $relation): bool
     {
@@ -176,7 +176,7 @@ trait HasGridUtils
     }
 
     /**
-     * @var string $relation	relation method / table name / model class name
+     * @param string $relation	relation method / table name / model class name
      */
     public static function hasRelationDeeply(string $relation): bool
     {
@@ -184,7 +184,7 @@ trait HasGridUtils
     }
 
     /**
-     * @var string $relation	relation method / table name / model class name
+     * @param string $relation	relation method / table name / model class name
      */
     public static function isDeepRelation(string $relation): bool
     {
@@ -326,17 +326,18 @@ trait HasGridUtils
             'lockedAt' => null,
         ];
 
-        /** @var Model $instance */
+        /** @var Model $model */
         $prefix = $fullnames ? $model->getTable() . '.' : '';
         if ($model->timestamps) {
             $timestamps['createdAt'] = $prefix . $model->getCreatedAtColumn();
             $timestamps['updatedAt'] = $prefix . $model->getUpdatedAtColumn();
         }
         $uses = class_uses_recursive($model);
-        if (in_array(SoftDeletes::class, $uses)) {
+        if (method_exists($model, 'getDeletedAtColumn')) {
             $timestamps['deletedAt'] = $prefix . $model->getDeletedAtColumn();
         }
         if (in_array(HasLocks::class, $uses)) {
+            /** @phpstan-ignore method.notFound  */
             $timestamps['lockedAt'] = $prefix . app('locked')->getLockedColumnName();
         }
 
@@ -371,7 +372,7 @@ trait HasGridUtils
     public function getModelCasts(): array
     {
         $casts = $this->casts;
-        if (isset($this->dates)) {
+        if (property_exists($this, 'dates')) {
             foreach ($this->dates as $date) {
                 $casts[$date] = 'date';
             }

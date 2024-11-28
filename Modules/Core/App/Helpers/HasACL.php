@@ -7,12 +7,14 @@ namespace Modules\Core\App\Helpers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @phpstan-type HasACLType HasACL
+ */
 trait HasACL
 {
     protected static function bootHasACL(): void
     {
-        static::addGlobalScope('acl', function (Builder $builder): void {
-        });
+        static::addGlobalScope('acl', function (Builder $builder): void {});
     }
 
     public function acl(): HasMany

@@ -7,6 +7,9 @@ namespace Modules\Core\App\Helpers;
 use Override;
 use Approval\Traits\RequiresApproval;
 
+/**
+ * @phpstan-type HasApprovalsType HasApprovals
+ */
 trait HasApprovals
 {
     use RequiresApproval;

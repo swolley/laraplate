@@ -10,7 +10,7 @@ return [
              */
             'path' => 'docs',
 
-            'title' => env('APP_NAME') . ' - Swagger',
+            'title' => env('APP_NAME', 'Laraplate') . ' - Swagger',
 
             /*
              * The versions of the swagger file. The key is the version name and the value is the path to the file.

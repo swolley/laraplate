@@ -2,11 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use Modules\Core\Database\Seeders\CoreDatabaseSeeder;
 
-class DatabaseSeeder extends Seeder
+class DatabaseSeeder extends CoreDatabaseSeeder
 {
-	public function run()
+	/**
+	 * Seed the application's database.
+	 */
+	#[\Override]
+	public function run(): void
 	{
+		parent::run();
 	}
 }

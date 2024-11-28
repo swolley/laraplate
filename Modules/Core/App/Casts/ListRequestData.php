@@ -66,11 +66,13 @@ class ListRequestData extends SelectRequestData
         if (isset($validated['pagination']) || isset($validated['page'])) {
             $this->take = $this->pagination = (int) ($validated['pagination'] ?? self::getDefaultPagination());
             $this->page = (int) ($validated['page'] ?? 1);
+            /** @phpstan-ignore assign.readOnlyProperty */
             $this->skip = ($this->page - 1) * $this->pagination;
             $this->from = $this->skip + 1;
             $this->to = $this->from + $this->pagination;
         } elseif (isset($validated['from']) || isset($validated['to'])) {
             $this->from = (int) ($validated['from'] ?? 1);
+            /** @phpstan-ignore assign.readOnlyProperty */
             $this->skip = $this->from - 1;
             if ($this->to = isset($validated['to']) ? (int) $validated['to'] : null) {
                 $this->take = $this->pagination = $this->to - $this->from;
@@ -78,10 +80,12 @@ class ListRequestData extends SelectRequestData
         } elseif (isset($validated['limit'])) {
             $this->take = $this->limit = (int) $validated['limit'];
             $this->page = 1;
+            /** @phpstan-ignore assign.readOnlyProperty */
             $this->skip = 0;
             $this->pagination = $this->limit;
         } else {
             $this->page = 1;
+            /** @phpstan-ignore assign.readOnlyProperty */
             $this->skip = 0;
             $this->take = $this->pagination = self::getDefaultPagination();
         }
@@ -89,7 +93,7 @@ class ListRequestData extends SelectRequestData
 
     private static function getDefaultPagination(): int
     {
-        return Setting::where('name', 'pagination')->first('value')?->value ?? 25;
+        return Setting::query()->where('name', 'pagination')->first('value')?->value ?? 25;
     }
 
     public function calculateTotalPages(int $totalRecords): int

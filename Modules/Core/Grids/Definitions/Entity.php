@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Modules\Core\Inspector\Inspect;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\App\Casts\WhereClause;
@@ -27,6 +26,7 @@ use function PHPUnit\Framework\assertInstanceOf;
 
 /**
  * Main entity class with common properties
+ * 
  */
 abstract class Entity
 {
@@ -58,7 +58,7 @@ abstract class Entity
     {
         $this->requestData = $request->parsed();
 
-        Log::debug($this->requestData->jsonSerialize());
+        // Log::debug($this->requestData->jsonSerialize());
     }
 
     //endregion
@@ -100,6 +100,9 @@ abstract class Entity
 
     /**
      * gets model object
+     *
+     * @return Model
+     * @phpstan-return Model&HasGridUtils
      */
     public function getModel(): Model
     {
@@ -395,10 +398,10 @@ abstract class Entity
     /**
      * adds deeply a list of fields to current ojbect
      *
-     * @param array<string,Field|\Closure<Collection<string, Field> $fields
+     * @param array<string,Field|\Closure(string): Field> $fields
      * @return void
      */
-    protected function addFields(iterable|\Closure $fields)
+    protected function addFields(iterable $fields)
     {
         foreach ($fields as $name => &$field) {
             if ($field instanceof \Closure) {
@@ -756,12 +759,12 @@ abstract class Entity
         $responseBuilder->setData($data);
         $responseBuilder->setCurrentRecords($data->count());
         $responseBuilder->setTotalRecords($totalRecords);
-        if ($this->requestData->getRequest()->has('page') || $this->requestData->getRequest()->has('pagination')) {
-            $responseBuilder->setCurrentPage((int) ($this->requestData->getRequest()->get('page') ?? 1));
-            $responseBuilder->setPagination((int) $this->requestData->getRequest()->get('pagination'));
-        } elseif ($this->requestData->getRequest()->has('from')) {
-            $responseBuilder->setFrom($this->requestData->getPagination()['from']);
-            $responseBuilder->setTo($this->requestData->getPagination()['to']);
+        if ($this->requestData->request->has('page') || $this->requestData->request->has('pagination')) {
+            $responseBuilder->setCurrentPage((int) ($this->requestData->request->get('page') ?? 1));
+            $responseBuilder->setPagination((int) $this->requestData->request->get('pagination'));
+        } elseif ($this->requestData->request->has('from')) {
+            $responseBuilder->setFrom($this->requestData->pagination['from']);
+            $responseBuilder->setTo($this->requestData->pagination['to']);
         }
     }
 }

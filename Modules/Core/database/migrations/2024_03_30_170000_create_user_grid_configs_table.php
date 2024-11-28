@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -30,9 +31,18 @@ return new class() extends Migration
             $table->unique(['user_id', 'grid_name', 'layout_name']);
         });
 
+        $connection = DB::connection();
+        if ($connection->getDriverName() === 'pgsql') {
+            $true = 'TRUE';
+        } elseif (in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
+            $true = 1;
+        } else {
+            throw new \Exception('Unsupported database driver');
+        }
+
         DB::statement(
             "ALTER TABLE {$this->table_name}
-            ADD CONSTRAINT {$this->table_name}_public_CHECK CHECK (is_public = 1 OR user_id IS NOT NULL);",
+            ADD CONSTRAINT {$this->table_name}_public_CHECK CHECK (is_public = {$true} OR user_id IS NOT NULL);",
         );
     }
 

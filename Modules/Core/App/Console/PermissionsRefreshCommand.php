@@ -33,6 +33,8 @@ class PermissionsRefreshCommand extends Command
         'App\\Models\\Version',
         'App\\Models\\Modification',
         'Modules\\Core\\App\\Models\\DynamicEntity',
+        'Modules\\Core\\App\\Models\\License',
+        'Modules\\Core\\App\\Models\\ModelEmbedding',
         'Illuminate\\Database\\Eloquent\\Relations\\Pivot',
     ];
 
@@ -119,8 +121,9 @@ class PermissionsRefreshCommand extends Command
                 }
 
                 if (!in_array($permission_name, $found_permissions, true)) {
-                    if ($permission_class::where('name', $permission_name)->withTrashed()->exists()) {
-                        $permission_class::where('name', $permission_name)->withTrashed()->restore();
+                    $query = $permission_class::where('name', $permission_name)->withTrashed();
+                    if ($query->exists()) {
+                        $query->restore();
 
                         if (!$quiet_mode) {
                             $this->info("Restored '{$permission_name}' permission {$new_model_suffix}");
@@ -144,9 +147,11 @@ class PermissionsRefreshCommand extends Command
                 $permission_name = "{$connection}.{$table}." . ActionEnum::IMPERSONATE->value;
                 $all_permissions[] = $permission_name;
 
-                if (!in_array($permission_name, $found_permissions, true) && $permission_class::create([
-                    'name' => $permission_name,
-                ])) {
+                if (!in_array($permission_name, $found_permissions, true)) {
+                    $permission_class::updateOrCreate(
+                        ['name' => $permission_name],
+                        ['name' => $permission_name]
+                    );
                     if (!$quiet_mode) {
                         $this->info("Created '{$permission_name}' permission {$new_model_suffix}");
                     }

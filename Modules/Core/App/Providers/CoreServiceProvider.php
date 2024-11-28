@@ -21,6 +21,7 @@ use Modules\Core\Locking\LockedModelSubscriber;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Modules\Core\App\Http\Middleware\PreviewMiddleware;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Modules\Core\App\Http\Middleware\ConvertStringToBoolean;
 use Modules\Core\App\Http\Middleware\LocalizationMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
@@ -170,7 +171,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->app->booted(function (): void {
             $schedule = $this->app->make(Schedule::class);
-            if (Schema::hasTable(((new CronJob))->getTable())) {
+            if (Schema::hasTable((new CronJob())->getTable())) {
                 $crons = CronJob::where('is_active', true)->get();
                 foreach ($crons as $cron) {
                     $schedule->command($cron->command)->cron($cron->schedule)->onOneServer();
@@ -186,14 +187,27 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->publishes([module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower . '.php')], 'config');
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
-        // additional gelf logger for graylog
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/logging.php'), 'logging');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/auth.php'), 'auth');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/approval.php'), 'approval');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/fortify.php'), 'fortify');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/laravel-swagger.php'), 'laravel-swagger');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/swagger-ui.php'), 'swagger-ui');
-        $this->mergeConfigFrom(module_path($this->moduleName, 'config/versionable.php'), 'versionable');
+
+        $sourcePath = module_path($this->moduleName, 'config');
+        $files = glob($sourcePath . '/*.php');
+        foreach ($files as $file) {
+            $basename = basename($file, '.php');
+            if ($basename === 'config') continue;
+            $this->mergeConfigFrom($file, $basename);
+        }
+    }
+
+    #[\Override]
+    protected function mergeConfigFrom($path, $key)
+    {
+        if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $config = $this->app->make('config');
+
+            $config->set($key, array_merge(
+                $config->get($key, []),
+                require $path,
+            ));
+        }
     }
 
     protected function registerMiddlewares()

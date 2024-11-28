@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -20,13 +21,20 @@ return new class() extends Migration
 
             $table->unique(['name', 'guard_name'], 'permissions_UN');
 
-            DB::statement(
-                "ALTER TABLE permissions
-                add COLUMN `connection_name` varchar(50) as (regexp_substr(`name`, '^\\\\w+')) stored,
-                add COLUMN `table_name` varchar(50) as (replace(regexp_substr(`name`, '\\\\.\\\\w+\\\\.'), '.', '')) stored,
-                ADD INDEX permissions_ref_IDX (connection_name, table_name),
-                add constraint permissions_name_CHECK CHECK (REGEXP_INSTR(`name`, '^\\\\w+\\\\.\\\\w+\\\\.\\\\w+$') = 1);",
-            );
+            $connection = DB::connection();
+            if ($connection->getDriverName() === 'pgsql') {
+                DB::statement("ALTER TABLE permissions ADD COLUMN connection_name VARCHAR(50) GENERATED ALWAYS AS (regexp_replace(name, '^\\w+', '')) STORED");
+                DB::statement("ALTER TABLE permissions ADD COLUMN table_name VARCHAR(50) GENERATED ALWAYS AS (regexp_replace(regexp_replace(name, '\\.\\w+\\.', ''), '\\.', '')) STORED");
+                DB::statement("CREATE INDEX permissions_ref_IDX ON permissions (connection_name, table_name)");
+                DB::statement("ALTER TABLE permissions ADD CONSTRAINT permissions_name_CHECK CHECK (name ~ '^\\w+\\.\\w+\\.\\w+$')");
+            } elseif (in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
+                DB::statement("ALTER TABLE permissions ADD COLUMN connection_name VARCHAR(50) AS (regexp_substr(name, '^\\\\w+') ) STORED");
+                DB::statement("ALTER TABLE permissions ADD COLUMN table_name VARCHAR(50) AS (replace(regexp_substr(name, '\\\\.\\\\w+\\\\.'), '.', '') ) STORED");
+                DB::statement("CREATE INDEX permissions_ref_IDX ON permissions (connection_name, table_name)");
+                DB::statement("ALTER TABLE permissions ADD CONSTRAINT permissions_name_CHECK CHECK (REGEXP_INSTR(name, '^\\\\w+\\\\.\\\\w+\\\\.\\\\w+$') = 1)");
+            } else {
+                throw new \Exception('Unsupported database driver');
+            }
         });
 
         Schema::table('roles', function (Blueprint $table): void {
@@ -64,10 +72,10 @@ return new class() extends Migration
 
             DB::statement(
                 "ALTER TABLE permissions
-                drop COLUMN `connection_name` varchar(50) as (regexp_substr(`name`, '^\\\\w+')) stored,
-                drop COLUMN `table_name` varchar(50) as (replace(regexp_substr(`name`, '\\\\.\\\\w+\\\\.'), '.', '')) stored,
-                drop INDEX permissions_ref_IDX (connection_name, table_name),
-                drop constraint permissions_name_CHECK CHECK (REGEXP_INSTR(`name`, '^\\\\w+\\\\.\\\\w+\\\\.\\\\w+$') = 1);",
+                drop COLUMN `connection_name`,
+                drop COLUMN `table_name`,
+                drop INDEX permissions_ref_IDX,
+                drop constraint permissions_name_CHECK;"
             );
         });
 

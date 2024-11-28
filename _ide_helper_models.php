@@ -23,11 +23,11 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approver
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Approval\Models\Modification $modification
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Approval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Approval newQuery()
@@ -59,10 +59,10 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\CronJobFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\CronJob locked()
@@ -103,11 +103,11 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approver
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Approval\Models\Modification $modification
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Disapproval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Disapproval newQuery()
@@ -129,10 +129,10 @@ namespace Modules\Core\App\Models{
 /**
  * 
  *
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\DynamicEntity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\DynamicEntity newQuery()
@@ -155,11 +155,11 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon $valid_from
  * @property \Illuminate\Support\Carbon|null $valid_to
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\License expiredAt(\Illuminate\Support\Carbon $date)
@@ -216,8 +216,8 @@ namespace Modules\Core\App\Models{
  * @property string|null $modifiable_type
  * @property int|null $modifier_id
  * @property string|null $modifier_type
- * @property int $active
- * @property int $is_update
+ * @property bool $active
+ * @property bool $is_update
  * @property int $approvers_required
  * @property int $disapprovers_required
  * @property string $md5
@@ -228,16 +228,16 @@ namespace Modules\Core\App\Models{
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
  * @property-read int|null $disapprovals_count
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
  * @property-read int $approvals_remaining
  * @property-read int $approvers_remaining
  * @property-read int $disapprovals_remaining
  * @property-read int $disapprovers_remaining
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifiable
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $modifier
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Modification activeOnly()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Modification changes()
@@ -272,23 +272,23 @@ namespace Modules\Core\App\Models{
  * @property int $id
  * @property string $name
  * @property string $guard_name
- * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $connection_name
  * @property string|null $table_name
+ * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
  * @property-read \Modules\Core\App\Casts\ActionEnum|null $action
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\User> $users
  * @property-read int|null $users_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Permission newQuery()
@@ -322,24 +322,24 @@ namespace Modules\Core\App\Models{
  * @property int $id
  * @property string $name
  * @property string $guard_name
- * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $locked_at
  * @property string|null $locked_user_id
  * @property int|null $parent_id
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\App\Models\Role[] $children
  * @property-read int|null $children_count
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\Role|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\User> $users
  * @property-read int|null $users_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\App\Models\Role[] $ancestors The model's recursive parents.
  * @property-read int|null $ancestors_count
@@ -419,13 +419,13 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
  * @property-read array|null $preview
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
  * @property-read int|null $modifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\SettingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\Setting newModelQuery()
@@ -460,9 +460,6 @@ namespace Modules\Core\App\Models{
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password
- * @property string|null $two_factor_secret
- * @property string|null $two_factor_recovery_codes
- * @property string|null $two_factor_confirmed_at
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -473,27 +470,30 @@ namespace Modules\Core\App\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property string|null $two_factor_confirmed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $defaultPermissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $defaultPermissions
  * @property-read int|null $default_permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $defaultRoles
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $defaultRoles
  * @property-read int|null $default_roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
  * @property-read int|null $disapprovals_count
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\UserGridConfig> $grid_configs
  * @property-read int|null $grid_configs_count
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\License|null $license
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\App\Models\Role> $roles
  * @property-read int|null $roles_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\User locked()
@@ -546,11 +546,11 @@ namespace Modules\Core\App\Models{
  * @property array $config
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \Overtrue\LaravelVersionable\Version|null $firstVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $lastVersion
- * @property-read \Overtrue\LaravelVersionable\Version|null $latestVersion
+ * @property-read \Modules\Core\App\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\App\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\App\Models\Version|null $latestVersion
  * @property-read \Modules\Core\App\Models\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Overtrue\LaravelVersionable\Version> $versions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\App\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\UserGridConfig newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\App\Models\UserGridConfig newQuery()

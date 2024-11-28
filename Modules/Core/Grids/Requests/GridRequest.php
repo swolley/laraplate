@@ -26,6 +26,7 @@ class GridRequest extends FormRequest implements IParsableRequest
 
     public function rules()
     {
+        /** @phpstan-ignore method.notFound */
         $url = $this->url();
         if (strpos($url, '/' . GridAction::FUNNELS->value) !== false) {
             $grid_rules = $this->remapListRules('funnels.*');
@@ -77,6 +78,7 @@ class GridRequest extends FormRequest implements IParsableRequest
     {
         parent::prepareForValidation();
 
+        /** @phpstan-ignore method.notFound */
         $exploded_url = explode('/', $this->url());
         $this->action = GridAction::from($exploded_url[count($exploded_url) - 2]);
 
@@ -91,6 +93,7 @@ class GridRequest extends FormRequest implements IParsableRequest
                 $this->realMainRequest->setContainer($this->container);
                 if (isset($this->funnels)) {
                     foreach ($this->funnels as $funnel) {
+                        /** @phpstan-ignore staticMethod.notFound */
                         $sub_request = ListRequest::createFrom($this);
                         $sub_request->setContainer($this->container);
                         $sub_request->replace($funnel);
@@ -99,9 +102,10 @@ class GridRequest extends FormRequest implements IParsableRequest
                 }
                 if (isset($this->options)) {
                     foreach ($this->options as $option) {
+                        /** @phpstan-ignore staticMethod.notFound */
                         $sub_request = ListRequest::createFrom($this);
                         $sub_request->setContainer($this->container);
-                        $sub_request->replace($funnel);
+                        $sub_request->replace($option);
                         $this->realOptionRequests[] = $sub_request;
                     }
                 }
@@ -117,6 +121,7 @@ class GridRequest extends FormRequest implements IParsableRequest
             case GridAction::FORCE_DELETE:
             case GridAction::DELETE:
                 // case GridAction::RESTORE:
+                /** @phpstan-ignore staticMethod.notFound */
                 $this->realMainRequest = ModifyRequest::createFrom($this);
                 $this->realMainRequest->setContainer($this->container);
                 break;

@@ -51,6 +51,7 @@ class CreateUserCommand extends Command
             do {
                 /** @var User $user */
                 $user = new (user_class());
+                $password = '';
 
                 foreach ($fillables as $attribute) {
                     if ($attribute !== 'password') {

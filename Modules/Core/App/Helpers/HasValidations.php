@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Modules\Core\App\Helpers;
 
 use Modules\Core\App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\App\Casts\CrudExecutor;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\UnauthorizedException;
 
+/**
+ * @phpstan-type HasValidationsType HasValidations
+ */
 trait HasValidations
 {
     public const DEFAULT_RULE = 'always';
@@ -82,7 +86,7 @@ trait HasValidations
             return true;
         }
 
-        if ($user = auth()->user()) {
+        if ($user = Auth::user()) {
             /** @var User $user */
             return $user->isSuperAdmin() || $user->hasPermission($permission);
         }

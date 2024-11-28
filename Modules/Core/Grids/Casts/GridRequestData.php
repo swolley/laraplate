@@ -18,21 +18,21 @@ class GridRequestData extends ListRequestData
 
     public function __construct(GridAction $action, GridRequest $request, string $mainEntity, array $validated, string|array $primaryKey)
     {
+        parent::__construct($request, $mainEntity, $validated, $primaryKey);
         $this->action = $action;
-        $this->layout = static::extractLayout($validated, $mainEntity);
+        $this->layout = self::extractLayout($validated, $mainEntity);
         $this->fixQueryParamsNames($request, $primaryKey);
 
-        if (GridAction::isReadAction($this->action->value, $request->getMethod())) {
-            parent::__construct($request, $mainEntity, $validated, $primaryKey);
-            $this->globalSearch = static::extractGlobalSearchFilters($validated);
-            $this->funnelsFilters = static::extractFunnelsFilters($validated);
-            $this->optionsFilters = static::extractOptionsFilters($validated);
+        if (GridAction::isReadAction($this->action->value)) {
+            $this->globalSearch = self::extractGlobalSearchFilters($validated);
+            $this->funnelsFilters = self::extractFunnelsFilters($validated);
+            $this->optionsFilters = self::extractOptionsFilters($validated);
             $this->changes = null;
         } else {
             $this->globalSearch = null;
             $this->funnelsFilters = null;
             $this->optionsFilters = null;
-            $this->changes = static::extractChanges($validated);
+            $this->changes = self::extractChanges($validated);
         }
     }
 
@@ -93,7 +93,7 @@ class GridRequestData extends ListRequestData
     /**
      * extract changes
      *
-     * @return array|null;
+     * @return array|null
      */
     private function extractChanges(array $filters/*, string $entityName*/): ?array
     {
@@ -110,7 +110,7 @@ class GridRequestData extends ListRequestData
      */
     private static function replacePrimaryKeyUnderscores(string|array $primaryKeyName): array|string
     {
-        return is_string($primaryKeyName) ? str_replace('.', '_', $primaryKeyName) : array_map(fn($key) => (string) static::replacePrimaryKeyUnderscores($key), $primaryKeyName);
+        return is_string($primaryKeyName) ? str_replace('.', '_', $primaryKeyName) : array_map(fn($key) => (string) self::replacePrimaryKeyUnderscores($key), $primaryKeyName);
     }
 
     /**
@@ -127,7 +127,7 @@ class GridRequestData extends ListRequestData
             $modelPrimaryKey = [$modelPrimaryKey];
         }
         /** @var string[] $replaced */
-        $replaced = static::replacePrimaryKeyUnderscores($modelPrimaryKey);
+        $replaced = self::replacePrimaryKeyUnderscores($modelPrimaryKey);
         if (($this->action === GridAction::UPDATE || $this->action === GridAction::DELETE || $this->action === GridAction::FORCE_DELETE) && empty($replaced)) {
             throw new \BadMethodCallException('PrimaryKey is mandatory for update and delete actions');
         }

@@ -16,6 +16,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\suggest;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 use function Laravel\Prompts\multiselect;
 use Modules\Core\App\Helpers\HasValidations;
 use Symfony\Component\Console\Input\InputInterface;
@@ -209,6 +210,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
 
                 if (confirm(sprintf("Would you like to automatically map '%s' table?", $table_name))) {
                     $all_types = array_merge(...array_values($this->availableTypes));
+                    /** @var Model $class */
                     $class = $dynamicEntityClass::resolve($table_name);
 
                     foreach ($class->getFillable() as $fillable) {
@@ -318,8 +320,8 @@ class ModelMakeCommand extends BaseModelMakeCommand
         $this->availableClasses = $this->possibleModels();
 
         $prompted = collect($this->getDefinition()->getArguments())
-            ->filter(fn ($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
-            ->filter(fn ($argument) => $argument->getName() !== 'command')
+            ->filter(fn($argument) => $argument->isRequired() && is_null($input->getArgument($argument->getName())))
+            ->filter(fn($argument) => $argument->getName() !== 'command')
             ->each(function ($argument) use ($input): void {
                 $question = $this->promptForMissingArgumentsUsing()[$argument->getName()] ?? 'What is ' . lcfirst($argument->getDescription()) . '?';
                 $arg_name = $argument->getName();
@@ -364,7 +366,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
                 default: $this->isNewClass ? ['migration'] : [],
             ),
         )
-            ->map(fn ($option) => match ($option) {
+            ->map(fn($option) => match ($option) {
                 'resource controller' => 'resource',
                 'form requests' => 'requests',
                 default => $option,
@@ -462,7 +464,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
         $exploded = explode('\\', $relatedName);
         $targetEntityShort = end($exploded);
 
-        $filtered_relation_types = array_filter($this->availableTypes['Relationships/Associations'], fn ($type) => $type !== 'relation');
+        $filtered_relation_types = array_filter($this->availableTypes['Relationships/Associations'], fn($type) => $type !== 'relation');
 
         /** @var Collection<int, list{array<array-key, string>|string, string}> */
         $rows = new Collection();
@@ -915,7 +917,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
     {
         return suggest(
             $question,
-            fn ($value) => array_filter($choices, fn ($name) => Str::contains($name, $value, ignoreCase: true)),
+            fn($value) => array_filter($choices, fn($name) => Str::contains($name, $value, ignoreCase: true)),
             required: true,
         );
     }

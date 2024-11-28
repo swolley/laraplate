@@ -34,7 +34,7 @@ class Funnel extends ListEntity
             // columns filters
             $this->prepareFunnelFilterProperties($columns_filters, $grouped_filters);
             // other funnels filters
-            $this->prepareFunnelFilterProperties(array_filter($this->requestData->getFunnelsFilters(), fn ($f) => $f !== $current_funnel, ARRAY_FILTER_USE_KEY), $grouped_filters);
+            $this->prepareFunnelFilterProperties(array_filter($this->requestData->funnelsFilters, fn($f) => $f !== $current_funnel, ARRAY_FILTER_USE_KEY), $grouped_filters);
 
             foreach ($grouped_filters as $path => $entity_filters) {
                 if (count(explode('.', $path)) === 1) {
@@ -68,8 +68,8 @@ class Funnel extends ListEntity
     protected function getData(): array
     {
         $name = $this->getValueField()->getFullAlias();
-        $funnels_data = $this->requestData->getFunnelsFilters()[$name];
-        $columns_filters = $this->requestData->getColumnsFilters() ?? [];
+        $funnels_data = $this->requestData->funnelsFilters[$name];
+        $columns_filters = $this->requestData->filters ?? [];
 
         $exploded = explode('.', $name);
         $subfix = array_pop($exploded);
@@ -88,7 +88,7 @@ class Funnel extends ListEntity
         // if (is_array($this->getLabelField())) array_push($columns, ...array_map(fn ($field) => $field->getName(), $this->getLabelField()));
         // else $columns[] = $this->getLabelField()->getName();
         // $columns = array_unique($columns);
-        $columns = $this->getAllFields()->map(fn ($field) => $field->getName())->toArray();
+        $columns = $this->getAllFields()->map(fn($field) => $field->getName())->toArray();
 
         $query = $model::query()->select($columns);
         $this->addSortsIntoQuery($query, $funnels_data['sort'] ?? $this->getDefaultSorts($columns, $model));
@@ -99,7 +99,7 @@ class Funnel extends ListEntity
         $last_relation = array_pop($inversed_relationships)->getName();
         if (!empty($inversed_relationships)) {
             // deep relation
-            $imploded_inversed_relation = implode('.', array_map(fn ($r) => $r->getName(), $inversed_relationships));
+            $imploded_inversed_relation = implode('.', array_map(fn($r) => $r->getName(), $inversed_relationships));
             $query->with([$imploded_inversed_relation => function ($q) use ($last_relation, $columns_filters, $name) {
                 $this->getLastWithCountRelationQuery($q, $last_relation, $columns_filters, $name);
             }]);

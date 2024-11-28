@@ -21,8 +21,8 @@ class CacheManager
     {
         $path = $request->getPathInfo();
         $params = $request->query();
-        $user = static::getKeyPartsFromUser($request->user());
-        static::recursiveKSort($params);
+        $user = self::getKeyPartsFromUser($request->user());
+        self::recursiveKSort($params);
 
         return base64_encode($path . ($user ? implode('_', $user) . '_' : '') . serialize($params));
     }
@@ -44,11 +44,11 @@ class CacheManager
                 if (!method_exists($model, 'usesCache') || !$model->usesCache()) {
                     return $callback();
                 }
-                $tags[] = static::getTableName($model);
+                $tags[] = self::getTableName($model);
             }
         }
 
-        if ($user = static::getKeyPartsFromUser($request->user())) {
+        if ($user = self::getKeyPartsFromUser($request->user())) {
             array_push($tags, ...$user);
         }
         $key = static::getKeyFromRequest($request);
@@ -82,7 +82,7 @@ class CacheManager
             }
 
             if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                Cache::tags([config('APP_NAME'), static::getTableName($model)])->flush();
+                Cache::tags([config('APP_NAME'), self::getTableName($model)])->flush();
             }
         }
     }
@@ -102,7 +102,7 @@ class CacheManager
                 }
 
                 if (!method_exists($model, 'usesCache') || $model->usesCache()) {
-                    Cache::tags([config('APP_NAME'), static::getTableName($model)])->forget($key);
+                    Cache::tags([config('APP_NAME'), self::getTableName($model)])->forget($key);
                 }
             }
         } else {
@@ -125,7 +125,7 @@ class CacheManager
                 }
 
                 if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                    Cache::tags([config('APP_NAME'), static::getTableName($model), $user_key])->flush();
+                    Cache::tags([config('APP_NAME'), self::getTableName($model), $user_key])->flush();
                 }
             }
         } else {
@@ -148,7 +148,7 @@ class CacheManager
                 }
 
                 if (method_exists($model, 'usesCache') && $model->usesCache()) {
-                    Cache::tags([config('APP_NAME'), static::getTableName($model), $role_key])->flush();
+                    Cache::tags([config('APP_NAME'), self::getTableName($model), $role_key])->flush();
                 }
             }
         } else {
@@ -170,7 +170,7 @@ class CacheManager
             ksort($array);
 
             foreach ($array as &$value) {
-                static::recursiveKSort($value);
+                self::recursiveKSort($value);
             }
         }
     }

@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.33.2.
+ * Generated for Laravel 11.34.2.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -3462,6 +3462,16 @@ namespace Illuminate\Support\Facades {
                         $instance->assertChained($expectedChain);
         }
                     /**
+         * Assert no chained jobs was dispatched.
+         *
+         * @return void 
+         * @static 
+         */        public static function assertNothingChained()
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\BusFake $instance */
+                        $instance->assertNothingChained();
+        }
+                    /**
          * Assert if a job was dispatched with an empty chain based on a truth-test callback.
          *
          * @param string|\Closure $command
@@ -3515,6 +3525,16 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Support\Testing\Fakes\BusFake $instance */
                         $instance->assertNothingBatched();
+        }
+                    /**
+         * Assert that no jobs were dispatched, chained, or batched.
+         *
+         * @return void 
+         * @static 
+         */        public static function assertNothingPlaced()
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\BusFake $instance */
+                        $instance->assertNothingPlaced();
         }
                     /**
          * Get all of the jobs matching a truth-test callback.
@@ -5638,7 +5658,7 @@ namespace Illuminate\Support\Facades {
          * Build a database connection instance from the given configuration.
          *
          * @param array $config
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function build($config)
         {
@@ -5651,7 +5671,7 @@ namespace Illuminate\Support\Facades {
          * @param string $name
          * @param array $config
          * @param bool $force
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function connectUsing($name, $config, $force = false)
         {
@@ -5861,38 +5881,18 @@ namespace Illuminate\Support\Facades {
          * @return string 
          * @static 
          */        public static function getDriverTitle()
-        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+        {            //Method inherited from \Illuminate\Database\PostgresConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getDriverTitle();
-        }
-                    /**
-         * Determine if the connected database is a MariaDB database.
-         *
-         * @return bool 
-         * @static 
-         */        public static function isMaria()
-        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
-                        return $instance->isMaria();
-        }
-                    /**
-         * Get the server version for the connection.
-         *
-         * @return string 
-         * @static 
-         */        public static function getServerVersion()
-        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
-                        return $instance->getServerVersion();
         }
                     /**
          * Get a schema builder instance for the connection.
          *
-         * @return \Illuminate\Database\Schema\MariaDbBuilder 
+         * @return \Illuminate\Database\Schema\PostgresBuilder 
          * @static 
          */        public static function getSchemaBuilder()
-        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+        {            //Method inherited from \Illuminate\Database\PostgresConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getSchemaBuilder();
         }
                     /**
@@ -5900,35 +5900,12 @@ namespace Illuminate\Support\Facades {
          *
          * @param \Illuminate\Filesystem\Filesystem|null $files
          * @param callable|null $processFactory
-         * @return \Illuminate\Database\Schema\MariaDbSchemaState 
+         * @return \Illuminate\Database\Schema\PostgresSchemaState 
          * @static 
          */        public static function getSchemaState($files = null, $processFactory = null)
-        {            //Method inherited from \Illuminate\Database\MariaDbConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+        {            //Method inherited from \Illuminate\Database\PostgresConnection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getSchemaState($files, $processFactory);
-        }
-                    /**
-         * Run an insert statement against the database.
-         *
-         * @param string $query
-         * @param array $bindings
-         * @param string|null $sequence
-         * @return bool 
-         * @static 
-         */        public static function insert($query, $bindings = [], $sequence = null)
-        {            //Method inherited from \Illuminate\Database\MySqlConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
-                        return $instance->insert($query, $bindings, $sequence);
-        }
-                    /**
-         * Get the connection's last insert ID.
-         *
-         * @return string|int|null 
-         * @static 
-         */        public static function getLastInsertId()
-        {            //Method inherited from \Illuminate\Database\MySqlConnection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
-                        return $instance->getLastInsertId();
         }
                     /**
          * Set the query grammar to the default implementation.
@@ -5937,7 +5914,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function useDefaultQueryGrammar()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->useDefaultQueryGrammar();
         }
                     /**
@@ -5947,7 +5924,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function useDefaultSchemaGrammar()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->useDefaultSchemaGrammar();
         }
                     /**
@@ -5957,7 +5934,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function useDefaultPostProcessor()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->useDefaultPostProcessor();
         }
                     /**
@@ -5969,17 +5946,17 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function table($table, $as = null)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->table($table, $as);
         }
                     /**
-         * Get a new query builder instance.
+         * 
          *
-         * @return \Illuminate\Database\Query\Builder 
+         * @inheritDoc 
          * @static 
          */        public static function query()
         {
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->query();
         }
                     /**
@@ -5992,7 +5969,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function selectOne($query, $bindings = [], $useReadPdo = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->selectOne($query, $bindings, $useReadPdo);
         }
                     /**
@@ -6006,7 +5983,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function scalar($query, $bindings = [], $useReadPdo = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->scalar($query, $bindings, $useReadPdo);
         }
                     /**
@@ -6018,7 +5995,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function selectFromWriteConnection($query, $bindings = [])
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->selectFromWriteConnection($query, $bindings);
         }
                     /**
@@ -6031,7 +6008,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function select($query, $bindings = [], $useReadPdo = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->select($query, $bindings, $useReadPdo);
         }
                     /**
@@ -6044,7 +6021,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function selectResultSets($query, $bindings = [], $useReadPdo = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->selectResultSets($query, $bindings, $useReadPdo);
         }
                     /**
@@ -6057,8 +6034,20 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function cursor($query, $bindings = [], $useReadPdo = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->cursor($query, $bindings, $useReadPdo);
+        }
+                    /**
+         * Run an insert statement against the database.
+         *
+         * @param string $query
+         * @param array $bindings
+         * @return bool 
+         * @static 
+         */        public static function insert($query, $bindings = [])
+        {            //Method inherited from \Illuminate\Database\Connection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
+                        return $instance->insert($query, $bindings);
         }
                     /**
          * Run an update statement against the database.
@@ -6069,7 +6058,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function update($query, $bindings = [])
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->update($query, $bindings);
         }
                     /**
@@ -6081,7 +6070,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function delete($query, $bindings = [])
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->delete($query, $bindings);
         }
                     /**
@@ -6093,7 +6082,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function statement($query, $bindings = [])
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->statement($query, $bindings);
         }
                     /**
@@ -6105,7 +6094,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function affectingStatement($query, $bindings = [])
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->affectingStatement($query, $bindings);
         }
                     /**
@@ -6116,7 +6105,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function unprepared($query)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->unprepared($query);
         }
                     /**
@@ -6126,7 +6115,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function threadCount()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->threadCount();
         }
                     /**
@@ -6137,7 +6126,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function pretend($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->pretend($callback);
         }
                     /**
@@ -6148,7 +6137,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function withoutPretending($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->withoutPretending($callback);
         }
                     /**
@@ -6160,7 +6149,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function bindValues($statement, $bindings)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->bindValues($statement, $bindings);
         }
                     /**
@@ -6171,7 +6160,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function prepareBindings($bindings)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->prepareBindings($bindings);
         }
                     /**
@@ -6184,7 +6173,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function logQuery($query, $bindings, $time = null)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->logQuery($query, $bindings, $time);
         }
                     /**
@@ -6196,7 +6185,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function whenQueryingForLongerThan($threshold, $handler)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->whenQueryingForLongerThan($threshold, $handler);
         }
                     /**
@@ -6206,7 +6195,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function allowQueryDurationHandlersToRunAgain()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->allowQueryDurationHandlersToRunAgain();
         }
                     /**
@@ -6216,7 +6205,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function totalQueryDuration()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->totalQueryDuration();
         }
                     /**
@@ -6226,7 +6215,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function resetTotalQueryDuration()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->resetTotalQueryDuration();
         }
                     /**
@@ -6236,29 +6225,29 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function reconnectIfMissingConnection()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->reconnectIfMissingConnection();
         }
                     /**
          * Register a hook to be run just before a database transaction is started.
          *
          * @param \Closure $callback
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function beforeStartingTransaction($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->beforeStartingTransaction($callback);
         }
                     /**
          * Register a hook to be run just before a database query is executed.
          *
          * @param \Closure $callback
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function beforeExecuting($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->beforeExecuting($callback);
         }
                     /**
@@ -6269,7 +6258,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function listen($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->listen($callback);
         }
                     /**
@@ -6280,7 +6269,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function raw($value)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->raw($value);
         }
                     /**
@@ -6292,7 +6281,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function escape($value, $binary = false)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->escape($value, $binary);
         }
                     /**
@@ -6302,7 +6291,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function hasModifiedRecords()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->hasModifiedRecords();
         }
                     /**
@@ -6313,18 +6302,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function recordsHaveBeenModified($value = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->recordsHaveBeenModified($value);
         }
                     /**
          * Set the record modification state.
          *
          * @param bool $value
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setRecordModificationState($value)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setRecordModificationState($value);
         }
                     /**
@@ -6334,18 +6323,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function forgetRecordModificationState()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->forgetRecordModificationState();
         }
                     /**
          * Indicate that the connection should use the write PDO connection for reads.
          *
          * @param bool $value
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function useWriteConnectionWhenReading($value = true)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->useWriteConnectionWhenReading($value);
         }
                     /**
@@ -6355,7 +6344,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getPdo()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getPdo();
         }
                     /**
@@ -6365,7 +6354,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getRawPdo()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getRawPdo();
         }
                     /**
@@ -6375,7 +6364,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getReadPdo()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getReadPdo();
         }
                     /**
@@ -6385,29 +6374,29 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getRawReadPdo()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getRawReadPdo();
         }
                     /**
          * Set the PDO connection.
          *
          * @param \PDO|\Closure|null $pdo
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setPdo($pdo)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setPdo($pdo);
         }
                     /**
          * Set the PDO connection used for reading.
          *
          * @param \PDO|\Closure|null $pdo
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setReadPdo($pdo)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setReadPdo($pdo);
         }
                     /**
@@ -6417,7 +6406,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getName()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getName();
         }
                     /**
@@ -6427,7 +6416,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getNameWithReadWriteType()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getNameWithReadWriteType();
         }
                     /**
@@ -6438,7 +6427,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getConfig($option = null)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getConfig($option);
         }
                     /**
@@ -6448,7 +6437,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getDriverName()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getDriverName();
         }
                     /**
@@ -6458,18 +6447,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getQueryGrammar()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getQueryGrammar();
         }
                     /**
          * Set the query grammar used by the connection.
          *
          * @param \Illuminate\Database\Query\Grammars\Grammar $grammar
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setQueryGrammar($grammar)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setQueryGrammar($grammar);
         }
                     /**
@@ -6479,18 +6468,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getSchemaGrammar()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getSchemaGrammar();
         }
                     /**
          * Set the schema grammar used by the connection.
          *
          * @param \Illuminate\Database\Schema\Grammars\Grammar $grammar
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setSchemaGrammar($grammar)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setSchemaGrammar($grammar);
         }
                     /**
@@ -6500,18 +6489,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getPostProcessor()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getPostProcessor();
         }
                     /**
          * Set the query post processor used by the connection.
          *
          * @param \Illuminate\Database\Query\Processors\Processor $processor
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setPostProcessor($processor)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setPostProcessor($processor);
         }
                     /**
@@ -6521,18 +6510,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getEventDispatcher()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getEventDispatcher();
         }
                     /**
          * Set the event dispatcher instance on the connection.
          *
          * @param \Illuminate\Contracts\Events\Dispatcher $events
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setEventDispatcher($events)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setEventDispatcher($events);
         }
                     /**
@@ -6542,18 +6531,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function unsetEventDispatcher()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->unsetEventDispatcher();
         }
                     /**
          * Set the transaction manager instance on the connection.
          *
          * @param \Illuminate\Database\DatabaseTransactionsManager $manager
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setTransactionManager($manager)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setTransactionManager($manager);
         }
                     /**
@@ -6563,7 +6552,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function unsetTransactionManager()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->unsetTransactionManager();
         }
                     /**
@@ -6573,7 +6562,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function pretending()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->pretending();
         }
                     /**
@@ -6583,7 +6572,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getQueryLog()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getQueryLog();
         }
                     /**
@@ -6593,7 +6582,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getRawQueryLog()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getRawQueryLog();
         }
                     /**
@@ -6603,7 +6592,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function flushQueryLog()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->flushQueryLog();
         }
                     /**
@@ -6613,7 +6602,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function enableQueryLog()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->enableQueryLog();
         }
                     /**
@@ -6623,7 +6612,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function disableQueryLog()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->disableQueryLog();
         }
                     /**
@@ -6633,7 +6622,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function logging()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->logging();
         }
                     /**
@@ -6643,29 +6632,29 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getDatabaseName()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getDatabaseName();
         }
                     /**
          * Set the name of the connected database.
          *
          * @param string $database
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setDatabaseName($database)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setDatabaseName($database);
         }
                     /**
          * Set the read / write type of the connection.
          *
          * @param string|null $readWriteType
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setReadWriteType($readWriteType)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setReadWriteType($readWriteType);
         }
                     /**
@@ -6675,18 +6664,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getTablePrefix()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->getTablePrefix();
         }
                     /**
          * Set the table prefix in use by the connection.
          *
          * @param string $prefix
-         * @return \Staudenmeir\LaravelCte\Connections\MariaDbConnection 
+         * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection 
          * @static 
          */        public static function setTablePrefix($prefix)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->setTablePrefix($prefix);
         }
                     /**
@@ -6698,8 +6687,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function withTablePrefix($grammar)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->withTablePrefix($grammar);
+        }
+                    /**
+         * Get the server version for the connection.
+         *
+         * @return string 
+         * @static 
+         */        public static function getServerVersion()
+        {            //Method inherited from \Illuminate\Database\Connection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
+                        return $instance->getServerVersion();
         }
                     /**
          * Register a connection resolver.
@@ -6710,7 +6709,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function resolverFor($driver, $callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        \Staudenmeir\LaravelCte\Connections\MariaDbConnection::resolverFor($driver, $callback);
+                        \Staudenmeir\LaravelCte\Connections\PostgresConnection::resolverFor($driver, $callback);
         }
                     /**
          * Get the connection resolver for the given driver.
@@ -6720,7 +6719,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getResolver($driver)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        return \Staudenmeir\LaravelCte\Connections\MariaDbConnection::getResolver($driver);
+                        return \Staudenmeir\LaravelCte\Connections\PostgresConnection::getResolver($driver);
         }
                     /**
          * 
@@ -6735,7 +6734,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function transaction($callback, $attempts = 1)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->transaction($callback, $attempts);
         }
                     /**
@@ -6746,7 +6745,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function beginTransaction()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->beginTransaction();
         }
                     /**
@@ -6757,7 +6756,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function commit()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->commit();
         }
                     /**
@@ -6769,7 +6768,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function rollBack($toLevel = null)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->rollBack($toLevel);
         }
                     /**
@@ -6779,7 +6778,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function transactionLevel()
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         return $instance->transactionLevel();
         }
                     /**
@@ -6791,7 +6790,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function afterCommit($callback)
         {            //Method inherited from \Illuminate\Database\Connection         
-                        /** @var \Staudenmeir\LaravelCte\Connections\MariaDbConnection $instance */
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
                         $instance->afterCommit($callback);
         }
             }
@@ -6804,8 +6803,8 @@ namespace Illuminate\Support\Facades {
                     /**
          * Register an event listener with the dispatcher.
          *
-         * @param \Illuminate\Events\Queued\Closure|\Closure|string|array $events
-         * @param \Illuminate\Events\Queued\Closure|\Closure|string|array|null $listener
+         * @param \Illuminate\Events\Queued\Closure|callable|array|\Illuminate\Events\class-string|string $events
+         * @param \Illuminate\Events\Queued\Closure|callable|array|\Illuminate\Events\class-string|null $listener
          * @return void 
          * @static 
          */        public static function listen($events, $listener = null)
@@ -8425,7 +8424,7 @@ namespace Illuminate\Support\Facades {
          * Stub the given URL using the given callback.
          *
          * @param string $url
-         * @param \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable $callback
+         * @param \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable|int|string|array $callback
          * @return \Illuminate\Http\Client\Factory 
          * @static 
          */        public static function stubUrl($url, $callback)
@@ -12923,122 +12922,6 @@ namespace Illuminate\Support\Facades {
                         return $instance->bearerToken();
         }
                     /**
-         * Determine if the request contains a given input item key.
-         *
-         * @param string|array $key
-         * @return bool 
-         * @static 
-         */        public static function exists($key)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->exists($key);
-        }
-                    /**
-         * Determine if the request contains a given input item key.
-         *
-         * @param string|array $key
-         * @return bool 
-         * @static 
-         */        public static function has($key)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->has($key);
-        }
-                    /**
-         * Determine if the request contains any of the given inputs.
-         *
-         * @param string|array $keys
-         * @return bool 
-         * @static 
-         */        public static function hasAny($keys)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->hasAny($keys);
-        }
-                    /**
-         * Apply the callback if the request contains the given input item key.
-         *
-         * @param string $key
-         * @param callable $callback
-         * @param callable|null $default
-         * @return $this|mixed 
-         * @static 
-         */        public static function whenHas($key, $callback, $default = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->whenHas($key, $callback, $default);
-        }
-                    /**
-         * Determine if the request contains a non-empty value for an input item.
-         *
-         * @param string|array $key
-         * @return bool 
-         * @static 
-         */        public static function filled($key)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->filled($key);
-        }
-                    /**
-         * Determine if the request contains an empty value for an input item.
-         *
-         * @param string|array $key
-         * @return bool 
-         * @static 
-         */        public static function isNotFilled($key)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->isNotFilled($key);
-        }
-                    /**
-         * Determine if the request contains a non-empty value for any of the given inputs.
-         *
-         * @param string|array $keys
-         * @return bool 
-         * @static 
-         */        public static function anyFilled($keys)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->anyFilled($keys);
-        }
-                    /**
-         * Apply the callback if the request contains a non-empty value for the given input item key.
-         *
-         * @param string $key
-         * @param callable $callback
-         * @param callable|null $default
-         * @return $this|mixed 
-         * @static 
-         */        public static function whenFilled($key, $callback, $default = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->whenFilled($key, $callback, $default);
-        }
-                    /**
-         * Determine if the request is missing a given input item key.
-         *
-         * @param string|array $key
-         * @return bool 
-         * @static 
-         */        public static function missing($key)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->missing($key);
-        }
-                    /**
-         * Apply the callback if the request is missing the given input item key.
-         *
-         * @param string $key
-         * @param callable $callback
-         * @param callable|null $default
-         * @return $this|mixed 
-         * @static 
-         */        public static function whenMissing($key, $callback, $default = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->whenMissing($key, $callback, $default);
-        }
-                    /**
          * Get the keys for all of the input and files.
          *
          * @return array 
@@ -13072,139 +12955,15 @@ namespace Illuminate\Support\Facades {
                         return $instance->input($key, $default);
         }
                     /**
-         * Retrieve input from the request as a Stringable instance.
-         *
-         * @param string $key
-         * @param mixed $default
-         * @return \Illuminate\Support\Stringable 
-         * @static 
-         */        public static function str($key, $default = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->str($key, $default);
-        }
-                    /**
-         * Retrieve input from the request as a Stringable instance.
-         *
-         * @param string $key
-         * @param mixed $default
-         * @return \Illuminate\Support\Stringable 
-         * @static 
-         */        public static function string($key, $default = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->string($key, $default);
-        }
-                    /**
-         * Retrieve input as a boolean value.
-         * 
-         * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
-         *
-         * @param string|null $key
-         * @param bool $default
-         * @return bool 
-         * @static 
-         */        public static function boolean($key = null, $default = false)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->boolean($key, $default);
-        }
-                    /**
-         * Retrieve input as an integer value.
-         *
-         * @param string $key
-         * @param int $default
-         * @return int 
-         * @static 
-         */        public static function integer($key, $default = 0)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->integer($key, $default);
-        }
-                    /**
-         * Retrieve input as a float value.
-         *
-         * @param string $key
-         * @param float $default
-         * @return float 
-         * @static 
-         */        public static function float($key, $default = 0.0)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->float($key, $default);
-        }
-                    /**
-         * Retrieve input from the request as a Carbon instance.
-         *
-         * @param string $key
-         * @param string|null $format
-         * @param string|null $tz
-         * @return \Illuminate\Support\Carbon|null 
-         * @throws \Carbon\Exceptions\InvalidFormatException
-         * @static 
-         */        public static function date($key, $format = null, $tz = null)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->date($key, $format, $tz);
-        }
-                    /**
-         * Retrieve input from the request as an enum.
-         *
-         * @template TEnum
-         * @param string $key
-         * @param \Illuminate\Http\class-string<TEnum> $enumClass
-         * @return \Illuminate\Http\TEnum|null 
-         * @static 
-         */        public static function enum($key, $enumClass)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->enum($key, $enumClass);
-        }
-                    /**
-         * Retrieve input from the request as an array of enums.
-         *
-         * @template TEnum
-         * @param string $key
-         * @param \Illuminate\Http\class-string<TEnum> $enumClass
-         * @return \Illuminate\Http\TEnum[] 
-         * @static 
-         */        public static function enums($key, $enumClass)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->enums($key, $enumClass);
-        }
-                    /**
-         * Retrieve input from the request as a collection.
+         * Retrieve input from the request as a Fluent object instance.
          *
          * @param array|string|null $key
-         * @return \Illuminate\Support\Collection 
+         * @return \Illuminate\Support\Fluent 
          * @static 
-         */        public static function collect($key = null)
+         */        public static function fluent($key = null)
         {
                         /** @var \Illuminate\Http\Request $instance */
-                        return $instance->collect($key);
-        }
-                    /**
-         * Get a subset containing the provided keys with values from the input data.
-         *
-         * @param array|mixed $keys
-         * @return array 
-         * @static 
-         */        public static function only($keys)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->only($keys);
-        }
-                    /**
-         * Get all of the input except for a specified array of items.
-         *
-         * @param array|mixed $keys
-         * @return array 
-         * @static 
-         */        public static function except($keys)
-        {
-                        /** @var \Illuminate\Http\Request $instance */
-                        return $instance->except($keys);
+                        return $instance->fluent($key);
         }
                     /**
          * Retrieve a query string item from the request.
@@ -13307,6 +13066,257 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Http\Request $instance */
                         return $instance->dd(...$args);
+        }
+                    /**
+         * Determine if the data contains a given key.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function exists($key)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->exists($key);
+        }
+                    /**
+         * Determine if the data contains a given key.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function has($key)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->has($key);
+        }
+                    /**
+         * Determine if the instance contains any of the given keys.
+         *
+         * @param string|array $keys
+         * @return bool 
+         * @static 
+         */        public static function hasAny($keys)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->hasAny($keys);
+        }
+                    /**
+         * Apply the callback if the instance contains the given key.
+         *
+         * @param string $key
+         * @param callable $callback
+         * @param callable|null $default
+         * @return $this|mixed 
+         * @static 
+         */        public static function whenHas($key, $callback, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->whenHas($key, $callback, $default);
+        }
+                    /**
+         * Determine if the instance contains a non-empty value for the given key.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function filled($key)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->filled($key);
+        }
+                    /**
+         * Determine if the instance contains an empty value for the given key.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function isNotFilled($key)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->isNotFilled($key);
+        }
+                    /**
+         * Determine if the instance contains a non-empty value for any of the given keys.
+         *
+         * @param string|array $keys
+         * @return bool 
+         * @static 
+         */        public static function anyFilled($keys)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->anyFilled($keys);
+        }
+                    /**
+         * Apply the callback if the instance contains a non-empty value for the given key.
+         *
+         * @param string $key
+         * @param callable $callback
+         * @param callable|null $default
+         * @return $this|mixed 
+         * @static 
+         */        public static function whenFilled($key, $callback, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->whenFilled($key, $callback, $default);
+        }
+                    /**
+         * Determine if the instance is missing a given key.
+         *
+         * @param string|array $key
+         * @return bool 
+         * @static 
+         */        public static function missing($key)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->missing($key);
+        }
+                    /**
+         * Apply the callback if the instance is missing the given key.
+         *
+         * @param string $key
+         * @param callable $callback
+         * @param callable|null $default
+         * @return $this|mixed 
+         * @static 
+         */        public static function whenMissing($key, $callback, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->whenMissing($key, $callback, $default);
+        }
+                    /**
+         * Retrieve data from the instnce as a Stringable instance.
+         *
+         * @param string $key
+         * @param mixed $default
+         * @return \Illuminate\Support\Stringable 
+         * @static 
+         */        public static function str($key, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->str($key, $default);
+        }
+                    /**
+         * Retrieve data from the instance as a Stringable instance.
+         *
+         * @param string $key
+         * @param mixed $default
+         * @return \Illuminate\Support\Stringable 
+         * @static 
+         */        public static function string($key, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->string($key, $default);
+        }
+                    /**
+         * Retrieve data as a boolean value.
+         * 
+         * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+         *
+         * @param string|null $key
+         * @param bool $default
+         * @return bool 
+         * @static 
+         */        public static function boolean($key = null, $default = false)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->boolean($key, $default);
+        }
+                    /**
+         * Retrieve data as an integer value.
+         *
+         * @param string $key
+         * @param int $default
+         * @return int 
+         * @static 
+         */        public static function integer($key, $default = 0)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->integer($key, $default);
+        }
+                    /**
+         * Retrieve data as a float value.
+         *
+         * @param string $key
+         * @param float $default
+         * @return float 
+         * @static 
+         */        public static function float($key, $default = 0.0)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->float($key, $default);
+        }
+                    /**
+         * Retrieve data from the instance as a Carbon instance.
+         *
+         * @param string $key
+         * @param string|null $format
+         * @param string|null $tz
+         * @return \Illuminate\Support\Carbon|null 
+         * @throws \Carbon\Exceptions\InvalidFormatException
+         * @static 
+         */        public static function date($key, $format = null, $tz = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->date($key, $format, $tz);
+        }
+                    /**
+         * Retrieve data from the instance as an enum.
+         *
+         * @template TEnum of \BackedEnum
+         * @param string $key
+         * @param \Illuminate\Http\class-string<TEnum> $enumClass
+         * @return \Illuminate\Http\TEnum|null 
+         * @static 
+         */        public static function enum($key, $enumClass)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->enum($key, $enumClass);
+        }
+                    /**
+         * Retrieve data from the instance as an array of enums.
+         *
+         * @template TEnum of \BackedEnum
+         * @param string $key
+         * @param \Illuminate\Http\class-string<TEnum> $enumClass
+         * @return \Illuminate\Http\TEnum[] 
+         * @static 
+         */        public static function enums($key, $enumClass)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->enums($key, $enumClass);
+        }
+                    /**
+         * Retrieve data from the instance as a collection.
+         *
+         * @param array|string|null $key
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */        public static function collect($key = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->collect($key);
+        }
+                    /**
+         * Get a subset containing the provided keys with values from the instance data.
+         *
+         * @param array|mixed $keys
+         * @return array 
+         * @static 
+         */        public static function only($keys)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->only($keys);
+        }
+                    /**
+         * Get all of the data except for a specified array of items.
+         *
+         * @param array|mixed $keys
+         * @return array 
+         * @static 
+         */        public static function except($keys)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->except($keys);
         }
                     /**
          * Register a custom macro.
@@ -14615,6 +14625,8 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes runInBackground()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes when(\Closure|bool $callback)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes skip(\Closure|bool $callback)
+     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes name(string $description)
+     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes description(string $description)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes cron(string $expression)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes between(string $startTime, string $endTime)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes unlessBetween(string $startTime, string $endTime)
@@ -14722,6 +14734,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param \Illuminate\Console\Scheduling\Event $event
          * @return void 
+         * @throws \RuntimeException
          * @static 
          */        public static function group($events)
         {
@@ -14853,8 +14866,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function createDatabase($name)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->createDatabase($name);
         }
                     /**
@@ -14864,8 +14877,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function dropDatabaseIfExists($name)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->dropDatabaseIfExists($name);
         }
                     /**
@@ -14875,29 +14888,60 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function hasTable($table)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->hasTable($table);
         }
                     /**
-         * Get the tables for the database.
+         * Determine if the given view exists.
          *
-         * @return array 
+         * @param string $view
+         * @return bool 
          * @static 
-         */        public static function getTables()
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        return $instance->getTables();
+         */        public static function hasView($view)
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->hasView($view);
         }
                     /**
-         * Get the views for the database.
+         * Get the user-defined types that belong to the database.
          *
          * @return array 
          * @static 
-         */        public static function getViews()
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        return $instance->getViews();
+         */        public static function getTypes()
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->getTypes();
+        }
+                    /**
+         * Drop all tables from the database.
+         *
+         * @return void 
+         * @static 
+         */        public static function dropAllTables()
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        $instance->dropAllTables();
+        }
+                    /**
+         * Drop all views from the database.
+         *
+         * @return void 
+         * @static 
+         */        public static function dropAllViews()
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        $instance->dropAllViews();
+        }
+                    /**
+         * Drop all types from the database.
+         *
+         * @return void 
+         * @static 
+         */        public static function dropAllTypes()
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        $instance->dropAllTypes();
         }
                     /**
          * Get the columns for a given table.
@@ -14906,8 +14950,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function getColumns($table)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getColumns($table);
         }
                     /**
@@ -14917,8 +14961,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function getIndexes($table)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getIndexes($table);
         }
                     /**
@@ -14928,29 +14972,20 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function getForeignKeys($table)
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getForeignKeys($table);
         }
                     /**
-         * Drop all tables from the database.
+         * Parse the database object reference and extract the schema and table.
          *
-         * @return void 
+         * @param string $reference
+         * @return array 
          * @static 
-         */        public static function dropAllTables()
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        $instance->dropAllTables();
-        }
-                    /**
-         * Drop all views from the database.
-         *
-         * @return void 
-         * @static 
-         */        public static function dropAllViews()
-        {            //Method inherited from \Illuminate\Database\Schema\MySqlBuilder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        $instance->dropAllViews();
+         */        public static function parseSchemaAndTable($reference)
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->parseSchemaAndTable($reference);
         }
                     /**
          * Set the default string length for migrations.
@@ -14960,7 +14995,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function defaultStringLength($length)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::defaultStringLength($length);
+                        \Illuminate\Database\Schema\PostgresBuilder::defaultStringLength($length);
         }
                     /**
          * Set the default morph key type for migrations.
@@ -14971,7 +15006,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function defaultMorphKeyType($type)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::defaultMorphKeyType($type);
+                        \Illuminate\Database\Schema\PostgresBuilder::defaultMorphKeyType($type);
         }
                     /**
          * Set the default morph key type for migrations to UUIDs.
@@ -14980,7 +15015,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function morphUsingUuids()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::morphUsingUuids();
+                        \Illuminate\Database\Schema\PostgresBuilder::morphUsingUuids();
         }
                     /**
          * Set the default morph key type for migrations to ULIDs.
@@ -14989,18 +15024,17 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function morphUsingUlids()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::morphUsingUlids();
+                        \Illuminate\Database\Schema\PostgresBuilder::morphUsingUlids();
         }
                     /**
-         * Determine if the given view exists.
+         * Get the tables that belong to the database.
          *
-         * @param string $view
-         * @return bool 
+         * @return array 
          * @static 
-         */        public static function hasView($view)
+         */        public static function getTables()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        return $instance->hasView($view);
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->getTables();
         }
                     /**
          * Get the names of the tables that belong to the database.
@@ -15009,18 +15043,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getTableListing()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getTableListing();
         }
                     /**
-         * Get the user-defined types that belong to the database.
+         * Get the views that belong to the database.
          *
          * @return array 
          * @static 
-         */        public static function getTypes()
+         */        public static function getViews()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        return $instance->getTypes();
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->getViews();
         }
                     /**
          * Determine if the given table has a given column.
@@ -15031,7 +15065,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function hasColumn($table, $column)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->hasColumn($table, $column);
         }
                     /**
@@ -15043,7 +15077,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function hasColumns($table, $columns)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->hasColumns($table, $columns);
         }
                     /**
@@ -15056,7 +15090,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function whenTableHasColumn($table, $column, $callback)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->whenTableHasColumn($table, $column, $callback);
         }
                     /**
@@ -15069,7 +15103,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function whenTableDoesntHaveColumn($table, $column, $callback)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->whenTableDoesntHaveColumn($table, $column, $callback);
         }
                     /**
@@ -15082,7 +15116,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getColumnType($table, $column, $fullDefinition = false)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getColumnType($table, $column, $fullDefinition);
         }
                     /**
@@ -15093,7 +15127,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getColumnListing($table)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getColumnListing($table);
         }
                     /**
@@ -15104,7 +15138,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getIndexListing($table)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getIndexListing($table);
         }
                     /**
@@ -15117,7 +15151,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function hasIndex($table, $index, $type = null)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->hasIndex($table, $index, $type);
         }
                     /**
@@ -15129,7 +15163,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function table($table, $callback)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->table($table, $callback);
         }
                     /**
@@ -15141,7 +15175,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function create($table, $callback)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->create($table, $callback);
         }
                     /**
@@ -15152,7 +15186,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function drop($table)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->drop($table);
         }
                     /**
@@ -15163,7 +15197,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function dropIfExists($table)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->dropIfExists($table);
         }
                     /**
@@ -15175,19 +15209,8 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function dropColumns($table, $columns)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->dropColumns($table, $columns);
-        }
-                    /**
-         * Drop all types from the database.
-         *
-         * @return void 
-         * @throws \LogicException
-         * @static 
-         */        public static function dropAllTypes()
-        {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
-                        $instance->dropAllTypes();
         }
                     /**
          * Rename a table on the schema.
@@ -15198,7 +15221,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function rename($from, $to)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->rename($from, $to);
         }
                     /**
@@ -15208,7 +15231,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function enableForeignKeyConstraints()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->enableForeignKeyConstraints();
         }
                     /**
@@ -15218,7 +15241,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function disableForeignKeyConstraints()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->disableForeignKeyConstraints();
         }
                     /**
@@ -15229,7 +15252,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function withoutForeignKeyConstraints($callback)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->withoutForeignKeyConstraints($callback);
         }
                     /**
@@ -15239,18 +15262,18 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function getConnection()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getConnection();
         }
                     /**
          * Set the database connection instance.
          *
          * @param \Illuminate\Database\Connection $connection
-         * @return \Illuminate\Database\Schema\MariaDbBuilder 
+         * @return \Illuminate\Database\Schema\PostgresBuilder 
          * @static 
          */        public static function setConnection($connection)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->setConnection($connection);
         }
                     /**
@@ -15261,7 +15284,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function blueprintResolver($resolver)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        /** @var \Illuminate\Database\Schema\MariaDbBuilder $instance */
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         $instance->blueprintResolver($resolver);
         }
                     /**
@@ -15274,7 +15297,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function macro($name, $macro)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::macro($name, $macro);
+                        \Illuminate\Database\Schema\PostgresBuilder::macro($name, $macro);
         }
                     /**
          * Mix another object into the class.
@@ -15286,7 +15309,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function mixin($mixin, $replace = true)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::mixin($mixin, $replace);
+                        \Illuminate\Database\Schema\PostgresBuilder::mixin($mixin, $replace);
         }
                     /**
          * Checks if macro is registered.
@@ -15296,7 +15319,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function hasMacro($name)
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        return \Illuminate\Database\Schema\MariaDbBuilder::hasMacro($name);
+                        return \Illuminate\Database\Schema\PostgresBuilder::hasMacro($name);
         }
                     /**
          * Flush the existing macros.
@@ -15305,7 +15328,7 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function flushMacros()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
-                        \Illuminate\Database\Schema\MariaDbBuilder::flushMacros();
+                        \Illuminate\Database\Schema\PostgresBuilder::flushMacros();
         }
             }
             /**
@@ -16259,6 +16282,19 @@ namespace Illuminate\Support\Facades {
         {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
                         /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
                         return $instance->assertExists($path, $content);
+        }
+                    /**
+         * Assert that the number of files in path equals the expected count.
+         *
+         * @param string $path
+         * @param int $count
+         * @param bool $recursive
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter 
+         * @static 
+         */        public static function assertCount($path, $count, $recursive = false)
+        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
+                        /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
+                        return $instance->assertCount($path, $count, $recursive);
         }
                     /**
          * Assert that the given file or directory does not exist.
@@ -18731,6 +18767,134 @@ namespace Illuminate\Support\Facades {
          */        public static function flushMacros()
         {
                         \Illuminate\Foundation\Vite::flushMacros();
+        }
+            }
+    }
+
+namespace Laravel\Octane\Facades {
+            /**
+     * 
+     *
+     * @see \Laravel\Octane\Octane
+     */        class Octane {
+                    /**
+         * Get a Swoole table instance.
+         *
+         * @static 
+         */        public static function table($table)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->table($table);
+        }
+                    /**
+         * Format an exception to a string that should be returned to the client.
+         *
+         * @static 
+         */        public static function formatExceptionForClient($e, $debug = false)
+        {
+                        return \Laravel\Octane\Octane::formatExceptionForClient($e, $debug);
+        }
+                    /**
+         * Write an error message to STDERR or to the SAPI logger if not in CLI mode.
+         *
+         * @static 
+         */        public static function writeError($message)
+        {
+                        return \Laravel\Octane\Octane::writeError($message);
+        }
+                    /**
+         * Concurrently resolve the given callbacks via background tasks, returning the results.
+         * 
+         * Results will be keyed by their given keys - if a task did not finish, the tasks value will be "false".
+         *
+         * @return array 
+         * @throws \Laravel\Octane\Exceptions\TaskException
+         * @throws \Laravel\Octane\Exceptions\TaskTimeoutException
+         * @static 
+         */        public static function concurrently($tasks, $waitMilliseconds = 3000)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->concurrently($tasks, $waitMilliseconds);
+        }
+                    /**
+         * Get the task dispatcher.
+         *
+         * @return \Laravel\Octane\Contracts\DispatchesTasks 
+         * @static 
+         */        public static function tasks()
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->tasks();
+        }
+                    /**
+         * Get the listeners that will prepare the Laravel application for a new request.
+         *
+         * @static 
+         */        public static function prepareApplicationForNextRequest()
+        {
+                        return \Laravel\Octane\Octane::prepareApplicationForNextRequest();
+        }
+                    /**
+         * Get the listeners that will prepare the Laravel application for a new operation.
+         *
+         * @static 
+         */        public static function prepareApplicationForNextOperation()
+        {
+                        return \Laravel\Octane\Octane::prepareApplicationForNextOperation();
+        }
+                    /**
+         * Get the container bindings / services that should be pre-resolved by default.
+         *
+         * @static 
+         */        public static function defaultServicesToWarm()
+        {
+                        return \Laravel\Octane\Octane::defaultServicesToWarm();
+        }
+                    /**
+         * Register a Octane route.
+         *
+         * @static 
+         */        public static function route($method, $uri, $callback)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->route($method, $uri, $callback);
+        }
+                    /**
+         * Determine if a route exists for the given method and URI.
+         *
+         * @static 
+         */        public static function hasRouteFor($method, $uri)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->hasRouteFor($method, $uri);
+        }
+                    /**
+         * Invoke the route for the given method and URI.
+         *
+         * @static 
+         */        public static function invokeRoute($request, $method, $uri)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->invokeRoute($request, $method, $uri);
+        }
+                    /**
+         * Get the registered Octane routes.
+         *
+         * @static 
+         */        public static function getRoutes()
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->getRoutes();
+        }
+                    /**
+         * Register a callback to be called every N seconds.
+         *
+         * @return \Laravel\Octane\Swoole\InvokeTickCallable 
+         * @static 
+         */        public static function tick($key, $callback, $seconds = 1, $immediate = true)
+        {
+                        /** @var \Laravel\Octane\Octane $instance */
+                        return $instance->tick($key, $callback, $seconds, $immediate);
         }
             }
     }
@@ -23905,6 +24069,7 @@ namespace  {
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
             class Vite extends \Illuminate\Support\Facades\Vite {}
+            class Octane extends \Laravel\Octane\Facades\Octane {}
             class Socialite extends \Laravel\Socialite\Facades\Socialite {}
             class Module extends \Nwidart\Modules\Facades\Module {}
             class Flare extends \Spatie\LaravelIgnition\Facades\Flare {}
@@ -24086,7 +24251,7 @@ if (! function_exists('filled')) {
 
 if (! function_exists('fluent')) {
     /**
-     * Create an Fluent object from the given value.
+     * Create a Fluent object from the given value.
      *
      * @param  object|array  $value
      * @return \Illuminate\Support\Fluent
@@ -24139,6 +24304,19 @@ if (! function_exists('object_get')) {
         }
 
         return $object;
+    }
+}
+
+if (! function_exists('laravel_cloud')) {
+    /**
+     * Determine if the application is running on Laravel Cloud.
+     *
+     * @return bool
+     */
+    function laravel_cloud()
+    {
+        return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
+               ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
     }
 }
 
