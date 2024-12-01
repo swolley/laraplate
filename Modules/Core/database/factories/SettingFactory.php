@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Modules\Core\Database\Factories;
 
 use Illuminate\Support\Carbon;
-use Modules\Core\App\Models\Setting;
+use Modules\Core\Models\Setting;
 use Faker\Extension\ExtensionNotFound;
-use Modules\Core\App\Casts\SettingTypeEnum;
+use Modules\Core\Casts\SettingTypeEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Contracts\Container\BindingResolutionException;
 

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use Modules\Core\App\Http\Controllers\DocsController;
+use Modules\Core\Http\Controllers\DocsController;
 
 Route::controller(DocsController::class)->name('docs.')->group(function (): void {
 	if (App::isLocal()) {

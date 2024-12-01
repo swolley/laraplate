@@ -4,6 +4,6 @@
     "description": "Common functionalisties for every Laravel application.",
     "keywords": ["core", "common"],
     "priority": 100,
-    "providers": ["Modules\\Core\\App\\Providers\\CoreServiceProvider"],
+    "providers": ["Modules\\Core\\Providers\\CoreServiceProvider"],
     "files": []
 }

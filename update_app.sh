@@ -13,3 +13,7 @@ php artisan config:clear
 php artisan route:cache
 php artisan view:cache
 php artisan config:cache
+
+if command -v supervisorctl &> /dev/null; then
+    supervisorctl reload
+fi

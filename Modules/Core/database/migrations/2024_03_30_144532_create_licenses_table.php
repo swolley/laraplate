@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use Modules\Core\App\Helpers\CommonMigrationColumns;
+use Modules\Core\Helpers\CommonMigrationColumns;
 
 return new class extends Migration
 {

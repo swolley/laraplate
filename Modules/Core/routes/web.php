@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Modules\Core\App\Http\Controllers\CrudController;
-use Modules\Core\App\Http\Controllers\GridsController;
+use Modules\Core\Http\Controllers\CrudController;
+use Modules\Core\Http\Controllers\GridsController;
 
 /*
 |--------------------------------------------------------------------------

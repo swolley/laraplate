@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Modules\Core\Database\Factories;
 
 use Illuminate\Support\Str;
-use Modules\Core\App\Models\User;
+use Modules\Core\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Modules\Core\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Modules\Core\Models\User>
  */
 class UserFactory extends Factory
 {
@@ -43,7 +43,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn () => [
+        return $this->state(fn() => [
             'email_verified_at' => null,
         ]);
     }

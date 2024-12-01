@@ -2031,7 +2031,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Get the currently authenticated user.
          *
-         * @return \Modules\Core\App\Models\User|null 
+         * @return \Modules\Core\Models\User|null 
          * @static 
          */        public static function user()
         {            //Method inherited from \Illuminate\Auth\SessionGuard         
@@ -2063,7 +2063,7 @@ namespace Illuminate\Support\Facades {
          * Log the given user ID into the application without sessions or cookies.
          *
          * @param mixed $id
-         * @return \Modules\Core\App\Models\User|false 
+         * @return \Modules\Core\Models\User|false 
          * @static 
          */        public static function onceUsingId($id)
         {            //Method inherited from \Illuminate\Auth\SessionGuard         
@@ -2137,7 +2137,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param mixed $id
          * @param bool $remember
-         * @return \Modules\Core\App\Models\User|false 
+         * @return \Modules\Core\Models\User|false 
          * @static 
          */        public static function loginUsingId($id, $remember = false)
         {            //Method inherited from \Illuminate\Auth\SessionGuard         
@@ -2184,7 +2184,7 @@ namespace Illuminate\Support\Facades {
          * The application must be using the AuthenticateSession middleware.
          *
          * @param string $password
-         * @return \Modules\Core\App\Models\User|null 
+         * @return \Modules\Core\Models\User|null 
          * @throws \Illuminate\Auth\AuthenticationException
          * @static 
          */        public static function logoutOtherDevices($password)
@@ -2206,7 +2206,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Get the last user we attempted to authenticate.
          *
-         * @return \Modules\Core\App\Models\User 
+         * @return \Modules\Core\Models\User 
          * @static 
          */        public static function getLastAttempted()
         {            //Method inherited from \Illuminate\Auth\SessionGuard         
@@ -2310,7 +2310,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Return the currently cached user.
          *
-         * @return \Modules\Core\App\Models\User|null 
+         * @return \Modules\Core\Models\User|null 
          * @static 
          */        public static function getUser()
         {            //Method inherited from \Illuminate\Auth\SessionGuard         
@@ -2362,7 +2362,7 @@ namespace Illuminate\Support\Facades {
                     /**
          * Determine if the current user is authenticated. If not, throw an exception.
          *
-         * @return \Modules\Core\App\Models\User 
+         * @return \Modules\Core\Models\User 
          * @throws \Illuminate\Auth\AuthenticationException
          * @static 
          */        public static function authenticate()
@@ -20377,6 +20377,27 @@ namespace Illuminate\Routing {
          */        public static function permission($permissions = [])
         {
                         return \Illuminate\Routing\Route::permission($permissions);
+        }
+            }
+    }
+
+namespace Illuminate\Database\Eloquent\Factories {
+            /**
+     * 
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @method $this trashed()
+     */        class Factory {
+                    /**
+         * 
+         *
+         * @see \Spatie\Translatable\TranslatableServiceProvider::packageRegistered()
+         * @param array|string $locales
+         * @param mixed|null $value
+         * @static 
+         */        public static function translations($locales, $value)
+        {
+                        return \Illuminate\Database\Eloquent\Factories\Factory::translations($locales, $value);
         }
             }
     }

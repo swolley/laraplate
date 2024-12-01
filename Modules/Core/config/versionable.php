@@ -15,7 +15,7 @@ return [
     /*
      * The model class for store versions.
      */
-    'version_model' => Modules\Core\App\Models\Version::class,
+    'version_model' => Modules\Core\Models\Version::class,
 
     /**
      * The model class for user.

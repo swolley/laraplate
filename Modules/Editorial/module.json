@@ -1,0 +1,9 @@
+{
+    "name": "Editorial",
+    "alias": "editorial",
+    "description": "Functionalities for a basic editorial system.",
+    "keywords": ["editorial", "cms"],
+    "priority": 0,
+    "providers": ["Modules\\Editorial\\Providers\\EditorialServiceProvider"],
+    "files": []
+}

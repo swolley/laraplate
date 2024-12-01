@@ -2,7 +2,7 @@
 
 namespace Modules\Core\Database\Factories;
 
-use Modules\Core\App\Models\License;
+use Modules\Core\Models\License;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LicenseFactory extends Factory

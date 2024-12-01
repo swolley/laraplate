@@ -124,7 +124,7 @@ return [
 
     'helper_files' => [
         base_path() . '/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
-        base_path() . 'Modules/Core/App/Helpers/helpers.php',
+        base_path() . '/Modules/Core/app/Helpers/helpers.php',
     ],
 
     /*
@@ -142,7 +142,7 @@ return [
 
     'model_locations' => [
         'app/Models',
-        'Modules/**/App/Models',
+        'Modules/**/app/Models',
     ],
 
     /*
@@ -155,7 +155,7 @@ return [
     */
 
     'ignored_models' => [
-        'Modules\\Core\\App\\Models\\Version'
+        'Modules\\Core\\Models\\Version'
     ],
 
     /*

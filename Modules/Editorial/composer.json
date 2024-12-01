@@ -1,0 +1,32 @@
+{
+    "name": "swolley/laraplate-editorial",
+    "description": "Editorial Module contains all the necessary functionalities for build up a new editorial system.",
+    "authors": [
+        {
+            "name": "Swolley",
+            "email": "myentity@inwind.it"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "spatie/laravel-tags": "^4.7"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Editorial\\": "app/",
+            "Modules\\Editorial\\Database\\Factories\\": "database/factories/",
+            "Modules\\Editorial\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Editorial\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Core\App\Http\Controllers\CrudController;
+use Modules\Core\Http\Controllers\CrudController;
 
 Route::controller(CrudController::class)->group(function () {
 	Route::match(['get', 'post'], '/select/{entity}', 'list')->name('list');

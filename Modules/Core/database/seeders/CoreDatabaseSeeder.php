@@ -10,16 +10,16 @@ use Illuminate\Database\Seeder;
 use function Laravel\Prompts\text;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Modules\Core\App\Models\CronJob;
-use Modules\Core\App\Models\Setting;
+use Modules\Core\Models\CronJob;
+use Modules\Core\Models\Setting;
 use function Laravel\Prompts\password;
-use Modules\Core\App\Casts\ActionEnum;
+use Modules\Core\Casts\ActionEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
-use Modules\Core\App\Helpers\HasApprovals;
+use Modules\Core\Helpers\HasApprovals;
 use Spatie\Permission\PermissionRegistrar;
 
-use Modules\Core\App\Casts\SettingTypeEnum;
+use Modules\Core\Casts\SettingTypeEnum;
 
 class CoreDatabaseSeeder extends Seeder
 {
