@@ -601,8 +601,11 @@ namespace Modules\Editorial\Models{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Editorial\Models\Folder[] $children
  * @property-read int|null $children_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Modules\Editorial\Models\Newspaper $newspaper
  * @property-read \Modules\Editorial\Models\Folder|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -681,8 +684,11 @@ namespace Modules\Editorial\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Modules\Editorial\Models\Newspaper|null $newspaper
  * @property-read \Modules\Editorial\Models\Template|null $template
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -724,10 +730,13 @@ namespace Modules\Editorial\Models{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Editorial\Models\Folder> $categories
  * @property-read int|null $categories_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Editorial\Models\ModelType> $models
  * @property-read int|null $models_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Editorial\Models\Folder> $sections
  * @property-read int|null $sections_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -804,10 +813,13 @@ namespace Modules\Editorial\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Editorial\Models\ModelType> $models
  * @property-read int|null $models_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Editorial\Models\Template newModelQuery()

@@ -2,6 +2,7 @@
 
 namespace Modules\Editorial\Models;
 
+use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Template extends Model
 {
-    use HasFactory, HasCommonObserver;
+    use HasFactory, HasCommonObserver, HasApprovals;
 
     /**
      * The attributes that are mass assignable.

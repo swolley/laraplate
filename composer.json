@@ -1,6 +1,5 @@
 {
     "name": "swolley/laravel-boilerplate",
-    "version": "2.2.0",
     "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
@@ -78,11 +77,6 @@
         "lint": [
             "vendor/bin/pint --dirty"
         ],
-        "changelog": "conventional-changelog",
-        "release": "conventional-changelog --commit",
-        "release:patch": "conventional-changelog --patch --commit",
-        "release:minor": "conventional-changelog --minor --commit",
-        "release:major": "conventional-changelog --major --commit",
         "test": "./vendor/bin/pest"
     },
     "extra": {

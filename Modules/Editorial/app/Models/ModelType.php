@@ -2,16 +2,18 @@
 
 namespace Modules\Editorial\Models;
 
+use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 // use Modules\Editorial\Database\Factories\ModelTypeFactory;
 
 class ModelType extends Model
 {
-    use HasFactory, HasCommonObserver, SoftDeletes;
+    use HasFactory, HasCommonObserver, SoftDeletes, HasApprovals;
 
     /**
      * The attributes that are mass assignable.

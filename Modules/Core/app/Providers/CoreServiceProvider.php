@@ -152,7 +152,8 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // App
+        // FIXME: correggere errore inizializzazione comandi
+        /* // App
         $module_commands_subpath = config('modules.paths.generator.command.path');
         $commands = $this->inspectFolderCommands($module_commands_subpath);
 
@@ -165,7 +166,7 @@ class CoreServiceProvider extends ServiceProvider
         $cache_commands = $this->inspectFolderCommands($cache_commands_subpath);
         array_push($commands, ...$cache_commands);
 
-        $this->commands($commands);
+        $this->commands($commands); */
     }
 
     /**

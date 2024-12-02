@@ -2,6 +2,7 @@
 
 namespace Modules\Editorial\Models;
 
+use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Folder extends Model
 {
-    use HasFactory, HasRecursiveRelationships, HasCommonObserver, SoftDeletes;
+    use HasFactory, HasRecursiveRelationships, HasCommonObserver, SoftDeletes, HasApprovals;
 
     /**
      * The attributes that are mass assignable.
