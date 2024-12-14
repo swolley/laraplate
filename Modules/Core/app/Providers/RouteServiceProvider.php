@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Modules\Core\Providers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * The module namespace to assume when generating URLs to actions.
-     */
-    protected string $moduleNamespace = 'Modules\Core\Http\Controllers';
+    protected string $name = 'Core';
 
     /**
      * Called before routes are registered.
@@ -34,6 +30,16 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
     }
 
+    protected function getPrefix(): string
+    {
+        return Str::slug($this->name);
+    }
+
+    protected function getModuleNamespace(): string
+    {
+        return str_replace('Providers', 'Http\Controllers', __NAMESPACE__);
+    }
+
     /**
      * Define the "web" routes for the application.
      *
@@ -41,34 +47,35 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
+        $name_prefix = $this->getPrefix();
         Route::middleware('web')
-            ->namespace($this->moduleNamespace)
-            // ->prefix('app')
-            ->name('core.')
+            ->namespace($this->namespace)
+            ->name("$name_prefix.")
             ->group([
-                module_path('Core', '/routes/dev.php'),
+                module_path($this->name, '/routes/dev.php'),
             ]);
 
+        $route_prefix = 'app';
         Route::middleware(['web'/*, 'verified'*/])
-            ->namespace($this->moduleNamespace)
-            ->prefix('app')
-            ->name('core.')
-            ->group(module_path('Core', '/routes/web.php'));
+            ->namespace($this->namespace)
+            ->prefix($route_prefix)
+            ->name("$name_prefix.")
+            ->group(module_path($this->name, '/routes/web.php'));
 
         Route::middleware('auth')
-            ->prefix('app/auth')
-            ->name('core.')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('Core', '/routes/auth.php'));
+            ->prefix("$route_prefix/auth")
+            ->name("$name_prefix.")
+            ->namespace($this->namespace)
+            ->group(module_path($this->name, '/routes/auth.php'));
 
         Route::middleware('info')
-            ->name('core.')
-            ->prefix('app')
-            ->namespace($this->moduleNamespace)
-            ->group(module_path('Core', '/routes/info.php'));
+            ->name("$name_prefix.")
+            ->prefix($route_prefix)
+            ->namespace($this->namespace)
+            ->group(module_path($this->name, '/routes/info.php'));
 
         // fake reset password for fortify notifications generation. Url can be modified, but name must be 'password.reset' !!
-        Route::get('/app/auth/reset-password', function () {
+        Route::get("$route_prefix/auth/reset-password", function () {
             return abort(Response::HTTP_MOVED_PERMANENTLY);
         })->name('password.reset');
     }
@@ -81,13 +88,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes(): void
     {
         if (config('core.expose_crud_api')) {
-            Route::prefix('api/v1')
-                ->middleware(['api'])
-                ->name('core.api.')
-                ->namespace($this->moduleNamespace)
+            $name_prefix = $this->getPrefix();
+            $route_prefix = 'api';
+            Route::prefix("$route_prefix/v1")
+                ->middleware([$route_prefix])
+                ->name("$name_prefix.$route_prefix.")
+                ->namespace($this->namespace)
                 ->group([
-                    module_path('Core', '/routes/crud.php'),
-                    module_path('Core', '/routes/api.php'),
+                    module_path($this->name, '/routes/crud.php'),
+                    module_path($this->name, '/routes/api.php'),
                 ]);
         }
     }

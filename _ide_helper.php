@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.34.2.
+ * Generated for Laravel 11.35.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -6691,6 +6691,17 @@ namespace Illuminate\Support\Facades {
                         return $instance->withTablePrefix($grammar);
         }
                     /**
+         * Execute the given callback without table prefix.
+         *
+         * @param \Closure $callback
+         * @return void 
+         * @static 
+         */        public static function withoutTablePrefix($callback)
+        {            //Method inherited from \Illuminate\Database\Connection         
+                        /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
+                        $instance->withoutTablePrefix($callback);
+        }
+                    /**
          * Get the server version for the connection.
          *
          * @return string 
@@ -8281,8 +8292,8 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Http\Client\PendingRequest withoutRedirecting()
      * @method static \Illuminate\Http\Client\PendingRequest withoutVerifying()
      * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
-     * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
-     * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
+     * @method static \Illuminate\Http\Client\PendingRequest timeout(int|float $seconds)
+     * @method static \Illuminate\Http\Client\PendingRequest connectTimeout(int|float $seconds)
      * @method static \Illuminate\Http\Client\PendingRequest retry(array|int $times, \Closure|int $sleepMilliseconds = 0, callable|null $when = null, bool $throw = true)
      * @method static \Illuminate\Http\Client\PendingRequest withOptions(array $options)
      * @method static \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
@@ -11369,6 +11380,16 @@ namespace Illuminate\Support\Facades {
                         return $instance->method();
         }
                     /**
+         * Get a URI instance for the request.
+         *
+         * @return \Illuminate\Support\Uri 
+         * @static 
+         */        public static function uri()
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->uri();
+        }
+                    /**
          * Get the root URL for the application.
          *
          * @return string 
@@ -13319,6 +13340,36 @@ namespace Illuminate\Support\Facades {
                         return $instance->except($keys);
         }
                     /**
+         * Apply the callback if the given "value" is (or resolves to) truthy.
+         *
+         * @template TWhenParameter
+         * @template TWhenReturnType
+         * @param (\Closure($this): TWhenParameter)|\Illuminate\Http\TWhenParameter|null $value
+         * @param (callable($this, TWhenParameter): TWhenReturnType)|null $callback
+         * @param (callable($this, TWhenParameter): TWhenReturnType)|null $default
+         * @return $this|\Illuminate\Http\TWhenReturnType 
+         * @static 
+         */        public static function when($value = null, $callback = null, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->when($value, $callback, $default);
+        }
+                    /**
+         * Apply the callback if the given "value" is (or resolves to) falsy.
+         *
+         * @template TUnlessParameter
+         * @template TUnlessReturnType
+         * @param (\Closure($this): TUnlessParameter)|\Illuminate\Http\TUnlessParameter|null $value
+         * @param (callable($this, TUnlessParameter): TUnlessReturnType)|null $callback
+         * @param (callable($this, TUnlessParameter): TUnlessReturnType)|null $default
+         * @return $this|\Illuminate\Http\TUnlessReturnType 
+         * @static 
+         */        public static function unless($value = null, $callback = null, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->unless($value, $callback, $default);
+        }
+                    /**
          * Register a custom macro.
          *
          * @param string $name
@@ -14975,6 +15026,16 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
                         return $instance->getForeignKeys($table);
+        }
+                    /**
+         * Get the schemas for the connection.
+         *
+         * @return array 
+         * @static 
+         */        public static function getSchemas()
+        {
+                        /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+                        return $instance->getSchemas();
         }
                     /**
          * Parse the database object reference and extract the schema and table.
@@ -19833,6 +19894,7 @@ namespace Tymon\JWTAuth\Facades {
             /**
      * 
      *
+     * @deprecated 
      */        class JWTAuth {
                     /**
          * Attempt to authenticate the user and return the token.
@@ -24100,6 +24162,7 @@ namespace  {
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
             class Vite extends \Illuminate\Support\Facades\Vite {}
+            class Horizon extends \Laravel\Horizon\Horizon {}
             class Octane extends \Laravel\Octane\Facades\Octane {}
             class Socialite extends \Laravel\Socialite\Facades\Socialite {}
             class Module extends \Nwidart\Modules\Facades\Module {}

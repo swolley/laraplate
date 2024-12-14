@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Modules\Core\Models;
 
 use Illuminate\Validation\Rule;
+use Modules\Core\Models\License;
 use Approval\Models\Modification;
 use Approval\Traits\ApprovesChanges;
-use Modules\Core\Models\License;
+use Modules\Core\Helpers\HasVersions;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Modules\Core\Helpers\HasValidations;
+use Modules\Core\Observers\UserObserver;
 use Illuminate\Validation\Rules\Password;
 use Modules\Core\Locking\Traits\HasLocks;
 use Lab404\Impersonate\Models\Impersonate;
-use Modules\Core\Helpers\HasValidations;
-use Modules\Core\Observers\UserObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Modules\Core\Helpers\HasCommonObserver;
 use Modules\Core\Database\Factories\UserFactory;
 use  Illuminate\Foundation\Auth\User as BaseUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -35,7 +35,6 @@ class User extends BaseUser
 {
     use ApprovesChanges,
         // HasApiTokens,
-        HasCommonObserver,
         HasFactory,
         HasLocks,
         HasValidations,
@@ -43,6 +42,7 @@ class User extends BaseUser
         TwoFactorAuthenticatable,
         Notifiable,
         SoftDeletes,
+        HasVersions,
         HasRoles {
         roles as defaultRoles;
         permissions as defaultPermissions;

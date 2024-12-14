@@ -1,10 +1,12 @@
 {
-    "name": "swolley/laravel-boilerplate",
+    "name": "swolley/laraplate",
     "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
+    "version": "1.0.0",
     "keywords": [
         "laravel",
+        "laraplate",
         "framework"
     ],
     "authors": [
@@ -15,13 +17,8 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=8.3",
-        "ext-curl": "*",
-        "ext-json": "*",
-        "ext-redis": "*",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^11.0",
-        "laravel/octane": "^2.6",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "nwidart/laravel-modules": "^11.0",
@@ -87,6 +84,7 @@
         },
         "merge-plugin": {
             "include": [
+                "composer.*.json",
                 "Modules/*/composer.json"
             ],
             "recurse": false,

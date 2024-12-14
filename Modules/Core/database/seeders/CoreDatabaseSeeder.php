@@ -6,20 +6,18 @@ namespace Modules\Core\Database\Seeders;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-
-use function Laravel\Prompts\text;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Modules\Core\Models\CronJob;
 use Modules\Core\Models\Setting;
-use function Laravel\Prompts\password;
+use function Laravel\Prompts\text;
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Casts\ActionEnum;
+use Illuminate\Support\Facades\Hash;
+use function Laravel\Prompts\password;
+use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
-use Modules\Core\Helpers\HasApprovals;
-use Spatie\Permission\PermissionRegistrar;
-
 use Modules\Core\Casts\SettingTypeEnum;
+use Spatie\Permission\PermissionRegistrar;
 
 class CoreDatabaseSeeder extends Seeder
 {

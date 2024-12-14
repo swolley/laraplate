@@ -6,8 +6,8 @@ namespace Modules\Core\Helpers;
 
 use Modules\Core\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Casts\CrudExecutor;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\UnauthorizedException;
 

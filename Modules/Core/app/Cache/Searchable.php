@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\Core\Cache;
 
 use LLPhant\Embeddings\Document;
-use Elastic\Elasticsearch\ClientBuilder;
 use Modules\Core\Models\ModelEmbedding;
+use Elastic\Elasticsearch\ClientBuilder;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LLPhant\Embeddings\DocumentSplitter\DocumentSplitter;
 use LLPhant\Embeddings\EmbeddingFormatter\EmbeddingFormatter;
@@ -20,7 +20,14 @@ trait Searchable
 	 * generate document for Alasticseaerch from entty attributes
 	 * @return array<string, mixed>
 	 */
-	abstract protected function prepareElasticDocument(): array;
+	protected function prepareElasticDocument(): array
+	{
+		foreach ($this->getFillable() as $attribute) {
+			$data[$attribute] = $this->{$attribute};
+		}
+
+		return $data;
+	}
 
 	/**
 	 * @return string|null

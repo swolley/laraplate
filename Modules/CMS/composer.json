@@ -1,0 +1,47 @@
+{
+    "name": "swolley/laraplate-cms",
+    "description": "CMS Module contains all the necessary functionalities for build up a new CMS system.",
+    "version": "1.0.0",
+    "keywords": [
+        "laravel",
+        "laraplate",
+        "cms"
+    ],
+    "authors": [
+        {
+            "name": "Swolley",
+            "email": "myentity@inwind.it"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "ext-gd": "*",
+        "ext-imagick": "*",
+        "spatie/laravel-tags": "^4.7",
+        "tightenco/parental": "*",
+        "spatie/laravel-medialibrary": "^11.11"
+    },
+    "suggest": {
+        "ext-gd": "Instead of php-imagick for image processing",
+        "ext-imagick": "Instead of php-gd for image processing"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CMS\\": "app/",
+            "Modules\\CMS\\Database\\Factories\\": "database/factories/",
+            "Modules\\CMS\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\CMS\\Tests\\": "tests/"
+        }
+    }
+}

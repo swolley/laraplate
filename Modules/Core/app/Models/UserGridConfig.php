@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\Core\Models;
 
-use Modules\Core\Helpers\HasCache;
+use Modules\Core\Cache\HasCache;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasValidations;
-use Modules\Core\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,7 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class UserGridConfig extends Model
 {
-    use HasFactory, HasCommonObserver, HasValidations, HasCache;
+    use HasFactory, HasValidations, HasCache;
 
     /**
      * The attributes that are mass assignable.

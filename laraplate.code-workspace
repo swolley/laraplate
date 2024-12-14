@@ -1,24 +1,23 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"php.version": "8.3",
-		"search.exclude": {
-			"**/vendor": true
-		}
-	},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-			{
-				"name": "Listen for Xdebug",
-				"type": "php",
-				"request": "launch",
-				"port": 9003
-			}
-		]
-	}
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "search.exclude": {
+            "**/vendor": true
+        }
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Listen for Xdebug",
+                "type": "php",
+                "request": "launch",
+                "port": 9003
+            }
+        ]
+    }
 }

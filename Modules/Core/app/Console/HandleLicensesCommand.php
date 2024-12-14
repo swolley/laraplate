@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Modules\Core\Console;
 
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 use Modules\Core\Models\User;
+use Illuminate\Console\Command;
+use Modules\Core\Models\License;
+use Modules\Core\Models\Setting;
 use function Laravel\Prompts\text;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\table;
 use Illuminate\Support\Facades\Log;
 use function Laravel\Prompts\select;
-use Modules\Core\Models\License;
-use Modules\Core\Models\Setting;
 use function Laravel\Prompts\confirm;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,8 +29,8 @@ class HandleLicensesCommand extends Command
             $number = 0;
             $valid_to = null;
 
-            $licenses_groups = License::withoutGlobalScopes()->groupBy('valid_to')
-                ->select(DB::raw("valid_to"), \DB::raw('count(*) as count'))
+            $licenses_groups = License::query()->groupBy('valid_to')
+                ->select(DB::raw("valid_to"), DB::raw('count(*) as count'))
                 ->get();
             $licenses_count = (int) $licenses_groups->reduce(fn(int $total, object $current) => $total + $current->count, 0);
 
@@ -90,7 +90,7 @@ class HandleLicensesCommand extends Command
                     break;
             }
 
-            User::whereNotNull('license_id')->update([
+            User::query()->whereNotNull('license_id')->update([
                 'license_id' => null
             ]);
 
@@ -113,12 +113,12 @@ class HandleLicensesCommand extends Command
             $remapped[] = [$license->id, $license->valid_to, $license->user->name];
         }
         table(['License', 'Expiration', 'User'], $remapped);
-        $this->output->info('Current max sessions available: ' . (Setting::where('name', 'maxConcurrentSessions')->first()?->value ?? 'unlimited'));
+        $this->output->info('Current max sessions available: ' . (Setting::query()->where('name', 'maxConcurrentSessions')->first()?->value ?? 'unlimited'));
     }
 
     private function renewLicenses(int $number, int $licensesCount, ?Carbon $validTo)
     {
-        $updated = License::withoutGlobalScopes()->take($number)->update([
+        $updated = License::query()->take($number)->update([
             'valid_from' => today(),
             'valid_to' => $validTo,
         ]);
@@ -126,7 +126,7 @@ class HandleLicensesCommand extends Command
         $this->output->info($message);
         Log::info($message);
         if ($licensesCount > $number) {
-            $closed = License::offset($number)->update([
+            $closed = License::query()->offset($number)->update([
                 'valid_to' => $validTo ?? today()
             ]);
             $message = "Closed $closed licenses";
@@ -169,7 +169,7 @@ class HandleLicensesCommand extends Command
 
     private function closeLicenses(int $number, ?Carbon $validTo)
     {
-        $query = License::take($number);
+        $query = License::query()->take($number);
         $closed = $query->count();
         $query->update([
             'valid_to' => $validTo ?? today()

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Modules\Core\Models;
 
 use Illuminate\Support\Facades\Cache;
+use Modules\Core\Helpers\HasVersions;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasValidations;
 use Modules\Core\Locking\Traits\HasLocks;
-use Modules\Core\Helpers\HasCommonObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\Database\Factories\CronJobFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +20,7 @@ use Modules\Core\Rules\CronExpression as CronExpressionRule;
  */
 class CronJob extends Model
 {
-    use HasCommonObserver, HasFactory, HasLocks, HasValidations, SoftDeletes;
+    use HasFactory, HasLocks, HasValidations, SoftDeletes, HasVersions;
 
     // region [ATTRIBUTES]
 

@@ -22,3 +22,5 @@ storage/clockwork/*
 .cache/
 .husky
 *.tmp
+.env.testing
+TEMP

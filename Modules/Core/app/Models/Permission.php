@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Core\Models;
 
+use Modules\Core\Cache\HasCache;
 use Modules\Core\Casts\ActionEnum;
-use Modules\Core\Helpers\HasCache;
 use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Core\Helpers\HasCommonObserver;
 use Modules\Core\Database\Factories\PermissionFactory;
 use Spatie\Permission\Models\Permission as ModelsPermission;
 
@@ -17,7 +16,7 @@ use Spatie\Permission\Models\Permission as ModelsPermission;
  */
 class Permission extends ModelsPermission
 {
-    use HasCommonObserver, HasValidations, SoftDeletes, HasCache;
+    use HasValidations, SoftDeletes, HasCache;
 
     /**
      * @var string[]

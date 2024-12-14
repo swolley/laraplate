@@ -6,15 +6,15 @@ namespace Modules\Core\Console;
 
 use Throwable;
 use Illuminate\Support\Str;
-use Illuminate\Console\Command;
 use Modules\Core\Models\Role;
 use Modules\Core\Models\User;
+use Illuminate\Console\Command;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\table;
+use Modules\Core\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
-use Modules\Core\Models\Permission;
 use function Laravel\Prompts\multiselect;
 
 use Illuminate\Support\Facades\Validator;
@@ -43,8 +43,8 @@ class CreateUserCommand extends Command
             $user = new (user_class());
             $fillables = $user->getFillable();
             $validations = $user->getOperationRules('create');
-            $all_roles = Role::get(['id', 'name'])->pluck('name', 'id');
-            $all_permissions = Permission::get(['id', 'name'])->pluck('name', 'id');
+            $all_roles = Role::query()->get(['id', 'name'])->pluck('name', 'id');
+            $all_permissions = Permission::query()->get(['id', 'name'])->pluck('name', 'id');
 
             $created_users = [];
 

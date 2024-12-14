@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Modules\Core\Providers;
 
 use Illuminate\Support\Str;
@@ -12,13 +10,14 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Modules\Core\Helpers\SoftDeletes;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Modules\Core\Helpers\HasMergeConfigs;
+use Nwidart\Modules\Traits\PathNamespace;
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\Core\Overrides\ServiceProvider;
 use Modules\Core\Locking\LockedModelSubscriber;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Modules\Core\Http\Middleware\PreviewMiddleware;
@@ -27,14 +26,15 @@ use Modules\Core\Http\Middleware\ConvertStringToBoolean;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Database\Eloquent\SoftDeletes as BaseSoftDeletes;
 
 class CoreServiceProvider extends ServiceProvider
 {
-    use HasMergeConfigs;
+    use PathNamespace;
 
-    protected string $moduleName = 'Core';
+    protected string $name = 'Core';
 
-    protected string $moduleNameLower = 'core';
+    protected string $nameLower = 'core';
 
     protected $subscribe = [
         LockedModelSubscriber::class,
@@ -56,7 +56,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
         $this->registerAuths();
         $this->registerMiddlewares();
 
@@ -88,13 +88,14 @@ class CoreServiceProvider extends ServiceProvider
         /** @var \Illuminate\Foundation\Application $app */
         $app = $this->app;
 
+        $app->register(EventServiceProvider::class);
         $app->register(RouteServiceProvider::class);
 
-        $app->singleton(Locked::class, function () {
-            return new Locked();
-        });
-
+        $app->singleton(Locked::class, fn() => new Locked());
         $app->alias(Locked::class, 'locked');
+
+        $app->alias(BaseSoftDeletes::class, SoftDeletes::class);
+        $app->alias('App\Models\User', User::class);
 
         if ($app->isLocal()) {
             $app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
@@ -108,52 +109,11 @@ class CoreServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register translations.
-     */
-    public function registerTranslations(): void
-    {
-        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
-
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
-            $this->loadJsonTranslationsFrom($langPath);
-        } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'lang'));
-        }
-    }
-
-    /**
-     * Register views.
-     */
-    public function registerViews(): void
-    {
-        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
-        $sourcePath = module_path($this->moduleName, 'resources/views');
-
-        $this->publishes([$sourcePath => $viewPath], ['views', $this->moduleNameLower . '-module-views']);
-
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
-
-        $componentNamespace = str_replace('/', '\\', config('modules.namespace') . '\\' . $this->moduleName . '\\' . config('modules.paths.generator.component-class.path'));
-        Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
-    {
-        return [];
-    }
-
-    /**
-     * Register commands in the format of Command::class.
+     * Register commands in the format of Command::class
      */
     protected function registerCommands(): void
     {
-        // FIXME: correggere errore inizializzazione comandi
-        /* // App
+        // App
         $module_commands_subpath = config('modules.paths.generator.command.path');
         $commands = $this->inspectFolderCommands($module_commands_subpath);
 
@@ -166,7 +126,7 @@ class CoreServiceProvider extends ServiceProvider
         $cache_commands = $this->inspectFolderCommands($cache_commands_subpath);
         array_push($commands, ...$cache_commands);
 
-        $this->commands($commands); */
+        $this->commands($commands);
     }
 
     /**
@@ -191,6 +151,46 @@ class CoreServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Register translations.
+     */
+    public function registerTranslations(): void
+    {
+        $langPath = resource_path('lang/modules/' . $this->nameLower);
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $this->nameLower);
+            $this->loadJsonTranslationsFrom($langPath);
+        } else {
+            $this->loadTranslationsFrom(module_path($this->name, 'lang'), $this->nameLower);
+            $this->loadJsonTranslationsFrom(module_path($this->name, 'lang'));
+        }
+    }
+
+    /**
+     * Register config.
+     */
+    protected function registerConfig(): void
+    {
+        parent::registerConfig();
+    }
+
+    /**
+     * Register views.
+     */
+    public function registerViews(): void
+    {
+        $viewPath = resource_path('views/modules/' . $this->nameLower);
+        $sourcePath = module_path($this->name, 'resources/views');
+
+        $this->publishes([$sourcePath => $viewPath], ['views', $this->nameLower . '-module-views']);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
+
+        $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
+        Blade::componentNamespace($componentNamespace, $this->nameLower);
+    }
+
     protected function registerMiddlewares()
     {
         $router = app('router');
@@ -205,21 +205,28 @@ class CoreServiceProvider extends ServiceProvider
     private function inspectFolderCommands(string $commandsSubpath)
     {
         $modules_namespace = config('modules.namespace');
-        $files = glob(module_path($this->moduleName, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
+        $files = glob(module_path($this->name, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
 
         return array_map(
-            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->moduleName, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
+            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->name, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
             $files,
         );
+    }
+
+    /**
+     * Get the services provided by the provider.
+     */
+    public function provides(): array
+    {
+        return [];
     }
 
     private function getPublishableViewPaths(): array
     {
         $paths = [];
-
         foreach (config('view.paths') as $path) {
-            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
-                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            if (is_dir($path . '/modules/' . $this->nameLower)) {
+                $paths[] = $path . '/modules/' . $this->nameLower;
             }
         }
 

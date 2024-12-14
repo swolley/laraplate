@@ -1,6 +1,12 @@
 {
     "name": "swolley/laraplate-core",
     "description": "Core Module contains all the necessary functionalities for build up a new Laravel application.",
+    "version": "1.0.0",
+    "keywords": [
+        "laravel",
+        "laraplate",
+        "core"
+    ],
     "authors": [
         {
             "name": "Swolley",
@@ -13,6 +19,8 @@
         "ext-curl": "*",
         "ext-json": "*",
         "ext-redis": "*",
+        "ext-pcntl": "*",
+        "ext-posix": "*",
         "doctrine/dbal": "*",
         "amphp/amp": "^3.0",
         "laravel/fortify": "^1.21",
@@ -25,7 +33,9 @@
         "stephenlake/laravel-approval": "^1.1",
         "wotz/laravel-swagger-ui": "^1.0",
         "elasticsearch/elasticsearch": "^8.15",
-        "theodo-group/llphant": "^0.8.8"
+        "theodo-group/llphant": "^0.8.8",
+        "laravel/horizon": "^5.30",
+        "laravel/octane": "^2.6"
     },
     "require-dev": {
         "mtrajano/laravel-swagger": "^0.6.4",

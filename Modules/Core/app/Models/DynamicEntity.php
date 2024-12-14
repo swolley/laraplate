@@ -13,14 +13,14 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 use Illuminate\Support\Collection;
 use Modules\Core\Inspector\Inspect;
+use Modules\Core\Helpers\HasVersions;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Helpers\HasValidations;
 use Modules\Core\Inspector\Entities\Index;
 use Modules\Core\Grids\Traits\HasGridUtils;
 use Modules\Core\Inspector\Entities\Column;
-use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Core\Helpers\HasCommonObserver;
 use Modules\Core\Inspector\Entities\ForeignKey;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
@@ -30,7 +30,7 @@ use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
  */
 final class DynamicEntity extends Model
 {
-    use HasCommonObserver, HasValidations, SoftDeletes, HasGridUtils /* , HasAcl? */;
+    use HasValidations, SoftDeletes, HasGridUtils /* , HasAcl? */, HasVersions;
 
     /**
      * @var bool

@@ -8,17 +8,17 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
 use Modules\Core\Models\User;
+use Modules\Core\Models\License;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
-use Modules\Core\Models\License;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Contracts\LoginResponse;
+use Modules\Core\Http\Requests\LoginRequest;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
-use Modules\Core\Http\Requests\LoginRequest;
 use Modules\Core\Actions\Fortify\CreateNewUser;
 use Modules\Core\Actions\Fortify\ResetUserPassword;
 use Modules\Core\Actions\Fortify\UpdateUserPassword;
@@ -88,7 +88,7 @@ class FortifyServiceProvider extends ServiceProvider
             $password = $request->request->get('password');
 
             /** @phpstan-ignore larastan.relationExistence */
-            $query = User::has('roles');
+            $query = User::query()->has('roles');
             if ($username) {
                 $query->where('username', $username);
             } else {
@@ -108,13 +108,13 @@ class FortifyServiceProvider extends ServiceProvider
             // verify user license
             if (config('core.enable_user_licenses')) {
                 /** @phpstan-ignore larastan.relationExistence */
-                $available_license = License::doesntHave('user')->first();
+                $available_license = License::query()->doesntHave('user')->first();
                 if (!$user->license_id && !$available_license && $user->roles->filter(fn($role) => $role->name === 'superadmin')->isEmpty()) {
                     Log::warning("No free licenses available for user login");
                     return null;
                 }
                 if (!$user->license_id) {
-                    $user->license()->associate(License::free()->first());
+                    $user->license()->associate(License::query()->free()->first());
                 }
             }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Core\Models;
 
-use Modules\Core\Helpers\HasCommonObserver;
 use Approval\Models\Modification as ApprovalModification;
 
 /**
@@ -12,8 +11,6 @@ use Approval\Models\Modification as ApprovalModification;
  */
 class Modification extends ApprovalModification
 {
-    use HasCommonObserver;
-
     /**
      * @var string[]
      *

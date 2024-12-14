@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Models;
 
+use Modules\Core\Cache\HasCache;
 use Illuminate\Support\Collection;
-use Modules\Core\Helpers\HasCache;
-use Modules\Core\Locking\Traits\HasLocks;
+use Modules\Core\Helpers\HasVersions;
 use Modules\Core\Helpers\HasValidations;
+use Modules\Core\Locking\Traits\HasLocks;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Role as BaseRole;
-use Modules\Core\Helpers\HasCommonObserver;
 use Modules\Core\Database\Factories\RoleFactory;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +22,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
  */
 class Role extends BaseRole
 {
-    use HasCommonObserver, HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes, HasCache;
+    use HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes, HasCache, HasVersions;
 
     /**
      * @var string[]
