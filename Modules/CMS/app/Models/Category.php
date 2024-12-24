@@ -37,7 +37,7 @@ class Category extends Model
             'order' => 'integer',
             'persistence' => 'integer',
             'is_active' => 'boolean',
-            'created_at' => 'immultable_datetime',
+            'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];

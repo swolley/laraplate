@@ -18,7 +18,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class License extends Model
 {
-    use HasFactory, HasUuids, HasValidity, HasValidations;
+    use HasFactory, HasUuids, HasValidity, HasValidations {
+        getRules as protected getRulesTrait;
+    }
 
     protected $keyType = 'string';
 
@@ -26,16 +28,6 @@ class License extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-
-    public function __construct($attributes = [])
-    {
-        $this->rules[static::DEFAULT_RULE] = [
-            'valid_from' => 'date',
-            'valid_to' => 'nullable|date',
-        ];
-
-        parent::__construct($attributes);
-    }
 
     protected static function newFactory(): LicenseFactory
     {
@@ -55,5 +47,15 @@ class License extends Model
     public function user(): HasOne
     {
         return $this->hasOne(User::class);
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'valid_from' => 'date',
+                'valid_to' => 'nullable|date',
+            ],
+        ];
     }
 }

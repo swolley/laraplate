@@ -23,7 +23,7 @@ trait HasSlug
 
 	public function generateSlug(): string
 	{
-		$slugger = config('tags.slugger', '\Illuminate\Support\Str::slug');
+		$slugger = config('cms.slugger', '\Illuminate\Support\Str::slug');
 
 		$slug = array_reduce($this->slug_fields, function ($slug, $field) {
 			return $slug . '-' . $this->{$field};

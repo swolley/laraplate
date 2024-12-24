@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.35.1.
+ * Generated for Laravel 11.36.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -5664,6 +5664,16 @@ namespace Illuminate\Support\Facades {
         {
                         /** @var \Illuminate\Database\DatabaseManager $instance */
                         return $instance->build($config);
+        }
+                    /**
+         * Calculate the dynamic connection name for an on-demand connection based on its configuration.
+         *
+         * @param array $config
+         * @return string 
+         * @static 
+         */        public static function calculateDynamicConnectionName($config)
+        {
+                        return \Illuminate\Database\DatabaseManager::calculateDynamicConnectionName($config);
         }
                     /**
          * Get a database connection instance from the given configuration.
@@ -15982,6 +15992,27 @@ namespace Illuminate\Support\Facades {
                         $instance->regenerateToken();
         }
                     /**
+         * Determine if the previous URI is available.
+         *
+         * @return bool 
+         * @static 
+         */        public static function hasPreviousUri()
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        return $instance->hasPreviousUri();
+        }
+                    /**
+         * Get the previous URL from the session as a URI instance.
+         *
+         * @return \Illuminate\Support\Uri 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function previousUri()
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        return $instance->previousUri();
+        }
+                    /**
          * Get the previous URL from the session.
          *
          * @return string|null 
@@ -24159,6 +24190,7 @@ namespace  {
             class Storage extends \Illuminate\Support\Facades\Storage {}
             class Str extends \Illuminate\Support\Str {}
             class URL extends \Illuminate\Support\Facades\URL {}
+            class Uri extends \Illuminate\Support\Uri {}
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
             class Vite extends \Illuminate\Support\Facades\Vite {}
@@ -24178,6 +24210,7 @@ namespace {
 
 use Illuminate\Contracts\Support\DeferringDisplayableValue;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
 use Illuminate\Support\Fluent;
@@ -24187,6 +24220,7 @@ use Illuminate\Support\Onceable;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable as SupportStringable;
 
 if (! function_exists('append_config')) {
     /**
@@ -24233,6 +24267,10 @@ if (! function_exists('blank')) {
         }
 
         if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Model) {
             return false;
         }
 
@@ -24546,7 +24584,7 @@ if (! function_exists('str')) {
             };
         }
 
-        return Str::of($string);
+        return new SupportStringable($string);
     }
 }
 
@@ -24903,7 +24941,7 @@ if (!function_exists('models')) {
                 $namespace = 'App\\Models\\';
             } else {
                 $module_name = basename($m);
-                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, Str::replace('/', '\\', $modules_models_folder));
+                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, Str::replace(['app/', '/'], ['', '\\'], $modules_models_folder));
             }
 
             foreach ($model_files as $model_file) {

@@ -230,7 +230,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
                     $found_rules = [];
 
                     if (class_uses_trait($class, HasValidations::class)) {
-                        foreach ($class->rules as $property => $rules) {
+                        foreach ($class->getRules() as $property => $rules) {
                             $found_rules[$property] = $rules;
                         }
                     }

@@ -205,7 +205,7 @@ if (!function_exists('models')) {
                 $namespace = 'App\\Models\\';
             } else {
                 $module_name = basename($m);
-                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, Str::replace('/', '\\', $modules_models_folder));
+                $namespace = sprintf('%s\\%s\\%s\\', config('modules.namespace'), $module_name, Str::replace(['app/', '/'], ['', '\\'], $modules_models_folder));
             }
 
             foreach ($model_files as $model_file) {

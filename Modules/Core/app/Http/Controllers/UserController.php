@@ -10,15 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
 use UnexpectedValueException;
-use Modules\Core\Models\User;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Modules\Core\Helpers\ResponseBuilder;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\Listeners\AfterLoginListener;
-use Laravel\Socialite\Contracts\User as SocialUser;
+use Illuminate\Validation\UnauthorizedException;
 use Modules\Core\Http\Resources\UserInfoResponse;
+use Laravel\Socialite\Contracts\User as SocialUser;
 use Modules\Core\Http\Requests\ImpersonationRequest;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -89,6 +89,7 @@ class UserController extends Controller
     {
         $user_to_impersonate_id = $request->validated()['user'];
         $user_to_impersonate = user_class()::findOrFail($user_to_impersonate_id);
+        /** @var User $current_user  */
         $current_user = Auth::user();
         $current_user->impersonate($user_to_impersonate);
 
@@ -145,5 +146,21 @@ class UserController extends Controller
         Auth::login($user);
 
         return redirect('/dashboard');
+    }
+
+    /**
+     * Maintain user session.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function maintainSession(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json(['message' => 'Session maintained successfully.']);
     }
 }

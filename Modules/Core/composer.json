@@ -28,7 +28,7 @@
         "lab404/laravel-impersonate": "^1.7",
         "overtrue/laravel-versionable": "^5.2",
         "spatie/laravel-permission": "^6.4",
-        "staudenmeir/laravel-adjacency-list": "*",
+        "staudenmeir/laravel-adjacency-list": "^1.23",
         "laravel/socialite": "^5.15",
         "stephenlake/laravel-approval": "^1.1",
         "wotz/laravel-swagger-ui": "^1.0",

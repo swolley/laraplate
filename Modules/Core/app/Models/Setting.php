@@ -20,7 +20,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Setting extends Model
 {
-    use HasApprovals, HasFactory, HasValidations, SoftDeletes, HasCache, HasVersions;
+    use HasApprovals, HasFactory, HasValidations, SoftDeletes, HasCache, HasVersions {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * @var string[]
@@ -44,22 +46,6 @@ class Setting extends Model
         'group_name' => 'base',
     ];
 
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->rules[static::DEFAULT_RULE] = [
-            'name' => 'string|required|max:50',
-            'encrypted' => 'boolean|required',
-            'choices' => 'sometimes|nullable',
-            'choices.*' => 'filled',
-            'type' => ['required', new Enum(SettingTypeEnum::class)],
-            'group_name' => 'string|required|max:50',
-            'description' => 'string|max:255|nullable',
-            'locked_at' => 'date|nullable',
-        ];
-    }
-
     protected static function newFactory(): SettingFactory
     {
         return SettingFactory::new();
@@ -72,6 +58,9 @@ class Setting extends Model
             'encrypted' => 'boolean',
             'choices' => 'array',
             'type' => SettingTypeEnum::class,
+            'created_at' => 'immutable_datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -81,6 +70,21 @@ class Setting extends Model
             array_filter($this->getFillable(), fn($field) => $field !== 'description'),
             array_keys($modifications),
         ));
-        // return !empty($modifications);
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'name' => 'string|required|max:50',
+                'encrypted' => 'boolean|required',
+                'choices' => 'sometimes|nullable',
+                'choices.*' => 'filled',
+                'type' => ['required', new Enum(SettingTypeEnum::class)],
+                'group_name' => 'string|required|max:50',
+                'description' => 'string|max:255|nullable',
+                'locked_at' => 'date|nullable',
+            ],
+        ];
     }
 }

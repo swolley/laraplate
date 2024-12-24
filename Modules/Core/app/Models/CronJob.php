@@ -20,9 +20,9 @@ use Modules\Core\Rules\CronExpression as CronExpressionRule;
  */
 class CronJob extends Model
 {
-    use HasFactory, HasLocks, HasValidations, SoftDeletes, HasVersions;
-
-    // region [ATTRIBUTES]
+    use HasFactory, HasLocks, SoftDeletes, HasVersions, HasValidations {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * @var string[]
@@ -52,23 +52,10 @@ class CronJob extends Model
             'schedule' => CronExpressionCast::class,
             'description' => 'string',
             'is_active' => 'boolean',
+            'created_at' => 'immutable_datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
-    }
-
-    // endregion
-
-    public function __construct($attributes = [])
-    {
-        $this->rules[static::DEFAULT_RULE] = [
-            'name' => 'string|required|max:255',
-            'command' => 'string|required|max:255',
-            'parameters' => 'json|required',
-            'schedule' => ['required', new CronExpressionRule],
-            'description' => 'string|max:255|nullable',
-            'is_active' => 'boolean|required',
-        ];
-
-        parent::__construct($attributes);
     }
 
     protected static function newFactory(): CronJobFactory
@@ -76,15 +63,27 @@ class CronJob extends Model
         return CronJobFactory::new();
     }
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
         static::saved(function (CronJob $cronJob): void {
             Cache::forget($cronJob->getTable());
         });
         static::deleted(function (CronJob $cronJob): void {
             Cache::forget($cronJob->getTable());
         });
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'name' => 'string|required|max:255',
+                'command' => 'string|required|max:255',
+                'parameters' => 'json|required',
+                'schedule' => ['required', new CronExpressionRule],
+                'description' => 'string|max:255|nullable',
+                'is_active' => 'boolean|required',
+            ],
+        ];
     }
 }

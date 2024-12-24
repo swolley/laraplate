@@ -5,43 +5,62 @@ namespace Modules\CMS\Models;
 use Spatie\Tags\HasTags;
 use Parental\HasChildren;
 use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
+use Modules\CMS\Helpers\HasSlug;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Collection;
 use Modules\Core\Cache\Searchable;
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Helpers\HasValidity;
 use Modules\Core\Helpers\HasVersions;
 use Illuminate\Database\Eloquent\Model;
+use Modules\CMS\Models\Pivot\Relatable;
 use Modules\CMS\Models\Pivot\Authorable;
+use Modules\Core\Helpers\HasValidations;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Locking\Traits\HasLocks;
 use Spatie\EloquentSortable\SortableTrait;
 use Modules\CMS\Models\Pivot\Categorizable;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Modules\Core\Locking\HasOptimisticLocking;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @mixin IdeHelperContent
  */
-class Content extends Model
+class Content extends Model implements HasMedia
 {
-	use SoftDeletes, HasTags, HasValidity, HasLocks, HasVersions, HasChildren, SortableTrait, Searchable {
+	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasValidations, Searchable {
 		prepareElasticDocument as protected prepareElasticDocumentTrait;
+		getRules as protected getRulesTrait;
 	}
 
-	// protected $fillable = ['items'];
+	protected $fillable = ['valid_from', 'valid_to', 'preset_id', 'entity_id', 'components'];
 
-	protected $hidden = ['author_id', 'model_type_id', 'entity_id', 'created_at', 'updated_at', 'deleted_at', 'entity'];
+	protected $with = ['entity', 'authors'];
+
+	protected $hidden = ['preset_id', 'entity_id', 'created_at', 'updated_at', 'deleted_at', 'entity', 'components'];
 
 	protected $childColumn = 'entity_id';
+
+	protected $sortable = [
+		'order_column_name' => 'order_column',
+		'sort_when_creating' => true,
+	];
+
+	protected $appends = ['values'];
 
 	protected function casts(): array
 	{
 		return [
-			'items' => 'json',
-			'author_id' => 'integer',
-			'model_type_id' => 'integer',
-			'created_at' => 'immultable_datetime',
+			'components' => 'json',
+			'preset_id' => 'integer',
+			'created_at' => 'immutable_datetime',
 			'updated_at' => 'datetime',
 			'deleted_at' => 'datetime',
 		];
@@ -70,8 +89,6 @@ class Content extends Model
 	{
 		parent::__construct($attributes);
 
-		$this->items = $attributes['items'] ?? new \stdClass;
-
 		if (static::class !== Content::class && !$this->entity_id) {
 			$this->entity()->associate(static::getAvailableEntities()->firstWhere('name', Str::snake(class_basename($this::class))));
 		}
@@ -82,8 +99,22 @@ class Content extends Model
 	{
 		parent::boot();
 
-		static::addGlobalScope('always_with_entity', function (Builder $builder) {
-			$builder->with('entity');
+		// static::addGlobalScope('always_with_entity', function (Builder $builder) {
+		// 	$builder->with('entity');
+		// });
+
+		static::addGlobalScope('ordered', function (Builder $builder) {
+			$builder->ordered('asc')->orderBy('valid_from', 'desc')->orderBy('created_at', 'desc');
+		});
+
+		static::saving(function ($content) {
+			if ($content->preset_id) {
+				$preset = Preset::find($content->preset_id, ['entity_id']);
+				if ($content->entity_id && $content->entity_id !== $preset->entity_id) {
+					throw new \UnexpectedValueException("Entity mismatch: {$content->entity->name} is not compatible with {$preset->name}");
+				}
+				$content->entity_id = $preset->entity_id;
+			}
 		});
 	}
 
@@ -93,12 +124,31 @@ class Content extends Model
 	 */
 	public function getNameAttribute(): string
 	{
-		return $this->components()->firstWhere('is_slug', true)->value;
+		$field = $this->preset?->fields()->firstWhere('is_slug', true);
+		return $field ? $this->values->{$field->name} : '';
+	}
+
+	protected function values(): Attribute
+	{
+		return Attribute::make(
+			get: fn() => (object) $this->fields()->mapWithKeys(function (Field $field) {
+				$components = (object) $this->components;
+				return [$field->name => property_exists($components, $field->name) ? $components->{$field->name} : $field->default ?? null];
+			}),
+			set: fn(array|object $values) => (object) $this->fields()->mapWithKeys(function (Field $field) use ($values) {
+				return [$field->name => data_get($values, $field->name) ?? $field->default ?? null];
+			}),
+		);
+	}
+
+	private function fields(): Collection
+	{
+		return $this->preset?->fields ?? collect();
 	}
 
 	public function entity(): BelongsTo
 	{
-		return $this->belongsTo(Entity::class);
+		return $this->belongsTo(Entity::class)->select(['id', 'name', 'slug'])->withTrashed();
 	}
 
 	/**
@@ -114,7 +164,7 @@ class Content extends Model
 	 */
 	public function authors(): BelongsToMany
 	{
-		return $this->belongsToMany(Author::class)->using(Authorable::class)->withTimestamps();
+		return $this->belongsToMany(Author::class)->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
 	}
 
 	/**
@@ -122,26 +172,13 @@ class Content extends Model
 	 */
 	public function preset(): BelongsTo
 	{
-		return $this->belongsTo(Preset::class);
+		return $this->belongsTo(Preset::class)->withTrashed();
 	}
 
-	// protected function __get($key)
-	// {
-	// 	if (property_exists($this->items, $key)) {
-	// 		return $this->items->{$key};
-	// 	}
-
-	// 	return parent::__get($key);
-	// }
-
-	// protected function __set($key, $value)
-	// {
-	// 	if (property_exists($this->items, $key)) {
-	// 		return $this->items->{$key};
-	// 	}
-
-	// 	parent::__set($key, $value);
-	// }
+	public function related(): BelongsToMany
+	{
+		return $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+	}
 
 	protected static function getAvailableEntities(): Collection
 	{
@@ -162,62 +199,129 @@ class Content extends Model
 		return $document;
 	}
 
-	// Magic getter for items attributes
 	#[\Override]
 	public function __get($key)
 	{
-		// $entity = new User();
-		// if (in_array($key, $entity->getFillable())) {
-		// 	return $this->user ? $this->user->{$key} : null;
-		// }
-		return parent::__get($key);
+		$value = parent::__get($key);
+		if ($value == null) {
+			return $value;
+		}
+
+		return data_get($this->values, $key);
 	}
 
-	// Magic setter for items attributes
 	#[\Override]
 	public function __set($key, $value)
 	{
-		// $session_user = Auth::user();
-		// $entity = new User();
-		// $table = $entity->getTable();
-		// $user_can_insert = $session_user && $session_user->can("$table.create");
-		// $user_can_update = $session_user && $session_user->can("$table.update");
-		// if (in_array($key, $entity->getFillable()) && ($user_can_insert || $user_can_update)) {
-		// 	if (!$this->user && !$user_can_insert) {
-		// 		throw new UnauthorizedException("User cannot insert $entity");
-		// 	}
-
-		// 	if (!$this->user && !isset($this->tempUser) && $user_can_insert) {
-		// 		$this->tempUser = new User();
-		// 		$this->tempUser->{$key} = $value;
-		// 	} else if ($user_can_update) {
-		// 		$this->user->{$key} = $value;
-		// 	}
-		// 	return;
-		// }
-		parent::__set($key, $value);
-	}
-
-	// Save method to handle user creation/updating
-	#[\Override]
-	public function save(array $options = [])
-	{
-		// if (isset($this->tempUser) && $this->tempUser->isDirty()) {
-		// 	$this->tempUser->save();
-		// 	$this->user_id = $this->tempUser->id;
-		// 	unset($this->tempUser);
-		// 	$this->load('user');
-		// } else if ($this->user && $this->user->isDirty()) {
-		// 	$this->user->save();
-		// }
-		parent::save($options);
+		if (array_key_exists($key, $this->attributes)) {
+			parent::__set($key, $value);
+			return;
+		}
+		if (array_key_exists($key, $this->values)) {
+			data_set($this->values, $key, $value);
+		}
 	}
 
 	#[\Override]
 	public function toArray(): array
 	{
 		$content = parent::toArray();
-		$user = $this->user ? $this->user->toArray() : null;
-		return $user ? array_merge($content, $user) : $content;
+		if (isset($content['values'])) {
+			$values = $content['values'];
+			unset($content['values']);
+			$content = array_merge($content, $values);
+		} else if (isset($this->values)) {
+			$content = array_merge($content, $this->values->toArray());
+		}
+
+		return $content;
+	}
+
+	public function registerMediaCollections(): void
+	{
+		$this->addMediaCollection('images');
+		$this->addMediaCollection('videos')
+			->extractVideoFrameAtSecond(2);
+		$this->addMediaCollection('audios');
+		$this->addMediaCollection('files');
+	}
+
+
+	public function registerMediaConversions(?Media $media = null): void
+	{
+		$this->addMediaConversion('thumb')
+			->performOnCollections('images', 'videos')
+			->width(300)
+			->height(300)
+			->sharpen(10)
+			->fit(Fit::Fill, 300, 300);
+	}
+
+	public function getRules()
+	{
+		$fields = [];
+		foreach ($this->fields() as $field) {
+			$rule = $field->type->getRule();
+			if ($field->required) {
+				$rule .= '|required';
+			}
+			if (isset($field->options->min)) {
+				$rule .= '|min:' . $field->options->min;
+			}
+			if (isset($field->options->max)) {
+				$rule .= '|max:' . $field->options->max;
+			}
+			$fields['values.' . $field->name] = trim($rule, '|');
+		}
+
+		return $this->getRulesTrait() + [
+			static::DEFAULT_RULE => $fields + [
+				'values' => 'required',
+				'entity_id' => 'required|exists:entities,id',
+				'preset_id' => 'required|exists:presets,id',
+			],
+		];
+	}
+
+	public function isPublished(): bool
+	{
+		return $this->valid_from <= now() && ($this->valid_to === null || $this->valid_to >= now());
+	}
+
+	public function isExpired(): bool
+	{
+		return $this->valid_to !== null && $this->valid_to < now();
+	}
+
+	public function isDraft(): bool
+	{
+		return $this->valid_from === null;
+	}
+
+	public function isScheduled(): bool
+	{
+		return $this->valid_from !== null && $this->valid_from > now();
+	}
+
+	public function scopePublished(Builder $query): Builder
+	{
+		return $query->where('valid_from', '<=', now())->where(function ($query) {
+			$query->where('valid_to', '>=', now())->orWhereNull('valid_to');
+		});
+	}
+
+	public function scopeExpired(Builder $query): Builder
+	{
+		return $query->whereNotNull('valid_to')->where('valid_to', '<', now());
+	}
+
+	public function scopeDraft(Builder $query): Builder
+	{
+		return $query->whereNull('valid_from');
+	}
+
+	public function scopeScheduled(Builder $query): Builder
+	{
+		return $query->whereNotNull('valid_from')->where('valid_from', '>', now());
 	}
 }

@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Modules\Core\Listeners;
 
 use Illuminate\Support\Carbon;
+use Modules\Core\Models\License;
 use Illuminate\Auth\Events\Login;
-use Modules\Core\Models\User;
 use Illuminate\Support\Facades\Log;
 use Lab404\Impersonate\Impersonate;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
-use Modules\Core\Models\License;
 use Illuminate\Validation\UnauthorizedException;
 
 class AfterLoginListener
@@ -37,11 +36,11 @@ class AfterLoginListener
         }
     }
 
-    public static function checkUserLicense(User $user)
+    public static function checkUserLicense(Authenticatable $user)
     {
-        if (config('core.enable_user_licenses')) {
+        if (config('core.enable_user_licenses') && class_uses_trait($user, Impersonate::class)) {
             if (!$user->isGuest() && !$user->isSuperadmin() && $user->license_id === null) {
-                $available_licenses = License::whereDoesntHave('user')->get();
+                $available_licenses = License::query()->whereDoesntHave('user')->get();
                 if ($available_licenses->isEmpty()) {
                     throw new UnauthorizedException("No licenses available");
                 }

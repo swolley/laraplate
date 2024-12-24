@@ -25,7 +25,7 @@ class Template extends Model
     {
         return [
             /*'site_id' => 'integer',*/
-            'created_at' => 'immultable_datetime',
+            'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];

@@ -7,11 +7,13 @@ namespace Modules\Core\Console;
 use Throwable;
 use Illuminate\Support\Str;
 use Modules\Core\Models\Role;
-use Modules\Core\Models\User;
 use Illuminate\Console\Command;
 use function Laravel\Prompts\text;
+use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\table;
 use Modules\Core\Models\Permission;
+use function Laravel\Prompts\search;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
@@ -49,45 +51,65 @@ class CreateUserCommand extends Command
             $created_users = [];
 
             do {
-                /** @var User $user */
-                $user = new (user_class());
-                $password = '';
+                DB::transaction(function () use ($user, $fillables, $validations, $all_roles, $all_permissions, &$created_users, &$total_users_created) {
+                    /** @var User $user */
+                    $user = new (user_class());
+                    $password = '';
 
-                foreach ($fillables as $attribute) {
-                    if ($attribute !== 'password') {
-                        $answer = text(ucfirst($attribute), required: true, validate: fn(string $value) => $this->validationCallback($attribute, $value, $validations));
-                    } else {
-                        $answer = password(ucfirst($attribute), 'Type a password or let blank to randomly generate it', false, fn(string $value) => $value === '' ? null : $this->validationCallback($attribute, $value, $validations));
-                        if ($answer !== '') {
-                            password("Confirm {$attribute}", required: true, validate: fn($value) => $this->validationCallback($attribute, $value, ['password' => "in:{$answer}"]));
+                    foreach ($fillables as $attribute) {
+                        if ($attribute !== 'password') {
+                            $options = null;
+                            if (isset($validations[$attribute])) {
+                                if (is_string($validations[$attribute]) && preg_match('/in:([^|]*)/', $validations[$attribute], $matches)) {
+                                    $options = explode(',', $matches[1]);
+                                } else if (is_array($validations[$attribute])) {
+                                    $found = array_filter($validations[$attribute], fn($v) => is_string($v) && strpos($v, 'in:') !== false);
+                                    if (!empty($found)) {
+                                        preg_match('/in:([^|]*)/', $found[0], $matches);
+                                        $options = explode(',', $matches[1]);
+                                    }
+                                }
+                            }
+                            if ($options !== null) {
+                                $answer = search(ucfirst($attribute), fn($value) => array_filter($options, fn($o) => str_starts_with($o, $value)));
+                            } else {
+                                $answer = text(ucfirst($attribute), required: true, validate: fn(string $value) => $this->validationCallback($attribute, $value, $validations));
+                            }
                         } else {
-                            $answer = Str::password();
+                            $answer = password(ucfirst($attribute), 'Type a password or let blank to randomly generate it', false, fn(string $value) => $value === '' ? null : $this->validationCallback($attribute, $value, $validations));
+                            if ($answer !== '') {
+                                password("Confirm {$attribute}", required: true, validate: fn($value) => $this->validationCallback($attribute, $value, ['password' => "in:{$answer}"]));
+                            } else {
+                                $answer = Str::password();
+                            }
+                            $password = $answer;
+                            $answer = Hash::make($answer);
                         }
-                        $password = $answer;
-                        $answer = Hash::make($answer);
+
+                        $user->{$attribute} = $answer;
                     }
+                    $roles = multiselect('Roles', $all_roles, required: true);
+                    $permissions = (confirm('Do you want to specify custom user permissions', false, hint: "user already inherits choosen Roles permissions"))
+                        ? multiselect('Permissions', $all_permissions, required: false)
+                        : [];
 
-                    $user->{$attribute} = $answer;
-                }
-                $roles = multiselect('Roles', $all_roles, required: true);
-                $permissions = (confirm('Do you want to specify custom user permissions', false, hint: "user already inherits choosen Roles permissions"))
-                    ? multiselect('Permissions', $all_permissions, required: false)
-                    : [];
+                    $user->save();
+                    $user->roles()->sync($roles);
 
-                $user->save();
-                $user->roles()->sync($roles);
+                    if (!empty($permissions)) {
+                        $user->permissions()->sync($permissions);
+                    }
+                    $this->output->info("User created");
+                    $total_users_created++;
 
-                if (!empty($permissions)) {
-                    $user->permissions()->sync($permissions);
-                }
-                $this->output->info("User created");
-                $total_users_created++;
-
-                $created_users[] = [
-                    'user' => $user->name,
-                    'email' => $user->email,
-                    'password' => $password,
-                ];
+                    $created_users[] = [
+                        'user' => $user->name,
+                        'email' => $user->email,
+                        'password' => $password,
+                        'roles' => $all_roles->filter(fn($name, $id) => in_array($id, $roles))->pluck('name')->implode(', '),
+                        'permissions' => $all_permissions->filter(fn($name, $id) => in_array($id, $permissions))->pluck('name')->implode(', '),
+                    ];
+                });
             } while (confirm('Do you want to create another user?', false));
 
             $this->output->info("Creatd {$total_users_created} users");

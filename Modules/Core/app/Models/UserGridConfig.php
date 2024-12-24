@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class UserGridConfig extends Model
 {
-    use HasFactory, HasValidations, HasCache;
+    use HasFactory, HasValidations, HasCache {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -28,19 +30,6 @@ class UserGridConfig extends Model
         'config',
     ];
 
-    public function __construct(array $attributes = [])
-    {
-        $this->rules[static::DEFAULT_RULE] = [
-            'user_id' => 'integer|exists:users,id',
-            'grid_name' => 'required|max:255',
-            'layout_name' => 'required|max:255',
-            'is_public' => 'boolean|required',
-            'config' => 'required',
-        ];
-
-        parent::__construct($attributes);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(user_class());
@@ -52,8 +41,21 @@ class UserGridConfig extends Model
             'user_id' => 'integer',
             'is_public' => 'boolean',
             'config' => 'json',
-            'created_at' => 'datetime',
+            'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
+        ];
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'user_id' => 'integer|exists:users,id',
+                'grid_name' => 'required|max:255',
+                'layout_name' => 'required|max:255',
+                'is_public' => 'boolean|required',
+                'config' => 'required',
+            ],
         ];
     }
 }

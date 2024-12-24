@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Helpers;
 
-use Modules\Core\Models\User;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Casts\CrudExecutor;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +21,7 @@ trait HasValidations
     private $rules = [
         'create' => [],
         'update' => [],
-        'always' => [],
+        // 'always' => [],
     ];
 
     protected static function bootHasValidations(): void
@@ -94,14 +94,23 @@ trait HasValidations
         return true;
     }
 
-    public function getRules()
+    public function getRules(): array
     {
-        return $this->rules;
+        $primary_key = $this->getKeyName();
+        $rules = $this->rules;
+        if (!isset($rules[static::DEFAULT_RULE])) {
+            $rules[static::DEFAULT_RULE] = [];
+        }
+        $rules['update'] = array_merge($rules['update'], [
+            $primary_key => 'required|exists:' . $this->getTable() . ',' . $primary_key,
+        ]);
+        return $rules;
     }
 
     public function getOperationRules(?string $operation = null): array
     {
-        return $operation && array_key_exists($operation, $this->rules) ? array_merge($this->rules[static::DEFAULT_RULE], $this->rules[$operation]) : $this->rules[static::DEFAULT_RULE];
+        $rules = $this->getRules();
+        return $operation && array_key_exists($operation, $rules) ? array_merge($rules[static::DEFAULT_RULE] ?? [], $rules[$operation]) : $rules[static::DEFAULT_RULE] ?? [];
     }
 
     public function validateWithRules(string $operation): void

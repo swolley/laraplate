@@ -3,10 +3,10 @@
 namespace Modules\Core\Providers;
 
 use Illuminate\Support\Str;
-use Modules\Core\Models\User;
 use Modules\Core\Locking\Locked;
 use Modules\Core\Models\CronJob;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
@@ -95,7 +95,7 @@ class CoreServiceProvider extends ServiceProvider
         $app->alias(Locked::class, 'locked');
 
         $app->alias(BaseSoftDeletes::class, SoftDeletes::class);
-        $app->alias('App\Models\User', User::class);
+        // $app->alias('App\\Models\\User', user_class());
 
         if ($app->isLocal()) {
             $app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
@@ -105,7 +105,7 @@ class CoreServiceProvider extends ServiceProvider
     public function registerAuths(): void
     {
         // bypass all other checks if user is super admin
-        Gate::before(fn(?User $user) => $user && $user->isSuperAdmin() ? true : null);
+        Gate::before(fn(?User $user) => $user && $user instanceof \Modules\Core\Models\User && $user->isSuperAdmin() ? true : null);
     }
 
     /**
@@ -140,7 +140,7 @@ class CoreServiceProvider extends ServiceProvider
             $cache_key = (new CronJob())->getTable();
             if (Cache::has($cache_key)) {
                 $crons = Cache::get($cache_key);
-            } else if (Schema::hasTable((new CronJob())->getTable())) {
+            } else if (Schema::hasTable($cache_key)) {
                 $crons = CronJob::query()->where('is_active', true)->select(['command', 'schedule'])->get()->toArray();
                 Cache::put($cache_key, $crons);
             }
@@ -208,7 +208,7 @@ class CoreServiceProvider extends ServiceProvider
         $files = glob(module_path($this->name, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
 
         return array_map(
-            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->name, Str::replace('/', '\\', $commandsSubpath), basename($file, '.php')),
+            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->name, Str::replace(['app/', '/'], ['', '\\'], $commandsSubpath), basename($file, '.php')),
             $files,
         );
     }

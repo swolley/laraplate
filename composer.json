@@ -25,7 +25,7 @@
         "symfony/http-client": "^7.0",
         "symfony/mailgun-mailer": "^7.0",
         "tymon/jwt-auth": "^2.1",
-        "wikimedia/composer-merge-plugin": "*"
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",

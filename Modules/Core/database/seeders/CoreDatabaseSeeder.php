@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Modules\Core\Database\Seeders;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Modules\Core\Models\CronJob;
 use Modules\Core\Models\Setting;
-use function Laravel\Prompts\text;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Casts\ActionEnum;
-use Illuminate\Support\Facades\Hash;
-use function Laravel\Prompts\password;
-use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
 use Modules\Core\Casts\SettingTypeEnum;
+use Modules\Core\Helpers\HasSeedersUtils;
 use Spatie\Permission\PermissionRegistrar;
+use Illuminate\Database\Eloquent\Collection;
 
 class CoreDatabaseSeeder extends Seeder
 {
-    private $groups = [];
+    use HasSeedersUtils;
+
+    private Collection $groups;
 
     /**
      * Seed the application's database.
@@ -33,7 +32,7 @@ class CoreDatabaseSeeder extends Seeder
             $this->defaultSettings();
             $this->defaultPermissions();
             $this->defaultRoles();
-            $this->defaultUsers();
+            // $this->defaultUsers();
             $this->defaultCrons();
         });
         $this->command->newLine();
@@ -43,8 +42,7 @@ class CoreDatabaseSeeder extends Seeder
     {
         // il comando ha già le transaction
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        $already_exists = config('permission.models.permission')::exists();
-        $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>permissions</>');
+        $this->logOperation(config('permission.models.permission'));
         Artisan::call('permission:refresh');
         $this->command->line("    - permissions updated");
     }
@@ -56,163 +54,106 @@ class CoreDatabaseSeeder extends Seeder
         $role_table = (new $role_class)->getTable();
         $user_table = (new $user_class)->getTable();
         $permission_class = config('permission.models.permission');
-        $already_exists = $role_class::exists();
-        $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>roles</>');
+        $this->logOperation($role_class);
 
-        $superadmin = 'superadmin';
-        $admin = 'admin';
-        $guest = 'guest';
 
-        $this->groups[$superadmin] = $role_class::whereName($superadmin)->first();
-        $this->groups[$admin] = $role_class::whereName($admin)->first();
-        $this->groups[$guest] = $role_class::whereName($guest)->first();
+        $this->groups = $role_class::withoutGlobalScopes()->get()->keyBy('name');
 
-        DB::transaction(function () use ($role_class, $superadmin, $admin, $permission_class, $role_table, $user_table, $guest) {
-            if (!$this->groups[$superadmin]) {
-                $this->groups[$superadmin] = $this->create($role_class, ['name' => $superadmin, 'locked_at' => now()]);
+        DB::transaction(function () use ($role_class, $permission_class, $role_table, $user_table) {
+
+            $name = 'superadmin';
+            if (!$this->groups->has($name)) {
+                $this->groups->put($name, $this->create($role_class, ['name' => $name, 'locked_at' => now()]));
             }
 
-            if (!$this->groups[$admin]) {
-                $this->groups[$admin] = $this->create($role_class, ['name' => $admin, 'locked_at' => now()]);
+            $name = 'admin';
+            if (!$this->groups->has($name)) {
+                $permission = $this->create($role_class, ['name' => $name, 'locked_at' => now()]);
+                $this->groups->put($name, $permission);
                 // @phpstan-ignore-next-line
-                $this->groups[$admin]->givePermissionTo(
+                $permission->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
                         ->orWhere('name', 'like', '%.' . ActionEnum::SELECT->value)
                         ->get()
                 );
-                $this->command->line("    - $admin created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $admin already exists");
+                $this->command->line("    - $name already exists");
             }
 
-            if (!$this->groups[$guest]) {
-                $this->groups[$guest] = $this->create($role_class, ['name' => $guest, 'locked_at' => now()]);
+            $name = 'guest';
+            if (!$this->groups->has($name)) {
+                $permission = $this->create($role_class, ['name' => $name, 'locked_at' => now()]);
+                $this->groups->put($name, $permission);
                 // @phpstan-ignore-next-line
-                $this->groups[$guest]->givePermissionTo(
+                $permission->givePermissionTo(
                     $permission_class::where('name', 'like', "$user_table.%")
                         ->orWhere('name', 'like', "$role_table.%")
                         ->orWhere('name', 'like', '%.' . ActionEnum::SELECT->value)
                         ->get()
                 );
-                $this->command->line("    - $guest created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $guest already exists");
+                $this->command->line("    - $name already exists");
             }
         });
     }
 
-    private function defaultUsers(): void
-    {
-        $user_class = user_class();
-        $already_exists = $user_class::exists();
-        $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>users</>');
+    // private function defaultUsers(): void
+    // {
+    //     $user_class = user_class();
+    //     $already_exists = $user_class::exists();
+    //     $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>users</>');
 
-        $root = 'root';
-        $admin = 'admin';
-        $anonymous = 'anonymous';
-
-        DB::transaction(function () use ($admin, $root, $anonymous, $user_class) {
-            if (!$user_class::whereName($root)->exists()) {
-                $email = text("Please specify a $root user email", required: true, validate: fn(string $value) => filter_var($value, FILTER_VALIDATE_EMAIL) ? null : 'Please type a valid email');
-                $password = password("Please specify a $root user password", required: true);
-                password("Please confirm the password", required: true, validate: fn(string $value) => $password !== $value ? 'Passwords don\'t match' : null);
-                $root_user = $this->create($user_class, [
-                    'name' => $root,
-                    'username' => $root,
-                    'email' => $email,
-                    'password' => Hash::make($password),
-                    'email_verified_at' => now(),
-                    'locked_at' => now(),
-                ]);
-                // @phpstan-ignore-next-line
-                $root_user->assignRole($this->groups['superadmin']);
-                $this->command->line("    - $root created");
-            } else {
-                $this->command->line("    - $root already exists");
-            }
-
-            if (!$user_class::whereName($admin)->exists()) {
-                $email = text("Please specify a $admin user email", required: true, validate: fn(string $value) => filter_var($value, FILTER_VALIDATE_EMAIL) ? null : 'Please type a valid email');
-                $password = password("Please specify a $admin user password", required: true);
-                password("Please confirm the password", required: true, validate: fn(string $value) => $password !== $value ? 'Passwords don\'t match' : null);
-                $admin_user = $this->create($user_class, [
-                    'name' => $admin,
-                    'username' => $admin,
-                    'email' => $email,
-                    'password' => Hash::make(config('app.name')),
-                    'email_verified_at' => now(),
-                ]);
-                // @phpstan-ignore-next-line
-                $admin_user->assignRole($this->groups[$admin]);
-                $this->command->line("    - $admin created");
-            } else {
-                $this->command->line("    - $admin already exists");
-            }
-
-            if (!$user_class::whereName($anonymous)->exists()) {
-                $anonymous_user = $this->create($user_class, [
-                    'name' => $anonymous,
-                    'username' => $anonymous,
-                    'email' => "$anonymous@" . str_replace('_', '', Str::slug(config('app.name'))) . '.com',
-                    'password' => Hash::make(config('app.name')),
-                    'email_verified_at' => now(),
-                ]);
-                // @phpstan-ignore-next-line
-                $anonymous_user->assignRole($this->groups['guest']);
-                $this->command->line("    - $anonymous created");
-            } else {
-                $this->command->line("    - $anonymous already exists");
-            }
-        });
-    }
+    //     Artisan::call('auth:initialize-users');
+    // }
 
     private function defaultSettings(): void
     {
-        $defaultLanguage = 'defaultLanguage';
-        $pagination = 'pagination';
-        $maxConcurrentSessions = 'maxConcurrentSessions';
-        $already_exists = Setting::query()->exists();
-        $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>settings</>');
+        $this->logOperation(Setting::class);
 
-        DB::transaction(function () use ($defaultLanguage, $pagination, $maxConcurrentSessions) {
-            if (!Setting::query()->where('name', $defaultLanguage)->exists()) {
+        DB::transaction(function () {
+            $name = 'defaultLanguage';
+            if (!Setting::query()->withoutGlobalScopes()->where('name', $name)->exists()) {
                 $this->create(Setting::class, [
-                    'name' => $defaultLanguage,
+                    'name' => $name,
                     'value' => config('app.locale'),
                     'type' => SettingTypeEnum::STRING,
                     'group_name' => 'base',
                     'description' => 'Lingua default',
                 ]);
-                $this->command->line("    - $defaultLanguage created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $defaultLanguage already exists");
+                $this->command->line("    - $name already exists");
             }
 
-            if (!Setting::query()->where('name', $pagination)->exists()) {
+            $name = 'pagination';
+            if (!Setting::query()->withoutGlobalScopes()->where('name', $name)->exists()) {
                 $this->create(Setting::class, [
-                    'name' => $pagination,
+                    'name' => $name,
                     'value' => 20,
                     'type' => SettingTypeEnum::INTEGER,
                     'group_name' => 'base',
                     'description' => 'Paginazione default chiamate',
                 ]);
-                $this->command->line("    - $pagination created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $pagination already exists");
+                $this->command->line("    - $name already exists");
             }
 
-            if (!Setting::query()->where('name', $maxConcurrentSessions)->exists()) {
+            $name = 'maxConcurrentSessions';
+            if (!Setting::query()->withoutGlobalScopes()->where('name', $name)->exists()) {
                 $this->create(Setting::class, [
-                    'name' => $maxConcurrentSessions,
+                    'name' => $name,
                     'value' => PHP_INT_MAX,
                     'type' => SettingTypeEnum::INTEGER,
                     'group_name' => 'base',
                     'description' => 'Numero massimo sessioni simultanee',
                 ]);
-                $this->command->line("    - $maxConcurrentSessions created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $maxConcurrentSessions already exists");
+                $this->command->line("    - $name already exists");
             }
 
             // ModuleDatabaseActivator::seedBackendModules();
@@ -221,50 +162,38 @@ class CoreDatabaseSeeder extends Seeder
 
     private function defaultCrons(): void
     {
-        $clearUserAssignedLicenses = 'clearUserAssignedLicenses';
-        $clearResetTokens = 'clearResetTokens';
-        $already_exists = CronJob::query()->exists();
-        $this->command->line("  " . ($already_exists ? 'Updating' : 'Creating') . ' default <fg=cyan;options=bold>cron jobs</>');
+        $this->logOperation(CronJob::class);
 
-        DB::transaction(function () use ($clearUserAssignedLicenses, $clearResetTokens) {
-            if (!CronJob::query()->where('name', $clearUserAssignedLicenses)->exists()) {
+        DB::transaction(function () {
+            $name = 'clearUserAssignedLicenses';
+            if (!CronJob::query()->withoutGlobalScopes()->where('name', $name)->exists()) {
                 $this->create(CronJob::class, [
-                    'name' => $clearUserAssignedLicenses,
+                    'name' => $name,
                     'command' => 'auth:clear-licenses',
                     'parameters' => [],
                     'schedule' => '@midnight',
                     'description' => 'Resetta assegnazione licenze login a utenti',
                     'is_active' => config('core.enable_user_licenses'),
                 ]);
-                $this->command->line("    - $clearUserAssignedLicenses created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $clearUserAssignedLicenses already exists");
+                $this->command->line("    - $name already exists");
             }
 
-            if (!CronJob::query()->where('name', $clearResetTokens)->exists()) {
+            $name = 'clearResetTokens';
+            if (!CronJob::query()->withoutGlobalScopes()->where('name', $name)->exists()) {
                 $this->create(CronJob::class, [
-                    'name' => $clearResetTokens,
+                    'name' => $name,
                     'command' => 'auth:clear-resets',
                     'parameters' => [],
                     'schedule' => '*/4 * * * *',
                     'description' => 'Rimuove reset password tokens scaduti',
                     'is_active' => true,
                 ]);
-                $this->command->line("    - $clearResetTokens created");
+                $this->command->line("    - $name created");
             } else {
-                $this->command->line("    - $clearResetTokens already exists");
+                $this->command->line("    - $name already exists");
             }
         });
-    }
-
-    /** 
-     * @param class-string $class 
-     */
-    private function create(string $class, array $attributes): Model
-    {
-        $model = $class::make($attributes);
-        if (class_uses_trait($model, HasApprovals::class)) $model->setForcedApprovalUpdate(true);
-        $model->save();
-        return $model;
     }
 }

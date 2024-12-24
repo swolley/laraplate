@@ -16,10 +16,11 @@ use Modules\Core\Observers\UserObserver;
 use Illuminate\Validation\Rules\Password;
 use Modules\Core\Locking\Traits\HasLocks;
 use Lab404\Impersonate\Models\Impersonate;
+use Modules\Core\Models\Pivot\ModelHasRole;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Foundation\Auth\User as BaseUser;
 use Modules\Core\Database\Factories\UserFactory;
-use  Illuminate\Foundation\Auth\User as BaseUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Lab404\Impersonate\Services\ImpersonateManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,8 +45,10 @@ class User extends BaseUser
         SoftDeletes,
         HasVersions,
         HasRoles {
-        roles as defaultRoles;
-        permissions as defaultPermissions;
+        // roles as defaultRoles;
+        // permissions as defaultPermissions;
+        getRules as protected getRulesTrait;
+        roles as protected rolesTrait;
     }
 
     /**
@@ -87,31 +90,9 @@ class User extends BaseUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-        ];
-    }
-
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->rules[static::DEFAULT_RULE] = [
-            'lang' => 'nullable|in:' . implode(',', translations()),
-            'locked_at' => 'date|nullable',
-        ];
-        $this->rules['create'] = [
-            'name' => 'string|required|max:255',
-            'username' => 'max:255|unique:' . static::class,
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users'),
-            ],
-            'password' => [Password::required()],
-        ];
-        $this->rules['update'] = [
-            'name' => 'string|max:255',
+            'created_at' => 'immutable_datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -141,15 +122,15 @@ class User extends BaseUser
         return $this->hasRole('superadmin');
     }
 
-    public function permissions(): BelongsToMany
-    {
-        return $this->defaultPermissions();
-    }
+    // public function permissions(): BelongsToMany
+    // {
+    //     return $this->defaultPermissions();
+    // }
 
-    public function roles(): BelongsToMany
-    {
-        return $this->defaultRoles();
-    }
+    // public function roles(): BelongsToMany
+    // {
+    //     return $this->defaultRoles();
+    // }
 
     public function grid_configs(): HasMany
     {
@@ -159,6 +140,11 @@ class User extends BaseUser
     public function license(): BelongsTo
     {
         return $this->belongsTo(License::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->rolesTrait()->using(ModelHasRole::class);
     }
 
     protected function authorizedToApprove(Modification $mod): bool
@@ -174,5 +160,38 @@ class User extends BaseUser
     protected function getDefaultGuardName(): string
     {
         return 'web';
+    }
+
+    public function getRules(): array
+    {
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'lang' => 'sometimes|in:' . implode(',', translations()),
+            'locked_at' => 'sometimes|date',
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => 'string|required|max:255',
+            'username' => ['max:255', Rule::unique('users')],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users'),
+            ],
+            'password' => [Password::required()],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => 'sometimes|string|max:255',
+            'username' => ['sometimes', 'max:255', Rule::unique('users')->ignore($this->id)],
+            'email' => [
+                'sometimes',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($this->id),
+            ],
+            'password' => ['sometimes', Password::default()],
+        ]);
+
+        return $rules;
     }
 }

@@ -21,9 +21,12 @@ class ModelEmbedding extends Model
         "embedding",
     ];
 
-    protected $casts = [
-        "embedding" => "json",
-    ];
+    protected function casts(): array
+    {
+        return [
+            "embedding" => "json",
+        ];
+    }
 
     public function model(): MorphTo
     {

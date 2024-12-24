@@ -3,12 +3,15 @@
 namespace Modules\CMS\Models;
 
 use Spatie\Tags\Tag as BaseTag;
+// use Modules\CMS\Helpers\HasSlug;
 
 /**
  * @mixin IdeHelperTag
  */
 class Tag extends BaseTag
 {
+    // use HasSlug;
+
     public array $translatable = [];
 
     /**
@@ -22,7 +25,7 @@ class Tag extends BaseTag
     {
         return [
             'order_column' => 'integer',
-            'created_at' => 'immultable_datetime',
+            'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];

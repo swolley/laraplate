@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Helpers;
 
-use Modules\Core\Models\User;
+use Illuminate\Foundation\Auth\User;
 use Overtrue\LaravelVersionable\Versionable;
 
 /**

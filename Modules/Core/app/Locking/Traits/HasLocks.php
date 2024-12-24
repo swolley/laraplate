@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Locking\Traits;
 
 use Modules\Core\Locking\Locked;
-use Modules\Core\Models\User;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Locking\Exceptions\CannotUnlockException;

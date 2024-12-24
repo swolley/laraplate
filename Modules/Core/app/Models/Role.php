@@ -9,12 +9,14 @@ use Illuminate\Support\Collection;
 use Modules\Core\Helpers\HasVersions;
 use Modules\Core\Helpers\HasValidations;
 use Modules\Core\Locking\Traits\HasLocks;
+use Modules\Core\Models\Pivot\ModelHasRole;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Role as BaseRole;
 use Modules\Core\Database\Factories\RoleFactory;
 use Spatie\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 /**
@@ -22,7 +24,9 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
  */
 class Role extends BaseRole
 {
-    use HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes, HasCache, HasVersions;
+    use HasFactory, HasLocks, HasRecursiveRelationships, HasValidations, SoftDeletes, HasCache, HasVersions {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * @var string[]
@@ -47,21 +51,15 @@ class Role extends BaseRole
         'pivot',
     ];
 
-    public function __construct($attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->rules[static::DEFAULT_RULE] = [
-            'name' => 'string|required|max:255',
-            'guard_name' => 'string|max:255',
-            'description' => 'string|max:255|nullable',
-            'locked_at' => 'date|nullable',
-        ];
-    }
-
     protected static function newFactory(): RoleFactory
     {
         return RoleFactory::new();
+    }
+
+    #[\Override]
+    public function users(): BelongsToMany
+    {
+        return parent::users()->using(ModelHasRole::class);
     }
 
     /**
@@ -108,5 +106,17 @@ class Role extends BaseRole
         }
 
         return false;
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'name' => 'string|required|max:255',
+                'guard_name' => 'string|max:255',
+                'description' => 'string|max:255|nullable',
+                'locked_at' => 'date|nullable',
+            ],
+        ];
     }
 }

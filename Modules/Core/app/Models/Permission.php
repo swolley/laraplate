@@ -16,7 +16,9 @@ use Spatie\Permission\Models\Permission as ModelsPermission;
  */
 class Permission extends ModelsPermission
 {
-    use HasValidations, SoftDeletes, HasCache;
+    use HasValidations, SoftDeletes, HasCache {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * @var string[]
@@ -45,18 +47,12 @@ class Permission extends ModelsPermission
 
     public function __construct($attributes = [])
     {
+        parent::__construct($attributes);
+
         $this->guarded = array_merge($this->guarded ?? [], [
             'connection_name',
             'table_name',
         ]);
-
-        $this->rules[static::DEFAULT_RULE] = [
-            'name' => 'string|max:255|required|regex:/^\\w+\\.\\w+\\.\\w+$/',
-            'guard_name' => 'string|max:255',
-            'description' => 'string|max:255|nullable',
-        ];
-
-        parent::__construct($attributes);
     }
 
     protected static function newFactory(): PermissionFactory
@@ -72,5 +68,16 @@ class Permission extends ModelsPermission
         $splitted = explode('.', $this->name);
 
         return ActionEnum::tryFrom(array_pop($splitted));
+    }
+
+    public function getRules()
+    {
+        return $this->getRulesTrait() + [
+            static::DEFAULT_RULE => [
+                'name' => 'string|max:255|required|regex:/^\\w+\\.\\w+\\.\\w+$/',
+                'guard_name' => 'string|max:255',
+                'description' => 'string|max:255|nullable',
+            ],
+        ];
     }
 }

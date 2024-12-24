@@ -29,7 +29,7 @@ class Author extends Model
         return [
             'picture' => 'array',
             'user_id' => 'integer',
-            'created_at' => 'immultable_datetime',
+            'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];
@@ -52,7 +52,7 @@ class Author extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'));
+        return $this->belongsTo(user_class());
     }
 
     public function owns(): BelongsToMany

@@ -266,7 +266,7 @@ class Field implements \JsonSerializable
 
     private function parseValidationsRules(): array
     {
-        $validations = $this->model->rules[$this->getName()] ?? [];
+        $validations = $this->model->getRules()[$this->getName()] ?? [];
         if (is_string($validations)) {
             preg_match("/regex:\/(?:.*)\//", $validations, $regex, PREG_UNMATCHED_AS_NULL);
             if (!empty($regex) && $regex[0] !== null) {

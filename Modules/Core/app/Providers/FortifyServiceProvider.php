@@ -12,6 +12,7 @@ use Modules\Core\Models\License;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -82,6 +83,10 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
 
+        RateLimiter::for('im-still-here', function (Request $request) {
+            return Limit::perMinute(6)->by($request->session()->get('login.id'));
+        });
+
         Fortify::authenticateUsing(function (LoginRequest $request) {
             $username = $request->request->get('username');
             $email = $request->request->get('email');
@@ -115,6 +120,7 @@ class FortifyServiceProvider extends ServiceProvider
                 }
                 if (!$user->license_id) {
                     $user->license()->associate(License::query()->free()->first());
+                    Session::put('license_id', $user->license_id);
                 }
             }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('entity_id')->nullable(false)->constrained('entities', 'id', 'contents_entity_id_FK')->cascadeOnDelete();
             $table->unsignedBigInteger('preset_id')->nullable(false);
             $table->integer('order_column')->nullable();
+            $table->json('components')->nullable(false);
             CommonMigrationColumns::timestamps($table, true, true, true, true);
 
             $table->foreign(['preset_id', 'entity_id'], 'contents_preset_FK')->references(['id', 'entity_id'])->on('presets')->cascadeOnDelete();
@@ -38,6 +39,15 @@ return new class extends Migration
             CommonMigrationColumns::timestamps($table, true);
 
             $table->unique(['content_id', 'author_id'], 'authorables_UN');
+        });
+
+        Schema::create('relatables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('content_id')->nullable(false)->constrained('contents', 'id', 'relatables_content_id_FK')->cascadeOnDelete();
+            $table->foreignId('related_content_id')->nullable(false)->constrained('contents', 'id', 'relatables_related_content_id_FK')->cascadeOnDelete();
+            CommonMigrationColumns::timestamps($table, true);
+
+            $table->unique(['content_id', 'related_content_id'], 'relatables_UN');
         });
     }
 

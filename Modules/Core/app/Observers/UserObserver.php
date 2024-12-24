@@ -6,8 +6,8 @@ namespace Modules\Core\Observers;
 
 use Hash;
 use Illuminate\Support\Str;
-use Modules\Core\Models\User;
 use Illuminate\Support\Facades\App;
+use Illuminate\Foundation\Auth\User;
 
 class UserObserver
 {

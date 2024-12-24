@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Core\Console;
 
 use Carbon\Carbon;
-use Modules\Core\Models\User;
 use Illuminate\Console\Command;
 use Modules\Core\Models\License;
 use Modules\Core\Models\Setting;
@@ -90,7 +89,13 @@ class HandleLicensesCommand extends Command
                     break;
             }
 
-            User::query()->whereNotNull('license_id')->update([
+            $user_class = user_class();
+            if (!$user_class instanceof \Modules\Core\Models\User) {
+                $this->output->info('User class is not Modules\Core\Models\User');
+                DB::commit();
+                return static::SUCCESS;
+            }
+            $user_class::query()->whereNotNull('license_id')->update([
                 'license_id' => null
             ]);
 
