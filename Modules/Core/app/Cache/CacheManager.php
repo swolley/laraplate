@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Core\Cache;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Auth\User;
@@ -34,7 +35,7 @@ class CacheManager
     {
         $tags = [config('APP_NAME')];
         if ($entity) {
-            $models = is_array($entity) ? $entity : [$entity];
+            $models = Arr::wrap($entity);
 
             foreach ($models as &$model) {
                 if (is_string($model)) {
@@ -74,7 +75,7 @@ class CacheManager
      */
     public static function clearByEntity(Model|string|array $entity): void
     {
-        $models = is_array($entity) ? $entity : [$entity];
+        $models = Arr::wrap($entity);
 
         foreach ($models as &$model) {
             if (is_string($model)) {
@@ -94,7 +95,7 @@ class CacheManager
     {
         $key = static::getKeyFromRequest($request);
         if ($entity) {
-            $entity = is_array($entity) ? $entity : [$entity];
+            $entity = Arr::wrap($entity);
 
             foreach ($entity as $model) {
                 if (is_string($model)) {
@@ -117,7 +118,7 @@ class CacheManager
     {
         $user_key = 'U' . $user->id;
         if ($entity) {
-            $models = is_array($entity) ? $entity : [$entity];
+            $models = Arr::wrap($entity);
 
             foreach ($models as &$model) {
                 if (is_string($model)) {
@@ -140,7 +141,7 @@ class CacheManager
     {
         $role_key = 'R' . $role->id;
         if ($entity) {
-            $models = is_array($entity) ? $entity : [$entity];
+            $models = Arr::wrap($entity);
 
             foreach ($models as &$model) {
                 if (is_string($model)) {

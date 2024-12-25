@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
 			if (is_dir($module_dir)) {
 				$seeders = glob($module_dir . '/*.php');
 				foreach ($seeders as $seeder) {
-					$this->call("Modules\\$module\\Database\\Seeders\\" . basename($seeder));
+					$seeder_class = "Modules\\$module\\Database\\Seeders\\" . basename($seeder, '.php');
+					$this->call($seeder_class);
 				}
 			}
 		}

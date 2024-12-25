@@ -168,7 +168,7 @@ class ListRequestData extends SelectRequestData
     private function addGroupsToColumns(array $groups): void
     {
         if (!empty($this->columns)) {
-            $all_columns_name = array_map(fn(Column $column) => /*is_string($column) ? $column : $column['name']*/ $column->name, $this->columns);
+            $all_columns_name = array_map(fn(Column $column) => $column->name, $this->columns);
 
             foreach ($groups as $group) {
                 if (!in_array($group, $all_columns_name, true)) {

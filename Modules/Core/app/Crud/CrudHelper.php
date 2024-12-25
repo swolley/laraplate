@@ -6,19 +6,19 @@ namespace Modules\Core\Crud;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Modules\Core\Casts\Sort;
+use InvalidArgumentException;
 use Modules\Core\Casts\Column;
 use Modules\Core\Casts\Filter;
+use Modules\Core\Casts\ColumnType;
+use Modules\Core\Casts\WhereClause;
 use Modules\Core\Inspector\Inspect;
 use Illuminate\Support\Facades\Auth;
-use Modules\Core\Casts\ColumnType;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Core\Casts\WhereClause;
 use Modules\Core\Casts\FiltersGroup;
-use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Casts\FilterOperator;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Casts\ListRequestData;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Casts\SelectRequestData;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -254,7 +254,7 @@ class CrudHelper
 
 	private function recursivelyApplyFilters(Builder|Relation $query, FiltersGroup|array $filters, array $relation_columns): void
 	{
-		$iterable = is_Array($filters) && Arr::isList($filters) ? $filters : $filters->filters;
+		$iterable = is_array($filters) && Arr::isList($filters) ? $filters : $filters->filters;
 		$method = $filters->operator === WhereClause::AND ? 'where' : 'orWhere';
 		foreach ($iterable as &$subfilter) {
 			if (isset($subfilter->filters)) {
@@ -273,10 +273,7 @@ class CrudHelper
 	{
 		usort($columns, fn(Column $a, Column $b) => $a->name <=> $b->name);
 		$all_columns_name = array_map(fn(Column $column) => $column->name, $columns);
-		$primary_key = $query->getModel()->getKeyName();
-		if (is_string($primary_key)) {
-			$primary_key = [$primary_key];
-		}
+		$primary_key = Arr::wrap($query->getModel()->getKeyName());
 		foreach ($primary_key as $key) {
 			if (!in_array($key, $all_columns_name)) {
 				array_unshift($columns, new Column($key, ColumnType::COLUMN));

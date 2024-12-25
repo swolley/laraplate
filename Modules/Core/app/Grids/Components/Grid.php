@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Grids\Components;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -384,12 +385,9 @@ class Grid extends Entity
      */
     private function addPrimaryKey(array &$allFields)
     {
-        $primary_key_name = $this->getPrimaryKey();
+        $primary_key_name = Arr::wrap($this->getPrimaryKey());
         $primary_key_type = $this->getModel()->getKeyType();
         $is_autoincremental = $this->getModel()->incrementing;
-        if (is_string($primary_key_name)) {
-            $primary_key_name = [$primary_key_name];
-        }
         foreach ($primary_key_name as $name) {
             $full_name = lcfirst($this->getModelName()) . '.' . $name;
             if (!array_key_exists($full_name, $allFields)) {
