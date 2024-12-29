@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		$modules = modules();
+		$modules = modules(prioritySort: true);
 		foreach ($modules as $module) {
 			$module_dir = module_path($module, 'database/seeders');
 			if (is_dir($module_dir)) {

@@ -5,6 +5,7 @@ namespace Modules\Cms\Models;
 use Modules\Core\Helpers\HasVersions;
 use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Template extends Model
 {
-    use HasFactory, HasApprovals, HasVersions;
+    use HasFactory, HasApprovals, HasVersions, HasValidations {
+        getRules as protected getRulesTrait;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -29,5 +32,17 @@ class Template extends Model
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];
+    }
+
+    public function getRules(): array
+    {
+        $rules = $this->getRulesTrait();
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:templates,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:templates,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

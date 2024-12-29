@@ -2,11 +2,13 @@
 
 namespace Modules\Cms\Models;
 
+use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
 use Modules\Core\Helpers\HasValidity;
 use Modules\Core\Helpers\HasVersions;
 use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Helpers\HasValidations;
 use Spatie\EloquentSortable\SortableTrait;
 use Modules\Cms\Models\Pivot\Categorizable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +22,10 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
  */
 class Category extends Model
 {
-    use HasFactory, HasRecursiveRelationships, SoftDeletes, HasValidity, HasApprovals, HasVersions, SortableTrait, HasSlug;
+    use HasFactory, HasRecursiveRelationships, SoftDeletes, HasValidity, HasApprovals, HasVersions, SortableTrait, HasSlug, HasPath, HasValidations {
+        getRules as protected getRulesTrait;
+        getFullPath as protected getFullPathTrait;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -43,6 +48,18 @@ class Category extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (Category $category) {
+            if ($category->parent_id) {
+                if ($category->entity_id && $category->entity_id !== $category->parent->entity_id) {
+                    throw new \UnexpectedValueException("Entity mismatch: {$category->entity->name} is not compatible with {$category->parent->name}");
+                }
+                $category->entity_id = $category->parent->entity_id;
+            }
+        });
+    }
+
     public function entity(): BelongsTo
     {
         return $this->belongsTo(Entity::class);
@@ -51,5 +68,26 @@ class Category extends Model
     public function contents(): BelongsToMany
     {
         return $this->belongsToMany(Content::class, 'categorizables')->using(Categorizable::class)->withTimestamps();
+    }
+
+    public function getRules(): array
+    {
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:categories,name,' . $this->id],
+        ]);
+        return $rules;
+    }
+
+    public function getPath(): ?string
+    {
+        $ancestors = $this->ancestors()->pluck('slug');
+        return $ancestors->join('/');
     }
 }

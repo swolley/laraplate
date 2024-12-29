@@ -110,13 +110,18 @@ class Role extends BaseRole
 
     public function getRules()
     {
-        return $this->getRulesTrait() + [
-            static::DEFAULT_RULE => [
-                'name' => 'string|required|max:255',
-                'guard_name' => 'string|max:255',
-                'description' => 'string|max:255|nullable',
-                'locked_at' => 'date|nullable',
-            ],
-        ];
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'guard_name' => ['string', 'max:255'],
+            'description' => ['string', 'max:255', 'nullable'],
+            'locked_at' => ['date', 'nullable'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:roles,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

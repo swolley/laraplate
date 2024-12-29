@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Facades\Module;
 use Mtrajano\LaravelSwagger\FormatterManager;
 use Modules\Core\Overrides\ModuleDocGenerator;
+use Symfony\Component\Console\Input\InputOption;
 use Mtrajano\LaravelSwagger\LaravelSwaggerException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -20,9 +21,16 @@ class SwaggerGenerateCommand extends BaseGenerateSwaggerDoc
         $this->signature .= '
                 {--m|module= : Filter to a specific Module}
         ';
-        $this->description .= ' <comment>(Modules\Core)</comment>';
+        $this->description .= ' <comment>(⛭ Modules\Core)</comment>';
 
         parent::__construct();
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            ['module', null, InputOption::VALUE_OPTIONAL, 'Filter to a specific Module', null],
+        ];
     }
 
     /**

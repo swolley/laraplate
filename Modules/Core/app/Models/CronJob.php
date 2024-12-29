@@ -75,15 +75,20 @@ class CronJob extends Model
 
     public function getRules()
     {
-        return $this->getRulesTrait() + [
-            static::DEFAULT_RULE => [
-                'name' => 'string|required|max:255',
-                'command' => 'string|required|max:255',
-                'parameters' => 'json|required',
-                'schedule' => ['required', new CronExpressionRule],
-                'description' => 'string|max:255|nullable',
-                'is_active' => 'boolean|required',
-            ],
-        ];
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'command' => ['required', 'string', 'max:255'],
+            'parameters' => ['required', 'json'],
+            'schedule' => ['required', new CronExpressionRule],
+            'description' => ['string', 'max:255', 'nullable'],
+            'is_active' => ['boolean', 'required'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:cron_jobs,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:cron_jobs,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

@@ -32,7 +32,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
 {
     use PromptsForMissingInput;
 
-    protected $description = 'Create or modify an Eloquent model class <comment>(Modules\Core)</comment>';
+    protected $description = 'Create or modify an Eloquent model class <comment>(⛭ Modules\Core)</comment>';
 
     private bool $isNewClass = false;
 

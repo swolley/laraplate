@@ -91,15 +91,14 @@ class Preset extends Model
         $rules = $this->getRulesTrait();
         $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
             'is_active' => 'boolean',
-            'template_id' => 'sometimes|exists:templates,id',
+            'template_id' => ['sometimes', 'exists:templates,id'],
+            'entity_id' => ['required', 'exists:entities,id'],
         ]);
         $rules['create'] = array_merge($rules['create'], [
-            'name' => 'required|string|max:255',
-            'entity_id' => 'required|exists:entities,id',
+            'name' => ['required', 'string', 'max:255'],
         ]);
         $rules['update'] = array_merge($rules['update'], [
-            'name' => 'sometimes|string|max:255',
-            'entity_id' => 'sometimes|exists:entities,id',
+            'name' => ['sometimes', 'string', 'max:255'],
         ]);
         return $rules;
     }

@@ -11,7 +11,7 @@ class FreeExpiredLicensesCommand extends Command
 {
     protected $signature = 'auth:free-expired-licenses';
 
-    protected $description = 'Free expired licenses. <comment>(Modules\Core)</comment>';
+    protected $description = 'Free expired licenses. <comment>(⛭ Modules\Core)</comment>';
 
     public function handle(): void
     {

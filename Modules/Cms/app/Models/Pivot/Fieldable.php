@@ -13,6 +13,10 @@ class Fieldable extends Pivot
 {
 	use HasVersions, SortableTrait;
 
+	public $incrementing = true;
+
+	protected $table = 'fieldables';
+
 	protected $attributes = [
 		'is_required' => false,
 		'order_column' => 0,

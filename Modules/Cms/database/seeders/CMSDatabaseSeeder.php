@@ -17,8 +17,19 @@ class CMSDatabaseSeeder extends Seeder
 {
     use HasSeedersUtils;
 
+    /**
+     * @var Collection<string, Entity>
+     */
     private Collection $entities;
+
+    /**
+     * @var Collection<string, Preset>
+     */
     private Collection $presets;
+
+    /**
+     * @var Collection<string, Field>
+     */
     private Collection $fields;
 
     /**
@@ -34,7 +45,7 @@ class CMSDatabaseSeeder extends Seeder
     {
         $this->logOperation(Field::class);
 
-        $this->fields = Field::withoutGlobalScopes()->get()->keyBy('name');
+        $this->fields = Field::query()->withoutGlobalScopes()->get()->keyBy('name');
 
         DB::transaction(function () {
             $text_fields = ['kicker', 'title', 'subtitle'];
@@ -88,30 +99,29 @@ class CMSDatabaseSeeder extends Seeder
         $this->logOperation(Entity::class);
 
 
-        $this->entities = Entity::withoutGlobalScopes()->get()->keyBy('name');
+        $this->entities = Entity::query()->withoutGlobalScopes()->get()->keyBy('name');
 
         DB::transaction(function () {
             $standard = 'standard';
 
             $entity_name = 'article';
             if (!$this->entities->has($entity_name)) {
+                /** @var Entity $preset */
                 $entity = $this->create(Entity::class, ['name' => $entity_name]);
                 $this->entities->put($entity_name, $entity);
+                /** @var Preset $preset */
                 $preset = $this->create(Preset::class, ['name' => $standard, 'entity_id' => $entity->id]);
                 // required fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => true, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, true);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
                 // optional fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['kicker', 'subtitle', 'short_content']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => false, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['kicker', 'subtitle', 'short_content']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, false);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
+
                 $this->command->line("    - $entity_name created");
             } else {
                 $this->command->line("    - $entity_name already exists");
@@ -119,23 +129,22 @@ class CMSDatabaseSeeder extends Seeder
 
             $entity_name = 'event';
             if (!$this->entities->has($entity_name)) {
+                /** @var Entity $entity */
                 $entity = $this->create(Entity::class, ['name' => $entity_name]);
                 $this->entities->put($entity_name, $entity);
+                /** @var Preset $preset */
                 $preset = $this->create(Preset::class, ['name' => $standard, 'entity_id' => $entity->id]);
                 // required fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content', 'period_from']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => true, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content', 'period_from']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, true);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
                 // optional fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['subtitle', 'short_content', 'period_to']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => false, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['subtitle', 'short_content', 'period_to']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, false);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
+
                 $this->command->line("    - $entity_name created");
             } else {
                 $this->command->line("    - $entity_name already exists");
@@ -143,27 +152,42 @@ class CMSDatabaseSeeder extends Seeder
 
             $entity_name = 'multimedia';
             if (!$this->entities->has($entity_name)) {
+                /** @var Entity $entity */
                 $entity = $this->create(Entity::class, ['name' => $entity_name]);
                 $this->entities->put($entity_name, $entity);
+                /** @var Preset $preset */
                 $preset = $this->create(Preset::class, ['name' => $standard, 'entity_id' => $entity->id]);
                 // required fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => true, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['title', 'content']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, true);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
                 // optional fields
-                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['subtitle', 'short_content']))->pluck('id')->toArray();
-                $fields = array_flip($fields);
-                foreach ($fields as &$pivotAttributes) {
-                    $pivotAttributes = ['is_required' => false, 'default' => null, 'preset_id' => $preset->id];
+                $fields = $this->fields->filter(fn($field) => in_array($field->name, ['subtitle', 'short_content']));
+                foreach ($fields as $field) {
+                    $this->assignFieldToPreset($preset, $field, false);
                 }
-                $preset->fields()->syncWithoutDetaching($fields);
+
                 $this->command->line("    - $entity_name created");
             } else {
                 $this->command->line("    - $entity_name already exists");
             }
         });
+    }
+
+    private function assignFieldToPreset(Preset $preset, Field $field, bool $is_required): void
+    {
+        $pivotAttributes = ['is_required' => $is_required, 'default' => $this->getDefaultFieldValue($field, $is_required), 'preset_id' => $preset->id];
+        $preset->fields()->attach($field->id, $pivotAttributes);
+    }
+
+    private function getDefaultFieldValue(Field $field, bool $is_required): mixed
+    {
+        return match ($field->type) {
+            FieldType::SELECT && isset($field->options->multiple) && $field->options->multiple => [],
+            FieldType::SWITCH => $is_required ? true : false,
+            FieldType::CHECKBOX => [],
+            default => null,
+        };
     }
 }

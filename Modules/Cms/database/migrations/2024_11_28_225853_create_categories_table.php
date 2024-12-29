@@ -29,6 +29,7 @@ return new class extends Migration
 
             $table->unique(['entity_id', 'name', 'deleted_at'], 'categories_UN');
             $table->unique(['entity_id', 'slug', 'deleted_at'], 'categories_slug_UN');
+            $table->unique(['id', 'entity_id'], 'category_entity_UN');
         });
     }
 

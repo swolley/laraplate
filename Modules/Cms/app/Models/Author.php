@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Core\Helpers\HasVersions;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Models\Pivot\Authorable;
+use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,7 +19,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Author extends Model
 {
-    use HasFactory, SoftDeletes, HasVersions;
+    use HasFactory, SoftDeletes, HasVersions, HasValidations {
+        getRules as protected getRulesTrait;
+    }
 
     protected $fillable = ['name', 'public_email', 'picture', 'can_login'];
 
@@ -57,7 +60,7 @@ class Author extends Model
 
     public function owns(): BelongsToMany
     {
-        return $this->belongsToMany(Content::class)->using(Authorable::class)->withTimestamps();
+        return $this->belongsToMany(Content::class, 'authorables')->using(Authorable::class)->withTimestamps();
     }
 
     // Magic getter for user attributes
@@ -117,5 +120,20 @@ class Author extends Model
         $author = parent::toArray();
         $user = $this->user ? $this->user->toArray() : null;
         return $user ? array_merge($author, $user) : $author;
+    }
+
+    public function getRules(): array
+    {
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'name' => ['required', 'string', 'max:255', 'unique:authors,name'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:authors,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:authors,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

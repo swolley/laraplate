@@ -51,11 +51,11 @@ class License extends Model
 
     public function getRules()
     {
-        return $this->getRulesTrait() + [
-            static::DEFAULT_RULE => [
-                'valid_from' => 'date',
-                'valid_to' => 'nullable|date',
-            ],
-        ];
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'valid_from' => ['date'],
+            'valid_to' => ['nullable', 'date'],
+        ]);
+        return $rules;
     }
 }

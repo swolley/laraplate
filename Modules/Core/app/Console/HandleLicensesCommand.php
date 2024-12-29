@@ -20,7 +20,7 @@ class HandleLicensesCommand extends Command
 {
     protected $signature = 'auth:licenses';
 
-    protected $description = 'Renew, add or delete user licenses. <comment>(Modules\Core)</comment>';
+    protected $description = 'Renew, add or delete user licenses. <comment>(⛭ Modules\Core)</comment>';
 
     public function handle()
     {

@@ -6,6 +6,7 @@ use Spatie\Tags\HasTags;
 use Parental\HasChildren;
 use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
+use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Collection;
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class Content extends Model implements HasMedia
 {
-	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasValidations, Searchable {
+	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable {
 		prepareElasticDocument as protected prepareElasticDocumentTrait;
 		getRules as protected getRulesTrait;
 	}
@@ -156,7 +157,7 @@ class Content extends Model implements HasMedia
 	 */
 	public function categories(): BelongsToMany
 	{
-		return $this->belongsToMany(Category::class, 'categorizables')->using(Categorizable::class)->withTimestamps();
+		return $this->belongsToMany(Category::class, 'categorizables')->using(Categorizable::class)->withTimestamps()->where('entity_id', $this->entity_id);
 	}
 
 	/**
@@ -164,7 +165,7 @@ class Content extends Model implements HasMedia
 	 */
 	public function authors(): BelongsToMany
 	{
-		return $this->belongsToMany(Author::class)->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
+		return $this->belongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
 	}
 
 	/**
@@ -172,12 +173,16 @@ class Content extends Model implements HasMedia
 	 */
 	public function preset(): BelongsTo
 	{
-		return $this->belongsTo(Preset::class)->withTrashed();
+		return $this->belongsTo(Preset::class)->withTrashed()->where('entity_id', $this->entity_id);
 	}
 
-	public function related(): BelongsToMany
+	public function related(?Entity $entity = null): BelongsToMany
 	{
-		return $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		$relation = $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		if ($entity) {
+			$relation->where('entity_id', $entity->id);
+		}
+		return $relation;
 	}
 
 	protected static function getAvailableEntities(): Collection
@@ -274,13 +279,13 @@ class Content extends Model implements HasMedia
 			$fields['values.' . $field->name] = trim($rule, '|');
 		}
 
-		return $this->getRulesTrait() + [
-			static::DEFAULT_RULE => $fields + [
-				'values' => 'required',
-				'entity_id' => 'required|exists:entities,id',
-				'preset_id' => 'required|exists:presets,id',
-			],
-		];
+		$rules = $this->getRulesTrait();
+		$rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+			'values' => 'required',
+			'entity_id' => 'required|exists:entities,id',
+			'preset_id' => 'required|exists:presets,id',
+		]);
+		return $rules;
 	}
 
 	public function isPublished(): bool
@@ -323,5 +328,15 @@ class Content extends Model implements HasMedia
 	public function scopeScheduled(Builder $query): Builder
 	{
 		return $query->whereNotNull('valid_from')->where('valid_from', '>', now());
+	}
+
+	public function getPrefix(): string
+	{
+		return $this->entity->slug;
+	}
+
+	public function getPath(): ?string
+	{
+		return $this->categories()->first()?->getPath();
 	}
 }

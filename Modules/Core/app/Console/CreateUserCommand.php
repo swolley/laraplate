@@ -18,11 +18,12 @@ use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\multiselect;
-
-use Illuminate\Support\Facades\Validator;
+use Modules\Core\Helpers\HasCommandUtils;
 
 class CreateUserCommand extends Command
 {
+    use HasCommandUtils;
+
     /**
      * The name and signature of the console command.
      */
@@ -31,7 +32,7 @@ class CreateUserCommand extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Create new user <comment>(Modules\Core)</comment>';
+    protected $description = 'Create new user <comment>(⛭ Modules\Core)</comment>';
 
     /**
      * Execute the console command.
@@ -112,7 +113,7 @@ class CreateUserCommand extends Command
                 });
             } while (confirm('Do you want to create another user?', false));
 
-            $this->output->info("Creatd {$total_users_created} users");
+            $this->output->info("Created {$total_users_created} users");
 
             table(['User', 'Email', 'Password'], $created_users);
 
@@ -122,18 +123,5 @@ class CreateUserCommand extends Command
 
             return static::FAILURE;
         }
-    }
-    private function validationCallback(string $attribute, string $value, array $validations)
-    {
-        if (!array_key_exists($attribute, $validations)) {
-            return null;
-        }
-        $validator = Validator::make([$attribute => $value], array_filter($validations, fn($k) => $k === $attribute, ARRAY_FILTER_USE_KEY))->stopOnFirstFailure(true);
-
-        if (!$validator->passes()) {
-            return $validator->messages()->first();
-        }
-
-        return null;
     }
 }

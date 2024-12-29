@@ -20,7 +20,7 @@ if (!function_exists('modules')) {
      * @param  string|null  $onlyModule  filter for specified module
      * @return string[]
      */
-    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $onlyModule = null): array
+    function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $onlyModule = null, ?bool $prioritySort = false): array
     {
         $module_class = 'Nwidart\\Modules\\Facades\\Module';
         $modules = class_exists($module_class) ? ($onlyActive ? $module_class::allEnabled() : $module_class::all()) : [];
@@ -32,6 +32,10 @@ if (!function_exists('modules')) {
         if ($onlyModule) {
             $onlyModule = ucfirst($onlyModule);
             $remapped_modules = array_filter($remapped_modules, fn(string $k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
+        }
+
+        if ($prioritySort) {
+            uasort($remapped_modules, fn(Module $a, Module $b) => $b->getPriority() <=> $a->getPriority());
         }
 
         $remapped_modules = $fullpath ? array_map(fn(Module $m) => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);

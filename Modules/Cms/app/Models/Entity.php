@@ -2,6 +2,7 @@
 
 namespace Modules\Cms\Models;
 
+use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
 use Modules\Core\Cache\HasCache;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Entity extends Model
 {
-    use HasFactory, SoftDeletes, HasCache, HasSlug, HasValidations {
+    use HasFactory, SoftDeletes, HasCache, HasSlug, HasPath, HasValidations {
         getRules as protected getRulesTrait;
     }
 
@@ -72,11 +73,16 @@ class Entity extends Model
             'slug' => 'sometimes|string|max:255',
         ]);
         $rules['create'] = array_merge($rules['create'], [
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'unique:entities,name'],
         ]);
         $rules['update'] = array_merge($rules['update'], [
-            'name' => 'sometimes|string|max:255',
+            'name' => ['sometimes', 'string', 'max:255', 'unique:entities,name,' . $this->id],
         ]);
         return $rules;
+    }
+
+    public function getPath(): ?string
+    {
+        return null;
     }
 }

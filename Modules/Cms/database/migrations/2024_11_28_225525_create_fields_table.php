@@ -29,8 +29,8 @@ return new class extends Migration
             $table->foreignId('field_id')->nullable(false)->constrained('fields', 'id', 'fieldables_field_id_FK')->cascadeOnDelete();
             $table->boolean('is_required')->default(false)->nullable(false);
             $table->integer('order_column')->default(0)->nullable(false);
-            $table->json('default')->nullable(false);
-            CommonMigrationColumns::timestamps($table, true);
+            $table->json('default')->nullable(true);
+            CommonMigrationColumns::timestamps($table);
 
             $table->unique(['preset_id', 'field_id'], 'fieldables_UN');
         });

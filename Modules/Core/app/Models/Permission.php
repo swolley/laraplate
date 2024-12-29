@@ -72,12 +72,17 @@ class Permission extends ModelsPermission
 
     public function getRules()
     {
-        return $this->getRulesTrait() + [
-            static::DEFAULT_RULE => [
-                'name' => 'string|max:255|required|regex:/^\\w+\\.\\w+\\.\\w+$/',
-                'guard_name' => 'string|max:255',
-                'description' => 'string|max:255|nullable',
-            ],
-        ];
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'guard_name' => ['string', 'max:255'],
+            'description' => ['string', 'max:255', 'nullable'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'regex:/^\\w+\\.\\w+\\.\\w+$/', 'unique:permissions,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^\\w+\\.\\w+\\.\\w+$/', 'unique:permissions,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

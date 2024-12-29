@@ -104,14 +104,13 @@ class Field extends Model
         $rules = $this->getRulesTrait();
         $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
             'is_active' => 'boolean',
-        ]);
-        $rules['create'] = array_merge($rules['create'], [
-            'name' => 'required|string|max:255',
             'type' => ['required', 'string', Rule::enum(FieldType::class)],
         ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:fields,name'],
+        ]);
         $rules['update'] = array_merge($rules['update'], [
-            'name' => 'sometimes|string|max:255',
-            'type' => ['sometimes', 'string', Rule::enum(FieldType::class)],
+            'name' => ['sometimes', 'string', 'max:255', 'unique:fields,name,' . $this->id],
         ]);
         return $rules;
     }

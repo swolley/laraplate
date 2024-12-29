@@ -113,11 +113,9 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // App
         $module_commands_subpath = config('modules.paths.generator.command.path');
         $commands = $this->inspectFolderCommands($module_commands_subpath);
 
-        // Locking
         $locking_commands_subpath = Str::replace('Console', 'Locking/Console', $module_commands_subpath);
         $locking_commands = $this->inspectFolderCommands($locking_commands_subpath);
         array_push($commands, ...$locking_commands);
@@ -167,13 +165,13 @@ class CoreServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register config.
-     */
-    protected function registerConfig(): void
-    {
-        parent::registerConfig();
-    }
+    // /**
+    //  * Register config.
+    //  */
+    // protected function registerConfig(): void
+    // {
+    //     parent::registerConfig();
+    // }
 
     /**
      * Register views.

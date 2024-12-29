@@ -17,14 +17,14 @@ class PermissionsRefreshCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'permission:refresh { --quiet: prevent output }';
+    protected $signature = 'permission:refresh';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Refresh the Permission table with inspected rules <comment>(Modules\Core)</comment>';
+    protected $description = 'Refresh the Permission table with inspected rules <comment>(⛭ Modules\Core)</comment>';
 
     /**
      * @var string[]

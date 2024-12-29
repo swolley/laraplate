@@ -74,17 +74,22 @@ class Setting extends Model
 
     public function getRules()
     {
-        return $this->getRulesTrait() + [
-            static::DEFAULT_RULE => [
-                'name' => 'string|required|max:50',
-                'encrypted' => 'boolean|required',
-                'choices' => 'sometimes|nullable',
-                'choices.*' => 'filled',
-                'type' => ['required', new Enum(SettingTypeEnum::class)],
-                'group_name' => 'string|required|max:50',
-                'description' => 'string|max:255|nullable',
-                'locked_at' => 'date|nullable',
-            ],
-        ];
+        $rules = $this->getRulesTrait();
+        $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+            'encrypted' => ['boolean', 'required'],
+            'choices' => ['sometimes', 'nullable'],
+            'choices.*' => ['filled'],
+            'type' => ['required', new Enum(SettingTypeEnum::class)],
+            'group_name' => ['string', 'required', 'max:50'],
+            'description' => ['string', 'max:255', 'nullable'],
+            'locked_at' => ['date', 'nullable'],
+        ]);
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:50', 'unique:settings,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:50', 'unique:settings,name,' . $this->id],
+        ]);
+        return $rules;
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Modules\Cms\Models\Pivot;
 
-use Modules\Core\Helpers\HasVersions;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
@@ -10,5 +9,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class Authorable extends Pivot
 {
-    use HasVersions;
+    protected $table = 'authorables';
+
+    protected $casts = [
+        'created_at' => 'immutable_datetime',
+        'updated_at' => 'datetime',
+    ];
 }

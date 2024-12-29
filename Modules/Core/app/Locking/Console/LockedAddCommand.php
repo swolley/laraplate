@@ -14,7 +14,7 @@ class LockedAddCommand extends Command
 {
     public $signature = 'lock:locked-add {model} {--namespace=}';
 
-    public $description = 'Add a migration to add locked columns to a model <comment>(Modules\Core)</comment>';
+    public $description = 'Add a migration to add locked columns to a model <comment>(⛭ Modules\Core)</comment>';
 
     protected $operation = 'add';
 

@@ -24,33 +24,43 @@ return new class extends Migration
                 ->references(['entity_id', 'id'])
                 ->on('presets')
                 ->cascadeOnDelete();
+            $table->unique(['id', 'entity_id'], 'content_entity_UN');
         });
 
-        Schema::create('collectables', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('content_id')->nullable(false)->constrained('contents', 'id', 'collectables_content_id_FK')->cascadeOnDelete();
-            $table->foreignId('category_id')->nullable(false)->constrained('categories', 'id', 'collectables_category_id_FK')->cascadeOnDelete();
-            CommonMigrationColumns::timestamps($table, true);
+        Schema::create('categorizables', function (Blueprint $table) {
+            // $table->id();
+            $table->unsignedBigInteger('content_id')->nullable(false);
+            $table->unsignedBigInteger('entity_id')->nullable(false);
+            $table->unsignedBigInteger('category_id')->nullable(false);
+            CommonMigrationColumns::timestamps($table);
 
-            $table->unique(['content_id', 'category_id'], 'collectables_UN');
+            $table->primary(['content_id', 'category_id', 'entity_id']);
+            $table->foreign(['content_id', 'entity_id'], 'categorizables_content_FK')
+                ->references(['id', 'entity_id'])
+                ->on('contents')
+                ->cascadeOnDelete();
+            $table->foreign(['category_id', 'entity_id'], 'categorizables_category_FK')
+                ->references(['id', 'entity_id'])
+                ->on('categories')
+                ->cascadeOnDelete();
         });
 
         Schema::create('authorables', function (Blueprint $table) {
-            $table->id();
+            // $table->id();
             $table->foreignId('content_id')->nullable(false)->constrained('contents', 'id', 'authorables_content_id_FK')->cascadeOnDelete();
             $table->foreignId('author_id')->nullable(false)->constrained('authors', 'id', 'authorables_author_id_FK')->cascadeOnDelete();
-            CommonMigrationColumns::timestamps($table, true);
+            CommonMigrationColumns::timestamps($table);
 
-            $table->unique(['content_id', 'author_id'], 'authorables_UN');
+            $table->primary(['content_id', 'author_id']);
         });
 
         Schema::create('relatables', function (Blueprint $table) {
-            $table->id();
+            // $table->id();
             $table->foreignId('content_id')->nullable(false)->constrained('contents', 'id', 'relatables_content_id_FK')->cascadeOnDelete();
             $table->foreignId('related_content_id')->nullable(false)->constrained('contents', 'id', 'relatables_related_content_id_FK')->cascadeOnDelete();
-            CommonMigrationColumns::timestamps($table, true);
+            CommonMigrationColumns::timestamps($table);
 
-            $table->unique(['content_id', 'related_content_id'], 'relatables_UN');
+            $table->primary(['content_id', 'related_content_id']);
         });
     }
 
@@ -60,7 +70,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('contents');
-        Schema::dropIfExists('collectables');
+        Schema::dropIfExists('categorizables');
         Schema::dropIfExists('authorables');
+        Schema::dropIfExists('relatables');
     }
 };

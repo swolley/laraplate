@@ -8,7 +8,7 @@ class OptimisticLockRemoveCommand extends OptimisticLockAddCommand
 {
     public $signature = 'lock:optimistic-remove {model} {--namespace=}';
 
-    public $description = 'Add a migration to remove optimistic locking columns to a model <comment>(Modules\Core)</comment>';
+    public $description = 'Add a migration to remove optimistic locking columns to a model <comment>(⛭ Modules\Core)</comment>';
 
     protected $operation = 'remove';
 }

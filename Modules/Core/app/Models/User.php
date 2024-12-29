@@ -149,12 +149,12 @@ class User extends BaseUser
 
     protected function authorizedToApprove(Modification $mod): bool
     {
-        return $this->can(($this->getConnectionName() ?? 'default') . $this->getTable() . '.approve');
+        return $this->can(($this->getConnectionName() ?? 'default') . $mod->modifiable->getTable() . '.approve');
     }
 
     protected function authorizedToDisapprove(Modification $mod): bool
     {
-        return $this->can(($this->getConnectionName() ?? 'default') . $this->getTable() . '.disapprove');
+        return $this->can(($this->getConnectionName() ?? 'default') . $mod->modifiable->getTable() . '.disapprove');
     }
 
     protected function getDefaultGuardName(): string
@@ -166,12 +166,12 @@ class User extends BaseUser
     {
         $rules = $this->getRulesTrait();
         $rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
-            'lang' => 'sometimes|in:' . implode(',', translations()),
-            'locked_at' => 'sometimes|date',
+            'lang' => ['sometimes', 'in:' . implode(',', translations())],
+            'locked_at' => ['sometimes', 'date'],
         ]);
         $rules['create'] = array_merge($rules['create'], [
-            'name' => 'string|required|max:255',
-            'username' => ['max:255', Rule::unique('users')],
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['max:255', 'unique:users,username'],
             'email' => [
                 'required',
                 'email',
@@ -181,13 +181,13 @@ class User extends BaseUser
             'password' => [Password::required()],
         ]);
         $rules['update'] = array_merge($rules['update'], [
-            'name' => 'sometimes|string|max:255',
-            'username' => ['sometimes', 'max:255', Rule::unique('users')->ignore($this->id)],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'username' => ['sometimes', 'max:255', 'unique:users,username,' . $this->id],
             'email' => [
                 'sometimes',
                 'email',
                 'max:255',
-                Rule::unique('users')->ignore($this->id),
+                'unique:users,email,' . $this->id,
             ],
             'password' => ['sometimes', Password::default()],
         ]);

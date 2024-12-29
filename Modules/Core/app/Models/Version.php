@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Modules\Core\Models;
 
 use Illuminate\Support\Carbon;
+use Modules\Core\Models\DynamicEntity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Core\Models\DynamicEntity;
 use Overtrue\LaravelVersionable\VersionStrategy;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Overtrue\LaravelVersionable\Version as OvertrueVersion;
@@ -43,25 +43,37 @@ class Version extends OvertrueVersion
     #[\Override]
     public static function createForModel(Model $model, $replacements = [], $time = null): Version
     {
-        /** @var \Overtrue\LaravelVersionable\Versionable|Model $model */
+        // parent logic because it's not possible to bypass the save action
+
+        /* @var \Overtrue\LaravelVersionable\Versionable|Model $model */
         $versionClass = $model->getVersionModel();
         $versionConnection = $model->getConnectionName();
+        $userForeignKeyName = $model->getUserForeignKeyName();
 
-        $version = new $versionClass();
+        $version = new $versionClass;
         $version->setConnection($versionConnection);
 
         $version->versionable_id = $model->getKey();
         $version->versionable_type = $model->getMorphClass();
+        $version->{$userForeignKeyName} = $model->getVersionUserId();
+        $version->contents = $model->getVersionableAttributes($model->getVersionStrategy(), $replacements);
+
+        if ($time) {
+            $version->created_at = Carbon::parse($time);
+        }
+
+        // custom additional logic
+
+        // if (is_array($version->versionable_id)) {
+        //     $versionable_id = '';
+        //     foreach ($version->versionable_id as $key => $value) {
+        //         $versionable_id .= $key . ':' . $value . ':';
+        //     }
+        //     $version->versionable_id = rtrim($versionable_id, ':');
+        // }
         if (static::isDynamicEntity($model)) {
             $version->connection_ref = $model->getConnection();
             $version->table_ref = $model->getTable();
-        }
-        $version->{\config('versionable.user_foreign_key')} = $model->getVersionUserId();
-        $version->contents = $model->getVersionableAttributes(VersionStrategy::DIFF, $replacements);
-
-        /** @var \DateTimeInterface|null|string $time */
-        if ($time) {
-            $version->created_at = Carbon::parse($time);
         }
 
         $version->save();

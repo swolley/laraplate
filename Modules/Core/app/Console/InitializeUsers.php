@@ -16,7 +16,7 @@ class InitializeUsers extends Command
 {
 	protected $signature = 'auth:initialize-users';
 
-	protected $description = 'Initialize users. <comment>(Modules\Core)</comment>';
+	protected $description = 'Initialize users. <comment>(⛭ Modules\Core)</comment>';
 
 	public function handle(): void
 	{

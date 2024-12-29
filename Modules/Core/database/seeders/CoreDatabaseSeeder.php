@@ -20,6 +20,9 @@ class CoreDatabaseSeeder extends Seeder
 {
     use HasSeedersUtils;
 
+    /**
+     * @var Collection<string, Role>
+     */
     private Collection $groups;
 
     /**

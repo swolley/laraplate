@@ -2,13 +2,9 @@
 
 namespace Modules\Cms\Providers;
 
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-// use Illuminate\Support\Facades\Blade;
-// use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Nwidart\Modules\Traits\PathNamespace;
 use Modules\Core\Overrides\ServiceProvider;
-// use Illuminate\Contracts\Foundation\CachesConfiguration;
 
 class CMSServiceProvider extends ServiceProvider
 {
@@ -45,7 +41,10 @@ class CMSServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $module_commands_subpath = config('modules.paths.generator.command.path');
+        $commands = $this->inspectFolderCommands($module_commands_subpath);
+
+        $this->commands($commands);
     }
 
     /**
@@ -98,6 +97,17 @@ class CMSServiceProvider extends ServiceProvider
     //     $componentNamespace = $this->module_namespace($this->name, $this->app_path(config('modules.paths.generator.component-class.path')));
     //     Blade::componentNamespace($componentNamespace, $this->nameLower);
     // }
+
+    private function inspectFolderCommands(string $commandsSubpath)
+    {
+        $modules_namespace = config('modules.namespace');
+        $files = glob(module_path($this->name, $commandsSubpath . DIRECTORY_SEPARATOR . '*.php'));
+
+        return array_map(
+            fn($file) => sprintf('%s\\%s\\%s\\%s', $modules_namespace, $this->name, Str::replace(['app/', '/'], ['', '\\'], $commandsSubpath), basename($file, '.php')),
+            $files,
+        );
+    }
 
     /**
      * Get the services provided by the provider.

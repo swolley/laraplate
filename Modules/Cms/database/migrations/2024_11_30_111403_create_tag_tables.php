@@ -16,14 +16,14 @@ return new class extends Migration
             $table->json('slug');
             $table->string('type')->nullable();
             $table->integer('order_column')->nullable();
-            CommonMigrationColumns::timestamps($table, true);
+            CommonMigrationColumns::timestamps($table);
         });
 
         Schema::create('taggables', function (Blueprint $table) {
             $table->foreignId('tag_id')->constrained('tags', 'id', 'taggables_tag_id_FK')->cascadeOnDelete();
             $table->morphs('taggable');
 
-            $table->unique(['tag_id', 'taggable_id', 'taggable_type'], 'taggables_UN');
+            $table->primary(['tag_id', 'taggable_id', 'taggable_type']);
         });
     }
 

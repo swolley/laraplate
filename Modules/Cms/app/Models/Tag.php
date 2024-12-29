@@ -3,14 +3,17 @@
 namespace Modules\Cms\Models;
 
 use Spatie\Tags\Tag as BaseTag;
-// use Modules\Cms\Helpers\HasSlug;
+use Modules\Cms\Helpers\HasPath;
+use Modules\Core\Helpers\HasValidations;
 
 /**
  * @mixin IdeHelperTag
  */
 class Tag extends BaseTag
 {
-    // use HasSlug;
+    use HasValidations, HasPath {
+        getRules as protected getRulesTrait;
+    }
 
     public array $translatable = [];
 
@@ -35,4 +38,21 @@ class Tag extends BaseTag
     // {
     //     // return TagFactory::new();
     // }
+
+    public function getRules(): array
+    {
+        $rules = $this->getRulesTrait();
+        $rules['create'] = array_merge($rules['create'], [
+            'name' => ['required', 'string', 'max:255', 'unique:tags,name'],
+        ]);
+        $rules['update'] = array_merge($rules['update'], [
+            'name' => ['sometimes', 'string', 'max:255', 'unique:tags,name,' . $this->id],
+        ]);
+        return $rules;
+    }
+
+    public function getPath(): ?string
+    {
+        return null;
+    }
 }
