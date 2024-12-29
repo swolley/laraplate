@@ -12,6 +12,7 @@ use Modules\Core\Helpers\HasValidations;
 use Spatie\EloquentSortable\SortableTrait;
 use Modules\Cms\Models\Pivot\Categorizable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\CMS\Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -58,6 +59,11 @@ class Category extends Model
                 $category->entity_id = $category->parent->entity_id;
             }
         });
+    }
+
+    protected static function newFactory(): CategoryFactory
+    {
+        return CategoryFactory::new();
     }
 
     public function entity(): BelongsTo

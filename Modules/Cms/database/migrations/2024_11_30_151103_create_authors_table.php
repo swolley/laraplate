@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users', 'id', 'authors_user_id_FK');
             $table->string('name');
             $table->string('public_email')->nullable();
-            $table->json('picture');
             CommonMigrationColumns::timestamps($table, true, true);
 
             $table->unique(['user_id', 'name', 'deleted_at'], 'authors_UN');

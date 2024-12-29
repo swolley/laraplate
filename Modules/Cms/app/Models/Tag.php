@@ -5,6 +5,7 @@ namespace Modules\Cms\Models;
 use Spatie\Tags\Tag as BaseTag;
 use Modules\Cms\Helpers\HasPath;
 use Modules\Core\Helpers\HasValidations;
+use Modules\CMS\Database\Factories\TagFactory;
 
 /**
  * @mixin IdeHelperTag
@@ -34,10 +35,10 @@ class Tag extends BaseTag
         ];
     }
 
-    // protected static function newFactory(): TagFactory
-    // {
-    //     // return TagFactory::new();
-    // }
+    protected static function newFactory(): TagFactory
+    {
+        return TagFactory::new();
+    }
 
     public function getRules(): array
     {

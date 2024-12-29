@@ -35,14 +35,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\CMS\\": "app/",
-            "Modules\\CMS\\Database\\Factories\\": "database/factories/",
-            "Modules\\CMS\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Cms\\": "app/",
+            "Modules\\Cms\\Database\\Factories\\": "database/factories/",
+            "Modules\\Cms\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Modules\\CMS\\Tests\\": "tests/"
+            "Modules\\Cms\\Tests\\": "tests/"
         }
     }
 }

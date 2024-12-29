@@ -9,10 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Cms\Database\Factories\EntityFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-// use Modules\Cms\Database\Factories\EntityFactory;
 
 /**
  * @mixin IdeHelperEntity
@@ -44,10 +43,10 @@ class Entity extends Model
         ];
     }
 
-    // protected static function newFactory(): EntityFactory
-    // {
-    //     // return EntityFactory::new();
-    // }
+    protected static function newFactory(): EntityFactory
+    {
+        return EntityFactory::new();
+    }
 
     protected static function boot()
     {

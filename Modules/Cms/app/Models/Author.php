@@ -2,15 +2,20 @@
 
 namespace Modules\Cms\Models;
 
+use Spatie\Image\Enums\Fit;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Helpers\HasVersions;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Models\Pivot\Authorable;
 use Modules\Core\Helpers\HasValidations;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Modules\CMS\Database\Factories\AuthorFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -19,18 +24,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Author extends Model
 {
-    use HasFactory, SoftDeletes, HasVersions, HasValidations {
+    use HasFactory, SoftDeletes, HasVersions, HasValidations, InteractsWithMedia {
         getRules as protected getRulesTrait;
     }
 
-    protected $fillable = ['name', 'public_email', 'picture', 'can_login'];
+    protected $fillable = ['name', 'public_email'];
 
-    protected $hidden = ['user_id', 'user', 'can_login', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = ['user_id', 'user', 'created_at', 'updated_at', 'deleted_at'];
+
+    protected $tempUser;
 
     protected function casts(): array
     {
         return [
-            'picture' => 'array',
             'user_id' => 'integer',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'datetime',
@@ -38,7 +44,10 @@ class Author extends Model
         ];
     }
 
-    protected $tempUser;
+    protected static function newFactory(): AuthorFactory
+    {
+        return AuthorFactory::new();
+    }
 
     protected function getCanLoginAttribute(): bool
     {
@@ -121,6 +130,39 @@ class Author extends Model
         $user = $this->user ? $this->user->toArray() : null;
         return $user ? array_merge($author, $user) : $author;
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images')->singleFile();
+        // $this->addMediaCollection('videos')
+        // 	->extractVideoFrameAtSecond(2);
+        // $this->addMediaCollection('audios');
+        // $this->addMediaCollection('files');
+    }
+
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->performOnCollections('images'/*, 'videos'*/)
+            ->width(300)
+            ->height(300)
+            ->sharpen(10)
+            ->fit(Fit::Fill, 300, 300);
+    }
+
+    protected function picture(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->getFirstMediaUrl('images'),
+            set: fn($value) => $this->addMedia($value)->toMediaCollection('images'),
+        );
+    }
+
+    // public function getPictureAttribute(): string
+    // {
+    //     return $this->getFirstMediaUrl('images', 'thumb');
+    // }
 
     public function getRules(): array
     {

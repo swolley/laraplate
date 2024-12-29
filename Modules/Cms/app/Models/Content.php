@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @mixin IdeHelperContent
@@ -106,6 +105,9 @@ class Content extends Model implements HasMedia
 
 		static::addGlobalScope('ordered', function (Builder $builder) {
 			$builder->ordered('asc')->orderBy('valid_from', 'desc')->orderBy('created_at', 'desc');
+			if (request()?->is('api/*')) {
+				$builder->with('all_related');
+			}
 		});
 
 		static::saving(function ($content) {
@@ -119,15 +121,25 @@ class Content extends Model implements HasMedia
 		});
 	}
 
-	/**
-	 * 
-	 * @return string
-	 */
-	public function getNameAttribute(): string
+	protected function name(): Attribute
 	{
-		$field = $this->preset?->fields()->firstWhere('is_slug', true);
-		return $field ? $this->values->{$field->name} : '';
+		return Attribute::make(
+			get: function () {
+				$field = $this->preset?->fields()->firstWhere('is_slug', true);
+				return $field ? $this->values->{$field->name} : '';
+			},
+		);
 	}
+
+	// /**
+	//  * 
+	//  * @return string
+	//  */
+	// public function getNameAttribute(): string
+	// {
+	// 	$field = $this->preset?->fields()->firstWhere('is_slug', true);
+	// 	return $field ? $this->values->{$field->name} : '';
+	// }
 
 	protected function values(): Attribute
 	{
@@ -183,6 +195,16 @@ class Content extends Model implements HasMedia
 			$relation->where('entity_id', $entity->id);
 		}
 		return $relation;
+	}
+
+	protected function all_related(?Entity $entity = null): BelongsToMany
+	{
+		return $this->related($entity)->orWhere(function ($query) use ($entity) {
+			$query->where('related_content_id', $this->id);
+			if ($entity) {
+				$query->where('entity_id', $entity->id);
+			}
+		});
 	}
 
 	protected static function getAvailableEntities(): Collection
@@ -244,6 +266,7 @@ class Content extends Model implements HasMedia
 
 	public function registerMediaCollections(): void
 	{
+		$this->addMediaCollection('cover')->singleFile();
 		$this->addMediaCollection('images');
 		$this->addMediaCollection('videos')
 			->extractVideoFrameAtSecond(2);
@@ -255,11 +278,19 @@ class Content extends Model implements HasMedia
 	public function registerMediaConversions(?Media $media = null): void
 	{
 		$this->addMediaConversion('thumb')
-			->performOnCollections('images', 'videos')
+			->performOnCollections('images', 'videos', 'cover')
 			->width(300)
 			->height(300)
 			->sharpen(10)
 			->fit(Fit::Fill, 300, 300);
+	}
+
+	protected function cover(): Attribute
+	{
+		return Attribute::make(
+			get: fn() => $this->getFirstMediaUrl('cover'),
+			set: fn($value) => $this->addMedia($value)->toMediaCollection('cover'),
+		);
 	}
 
 	public function getRules()

@@ -15,150 +15,6 @@ namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperAuthor
- * @property int $id
- * @property int $user_id
- * @property string $name
- * @property string|null $public_email
- * @property array<array-key, mixed> $picture
- * @property \Carbon\CarbonImmutable $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read bool $can_login
- * @property-read bool $is_signature
- * @property-read \Modules\Core\Models\Version|null $lastVersion
- * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $owns
- * @property-read int|null $owns_count
- * @property-read \Modules\Core\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
- * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePicture($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePublicEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withoutTrashed()
- */
-	class Author extends \Eloquent {}
-}
-
-namespace Modules\Cms\Models{
-/**
- * 
- *
- * @mixin IdeHelperCategory
- * @property int $id
- * @property int $entity_id
- * @property int|null $parent_id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property int $order
- * @property int $persistence
- * @property string|null $logo
- * @property string|null $logo_full
- * @property bool $is_active
- * @property int|null $order_column
- * @property \Carbon\CarbonImmutable $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $children
- * @property-read int|null $children_count
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
- * @property-read int|null $contents_count
- * @property-read \Modules\Cms\Models\Entity $entity
- * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read array|null $preview
- * @property-read \Modules\Core\Models\Version|null $lastVersion
- * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
- * @property-read int|null $modifications_count
- * @property-read \Modules\Cms\Models\Category|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
- * @property-read int|null $versions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $ancestors The model's recursive parents.
- * @property-read int|null $ancestors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $ancestorsAndSelf The model's recursive parents and itself.
- * @property-read int|null $ancestors_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $bloodline The model's ancestors, descendants and itself.
- * @property-read int|null $bloodline_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $childrenAndSelf The model's direct children and itself.
- * @property-read int|null $children_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $descendants The model's recursive children.
- * @property-read int|null $descendants_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $descendantsAndSelf The model's recursive children and itself.
- * @property-read int|null $descendants_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $parentAndSelf The model's direct parent and itself.
- * @property-read int|null $parent_and_self_count
- * @property-read \Modules\Cms\Models\Category|null $rootAncestor The model's topmost parent.
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $siblings The parent's other children.
- * @property-read int|null $siblings_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $siblingsAndSelf All the parent's children.
- * @property-read int|null $siblings_and_self_count
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> all($columns = ['*'])
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category breadthFirst()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category depthFirst()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category doesntHaveChildren()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expired()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expiredAt(\Illuminate\Support\Carbon $date)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> get($columns = ['*'])
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category getExpressionGrammar()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category hasChildren()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category hasParent()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category isLeaf()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category isRoot()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newModelQuery()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category onlyTrashed()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered(string $direction = 'asc')
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category tree($maxDepth = null)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category treeOf(\Illuminate\Database\Eloquent\Model|callable $constraint, $maxDepth = null)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category validAt(\Illuminate\Support\Carbon $date)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereCreatedAt($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDeletedAt($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDepth($operator, $value = null)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDescription($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereEntityId($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereId($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereIsActive($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLockedAt($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLockedUserId($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogo($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogoFull($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereName($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrder($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrderColumn($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSlug($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withGlobalScopes(array $scopes)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withRelationshipExpression($direction, callable $constraint, $initialDepth, $from = null, $maxDepth = null)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withoutTrashed()
- */
-	class Category extends \Eloquent {}
-}
-
-namespace Modules\Cms\Models{
-/**
- * 
- *
  * @mixin IdeHelperContent
  * @property int $id
  * @property int $entity_id
@@ -177,15 +33,16 @@ namespace Modules\Cms\Models{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
+ * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read string $name
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
+ * @property-read mixed $name
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Spatie\Tags\Tag> $tags
  * @property-read int|null $tags_count
@@ -244,6 +101,7 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Preset> $presets
  * @property-read int|null $presets_count
+ * @method static \Modules\CMS\Database\Factories\EntityFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity onlyTrashed()
@@ -440,40 +298,6 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset withoutTrashed()
  */
 	class Preset extends \Eloquent {}
-}
-
-namespace Modules\Cms\Models{
-/**
- * 
- *
- * @mixin IdeHelperTag
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $type
- * @property int|null $order_column
- * @property \Carbon\CarbonImmutable $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read mixed $translations
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag containing(string $name, $locale = null)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered(string $direction = 'asc')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereLocale(string $column, string $locale)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereLocales(string $column, array $locales)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withType(?string $type = null)
- */
-	class Tag extends \Eloquent {}
 }
 
 namespace Modules\Cms\Models{
