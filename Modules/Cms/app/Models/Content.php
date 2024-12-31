@@ -6,14 +6,18 @@ use Spatie\Tags\HasTags;
 use Parental\HasChildren;
 use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
+use Illuminate\Support\Carbon;
 use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
+use Awobaz\Compoships\Compoships;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Collection;
 use Modules\Core\Cache\Searchable;
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Helpers\HasValidity;
 use Modules\Core\Helpers\HasVersions;
+use Spatie\EloquentSortable\Sortable;
+use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Models\Pivot\Relatable;
 use Modules\Cms\Models\Pivot\Authorable;
@@ -33,18 +37,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * @mixin IdeHelperContent
  */
-class Content extends Model implements HasMedia
+class Content extends Model implements HasMedia, Sortable
 {
-	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable {
+	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable, Compoships/*, HasApprovals*/ {
 		prepareElasticDocument as protected prepareElasticDocumentTrait;
 		getRules as protected getRulesTrait;
+		Compoships::hasMany insteadof HasChildren;
+		Compoships::belongsTo insteadof HasChildren;
 	}
 
-	protected $fillable = ['valid_from', 'valid_to', 'preset_id', 'entity_id', 'components'];
+	protected $fillable = ['valid_from', 'valid_to', 'preset_id', 'entity_id'/*, 'components'*/];
 
-	protected $with = ['entity', 'authors'];
+	protected $with = ['entity', 'authors', 'categories', 'categories.ancestors'];
 
-	protected $hidden = ['preset_id', 'entity_id', 'created_at', 'updated_at', 'deleted_at', 'entity', 'components'];
+	protected $hidden = ['preset_id', 'entity_id', 'created_at', 'updated_at', 'deleted_at', 'entity', 'components', 'preset', 'withCaching', 'withoutObjectCaching'];
 
 	protected $childColumn = 'entity_id';
 
@@ -53,7 +59,13 @@ class Content extends Model implements HasMedia
 		'sort_when_creating' => true,
 	];
 
-	protected $appends = ['values'];
+	protected $attributes = [
+		'components' => '{}',
+	];
+
+	public static array $childTypes = [];
+
+	// protected $embed = ['components'];
 
 	protected function casts(): array
 	{
@@ -68,21 +80,7 @@ class Content extends Model implements HasMedia
 
 	protected function getChildTypes(): array
 	{
-		$child_types = [];
-		foreach (static::getAvailableEntities() as $entity) {
-			$class_name = Str::studly($entity->name);
-			$full_class_name = 'CMS\\Models\\Contents\\' . $class_name;
-			if (!class_exists($full_class_name)) {
-				$full_class_name = 'CMS_Content' . $class_name;
-				if (!class_exists($full_class_name)) {
-					eval("class {$full_class_name} extends \App\Models\Content {
-							use Parental\HasParent;
-						}");
-				}
-			}
-			$child_types[$entity->id] = $full_class_name;
-		}
-		return $child_types;
+		return static::$childTypes;
 	}
 
 	public function __construct(array $attributes = [])
@@ -90,162 +88,42 @@ class Content extends Model implements HasMedia
 		parent::__construct($attributes);
 
 		if (static::class !== Content::class && !$this->entity_id) {
-			$this->entity()->associate(static::getAvailableEntities()->firstWhere('name', Str::snake(class_basename($this::class))));
-		}
-	}
-
-	#[\Override]
-	protected static function boot()
-	{
-		parent::boot();
-
-		// static::addGlobalScope('always_with_entity', function (Builder $builder) {
-		// 	$builder->with('entity');
-		// });
-
-		static::addGlobalScope('ordered', function (Builder $builder) {
-			$builder->ordered('asc')->orderBy('valid_from', 'desc')->orderBy('created_at', 'desc');
-			if (request()?->is('api/*')) {
-				$builder->with('all_related');
-			}
-		});
-
-		static::saving(function ($content) {
-			if ($content->preset_id) {
-				$preset = Preset::find($content->preset_id, ['entity_id']);
-				if ($content->entity_id && $content->entity_id !== $preset->entity_id) {
-					throw new \UnexpectedValueException("Entity mismatch: {$content->entity->name} is not compatible with {$preset->name}");
-				}
-				$content->entity_id = $preset->entity_id;
-			}
-		});
-	}
-
-	protected function name(): Attribute
-	{
-		return Attribute::make(
-			get: function () {
-				$field = $this->preset?->fields()->firstWhere('is_slug', true);
-				return $field ? $this->values->{$field->name} : '';
-			},
-		);
-	}
-
-	// /**
-	//  * 
-	//  * @return string
-	//  */
-	// public function getNameAttribute(): string
-	// {
-	// 	$field = $this->preset?->fields()->firstWhere('is_slug', true);
-	// 	return $field ? $this->values->{$field->name} : '';
-	// }
-
-	protected function values(): Attribute
-	{
-		return Attribute::make(
-			get: fn() => (object) $this->fields()->mapWithKeys(function (Field $field) {
-				$components = (object) $this->components;
-				return [$field->name => property_exists($components, $field->name) ? $components->{$field->name} : $field->default ?? null];
-			}),
-			set: fn(array|object $values) => (object) $this->fields()->mapWithKeys(function (Field $field) use ($values) {
-				return [$field->name => data_get($values, $field->name) ?? $field->default ?? null];
-			}),
-		);
-	}
-
-	private function fields(): Collection
-	{
-		return $this->preset?->fields ?? collect();
-	}
-
-	public function entity(): BelongsTo
-	{
-		return $this->belongsTo(Entity::class)->select(['id', 'name', 'slug'])->withTrashed();
-	}
-
-	/**
-	 * The folders that belong to the content.
-	 */
-	public function categories(): BelongsToMany
-	{
-		return $this->belongsToMany(Category::class, 'categorizables')->using(Categorizable::class)->withTimestamps()->where('entity_id', $this->entity_id);
-	}
-
-	/**
-	 * The author that belongs to the content.
-	 */
-	public function authors(): BelongsToMany
-	{
-		return $this->belongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
-	}
-
-	/**
-	 * @return BelongsTo<Preset>
-	 */
-	public function preset(): BelongsTo
-	{
-		return $this->belongsTo(Preset::class)->withTrashed()->where('entity_id', $this->entity_id);
-	}
-
-	public function related(?Entity $entity = null): BelongsToMany
-	{
-		$relation = $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
-		if ($entity) {
-			$relation->where('entity_id', $entity->id);
-		}
-		return $relation;
-	}
-
-	protected function all_related(?Entity $entity = null): BelongsToMany
-	{
-		return $this->related($entity)->orWhere(function ($query) use ($entity) {
-			$query->where('related_content_id', $this->id);
+			$entity = Cache::rememberForever((new Entity())->getCacheKey(), fn() => Entity::withoutGlobalScopes()->get())->firstWhere('name', Str::snake(class_basename($this::class)));
 			if ($entity) {
-				$query->where('entity_id', $entity->id);
+				$this->entity()->associate($entity);
+				$this->entity_id = $entity?->id;
+				$preset = Cache::rememberForever((new Preset())->getCacheKey(), fn() => Preset::withoutGlobalScopes()->get())->firstWhere('entity_id', $entity->id);
+				if ($preset) {
+					$this->preset()->associate($preset);
+					$this->preset_id = $preset?->id;
+				}
 			}
-		});
-	}
-
-	protected static function getAvailableEntities(): Collection
-	{
-		$cachedEntities = Cache::forever((new Entity())->getCacheKey(), Entity::all());
-		if (is_iterable($cachedEntities)) {
-			return collect($cachedEntities);
 		}
-		return collect();
-	}
-
-	protected function prepareElasticDocument(): array
-	{
-		$document = $this->prepareElasticDocumentTrait();
-		$document['author_id'] = $this->author_id;
-		$document['author_name'] = $this->author->name;
-		$document['model_type_id'] = $this->model_type->id;
-
-		return $document;
 	}
 
 	#[\Override]
 	public function __get($key)
 	{
-		$value = parent::__get($key);
-		if ($value == null) {
-			return $value;
-		}
-
-		return data_get($this->values, $key);
+		$components = $this->getComponentsAttribute();
+		return array_key_exists($key, $components)
+			? data_get($components, $key)
+			: parent::__get($key);
 	}
 
 	#[\Override]
 	public function __set($key, $value)
 	{
-		if (array_key_exists($key, $this->attributes)) {
-			parent::__set($key, $value);
+		$components = $this->getComponentsAttribute();
+		if (array_key_exists($key, $components)) {
+			$components[$key] = $value;
+			$this->setComponentsAttribute($components);
 			return;
 		}
-		if (array_key_exists($key, $this->values)) {
-			data_set($this->values, $key, $value);
+
+		parent::__set($key, $value);
+
+		if ($key === 'preset_id' && $value) {
+			$this->entity_id = $this->preset?->entity_id;
 		}
 	}
 
@@ -253,90 +131,45 @@ class Content extends Model implements HasMedia
 	public function toArray(): array
 	{
 		$content = parent::toArray();
-		if (isset($content['values'])) {
-			$values = $content['values'];
-			unset($content['values']);
-			$content = array_merge($content, $values);
-		} else if (isset($this->values)) {
-			$content = array_merge($content, $this->values->toArray());
+		if (isset($content['components'])) {
+			$components = $content['components'];
+			unset($content['components']);
+			$content = array_merge($content, $components);
+		} else {
+			$content = array_merge($content, $this->getComponentsAttribute());
 		}
 
 		return $content;
 	}
 
-	public function registerMediaCollections(): void
+	#[\Override]
+	protected static function boot()
 	{
-		$this->addMediaCollection('cover')->singleFile();
-		$this->addMediaCollection('images');
-		$this->addMediaCollection('videos')
-			->extractVideoFrameAtSecond(2);
-		$this->addMediaCollection('audios');
-		$this->addMediaCollection('files');
-	}
+		parent::boot();
 
+		static::addGlobalScope('multi_ordered', function (Builder $builder) {
+			$builder->ordered('asc')->orderBy('valid_from', 'desc')->orderBy('contents.created_at', 'desc');
+		});
 
-	public function registerMediaConversions(?Media $media = null): void
-	{
-		$this->addMediaConversion('thumb')
-			->performOnCollections('images', 'videos', 'cover')
-			->width(300)
-			->height(300)
-			->sharpen(10)
-			->fit(Fit::Fill, 300, 300);
-	}
-
-	protected function cover(): Attribute
-	{
-		return Attribute::make(
-			get: fn() => $this->getFirstMediaUrl('cover'),
-			set: fn($value) => $this->addMedia($value)->toMediaCollection('cover'),
-		);
-	}
-
-	public function getRules()
-	{
-		$fields = [];
-		foreach ($this->fields() as $field) {
-			$rule = $field->type->getRule();
-			if ($field->required) {
-				$rule .= '|required';
+		static::saving(function ($content) {
+			if ($content->preset) {
+				$content->preset_id = $content->preset->id;
 			}
-			if (isset($field->options->min)) {
-				$rule .= '|min:' . $field->options->min;
+
+			if ($content->preset) {
+				if ($content->entity_id && $content->entity_id !== $content->preset->entity_id) {
+					throw new \UnexpectedValueException("Entity mismatch: {$content->entity->name} is not compatible with {$content->preset->name}");
+				}
+				$content->entity_id = $content->preset->entity_id;
 			}
-			if (isset($field->options->max)) {
-				$rule .= '|max:' . $field->options->max;
-			}
-			$fields['values.' . $field->name] = trim($rule, '|');
-		}
-
-		$rules = $this->getRulesTrait();
-		$rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
-			'values' => 'required',
-			'entity_id' => 'required|exists:entities,id',
-			'preset_id' => 'required|exists:presets,id',
-		]);
-		return $rules;
+		});
 	}
 
-	public function isPublished(): bool
-	{
-		return $this->valid_from <= now() && ($this->valid_to === null || $this->valid_to >= now());
-	}
+	#region Scopes
 
-	public function isExpired(): bool
+	protected function scopeForEntity(Builder $query, Entity $entity): Builder
 	{
-		return $this->valid_to !== null && $this->valid_to < now();
-	}
-
-	public function isDraft(): bool
-	{
-		return $this->valid_from === null;
-	}
-
-	public function isScheduled(): bool
-	{
-		return $this->valid_from !== null && $this->valid_from > now();
+		return $query->where('entity_id', $entity->id);
 	}
 
 	public function scopePublished(Builder $query): Builder
@@ -361,6 +194,157 @@ class Content extends Model implements HasMedia
 		return $query->whereNotNull('valid_from')->where('valid_from', '>', now());
 	}
 
+	#endregion
+
+	#region Attributes
+
+	protected function name(): Attribute
+	{
+		return Attribute::make(
+			get: function () {
+				$field = $this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true);
+				return $field ? data_get($this->getComponentsAttribute(), $field->name) : '';
+			},
+		);
+	}
+
+	protected function cover(): Attribute
+	{
+		return Attribute::make(
+			get: fn() => $this->getFirstMediaUrl('cover'),
+			set: fn($value) => $this->addMedia($value)->toMediaCollection('cover'),
+		);
+	}
+
+	protected function getComponentsAttribute(): array
+	{
+		return $this->mergeComponentsValues(json_decode($this->attributes['components'], true));
+	}
+
+	protected function setComponentsAttribute(array $components): void
+	{
+		$this->attributes['components'] = json_encode($this->mergeComponentsValues($components));
+	}
+
+	private function mergeComponentsValues(array $components): array
+	{
+		return $this->fields()->mapWithKeys(function (Field $field) use ($components) {
+			return [$field->name => data_get($components, $field->name) ?? $field->default];
+		})->toArray();
+	}
+
+	#endregion
+
+	#region Relations
+
+	private function fields(): Collection
+	{
+		return $this->preset?->fields ?? collect();
+	}
+
+	public function entity(): BelongsTo
+	{
+		return $this->belongsTo(Entity::class)->select(['id', 'name', 'slug'])->withTrashed();
+	}
+
+	/**
+	 * The folders that belong to the content.
+	 */
+	public function categories(): BelongsToMany
+	{
+		return $this->belongsToMany(Category::class, 'categorizables', ['content_id', 'entity_id'], ['id', 'entity_id'])->using(Categorizable::class)->withTimestamps();
+	}
+
+	/**
+	 * The author that belongs to the content.
+	 */
+	public function authors(): BelongsToMany
+	{
+		return $this->belongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
+	}
+
+	/**
+	 * @return BelongsTo<Preset>
+	 */
+	public function preset(): BelongsTo
+	{
+		return $this->belongsTo(Preset::class, ['preset_id', 'entity_id'], ['id', 'entity_id'])->withTrashed();
+	}
+
+	public function related(?bool $withInverse = false): BelongsToMany
+	{
+		$relation = $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		if ($withInverse) {
+			$relation->orWhere(fn($query) => $query->where('related_content_id', $this->id));
+		}
+		return $relation;
+	}
+
+	#endregion
+
+	protected function prepareElasticDocument(): array
+	{
+		$document = $this->prepareElasticDocumentTrait();
+		$document['authors'] = $this->authors->pluck('name')->toArray();
+		$document['authors_id'] = $this->authors->pluck('id')->toArray();
+		$document['preset'] = $this->preset->name;
+		$document['entity'] = $this->entity->name;
+		$document['categories'] = $this->categories->pluck('name')->toArray();
+		$document['categories_id'] = $this->categories->pluck('id')->toArray();
+		$document['tags'] = $this->tags->pluck('name')->toArray();
+		$document['tags_id'] = $this->tags->pluck('id')->toArray();
+
+		return $document;
+	}
+
+	public function registerMediaCollections(): void
+	{
+		$this->addMediaCollection('cover')->singleFile();
+		$this->addMediaCollection('images');
+		$this->addMediaCollection('videos')
+			->extractVideoFrameAtSecond(2);
+		$this->addMediaCollection('audios');
+		$this->addMediaCollection('files');
+	}
+
+
+	public function registerMediaConversions(?Media $media = null): void
+	{
+		$this->addMediaConversion('thumb')
+			->performOnCollections('images', 'videos', 'cover')
+			->width(300)
+			->height(300)
+			->sharpen(10)
+			->fit(Fit::Fill, 300, 300);
+	}
+
+	public function getRules()
+	{
+		$fields = [];
+		foreach ($this->fields() as $field) {
+			$rule = $field->type->getRule();
+			if ($field->required) {
+				$rule .= '|required';
+			}
+			if (isset($field->options->min)) {
+				$rule .= '|min:' . $field->options->min;
+			}
+			if (isset($field->options->max)) {
+				$rule .= '|max:' . $field->options->max;
+			}
+			$fields[/*'values.' . */$field->name] = trim($rule, '|');
+		}
+
+		$rules = $this->getRulesTrait();
+		$rules[static::DEFAULT_RULE] = array_merge($rules[static::DEFAULT_RULE], [
+			// 'values' => 'required',
+			...$fields,
+			'entity_id' => 'required|exists:entities,id',
+			'preset_id' => 'required|exists:presets,id',
+		]);
+		return $rules;
+	}
+
 	public function getPrefix(): string
 	{
 		return $this->entity->slug;
@@ -369,5 +353,55 @@ class Content extends Model implements HasMedia
 	public function getPath(): ?string
 	{
 		return $this->categories()->first()?->getPath();
+	}
+
+	public function isPublished(): bool
+	{
+		return $this->valid_from <= now() && ($this->valid_to === null || $this->valid_to >= now());
+	}
+
+	public function isExpired(): bool
+	{
+		return $this->valid_to !== null && $this->valid_to < now();
+	}
+
+	public function isDraft(): bool
+	{
+		return $this->valid_from === null;
+	}
+
+	public function isScheduled(): bool
+	{
+		return $this->valid_from !== null && $this->valid_from > now();
+	}
+
+	/**
+	 * Publish the content.
+	 * @param null|Carbon $valid_from 
+	 * @param null|Carbon $valid_to 
+	 * @return void 
+	 */
+	public function publish(?Carbon $valid_from = null, ?Carbon $valid_to = null): void
+	{
+		$valid_from = $valid_from ?? now();
+		if ($valid_to) {
+			$min = min($valid_from, $valid_to);
+			$max = max($valid_from, $valid_to);
+			$valid_from = $min;
+			$valid_to = $max;
+		}
+
+		$this->valid_from = $valid_from;
+		$this->valid_to = $valid_to;
+	}
+
+	/**
+	 * Unpublish the content.
+	 * @return void 
+	 */
+	public function unpublish(): void
+	{
+		$this->valid_from = null;
+		$this->valid_to = null;
 	}
 }

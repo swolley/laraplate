@@ -3,13 +3,14 @@
 namespace Modules\Cms\Models\Pivot;
 
 use Modules\Core\Helpers\HasVersions;
+use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @mixin IdeHelperFieldable
  */
-class Fieldable extends Pivot
+class Fieldable extends Pivot implements Sortable
 {
 	use HasVersions, SortableTrait;
 

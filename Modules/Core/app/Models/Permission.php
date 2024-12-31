@@ -31,6 +31,12 @@ class Permission extends ModelsPermission
         'guard_name',
     ];
 
+    protected $guarded = [
+        'id',
+        'connection_name',
+        'table_name',
+    ];
+
     /**
      * @var string[]
      *

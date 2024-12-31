@@ -67,7 +67,7 @@ class Author extends Model
         return $this->belongsTo(user_class());
     }
 
-    public function owns(): BelongsToMany
+    public function contents(): BelongsToMany
     {
         return $this->belongsToMany(Content::class, 'authorables')->using(Authorable::class)->withTimestamps();
     }

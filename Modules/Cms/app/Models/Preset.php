@@ -2,10 +2,12 @@
 
 namespace Modules\Cms\Models;
 
+use Modules\Core\Cache\HasCache;
+use Awobaz\Compoships\Compoships;
 use Modules\Core\Helpers\HasVersions;
+// use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\Builder;
 use Modules\Cms\Models\Pivot\Fieldable;
 use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Preset extends Model
 {
-    use HasFactory, SoftDeletes, HasApprovals, HasVersions, HasValidations {
+    use HasFactory, SoftDeletes, /*HasApprovals,*/ HasVersions, HasValidations, Compoships, HasCache {
         getRules as protected getRulesTrait;
     }
 
@@ -78,7 +80,7 @@ class Preset extends Model
 
     public function contents(): HasMany
     {
-        return $this->hasMany(Content::class);
+        return $this->hasMany(Content::class, ['preset_id', 'entity_id'], ['id', 'entity_id']);
     }
 
     public function fields(): BelongsToMany

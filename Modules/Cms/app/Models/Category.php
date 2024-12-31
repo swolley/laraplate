@@ -4,8 +4,10 @@ namespace Modules\Cms\Models;
 
 use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
+use Awobaz\Compoships\Compoships;
 use Modules\Core\Helpers\HasValidity;
 use Modules\Core\Helpers\HasVersions;
+use Spatie\EloquentSortable\Sortable;
 use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasValidations;
@@ -21,11 +23,12 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 /**
  * @mixin IdeHelperCategory
  */
-class Category extends Model
+class Category extends Model implements Sortable
 {
-    use HasFactory, HasRecursiveRelationships, SoftDeletes, HasValidity, HasApprovals, HasVersions, SortableTrait, HasSlug, HasPath, HasValidations {
+    use HasFactory, HasRecursiveRelationships, SoftDeletes, HasValidity, /*HasApprovals,*/ HasVersions, SortableTrait, HasSlug, HasPath, HasValidations, Compoships {
         getRules as protected getRulesTrait;
         getFullPath as protected getFullPathTrait;
+        HasRecursiveRelationships::newBaseQueryBuilder insteadof Compoships;
     }
 
     /**
@@ -73,7 +76,7 @@ class Category extends Model
 
     public function contents(): BelongsToMany
     {
-        return $this->belongsToMany(Content::class, 'categorizables')->using(Categorizable::class)->withTimestamps();
+        return $this->belongsToMany(Content::class, 'categorizables', ['category_id', 'entity_id'], ['id', 'entity_id'])->using(Categorizable::class)->withTimestamps();
     }
 
     public function getRules(): array

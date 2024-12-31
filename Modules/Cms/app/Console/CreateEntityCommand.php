@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
 use Modules\Core\Helpers\HasCommandUtils;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 // use Symfony\Component\Console\Input\InputOption;
 // use Symfony\Component\Console\Input\InputArgument;
 
@@ -23,7 +25,7 @@ class CreateEntityCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'cms:create-entity';
+    protected $signature = 'cms:create-entity {entity?} {--content-model}';
 
     /**
      * The console command description.
@@ -42,7 +44,11 @@ class CreateEntityCommand extends Command
             /** @var Collection<int, Field> $all_fields */
             $all_fields = Field::query()->get()->keyBy('id');
 
+            if ($this->argument('entity')) {
+                $entity->name = $this->argument('entity');
+            }
             foreach ($fillables as $attribute) {
+                if ($attribute === 'name' && $entity->name) continue;
                 $entity->{$attribute} = text(ucfirst($attribute), '', $attribute === 'slug' ? Str::slug($entity->name) : '', true, fn(string $value) => $this->validationCallback($attribute, $value, $validations));
             }
 
@@ -61,6 +67,10 @@ class CreateEntityCommand extends Command
                 $field = $all_fields->get($field);
                 $is_required = confirm("Do you want '{$field['name']}' to be required?", false);
                 $this->assignFieldToPreset($preset, $field, $is_required);
+            }
+
+            if ($this->option('content-model') || confirm("Do you want to create a content model file for this entity?", false)) {
+                $this->call('cms:make-content-model', ['entity' => $entity->name]);
             }
 
             $this->info("Entity '{$entity->name}' created");
@@ -104,20 +114,20 @@ class CreateEntityCommand extends Command
     /**
      * Get the console command arguments.
      */
-    // protected function getArguments(): array
-    // {
-    //     return [
-    //         ['example', InputArgument::REQUIRED, 'An example argument.'],
-    //     ];
-    // }
+    protected function getArguments(): array
+    {
+        return [
+            ['entity', InputArgument::OPTIONAL, 'The entity name.'],
+        ];
+    }
 
-    // /**
-    //  * Get the console command options.
-    //  */
-    // protected function getOptions(): array
-    // {
-    //     return [
-    //         ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
-    //     ];
-    // }
+    /**
+     * Get the console command options.
+     */
+    protected function getOptions(): array
+    {
+        return [
+            ['content-model', null, InputOption::VALUE_NONE, 'Create a content model file for this entity.', false],
+        ];
+    }
 }

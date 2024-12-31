@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('preset_id')->nullable(false);
             $table->integer('order_column')->nullable();
             $table->json('components')->nullable(false);
+            $table->string('slug')->nullable(false);
             CommonMigrationColumns::timestamps($table, true, true, true, true);
 
             $table->foreign(['entity_id', 'preset_id'], 'contents_preset_FK')

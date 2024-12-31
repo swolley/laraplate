@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Casts\ActionEnum;
 use Approval\Traits\RequiresApproval;
+use Modules\Core\Helpers\HasValidity;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PermissionsRefreshCommand extends Command
@@ -59,6 +60,8 @@ class PermissionsRefreshCommand extends Command
             // ActionEnum::RESTORE,
             ActionEnum::APPROVE,
             // ActionEnum::DISAPPROVE,
+            ActionEnum::PUBLISH,
+            // ActionEnum::UNPUBLISH,
         ];
         $changes = false;
         $all_permissions = [];
@@ -100,7 +103,7 @@ class PermissionsRefreshCommand extends Command
                 if ($permission === ActionEnum::DELETE && !class_uses_trait($model, SoftDeletes::class)) {
                     if (in_array($permission_name, $found_permissions, true) && $permission_class::where('name', $permission_name)->forceDelete()) {
                         if (!$quiet_mode) {
-                            $this->info("Deleted '{$permission_name}' permission");
+                            $this->line("<fg=red>Deleted</> '{$permission_name}' permission");
                         }
                         $changes = true;
                     }
@@ -112,7 +115,19 @@ class PermissionsRefreshCommand extends Command
                 if ($permission === ActionEnum::APPROVE && !class_uses_trait($model, RequiresApproval::class)) {
                     if (in_array($permission_name, $found_permissions, true) && $permission_class::where('name', $permission_name)->forceDelete()) {
                         if (!$quiet_mode) {
-                            $this->info("Deleted '{$permission_name}' permission");
+                            $this->line("<fg=red>Deleted</> '{$permission_name}' permission");
+                        }
+                        $changes = true;
+                    }
+
+                    continue;
+                }
+
+                // permessi di pubblicazione
+                if ($permission === ActionEnum::PUBLISH && !class_uses_trait($model, HasValidity::class)) {
+                    if (in_array($permission_name, $found_permissions, true) && $permission_class::where('name', $permission_name)->forceDelete()) {
+                        if (!$quiet_mode) {
+                            $this->line("<fg=red>Deleted</> '{$permission_name}' permission");
                         }
                         $changes = true;
                     }
@@ -126,16 +141,17 @@ class PermissionsRefreshCommand extends Command
                         $query->restore();
 
                         if (!$quiet_mode) {
-                            $this->info("Restored '{$permission_name}' permission {$new_model_suffix}");
+                            $this->line("<fg=green>Restored</> '{$permission_name}' permission {$new_model_suffix}");
                         }
                         $changes = true;
                     } else {
+
                         $permission_class::create([
                             'name' => $permission_name,
                         ]);
 
                         if (!$quiet_mode) {
-                            $this->info("Created '{$permission_name}' permission {$new_model_suffix}");
+                            $this->line("<fg=green>Created</> '{$permission_name}' permission {$new_model_suffix}");
                         }
                         $changes = true;
                     }
@@ -153,16 +169,16 @@ class PermissionsRefreshCommand extends Command
                         ['name' => $permission_name]
                     );
                     if (!$quiet_mode) {
-                        $this->info("Created '{$permission_name}' permission {$new_model_suffix}");
+                        $this->line("<fg=green>Created</> '{$permission_name}' permission {$new_model_suffix}");
                     }
                     $changes = true;
                 }
             }
         }
 
-        // mappare classi (commentato perché i modelli creati su file system verrebber oeliminati durante un deploy)
+        // mappare classi (commentato perché i modelli creati su file system verrebbero eliminati durante un deploy)
         // Permission::firstOrCreate(['name' => 'map_model'], ['name' => 'map_model']);
-        // sliminare cache di un modello (commentato perché da decidere in che modo renderla fattibile)
+        // eliminare cache di un modello (commentato perché da decidere in che modo renderla fattibile)
         // Permission::firstOrCreate(['name' => 'flush_cache'], ['name' => 'flush_cache']);
 
         $query = $permission_class::whereNotIn('name', $all_permissions);

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Modules\Core\Helpers;
 
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
+// use Modules\Core\Casts\ActionEnum;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Exceptions\InvalidFormatException;
+// use Illuminate\Validation\UnauthorizedException;
 
 trait HasValidity
 {
@@ -35,13 +38,32 @@ trait HasValidity
 
     protected static function bootHasValidity(): void
     {
+        // function check_authorization(Model $model): void
+        // {
+        //     $user = Auth::user();
+        //     if ($user && !$user->hasRole(($model->getConnection() ?? 'default') . '.' . $model->getTable() . '.' . ActionEnum::APPROVE->value)) {
+        //         throw new UnauthorizedException('User ' . $user->name . ' is not authorized to publish the model');
+        //     }
+        // }
+
         static::addGlobalScope('valid', function (Builder $query): void {
             static::withValidityFilter($query, Carbon::today());
         });
+
+        // static::creating(function (Model $model): void {
+        //     if (($model->isDirty($model->validFromKey()) && $model->{$model->validFromKey()} !== null) || ($model->isDirty($model->validToKey()) && $model->{$model->validToKey()} !== null)) {
+        //         check_authorization($model);
+        //     }
+        // });
+        // static::updating(function (Model $model): void {
+        //     if ($model->isDirty($model->validFromKey()) || $model->isDirty($model->validToKey())) {
+        //         check_authorization($model);
+        //     }
+        // });
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected static function withValidityFilter(Builder $query, Carbon $date): Builder
     {
@@ -62,7 +84,7 @@ trait HasValidity
 
     /**
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function scopeValidAt(Builder $query, Carbon $date): void
     {
@@ -70,7 +92,7 @@ trait HasValidity
     }
 
     /**
-     * @throws InvalidFormatException
+     * @throws \InvalidFormatException
      */
     public function isValid(?Carbon $date = null): bool
     {

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name')->nullable(false)->unique();
             $table->string('type')->nullable(false);
             $table->json('options')->nullable(false);
+            $table->boolean('is_slug')->default(false)->nullable(false);
             $table->boolean('is_active')->default(true)->nullable(false);
             CommonMigrationColumns::timestamps($table, true, true);
 

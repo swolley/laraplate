@@ -5,6 +5,7 @@ namespace Modules\Cms\Models;
 use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
 use Modules\Core\Cache\HasCache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Helpers\HasValidations;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Cms\Database\Factories\EntityFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @mixin IdeHelperEntity
@@ -59,9 +61,32 @@ class Entity extends Model
         });
     }
 
+    protected static function booted(): void
+    {
+        static::saved(function (Entity $entity) {
+            Cache::forget((new Preset())->getCacheKey());
+            Cache::forever($entity->getCacheKey(), Entity::query()->withoutGlobalScopes()->get());
+        });
+
+        static::forceDeleted(function (Entity $entity) {
+            Cache::forget((new Preset())->getCacheKey());
+            Cache::forever($entity->getCacheKey(), Entity::query()->withoutGlobalScopes()->get());
+        });
+    }
+
     public function presets(): HasMany
     {
         return $this->hasMany(Preset::class);
+    }
+
+    public function contents(): HasManyThrough
+    {
+        return $this->hasManyThrough(Content::class, Preset::class);
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
     }
 
     public function getRules(): array

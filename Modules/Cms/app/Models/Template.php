@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Template extends Model
 {
-    use HasFactory, HasApprovals, HasVersions, HasValidations {
+    use HasFactory, /*HasApprovals,*/ HasVersions, HasValidations {
         getRules as protected getRulesTrait;
     }
 

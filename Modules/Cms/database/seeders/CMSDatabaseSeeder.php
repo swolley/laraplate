@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Modules\Cms\Database\Seeders;
 
 use Modules\Cms\Models\Field;
+use Modules\Core\Models\Role;
 use Modules\Cms\Models\Entity;
 use Modules\Cms\Models\Preset;
 use Illuminate\Database\Seeder;
 use Modules\Cms\Casts\FieldType;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Casts\ActionEnum;
+use Modules\Core\Models\Permission;
 use Modules\Core\Helpers\HasSeedersUtils;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -39,6 +42,7 @@ class CMSDatabaseSeeder extends Seeder
     {
         $this->createDefaultFields();
         $this->createDefaultEntities();
+        $this->createDefaultRoles();
     }
 
     private function createDefaultFields(): void
@@ -53,7 +57,7 @@ class CMSDatabaseSeeder extends Seeder
                 if (!$this->fields->has($field)) {
                     $options = (object) ['max_length' => 255];
                     $this->fields->put($field, $this->create(Field::class, ['name' => $field, 'type' => FieldType::TEXT, 'options' => $options]));
-                    $this->command->line("    - $field created");
+                    $this->command->line("    - $field <fg=green>created</>");
                 } else {
                     $this->command->line("    - $field already exists");
                 }
@@ -64,7 +68,7 @@ class CMSDatabaseSeeder extends Seeder
                 if (!$this->fields->has($field)) {
                     $options = (object) ['max_length' => 65535];
                     $this->fields->put($field, $this->create(Field::class, ['name' => $field, 'type' => FieldType::TEXTAREA, 'options' => $options]));
-                    $this->command->line("    - $field created");
+                    $this->command->line("    - $field <fg=green>created</>");
                 } else {
                     $this->command->line("    - $field already exists");
                 }
@@ -75,7 +79,7 @@ class CMSDatabaseSeeder extends Seeder
                 if (!$this->fields->has($field)) {
                     $options = new \stdClass();
                     $this->fields->put($field, $this->create(Field::class, ['name' => $field, 'type' => FieldType::JSON, 'options' => $options]));
-                    $this->command->line("    - $field created");
+                    $this->command->line("    - $field <fg=green>created</>");
                 } else {
                     $this->command->line("    - $field already exists");
                 }
@@ -86,7 +90,7 @@ class CMSDatabaseSeeder extends Seeder
                 if (!$this->fields->has($field)) {
                     $options = (object) ['format' => 'Y-m-d H:i:s'];
                     $this->fields->put($field, $this->create(Field::class, ['name' => $field, 'type' => FieldType::DATETIME, 'options' => $options]));
-                    $this->command->line("    - $field created");
+                    $this->command->line("    - $field <fg=green>created</>");
                 } else {
                     $this->command->line("    - $field already exists");
                 }
@@ -122,7 +126,7 @@ class CMSDatabaseSeeder extends Seeder
                     $this->assignFieldToPreset($preset, $field, false);
                 }
 
-                $this->command->line("    - $entity_name created");
+                $this->command->line("    - $entity_name <fg=green>created</>");
             } else {
                 $this->command->line("    - $entity_name already exists");
             }
@@ -145,7 +149,7 @@ class CMSDatabaseSeeder extends Seeder
                     $this->assignFieldToPreset($preset, $field, false);
                 }
 
-                $this->command->line("    - $entity_name created");
+                $this->command->line("    - $entity_name <fg=green>created</>");
             } else {
                 $this->command->line("    - $entity_name already exists");
             }
@@ -168,11 +172,25 @@ class CMSDatabaseSeeder extends Seeder
                     $this->assignFieldToPreset($preset, $field, false);
                 }
 
-                $this->command->line("    - $entity_name created");
+                $this->command->line("    - $entity_name <fg=green>created</>");
             } else {
                 $this->command->line("    - $entity_name already exists");
             }
         });
+    }
+
+    private function createDefaultRoles(): void
+    {
+        $this->logOperation(Role::class);
+
+        $name = 'publisher';
+        if (!Role::whereName($name)->exists()) {
+            $role = $this->create(Role::class, ['name' => $name]);
+            $role->givePermissionTo(Permission::where('name', 'like', '%.' . ActionEnum::APPROVE->value)->get());
+            $this->command->line("    - $name <fg=green>created</>");
+        } else {
+            $this->command->line("    - $name already exists");
+        }
     }
 
     private function assignFieldToPreset(Preset $preset, Field $field, bool $is_required): void

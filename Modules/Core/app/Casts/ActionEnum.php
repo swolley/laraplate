@@ -14,6 +14,8 @@ enum ActionEnum: string
     case FORCE_DELETE = 'forceDelete';
     case APPROVE = 'approve';
         // case DISAPPROVE = 'disapprove';
+    case PUBLISH = 'publish';
+        // case UNPUBLISH = 'unpublish';
     case IMPERSONATE = 'impersonate';
     case LOCK = 'lock';
     // case UNLOCK = 'unlock';

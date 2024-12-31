@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * @property-read object $options
  * @mixin IdeHelperField
  */
 class Field extends Model
