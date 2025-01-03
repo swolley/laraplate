@@ -29627,7 +29627,7 @@ if (!function_exists('controllers')) {
             foreach ($controllers_files as $controller_file) {
                 $name = $controller_file->getFilenameWithoutExtension();
 
-                if ($name !== 'Controller' && mb_strpos($name, 'Abstract') === false) {
+                if ($name !== 'Controller' && !Str::contains($name, 'Abstract')) {
                     $controllers[] = $namespace . $name;
                 }
             }

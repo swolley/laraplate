@@ -4,8 +4,9 @@ namespace Modules\Cms\Models;
 
 use Modules\Core\Cache\HasCache;
 use Awobaz\Compoships\Compoships;
-use Modules\Core\Helpers\HasVersions;
+use Illuminate\Support\Facades\Cache;
 // use Illuminate\Database\Eloquent\Builder;
+use Modules\Core\Helpers\HasVersions;
 use Modules\Core\Helpers\HasApprovals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Models\Pivot\Fieldable;
@@ -64,6 +65,19 @@ class Preset extends Model
     //         }
     //     });
     // }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Preset $preset) {
+            Cache::forget($preset->getCacheKey());
+            Content::$all_presets = null;
+        });
+
+        static::forceDeleted(function (Preset $preset) {
+            Cache::forget($preset->getCacheKey());
+            Content::$all_presets = null;
+        });
+    }
 
     /**
      * @return BelongsTo<Template>

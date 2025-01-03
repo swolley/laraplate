@@ -65,12 +65,12 @@ class Entity extends Model
     {
         static::saved(function (Entity $entity) {
             Cache::forget((new Preset())->getCacheKey());
-            Cache::forever($entity->getCacheKey(), Entity::query()->withoutGlobalScopes()->get());
+            Content::resolveChildTypes();
         });
 
         static::forceDeleted(function (Entity $entity) {
             Cache::forget((new Preset())->getCacheKey());
-            Cache::forever($entity->getCacheKey(), Entity::query()->withoutGlobalScopes()->get());
+            Content::resolveChildTypes();
         });
     }
 

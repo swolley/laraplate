@@ -105,7 +105,7 @@ class DocsController extends OpenApiJsonController
                     return Str::contains($k, $version) || !Str::contains($k, '/api/');
                 }, ARRAY_FILTER_USE_KEY);
 
-                if (mb_strpos($short_name, 'App') === 0) {
+                if (Str::startsWith($short_name, 'App')) {
                     $main_json = $json;
                 } elseif (in_array(str_replace([$assets, '-swagger.json'], '', $file), $modules, true)) {
                     $additionalPaths = array_merge($additionalPaths, array_filter($json['paths'], fn(string $k) => Str::contains($k, $version) || !Str::contains($k, '/api/'), ARRAY_FILTER_USE_KEY));

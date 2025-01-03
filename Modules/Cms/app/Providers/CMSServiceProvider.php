@@ -44,19 +44,7 @@ class CMSServiceProvider extends ServiceProvider
         if ($entities->isEmpty()) {
             $entities = Entity::query()->withoutGlobalScopes()->get();
             Cache::forever($entity_cache_key, $entities);
-        }
-
-        foreach ($entities as $entity) {
-            if (isset(Content::$childTypes[$entity->id])) continue;
-
-            $class_name = Str::studly($entity->name);
-            $full_class_name = 'Modules\\Cms\\Models\\Contents\\' . $class_name;
-            if (!class_exists($full_class_name)) {
-                $class_definition = file_get_contents(module_path('Cms', 'stubs/content.stub'));
-                $class_definition = str_replace(['$CLASS$', '<?php'], [$class_name, ''], $class_definition);
-                eval($class_definition);
-            }
-            Content::$childTypes[$entity->id] = $full_class_name;
+            Content::resolveChildTypes($entities);
         }
     }
 

@@ -185,7 +185,7 @@ final class DynamicEntity extends Model
         } elseif ($first_column = $primaryKeyColumns->first()) {
             $this->primaryKey = $first_column->name;
             $this->incrementing = $first_column->autoincrement;
-            $this->keyType = $first_column->type->value && mb_strpos($first_column->type->value, 'int') === false ? 'string' : 'int';
+            $this->keyType = $first_column->type->value && !Str::contains($first_column->type->value, 'int') ? 'string' : 'int';
         }
     }
 
@@ -230,7 +230,7 @@ final class DynamicEntity extends Model
         }
 
         // set correct cast
-        $is_date = $column->type->value && mb_strpos($column->type->value, 'date') !== false;
+        $is_date = $column->type->value && Str::contains($column->type->value, 'date');
 
         $this->_casts[$column->name] = $column->type->value;
 

@@ -113,7 +113,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
         $short_name = ModelMakeCommand::stripModelsNamespace($className);
 
         /** @var int $pos */
-        $pos = mb_strpos($classCode, 'class ' . $short_name);
+        $pos = Str::position($classCode, 'class ' . $short_name);
 
         /** @var string $classCode */
         $classCode = Str::substrReplace($classCode, "/**\n */\n", $pos, 0);
@@ -237,7 +237,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
 
                     foreach ($class->getAppends() as $append) {
                         $type = $casts[$append] ?? 'text';
-                        $nullable = isset($found_rules[$append]) ? (gettype($found_rules[$append]) === 'string' ? mb_strpos($found_rules[$append], 'required') !== false : in_array('required', $found_rules[$append], true)) : true;
+                        $nullable = isset($found_rules[$append]) ? (gettype($found_rules[$append]) === 'string' ? Str::contains($found_rules[$append], 'required') : in_array('required', $found_rules[$append], true)) : true;
                         $method_subfix = Str::studly($append) . 'Attribute';
 
                         if (method_exists($class, 'get' . $method_subfix)) {
@@ -558,10 +558,10 @@ class ModelMakeCommand extends BaseModelMakeCommand
     private function addNewPropertyAnnotation(string $className, string $classCode, string $fieldName, string $fieldType, bool $fieldNullable): array|string
     {
         /** @var int $pos */
-        $pos = mb_strpos($classCode, 'class ' . ModelMakeCommand::stripModelsNamespace($className));
+        $pos = Str::position($classCode, 'class ' . ModelMakeCommand::stripModelsNamespace($className));
 
         /** @var int $pos */
-        $pos = mb_strpos($classCode, ' */', $pos - 20);
+        $pos = Str::position($classCode, ' */', $pos - 20);
 
         return Str::substrReplace($classCode, sprintf("\n * @property %s $%s\n", $this->getCodeTypeFromCast($fieldType) . ($fieldNullable ? '|null' : ''), $fieldName), $pos, 0);
     }
@@ -574,13 +574,13 @@ class ModelMakeCommand extends BaseModelMakeCommand
     private function addPropertyIntoFillables(string $classCode, string $fieldName): array|string
     {
         $search = 'protected $fillable = [';
-        $pos = mb_strpos($classCode, $search);
+        $pos = Str::position($classCode, $search);
 
         if ($pos !== false) {
             $needs_newline = $classCode[$pos + mb_strlen($search)] === ']';
 
             /** @var int $pos */
-            $pos = mb_strpos($classCode, '];', $pos);
+            $pos = Str::position($classCode, '];', $pos);
             $classCode = Str::substrReplace($classCode, sprintf("%s\t'%s',\n\t", $needs_newline ? "\n" : '', $fieldName), $pos, 0);
         }
 
@@ -595,13 +595,13 @@ class ModelMakeCommand extends BaseModelMakeCommand
     private function addPropertyIntoHidden(string $classCode, string $fieldName): array|string
     {
         $search = 'protected $hidden = [';
-        $pos = mb_strpos($classCode, $search);
+        $pos = Str::position($classCode, $search);
 
         if ($pos !== false) {
             $needs_newline = $classCode[$pos + mb_strlen($search)] === ']';
 
             /** @var int $pos */
-            $pos = mb_strpos($classCode, '];', $pos);
+            $pos = Str::position($classCode, '];', $pos);
             $classCode = Str::substrReplace($classCode, sprintf("%s\t'%s',\n\t", $needs_newline ? "\n" : '', $fieldName), $pos, 0);
         }
 
@@ -611,13 +611,13 @@ class ModelMakeCommand extends BaseModelMakeCommand
     private function addPropertyIntoCasts(string $classCode, string $fieldName, string $fieldType): string
     {
         $search = 'protected $casts = [';
-        $pos = mb_strpos($classCode, $search);
+        $pos = Str::position($classCode, $search);
 
         if ($pos !== false) {
             $needs_newline = $classCode[$pos + mb_strlen($search)] === ']';
 
             /** @var int $pos */
-            $pos = mb_strpos($classCode, '];', $pos);
+            $pos = Str::position($classCode, '];', $pos);
 
             /** @var string $pos */
             $classCode = Str::substrReplace($classCode, sprintf("%s\t'%s' => '%s',\n\t", $needs_newline ? "\n" : '', $fieldName, $fieldType), $pos, 0);
@@ -631,7 +631,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
     private function addPropertyIntoValidations(string $classCode, string $fieldName, string $fieldType, bool $fieldNullable): string
     {
         $search = 'public $rules = [';
-        $pos = mb_strpos($classCode, $search);
+        $pos = Str::position($classCode, $search);
 
         if ($pos !== false) {
             $needs_newline = $classCode[$pos + mb_strlen($search)] === ']';
@@ -645,14 +645,14 @@ class ModelMakeCommand extends BaseModelMakeCommand
             }
 
             /** @var int $pos */
-            $pos = mb_strpos($classCode, "'always' => [", $pos);
+            $pos = Str::position($classCode, "'always' => [", $pos);
             $needs_newline = $classCode[$pos + mb_strlen($search)] === ']';
 
             /** @var int $pos */
-            $pos = mb_strpos($classCode, '];', $pos);
+            $pos = Str::position($classCode, '];', $pos);
 
             /** @var string $classCode */
-            $classCode = Str::substrReplace($classCode, sprintf("%s\t'%s' => '%s%s',\n\t", $needs_newline ? "\n" : '', $fieldName, mb_strpos($fieldType, 'date') === 0 ? 'date' : $fieldType, !$fieldNullable ? '|required' : ''), $pos, 0);
+            $classCode = Str::substrReplace($classCode, sprintf("%s\t'%s' => '%s%s',\n\t", $needs_newline ? "\n" : '', $fieldName, Str::startsWith($fieldType, 'date') ? 'date' : $fieldType, !$fieldNullable ? '|required' : ''), $pos, 0);
         } else {
             $classCode = $this->injectCodeAtTheEnd($classCode, sprintf("\n%s\n\t\t'%s' => '%s%s',\n\t];", $search, $fieldName, $fieldType, !$fieldNullable ? '|required' : ''));
         }
@@ -664,10 +664,10 @@ class ModelMakeCommand extends BaseModelMakeCommand
     {
         $added_import = false;
         $search = "use {$importName};";
-        $relation_import_pos = mb_strpos($classCode, $search);
+        $relation_import_pos = Str::position($classCode, $search);
 
         if ($relation_import_pos === false) {
-            $relation_import_pos = mb_strpos($classCode, 'use ');
+            $relation_import_pos = Str::position($classCode, 'use ');
 
             if ($relation_import_pos !== false) {
                 /** @var string $classCode */
@@ -686,7 +686,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
     {
         if (!$fieldNullable) {
             $search = '#region [ACCESSORS_MUTATORS]';
-            $pos = mb_strpos($classCode, $search);
+            $pos = Str::position($classCode, $search);
             $field_real_type = $allTypes[$fieldType];
             $method_name = Str::studly($fieldName);
 
@@ -709,7 +709,7 @@ class ModelMakeCommand extends BaseModelMakeCommand
 
             if ($pos !== false) {
                 /** @var int $pos */
-                $pos = mb_strpos($classCode, '#endregion', $pos);
+                $pos = Str::position($classCode, '#endregion', $pos);
 
                 /** @var string $classCode */
                 $classCode = Str::substrReplace($classCode, $snippet, $pos, 0);
@@ -803,11 +803,11 @@ class ModelMakeCommand extends BaseModelMakeCommand
         EOL;
 
         $search = '#region [RELATIONS]';
-        $pos = mb_strpos($classCode, $search);
+        $pos = Str::position($classCode, $search);
 
         if ($pos !== false) {
             /** @var int $pos */
-            $pos = mb_strpos($classCode, '#endregion', $pos);
+            $pos = Str::position($classCode, '#endregion', $pos);
 
             /** @var string $classCode */
             $classCode = Str::substrReplace($classCode, $snippet, $pos, 0);

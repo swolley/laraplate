@@ -3,11 +3,12 @@
 namespace Modules\Core\Grids\Requests;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Modules\Core\Casts\IParsableRequest;
 use Modules\Core\Grids\Casts\GridAction;
 use Illuminate\Foundation\Http\FormRequest;
-use Modules\Core\Casts\IParsableRequest;
-use Modules\Core\Grids\Casts\GridRequestData;
 use Modules\Core\Http\Requests\ListRequest;
+use Modules\Core\Grids\Casts\GridRequestData;
 use Modules\Core\Http\Requests\ModifyRequest;
 
 class GridRequest extends FormRequest implements IParsableRequest
@@ -28,11 +29,11 @@ class GridRequest extends FormRequest implements IParsableRequest
     {
         /** @phpstan-ignore method.notFound */
         $url = $this->url();
-        if (strpos($url, '/' . GridAction::FUNNELS->value) !== false) {
+        if (Str::contains($url, '/' . GridAction::FUNNELS->value)) {
             $grid_rules = $this->remapListRules('funnels.*');
-        } else if (strpos($url, '/' . GridAction::OPTIONS->value) !== false) {
+        } else if (Str::contains($url, '/' . GridAction::OPTIONS->value)) {
             $grid_rules = $this->remapListRules('options.*');
-        } else if (strpos($url, '/' . GridAction::SELECT->value) !== false) {
+        } else if (Str::contains($url, '/' . GridAction::SELECT->value)) {
             $grid_rules = [
                 'options' => ['sometimes'],
                 'funnels' => ['sometimes'],
@@ -40,15 +41,15 @@ class GridRequest extends FormRequest implements IParsableRequest
                 ...$this->remapListRules('options.*'),
             ];
             // TODO: serve anche l'entità o parto da quella della griglia e poi guardo che colonne vengono chieste?
-        } else if (
-            strpos($url, '/' . GridAction::INSERT->value) ||
-            strpos($url, '/' . GridAction::UPDATE->value) ||
-            strpos($url, '/' . GridAction::DELETE->value) ||
-            strpos($url, '/' . GridAction::FORCE_DELETE->value) ||
-            strpos($url, '/' . GridAction::APPROVE->value) ||
-            strpos($url, '/' . GridAction::LOCK->value) ||
-            strpos($url, '/' . GridAction::CHECK->value)
-        ) {
+        } else if (Str::contains($url, [
+            '/' . GridAction::INSERT->value,
+            '/' . GridAction::UPDATE->value,
+            '/' . GridAction::DELETE->value,
+            '/' . GridAction::FORCE_DELETE->value,
+            '/' . GridAction::APPROVE->value,
+            '/' . GridAction::LOCK->value,
+            '/' . GridAction::CHECK->value,
+        ])) {
             $grid_rules = ['funnels' => 'exclude', 'options' => 'exclude'];
         } else {
             $grid_rules = [];

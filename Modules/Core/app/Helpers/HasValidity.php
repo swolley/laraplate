@@ -92,6 +92,9 @@ trait HasValidity
     }
 
     /**
+     * Check if the content is valid at a given date.
+     * @param Carbon|null $date 
+     * @return bool 
      * @throws \InvalidFormatException
      */
     public function isValid(?Carbon $date = null): bool
@@ -101,5 +104,70 @@ trait HasValidity
         }
 
         return $date->gte($this->{static::$valid_from_column}) && (!$this->{static::$valid_to_column} || $date->lte($this->{static::$valid_to_column}));
+    }
+
+    /**
+     * Alias for isValid method
+     */
+    public function isPublished(?Carbon $date = null): bool
+    {
+        return $this->isValid($date);
+    }
+
+    /**
+     * Check if the content is expired.
+     * @return bool 
+     */
+    public function isExpired(): bool
+    {
+        return $this->valid_to !== null && $this->valid_to < now();
+    }
+
+    /**
+     * Check if the content is draft (nor plublished yet).
+     * @return bool 
+     */
+    public function isDraft(): bool
+    {
+        return $this->valid_from === null;
+    }
+
+    /**
+     * Check if the content is scheduled (published in the future).
+     * @return bool 
+     */
+    public function isScheduled(): bool
+    {
+        return $this->valid_from !== null && $this->valid_from > now();
+    }
+
+    /**
+     * Publish the content.
+     * @param null|Carbon $valid_from 
+     * @param null|Carbon $valid_to 
+     * @return void 
+     */
+    public function publish(?Carbon $valid_from = null, ?Carbon $valid_to = null): void
+    {
+        $valid_from = $valid_from ?? now();
+        if ($valid_to) {
+            $min = min($valid_from, $valid_to);
+            $max = max($valid_from, $valid_to);
+            $valid_from = $min;
+            $valid_to = $max;
+        }
+
+        $this->valid_from = $valid_from;
+        $this->valid_to = $valid_to;
+    }
+
+    /**
+     * Unpublish the content.
+     * @return void 
+     */
+    public function unpublish(): void
+    {
+        $this->valid_from = null;
+        $this->valid_to = null;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Http\Requests;
 
+use Illuminate\Support\Str;
 use Modules\Core\Casts\SearchRequestData;
 
 class SearchRequest extends ListRequest
@@ -16,7 +17,7 @@ class SearchRequest extends ListRequest
         $rules = parent::rules();
         unset($rules["count"]);
         foreach (array_keys($rules) as $rule) {
-            if (strpos($rule, "sort.") !== false || strpos($rule, "group_by.") !== false || strpos($rule, "relations.") !== false) {
+            if (Str::contains($rule, ["sort.", "group_by.", "relations."])) {
                 unset($rules[$rule]);
             }
         }

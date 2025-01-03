@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -71,7 +72,7 @@ class TranslationsCheckCommand extends Command
     {
         $langname = explode(DIRECTORY_SEPARATOR, $lang);
         $langname = array_pop($langname);
-        $contains_requires = str_contains(file_get_contents($file), 'require(__DIR__');
+        $contains_requires = Str::contains(file_get_contents($file), 'require(__DIR__');
         $required = require $file;
         $file_identifier = str_replace(DIRECTORY_SEPARATOR . $langname . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR, $file);
 

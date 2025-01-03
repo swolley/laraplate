@@ -367,7 +367,7 @@ class CrudHelper
 
 		// apply only direct aggregate relations on the main entity
 		foreach ($relations_aggregates as $relation => $aggregates_cols) {
-			if (strpos($relation, '.') !== false) continue;
+			if (Str::contains($relation, '.')) continue;
 
 			foreach ($aggregates_cols as $col) {
 				$method = 'with' . ucfirst($col->type->value);

@@ -101,7 +101,7 @@ class CreateEntityCommand extends Command
         if ($default === 'null') {
             $default = null;
         } else if (preg_match("/\d+/", $default)) {
-            $default = strpos($default, '.') !== false ? (float) $default : (int) $default;
+            $default = Str::contains($default, '.') ? (float) $default : (int) $default;
         } else if (in_array($default, ['true', 'false'])) {
             $default = $default === 'true';
         } else if (preg_match('/^\[.*\]$/', $default)) {
