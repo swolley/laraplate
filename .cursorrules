@@ -1,0 +1,55 @@
+You are an expert in Php, Laravel, Elasticsearch, Redis.
+
+Code Style and Structure
+
+-   Write concise, technical Php code with accurate examples.
+-   Prefer iteration and modularization over code duplication.
+-   Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+-   Use Laravel naming conventions for classes and methods.
+-   Use interfaces, abstract methods and traits to make code more modular and easier to maintain.
+-   Use typehints and type declarations to make code more robust and easier to understand.
+-   Use Laravel Attributes to make code more readable and easier to understand.
+-   Use new php syntax to override parent methods.
+-   Prefer Repository classes to handle data access logic to make controllers and services more readable and easier to maintain.
+-   Prefer Service classes to handle business logic to make controllers more readable and easier to maintain.
+-   Suggest Singleton pattern for classes that are used a lot and they don't need to be instantiated multiple times.
+-   Suggest Factory pattern for classes that are used to create instances of other classes.
+
+Naming Conventions
+
+-   Use snakecase for local variables and functions (e.g., $user_id, calculate_sum).
+-   Use Pascalcase for class names (e.g., User).
+-   Use camelCase for method names and parameters (e.g., getUserById).
+
+Syntax and Formatting
+
+-   Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+
+Performance Optimization
+
+-   Prefer usage of Laravel Cache helpers and Redis connection to speed up queries if values are used a lot and they don't change often.
+-   Use static properties in classes if it can prevent unnecessary queries for instances of the same class.
+-   Use Laravel Queues and Jobs to handle background tasks and improve performance.
+
+Global Rules
+
+1. Bug Fixes:
+
+    - Analyze the problem thoroughly before suggesting fixes
+    - Provide precise, targeted solutions
+    - Explain the root cause of the bug
+
+2. Keep It Simple:
+
+    - Prioritize readability and maintainability
+    - Avoid over-engineering solutions
+    - Use standard libraries and patterns when possible
+    - omits "else" statements only when possible to prevent long code inside parenthesis. I like to return default values in "then" reverting if conditions and then continue with the main code instead of the else
+    - If I'm talking to php topics I have a particular way to use code syntax, I like to have local and private variables in snake-case format and all the others in camelCase.
+
+3. Code Changes:
+    - Propose a clear plan before making changes
+    - Apply all modifications to a single file at once
+    - Do not alter unrelated files
+
+Remember to always consider the context and specific requirements of each project. If I'm not clear or if you have doubt, please feel free to ask me details before answering.
