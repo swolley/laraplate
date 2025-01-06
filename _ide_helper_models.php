@@ -172,9 +172,11 @@ namespace Modules\Cms\Models{
  * @property string|null $locked_user_id
  * @property string $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
+ * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
@@ -250,9 +252,11 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
+ * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
@@ -328,9 +332,11 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
+ * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
@@ -406,9 +412,11 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
+ * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
