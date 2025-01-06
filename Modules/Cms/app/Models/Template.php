@@ -20,9 +20,16 @@ class Template extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['name', 'content'];
+    protected $fillable = [
+        'name', 
+        'content',
+    ];
 
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function casts(): array
     {

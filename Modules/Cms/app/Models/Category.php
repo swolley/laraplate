@@ -34,9 +34,31 @@ class Category extends Model implements Sortable
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['entity_id', 'parent_id', 'name', 'slug', 'description', 'model_type_id', 'order', 'persistence', 'logo', 'logo_full', 'is_active'];
+    protected $fillable = [
+        'entity_id',
+        'parent_id',
+        'name',
+        'slug',
+        'description',
+        'model_type_id',
+        'order',
+        'persistence',
+        'logo',
+        'logo_full',
+        'is_active',
+    ];
 
-    protected $hidden = ['entity_id', 'parent_id', 'model_type_id', 'order', 'persistence', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = [
+        'entity_id',
+        'parent_id',
+        'model_type_id',
+        'order',
+        'persistence',
+        'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function casts(): array
     {

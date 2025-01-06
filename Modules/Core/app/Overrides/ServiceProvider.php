@@ -39,10 +39,24 @@ class ServiceProvider extends BaseServiceProvider
 		if (! ($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
 			$config = $this->app->make('config');
 
-			$config->set($key, array_merge(
-				$config->get($key, []),
-				require $path
-			));
+			$original = $config->get($key, []);
+			$current = require $path;
+			$merged = self::mergeArrays($original, $current);
+			$config->set($key, $merged);
 		}
+	}
+
+	private static function mergeArrays(array &$array1, array $array2): array
+	{
+		foreach ($array2 as $key => $value) {
+			if (!array_key_exists($key, $array1)) {
+				$array1[$key] = $value;
+			} else if (is_array($value)) {
+				$array1[$key] = self::mergeArrays($array1[$key], $value);
+			} else {
+				$array1[$key] = $value;
+			}
+		}
+		return $array1;
 	}
 }

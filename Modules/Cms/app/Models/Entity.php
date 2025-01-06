@@ -27,9 +27,17 @@ class Entity extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = [
+        'name',
+        'slug',
+    ];
 
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at', 'is_active'];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'is_active',
+    ];
 
     protected $attributes = [
         'is_active' => true,

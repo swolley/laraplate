@@ -15,7 +15,6 @@ namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperAuthor
  * @property int $id
  * @property int $user_id
  * @property string $name
@@ -51,15 +50,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Author extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperAuthor {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperCategory
  * @property int $id
  * @property int $entity_id
  * @property int|null $parent_id
@@ -149,15 +149,16 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withRelationshipExpression($direction, callable $constraint, $initialDepth, $from = null, $maxDepth = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Category extends \Eloquent implements \Spatie\EloquentSortable\Sortable {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCategory {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperContent
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
@@ -226,15 +227,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content withoutTags(\ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Content extends \Eloquent implements \Spatie\MediaLibrary\HasMedia, \Spatie\EloquentSortable\Sortable {}
+	#[\AllowDynamicProperties]
+	class IdeHelperContent {}
 }
 
 namespace Modules\Cms\Models\Contents{
 /**
  * 
  *
- * @mixin IdeHelperArticle
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
@@ -303,15 +305,16 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article withoutTags(\ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Article extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperArticle {}
 }
 
 namespace Modules\Cms\Models\Contents{
 /**
  * 
  *
- * @mixin IdeHelperEvent
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
@@ -380,15 +383,16 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event withoutTags(\ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Event extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperEvent {}
 }
 
 namespace Modules\Cms\Models\Contents{
 /**
  * 
  *
- * @mixin IdeHelperMultimedia
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
@@ -457,15 +461,16 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia withoutTags(\ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Multimedia extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperMultimedia {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperEntity
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -494,8 +499,10 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Entity extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperEntity {}
 }
 
 namespace Modules\Cms\Models{
@@ -503,7 +510,6 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property-read object $options
- * @mixin IdeHelperField
  * @property int $id
  * @property string $name
  * @property \Modules\Cms\Casts\FieldType $type
@@ -535,15 +541,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Field extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperField {}
 }
 
 namespace Modules\Cms\Models\Pivot{
 /**
  * 
  *
- * @mixin IdeHelperAuthorable
  * @property int $content_id
  * @property int $author_id
  * @property \Carbon\CarbonImmutable $created_at
@@ -555,15 +562,16 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Authorable whereContentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Authorable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Authorable whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Authorable extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperAuthorable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
 /**
  * 
  *
- * @mixin IdeHelperCategorizable
  * @property int $content_id
  * @property int $entity_id
  * @property int $category_id
@@ -577,15 +585,16 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Categorizable extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCategorizable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
 /**
  * 
  *
- * @mixin IdeHelperFieldable
  * @property int $id
  * @property int $preset_id
  * @property int $field_id
@@ -611,15 +620,16 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Fieldable extends \Eloquent implements \Spatie\EloquentSortable\Sortable {}
+	#[\AllowDynamicProperties]
+	class IdeHelperFieldable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
 /**
  * 
  *
- * @mixin IdeHelperRelatable
  * @property int $content_id
  * @property int $related_content_id
  * @property \Carbon\CarbonImmutable $created_at
@@ -631,15 +641,16 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Relatable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Relatable whereRelatedContentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Relatable whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Relatable extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperRelatable {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperPreset
  * @property int $id
  * @property int $entity_id
  * @property string $name
@@ -674,15 +685,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Preset extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperPreset {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperTag
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -710,15 +722,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withType(?string $type = null)
+ * @mixin \Eloquent
  */
-	class Tag extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperTag {}
 }
 
 namespace Modules\Cms\Models{
 /**
  * 
  *
- * @mixin IdeHelperTemplate
  * @property int $id
  * @property string $name
  * @property string $content
@@ -739,15 +752,16 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Template extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperTemplate {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperCronJob
  * @property int $id
  * @property string $name
  * @property string $command
@@ -784,15 +798,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob withoutTrashed()
+ * @mixin \Eloquent
  */
-	class CronJob extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCronJob {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperDynamicEntity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -804,15 +819,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\DynamicEntity query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\DynamicEntity withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\DynamicEntity withoutTrashed()
+ * @mixin \Eloquent
  */
-	final class DynamicEntity extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	final class IdeHelperDynamicEntity {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperLicense
  * @property string $id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -833,15 +849,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidTo($value)
+ * @mixin \Eloquent
  */
-	class License extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperLicense {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperModelEmbedding
  * @property int $id
  * @property string $model_type
  * @property int $model_id
@@ -858,15 +875,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding whereModelId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding whereModelType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class ModelEmbedding extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperModelEmbedding {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperModification
  * @property int $id
  * @property int|null $modifiable_id
  * @property string|null $modifiable_type
@@ -910,15 +928,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Modification whereModifierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Modification whereModifierType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Modification whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
-	class Modification extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperModification {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperPermission
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -954,27 +973,29 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Permission extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperPermission {}
 }
 
 namespace Modules\Core\Models\Pivot{
 /**
  * 
  *
- * @mixin IdeHelperModelHasRole
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Pivot\ModelHasRole newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Pivot\ModelHasRole newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Pivot\ModelHasRole query()
+ * @mixin \Eloquent
  */
-	class ModelHasRole extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperModelHasRole {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperRole
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -1055,15 +1076,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Role withTrashed()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Role withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Role extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperRole {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperSetting
  * @property int $id
  * @property string $name
  * @property array<array-key, mixed> $value
@@ -1101,15 +1123,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting withoutTrashed()
+ * @mixin \Eloquent
  */
-	class Setting extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperSetting {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperUser
  * @property int $id
  * @property string $name
  * @property string $email
@@ -1180,15 +1203,16 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User withoutRole($roles, $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User withoutTrashed()
+ * @mixin \Eloquent
  */
-	class User extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperUser {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @mixin IdeHelperUserGridConfig
  * @property int $id
  * @property int|null $user_id
  * @property string $grid_name
@@ -1209,7 +1233,9 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig whereLayoutName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig whereUserId($value)
+ * @mixin \Eloquent
  */
-	class UserGridConfig extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperUserGridConfig {}
 }
 

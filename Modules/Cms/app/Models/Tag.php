@@ -21,9 +21,19 @@ class Tag extends BaseTag
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['name', 'slug', 'type', 'order_column'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'type',
+        'order_column',
+    ];
 
-    protected $hidden = ['order_column', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = [
+        'order_column',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function casts(): array
     {

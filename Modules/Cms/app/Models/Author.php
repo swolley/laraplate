@@ -28,9 +28,18 @@ class Author extends Model
         getRules as protected getRulesTrait;
     }
 
-    protected $fillable = ['name', 'public_email'];
+    protected $fillable = [
+        'name',
+        'public_email',
+    ];
 
-    protected $hidden = ['user_id', 'user', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = [
+        'user_id',
+        'user',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected $tempUser;
 

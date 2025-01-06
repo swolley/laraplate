@@ -31,9 +31,21 @@ class Preset extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['entity_id', 'name', 'is_active', 'template_id'];
+    protected $fillable = [
+        'entity_id',
+        'name',
+        'is_active',
+        'template_id',
+    ];
 
-    protected $hidden = ['entity_id', 'template_id', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = [
+        'entity_id',
+        'template_id',
+        'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected $attributes = [
         'is_active' => true,

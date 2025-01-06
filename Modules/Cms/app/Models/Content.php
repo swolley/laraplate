@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
 use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
-use Awobaz\Compoships\Compoships;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Collection;
 use Modules\Core\Cache\Searchable;
@@ -17,7 +16,6 @@ use Modules\Core\Helpers\HasValidity;
 use Modules\Core\Helpers\HasVersions;
 use Spatie\EloquentSortable\Sortable;
 use Modules\Core\Helpers\HasApprovals;
-use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Models\Pivot\Relatable;
 use Modules\Cms\Models\Pivot\Authorable;
 use Modules\Core\Helpers\HasValidations;
@@ -33,24 +31,49 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Core\Overrides\ComposhipsModel;
 
 /**
  * @mixin IdeHelperContent
  */
-class Content extends Model implements HasMedia, Sortable
+class Content extends ComposhipsModel implements HasMedia, Sortable
 {
-	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable, Compoships/*, HasApprovals*/ {
+	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable/*, HasApprovals*/ {
 		prepareElasticDocument as protected prepareElasticDocumentTrait;
 		getRules as protected getRulesTrait;
-		Compoships::hasMany insteadof HasChildren;
-		Compoships::belongsTo insteadof HasChildren;
+		HasChildren::hasMany as protected hasChildrenHasMany;
+		HasChildren::belongsTo as protected hasChildrenBelongsTo;
+		HasChildren::belongsToMany as protected hasChildrenBelongsToMany;
 	}
 
-	protected $fillable = ['valid_from', 'valid_to', 'preset_id', 'entity_id'/*, 'components'*/];
+	protected $fillable = [
+		'valid_from', 
+		'valid_to', 
+		'preset_id',
+		'entity_id',
+		'components',
+	];
 
-	protected $with = ['entity', 'authors', 'categories', 'categories.ancestors', 'media'];
+	protected $with = [
+		'entity', 
+		'authors', 
+		'categories', 
+		'catego	ries.ancestors', 
+		'media',
+	];
 
-	protected $hidden = ['preset_id', 'entity_id', 'created_at', 'updated_at', 'deleted_at', 'entity', 'components', 'preset', 'withCaching', 'withoutObjectCaching'];
+	protected $hidden = [
+		'preset_id', 
+		'entity_id', 
+		'created_at', 
+		'updated_at', 
+		'deleted_at', 
+		'entity', 
+		'components', 
+		'preset', 
+		'withCaching', 
+		'withoutObjectCaching',
+	];
 
 	protected $childColumn = 'entity_id';
 
@@ -63,7 +86,10 @@ class Content extends Model implements HasMedia, Sortable
 		'components' => '{}',
 	];
 
-	protected $appends = ['cover', 'path'];
+	protected $appends = [
+		'cover', 
+		'path',
+	];
 
 	public static array $childTypes = [];
 
@@ -182,7 +208,6 @@ class Content extends Model implements HasMedia, Sortable
 			}
 		});
 	}
-
 
 	#region Scopes
 
@@ -304,7 +329,14 @@ class Content extends Model implements HasMedia, Sortable
 	 */
 	public function categories(): BelongsToMany
 	{
-		return $this->belongsToMany(Category::class, 'categorizables', ['content_id', 'entity_id'], ['id', 'entity_id'])->using(Categorizable::class)->withTimestamps();
+		return parent::belongsToMany(
+			Category::class,
+			'categorizables',
+			['content_id', 'entity_id'],
+			['category_id', 'entity_id'],
+			['id', 'entity_id'],
+			['id', 'entity_id']
+		)->using(Categorizable::class)->withTimestamps();
 	}
 
 	/**
@@ -312,7 +344,7 @@ class Content extends Model implements HasMedia, Sortable
 	 */
 	public function authors(): BelongsToMany
 	{
-		return $this->belongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
+		return $this->hasChildrenBelongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
 	}
 
 	/**
@@ -331,7 +363,7 @@ class Content extends Model implements HasMedia, Sortable
 	 */
 	public function related(?bool $withInverse = false): BelongsToMany
 	{
-		$relation = $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		$relation = $this->hasChildrenBelongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
 		if ($withInverse) {
 			$relation->orWhere(fn($query) => $query->where('related_content_id', $this->id));
 		}
@@ -359,8 +391,7 @@ class Content extends Model implements HasMedia, Sortable
 	{
 		$this->addMediaCollection('cover')->singleFile();
 		$this->addMediaCollection('images');
-		$this->addMediaCollection('videos')
-			->extractVideoFrameAtSecond(2);
+		$this->addMediaCollection('videos');
 		$this->addMediaCollection('audios');
 		$this->addMediaCollection('files');
 	}
@@ -412,12 +443,12 @@ class Content extends Model implements HasMedia, Sortable
 
 	public function getPathPrefix(): string
 	{
-		return $this->entity->slug;
+		return $this->entity?->slug ?? '';
 	}
 
 	#[\Override]
 	public function getPath(): ?string
 	{
-		return $this->categories()->first()?->getPath();
+		return $this->categories->first()?->getPath();
 	}
 }
