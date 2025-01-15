@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CMS\Database\Factories;
+namespace Modules\Cms\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -9,7 +9,7 @@ class AuthorFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = \Modules\CMS\Models\Author::class;
+    protected $model = \Modules\Cms\Models\Author::class;
 
     /**
      * Define the model's default state.

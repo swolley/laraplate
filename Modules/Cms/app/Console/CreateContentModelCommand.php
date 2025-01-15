@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CMS\Console;
+namespace Modules\Cms\Console;
 
 use Illuminate\Support\Str;
 use Modules\Cms\Models\Entity;

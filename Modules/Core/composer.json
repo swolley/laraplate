@@ -41,7 +41,9 @@
     "require-dev": {
         "mtrajano/laravel-swagger": "^0.6.4",
         "pestphp/pest": "^3.5",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "mockery/mockery": "^1.6"
+        
     },
     "extra": {
         "laravel": {

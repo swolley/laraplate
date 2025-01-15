@@ -12,7 +12,7 @@ use Modules\Core\Helpers\HasValidations;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Modules\CMS\Database\Factories\AuthorFactory;
+use Modules\Cms\Database\Factories\AuthorFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;

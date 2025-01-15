@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait HasPath
 {
+	/** @class-property string|null $slug */
+
 	/**
 	 * get prefix for full path
 	 * @return string 

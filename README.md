@@ -23,7 +23,7 @@ php artisan module:seed --all
 ### Laraplate Modules
 
 -   Core: main common boilerplate funzionalities. About [Core Module](./Modules/Core/README.md).
--   CMS: common CMS funzionalities. About [CMS Module](./Modules/CMS/README.md).
+-   Cms: common Cms funzionalities. About [Cms Module](./Modules/Cms/README.md).
 
 <p align="center">
 	<a href="https://laravel.com" target="_blank">

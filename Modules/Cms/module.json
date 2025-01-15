@@ -1,9 +1,9 @@
 {
-    "name": "CMS",
+    "name": "Cms",
     "alias": "cms",
     "description": "Functionalities for a basic cms system.",
     "keywords": ["editorial", "cms"],
     "priority": 0,
-    "providers": ["Modules\\CMS\\Providers\\CMSServiceProvider"],
+    "providers": ["Modules\\Cms\\Providers\\CmsServiceProvider"],
     "files": []
 }

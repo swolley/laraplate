@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CMS\Database\Factories;
+namespace Modules\Cms\Database\Factories;
 
 use Modules\Cms\Models\Entity;
 use Modules\Cms\Models\Category;
@@ -11,7 +11,7 @@ class CategoryFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = \Modules\CMS\Models\Category::class;
+    protected $model = \Modules\Cms\Models\Category::class;
 
     /**
      * Define the model's default state.

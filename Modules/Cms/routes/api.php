@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use Modules\Cms\Http\Controllers\CMSController;
+use Modules\Cms\Http\Controllers\ContentsController;
 
 /*
  *--------------------------------------------------------------------------
@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Route;
  *
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    // Route::apiResource('cms', CMSController::class)->names('cms');
+// Route::group(['prefix' => 'locations'], function () {
+//     Route::get('/{value}/contents', [ContentsController::class, 'getContentsByLocation'])->name('locations.contents');
+//     Route::get('/{value}/{entity}', [ContentsController::class, 'getEntityContentsByLocation'])->name('locations.entity');
+// });
+Route::group(['prefix' => '{relation}'], function () {
+    Route::get('/{value}/contents', [ContentsController::class, 'getContentsByRelation'])->name('relation.contents')->where('relation', 'tags|categories|locations');
+    Route::get('/{value}/{entity}', [ContentsController::class, 'getEntityContentsByRelation'])->name('relation.entity')->where('relation', 'tags|categories|locations');
 });
+

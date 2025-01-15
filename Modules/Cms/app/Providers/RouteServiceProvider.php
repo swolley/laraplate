@@ -4,10 +4,16 @@ namespace Modules\Cms\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Str;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    protected string $name = 'CMS';
+    protected string $name = 'Cms';
+
+    protected function getPrefix(): string
+    {
+        return Str::slug($this->name);
+    }
 
     /**
      * Called before routes are registered.
@@ -35,7 +41,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')->group(module_path($this->name, '/routes/web.php'));
+        Route::middleware('web')
+            ->prefix('app')
+            ->name($this->getPrefix() . '.')
+            ->group([
+                module_path($this->name, '/routes/web.php'),
+            ]);
     }
 
     /**
@@ -45,6 +56,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes(): void
     {
-        Route::middleware('api')->prefix('api')->name('api.')->group(module_path($this->name, '/routes/api.php'));
+        $name_prefix = $this->getPrefix();
+        $route_prefix = 'api';
+        Route::prefix("$route_prefix/v1")
+            ->middleware($route_prefix)
+            ->name("$name_prefix.$route_prefix.")
+            ->group([
+                module_path($this->name, '/routes/api.php'),
+            ]);
     }
 }

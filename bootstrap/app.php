@@ -3,23 +3,17 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Application;
-// use Illuminate\Auth\Middleware\Authorize;
-// use Illuminate\Auth\Middleware\RequirePassword;
-// use Illuminate\Http\Middleware\SetCacheHeaders;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-// use Illuminate\Routing\Middleware\ThrottleRequests;
-// use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-// use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
-// use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -34,15 +28,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             // 'auth' => \App\Http\Middleware\Authenticate::class,
-            // 'auth.basic' => AuthenticateWithBasicAuth::class,
+            // 'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
             // 'auth.session' => AuthenticateSession::class,
-            // 'cache.headers' => SetCacheHeaders::class,
-            // 'can' => Authorize::class,
+            // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+            // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
             // // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-            // 'password.confirm' => RequirePassword::class,
-            // 'precognitive' => HandlePrecognitiveRequests::class,
-            // 'signed' => ValidateSignature::class,
-            // 'throttle' => ThrottleRequests::class,
+            // 'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+            // 'precognitive' => \Illuminate\Foundation\Http\Middleware\HHandlePrecognitiveRequests::class,
+            // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+            // 'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
             // 'hierarchical_permissions' => \Junges\ACL\Middlewares\HierarchicalPermissionsMiddleware::class
             // 'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -63,17 +57,17 @@ return Application::configure(basePath: dirname(__DIR__))
             ]
         );
 
-        $middleware->api([
-            'throttle:api',
-        ]);
+        // $middleware->api([
+        //     'throttle:api',
+        // ]);
 
         $middleware->appendToGroup('auth', [
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             StartSession::class,
             ShareErrorsFromSession::class,
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            // TODO: temporaneo \App\Http\Middleware\VerifyCsrfToken::class,
+            EnsureFrontendRequestsAreStateful::class,
+            VerifyCsrfToken::class,
             SubstituteBindings::class,
             'auth.session',
         ]);

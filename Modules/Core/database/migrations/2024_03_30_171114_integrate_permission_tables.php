@@ -32,6 +32,10 @@ return new class() extends Migration
                 DB::statement("ALTER TABLE permissions ADD COLUMN table_name VARCHAR(50) AS (replace(regexp_substr(name, '\\\\.\\\\w+\\\\.'), '.', '')) STORED");
                 DB::statement("CREATE INDEX permissions_ref_IDX ON permissions (connection_name, table_name)");
                 DB::statement("ALTER TABLE permissions ADD CONSTRAINT permissions_name_CHECK CHECK (REGEXP_INSTR(name, '^\\\\w+\\\\.\\\\w+\\\\.\\\\w+$') = 1)");
+            } else if ($connection->getDriverName() === 'sqlite') {
+                DB::statement("ALTER TABLE permissions ADD COLUMN connection_name TEXT AS (regexp_replace(regexp_replace(name, '\\.\\w+\\.\\w+$', ''), '\\.', '')) STORED");
+                DB::statement("ALTER TABLE permissions ADD COLUMN table_name TEXT AS (regexp_replace(regexp_replace(name, '^\\w+\\.', ''), '\\.\\w+$', '')) STORED");
+                DB::statement("CREATE INDEX permissions_ref_IDX ON permissions (connection_name, table_name)");
             } else {
                 throw new \Exception('Unsupported database driver');
             }

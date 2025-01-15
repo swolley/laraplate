@@ -5,6 +5,8 @@ namespace Modules\Core\Providers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -19,6 +21,20 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        RateLimiter::for('embeddings', function (object $job) {
+            return Limit::perMinute(60); // 60 jobs per minute
+        });
+        RateLimiter::for('indexing', function (object $job) {
+            return app()->environment('production') ? [
+                // Single worker limit
+                Limit::perMinute(300)  // 300 operations per minute (5 per second)
+                    ->by('indexing.worker'),
+                // Global limit for all workers
+                Limit::perMinute(1200)  // 1200 operations per minute (20 per second)
+                    ->by('indexing.global'),
+            ] : Limit::perMinute(60);
+        });
     }
 
     /**

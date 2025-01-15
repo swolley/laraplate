@@ -103,9 +103,7 @@ class HandleLicensesCommand extends Command
 
             return static::SUCCESS;
         } catch (\Throwable $ex) {
-            $message = $ex->getMEssage();
-            Log::error($message);
-            $this->output->error($message);
+            $this->output->error($ex->getMessage());
             return static::FAILURE;
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CMS\Database\Factories;
+namespace Modules\Cms\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -9,7 +9,7 @@ class TagFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = \Modules\CMS\Models\Tag::class;
+    protected $model = \Modules\Cms\Models\Tag::class;
 
     /**
      * Define the model's default state.
@@ -17,7 +17,7 @@ class TagFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->word(),
+            'name' => fake()->unique()->word(),
             'type' => fake()->randomElement(['person', 'location', 'organization', null]),
         ];
     }

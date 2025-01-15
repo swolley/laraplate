@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'horizon'),
+    'path' => env('HORIZON_PATH', 'app/horizon'),
 
     /*
     |--------------------------------------------------------------------------
@@ -180,33 +180,48 @@ return [
     */
 
     'defaults' => [
-        'supervisor-1' => [
+        'supervisor-embeddings' => [
             'connection' => 'redis',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 128,
-            'tries' => 1,
-            'timeout' => 60,
-            'nice' => 0,
+            'queue' => ['embeddings'],
+            'balance' => 'simple',
+            'processes' => 3,
+            'tries' => 3,
+        ],
+        'supervisor-indexing' => [
+            'connection' => 'redis',
+            'queue' => ['indexing'],
+            'balance' => 'simple',
+            'processes' => 5,
+            'tries' => 3,
         ],
     ],
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
+            'supervisor-embeddings' => [
+                'timeout' => 120,
+                'memory' => 512,
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
+                'nice' => 0,
+            ],
+            'supervisor-indexing' => [
+                'timeout' => 60,
+                'memory' => 256,
+                'maxProcesses' => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+                'nice' => 0,
             ],
         ],
 
         'local' => [
-            'supervisor-1' => [
-                'maxProcesses' => 3,
+            'supervisor-embeddings' => [
+                'processes' => 2,
+            ],
+            'supervisor-indexing' => [
+                'processes' => 3,
             ],
         ],
     ],

@@ -109,7 +109,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -229,7 +228,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -349,7 +347,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -469,7 +466,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -589,7 +585,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -709,7 +704,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -829,7 +823,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -949,7 +942,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -1069,7 +1061,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -1189,7 +1180,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -1309,7 +1299,6 @@ namespace PHPSTORM_META {
             'router' => \Illuminate\Routing\Router::class,
             'session' => \Illuminate\Session\SessionManager::class,
             'session.store' => \Illuminate\Session\Store::class,
-            'translatable' => \Spatie\Translatable\Translatable::class,
             'translation.loader' => \Illuminate\Translation\FileLoader::class,
             'translator' => \Illuminate\Translation\Translator::class,
             'tymon.jwt' => \Tymon\JWTAuth\JWT::class,
@@ -2144,11 +2133,6 @@ namespace PHPSTORM_META {
             'permission.cache.expiration_time' => 'object',
             'permission.cache.key' => 'string',
             'permission.cache.store' => 'string',
-            'tags.slugger' => 'string',
-            'tags.tag_model' => 'string',
-            'tags.taggable.table_name' => 'string',
-            'tags.taggable.morph_name' => 'string',
-            'tags.taggable.class_name' => 'string',
             'swagger-ui.files.0.path' => 'string',
             'swagger-ui.files.0.title' => 'string',
             'swagger-ui.files.0.versions.v1' => 'string',
@@ -2973,11 +2957,6 @@ namespace PHPSTORM_META {
             'permission.cache.expiration_time' => 'object',
             'permission.cache.key' => 'string',
             'permission.cache.store' => 'string',
-            'tags.slugger' => 'string',
-            'tags.tag_model' => 'string',
-            'tags.taggable.table_name' => 'string',
-            'tags.taggable.morph_name' => 'string',
-            'tags.taggable.class_name' => 'string',
             'swagger-ui.files.0.path' => 'string',
             'swagger-ui.files.0.title' => 'string',
             'swagger-ui.files.0.versions.v1' => 'string',
@@ -3802,11 +3781,6 @@ namespace PHPSTORM_META {
             'permission.cache.expiration_time' => 'object',
             'permission.cache.key' => 'string',
             'permission.cache.store' => 'string',
-            'tags.slugger' => 'string',
-            'tags.tag_model' => 'string',
-            'tags.taggable.table_name' => 'string',
-            'tags.taggable.morph_name' => 'string',
-            'tags.taggable.class_name' => 'string',
             'swagger-ui.files.0.path' => 'string',
             'swagger-ui.files.0.title' => 'string',
             'swagger-ui.files.0.versions.v1' => 'string',
@@ -4035,8 +4009,7 @@ namespace PHPSTORM_META {
 'permission.table_names.model_has_permissions','permission.table_names.model_has_roles','permission.table_names.role_has_permissions','permission.column_names.role_pivot_key','permission.column_names.permission_pivot_key',
 'permission.column_names.model_morph_key','permission.column_names.team_foreign_key','permission.register_permission_check_method','permission.register_octane_reset_listener','permission.teams',
 'permission.use_passport_client_credentials','permission.display_permission_in_exception','permission.display_role_in_exception','permission.enable_wildcard_permission','permission.cache.expiration_time',
-'permission.cache.key','permission.cache.store','tags.slugger','tags.tag_model','tags.taggable.table_name',
-'tags.taggable.morph_name','tags.taggable.class_name','swagger-ui.files.0.path','swagger-ui.files.0.title','swagger-ui.files.0.versions.v1',
+'permission.cache.key','permission.cache.store','swagger-ui.files.0.path','swagger-ui.files.0.title','swagger-ui.files.0.versions.v1',
 'swagger-ui.files.0.default','swagger-ui.files.0.middleware','swagger-ui.files.0.validator_url','swagger-ui.files.0.modify_file','swagger-ui.files.0.server_url',
 'swagger-ui.files.0.oauth.token_path','swagger-ui.files.0.oauth.refresh_path','swagger-ui.files.0.oauth.authorization_path','swagger-ui.files.0.oauth.client_id','swagger-ui.files.0.oauth.client_secret',
 'swagger-ui.files.0.stylesheet','laravel-swagger.title','laravel-swagger.description','laravel-swagger.appVersion','laravel-swagger.host',
@@ -4063,7 +4036,8 @@ namespace PHPSTORM_META {
 'core.crud.activate','core.crud.inactivate','core.crud.cache-clear','core.crud.grids.getGridsConfigs','core.crud.select',
 'core.crud.data','core.crud.check','core.crud.layout','core.crud.export','core.crud.insert',
 'core.crud.replace','core.crud.delete','core.auth.userInfo','core.auth.impersonate','core.auth.leaveImpersonate',
-'core.auth.maintainSession','core.info.siteInfo','core.info.getSiteConfigs','core.info.translations','password.reset',);
+'core.auth.maintainSession','core.info.siteInfo','core.info.getSiteConfigs','core.info.translations','password.reset',
+'cms.api.tags.contents','cms.api.categories.contents',);
         registerArgumentsSet('views', 
 'core::components.alert-icon','core::components.arrow-icon','core::components.barcode-icon','core::components.cancel-icon','core::components.check-icon',
 'core::components.creator-icon','core::components.module','core::components.php-icon','core::components.route-icon','core::components.swagger-icon',
@@ -4184,10 +4158,14 @@ namespace PHPSTORM_META {
     expectedArguments(\Illuminate\Support\Facades\Gate::inspect(), 0, argumentsSet('auth'));
                 expectedArguments(\Illuminate\Support\Facades\Route::can(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Route::cannot(), 0, argumentsSet('auth'));
+    expectedArguments(\Illuminate\Support\Facades\Route::cant(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Auth::can(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Auth::cannot(), 0, argumentsSet('auth'));
+    expectedArguments(\Illuminate\Support\Facades\Auth::cant(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cannot(), 0, argumentsSet('auth'));
+    expectedArguments(\Illuminate\Foundation\Auth\Access\Authorizable::cant(), 0, argumentsSet('auth'));
+                expectedArguments(\Illuminate\Contracts\Auth\Access\Authorizable::can(), 0, argumentsSet('auth'));
                 expectedArguments(\Illuminate\Config\Repository::getMany(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::set(), 0, argumentsSet('configs'));
     expectedArguments(\Illuminate\Config\Repository::string(), 0, argumentsSet('configs'));

@@ -14,7 +14,7 @@ use Modules\Core\Helpers\HasValidations;
 use Spatie\EloquentSortable\SortableTrait;
 use Modules\Cms\Models\Pivot\Categorizable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\CMS\Database\Factories\CategoryFactory;
+use Modules\Cms\Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,7 +25,17 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
  */
 class Category extends Model implements Sortable
 {
-    use HasFactory, HasRecursiveRelationships, SoftDeletes, HasValidity, /*HasApprovals,*/ HasVersions, SortableTrait, HasSlug, HasPath, HasValidations, Compoships {
+    use HasFactory, 
+        HasRecursiveRelationships, 
+        SoftDeletes, 
+        HasValidity, 
+        /*HasApprovals,*/ 
+        HasVersions, 
+        SortableTrait, 
+        HasSlug, 
+        HasPath, 
+        HasValidations, 
+        Compoships {
         getRules as protected getRulesTrait;
         getFullPath as protected getFullPathTrait;
         HasRecursiveRelationships::newBaseQueryBuilder insteadof Compoships;

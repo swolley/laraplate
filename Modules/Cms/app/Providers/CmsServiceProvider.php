@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Cache;
 use Nwidart\Modules\Traits\PathNamespace;
 use Modules\Core\Overrides\ServiceProvider;
 
-class CMSServiceProvider extends ServiceProvider
+class CmsServiceProvider extends ServiceProvider
 {
     use PathNamespace;
 
-    protected string $name = 'CMS';
+    protected string $name = 'Cms';
 
     protected string $nameLower = 'cms';
 

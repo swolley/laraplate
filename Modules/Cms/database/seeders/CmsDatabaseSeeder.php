@@ -16,7 +16,7 @@ use Modules\Core\Models\Permission;
 use Modules\Core\Helpers\HasSeedersUtils;
 use Illuminate\Database\Eloquent\Collection;
 
-class CMSDatabaseSeeder extends Seeder
+class CmsDatabaseSeeder extends Seeder
 {
     use HasSeedersUtils;
 

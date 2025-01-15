@@ -34,16 +34,19 @@ return new class() extends Migration
         $connection = DB::connection();
         if ($connection->getDriverName() === 'pgsql') {
             $true = 'TRUE';
-        } elseif (in_array($connection->getDriverName(), ['mysql', 'mariadb'])) {
+        } elseif (in_array($connection->getDriverName(), ['mysql', 'mariadb', 'sqlite'])) {
             $true = 1;
         } else {
             throw new \Exception('Unsupported database driver');
         }
 
-        DB::statement(
-            "ALTER TABLE {$this->table_name}
-            ADD CONSTRAINT {$this->table_name}_public_CHECK CHECK (is_public = {$true} OR user_id IS NOT NULL);",
-        );
+        if ($connection->getDriverName() !== 'sqlite') {
+            DB::statement(
+                "ALTER TABLE {$this->table_name}
+                ADD CONSTRAINT {$this->table_name}_public_CHECK 
+                CHECK (is_public = {$true} OR user_id IS NOT NULL);",
+            );
+        }
     }
 
     /**

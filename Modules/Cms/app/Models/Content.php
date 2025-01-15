@@ -2,12 +2,12 @@
 
 namespace Modules\Cms\Models;
 
-use Spatie\Tags\HasTags;
 use Parental\HasChildren;
 use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
 use Modules\Cms\Helpers\HasPath;
 use Modules\Cms\Helpers\HasSlug;
+use Modules\Cms\Helpers\HasTags;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Support\Collection;
 use Modules\Core\Cache\Searchable;
@@ -23,22 +23,38 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Core\Locking\Traits\HasLocks;
 use Spatie\EloquentSortable\SortableTrait;
 use Modules\Cms\Models\Pivot\Categorizable;
+use Modules\Core\Overrides\ComposhipsModel;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\Locking\HasOptimisticLocking;
 use Spatie\MediaLibrary\Conversions\Conversion;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Modules\Cms\Database\Factories\ContentFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Modules\Core\Overrides\ComposhipsModel;
 
 /**
  * @mixin IdeHelperContent
  */
 class Content extends ComposhipsModel implements HasMedia, Sortable
 {
-	use SoftDeletes, HasTags, HasValidity, HasLocks, HasOptimisticLocking, HasVersions, HasChildren, SortableTrait, InteractsWithMedia, HasSlug, HasPath, HasValidations, Searchable/*, HasApprovals*/ {
+	use HasFactory, 
+		SoftDeletes, 
+		HasTags, 
+		HasValidity, 
+		HasLocks, 
+		HasOptimisticLocking, 
+		HasVersions, 
+		HasChildren, 
+		SortableTrait, 
+		InteractsWithMedia, 
+		HasSlug, 
+		HasPath, 
+		HasValidations, 
+		Searchable
+		/*, HasApprovals*/ {
 		prepareElasticDocument as protected prepareElasticDocumentTrait;
 		getRules as protected getRulesTrait;
 		HasChildren::hasMany as protected hasChildrenHasMany;
@@ -142,7 +158,7 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 		}
 	}
 
-	public static function createFromEntity(Entity|string|int $entity): static
+	public static function makeFromEntity(Entity|string|int $entity): static
 	{
 		if (static::$all_presets === null) {
 			static::resolveChildTypes();
@@ -209,6 +225,11 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 		});
 	}
 
+	protected static function newFactory(): ContentFactory
+    {
+        return ContentFactory::new();
+    }
+
 	#region Scopes
 
 	protected function scopeForEntity(Builder $query, Entity $entity): Builder
@@ -269,11 +290,16 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 		}
 	}
 
-	protected function name(): Attribute
+	// protected function name(): Attribute
+	// {
+	// 	return Attribute::get(
+	// 		fn() => $this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true)?->name
+	// 	);
+	// }
+
+	protected function slugFields(): array
 	{
-		return Attribute::get(
-			fn() => $this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true)?->name
-		);
+		return [$this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true)?->name];
 	}
 
 	protected function cover(): Attribute
@@ -340,6 +366,15 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 	}
 
 	/**
+	 * The location that belongs to the content.
+	 * @return BelongsTo<Location>
+	 */
+	public function location(): BelongsTo
+	{
+		return $this->belongsTo(Location::class, 'content_id', 'location_id', 'id')->withTrashed();
+	}
+
+	/**
 	 * The author that belongs to the content.
 	 */
 	public function authors(): BelongsToMany
@@ -372,7 +407,7 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 
 	#endregion
 
-	protected function prepareElasticDocument(): array
+	public function prepareElasticDocument(): array
 	{
 		$document = $this->prepareElasticDocumentTrait();
 		$document['authors'] = $this->authors->pluck('name')->toArray();

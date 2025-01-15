@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use Modules\Cms\Http\Controllers\CMSController;
+use Modules\Cms\Http\Controllers\LocationsController;
+// use Modules\Cms\Http\Controllers\CmsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group([], function () {
-    // Route::resource('cms', CMSController::class)->names('cms');
+Route::prefix('locations')->group(function () {
+    Route::get('/geocode', [LocationsController::class, 'geocode'])->name('locations.geocode');
 });

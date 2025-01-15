@@ -74,5 +74,6 @@ return new class extends Migration
         Schema::dropIfExists('categorizables');
         Schema::dropIfExists('authorables');
         Schema::dropIfExists('relatables');
+        Schema::dropIfExists('locatables');
     }
 };

@@ -1,6 +1,6 @@
 {
     "name": "swolley/laraplate-cms",
-    "description": "CMS Module contains all the necessary functionalities for build up a new CMS system.",
+    "description": "Cms Module contains all the necessary functionalities for build up a new Cms system.",
     "version": "1.0.0",
     "keywords": [
         "laravel",
@@ -19,9 +19,9 @@
         "ext-gd": "*",
         "ext-exif": "*",
         "php-ffmpeg/php-ffmpeg": "^1.3",
-        "spatie/laravel-tags": "^4.7",
         "tightenco/parental": "^1.4",
-        "spatie/laravel-medialibrary": "^11.11"
+        "spatie/laravel-medialibrary": "^11.11",
+        "spatie/eloquent-sortable": "^4.4"
     },
     "suggest": {
         "ext-imagick": "Advanced image processing"

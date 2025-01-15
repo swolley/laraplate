@@ -17,7 +17,7 @@
 
 ## Description
 
-The CMS Module contains all the necessary functionalities to build a new CMS system.
+The Cms Module contains all the necessary functionalities to build a new Cms system.
 
 ## Installation
 
@@ -46,7 +46,7 @@ Then, you can install the module by running the following command:
 
 ```bash
 php artisan module:install Core
-php artisan module:install CMS
+php artisan module:install Cms
 ```
 
 ## Configuration
@@ -80,7 +80,7 @@ FORCE_MEDIA_LIBRARY_LAZY_LOADING=true		#force lazy loading for media files
 
 ### Installed Packages
 
-The CMS Module utilizes several packages to enhance its functionality. Below is a list of the key packages included in the `composer.json` file:
+The Cms Module utilizes several packages to enhance its functionality. Below is a list of the key packages included in the `composer.json` file:
 
 -   **Tags Management:**
 
@@ -96,7 +96,7 @@ The CMS Module utilizes several packages to enhance its functionality. Below is 
 
 ### Additional Functionalities
 
-The CMS Module includes built-in features such as:
+The Cms Module includes built-in features such as:
 
 -   Dynamic Content types management
 -   Media library management

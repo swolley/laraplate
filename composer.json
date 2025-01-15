@@ -33,8 +33,8 @@
         "larastan/larastan": "^2.0",
         "laravel/pint": "^1.14",
         "laravel/sail": "^1.26",
-        "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
+        "pestphp/pest-plugin-faker": "^3.0",
         "spatie/laravel-ignition": "^2.4"
     },
     "autoload": {
@@ -74,7 +74,9 @@
         "lint": [
             "vendor/bin/pint --dirty"
         ],
-        "test": "./vendor/bin/pest"
+        "test": "pest",
+        "test:coverage": "XDEBUG_MODE=coverage pest --coverage --min=80",
+        "test:parallel": "pest --parallel"
     },
     "extra": {
         "laravel": {
