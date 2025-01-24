@@ -31,51 +31,28 @@ class ContentsController extends CrudController
      * @throws Throwable 
      * @throws UnexpectedValueException 
      */
-    public function getEntityContentsByRelation(ListRequest $request, string $relation, string $value, string $entity)
+    public function getContentsByRelation(ListRequest $request, string $relation, string $value, string $entity)
     {
         $filters = $this->createCommonFilters($request, $relation, $value);
         
-        $entity = Str::singular($entity);
-        $filters['filters'][] = [
-            'operator' => WhereClause::OR->value,
-            'filters' => [
-                [
-                    'property' => 'contents.entity.name',
-                    'value' => $entity,
-                    'operator' => FilterOperator::EQUALS->value,
+        if ($entity !== 'contents') {
+            $entity = Str::singular($entity);
+            $filters['filters'][] = [
+                'operator' => WhereClause::OR->value,
+                'filters' => [
+                    [
+                        'property' => 'contents.entity.name',
+                        'value' => $entity,
+                        'operator' => FilterOperator::EQUALS->value,
+                    ],
+                    [
+                        'property' => 'contents.entity.slug',
+                        'value' => $entity,
+                        'operator' => FilterOperator::EQUALS->value,
+                    ],
                 ],
-                [
-                    'property' => 'contents.entity.slug',
-                    'value' => $entity,
-                    'operator' => FilterOperator::EQUALS->value,
-                ],
-            ],
-        ];
-
-        $request->merge([
-            'entity' => 'contents',
-            'filters' => $filters,
-        ]);
-        
-        return $this->list($request);
-    }
-    
-    /**
-     * Get contents by relation
-     * 
-     * @param ListRequest $request 
-     * @param string $relation relation name
-     * @param string $value relation value
-     * @return Response 
-     * @throws BadRequestException 
-     * @throws InvalidArgumentException 
-     * @throws BindingResolutionException 
-     * @throws Throwable 
-     * @throws UnexpectedValueException 
-     */
-    public function getContentsByRelation(ListRequest $request, string $relation, string $value)
-    {
-        $filters = $this->createCommonFilters($request, $relation, $value);
+            ];
+        }
 
         $request->merge([
             'entity' => 'contents',

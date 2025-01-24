@@ -66,7 +66,7 @@ class CreateUserCommand extends Command
                                 } else if (is_array($validations[$attribute])) {
                                     $found = array_filter($validations[$attribute], fn($v) => is_string($v) && Str::contains($v, 'in:'));
                                     if (!empty($found)) {
-                                        preg_match('/in:([^|]*)/', $found[0], $matches);
+                                        preg_match('/in:([^|]*)/', head($found), $matches);
                                         $options = explode(',', $matches[1]);
                                     }
                                 }
@@ -115,7 +115,7 @@ class CreateUserCommand extends Command
 
             $this->output->info("Created {$total_users_created} users");
 
-            table(['User', 'Email', 'Password'], $created_users);
+            table(['User', 'Email', 'Password', 'Roles', 'Permissions'], $created_users);
 
             return static::SUCCESS;
         } catch (Throwable $ex) {

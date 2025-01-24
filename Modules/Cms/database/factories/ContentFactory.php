@@ -40,7 +40,8 @@ class ContentFactory extends Factory
         return $this->afterMaking(function (Content $content) {
             $preset = Preset::where('entity_id', $content->entity_id)->inRandomOrder()->first();
             $content->components = $preset->fields->mapWithKeys(function (Field $field) {
-                if (fake()->boolean()) {
+                $value = $field->default;
+                if ($field->required || fake()->boolean()) {
                     switch ($field->type) {
                         case FieldType::TEXTAREA:
                             $value = fake()->paragraphs(fake()->numberBetween(1, 3), true);
@@ -54,16 +55,19 @@ class ContentFactory extends Factory
                         default:
                             $value = $field->default;
                     }
-                } else {
-                    $value = $field->default;
                 }
     
                 return [$field->name => $value];
             })->toArray();
         })->afterCreating(function (Content $content) {
-            $content->authors()->attach(Author::inRandomOrder()->limit(fake()->numberBetween(1, 3))->get());
-            $content->categories()->attach(Category::inRandomOrder()->limit(fake()->numberBetween(1, 3))->get());
-            $content->tags()->attach(Tag::inRandomOrder()->limit(fake()->numberBetween(1, 3))->get());
+            $authors = Author::inRandomOrder()->limit(fake()->numberBetween(1, 3))->get();
+            $content->authors()->attach($authors->isNotEmpty() ? $authors->pluck('id') : Author::factory()->count(rand(1, 3))->create());
+
+            $categories = Category::inRandomOrder()->limit(fake()->numberBetween(1, 2))->get();
+            $content->categories()->attach($categories->isNotEmpty() ? $categories->pluck('id') : Category::factory()->count(rand(1, 3))->create());
+            
+            $tags = Tag::inRandomOrder()->limit(fake()->numberBetween(1, 5))->get();
+            $content->tags()->attach($tags->isNotEmpty() ? $tags->pluck('id') : Tag::factory()->count(rand(1, 3))->create());
         });
     }
 }

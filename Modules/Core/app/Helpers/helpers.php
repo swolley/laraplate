@@ -40,7 +40,7 @@ if (!function_exists('modules')) {
 
         $remapped_modules = $fullpath ? array_map(fn(Module $m) => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
 
-        if ($showMainApp && !$onlyModule) {
+        if ($showMainApp && (!$onlyModule || $onlyModule === 'App')) {
             if ($fullpath) {
                 $remapped_modules['App'] = app_path();
             } else {
@@ -294,15 +294,14 @@ if (!function_exists('routes')) {
         usort($all_routes, fn(Route $a, Route $b) => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
-            if (!isset($route->action['namespace'])) {
-                if ((!$onlyModule || $onlyModule === 'App')) {
-                    $routes[] = $route;
-                }
-            } else {
-                $exploded = explode('\\', $route->action['namespace']);
-                if (($exploded[0] !== 'Modules' && (!$onlyModule || $onlyModule === 'App')) || (in_array($exploded[1], $modules) && (!$onlyModule || $exploded[1] === $onlyModule))) {
-                    $routes[] = $route;
-                }
+            $reference = $route->action['namespace'] ?? $route->action['controller'] ?? $route->action['uses'];
+            if (is_callable($reference)) {
+                $r = new ReflectionFunction($reference);
+                $reference = $r->getName();
+            }
+            $exploded = explode('\\', $reference);
+            if (($exploded[0] !== 'Modules' && (!$onlyModule || $onlyModule === 'App')) || (in_array($exploded[1], $modules) && (!$onlyModule || $exploded[1] === $onlyModule))) {
+                $routes[] = $route;
             }
         }
 

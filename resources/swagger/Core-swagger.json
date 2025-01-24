@@ -2,10 +2,10 @@
     "swagger": "2.0",
     "info": {
         "title": "Laraplate Core module",
-        "description": "",
+        "description": "Common functionalisties for every Laravel application. (core, common)",
         "version": "1.0.0"
     },
-    "host": "http:\/\/127.0.0.1",
+    "host": "127.0.0.1:8000",
     "basePath": "\/",
     "paths": {
         "\/app\/auth\/impersonate": {
@@ -53,6 +53,22 @@
                     }
                 },
                 "operationId": "post-app-auth-leave-impersonate",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/still-here": {
+            "get": {
+                "summary": "Maintain user session.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-still-here",
                 "tags": [
                     "App"
                 ]

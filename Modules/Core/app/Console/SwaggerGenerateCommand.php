@@ -78,19 +78,32 @@ class SwaggerGenerateCommand extends BaseGenerateSwaggerDoc
             }
         }
 
-        $docs = (new ModuleDocGenerator($config, $moduleName !== 'App' ? config('modules.namespace') . '\\' . $moduleName : $moduleName, $filter))->generate();
-        $docs['tags'] = [$moduleName];
+        $doc = (new ModuleDocGenerator($config, $moduleName !== 'App' ? config('modules.namespace') . '\\' . $moduleName : $moduleName, $filter))->generate();
+        $doc['tags'] = [$moduleName];
 
-        $formattedDocs = (new FormatterManager($docs))
+        $formattedDoc = (new FormatterManager($doc))
             ->setFormat($this->option('format'))
             ->format();
 
         if ($file) {
             $folder = Str::beforeLast($file, DIRECTORY_SEPARATOR);
             if (!file_exists($folder)) mkdir($folder, recursive: true);
-            file_put_contents($file, $formattedDocs);
+            file_put_contents($file, $formattedDoc);
+
+            $this->verboseGeneration($doc);
+
         } else {
-            $this->line($formattedDocs);
+            $this->line($formattedDoc);
+        }
+    }
+
+    private function verboseGeneration(array $doc): void
+    {
+        $this->info($doc['info']['title']);
+        foreach ($doc['paths'] as $path => $methods) {
+            $methods = array_map('strtoupper', array_keys($methods));
+            $this->line(implode("|", $methods) . (count($methods) > 1 ? "\t" : "\t\t") . $path);
         }
     }
 }
+

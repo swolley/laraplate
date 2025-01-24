@@ -19,7 +19,8 @@ use Modules\Cms\Http\Controllers\ContentsController;
 //     Route::get('/{value}/{entity}', [ContentsController::class, 'getEntityContentsByLocation'])->name('locations.entity');
 // });
 Route::group(['prefix' => '{relation}'], function () {
-    Route::get('/{value}/contents', [ContentsController::class, 'getContentsByRelation'])->name('relation.contents')->where('relation', 'tags|categories|locations');
-    Route::get('/{value}/{entity}', [ContentsController::class, 'getEntityContentsByRelation'])->name('relation.entity')->where('relation', 'tags|categories|locations');
+    $entities = ['contents', ...Cache::get('entities')->pluck('name')->toArray()];
+    $entities = array_map(fn($entity) => Str::plural($entity), $entities);
+    Route::get('/{value}/{entity}', [ContentsController::class, 'getContentsByRelation'])->name('relation.contents')->where('relation', 'tags|categories|locations|authors')->where('entity', $entities);
 });
 

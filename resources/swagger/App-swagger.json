@@ -5,57 +5,9 @@
         "description": "",
         "version": "1.0.0"
     },
-    "host": "http:\/\/127.0.0.1",
+    "host": "127.0.0.1:8000",
     "basePath": "\/",
     "paths": {
-        "\/_ignition\/execute-solution": {
-            "post": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-_ignition-execute-solution",
-                "tags": [
-                    "Others"
-                ]
-            }
-        },
-        "\/_ignition\/health-check": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-_ignition-health-check",
-                "tags": [
-                    "Others"
-                ]
-            }
-        },
-        "\/_ignition\/update-config": {
-            "post": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-_ignition-update-config",
-                "tags": [
-                    "Others"
-                ]
-            }
-        },
         "\/email\/verification-notification": {
             "post": {
                 "summary": "Send a new email verification notification.",
@@ -344,25 +296,6 @@
                 ]
             }
         },
-        "\/up": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "text\/html": []
-                        }
-                    }
-                },
-                "operationId": "get-up",
-                "tags": [
-                    "Others"
-                ]
-            }
-        },
         "\/user\/confirm-password": {
             "get": {
                 "summary": "Show the confirm password view.",
@@ -514,20 +447,6 @@
                     }
                 },
                 "operationId": "get-user-two-factor-recovery-codes",
-                "tags": [
-                    "Others"
-                ]
-            },
-            "post": {
-                "summary": "Generate a fresh set of two factor authentication recovery codes.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-user-two-factor-recovery-codes",
                 "tags": [
                     "Others"
                 ]

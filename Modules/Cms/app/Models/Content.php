@@ -128,6 +128,9 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 
 	protected function getChildTypes(): array
 	{
+		if (empty(static::$childTypes)) {
+			static::resolveChildTypes();
+		}
 		return static::$childTypes;
 	}
 
@@ -290,13 +293,6 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 		}
 	}
 
-	// protected function name(): Attribute
-	// {
-	// 	return Attribute::get(
-	// 		fn() => $this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true)?->name
-	// 	);
-	// }
-
 	protected function slugFields(): array
 	{
 		return [$this->preset?->fields()->select(['name', 'is_slug'])->firstWhere('is_slug', true)?->name];
@@ -346,7 +342,7 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 	 */
 	public function entity(): BelongsTo
 	{
-		return $this->belongsTo(Entity::class)->select(['id', 'name', 'slug'])->withTrashed();
+		return $this->belongsTo(Entity::class)->withTrashed();
 	}
 
 	/**
@@ -375,11 +371,14 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 	}
 
 	/**
-	 * The author that belongs to the content.
+	 * The authors that belong to the content.
+	 * @return BelongsToMany<Author>
 	 */
 	public function authors(): BelongsToMany
 	{
-		return $this->hasChildrenBelongsToMany(Author::class, 'authorables')->using(Authorable::class)->withTimestamps()->select(['id', 'name'])->withTrashed();
+		return $this->belongsToMany(Author::class, 'authorables')
+			->using(Authorable::class)
+			->withTimestamps();
 	}
 
 	/**
@@ -398,7 +397,8 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 	 */
 	public function related(?bool $withInverse = false): BelongsToMany
 	{
-		$relation = $this->hasChildrenBelongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		// $relation = $this->hasChildrenBelongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
+		$relation = $this->belongsToMany(Content::class, 'relatables')->using(Relatable::class)->withTimestamps();
 		if ($withInverse) {
 			$relation->orWhere(fn($query) => $query->where('related_content_id', $this->id));
 		}
@@ -418,6 +418,9 @@ class Content extends ComposhipsModel implements HasMedia, Sortable
 		$document['categories_id'] = $this->categories->pluck('id')->toArray();
 		$document['tags'] = $this->tags->pluck('name')->toArray();
 		$document['tags_id'] = $this->tags->pluck('id')->toArray();
+		$document['location'] = $this->location->name;
+		$document['location_id'] = $this->location->id;
+		$document['slug'] = $this->slug;
 
 		return $document;
 	}

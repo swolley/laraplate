@@ -33,16 +33,24 @@ trait Searchable
      */
     public function dispatchSearchableJobs(): void
     {
+		if (!config('explorer.connection.host')) {
+			return;
+		}
+
         if ($this->isDirty() || !$this->id) {
             throw new \Exception("Model hasn't been saved yet or has pending changes. Jobs dispatch aborted.");
         }
 
-        Bus::chain([
-			// Generate embeddings
-            new GenerateEmbeddingsJob($this),
-			// Index in Elasticsearch with embeddings
-            new IndexInElasticsearchJob($this)
-        ])->dispatch();
+		if (config('ai.openai_api_key')) {
+			Bus::chain([
+				// Generate embeddings
+        	    new GenerateEmbeddingsJob($this),
+				// Index in Elasticsearch with embeddings
+				new IndexInElasticsearchJob($this)
+			])->dispatch();
+		} else {
+			IndexInElasticsearchJob::dispatch($this);
+		}
     }
 
 	/** 

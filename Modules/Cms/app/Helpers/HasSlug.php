@@ -35,6 +35,6 @@ trait HasSlug
 			return $slug . '-' . $value;
 		}, '');
 
-		return call_user_func($slugger, $slug);
+		return call_user_func($slugger, ltrim($slug, '-'));
 	}
 }

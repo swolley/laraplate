@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('order_column')->nullable();
             $table->json('components')->nullable(false);
             $table->string('slug')->nullable(false);
-            CommonMigrationColumns::timestamps($table, true, true, true, true);
+            CommonMigrationColumns::timestamps($table, true, true, true, true, false);
 
             $table->foreign(['entity_id', 'preset_id'], 'contents_preset_FK')
                 ->references(['entity_id', 'id'])
@@ -63,6 +63,15 @@ return new class extends Migration
 
             $table->primary(['content_id', 'related_content_id']);
         });
+
+        Schema::create('locatables', function (Blueprint $table) {
+            // $table->id();
+            $table->foreignId('content_id')->nullable(false)->constrained('contents', 'id', 'locatables_content_id_FK')->cascadeOnDelete();
+            $table->foreignId('location_id')->nullable(false)->constrained('locations', 'id', 'locatables_location_id_FK')->cascadeOnDelete();
+            CommonMigrationColumns::timestamps($table);
+
+            $table->primary(['content_id', 'location_id']);
+        });
     }
 
     /**
@@ -70,10 +79,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contents');
-        Schema::dropIfExists('categorizables');
-        Schema::dropIfExists('authorables');
         Schema::dropIfExists('relatables');
+        Schema::dropIfExists('authorables');
+        Schema::dropIfExists('categorizables');
         Schema::dropIfExists('locatables');
+        Schema::dropIfExists('contents');
     }
 };

@@ -5,6 +5,7 @@ namespace Modules\Cms\Providers;
 use Illuminate\Support\Str;
 use Modules\Cms\Models\Entity;
 use Modules\Cms\Models\Content;
+use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\Cache;
 use Nwidart\Modules\Traits\PathNamespace;
 use Modules\Core\Overrides\ServiceProvider;
@@ -35,6 +36,10 @@ class CmsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        if (!Module::find('Core')/*->isEnabled()*/) {
+            throw new \Exception('Core is required and must be enabled');
+        }
+
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
 

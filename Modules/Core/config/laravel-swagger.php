@@ -49,12 +49,10 @@ return [
     ],
 
     'ignoredRoutes' => [
-        'core.docs.welcome',
-        'core.docs.phpinfo',
-        'swagger.index',
-        'swagger.oauth2-redirect',
-        'core.docs.swaggerDocs',
+        'core.docs.*',
+        'swagger.*',
         'password.reset',
+        'horizon.*',
     ],
 
     /*

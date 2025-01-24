@@ -41,6 +41,6 @@ abstract class CrudRequest extends FormRequest implements IParsableRequest
     public function parsed(): CrudRequestData
     {
         /** @phpstan-ignore method.notFound */
-        return new CrudRequestData($this, $this->route('entity'), $this->validated(), $this->primaryKey);
+        return new CrudRequestData($this, $this->route('entity'), $this->validated(), $this->primaryKey ?? 'id');
     }
 }
