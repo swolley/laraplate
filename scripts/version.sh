@@ -38,6 +38,25 @@ get_latest_version() {
     fi
 }
 
+# Funzione per aggiornare composer.json
+update_composer_version() {
+    local new_version=$1
+    
+    # Usa jq per aggiornare la versione mantenendo la formattazione del file
+    if command -v jq >/dev/null 2>&1; then
+        # Se jq è installato
+        tmp=$(mktemp)
+        jq --arg version "$new_version" '.version = $version' composer.json > "$tmp" && mv "$tmp" composer.json
+    else
+        # Fallback con sed se jq non è disponibile
+        sed -i "s/\"version\": \".*\"/\"version\": \"$new_version\"/" composer.json
+    fi
+    
+    # Commit delle modifiche al composer.json
+    git add composer.json
+    git commit -m "chore: bump version to $new_version"
+}
+
 # Funzione per aggiornare la versione nel repository corrente
 update_version() {
     local position=$1
@@ -45,8 +64,13 @@ update_version() {
     local new_version=$(increment_version "$current_version" "$position")
     
     echo "Aggiornamento versione da $current_version a $new_version"
+    
+    # Aggiorna composer.json
+    update_composer_version "$new_version"
+    
+    # Crea e pusha il tag
     git tag -a "$new_version" -m "Release $new_version"
-    git push origin "$new_version"
+    git push && git push origin "$new_version"
 }
 
 # Gestione dei comandi
