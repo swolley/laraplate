@@ -1,0 +1,6 @@
+[submodule "Modules/Core"]
+	path = Modules/Core
+	url = git@github.com:swolley/laraplate-core.git
+[submodule "Modules/Cms"]
+	path = Modules/Cms
+	url = git@github.com:swolley/laraplate-cms.git
