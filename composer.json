@@ -76,7 +76,11 @@
         ],
         "test": "pest",
         "test:coverage": "XDEBUG_MODE=coverage pest --coverage --min=80",
-        "test:parallel": "pest --parallel"
+        "test:parallel": "pest --parallel",
+        "version:major": "./scripts/version.sh major",
+        "version:minor": "./scripts/version.sh minor",
+        "version:patch": "./scripts/version.sh patch",
+        "setup:hooks": "./scripts/setup-hooks.sh"
     },
     "extra": {
         "laravel": {

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Chiedi all'utente se vuole incrementare la versione
+echo "Vuoi incrementare la versione?"
+echo "1) Major"
+echo "2) Minor"
+echo "3) Patch"
+echo "4) No"
+read -p "Seleziona un'opzione (1-4): " choice
+
+case $choice in
+    1)
+        composer version:major
+        ;;
+    2)
+        composer version:minor
+        ;;
+    3)
+        composer version:patch
+        ;;
+    4)
+        echo "Versione non incrementata"
+        exit 0
+        ;;
+    *)
+        echo "Opzione non valida"
+        exit 1
+        ;;
+esac
