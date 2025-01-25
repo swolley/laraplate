@@ -71,7 +71,7 @@ FORCE_MEDIA_LIBRARY_LAZY_LOADING=true		#force lazy loading for media files
 
 ### Requirements
 
--   PHP 8.3
+-   PHP >= 8.3
 -   Laravel 11
 -   **PHP Extensions:**
 
@@ -81,10 +81,6 @@ FORCE_MEDIA_LIBRARY_LAZY_LOADING=true		#force lazy loading for media files
 ### Installed Packages
 
 The Cms Module utilizes several packages to enhance its functionality. Below is a list of the key packages included in the `composer.json` file:
-
--   **Tags Management:**
-
-    -   [spatie/laravel-tags](https://github.com/spatie/laravel-tags): Provides a way to manage tags in models.
 
 -   **Parent-Child Relationships:**
 
@@ -105,6 +101,12 @@ The Cms Module includes built-in features such as:
 -   Authors and signatures management
 -   Export Templates management in blade format
 -   AI integration
+
+### Other References
+
+Cms Module takes inspiration from, but does not directly require, libraries such as:
+
+-   [spatie/laravel-tags](https://github.com/spatie/laravel-tags): Provides a way to manage tags in models.
 
 ## Contributing
 

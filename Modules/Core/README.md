@@ -203,7 +203,7 @@ If you need to override the Core Module or dependencies configs you can publish 
 
 ### Requirements
 
--   PHP 8.3
+-   PHP >= 8.3
 -   Laravel 11
 -   **PHP Extensions:**
 
@@ -212,6 +212,7 @@ If you need to override the Core Module or dependencies configs you can publish 
     -   `ext-redis`: Allows interaction with Redis databases.
     -   `ext-pcntl`: Provides process control functions.
     -   `ext-posix`: Offers access to POSIX functions.
+    -   `ext-intl`: Provides internationalization services.
 
 ### Installed Packages
 

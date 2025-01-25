@@ -21,6 +21,7 @@
         "ext-redis": "*",
         "ext-pcntl": "*",
         "ext-posix": "*",
+        "ext-intl": "*",
         "doctrine/dbal": "*",
         "amphp/amp": "^3.0",
         "laravel/fortify": "^1.21",

@@ -972,12 +972,12 @@
         <div class="relative min-h-screen flex flex-col items-center justify-center selection:bg-[#a5ac56] selection:text-white">
             <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
                 <header class="grid items-center gap-2 py-10">
-                    <div class="flex justify-center h-12 w-auto lg:h-16 text-[#a5ac56] gap-2">
-                        @include('core::components.creator-icon')
+                    <div class="flex justify-center w-auto text-[#a5ac56] gap-2">
+                        <img src="https://github.com/swolley/images/blob/master/swolley-1.jpg?raw=true" />
                     </div>
 
                     <!-- session -->
-                    @if (Route::has('login'))
+                    {{-- @if (Route::has('login'))
                     <nav class="-mx-3 flex flex-1 justify-end">
                         @auth
                         <a href="{{ url('/dashboard') }}" class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#a5ac56] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
@@ -995,7 +995,7 @@
                         @endif
                         @endauth
                     </nav>
-                    @endif
+                    @endif --}}
                 </header>
 
                 <main class="mt-6">
@@ -1061,7 +1061,6 @@
                                     <div class="text-sm/relaxed w-full">
                                         <i>Application Environment:</i>
                                         <span class="flex items-center" style="float: right">{{ config('app.env') }}</span>
-                                        0
                                     </div>
 
                                     <!-- database -->

@@ -7,6 +7,7 @@ namespace Modules\Core\Http\Controllers;
 use ArrayAccess;
 use Illuminate\Support\Str;
 use UnexpectedValueException;
+use Illuminate\Contracts\View\View;
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request as RequestFacade;
@@ -19,7 +20,7 @@ class DocsController extends OpenApiJsonController
         return response()->json($this->getJson($version));
     }
 
-    public function welcome()
+    public function welcome(): View
     {
         $all_modules = modules(true, false, false);
         $all_models = models(false);
@@ -73,9 +74,9 @@ class DocsController extends OpenApiJsonController
         ]);
     }
 
-    public function phpinfo(): void
+    public function phpinfo(): View
     {
-        phpinfo();
+        return view('core::phpinfo');
     }
 
     /**
