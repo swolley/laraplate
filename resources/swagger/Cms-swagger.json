@@ -125,7 +125,8 @@
                 ],
                 "operationId": "get-api-v1-tags-value-contents",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -246,7 +247,8 @@
                 ],
                 "operationId": "get-api-v1-tags-value-articles",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -367,7 +369,8 @@
                 ],
                 "operationId": "get-api-v1-tags-value-events",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -488,7 +491,8 @@
                 ],
                 "operationId": "get-api-v1-tags-value-multimedia",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -609,7 +613,8 @@
                 ],
                 "operationId": "get-api-v1-categories-value-contents",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -730,7 +735,8 @@
                 ],
                 "operationId": "get-api-v1-categories-value-articles",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -851,7 +857,8 @@
                 ],
                 "operationId": "get-api-v1-categories-value-events",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -972,7 +979,8 @@
                 ],
                 "operationId": "get-api-v1-categories-value-multimedia",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1093,7 +1101,8 @@
                 ],
                 "operationId": "get-api-v1-locations-value-contents",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1214,7 +1223,8 @@
                 ],
                 "operationId": "get-api-v1-locations-value-articles",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1335,7 +1345,8 @@
                 ],
                 "operationId": "get-api-v1-locations-value-events",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1456,7 +1467,8 @@
                 ],
                 "operationId": "get-api-v1-locations-value-multimedia",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1577,7 +1589,8 @@
                 ],
                 "operationId": "get-api-v1-authors-value-contents",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1698,7 +1711,8 @@
                 ],
                 "operationId": "get-api-v1-authors-value-articles",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1819,7 +1833,8 @@
                 ],
                 "operationId": "get-api-v1-authors-value-events",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1940,7 +1955,8 @@
                 ],
                 "operationId": "get-api-v1-authors-value-multimedia",
                 "tags": [
-                    "Api"
+                    "Api",
+                    "Cms"
                 ]
             }
         },
@@ -1986,12 +2002,14 @@
                 ],
                 "operationId": "get-app-locations-geocode",
                 "tags": [
-                    "App"
+                    "App",
+                    "Cms"
                 ]
             }
         }
     },
     "tags": [
-        "Cms"
+        "Cms",
+        "Api"
     ]
 }

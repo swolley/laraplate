@@ -38,7 +38,8 @@
                 ],
                 "operationId": "post-app-auth-impersonate",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -54,7 +55,8 @@
                 },
                 "operationId": "post-app-auth-leave-impersonate",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -70,7 +72,8 @@
                 },
                 "operationId": "get-app-auth-still-here",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -86,7 +89,8 @@
                 },
                 "operationId": "get-app-auth-user-profile-information",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -102,7 +106,8 @@
                 },
                 "operationId": "get-app-configs",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -127,7 +132,8 @@
                 ],
                 "operationId": "patch-app-crud-activate-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -152,7 +158,8 @@
                 ],
                 "operationId": "patch-app-crud-approve-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -177,7 +184,8 @@
                 ],
                 "operationId": "delete-app-crud-cache-clear-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -202,7 +210,8 @@
                 ],
                 "operationId": "delete-app-crud-delete-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -225,7 +234,8 @@
                 ],
                 "operationId": "post-app-crud-delete-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -277,7 +287,8 @@
                 ],
                 "operationId": "get-app-crud-detail-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -302,7 +313,8 @@
                 ],
                 "operationId": "patch-app-crud-disapprove-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -327,7 +339,8 @@
                 ],
                 "operationId": "get-app-crud-grid-check-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -352,7 +365,8 @@
                 ],
                 "operationId": "get-app-crud-grid-configs-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -377,7 +391,8 @@
                 ],
                 "operationId": "get-app-crud-grid-data-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -400,7 +415,8 @@
                 ],
                 "operationId": "post-app-crud-grid-data-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -425,7 +441,8 @@
                 ],
                 "operationId": "delete-app-crud-grid-delete-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -448,7 +465,8 @@
                 ],
                 "operationId": "post-app-crud-grid-delete-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -473,7 +491,8 @@
                 ],
                 "operationId": "get-app-crud-grid-export-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -496,7 +515,8 @@
                 ],
                 "operationId": "post-app-crud-grid-export-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -521,7 +541,8 @@
                 ],
                 "operationId": "post-app-crud-grid-insert-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -546,7 +567,8 @@
                 ],
                 "operationId": "get-app-crud-grid-layout-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -569,7 +591,8 @@
                 ],
                 "operationId": "post-app-crud-grid-layout-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "put": {
@@ -592,7 +615,8 @@
                 ],
                 "operationId": "put-app-crud-grid-layout-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "patch": {
@@ -615,7 +639,8 @@
                 ],
                 "operationId": "patch-app-crud-grid-layout-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "delete": {
@@ -638,7 +663,8 @@
                 ],
                 "operationId": "delete-app-crud-grid-layout-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -663,7 +689,8 @@
                 ],
                 "operationId": "get-app-crud-grid-select-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -686,7 +713,8 @@
                 ],
                 "operationId": "post-app-crud-grid-select-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -711,7 +739,8 @@
                 ],
                 "operationId": "patch-app-crud-grid-update-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "put": {
@@ -734,7 +763,8 @@
                 ],
                 "operationId": "put-app-crud-grid-update-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -793,7 +823,8 @@
                 ],
                 "operationId": "get-app-crud-history-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -818,7 +849,8 @@
                 ],
                 "operationId": "patch-app-crud-inactivate-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -843,7 +875,8 @@
                 ],
                 "operationId": "post-app-crud-insert-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -868,7 +901,8 @@
                 ],
                 "operationId": "patch-app-crud-lock-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -959,7 +993,8 @@
                 ],
                 "operationId": "get-app-crud-search-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -1027,7 +1062,8 @@
                 ],
                 "operationId": "post-app-crud-search-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1148,7 +1184,8 @@
                 ],
                 "operationId": "get-app-crud-select-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "post": {
@@ -1251,7 +1288,8 @@
                 ],
                 "operationId": "post-app-crud-select-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1317,7 +1355,8 @@
                 ],
                 "operationId": "get-app-crud-tree-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1342,7 +1381,8 @@
                 ],
                 "operationId": "patch-app-crud-unlock-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1367,7 +1407,8 @@
                 ],
                 "operationId": "patch-app-crud-update-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             },
             "put": {
@@ -1390,7 +1431,8 @@
                 ],
                 "operationId": "put-app-crud-update-entity",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1406,7 +1448,8 @@
                 },
                 "operationId": "get-app-info",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         },
@@ -1431,7 +1474,8 @@
                 ],
                 "operationId": "get-app-translations-lang",
                 "tags": [
-                    "App"
+                    "App",
+                    "Core"
                 ]
             }
         }

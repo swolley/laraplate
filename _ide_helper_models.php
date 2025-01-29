@@ -16,7 +16,7 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property int $user_id
+ * @property int|null $user_id
  * @property string $name
  * @property string|null $public_email
  * @property \Carbon\CarbonImmutable $created_at
@@ -34,7 +34,7 @@ namespace Modules\Cms\Models{
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property mixed $picture
- * @property-read \Modules\Core\Models\User $user
+ * @property-read \Modules\Core\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Cms\Database\Factories\AuthorFactory factory($count = null, $state = [])

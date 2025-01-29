@@ -73,13 +73,16 @@ update_version() {
     git push && git push origin "$new_version"
 }
 
-# Gestione dei comandi
-case $1 in
-    "major"|"minor"|"patch")
-        update_version $1
-        ;;
-    *)
-        echo "Uso: $0 {major|minor|patch}"
-        exit 1
-        ;;
-esac 
+if [ -n "$2" ] && [ -d "Modules/$2" ]; then
+    cd Modules/$2 && update_version $1
+else
+    case $1 in
+        "major"|"minor"|"patch")
+            update_version $1
+            ;;
+        *)
+            echo "Uso: $0 {major|minor|patch}"
+            exit 1
+            ;;
+    esac 
+fi
