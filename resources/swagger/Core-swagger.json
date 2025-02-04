@@ -3,11 +3,704 @@
     "info": {
         "title": "Laraplate Core module",
         "description": "Common functionalisties for every Laravel application. (core, common)",
-        "version": "1.0.0"
+        "version": "1.1.0"
     },
     "host": "127.0.0.1:8000",
     "basePath": "\/",
     "paths": {
+        "\/api\/v1\/delete\/{entity}": {
+            "delete": {
+                "summary": "Remove the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "delete-api-v1-delete-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            },
+            "post": {
+                "summary": "Remove the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-api-v1-delete-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/detail\/{entity}": {
+            "get": {
+                "summary": "Show the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-detail-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/history\/{entity}": {
+            "get": {
+                "summary": "Show resource history",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-history-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/insert\/{entity}": {
+            "post": {
+                "summary": "Insert the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "post-api-v1-insert-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/search\/{entity}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "qs",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-search-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "qs"
+                            ],
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "pagination": {
+                                    "type": "integer"
+                                },
+                                "page": {
+                                    "type": "integer"
+                                },
+                                "from": {
+                                    "type": "integer"
+                                },
+                                "to": {
+                                    "type": "integer"
+                                },
+                                "limit": {
+                                    "type": "integer"
+                                },
+                                "filters": {
+                                    "type": "string"
+                                },
+                                "qs": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-api-v1-search-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/select\/{entity}": {
+            "get": {
+                "summary": "List the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-select-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            },
+            "post": {
+                "summary": "List the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                },
+                                "columns": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "relations": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "pagination": {
+                                    "type": "integer"
+                                },
+                                "page": {
+                                    "type": "integer"
+                                },
+                                "from": {
+                                    "type": "integer"
+                                },
+                                "to": {
+                                    "type": "integer"
+                                },
+                                "limit": {
+                                    "type": "integer"
+                                },
+                                "count": {
+                                    "type": "boolean"
+                                },
+                                "sort": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "property": {
+                                                    "type": "string"
+                                                },
+                                                "direction": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "asc",
+                                                        "desc",
+                                                        "ASC",
+                                                        "DESC"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "filters": {
+                                    "type": "string"
+                                },
+                                "group_by": {
+                                    "type": "array",
+                                    "items": [
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-api-v1-select-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/tree\/{entity}": {
+            "get": {
+                "summary": "Get the specified resource data",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "parents",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "children",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-tree-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
+        "\/api\/v1\/update\/{entity}": {
+            "patch": {
+                "summary": "Update the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "patch-api-v1-update-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            },
+            "put": {
+                "summary": "Update the specified resource",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "entity",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "put-api-v1-update-entity",
+                "tags": [
+                    "Api",
+                    "Core"
+                ]
+            }
+        },
         "\/app\/auth\/impersonate": {
             "post": {
                 "summary": "Impersonate a user.",
@@ -1481,6 +2174,7 @@
         }
     },
     "tags": [
-        "Core"
+        "Core",
+        "Api"
     ]
 }
