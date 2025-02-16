@@ -1,0 +1,49 @@
+{
+    "printWidth": 120,
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "proseWrap": "preserve",
+    "htmlWhitespaceSensitivity": "css",
+    "vueIndentScriptAndStyle": false,
+    "endOfLine": "lf",
+    "embeddedLanguageFormatting": "auto",
+    "singleAttributePerLine": false,
+    "phpVersion": "8.3",
+    "trailingCommaPHP": true,
+    "braceStyle": "psr-2",
+    "plugins": [
+        "@prettier/plugin-php"
+    ],
+    "overrides": [
+        {
+            "files": "*.php",
+            "options": {
+                "parser": "php",
+                "tabWidth": 4,
+                "phpVersion": "8.3",
+                "trailingCommaPHP": true,
+                "braceStyle": "psr-2"
+            }
+        },
+        {
+            "files": ["*.css", "*.scss", "*.less"],
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": ["*.json", "*.yaml", "*.yml"],
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ]
+} 
