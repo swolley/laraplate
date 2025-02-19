@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use Modules\Core\Overrides\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,16 +11,16 @@ class DatabaseSeeder extends Seeder
 	 */
 	public function run(): void
 	{
-		$modules = modules(prioritySort: true);
-		foreach ($modules as $module) {
-			$module_dir = module_path($module, 'database/seeders');
-			if (is_dir($module_dir)) {
-				$seeders = glob($module_dir . '/*.php');
-				foreach ($seeders as $seeder) {
-					$seeder_class = "Modules\\$module\\Database\\Seeders\\" . basename($seeder, '.php');
-					$this->call($seeder_class);
-				}
-			}
-		}
+		// $modules = modules(prioritySort: true);
+		// foreach ($modules as $module) {
+		// 	$module_dir = module_path($module, 'database/seeders');
+		// 	if (is_dir($module_dir)) {
+		// 		$seeders = glob($module_dir . '/*.php');
+		// 		foreach ($seeders as $seeder) {
+		// 			$seeder_class = "Modules\\$module\\Database\\Seeders\\" . basename($seeder, '.php');
+		// 			$this->call($seeder_class);
+		// 		}
+		// 	}
+		// }
 	}
 }

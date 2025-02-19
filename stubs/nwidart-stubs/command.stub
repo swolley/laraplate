@@ -2,7 +2,7 @@
 
 namespace $NAMESPACE$;
 
-use Illuminate\Console\Command;
+use Modules\Core\Overrides\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -21,10 +21,10 @@ class $CLASS$ extends Command
     /**
      * Create a new command instance.
      */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    // public function __construct()
+    // {
+    //     parent::__construct();
+    //}
 
     /**
      * Execute the console command.

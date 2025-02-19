@@ -78,7 +78,7 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $locked_at
  * @property string|null $locked_user_id
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $children
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -89,24 +89,24 @@ namespace Modules\Cms\Models{
  * @property-read mixed $path
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $ancestors The model's recursive parents.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $ancestors The model's recursive parents.
  * @property-read int|null $ancestors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $ancestorsAndSelf The model's recursive parents and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $ancestorsAndSelf The model's recursive parents and itself.
  * @property-read int|null $ancestors_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $bloodline The model's ancestors, descendants and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $bloodline The model's ancestors, descendants and itself.
  * @property-read int|null $bloodline_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $childrenAndSelf The model's direct children and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $childrenAndSelf The model's direct children and itself.
  * @property-read int|null $children_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $descendants The model's recursive children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $descendants The model's recursive children.
  * @property-read int|null $descendants_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $descendantsAndSelf The model's recursive children and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $descendantsAndSelf The model's recursive children and itself.
  * @property-read int|null $descendants_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $parentAndSelf The model's direct parent and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $parentAndSelf The model's direct parent and itself.
  * @property-read int|null $parent_and_self_count
  * @property-read \Modules\Cms\Models\Category|null $rootAncestor The model's topmost parent.
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $siblings The parent's other children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $siblings The parent's other children.
  * @property-read int|null $siblings_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Cms\Models\Category[] $siblingsAndSelf All the parent's children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $siblingsAndSelf All the parent's children.
  * @property-read int|null $siblings_and_self_count
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> all($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category breadthFirst()
@@ -1070,7 +1070,7 @@ namespace Modules\Core\Models{
  * @property string|null $locked_at
  * @property string|null $locked_user_id
  * @property int|null $parent_id
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $children
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\TFactory|null $use_factory
@@ -1084,24 +1084,24 @@ namespace Modules\Core\Models{
  * @property-read int|null $users_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $ancestors The model's recursive parents.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $ancestors The model's recursive parents.
  * @property-read int|null $ancestors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $ancestorsAndSelf The model's recursive parents and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $ancestorsAndSelf The model's recursive parents and itself.
  * @property-read int|null $ancestors_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $bloodline The model's ancestors, descendants and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $bloodline The model's ancestors, descendants and itself.
  * @property-read int|null $bloodline_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $childrenAndSelf The model's direct children and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $childrenAndSelf The model's direct children and itself.
  * @property-read int|null $children_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $descendants The model's recursive children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $descendants The model's recursive children.
  * @property-read int|null $descendants_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $descendantsAndSelf The model's recursive children and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $descendantsAndSelf The model's recursive children and itself.
  * @property-read int|null $descendants_and_self_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $parentAndSelf The model's direct parent and itself.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $parentAndSelf The model's direct parent and itself.
  * @property-read int|null $parent_and_self_count
  * @property-read \Modules\Core\Models\Role|null $rootAncestor The model's topmost parent.
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $siblings The parent's other children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $siblings The parent's other children.
  * @property-read int|null $siblings_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection|\Modules\Core\Models\Role[] $siblingsAndSelf All the parent's children.
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $siblingsAndSelf All the parent's children.
  * @property-read int|null $siblings_and_self_count
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> all($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role breadthFirst()
