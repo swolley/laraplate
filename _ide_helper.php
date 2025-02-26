@@ -24536,6 +24536,174 @@ namespace Illuminate\Routing {
             }
     }
 
+namespace Laravel\Fortify\Http\Requests {
+    /**
+     * 
+     *
+     */
+    class LoginRequest {
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
+         * @param array $rules
+         * @param mixed $params
+         * @static 
+         */
+        public static function validate($rules, ...$params)
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::validate($rules, ...$params);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
+         * @param string $errorBag
+         * @param array $rules
+         * @param mixed $params
+         * @static 
+         */
+        public static function validateWithBag($errorBag, $rules, ...$params)
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::validateWithBag($errorBag, $rules, ...$params);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $absolute
+         * @static 
+         */
+        public static function hasValidSignature($absolute = true)
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidSignature($absolute);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @static 
+         */
+        public static function hasValidRelativeSignature()
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidRelativeSignature();
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $ignoreQuery
+         * @param mixed $absolute
+         * @static 
+         */
+        public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $ignoreQuery
+         * @static 
+         */
+        public static function hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
+        {
+            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidRelativeSignatureWhileIgnoring($ignoreQuery);
+        }
+
+            }
+    }
+
+namespace Illuminate\Foundation\Http {
+    /**
+     * 
+     *
+     */
+    class FormRequest {
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
+         * @param array $rules
+         * @param mixed $params
+         * @static 
+         */
+        public static function validate($rules, ...$params)
+        {
+            return \Illuminate\Foundation\Http\FormRequest::validate($rules, ...$params);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
+         * @param string $errorBag
+         * @param array $rules
+         * @param mixed $params
+         * @static 
+         */
+        public static function validateWithBag($errorBag, $rules, ...$params)
+        {
+            return \Illuminate\Foundation\Http\FormRequest::validateWithBag($errorBag, $rules, ...$params);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $absolute
+         * @static 
+         */
+        public static function hasValidSignature($absolute = true)
+        {
+            return \Illuminate\Foundation\Http\FormRequest::hasValidSignature($absolute);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @static 
+         */
+        public static function hasValidRelativeSignature()
+        {
+            return \Illuminate\Foundation\Http\FormRequest::hasValidRelativeSignature();
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $ignoreQuery
+         * @param mixed $absolute
+         * @static 
+         */
+        public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+        {
+            return \Illuminate\Foundation\Http\FormRequest::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
+        }
+
+        /**
+         * 
+         *
+         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
+         * @param mixed $ignoreQuery
+         * @static 
+         */
+        public static function hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
+        {
+            return \Illuminate\Foundation\Http\FormRequest::hasValidRelativeSignatureWhileIgnoring($ignoreQuery);
+        }
+
+            }
+    }
+
 
 namespace  {
     class App extends \Illuminate\Support\Facades\App {}

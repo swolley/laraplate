@@ -824,6 +824,31 @@ namespace Modules\Core\Models{
 /**
  * 
  *
+ * @property \Modules\Core\Casts\FiltersGroup $filters
+ * @property \Modules\Core\Casts\Sort $sort
+ * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read \Modules\Core\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Modules\Core\Models\Permission|null $permission
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
+ * @property-read int|null $versions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL forPermission($permission_id)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL withoutTrashed()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperACL {}
+}
+
+namespace Modules\Core\Models{
+/**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property string $command
