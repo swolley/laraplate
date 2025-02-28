@@ -28,7 +28,6 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read bool $can_login
  * @property-read bool $is_signature
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
@@ -82,7 +81,6 @@ namespace Modules\Cms\Models{
  * @property-read int|null $children_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Modules\Cms\Models\Category|null $parent
@@ -184,7 +182,6 @@ namespace Modules\Cms\Models{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
@@ -265,7 +262,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
@@ -346,7 +342,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
@@ -427,7 +422,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
@@ -496,7 +490,6 @@ namespace Modules\Cms\Models{
  * @property-read int|null $categories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read mixed $path
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Preset> $presets
  * @property-read int|null $presets_count
@@ -534,7 +527,6 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Modules\Cms\Models\Pivot\Fieldable|null $pivot
@@ -584,7 +576,6 @@ namespace Modules\Cms\Models{
  * @property string|null $locked_user_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read mixed $path
  * @method static \Modules\Cms\Database\Factories\LocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location newModelQuery()
@@ -730,7 +721,6 @@ namespace Modules\Cms\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Field> $fields
  * @property-read int|null $fields_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Modules\Cms\Models\Template|null $template
@@ -767,7 +757,6 @@ namespace Modules\Cms\Models{
  * @property int|null $order_column
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read mixed $path
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag containing(string $name, $locale = null)
  * @method static \Modules\Cms\Database\Factories\TagFactory factory($count = null, $state = [])
@@ -800,7 +789,6 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Cms\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -860,7 +848,6 @@ namespace Modules\Core\Models{
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -922,7 +909,6 @@ namespace Modules\Core\Models{
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon $valid_from
  * @property \Illuminate\Support\Carbon|null $valid_to
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expiredAt(\Illuminate\Support\Carbon $date)
@@ -1098,7 +1084,6 @@ namespace Modules\Core\Models{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Modules\Core\Models\Role|null $parent
@@ -1189,7 +1174,6 @@ namespace Modules\Core\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
@@ -1247,7 +1231,6 @@ namespace Modules\Core\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
  * @property-read int|null $disapprovals_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\UserGridConfig> $grid_configs
  * @property-read int|null $grid_configs_count
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -1313,7 +1296,6 @@ namespace Modules\Core\Models{
  * @property array<array-key, mixed> $config
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \Modules\Core\Models\TFactory|null $use_factory
  * @property-read \Modules\Core\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig newQuery()
