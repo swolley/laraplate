@@ -29927,7 +29927,7 @@ if (!function_exists('modules')) {
      */
     function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $onlyModule = null, ?bool $prioritySort = false): array
     {
-        $module_class = 'Nwidart\\Modules\\Facades\\Module';
+        $module_class = \Nwidart\Modules\Facades\Module::class;
         $modules = class_exists($module_class) ? ($onlyActive ? $module_class::allEnabled() : $module_class::all()) : [];
         $remapped_modules = [];
         foreach ($modules as $module => $class) {
@@ -30034,7 +30034,7 @@ if (!function_exists('translations')) {
                         $modules_languages[] = $language;
                     }
                 } else {
-                    array_push($modules_languages, $file);
+                    $modules_languages[] = $file;
                 }
             }
         }
@@ -30081,7 +30081,7 @@ if (!function_exists('migrations')) {
             }
 
             return $count ? count($found) : $found;
-        } catch (Exception $ex) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -30204,7 +30204,7 @@ if (!function_exists('routes')) {
                 $r = new ReflectionFunction($reference);
                 $reference = $r->getName();
             }
-            $exploded = explode('\\', $reference);
+            $exploded = explode('\\', (string) $reference);
             if (($exploded[0] !== 'Modules' && (!$onlyModule || $onlyModule === 'App')) || (in_array($exploded[1], $modules) && (!$onlyModule || $exploded[1] === $onlyModule))) {
                 $routes[] = $route;
             }
@@ -30245,10 +30245,8 @@ if (!function_exists('api_versions')) {
             $matches = [];
             preg_match("/^api\/(v\d)\//", $uri, $matches);
 
-            if (count($matches) === 2) {
-                if (!in_array($matches[1], $versions, true)) {
-                    $versions[] = $matches[1];
-                }
+            if (count($matches) === 2 && !in_array($matches[1], $versions, true)) {
+                $versions[] = $matches[1];
             }
         }
 
@@ -30300,11 +30298,7 @@ if (!function_exists('array_sort_keys')) {
         foreach ($keys as $key) {
             $value = $array[(string) $key];
 
-            if (is_array($value)) {
-                $result[(string) $key] = array_sort_keys($value);
-            } else {
-                $result[(string) $key] = $value;
-            }
+            $result[(string) $key] = is_array($value) ? array_sort_keys($value) : $value;
         }
 
         return $result;

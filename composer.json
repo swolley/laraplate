@@ -58,7 +58,6 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan module:composer-update -a",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:models -MN",
@@ -82,7 +81,8 @@
         "version:major": "./scripts/version.sh major",
         "version:minor": "./scripts/version.sh minor",
         "version:patch": "./scripts/version.sh patch",
-        "setup:hooks": "./scripts/setup-hooks.sh"
+        "setup:hooks": "./scripts/setup-hooks.sh",
+        "update-all": "./scripts/update-composer.sh"
     },
     "extra": {
         "laravel": {

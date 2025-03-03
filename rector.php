@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 // use Rector\Laravel\Set\LaravelSetList;
+use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
 use RectorLaravel\Set\LaravelSetList;
 use Rector\Set\ValueObject\LevelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
-        __DIR__ . '/app',
-        __DIR__ . '/Modules',
-    ]);
+    // Rileva automaticamente tutti i moduli
+    $modules = array_filter(glob(__DIR__ . '/Modules/*'), 'is_dir');
+    $paths = array_merge(
+        [__DIR__ . '/app'],
+        array_map(fn($module) => "$module/app", $modules),
+        array_map(fn($module) => "$module/tests", $modules),
+    );
+
+    $rectorConfig->paths($paths);
 
     $rectorConfig->sets([
         SetList::CODE_QUALITY,
@@ -23,9 +29,15 @@ return static function (RectorConfig $rectorConfig): void {
         LevelSetList::UP_TO_PHP_84,   // Per supporto PHP 8.4
     ]);
 
-    // Skip alcuni file/directory se necessario
+    // Skip directories e files specifici
     $rectorConfig->skip([
         __DIR__ . '/vendor',
         __DIR__ . '/storage',
+        __DIR__ . '/Modules/*/vendor',
+        __DIR__ . '/Modules/*/node_modules',
+        // Aggiungi altri pattern da escludere se necessario
     ]);
+
+    // Imposta il livello PHP target
+    $rectorConfig->phpVersion(PhpVersion::PHP_84);
 };
