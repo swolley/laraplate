@@ -16,7 +16,7 @@
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "auto",
     "singleAttributePerLine": false,
-    "phpVersion": "8.3",
+    "phpVersion": "8.4",
     "trailingCommaPHP": true,
     "braceStyle": "psr-2",
     "plugins": [
@@ -28,7 +28,7 @@
             "options": {
                 "parser": "php",
                 "tabWidth": 4,
-                "phpVersion": "8.3",
+                "phpVersion": "8.4",
                 "trailingCommaPHP": true,
                 "braceStyle": "psr-2"
             }

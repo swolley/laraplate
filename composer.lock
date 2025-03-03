@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7684ddee32fd3d17462546151bbcb601",
+    "content-hash": "fc36c7c2e810087bf0a68a4170d807ef",
     "packages": [
         {
             "name": "awobaz/compoships",
@@ -10260,27 +10260,27 @@
         },
         {
             "name": "tightenco/parental",
-            "version": "v1.4.1",
+            "version": "v1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tighten/parental.git",
-                "reference": "a6a2d6b9ba0e78347fb903c71808c3c0a27b659a"
+                "reference": "63e5bb893974e1d96d33872ee6d9de67c7c237cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tighten/parental/zipball/a6a2d6b9ba0e78347fb903c71808c3c0a27b659a",
-                "reference": "a6a2d6b9ba0e78347fb903c71808c3c0a27b659a",
+                "url": "https://api.github.com/repos/tighten/parental/zipball/63e5bb893974e1d96d33872ee6d9de67c7c237cf",
+                "reference": "63e5bb893974e1d96d33872ee6d9de67c7c237cf",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^9.0||^10.0||^11.0",
-                "illuminate/events": "^9.0||^10.0||^11.0",
+                "illuminate/database": "^9.0||^10.0||^11.0||^12.0",
+                "illuminate/events": "^9.0||^10.0||^11.0||^12.0",
                 "php": "^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^7.0||^8.0||^9.0",
-                "phpunit/phpunit": "^9.5.10||^10.5",
-                "tightenco/duster": "^2.7"
+                "orchestra/testbench": "^7.0||^8.0||^9.0||^10.0",
+                "phpunit/phpunit": "^9.5.10||^10.5||^11.5.3",
+                "tightenco/duster": "^3.1"
             },
             "type": "library",
             "autoload": {
@@ -10309,7 +10309,7 @@
             "description": "A simple eloquent trait that allows relationships to be accessed through child models.",
             "support": {
                 "issues": "https://github.com/tighten/parental/issues",
-                "source": "https://github.com/tighten/parental/tree/v1.4.1"
+                "source": "https://github.com/tighten/parental/tree/v1.4.2"
             },
             "funding": [
                 {
@@ -10317,7 +10317,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-02-06T21:14:54+00:00"
+            "time": "2025-03-03T21:32:44+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
