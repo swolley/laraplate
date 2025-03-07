@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -55,8 +54,6 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
-
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -68,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -81,11 +78,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'it'),
+    'locale' => env('APP_LOCALE', 'en'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'it_IT'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +101,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', '')),
+            explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
 
@@ -122,7 +119,8 @@ return [
     */
 
     'maintenance' => [
-        'driver' => env('APP_MAINTENANCE_DRIVER', 'cache'),
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
 ];

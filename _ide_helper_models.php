@@ -11,6 +11,86 @@
  */
 
 
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $username
+ * @property string|null $lang
+ * @property string|null $last_login_at
+ * @property string|null $license_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $locked_at
+ * @property string|null $locked_user_id
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property string|null $two_factor_confirmed_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
+ * @property-read int|null $approvals_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
+ * @property-read int|null $disapprovals_count
+ * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\UserGridConfig> $grid_configs
+ * @property-read int|null $grid_configs_count
+ * @property-read \Modules\Core\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Modules\Core\Models\License|null $license
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \Modules\Core\Models\Pivot\ModelHasRole|null $pivot
+ * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
+ * @property-read int|null $roles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
+ * @property-read int|null $versions_count
+ * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User locked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User lockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlocked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLang($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLastLoginAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLicenseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLockedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLockedUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorRecoveryCodes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereUsername($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User withoutPermission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User withoutRole($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User withoutTrashed()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperUser {}
+}
+
 namespace Modules\Cms\Models{
 /**
  * 

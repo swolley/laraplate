@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 11.44.0.
+ * Generated for Laravel 12.1.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1296,11 +1296,12 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a binding with the container.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @param bool $shared
          * @return void 
          * @throws \TypeError
+         * @throws ReflectionException
          * @static 
          */
         public static function bind($abstract, $concrete = null, $shared = false)
@@ -1358,7 +1359,7 @@ namespace Illuminate\Support\Facades {
          * Add a contextual binding to the container.
          *
          * @param string $concrete
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string $implementation
          * @return void 
          * @static 
@@ -1373,7 +1374,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a binding if it hasn't already been registered.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @param bool $shared
          * @return void 
@@ -1389,7 +1390,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a shared binding in the container.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @return void 
          * @static 
@@ -1404,7 +1405,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a shared binding if it hasn't already been registered.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @return void 
          * @static 
@@ -1419,7 +1420,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a scoped binding in the container.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @return void 
          * @static 
@@ -1434,7 +1435,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a scoped binding if it hasn't already been registered.
          *
-         * @param string $abstract
+         * @param \Closure|string $abstract
          * @param \Closure|string|null $concrete
          * @return void 
          * @static 
@@ -6063,6 +6064,21 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Run the callback function with the given context values and restore the original context state when complete.
+         *
+         * @param callable $callback
+         * @param array<string, mixed> $data
+         * @param array<string, mixed> $hidden
+         * @return mixed 
+         * @static 
+         */
+        public static function scope($callback, $data = [], $hidden = [])
+        {
+            /** @var \Illuminate\Log\Context\Repository $instance */
+            return $instance->scope($callback, $data, $hidden);
+        }
+
+        /**
          * Determine if the repository is empty.
          *
          * @return bool 
@@ -6621,16 +6637,16 @@ namespace Illuminate\Support\Facades {
      *
      * @see https://carbon.nesbot.com/docs/
      * @see https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Factory.php
-     * @method static \Illuminate\Support\Carbon create($year = 0, $month = 1, $day = 1, $hour = 0, $minute = 0, $second = 0, $tz = null)
-     * @method static \Illuminate\Support\Carbon createFromDate($year = null, $month = null, $day = null, $tz = null)
-     * @method static \Illuminate\Support\Carbon|false createFromFormat($format, $time, $tz = null)
-     * @method static \Illuminate\Support\Carbon createFromTime($hour = 0, $minute = 0, $second = 0, $tz = null)
-     * @method static \Illuminate\Support\Carbon createFromTimeString($time, $tz = null)
-     * @method static \Illuminate\Support\Carbon createFromTimestamp($timestamp, $tz = null)
-     * @method static \Illuminate\Support\Carbon createFromTimestampMs($timestamp, $tz = null)
+     * @method static \Illuminate\Support\Carbon create($year = 0, $month = 1, $day = 1, $hour = 0, $minute = 0, $second = 0, $timezone = null)
+     * @method static \Illuminate\Support\Carbon createFromDate($year = null, $month = null, $day = null, $timezone = null)
+     * @method static \Illuminate\Support\Carbon|false createFromFormat($format, $time, $timezone = null)
+     * @method static \Illuminate\Support\Carbon createFromTime($hour = 0, $minute = 0, $second = 0, $timezone = null)
+     * @method static \Illuminate\Support\Carbon createFromTimeString($time, $timezone = null)
+     * @method static \Illuminate\Support\Carbon createFromTimestamp($timestamp, $timezone = null)
+     * @method static \Illuminate\Support\Carbon createFromTimestampMs($timestamp, $timezone = null)
      * @method static \Illuminate\Support\Carbon createFromTimestampUTC($timestamp)
-     * @method static \Illuminate\Support\Carbon createMidnightDate($year = null, $month = null, $day = null, $tz = null)
-     * @method static \Illuminate\Support\Carbon|false createSafe($year = null, $month = null, $day = null, $hour = null, $minute = null, $second = null, $tz = null)
+     * @method static \Illuminate\Support\Carbon createMidnightDate($year = null, $month = null, $day = null, $timezone = null)
+     * @method static \Illuminate\Support\Carbon|false createSafe($year = null, $month = null, $day = null, $hour = null, $minute = null, $second = null, $timezone = null)
      * @method static void disableHumanDiffOption($humanDiffOption)
      * @method static void enableHumanDiffOption($humanDiffOption)
      * @method static mixed executeWithLocale($locale, $func)
@@ -6643,7 +6659,7 @@ namespace Illuminate\Support\Facades {
      * @method static string getLocale()
      * @method static int getMidDayAt()
      * @method static \Illuminate\Support\Carbon|null getTestNow()
-     * @method static \Symfony\Component\Translation\TranslatorInterface getTranslator()
+     * @method static \Symfony\Contracts\Translation\TranslatorInterface getTranslator()
      * @method static int getWeekEndsAt()
      * @method static int getWeekStartsAt()
      * @method static array getWeekendDays()
@@ -6666,8 +6682,8 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Support\Carbon maxValue()
      * @method static \Illuminate\Support\Carbon minValue()
      * @method static void mixin($mixin)
-     * @method static \Illuminate\Support\Carbon now($tz = null)
-     * @method static \Illuminate\Support\Carbon parse($time = null, $tz = null)
+     * @method static \Illuminate\Support\Carbon now($timezone = null)
+     * @method static \Illuminate\Support\Carbon parse($time = null, $timezone = null)
      * @method static string pluralUnit(string $unit)
      * @method static void resetMonthsOverflow()
      * @method static void resetToStringFormat()
@@ -6678,7 +6694,7 @@ namespace Illuminate\Support\Facades {
      * @method static void setMidDayAt($hour)
      * @method static void setTestNow($testNow = null)
      * @method static void setToStringFormat($format)
-     * @method static void setTranslator(\Symfony\Component\Translation\TranslatorInterface $translator)
+     * @method static void setTranslator(\Symfony\Contracts\Translation\TranslatorInterface $translator)
      * @method static void setUtf8($utf8)
      * @method static void setWeekEndsAt($day)
      * @method static void setWeekStartsAt($day)
@@ -6686,12 +6702,12 @@ namespace Illuminate\Support\Facades {
      * @method static bool shouldOverflowMonths()
      * @method static bool shouldOverflowYears()
      * @method static string singularUnit(string $unit)
-     * @method static \Illuminate\Support\Carbon today($tz = null)
-     * @method static \Illuminate\Support\Carbon tomorrow($tz = null)
+     * @method static \Illuminate\Support\Carbon today($timezone = null)
+     * @method static \Illuminate\Support\Carbon tomorrow($timezone = null)
      * @method static void useMonthsOverflow($monthsOverflow = true)
      * @method static void useStrictMode($strictModeEnabled = true)
      * @method static void useYearsOverflow($yearsOverflow = true)
-     * @method static \Illuminate\Support\Carbon yesterday($tz = null)
+     * @method static \Illuminate\Support\Carbon yesterday($timezone = null)
      * @see \Illuminate\Support\DateFactory
      */
     class Date {
@@ -8073,32 +8089,17 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Set the table prefix and return the grammar.
-         *
-         * @template TGrammar of \Illuminate\Database\Grammar
-         * @param TGrammar $grammar
-         * @return TGrammar 
-         * @static 
-         */
-        public static function withTablePrefix($grammar)
-        {
-            //Method inherited from \Illuminate\Database\Connection 
-            /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
-            return $instance->withTablePrefix($grammar);
-        }
-
-        /**
          * Execute the given callback without table prefix.
          *
          * @param \Closure $callback
-         * @return void 
+         * @return mixed 
          * @static 
          */
         public static function withoutTablePrefix($callback)
         {
             //Method inherited from \Illuminate\Database\Connection 
             /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
-            $instance->withoutTablePrefix($callback);
+            return $instance->withoutTablePrefix($callback);
         }
 
         /**
@@ -10182,6 +10183,18 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Http\Client\Factory $instance */
             return $instance->allowStrayRequests();
+        }
+
+        /**
+         * Begin recording request / response pairs.
+         *
+         * @return \Illuminate\Http\Client\Factory 
+         * @static 
+         */
+        public static function record()
+        {
+            /** @var \Illuminate\Http\Client\Factory $instance */
+            return $instance->record();
         }
 
         /**
@@ -12952,47 +12965,58 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Release a reserved job back onto the queue after (n) seconds.
+         * Get the number of queue jobs that are ready to process.
          *
-         * @param string $queue
-         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
-         * @param int $delay
-         * @return mixed 
+         * @param string|null $queue
+         * @return int 
          * @static 
          */
-        public static function release($queue, $job, $delay)
+        public static function readyNow($queue = null)
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->release($queue, $job, $delay);
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            return $instance->readyNow($queue);
+        }
+
+        /**
+         * Migrate the delayed jobs that are ready to the regular queue.
+         *
+         * @param string $from
+         * @param string $to
+         * @return void 
+         * @static 
+         */
+        public static function migrateExpiredJobs($from, $to)
+        {
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            $instance->migrateExpiredJobs($from, $to);
         }
 
         /**
          * Delete a reserved job from the queue.
          *
          * @param string $queue
-         * @param string $id
+         * @param \Illuminate\Queue\Jobs\RedisJob $job
          * @return void 
-         * @throws \Throwable
          * @static 
          */
-        public static function deleteReserved($queue, $id)
+        public static function deleteReserved($queue, $job)
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            $instance->deleteReserved($queue, $id);
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            $instance->deleteReserved($queue, $job);
         }
 
         /**
          * Delete a reserved job from the reserved queue and release it.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
+         * @param \Illuminate\Queue\Jobs\RedisJob $job
          * @param int $delay
          * @return void 
          * @static 
          */
         public static function deleteAndRelease($queue, $job, $delay)
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             $instance->deleteAndRelease($queue, $job, $delay);
         }
 
@@ -13005,7 +13029,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear($queue)
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            //Method inherited from \Illuminate\Queue\RedisQueue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->clear($queue);
         }
 
@@ -13018,20 +13043,35 @@ namespace Illuminate\Support\Facades {
          */
         public static function getQueue($queue)
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            //Method inherited from \Illuminate\Queue\RedisQueue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->getQueue($queue);
         }
 
         /**
-         * Get the underlying database instance.
+         * Get the connection for the queue.
          *
-         * @return \Illuminate\Database\Connection 
+         * @return \Illuminate\Redis\Connections\Connection 
          * @static 
          */
-        public static function getDatabase()
+        public static function getConnection()
         {
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
-            return $instance->getDatabase();
+            //Method inherited from \Illuminate\Queue\RedisQueue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            return $instance->getConnection();
+        }
+
+        /**
+         * Get the underlying Redis instance.
+         *
+         * @return \Illuminate\Contracts\Redis\Factory 
+         * @static 
+         */
+        public static function getRedis()
+        {
+            //Method inherited from \Illuminate\Queue\RedisQueue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            return $instance->getRedis();
         }
 
         /**
@@ -13044,7 +13084,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -13058,7 +13098,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -13072,7 +13112,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -13086,7 +13126,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
+            \Laravel\Horizon\RedisQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -13098,7 +13138,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13112,7 +13152,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            /** @var \Laravel\Horizon\RedisQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -16207,7 +16247,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param \Closure $callback
          * @param array $headers
-         * @param string $endStreamWith
+         * @param \Illuminate\Http\StreamedEvent|string|null $endStreamWith
          * @return \Symfony\Component\HttpFoundation\StreamedResponse 
          * @static 
          */
@@ -16233,7 +16273,7 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Create a new streamed response instance.
+         * Create a new streamed JSON response instance.
          *
          * @param array $data
          * @param int $status
@@ -17788,70 +17828,6 @@ namespace Illuminate\Support\Facades {
      */
     class Schema {
         /**
-         * Create a database in the schema.
-         *
-         * @param string $name
-         * @return bool 
-         * @static 
-         */
-        public static function createDatabase($name)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->createDatabase($name);
-        }
-
-        /**
-         * Drop a database from the schema if the database exists.
-         *
-         * @param string $name
-         * @return bool 
-         * @static 
-         */
-        public static function dropDatabaseIfExists($name)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->dropDatabaseIfExists($name);
-        }
-
-        /**
-         * Determine if the given table exists.
-         *
-         * @param string $table
-         * @return bool 
-         * @static 
-         */
-        public static function hasTable($table)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->hasTable($table);
-        }
-
-        /**
-         * Determine if the given view exists.
-         *
-         * @param string $view
-         * @return bool 
-         * @static 
-         */
-        public static function hasView($view)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->hasView($view);
-        }
-
-        /**
-         * Get the user-defined types that belong to the database.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getTypes()
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getTypes();
-        }
-
-        /**
          * Drop all tables from the database.
          *
          * @return void 
@@ -17888,67 +17864,15 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Get the columns for a given table.
+         * Get the current schemas for the connection.
          *
-         * @param string $table
-         * @return array 
+         * @return string[] 
          * @static 
          */
-        public static function getColumns($table)
+        public static function getCurrentSchemaListing()
         {
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getColumns($table);
-        }
-
-        /**
-         * Get the indexes for a given table.
-         *
-         * @param string $table
-         * @return array 
-         * @static 
-         */
-        public static function getIndexes($table)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getIndexes($table);
-        }
-
-        /**
-         * Get the foreign keys for a given table.
-         *
-         * @param string $table
-         * @return array 
-         * @static 
-         */
-        public static function getForeignKeys($table)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getForeignKeys($table);
-        }
-
-        /**
-         * Get the schemas for the connection.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getSchemas()
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getSchemas();
-        }
-
-        /**
-         * Parse the database object reference and extract the schema and table.
-         *
-         * @param string $reference
-         * @return array 
-         * @static 
-         */
-        public static function parseSchemaAndTable($reference)
-        {
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->parseSchemaAndTable($reference);
+            return $instance->getCurrentSchemaListing();
         }
 
         /**
@@ -17962,6 +17886,17 @@ namespace Illuminate\Support\Facades {
         {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             \Illuminate\Database\Schema\PostgresBuilder::defaultStringLength($length);
+        }
+
+        /**
+         * Set the default time precision for migrations.
+         *
+         * @static 
+         */
+        public static function defaultTimePrecision($precision)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            return \Illuminate\Database\Schema\PostgresBuilder::defaultTimePrecision($precision);
         }
 
         /**
@@ -18003,42 +17938,129 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Get the tables that belong to the database.
+         * Create a database in the schema.
          *
-         * @return array 
+         * @param string $name
+         * @return bool 
          * @static 
          */
-        public static function getTables()
+        public static function createDatabase($name)
         {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getTables();
+            return $instance->createDatabase($name);
         }
 
         /**
-         * Get the names of the tables that belong to the database.
+         * Drop a database from the schema if the database exists.
          *
-         * @return array 
+         * @param string $name
+         * @return bool 
          * @static 
          */
-        public static function getTableListing()
+        public static function dropDatabaseIfExists($name)
         {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getTableListing();
+            return $instance->dropDatabaseIfExists($name);
         }
 
         /**
-         * Get the views that belong to the database.
+         * Get the schemas that belong to the connection.
          *
          * @return array 
          * @static 
          */
-        public static function getViews()
+        public static function getSchemas()
         {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->getViews();
+            return $instance->getSchemas();
+        }
+
+        /**
+         * Determine if the given table exists.
+         *
+         * @param string $table
+         * @return bool 
+         * @static 
+         */
+        public static function hasTable($table)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->hasTable($table);
+        }
+
+        /**
+         * Determine if the given view exists.
+         *
+         * @param string $view
+         * @return bool 
+         * @static 
+         */
+        public static function hasView($view)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->hasView($view);
+        }
+
+        /**
+         * Get the tables that belong to the connection.
+         *
+         * @param string|string[]|null $schema
+         * @return array 
+         * @static 
+         */
+        public static function getTables($schema = null)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getTables($schema);
+        }
+
+        /**
+         * Get the names of the tables that belong to the connection.
+         *
+         * @param string|string[]|null $schema
+         * @param bool $schemaQualified
+         * @return array 
+         * @static 
+         */
+        public static function getTableListing($schema = null, $schemaQualified = true)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getTableListing($schema, $schemaQualified);
+        }
+
+        /**
+         * Get the views that belong to the connection.
+         *
+         * @param string|string[]|null $schema
+         * @return array 
+         * @static 
+         */
+        public static function getViews($schema = null)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getViews($schema);
+        }
+
+        /**
+         * Get the user-defined types that belong to the connection.
+         *
+         * @param string|string[]|null $schema
+         * @return array 
+         * @static 
+         */
+        public static function getTypes($schema = null)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getTypes($schema);
         }
 
         /**
@@ -18134,6 +18156,34 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the columns for a given table.
+         *
+         * @param string $table
+         * @return array 
+         * @static 
+         */
+        public static function getColumns($table)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getColumns($table);
+        }
+
+        /**
+         * Get the indexes for a given table.
+         *
+         * @param string $table
+         * @return array 
+         * @static 
+         */
+        public static function getIndexes($table)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getIndexes($table);
+        }
+
+        /**
          * Get the names of the indexes for a given table.
          *
          * @param string $table
@@ -18161,6 +18211,20 @@ namespace Illuminate\Support\Facades {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
             return $instance->hasIndex($table, $index, $type);
+        }
+
+        /**
+         * Get the foreign keys for a given table.
+         *
+         * @param string $table
+         * @return array 
+         * @static 
+         */
+        public static function getForeignKeys($table)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getForeignKeys($table);
         }
 
         /**
@@ -18292,6 +18356,34 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the default schema name for the connection.
+         *
+         * @return string|null 
+         * @static 
+         */
+        public static function getCurrentSchemaName()
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->getCurrentSchemaName();
+        }
+
+        /**
+         * Parse the given database object reference and extract the schema and table.
+         *
+         * @param string $reference
+         * @param string|bool|null $withDefaultSchema
+         * @return array 
+         * @static 
+         */
+        public static function parseSchemaAndTable($reference, $withDefaultSchema = null)
+        {
+            //Method inherited from \Illuminate\Database\Schema\Builder 
+            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
+            return $instance->parseSchemaAndTable($reference, $withDefaultSchema);
+        }
+
+        /**
          * Get the database connection instance.
          *
          * @return \Illuminate\Database\Connection 
@@ -18302,20 +18394,6 @@ namespace Illuminate\Support\Facades {
             //Method inherited from \Illuminate\Database\Schema\Builder 
             /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
             return $instance->getConnection();
-        }
-
-        /**
-         * Set the database connection instance.
-         *
-         * @param \Illuminate\Database\Connection $connection
-         * @return \Illuminate\Database\Schema\PostgresBuilder 
-         * @static 
-         */
-        public static function setConnection($connection)
-        {
-            //Method inherited from \Illuminate\Database\Schema\Builder 
-            /** @var \Illuminate\Database\Schema\PostgresBuilder $instance */
-            return $instance->setConnection($connection);
         }
 
         /**
@@ -19518,7 +19596,7 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Indiate that signed URLs should serve the corresponding files.
+         * Indicate that signed URLs should serve the corresponding files.
          *
          * @param bool $serve
          * @param \Closure|null $urlGeneratorResolver
@@ -20494,7 +20572,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param \Illuminate\Http\Request $request
          * @param bool $absolute
-         * @param array $ignoreQuery
+         * @param \Closure|array $ignoreQuery
          * @return bool 
          * @static 
          */
@@ -20508,7 +20586,7 @@ namespace Illuminate\Support\Facades {
          * Determine if the given request has a valid signature for a relative URL.
          *
          * @param \Illuminate\Http\Request $request
-         * @param array $ignoreQuery
+         * @param \Closure|array $ignoreQuery
          * @return bool 
          * @static 
          */
@@ -20523,7 +20601,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param \Illuminate\Http\Request $request
          * @param bool $absolute
-         * @param array $ignoreQuery
+         * @param \Closure|array $ignoreQuery
          * @return bool 
          * @static 
          */
@@ -23376,1031 +23454,6 @@ namespace Nwidart\Modules\Facades {
             }
     }
 
-namespace Spatie\LaravelIgnition\Facades {
-    /**
-     * 
-     *
-     * @see \Spatie\FlareClient\Flare
-     */
-    class Flare {
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function make($apiKey = null, $contextDetector = null)
-        {
-            return \Spatie\FlareClient\Flare::make($apiKey, $contextDetector);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function setApiToken($apiToken)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->setApiToken($apiToken);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function apiTokenSet()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->apiTokenSet();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function setBaseUrl($baseUrl)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->setBaseUrl($baseUrl);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function setStage($stage)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->setStage($stage);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function sendReportsImmediately()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->sendReportsImmediately();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function determineVersionUsing($determineVersionCallable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->determineVersionUsing($determineVersionCallable);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function reportErrorLevels($reportErrorLevels)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->reportErrorLevels($reportErrorLevels);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function filterExceptionsUsing($filterExceptionsCallable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->filterExceptionsUsing($filterExceptionsCallable);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function filterReportsUsing($filterReportsCallable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->filterReportsUsing($filterReportsCallable);
-        }
-
-        /**
-         * 
-         *
-         * @param array<class-string<ArgumentReducer>|ArgumentReducer>|\Spatie\Backtrace\Arguments\ArgumentReducers|null $argumentReducers
-         * @static 
-         */
-        public static function argumentReducers($argumentReducers)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->argumentReducers($argumentReducers);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function withStackFrameArguments($withStackFrameArguments = true, $forcePHPIniSetting = false)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->withStackFrameArguments($withStackFrameArguments, $forcePHPIniSetting);
-        }
-
-        /**
-         * 
-         *
-         * @param class-string $exceptionClass
-         * @static 
-         */
-        public static function overrideGrouping($exceptionClass, $type = 'exception_message_and_class')
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->overrideGrouping($exceptionClass, $type);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function version()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->version();
-        }
-
-        /**
-         * 
-         *
-         * @return array<int, FlareMiddleware|class-string<FlareMiddleware>> 
-         * @static 
-         */
-        public static function getMiddleware()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->getMiddleware();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function setContextProviderDetector($contextDetector)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->setContextProviderDetector($contextDetector);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function setContainer($container)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->setContainer($container);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function registerFlareHandlers()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->registerFlareHandlers();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function registerExceptionHandler()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->registerExceptionHandler();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function registerErrorHandler($errorLevels = null)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->registerErrorHandler($errorLevels);
-        }
-
-        /**
-         * 
-         *
-         * @param \Spatie\FlareClient\FlareMiddleware\FlareMiddleware|array<FlareMiddleware>|class-string<FlareMiddleware>|callable $middleware
-         * @return \Spatie\FlareClient\Flare 
-         * @static 
-         */
-        public static function registerMiddleware($middleware)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->registerMiddleware($middleware);
-        }
-
-        /**
-         * 
-         *
-         * @return array<int,FlareMiddleware|class-string<FlareMiddleware>> 
-         * @static 
-         */
-        public static function getMiddlewares()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->getMiddlewares();
-        }
-
-        /**
-         * 
-         *
-         * @param string $name
-         * @param string $messageLevel
-         * @param array<int, mixed> $metaData
-         * @return \Spatie\FlareClient\Flare 
-         * @static 
-         */
-        public static function glow($name, $messageLevel = 'info', $metaData = [])
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->glow($name, $messageLevel, $metaData);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function handleException($throwable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->handleException($throwable);
-        }
-
-        /**
-         * 
-         *
-         * @return mixed 
-         * @static 
-         */
-        public static function handleError($code, $message, $file = '', $line = 0)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->handleError($code, $message, $file, $line);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function applicationPath($applicationPath)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->applicationPath($applicationPath);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function report($throwable, $callback = null, $report = null, $handled = null)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->report($throwable, $callback, $report, $handled);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function reportHandled($throwable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->reportHandled($throwable);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function reportMessage($message, $logLevel, $callback = null)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->reportMessage($message, $logLevel, $callback);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function sendTestReport($throwable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->sendTestReport($throwable);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function reset()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->reset();
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function anonymizeIp()
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->anonymizeIp();
-        }
-
-        /**
-         * 
-         *
-         * @param array<int, string> $fieldNames
-         * @return \Spatie\FlareClient\Flare 
-         * @static 
-         */
-        public static function censorRequestBodyFields($fieldNames)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->censorRequestBodyFields($fieldNames);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function createReport($throwable)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->createReport($throwable);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function createReportFromMessage($message, $logLevel)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->createReportFromMessage($message, $logLevel);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function stage($stage)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->stage($stage);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function messageLevel($messageLevel)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->messageLevel($messageLevel);
-        }
-
-        /**
-         * 
-         *
-         * @param string $groupName
-         * @param mixed $default
-         * @return array<int, mixed> 
-         * @static 
-         */
-        public static function getGroup($groupName = 'context', $default = [])
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->getGroup($groupName, $default);
-        }
-
-        /**
-         * 
-         *
-         * @static 
-         */
-        public static function context($key, $value)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->context($key, $value);
-        }
-
-        /**
-         * 
-         *
-         * @param string $groupName
-         * @param array<string, mixed> $properties
-         * @return \Spatie\FlareClient\Flare 
-         * @static 
-         */
-        public static function group($groupName, $properties)
-        {
-            /** @var \Spatie\FlareClient\Flare $instance */
-            return $instance->group($groupName, $properties);
-        }
-
-            }
-    }
-
-namespace Tymon\JWTAuth\Facades {
-    /**
-     * 
-     *
-     * @deprecated 
-     */
-    class JWTAuth {
-        /**
-         * Attempt to authenticate the user and return the token.
-         *
-         * @param array $credentials
-         * @return false|string 
-         * @static 
-         */
-        public static function attempt($credentials)
-        {
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->attempt($credentials);
-        }
-
-        /**
-         * Authenticate a user via a token.
-         *
-         * @return \Tymon\JWTAuth\Contracts\JWTSubject|false 
-         * @static 
-         */
-        public static function authenticate()
-        {
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->authenticate();
-        }
-
-        /**
-         * Alias for authenticate().
-         *
-         * @return \Tymon\JWTAuth\Contracts\JWTSubject|false 
-         * @static 
-         */
-        public static function toUser()
-        {
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->toUser();
-        }
-
-        /**
-         * Get the authenticated user.
-         *
-         * @return \Tymon\JWTAuth\Contracts\JWTSubject 
-         * @static 
-         */
-        public static function user()
-        {
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->user();
-        }
-
-        /**
-         * Generate a token for a given subject.
-         *
-         * @param \Tymon\JWTAuth\Contracts\JWTSubject $subject
-         * @return string 
-         * @static 
-         */
-        public static function fromSubject($subject)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->fromSubject($subject);
-        }
-
-        /**
-         * Alias to generate a token for a given user.
-         *
-         * @param \Tymon\JWTAuth\Contracts\JWTSubject $user
-         * @return string 
-         * @static 
-         */
-        public static function fromUser($user)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->fromUser($user);
-        }
-
-        /**
-         * Refresh an expired token.
-         *
-         * @param bool $forceForever
-         * @param bool $resetClaims
-         * @return string 
-         * @static 
-         */
-        public static function refresh($forceForever = false, $resetClaims = false)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->refresh($forceForever, $resetClaims);
-        }
-
-        /**
-         * Invalidate a token (add it to the blacklist).
-         *
-         * @param bool $forceForever
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function invalidate($forceForever = false)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->invalidate($forceForever);
-        }
-
-        /**
-         * Alias to get the payload, and as a result checks that
-         * the token is valid i.e. not expired or blacklisted.
-         *
-         * @return \Tymon\JWTAuth\Payload 
-         * @throws \Tymon\JWTAuth\Exceptions\JWTException
-         * @static 
-         */
-        public static function checkOrFail()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->checkOrFail();
-        }
-
-        /**
-         * Check that the token is valid.
-         *
-         * @param bool $getPayload
-         * @return \Tymon\JWTAuth\Payload|bool 
-         * @static 
-         */
-        public static function check($getPayload = false)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->check($getPayload);
-        }
-
-        /**
-         * Get the token.
-         *
-         * @return \Tymon\JWTAuth\Token|null 
-         * @static 
-         */
-        public static function getToken()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->getToken();
-        }
-
-        /**
-         * Parse the token from the request.
-         *
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @throws \Tymon\JWTAuth\Exceptions\JWTException
-         * @static 
-         */
-        public static function parseToken()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->parseToken();
-        }
-
-        /**
-         * Get the raw Payload instance.
-         *
-         * @return \Tymon\JWTAuth\Payload 
-         * @static 
-         */
-        public static function getPayload()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->getPayload();
-        }
-
-        /**
-         * Alias for getPayload().
-         *
-         * @return \Tymon\JWTAuth\Payload 
-         * @static 
-         */
-        public static function payload()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->payload();
-        }
-
-        /**
-         * Convenience method to get a claim value.
-         *
-         * @param string $claim
-         * @return mixed 
-         * @static 
-         */
-        public static function getClaim($claim)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->getClaim($claim);
-        }
-
-        /**
-         * Create a Payload instance.
-         *
-         * @param \Tymon\JWTAuth\Contracts\JWTSubject $subject
-         * @return \Tymon\JWTAuth\Payload 
-         * @static 
-         */
-        public static function makePayload($subject)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->makePayload($subject);
-        }
-
-        /**
-         * Check if the subject model matches the one saved in the token.
-         *
-         * @param string|object $model
-         * @return bool 
-         * @static 
-         */
-        public static function checkSubjectModel($model)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->checkSubjectModel($model);
-        }
-
-        /**
-         * Set the token.
-         *
-         * @param \Tymon\JWTAuth\Token|string $token
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function setToken($token)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->setToken($token);
-        }
-
-        /**
-         * Unset the current token.
-         *
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function unsetToken()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->unsetToken();
-        }
-
-        /**
-         * Set the request instance.
-         *
-         * @param \Illuminate\Http\Request $request
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function setRequest($request)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->setRequest($request);
-        }
-
-        /**
-         * Set whether the subject should be "locked".
-         *
-         * @param bool $lock
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function lockSubject($lock)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->lockSubject($lock);
-        }
-
-        /**
-         * Get the Manager instance.
-         *
-         * @return \Tymon\JWTAuth\Manager 
-         * @static 
-         */
-        public static function manager()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->manager();
-        }
-
-        /**
-         * Get the Parser instance.
-         *
-         * @return \Tymon\JWTAuth\Http\Parser\Parser 
-         * @static 
-         */
-        public static function parser()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->parser();
-        }
-
-        /**
-         * Get the Payload Factory.
-         *
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function factory()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->factory();
-        }
-
-        /**
-         * Get the Blacklist.
-         *
-         * @return \Tymon\JWTAuth\Blacklist 
-         * @static 
-         */
-        public static function blacklist()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->blacklist();
-        }
-
-        /**
-         * Set the custom claims.
-         *
-         * @param array $customClaims
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function customClaims($customClaims)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->customClaims($customClaims);
-        }
-
-        /**
-         * Alias to set the custom claims.
-         *
-         * @param array $customClaims
-         * @return \Tymon\JWTAuth\JWTAuth 
-         * @static 
-         */
-        public static function claims($customClaims)
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->claims($customClaims);
-        }
-
-        /**
-         * Get the custom claims.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getCustomClaims()
-        {
-            //Method inherited from \Tymon\JWTAuth\JWT 
-            /** @var \Tymon\JWTAuth\JWTAuth $instance */
-            return $instance->getCustomClaims();
-        }
-
-            }
-    /**
-     * 
-     *
-     */
-    class JWTFactory {
-        /**
-         * Create the Payload instance.
-         *
-         * @param bool $resetClaims
-         * @return \Tymon\JWTAuth\Payload 
-         * @static 
-         */
-        public static function make($resetClaims = false)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->make($resetClaims);
-        }
-
-        /**
-         * Empty the claims collection.
-         *
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function emptyClaims()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->emptyClaims();
-        }
-
-        /**
-         * Build and get the Claims Collection.
-         *
-         * @return \Tymon\JWTAuth\Claims\Collection 
-         * @static 
-         */
-        public static function buildClaimsCollection()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->buildClaimsCollection();
-        }
-
-        /**
-         * Get a Payload instance with a claims collection.
-         *
-         * @param \Tymon\JWTAuth\Claims\Collection $claims
-         * @return \Tymon\JWTAuth\Payload 
-         * @static 
-         */
-        public static function withClaims($claims)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->withClaims($claims);
-        }
-
-        /**
-         * Set the default claims to be added to the Payload.
-         *
-         * @param array $claims
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setDefaultClaims($claims)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->setDefaultClaims($claims);
-        }
-
-        /**
-         * Helper to set the ttl.
-         *
-         * @param int $ttl
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setTTL($ttl)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->setTTL($ttl);
-        }
-
-        /**
-         * Helper to get the ttl.
-         *
-         * @return int 
-         * @static 
-         */
-        public static function getTTL()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->getTTL();
-        }
-
-        /**
-         * Get the default claims.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getDefaultClaims()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->getDefaultClaims();
-        }
-
-        /**
-         * Get the PayloadValidator instance.
-         *
-         * @return \Tymon\JWTAuth\Validators\PayloadValidator 
-         * @static 
-         */
-        public static function validator()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->validator();
-        }
-
-        /**
-         * Set the custom claims.
-         *
-         * @param array $customClaims
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function customClaims($customClaims)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->customClaims($customClaims);
-        }
-
-        /**
-         * Alias to set the custom claims.
-         *
-         * @param array $customClaims
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function claims($customClaims)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->claims($customClaims);
-        }
-
-        /**
-         * Get the custom claims.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getCustomClaims()
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->getCustomClaims();
-        }
-
-        /**
-         * Set the refresh flow flag.
-         *
-         * @param bool $refreshFlow
-         * @return \Tymon\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setRefreshFlow($refreshFlow = true)
-        {
-            /** @var \Tymon\JWTAuth\Factory $instance */
-            return $instance->setRefreshFlow($refreshFlow);
-        }
-
-            }
-    }
-
 namespace Illuminate\Http {
     /**
      * 
@@ -25302,7 +24355,7 @@ namespace  {
          * @param string $pageName
          * @param int|null $page
          * @param \Closure|int|null $total
-         * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator 
+         * @return \Illuminate\Pagination\LengthAwarePaginator 
          * @throws \InvalidArgumentException
          * @static 
          */
@@ -25616,6 +24669,30 @@ namespace  {
         {
             /** @var \Illuminate\Database\Eloquent\Builder $instance */
             return $instance->withoutEagerLoads();
+        }
+
+        /**
+         * Get the "limit" value from the query or null if it's not set.
+         *
+         * @return mixed 
+         * @static 
+         */
+        public static function getLimit()
+        {
+            /** @var \Illuminate\Database\Eloquent\Builder $instance */
+            return $instance->getLimit();
+        }
+
+        /**
+         * Get the "offset" value from the query or null if it's not set.
+         *
+         * @return mixed 
+         * @static 
+         */
+        public static function getOffset()
+        {
+            /** @var \Illuminate\Database\Eloquent\Builder $instance */
+            return $instance->getOffset();
         }
 
         /**
@@ -29229,7 +28306,6 @@ namespace  {
          * Add an "or where date" clause to determine if a "date" column is today or before to the query.
          *
          * @param array|string $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -29243,7 +28319,6 @@ namespace  {
          * Add an "or where date" clause to determine if a "date" column is after today.
          *
          * @param array|string $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -29257,7 +28332,6 @@ namespace  {
          * Add an "or where date" clause to determine if a "date" column is today or after to the query.
          *
          * @param array|string $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -29367,9 +28441,6 @@ namespace  {
     class Octane extends \Laravel\Octane\Facades\Octane {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Module extends \Nwidart\Modules\Facades\Module {}
-    class Flare extends \Spatie\LaravelIgnition\Facades\Flare {}
-    class JWTAuth extends \Tymon\JWTAuth\Facades\JWTAuth {}
-    class JWTFactory extends \Tymon\JWTAuth\Facades\JWTFactory {}
 }
 
 

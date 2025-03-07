@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -41,10 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'api' => [
-            'driver' => 'jwt',
-            'provider' => 'users',
-        ],
     ],
 
     /*
@@ -67,7 +62,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', 'App\Models\User'),
+            'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
         // 'users' => [
@@ -116,4 +111,5 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
 ];

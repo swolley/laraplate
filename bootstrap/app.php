@@ -18,31 +18,31 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
+        web: __DIR__.'/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__ . '/../routes/console.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->throttleWithRedis();
 
-        $middleware->alias([
-            // 'auth' => \App\Http\Middleware\Authenticate::class,
-            // 'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-            // 'auth.session' => AuthenticateSession::class,
-            // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-            // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
-            // // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-            // 'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
-            // 'precognitive' => \Illuminate\Foundation\Http\Middleware\HHandlePrecognitiveRequests::class,
-            // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-            // 'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            // 'hierarchical_permissions' => \Junges\ACL\Middlewares\HierarchicalPermissionsMiddleware::class
-            // 'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            // 'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            // 'verified' => EnsureEmailIsVerified::class,
-        ]);
+        // $middleware->alias([
+        //     // 'auth' => \App\Http\Middleware\Authenticate::class,
+        //     // 'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        //     // 'auth.session' => AuthenticateSession::class,
+        //     // 'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        //     // 'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        //     // // 'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        //     // 'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+        //     // 'precognitive' => \Illuminate\Foundation\Http\Middleware\HHandlePrecognitiveRequests::class,
+        //     // 'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        //     // 'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        //     // 'hierarchical_permissions' => \Junges\ACL\Middlewares\HierarchicalPermissionsMiddleware::class
+        //     // 'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+        //     // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+        //     // 'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        //     // 'verified' => EnsureEmailIsVerified::class,
+        // ]);
 
         $middleware->web(
             append: [
@@ -80,6 +80,6 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
