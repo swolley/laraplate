@@ -110,7 +110,7 @@ namespace Modules\Cms\Models{
  * @property-read bool $is_signature
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property mixed $picture
  * @property-read \Modules\Core\Models\User|null $user
@@ -264,7 +264,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
@@ -344,7 +344,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
@@ -424,7 +424,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
@@ -504,7 +504,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
@@ -680,6 +680,69 @@ namespace Modules\Cms\Models{
  */
 	#[\AllowDynamicProperties]
 	class IdeHelperLocation {}
+}
+
+namespace Modules\Cms\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $model_type
+ * @property int $model_id
+ * @property string|null $uuid
+ * @property string $collection_name
+ * @property string $name
+ * @property string $file_name
+ * @property string|null $mime_type
+ * @property string $disk
+ * @property string|null $conversions_disk
+ * @property int $size
+ * @property array<array-key, mixed> $manipulations
+ * @property array<array-key, mixed> $custom_properties
+ * @property array<array-key, mixed> $generated_conversions
+ * @property array<array-key, mixed> $responsive_images
+ * @property int|null $order_column
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read mixed $extension
+ * @property-read mixed $human_readable_size
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $model
+ * @property-read mixed $original_url
+ * @property-read mixed $preview_url
+ * @property-read mixed $type
+ * @method static \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, static> all($columns = ['*'])
+ * @method static \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, static> get($columns = ['*'])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereCollectionName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereConversionsDisk($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereCustomProperties($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereDisk($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereFileName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereGeneratedConversions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereManipulations($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereModelId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereModelType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereResponsiveImages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereUuid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media withoutTrashed()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperMedia {}
 }
 
 namespace Modules\Cms\Models\Pivot{
