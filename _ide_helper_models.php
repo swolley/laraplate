@@ -32,7 +32,6 @@ namespace App\Models{
  * @property string|null $locked_user_id
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
- * @property string|null $two_factor_confirmed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
@@ -76,7 +75,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorConfirmedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorRecoveryCodes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereTwoFactorSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereUpdatedAt($value)
@@ -157,6 +155,8 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property string $valid_from
+ * @property string|null $valid_to
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -225,6 +225,8 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSlug($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidFrom($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidTo($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withGlobalScopes(array $scopes)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withRelationshipExpression($direction, callable $constraint, $initialDepth, $from = null, $maxDepth = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withTrashed()
@@ -252,6 +254,8 @@ namespace Modules\Cms\Models{
  * @property string|null $locked_user_id
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
+ * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -332,6 +336,8 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
+ * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -412,6 +418,8 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
+ * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -492,6 +500,8 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $locked_user_id
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
+ * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -647,6 +657,7 @@ namespace Modules\Cms\Models{
  * @property string|null $province
  * @property string $country
  * @property string|null $postcode
+ * @property string|null $zone
  * @property float|null $latitude
  * @property float|null $longitude
  * @property \Illuminate\Support\Carbon $created_at
@@ -676,6 +687,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereProvince($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereZone($value)
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -706,6 +718,7 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read mixed $extension
+ * @property-read \Illuminate\Support\Carbon|null $expires_at
  * @property-read mixed $human_readable_size
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $model
  * @property-read mixed $original_url
@@ -1368,7 +1381,6 @@ namespace Modules\Core\Models{
  * @property string|null $locked_user_id
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
- * @property string|null $two_factor_confirmed_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
@@ -1412,7 +1424,6 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereTwoFactorConfirmedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereTwoFactorRecoveryCodes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereTwoFactorSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereUpdatedAt($value)
