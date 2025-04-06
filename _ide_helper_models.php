@@ -28,8 +28,10 @@ namespace App\Models{
  * @property string|null $last_login_at
  * @property string|null $license_id
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
@@ -67,6 +69,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLang($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLastLoginAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereLicenseId($value)
@@ -100,6 +104,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
@@ -122,6 +127,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePublicEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
@@ -139,30 +145,34 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property int $entity_id
+ * @property int|null $entity_id
  * @property int|null $parent_id
  * @property string $name
  * @property string $slug
  * @property string|null $description
- * @property int $order
- * @property int $persistence
+ * @property int|null $persistence
  * @property string|null $logo
  * @property string|null $logo_full
  * @property bool $is_active
- * @property int|null $order_column
+ * @property int $order_column
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string $valid_from
  * @property string|null $valid_to
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Modules\Cms\Models\Category|null $parent
  * @property-read mixed $path
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
@@ -214,12 +224,13 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereEntityId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereIsActive($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereIsDeleted($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereIsLocked($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLockedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLockedUserId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogo($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogoFull($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereName($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrder($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrderColumn($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
@@ -244,14 +255,17 @@ namespace Modules\Cms\Models{
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
- * @property int|null $order_column
+ * @property int $order_column
+ * @property string $title
  * @property array $components
  * @property string $slug
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
@@ -266,14 +280,21 @@ namespace Modules\Cms\Models{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
+ * @property-read int|null $locations_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
+ * @property-read int|null $trashed_media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content draft()
@@ -298,11 +319,14 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereValidTo($value)
@@ -326,14 +350,17 @@ namespace Modules\Cms\Models\Contents{
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
- * @property int|null $order_column
+ * @property int $order_column
+ * @property string $title
  * @property array $components
  * @property string $slug
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
@@ -348,14 +375,21 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
+ * @property-read int|null $locations_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
+ * @property-read int|null $trashed_media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article draft()
@@ -380,11 +414,14 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereValidTo($value)
@@ -408,14 +445,17 @@ namespace Modules\Cms\Models\Contents{
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
- * @property int|null $order_column
+ * @property int $order_column
+ * @property string $title
  * @property array $components
  * @property string $slug
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
@@ -430,14 +470,21 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
+ * @property-read int|null $locations_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
+ * @property-read int|null $trashed_media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event draft()
@@ -462,11 +509,14 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereValidTo($value)
@@ -490,14 +540,17 @@ namespace Modules\Cms\Models\Contents{
  * @property int $id
  * @property int $entity_id
  * @property int $preset_id
- * @property int|null $order_column
+ * @property int $order_column
+ * @property string $title
  * @property array $components
  * @property string $slug
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
@@ -512,14 +565,21 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
+ * @property-read int|null $locations_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read mixed $path
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
+ * @property-read int|null $trashed_media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia draft()
@@ -544,11 +604,14 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereValidTo($value)
@@ -576,6 +639,10 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
+ * @property string|null $locked_at
+ * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
@@ -592,6 +659,10 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereLockedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereUpdatedAt($value)
@@ -616,6 +687,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -632,6 +704,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereOptions($value)
@@ -649,6 +722,15 @@ namespace Modules\Cms\Models{
 /**
  * 
  *
+ * @method static whereDistance(Point $point, float $distance)
+ * @method static orderByDistance(Point $point, string $direction = 'asc')
+ * @method static whereDistanceSphere(Point $point, float $distance)
+ * @method static orderByDistanceSphere(Point $point, string $direction = 'asc')
+ * @method static whereWithin(Polygon $polygon)
+ * @method static whereNotWithin(Polygon $polygon)
+ * @method static whereContains(Polygon $polygon)
+ * @method static whereNotContains(Polygon $polygon)
+ * @method static whereEquals(Point $point)
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -658,36 +740,56 @@ namespace Modules\Cms\Models{
  * @property string $country
  * @property string|null $postcode
  * @property string|null $zone
- * @property float|null $latitude
- * @property float|null $longitude
+ * @property \MatanYadaev\EloquentSpatial\Objects\Geometry|null $geolocation
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
+ * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property float|null $latitude
+ * @property float|null $longitude
  * @property-read mixed $path
  * @method static \Modules\Cms\Database\Factories\LocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location orderByDistanceSphere(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereCity($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereCrosses(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereDisjoint(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereDistanceSphere(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $operator, int|float $value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereGeolocation($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereIntersects(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereLockedUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereOverlaps(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location wherePostcode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereProvince($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereSrid(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, string $operator, int|float $value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereTouches(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereZone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withCentroid(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, string $alias = 'centroid')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withDistance(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $alias = 'distance')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withDistanceSphere(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $alias = 'distance')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -713,10 +815,11 @@ namespace Modules\Cms\Models{
  * @property array<array-key, mixed> $custom_properties
  * @property array<array-key, mixed> $generated_conversions
  * @property array<array-key, mixed> $responsive_images
- * @property int|null $order_column
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $order_column
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read mixed $extension
  * @property-read \Illuminate\Support\Carbon|null $expires_at
  * @property-read mixed $human_readable_size
@@ -740,6 +843,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereFileName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereGeneratedConversions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereManipulations($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereMimeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Media whereModelId($value)
@@ -870,6 +974,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -891,6 +996,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Preset whereUpdatedAt($value)
@@ -910,24 +1016,31 @@ namespace Modules\Cms\Models{
  * @property string $name
  * @property string $slug
  * @property string|null $type
- * @property int|null $order_column
+ * @property int $order_column
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read mixed $path
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag containing(string $name, $locale = null)
  * @method static \Modules\Cms\Database\Factories\TagFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withType(?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -943,7 +1056,8 @@ namespace Modules\Cms\Models{
  * @property string $content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -956,6 +1070,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Template whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -1003,6 +1118,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -1023,6 +1139,7 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereParameters($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\CronJob whereSchedule($value)
@@ -1096,7 +1213,7 @@ namespace Modules\Core\Models{
  * @property array<array-key, mixed> $embedding
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $model
+ * @property-read \Illuminate\Database\Eloquent\Model $model
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding query()
@@ -1177,7 +1294,8 @@ namespace Modules\Core\Models{
  * @property string|null $connection_name
  * @property string|null $table_name
  * @property string|null $description
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Core\Casts\ActionEnum|null $action
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
@@ -1187,7 +1305,6 @@ namespace Modules\Core\Models{
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission role($roles, $guard = null, $without = false)
@@ -1197,13 +1314,12 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereGuardName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereTableName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutRole($roles, $guard = null)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -1234,8 +1350,10 @@ namespace Modules\Core\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property int|null $parent_id
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $children
  * @property-read int|null $children_count
@@ -1297,6 +1415,8 @@ namespace Modules\Core\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereDescription($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereGuardName($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereId($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereIsDeleted($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereIsLocked($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereLockedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereLockedUserId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Core\Models\Role whereName($value)
@@ -1328,6 +1448,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -1348,6 +1469,7 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereEncrypted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereGroupName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Setting whereUpdatedAt($value)
@@ -1377,8 +1499,10 @@ namespace Modules\Core\Models{
  * @property string|null $last_login_at
  * @property string|null $license_id
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted
  * @property string|null $locked_at
  * @property string|null $locked_user_id
+ * @property bool $is_locked
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
@@ -1416,6 +1540,8 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereLang($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereLastLoginAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereLicenseId($value)

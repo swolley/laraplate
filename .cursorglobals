@@ -1,5 +1,6 @@
 Global Rules
 
+-   Respond always in Italiano into the chat but code must be written in english. Also comments and code documentation must be always in English
 -   Prioritize Clean, Efficient Code Write clear, optimized code that is easy to understand and modify. Balance efficiency with readability based on project requirements.
 -   Focus on End-User Experience Ensure that all code contributes to an excellent end-user experience, whether it's a UI, API, or backend service.
 -   Create Modular & Reusable Code Break functionality into self-contained, reusable components for flexibility and scalability.
@@ -12,7 +13,6 @@ Global Rules
 -   Support Continuous Integration/Continuous Deployment (CI/CD) Write code and tests that align with CI/CD practices, facilitating automated building, testing, and deployment processes.
 -   Design for Scalability Make architectural and design choices that allow for future growth, increased load, and potential changes in project requirements.
 -   Follow API Design Best Practices (when applicable) For projects involving APIs, adhere to RESTful principles, use clear naming conventions.
--   Comments nad code documentation must be always in English
 
 Bug Fixes:
 
@@ -33,9 +33,5 @@ Code Changes:
 -   Propose a clear plan before making changes
 -   Apply all modifications to a single file at once
 -   Do not alter unrelated files
-
-Tests:
-
--   Use PestPHP for testing
 
 Remember to always consider the context and specific requirements of each project. If I'm not clear or if you have doubt, please feel free to ask me details before answering.
