@@ -4,7 +4,7 @@
     "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "version": "1.6.4",
+    "version": "v1.6.5",
     "keywords": [
         "laravel",
         "laraplate",
