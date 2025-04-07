@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Funzione per incrementare la versione
+# function to increment the version
 increment_version() {
     local version=$1
     local position=$2
 
-    # Divide la versione in array
+    # Remove the 'v' prefix if present
+    version=${version#v}
+    
+    # split version in array
     IFS='.' read -ra VERSION_PARTS <<< "$version"
     
-    # Incrementa la parte specificata
+    # increment the specified part
     case $position in
         "major")
             ((VERSION_PARTS[0]++))
@@ -24,51 +27,51 @@ increment_version() {
             ;;
     esac
 
-    # Ricompone la versione
-    echo "${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.${VERSION_PARTS[2]}"
+    # rebuild version with prefix 'v'
+    echo "v${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.${VERSION_PARTS[2]}"
 }
 
-# Funzione per ottenere l'ultima versione tag
+# function to get the latest version tag
 get_latest_version() {
     local latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null)
     if [ -z "$latest_tag" ]; then
-        echo "0.0.0"
+        echo "v0.0.0"
     else
         echo "$latest_tag"
     fi
 }
 
-# Funzione per aggiornare composer.json
+# function to update composer.json
 update_composer_version() {
     local new_version=$1
     
-    # Usa jq per aggiornare la versione mantenendo la formattazione del file
+    # use jq to update the version while keeping the file formatting
     if command -v jq >/dev/null 2>&1; then
-        # Se jq è installato
+        # if jq is installed
         tmp=$(mktemp)
         jq --arg version "$new_version" '.version = $version' composer.json > "$tmp" && mv "$tmp" composer.json
     else
-        # Fallback con sed se jq non è disponibile
+        # fallback to sed if jq is not available
         sed -i "s/\"version\": \".*\"/\"version\": \"$new_version\"/" composer.json
     fi
     
-    # Commit delle modifiche al composer.json
+    # commit the changes to the composer.json
     git add composer.json
     git commit -m "chore: bump version to $new_version"
 }
 
-# Funzione per aggiornare la versione nel repository corrente
+# function to update the version in the current repository
 update_version() {
     local position=$1
     local current_version=$(get_latest_version)
     local new_version=$(increment_version "$current_version" "$position")
     
-    echo "Aggiornamento versione da $current_version a $new_version"
+    echo "Updating version from $current_version to $new_version"
     
-    # Aggiorna composer.json
+    # update composer.json
     update_composer_version "$new_version"
     
-    # Crea e pusha il tag
+    # create and push the tag
     git tag -a "$new_version" -m "Release $new_version"
     git push && git push origin "$new_version"
 }
@@ -81,7 +84,7 @@ else
             update_version $1
             ;;
         *)
-            echo "Uso: $0 {major|minor|patch}"
+            echo "Usage: $0 {major|minor|patch}"
             exit 1
             ;;
     esac 
