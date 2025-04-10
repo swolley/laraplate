@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.7.2.
+ * Generated for Laravel 12.8.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -10155,9 +10155,9 @@ namespace Illuminate\Support\Facades {
          * @return \Illuminate\Http\Client\RequestException 
          * @static 
          */
-        public static function requestException($body = null, $status = 200, $headers = [])
+        public static function failedRequest($body = null, $status = 200, $headers = [])
         {
-            return \Illuminate\Http\Client\Factory::requestException($body, $status, $headers);
+            return \Illuminate\Http\Client\Factory::failedRequest($body, $status, $headers);
         }
 
         /**
@@ -15798,7 +15798,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get an array of all of the files on the request.
          *
-         * @return array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> 
+         * @return array<string, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> 
          * @static 
          */
         public static function allFiles()
@@ -15825,7 +15825,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string|null $key
          * @param mixed $default
-         * @return ($key is null ? array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> : \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null)
+         * @return ($key is null ? array<string, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> : \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null)
          * @static 
          */
         public static function file($key = null, $default = null)

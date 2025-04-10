@@ -164,8 +164,12 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked
  * @property string $valid_from
  * @property string|null $valid_to
+ * @property int|null $parent_entity_id
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
+ * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
+ * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -203,6 +207,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expired()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\CategoryFactory factory($count = null, $state = [])
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category forEntity(\Modules\Cms\Models\Entity|int|null $entity)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> get($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category getExpressionGrammar()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category hasChildren()
@@ -216,6 +221,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category tree($maxDepth = null)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category treeOf(\Illuminate\Database\Eloquent\Model|callable $constraint, $maxDepth = null)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category valid()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category validAt(\Illuminate\Support\Carbon $date)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereCreatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDeletedAt($value)
@@ -232,6 +238,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogoFull($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereName($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrderColumn($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentEntityId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSlug($value)
@@ -268,6 +275,7 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -313,6 +321,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content scheduled()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content validAt(\Illuminate\Support\Carbon $date)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereCreatedAt($value)
@@ -324,6 +333,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereTitle($value)
@@ -363,6 +373,7 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -408,6 +419,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article scheduled()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article validAt(\Illuminate\Support\Carbon $date)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereCreatedAt($value)
@@ -419,6 +431,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereTitle($value)
@@ -458,6 +471,7 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -503,6 +517,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event scheduled()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event validAt(\Illuminate\Support\Carbon $date)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereCreatedAt($value)
@@ -514,6 +529,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereTitle($value)
@@ -553,6 +569,7 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -598,6 +615,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia scheduled()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia validAt(\Illuminate\Support\Carbon $date)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereCreatedAt($value)
@@ -609,6 +627,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereTitle($value)
@@ -982,8 +1001,11 @@ namespace Modules\Cms\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Field> $fields
  * @property-read int|null $fields_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
  * @property-read \Modules\Cms\Models\Template|null $template
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -1191,6 +1213,7 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License occupied()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License validAt(\Illuminate\Support\Carbon $date)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereId($value)
