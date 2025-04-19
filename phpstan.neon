@@ -11,7 +11,7 @@ parameters:
         - routes/
     
     scanFiles:
-        - _ide_helper.php
+        # - _ide_helper.php  # Commento questo file per evitare conflitti di importazione
         - _ide_helper_models.php
         - .phpstorm.meta.php
 
@@ -38,10 +38,20 @@ parameters:
           message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'.$#"
           identifier: larastan.noEnvCallsOutsideOfConfig
           path: Modules/*/config/*
-#
-#    excludePaths:
-#        - ./*/*/FileToBeExcluded.php
-#
+        # Ignora gli errori relativi ai metodi dei trait HasValidations e HasPermissions
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::shouldSkipValidation\(\)#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::validateWithRules\(\)#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getRules\(\)#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getOperationRules\(\)#'
+        - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::isSuperAdmin\(\)#'
+        - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::hasPermission\(\)#'
+
+    excludePaths:
+        # Escludo esplicitamente il file _ide_helper.php che causa il conflitto
+        - _ide_helper.php
+        # Escludi file vendor che possono causare problemi
+        - vendor/**
+        - Modules/*/vendor/**
 
     checkModelProperties: true
     checkOctaneCompatibility: true

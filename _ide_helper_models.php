@@ -23,17 +23,17 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $username
- * @property string|null $lang
- * @property string|null $last_login_at
- * @property string|null $license_id
+ * @property string $username The username of the user
+ * @property string|null $lang The language of the user
+ * @property string|null $last_login_at The last login date of the user
+ * @property string|null $license_id The license id of the user
+ * @property string|null $two_factor_secret The two factor secret of the user
+ * @property string|null $two_factor_recovery_codes The two factor recovery codes of the user
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
- * @property string|null $two_factor_secret
- * @property string|null $two_factor_recovery_codes
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
@@ -98,13 +98,13 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property int|null $user_id
- * @property string $name
- * @property string|null $public_email
+ * @property int|null $user_id The user that the author belongs to
+ * @property string $name The name of the author
+ * @property array $components The author contents
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
@@ -124,12 +124,12 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePublicEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withTrashed()
@@ -146,25 +146,25 @@ namespace Modules\Cms\Models{
  *
  * @property int $id
  * @property int|null $entity_id
- * @property int|null $parent_id
- * @property string $name
- * @property string $slug
- * @property string|null $description
- * @property int|null $persistence
- * @property string|null $logo
- * @property string|null $logo_full
- * @property bool $is_active
- * @property int $order_column
+ * @property int|null $parent_id The parent category
+ * @property int|null $parent_entity_id The entity that the parent category belongs to
+ * @property string $name The name of the category
+ * @property string $slug The slug of the category
+ * @property array $components The category contents
+ * @property int|null $persistence The persistence in days of the content in the category
+ * @property string|null $logo The logo of the category
+ * @property string|null $logo_full The full logo of the category
+ * @property bool $is_active Whether the category is active
+ * @property int $order_column The order of the category
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property string $valid_from
  * @property string|null $valid_to
- * @property int|null $parent_entity_id
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
@@ -172,7 +172,9 @@ namespace Modules\Cms\Models{
  * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read mixed $full_name
  * @property-read array|null $preview
+ * @property-read mixed $ids
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
@@ -200,10 +202,12 @@ namespace Modules\Cms\Models{
  * @property-read int|null $siblings_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $siblingsAndSelf All the parent's children.
  * @property-read int|null $siblings_and_self_count
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category active()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> all($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category breadthFirst()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category depthFirst()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category doesntHaveChildren()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category draft()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expired()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\CategoryFactory factory($count = null, $state = [])
@@ -214,19 +218,27 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category hasParent()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category isLeaf()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category isRoot()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category locked()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newModelQuery()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category onlyTrashed()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered(string $direction = 'asc')
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category priorityOrdered(string $direction = 'asc')
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category published()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category scheduled()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category tree($maxDepth = null)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category treeOf(\Illuminate\Database\Eloquent\Model|callable $constraint, $maxDepth = null)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category unlocked()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category valid()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category validityOrdered()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereComponents($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereCreatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDeletedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDepth($operator, $value = null)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereDescription($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereEntityId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereIsActive($value)
@@ -261,21 +273,20 @@ namespace Modules\Cms\Models{
  *
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id
- * @property int $order_column
- * @property string $title
- * @property array $components
- * @property string $slug
+ * @property int $preset_id The preset that the content belongs to
+ * @property string $title The title of the content
+ * @property array $components The content contents
+ * @property string $slug The slug of the content
+ * @property int $order_column The order of the content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -286,7 +297,6 @@ namespace Modules\Cms\Models{
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -315,7 +325,8 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content scheduled()
@@ -323,6 +334,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereDeletedAt($value)
@@ -333,7 +345,6 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereTitle($value)
@@ -359,21 +370,20 @@ namespace Modules\Cms\Models\Contents{
  *
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id
- * @property int $order_column
- * @property string $title
- * @property array $components
- * @property string $slug
+ * @property int $preset_id The preset that the content belongs to
+ * @property string $title The title of the content
+ * @property array $components The content contents
+ * @property string $slug The slug of the content
+ * @property int $order_column The order of the content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -384,7 +394,6 @@ namespace Modules\Cms\Models\Contents{
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -413,7 +422,8 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article scheduled()
@@ -421,6 +431,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereDeletedAt($value)
@@ -431,7 +442,6 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereTitle($value)
@@ -457,21 +467,20 @@ namespace Modules\Cms\Models\Contents{
  *
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id
- * @property int $order_column
- * @property string $title
- * @property array $components
- * @property string $slug
+ * @property int $preset_id The preset that the content belongs to
+ * @property string $title The title of the content
+ * @property array $components The content contents
+ * @property string $slug The slug of the content
+ * @property int $order_column The order of the content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -482,7 +491,6 @@ namespace Modules\Cms\Models\Contents{
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -511,7 +519,8 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event scheduled()
@@ -519,6 +528,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereDeletedAt($value)
@@ -529,7 +539,6 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereTitle($value)
@@ -555,21 +564,20 @@ namespace Modules\Cms\Models\Contents{
  *
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id
- * @property int $order_column
- * @property string $title
- * @property array $components
- * @property string $slug
+ * @property int $preset_id The preset that the content belongs to
+ * @property string $title The title of the content
+ * @property array $components The content contents
+ * @property string $slug The slug of the content
+ * @property int $order_column The order of the content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property int|null $original_id
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -580,7 +588,6 @@ namespace Modules\Cms\Models\Contents{
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -609,7 +616,8 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia scheduled()
@@ -617,6 +625,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereDeletedAt($value)
@@ -627,7 +636,6 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOriginalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereTitle($value)
@@ -652,16 +660,15 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $slug
- * @property bool $is_active
+ * @property string $name The name of the entity
+ * @property string $slug The slug of the entity
+ * @property \Modules\Cms\Casts\EntityType $type The type of the entity
+ * @property bool $is_active Whether the entity is active
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
@@ -670,23 +677,23 @@ namespace Modules\Cms\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Preset> $presets
  * @property-read int|null $presets_count
  * @method static \Modules\Cms\Database\Factories\EntityFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity locked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity unlocked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereIsLocked($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Entity withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -699,14 +706,14 @@ namespace Modules\Cms\Models{
  *
  * @property-read object $options
  * @property int $id
- * @property string $name
- * @property \Modules\Cms\Casts\FieldType $type
- * @property bool $is_slug
- * @property bool $is_active
+ * @property string $name The name of the field
+ * @property \Modules\Cms\Casts\FieldType $type The type of the field
+ * @property bool $is_slug Whether the field takes part in the slug
+ * @property bool $is_active Whether the field is active
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -751,22 +758,22 @@ namespace Modules\Cms\Models{
  * @method static whereNotContains(Polygon $polygon)
  * @method static whereEquals(Point $point)
  * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $address
- * @property string|null $city
- * @property string|null $province
- * @property string $country
- * @property string|null $postcode
- * @property string|null $zone
- * @property \MatanYadaev\EloquentSpatial\Objects\Geometry|null $geolocation
+ * @property string $name The friendly name of the location
+ * @property string $slug The slug of the location
+ * @property string|null $address The address of the location
+ * @property string|null $city The city of the location
+ * @property string|null $province The province of the location
+ * @property string $country The country of the location
+ * @property string|null $postcode The postcode of the location
+ * @property string|null $zone The zone of the location
+ * @property \MatanYadaev\EloquentSpatial\Objects\Geometry|null $geolocation The geolocation of the location
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -822,23 +829,23 @@ namespace Modules\Cms\Models{
  * @property int $id
  * @property string $model_type
  * @property int $model_id
- * @property string|null $uuid
- * @property string $collection_name
- * @property string $name
- * @property string $file_name
- * @property string|null $mime_type
- * @property string $disk
- * @property string|null $conversions_disk
- * @property int $size
- * @property array<array-key, mixed> $manipulations
- * @property array<array-key, mixed> $custom_properties
- * @property array<array-key, mixed> $generated_conversions
- * @property array<array-key, mixed> $responsive_images
- * @property int $order_column
+ * @property string|null $uuid The UUID of the media
+ * @property string $collection_name The collection name of the media
+ * @property string $name The name of the media
+ * @property string $file_name The file name of the media
+ * @property string|null $mime_type The mime type of the media
+ * @property string $disk The disk of the media
+ * @property string|null $conversions_disk The conversions disk of the media
+ * @property int $size The size of the media
+ * @property array<array-key, mixed> $manipulations The manipulations of the media
+ * @property array<array-key, mixed> $custom_properties The custom properties of the media
+ * @property array<array-key, mixed> $generated_conversions The generated conversions of the media
+ * @property array<array-key, mixed> $responsive_images The responsive images of the media
+ * @property int $order_column The order column of the media
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $extension
  * @property-read \Illuminate\Support\Carbon|null $expires_at
  * @property-read mixed $human_readable_size
@@ -906,9 +913,9 @@ namespace Modules\Cms\Models\Pivot{
 /**
  * 
  *
- * @property int $content_id
- * @property int $entity_id
- * @property int $category_id
+ * @property int $content_id The content that the categorizable belongs to
+ * @property int $entity_id The entity that the categorizable belongs to
+ * @property int $category_id The category that the categorizable belongs to
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable newModelQuery()
@@ -932,11 +939,13 @@ namespace Modules\Cms\Models\Pivot{
  * @property int $id
  * @property int $preset_id
  * @property int $field_id
- * @property bool $is_required
- * @property int $order_column
- * @property array<array-key, mixed>|null $default
+ * @property bool $is_required Whether the field is required
+ * @property int $order_column The order of the field
+ * @property array<array-key, mixed>|null $default The default value of the field
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ * @property string|null $deleted_at
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -944,12 +953,15 @@ namespace Modules\Cms\Models\Pivot{
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereFieldId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereIsRequired($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable wherePresetId($value)
@@ -987,13 +999,13 @@ namespace Modules\Cms\Models{
  *
  * @property int $id
  * @property int $entity_id
- * @property string $name
- * @property bool $is_active
+ * @property string $name The name of the preset
+ * @property bool $is_active Whether the preset is active
  * @property int|null $template_id
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -1035,21 +1047,22 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $slug
- * @property string|null $type
- * @property int $order_column
+ * @property string $name The name of the tag
+ * @property string $slug The slug of the tag
+ * @property string|null $type The type of the tag
+ * @property int $order_column The order of the tag
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $path
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag containing(string $name, $locale = null)
  * @method static \Modules\Cms\Database\Factories\TagFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereDeletedAt($value)
@@ -1074,12 +1087,12 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $content
+ * @property string $name The name of the template
+ * @property string $content The blade template content
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property string|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -1131,16 +1144,16 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $command
- * @property array<array-key, mixed> $parameters
- * @property \Cron\CronExpression $schedule
- * @property bool $is_active
- * @property string|null $description
+ * @property string $name The name of the cron job
+ * @property string $command The command of the cron job
+ * @property array<array-key, mixed> $parameters The parameters of the cron job
+ * @property \Cron\CronExpression $schedule The schedule of the cron job
+ * @property bool $is_active Is the cron job active
+ * @property string|null $description The description of the cron job
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
@@ -1199,12 +1212,13 @@ namespace Modules\Core\Models{
 /**
  * 
  *
- * @property string $id
+ * @property string $id The unique identifier for the license
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon $valid_from
- * @property \Illuminate\Support\Carbon|null $valid_to
+ * @property string $valid_from
+ * @property string|null $valid_to
  * @property-read \Modules\Core\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License draft()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Core\Database\Factories\LicenseFactory factory($count = null, $state = [])
@@ -1212,9 +1226,12 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License occupied()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License scheduled()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License valid()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereUpdatedAt($value)
@@ -1233,9 +1250,9 @@ namespace Modules\Core\Models{
  * @property int $id
  * @property string $model_type
  * @property int $model_id
- * @property array<array-key, mixed> $embedding
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property array<array-key, mixed> $embedding The generated embedding of the model
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model $model
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ModelEmbedding newQuery()
@@ -1257,16 +1274,16 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property int|null $modifiable_id
- * @property string|null $modifiable_type
- * @property int|null $modifier_id
- * @property string|null $modifier_type
- * @property bool $active
- * @property bool $is_update
- * @property int $approvers_required
- * @property int $disapprovers_required
- * @property string $md5
- * @property array<array-key, mixed> $modifications
+ * @property int|null $modifiable_id The id of the modifiable model
+ * @property string|null $modifiable_type The type of the modifiable model
+ * @property int|null $modifier_id The id of the modifier model
+ * @property string|null $modifier_type The type of the modifier model
+ * @property bool $active Whether the modification is active
+ * @property bool $is_update Whether the modification is an update
+ * @property int $approvers_required The number of approvers required
+ * @property int $disapprovers_required The number of disapprovers required
+ * @property string $md5 The md5 hash of the modifications
+ * @property array<array-key, mixed> $modifications The modifications
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
@@ -1310,15 +1327,15 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $guard_name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $name The name of the permission
+ * @property string $guard_name The guard name of the permission
+ * @property string|null $description The description of the permission
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property string|null $deleted_at
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $connection_name
  * @property string|null $table_name
- * @property string|null $description
- * @property string|null $deleted_at
- * @property bool $is_deleted
  * @property-read \Modules\Core\Casts\ActionEnum|null $action
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
@@ -1367,17 +1384,17 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property string $guard_name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $description
+ * @property string $name The name of the role
+ * @property string $guard_name The guard name of the role
+ * @property string|null $description The description of the role
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
- * @property int|null $parent_id
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
+ * @property int|null $parent_id The parent id of the role
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -1461,17 +1478,17 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property string $name
- * @property array<array-key, mixed> $value
- * @property bool $encrypted
- * @property array<array-key, mixed>|null $choices
- * @property \Modules\Core\Casts\SettingTypeEnum $type
- * @property string $group_name
- * @property string $description
+ * @property string $name The name of the setting
+ * @property array<array-key, mixed> $value The value of the setting
+ * @property bool $encrypted Is the value encrypted
+ * @property array<array-key, mixed>|null $choices Constrained available values
+ * @property \Modules\Core\Casts\SettingTypeEnum $type The type of the setting
+ * @property string $group_name The group name of the setting
+ * @property string $description The description of the setting
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -1517,17 +1534,17 @@ namespace Modules\Core\Models{
  * @property string|null $remember_token
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $username
- * @property string|null $lang
- * @property string|null $last_login_at
- * @property string|null $license_id
+ * @property string $username The username of the user
+ * @property string|null $lang The language of the user
+ * @property string|null $last_login_at The last login date of the user
+ * @property string|null $license_id The license id of the user
+ * @property string|null $two_factor_secret The two factor secret of the user
+ * @property string|null $two_factor_recovery_codes The two factor recovery codes of the user
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property bool $is_deleted
- * @property string|null $locked_at
- * @property string|null $locked_user_id
- * @property bool $is_locked
- * @property string|null $two_factor_secret
- * @property string|null $two_factor_recovery_codes
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Disapproval> $disapprovals
@@ -1592,11 +1609,11 @@ namespace Modules\Core\Models{
  * 
  *
  * @property int $id
- * @property int|null $user_id
- * @property string $grid_name
- * @property string $layout_name
- * @property bool $is_public
- * @property array<array-key, mixed> $config
+ * @property int|null $user_id The user id of the user grid config
+ * @property string $grid_name The grid name of the user grid config
+ * @property string $layout_name The layout name of the user grid config
+ * @property bool $is_public The is public of the user grid config
+ * @property array<array-key, mixed> $config The config of the user grid config
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read \Modules\Core\Models\User|null $user
