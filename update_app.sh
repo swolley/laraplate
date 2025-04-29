@@ -2,18 +2,18 @@
 
 git pull
 
+composer install
+
 php artisan migrate
 php artisan db:seed
 
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
-php artisan config:clear
+php artisan optimize:clear
+php artisan optimize
 
-php artisan route:cache
-php artisan view:cache
-php artisan config:cache
+php artisan filament:optimize-clear
+php artisan filament:optimize
 
 if command -v supervisorctl &> /dev/null; then
     supervisorctl reload
+    php artisan horizon:restart
 fi

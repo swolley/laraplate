@@ -53,6 +53,7 @@ namespace App\Models{
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User admin()
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User lockedBy(\Illuminate\Foundation\Auth\User $user)
@@ -62,6 +63,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User superAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereCreatedAt($value)
@@ -108,6 +110,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
+ * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read bool $can_login
  * @property-read bool $is_signature
@@ -116,6 +119,10 @@ namespace Modules\Cms\Models{
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property mixed $picture
+ * @property-read \Modules\Cms\Models\Preset|null $preset
+ * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @property-read mixed $type
  * @property-read \Modules\Core\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -132,7 +139,12 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAllTagsOfAnyType($tags)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAnyTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAnyTagsOfAnyType($tags)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withoutTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withoutTrashed()
  * @mixin \Eloquent
  */
@@ -181,6 +193,10 @@ namespace Modules\Cms\Models{
  * @property-read int|null $modifications_count
  * @property-read \Modules\Cms\Models\Category|null $parent
  * @property-read mixed $path
+ * @property-read \Modules\Cms\Models\Preset|null $preset
+ * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $ancestors The model's recursive parents.
@@ -211,7 +227,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expired()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\CategoryFactory factory($count = null, $state = [])
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category forEntity(\Modules\Cms\Models\Entity|int|null $entity)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category forEntity(\Modules\Cms\Models\Entity|string|int|null $entity)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> get($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category getExpressionGrammar()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category hasChildren()
@@ -257,9 +273,14 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidFrom($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidTo($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withAllTagsOfAnyType($tags)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withAnyTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withAnyTagsOfAnyType($tags)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withGlobalScopes(array $scopes)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withRelationshipExpression($direction, callable $constraint, $initialDepth, $from = null, $maxDepth = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withTrashed()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category withoutTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category withoutTrashed()
  * @mixin \Eloquent
  */
@@ -289,14 +310,13 @@ namespace Modules\Cms\Models{
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
- * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -313,6 +333,7 @@ namespace Modules\Cms\Models{
  * @property-read int|null $tags_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
  * @property-read int|null $trashed_media_count
+ * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content draft()
@@ -386,14 +407,13 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
- * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -410,6 +430,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $tags_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
  * @property-read int|null $trashed_media_count
+ * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article draft()
@@ -483,14 +504,13 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
- * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -507,6 +527,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $tags_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
  * @property-read int|null $trashed_media_count
+ * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event draft()
@@ -580,14 +601,13 @@ namespace Modules\Cms\Models\Contents{
  * @property string|null $valid_to
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
  * @property-read int|null $all_media_count
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
- * @property-read int|null $categories_count
  * @property mixed $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -604,6 +624,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $tags_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
  * @property-read int|null $trashed_media_count
+ * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia draft()
@@ -653,6 +674,103 @@ namespace Modules\Cms\Models\Contents{
  */
 	#[\AllowDynamicProperties]
 	class IdeHelperMultimedia {}
+}
+
+namespace Modules\Cms\Models\Contents{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $entity_id
+ * @property int $preset_id The preset that the content belongs to
+ * @property string $title The title of the content
+ * @property array $components The content contents
+ * @property string $slug The slug of the content
+ * @property int $order_column The order of the content
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property string|null $locked_at The date and time when the entity was locked
+ * @property string|null $locked_user_id The user who locked the entity
+ * @property bool $is_locked Whether the entity is locked
+ * @property string|null $valid_from
+ * @property string|null $valid_to
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
+ * @property-read int|null $all_media_count
+ * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
+ * @property-read int|null $authors_count
+ * @property mixed $cover
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
+ * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read array|null $preview
+ * @property-read \Modules\Core\Models\Version|null $lastVersion
+ * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
+ * @property-read int|null $locations_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
+ * @property-read int|null $media_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
+ * @property-read int|null $modifications_count
+ * @property-read mixed $path
+ * @property-read \Modules\Cms\Models\Preset $preset
+ * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
+ * @property-read int|null $trashed_media_count
+ * @property-read mixed $type
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
+ * @property-read int|null $versions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey draft()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey expired()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey expiredAt(\Illuminate\Support\Carbon $date)
+ * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey forEntity(\Modules\Cms\Models\Entity $entity)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey locked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey lockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey priorityOrdered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey published()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey scheduled()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey unlocked()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey unlockedBy(\Illuminate\Foundation\Auth\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey valid()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey validAt(\Illuminate\Support\Carbon $date)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey validityOrdered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereComponents($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereEntityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereIsLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereLockedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereLockedUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereOrderColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereValidFrom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereValidTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withAllTagsOfAnyType($tags)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withAnyTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withAnyTagsOfAnyType($tags)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withoutTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey withoutTrashed()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperSurvey {}
 }
 
 namespace Modules\Cms\Models{
@@ -781,6 +899,8 @@ namespace Modules\Cms\Models{
  * @property float|null $latitude
  * @property float|null $longitude
  * @property-read mixed $path
+ * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
+ * @property-read int|null $tags_count
  * @method static \Modules\Cms\Database\Factories\LocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location newQuery()
@@ -811,10 +931,15 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereTouches(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location whereZone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withAllTagsOfAnyType($tags)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withAnyTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withAnyTagsOfAnyType($tags)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withCentroid(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, string $alias = 'centroid')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withDistance(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $alias = 'distance')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withDistanceSphere(\Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $column, \Illuminate\Contracts\Database\Query\Expression|\MatanYadaev\EloquentSpatial\Objects\Geometry|string $geometryOrColumn, string $alias = 'distance')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withoutTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Location withoutTrashed()
  * @mixin \Eloquent
  */
@@ -914,7 +1039,6 @@ namespace Modules\Cms\Models\Pivot{
  * 
  *
  * @property int $content_id The content that the categorizable belongs to
- * @property int $entity_id The entity that the categorizable belongs to
  * @property int $category_id The category that the categorizable belongs to
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -924,7 +1048,6 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereContentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Categorizable whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -1564,6 +1687,7 @@ namespace Modules\Core\Models{
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User admin()
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User lockedBy(\Illuminate\Foundation\Auth\User $user)
@@ -1573,6 +1697,7 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User superAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereCreatedAt($value)
