@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-class Kernel extends HttpKernel
+final class Kernel extends HttpKernel
 {
     // ... existing code ...
 
     protected $middlewareAliases = [
         // ... existing aliases ...
-        'filament.auth' => \App\Http\Middleware\FilamentAuthenticate::class,
+        'filament.auth' => Middleware\FilamentAuthenticate::class,
     ];
 
     // ... existing code ...

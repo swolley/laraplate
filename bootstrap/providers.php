@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     // Application Service Providers...
     App\Providers\AppServiceProvider::class,

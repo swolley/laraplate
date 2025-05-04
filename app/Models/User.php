@@ -9,7 +9,7 @@ use Modules\Core\Models\User as CoreUser;
 /**
  * @mixin IdeHelperUser
  */
-class User extends CoreUser
+final class User extends CoreUser
 {
-    // 
+    //
 }

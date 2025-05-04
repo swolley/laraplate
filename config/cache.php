@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Support\Str;
+declare(strict_types=1);
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Cache Store
@@ -32,7 +31,6 @@ return [
     */
 
     'stores' => [
-
         'array' => [
             'driver' => 'array',
             'serialize' => false,
@@ -95,7 +93,6 @@ return [
         'octane' => [
             'driver' => 'octane',
         ],
-
     ],
 
     /*
@@ -110,5 +107,4 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', ''),
-
 ];

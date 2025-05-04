@@ -19,11 +19,13 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4",
+        "filament/filament": "^3.3",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "nwidart/laravel-modules": "^12.0"
+        "nwidart/laravel-modules": "^12.0",
+        "symfony/http-client": "^7.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
@@ -35,6 +37,7 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
+        "nunomaduro/phpinsights": "^2.13",
         "phpunit/phpunit": "^11.5.3",
         "rector/rector": "^2.0"
     },
@@ -54,7 +57,8 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
@@ -121,6 +125,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
             "joshbrw/laravel-module-installer": true,
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,

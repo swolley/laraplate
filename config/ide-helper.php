@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'filename'  => '_ide_helper.php',
+    'filename' => '_ide_helper.php',
 
     /*
     |--------------------------------------------------------------------------
@@ -155,7 +155,7 @@ return [
     */
 
     'ignored_models' => [
-        'Modules\\Core\\Models\\Version'
+        'Modules\\Core\\Models\\Version',
     ],
 
     /*
