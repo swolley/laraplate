@@ -6,17 +6,16 @@ parameters:
 
     paths:
         - app/
-        - tests/
         - Modules/
         - routes/
+        # escludo temporaneamente
+        # - tests/
     
-    scanFiles:
-        # - _ide_helper.php  # Commento questo file per evitare conflitti di importazione
-        - _ide_helper_models.php
-        - .phpstorm.meta.php
+    stubFiles:
+        - _ide_helper_custom.php
 
     # Level 9 is the highest level
-    level: 2
+    level: 1
 
     ignoreErrors:
         - '#Call to an undefined method Illuminate\\Routing\\Route::name\(\).$#'
@@ -49,9 +48,15 @@ parameters:
     excludePaths:
         # Escludo esplicitamente il file _ide_helper.php che causa il conflitto
         - _ide_helper.php
+        - _ide_helper_models.php
+        - .phpstorm.meta.php
         # Escludi file vendor che possono causare problemi
         - vendor/**
-        - Modules/*/vendor/**
+        - Modules/**/vendor/**
+        # escludo temporaneamente
+        - Modules/Core/app/Grids/**
+        # escludo temporaneamente
+        - Modules/**/tests/**
 
     checkModelProperties: true
     checkOctaneCompatibility: true

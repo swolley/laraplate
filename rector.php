@@ -13,7 +13,7 @@ use Rector\ValueObject\PhpVersion;
 $modules = array_filter(glob(__DIR__ . '/Modules/*'), 'is_dir');
 $paths = array_merge(
     [__DIR__ . '/app'],
-    array_map(fn($module) => "$module/app", $modules),
+    array_map(fn($module) => "{$module}/app", $modules),
     // array_map(fn($module) => "$module/tests", $modules),
 );
 

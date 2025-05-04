@@ -6,7 +6,4 @@ namespace App\Http\Controllers;
 
 use Modules\Core\Http\Controllers\Controller as CoreController;
 
-abstract class Controller extends CoreController
-{
-    //
-}
+abstract class Controller extends CoreController {}

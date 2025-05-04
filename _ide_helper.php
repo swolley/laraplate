@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.10.2.
+ * Generated for Laravel 12.12.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -4008,6 +4008,30 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Bus\Dispatcher $instance */
             return $instance->map($map);
+        }
+
+        /**
+         * Allow dispatching after responses.
+         *
+         * @return \Illuminate\Bus\Dispatcher 
+         * @static 
+         */
+        public static function withDispatchingAfterResponses()
+        {
+            /** @var \Illuminate\Bus\Dispatcher $instance */
+            return $instance->withDispatchingAfterResponses();
+        }
+
+        /**
+         * Disable dispatching after responses.
+         *
+         * @return \Illuminate\Bus\Dispatcher 
+         * @static 
+         */
+        public static function withoutDispatchingAfterResponses()
+        {
+            /** @var \Illuminate\Bus\Dispatcher $instance */
+            return $instance->withoutDispatchingAfterResponses();
         }
 
         /**
@@ -18506,7 +18530,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Set the Schema Blueprint resolver callback.
          *
-         * @param \Closure $resolver
+         * @param \Illuminate\Database\Schema\TResolver|null $resolver
          * @return void 
          * @static 
          */
@@ -24451,174 +24475,6 @@ namespace Illuminate\Database\Eloquent\Relations {
             }
     }
 
-namespace Laravel\Fortify\Http\Requests {
-    /**
-     * 
-     *
-     */
-    class LoginRequest {
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
-         * @param array $rules
-         * @param mixed $params
-         * @static 
-         */
-        public static function validate($rules, ...$params)
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::validate($rules, ...$params);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
-         * @param string $errorBag
-         * @param array $rules
-         * @param mixed $params
-         * @static 
-         */
-        public static function validateWithBag($errorBag, $rules, ...$params)
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::validateWithBag($errorBag, $rules, ...$params);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $absolute
-         * @static 
-         */
-        public static function hasValidSignature($absolute = true)
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidSignature($absolute);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @static 
-         */
-        public static function hasValidRelativeSignature()
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidRelativeSignature();
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $ignoreQuery
-         * @param mixed $absolute
-         * @static 
-         */
-        public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $ignoreQuery
-         * @static 
-         */
-        public static function hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
-        {
-            return \Laravel\Fortify\Http\Requests\LoginRequest::hasValidRelativeSignatureWhileIgnoring($ignoreQuery);
-        }
-
-            }
-    }
-
-namespace Illuminate\Foundation\Http {
-    /**
-     * 
-     *
-     */
-    class FormRequest {
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
-         * @param array $rules
-         * @param mixed $params
-         * @static 
-         */
-        public static function validate($rules, ...$params)
-        {
-            return \Illuminate\Foundation\Http\FormRequest::validate($rules, ...$params);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestValidation()
-         * @param string $errorBag
-         * @param array $rules
-         * @param mixed $params
-         * @static 
-         */
-        public static function validateWithBag($errorBag, $rules, ...$params)
-        {
-            return \Illuminate\Foundation\Http\FormRequest::validateWithBag($errorBag, $rules, ...$params);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $absolute
-         * @static 
-         */
-        public static function hasValidSignature($absolute = true)
-        {
-            return \Illuminate\Foundation\Http\FormRequest::hasValidSignature($absolute);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @static 
-         */
-        public static function hasValidRelativeSignature()
-        {
-            return \Illuminate\Foundation\Http\FormRequest::hasValidRelativeSignature();
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $ignoreQuery
-         * @param mixed $absolute
-         * @static 
-         */
-        public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
-        {
-            return \Illuminate\Foundation\Http\FormRequest::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
-        }
-
-        /**
-         * 
-         *
-         * @see \Illuminate\Foundation\Providers\FoundationServiceProvider::registerRequestSignatureValidation()
-         * @param mixed $ignoreQuery
-         * @static 
-         */
-        public static function hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
-        {
-            return \Illuminate\Foundation\Http\FormRequest::hasValidRelativeSignatureWhileIgnoring($ignoreQuery);
-        }
-
-            }
-    }
-
 namespace Livewire\Features\SupportTesting {
     /**
      * 
@@ -27584,6 +27440,76 @@ namespace Staudenmeir\LaravelCte\Query {
         public static function getSelect()
         {
             return \Staudenmeir\LaravelCte\Query\Builder::getSelect();
+        }
+
+            }
+    }
+
+namespace Illuminate\Cache {
+    /**
+     * 
+     *
+     * @mixin \Illuminate\Contracts\Cache\Store
+     */
+    class Repository {
+        /**
+         * 
+         *
+         * @see \Modules\Core\Providers\CoreServiceProvider::boot()
+         * @param mixed $args
+         * @static 
+         */
+        public static function tryByRequest(...$args)
+        {
+            return \Illuminate\Cache\Repository::tryByRequest(...$args);
+        }
+
+        /**
+         * 
+         *
+         * @see \Modules\Core\Providers\CoreServiceProvider::boot()
+         * @param mixed $args
+         * @static 
+         */
+        public static function clearByEntity(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByEntity(...$args);
+        }
+
+        /**
+         * 
+         *
+         * @see \Modules\Core\Providers\CoreServiceProvider::boot()
+         * @param mixed $args
+         * @static 
+         */
+        public static function clearByRequest(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByRequest(...$args);
+        }
+
+        /**
+         * 
+         *
+         * @see \Modules\Core\Providers\CoreServiceProvider::boot()
+         * @param mixed $args
+         * @static 
+         */
+        public static function clearByUser(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByUser(...$args);
+        }
+
+        /**
+         * 
+         *
+         * @see \Modules\Core\Providers\CoreServiceProvider::boot()
+         * @param mixed $args
+         * @static 
+         */
+        public static function clearByGroup(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByGroup(...$args);
         }
 
             }
@@ -32331,7 +32257,7 @@ namespace  {
         /**
          * Get the current query value bindings in a flattened array.
          *
-         * @return array 
+         * @return list<mixed> 
          * @static 
          */
         public static function getBindings()
@@ -32343,7 +32269,16 @@ namespace  {
         /**
          * Get the raw array of bindings.
          *
-         * @return array 
+         * @return \Illuminate\Database\Query\array{ select: list<mixed>,
+         *      from: list<mixed>,
+         *      join: list<mixed>,
+         *      where: list<mixed>,
+         *      groupBy: list<mixed>,
+         *      having: list<mixed>,
+         *      order: list<mixed>,
+         *      union: list<mixed>,
+         *      unionOrder: list<mixed>,
+         * }
          * @static 
          */
         public static function getRawBindings()
@@ -32355,6 +32290,7 @@ namespace  {
         /**
          * Set the bindings on the query builder.
          *
+         * @param list<mixed> $bindings
          * @param string $type
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @throws \InvalidArgumentException
@@ -32397,6 +32333,7 @@ namespace  {
         /**
          * Merge an array of bindings into our bindings.
          *
+         * @param self $query
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -32409,7 +32346,8 @@ namespace  {
         /**
          * Remove all of the expressions from a list of bindings.
          *
-         * @return array 
+         * @param array<mixed> $bindings
+         * @return list<mixed> 
          * @static 
          */
         public static function cleanBindings($bindings)
