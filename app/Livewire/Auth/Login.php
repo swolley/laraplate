@@ -16,11 +16,6 @@ final class Login extends Component
 
     public $remember = false;
 
-    protected $rules = [
-        'email' => 'required|email',
-        'password' => 'required',
-    ];
-
     public function authenticate()
     {
         $this->validate();
@@ -42,6 +37,7 @@ final class Login extends Component
         }
 
         $this->addError('email', 'These credentials do not match our records.');
+        return null;
     }
 
     public function render()
