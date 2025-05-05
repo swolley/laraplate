@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\ValueObject\PhpVersion;
-// use Rector\Laravel\Set\LaravelSetList;
+use RectorLaravel\Set\LaravelSetList;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
-
-// use Rector\Set\ValueObject\SetList;
-// use RectorLaravel\Set\LaravelSetList;
-// use Rector\Set\ValueObject\LevelSetList;
 
 $modules = array_filter(glob(__DIR__ . '/Modules/*'), 'is_dir');
 $paths = array_merge(
     [__DIR__ . '/app'],
-    array_map(fn ($module) => "{$module}/app", $modules),
+    array_map(fn($module) => "{$module}/app", $modules),
     // array_map(fn($module) => "$module/tests", $modules),
 );
 
@@ -39,8 +35,10 @@ return RectorConfig::configure()
         privatization: true,
         earlyReturn: true,
         strictBooleans: true,
-        // LaravelSetList::LARAVEL_120,  // Per migrare a Laravel 12
     )
+    ->withSets([
+        LaravelSetList::LARAVEL_120,
+    ])
     ->withPhpSets(
         php84: true,
     )
