@@ -15,11 +15,13 @@ use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
 use SlevomatCodingStandard\Sniffs\TypeHints\ParameterTypeHintSniff;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenDefineFunctions;
 use SlevomatCodingStandard\Sniffs\TypeHints\DeclareStrictTypesSniff;
+use SlevomatCodingStandard\Sniffs\Classes\ForbiddenPublicPropertySniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff;
 use SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff;
 use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Sniffs\Commenting\UselessFunctionDocCommentSniff;
 use SlevomatCodingStandard\Sniffs\Classes\SuperfluousAbstractClassNamingSniff;
+use PHP_CodeSniffer\Standards\Generic\Sniffs\Metrics\CyclomaticComplexitySniff;
 use SlevomatCodingStandard\Sniffs\ControlStructures\RequireShortTernaryOperatorSniff;
 use SlevomatCodingStandard\Sniffs\ControlStructures\DisallowShortTernaryOperatorSniff;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\NamingConventions\InterfaceNameSuffixSniff;
@@ -102,12 +104,16 @@ return [
         SuperfluousAbstractClassNamingSniff::class,
         FunctionLengthSniff::class,
         EvalSniff::class,
+        ForbiddenPublicPropertySniff::class,
     ],
 
     'config' => [
         ForbiddenPrivateMethods::class => [
             'title' => 'The usage of private methods is not idiomatic in Laravel.',
         ],
+        // CyclomaticComplexitySniff::class => [
+        //     'maxComplexity' => 7,
+        // ],
     ],
 
     /*
