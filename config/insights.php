@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use PHP_CodeSniffer\Standards\Squiz\Sniffs\PHP\EvalSniff;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits;
 use NunoMaduro\PhpInsights\Domain\Sniffs\ForbiddenSetterSniff;
 use NunoMaduro\PhpInsights\Domain\Metrics\Architecture\Classes;
@@ -73,6 +74,7 @@ return [
     'exclude' => [
         //  'path/to/directory-or-file'
         'Modules/Core/app/Grids',
+        '_ide_helper_custom.php',
     ],
 
     'add' => [
@@ -99,6 +101,7 @@ return [
         SuperfluousExceptionNamingSniff::class,
         SuperfluousAbstractClassNamingSniff::class,
         FunctionLengthSniff::class,
+        EvalSniff::class,
     ],
 
     'config' => [

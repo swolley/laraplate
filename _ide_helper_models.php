@@ -92,7 +92,7 @@ namespace App\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperUser {}
+	final class IdeHelperUser {}
 }
 
 namespace Modules\Cms\Models{
@@ -149,7 +149,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperAuthor {}
+	final class IdeHelperAuthor {}
 }
 
 namespace Modules\Cms\Models{
@@ -283,7 +283,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperCategory {}
+	final class IdeHelperCategory {}
 }
 
 namespace Modules\Cms\Models{
@@ -479,7 +479,7 @@ namespace Modules\Cms\Models\Contents{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperArticle {}
+	final class IdeHelperArticle {}
 }
 
 namespace Modules\Cms\Models\Contents{
@@ -577,7 +577,7 @@ namespace Modules\Cms\Models\Contents{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperEvent {}
+	final class IdeHelperEvent {}
 }
 
 namespace Modules\Cms\Models\Contents{
@@ -675,7 +675,7 @@ namespace Modules\Cms\Models\Contents{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperMultimedia {}
+	final class IdeHelperMultimedia {}
 }
 
 namespace Modules\Cms\Models\Contents{
@@ -773,7 +773,7 @@ namespace Modules\Cms\Models\Contents{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperSurvey {}
+	final class IdeHelperSurvey {}
 }
 
 namespace Modules\Cms\Models{
@@ -818,7 +818,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperEntity {}
+	final class IdeHelperEntity {}
 }
 
 namespace Modules\Cms\Models{
@@ -862,7 +862,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperField {}
+	final class IdeHelperField {}
 }
 
 namespace Modules\Cms\Models{
@@ -947,7 +947,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperLocation {}
+	final class IdeHelperLocation {}
 }
 
 namespace Modules\Cms\Models{
@@ -1013,7 +1013,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperMedia {}
+	final class IdeHelperMedia {}
 }
 
 namespace Modules\Cms\Models\Pivot{
@@ -1034,7 +1034,7 @@ namespace Modules\Cms\Models\Pivot{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperAuthorable {}
+	final class IdeHelperAuthorable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
@@ -1055,7 +1055,7 @@ namespace Modules\Cms\Models\Pivot{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperCategorizable {}
+	final class IdeHelperCategorizable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
@@ -1094,7 +1094,7 @@ namespace Modules\Cms\Models\Pivot{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperFieldable {}
+	final class IdeHelperFieldable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
@@ -1115,7 +1115,7 @@ namespace Modules\Cms\Models\Pivot{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperRelatable {}
+	final class IdeHelperRelatable {}
 }
 
 namespace Modules\Cms\Models{
@@ -1164,7 +1164,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperPreset {}
+	final class IdeHelperPreset {}
 }
 
 namespace Modules\Cms\Models{
@@ -1203,7 +1203,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperTag {}
+	final class IdeHelperTag {}
 }
 
 namespace Modules\Cms\Models{
@@ -1235,7 +1235,7 @@ namespace Modules\Cms\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperTemplate {}
+	final class IdeHelperTemplate {}
 }
 
 namespace Modules\Core\Models{
@@ -1260,7 +1260,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperACL {}
+	final class IdeHelperACL {}
 }
 
 namespace Modules\Core\Models{
@@ -1308,7 +1308,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperCronJob {}
+	final class IdeHelperCronJob {}
 }
 
 namespace Modules\Core\Models{
@@ -1364,7 +1364,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperLicense {}
+	final class IdeHelperLicense {}
 }
 
 namespace Modules\Core\Models{
@@ -1390,7 +1390,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperModelEmbedding {}
+	final class IdeHelperModelEmbedding {}
 }
 
 namespace Modules\Core\Models{
@@ -1443,7 +1443,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperModification {}
+	final class IdeHelperModification {}
 }
 
 namespace Modules\Core\Models{
@@ -1487,7 +1487,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperPermission {}
+	final class IdeHelperPermission {}
 }
 
 namespace Modules\Core\Models\Pivot{
@@ -1500,7 +1500,7 @@ namespace Modules\Core\Models\Pivot{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperModelHasRole {}
+	final class IdeHelperModelHasRole {}
 }
 
 namespace Modules\Core\Models{
@@ -1594,7 +1594,7 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperRole {}
+	final class IdeHelperRole {}
 }
 
 namespace Modules\Core\Models{
@@ -1643,14 +1643,14 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperSetting {}
+	final class IdeHelperSetting {}
 }
 
 namespace Modules\Core\Models{
 /**
  * 
  *
- * @property \Illuminate\Database\Eloquent\Relations\BelongsToMany $roles
+ * @property BelongsToMany $roles
  * @property int $id
  * @property string $name
  * @property string $email
@@ -1757,6 +1757,6 @@ namespace Modules\Core\Models{
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
-	class IdeHelperUserGridConfig {}
+	final class IdeHelperUserGridConfig {}
 }
 
