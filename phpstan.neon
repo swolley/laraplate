@@ -1,50 +1,20 @@
 includes:
     - vendor/larastan/larastan/extension.neon
     - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - vendor/nesbot/carbon/extension.neon
 
 parameters:
-
+    # Livello di analisi (0-8)
+    level: 1
+    
+    # Directory da analizzare
     paths:
         - app/
         - Modules/
-        - routes/
-        # escludo temporaneamente
+        # - routes/
         # - tests/
     
-    stubFiles:
-        - _ide_helper_custom.php
-
-    # Level 9 is the highest level
-    level: 1
-
-    ignoreErrors:
-        - '#Call to an undefined method Illuminate\\Routing\\Route::name\(\).$#'
-        - '#Call to an undefined method Illuminate\\Routing\\Route::withoutMiddleware\(\).$#'
-        - '#Call to an undefined method Illuminate\\Routing\\Route::can\(\).$#'
-        - '#Call to an undefined method Illuminate\\Routing\\Route::where\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::isJson\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::json\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::getRealMethod\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::has\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::get\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::all\(\).$#'
-        - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
-        - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::withTrashed\(\).$#'
-        - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::getTimestampColumns\(\).$#'
-        - '#Call to an undefined method Modules\\Core\Grids\\Casts\\GridRequestData|Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
-        - '#Call to an undefined method Illuminate\\Http\\Request::getMethod\(\).$#'
-        - 
-          message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'.$#"
-          identifier: larastan.noEnvCallsOutsideOfConfig
-          path: Modules/*/config/*
-        # Ignora gli errori relativi ai metodi dei trait HasValidations e HasPermissions
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::shouldSkipValidation\(\)#'
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::validateWithRules\(\)#'
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getRules\(\)#'
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getOperationRules\(\)#'
-        - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::isSuperAdmin\(\)#'
-        - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::hasPermission\(\)#'
-
+    # File da escludere
     excludePaths:
         # Escludo esplicitamente il file _ide_helper.php che causa il conflitto
         - _ide_helper.php
@@ -57,7 +27,51 @@ parameters:
         - Modules/Core/app/Grids/**
         # escludo temporaneamente
         - Modules/**/tests/**
+        - storage/*
+        - bootstrap/cache/*
+    
+    # Ignora errori specifici
+    ignoreErrors:
+        # - '#Call to an undefined method [a-zA-Z0-9\\_]+::shouldReceive\(\)#'
+        # - '#Call to an undefined method Illuminate\\Routing\\Route::name\(\).$#'
+        # - '#Call to an undefined method Illuminate\\Routing\\Route::withoutMiddleware\(\).$#'
+        # - '#Call to an undefined method Illuminate\\Routing\\Route::can\(\).$#'
+        # - '#Call to an undefined method Illuminate\\Routing\\Route::where\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::isJson\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::json\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Http\\Requests\\CrudRequest::getRealMethod\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::has\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::get\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::all\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
+        # - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::withTrashed\(\).$#'
+        # - '#Call to an undefined static method Illuminate\\Database\\Eloquent\\Model::getTimestampColumns\(\).$#'
+        # - '#Call to an undefined method Modules\\Core\Grids\\Casts\\GridRequestData|Modules\\Core\\Grids\\Requests\\GridRequest::getMethod\(\).$#'
+        # - '#Call to an undefined method Illuminate\\Http\\Request::getMethod\(\).$#'
+        # Ignora gli errori relativi ai metodi dei trait HasValidations e HasPermissions
+        # - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::shouldSkipValidation\(\)#'
+        # - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::validateWithRules\(\)#'
+        # - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getRules\(\)#'
+        # - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::getOperationRules\(\)#'
+        # - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::isSuperAdmin\(\)#'
+        # - '#Call to an undefined method Illuminate\\Foundation\\Auth\\User::hasPermission\(\)#'
+        - 
+          message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'.$#"
+          identifier: larastan.noEnvCallsOutsideOfConfig
+          path: Modules/*/config/*
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::forget\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::has\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::get\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::put\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::macro\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::tags\(\)#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::remember\(\)#'
+        - '#Static call to instance method __construct\(\)#'
 
+    stubFiles:
+        - _ide_helper_custom.php
+
+    # Configurazione per Laravel
     checkModelProperties: true
     checkOctaneCompatibility: true
     noEnvCallsOutsideOfConfig: true

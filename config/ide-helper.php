@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'include_factory_builders' => false,
+    'include_factory_builders' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -309,6 +309,6 @@ return [
     |
     */
     'post_migrate' => [
-        'ide-helper:models -M',
+        'ide-helper:models -MN',
     ],
 ];

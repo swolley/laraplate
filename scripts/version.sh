@@ -41,6 +41,19 @@ get_latest_version() {
     fi
 }
 
+ament_or_commit() {
+    local message=$1
+    
+    local unpushed=$(git rev-list @{upstream}..HEAD 2>/dev/null)
+    if [ -n "$unpushed" ]; then
+        # if there are unpushed commits, amend the last one
+        git commit --amend --no-edit
+    else
+        # if no unpushed commits and version has changed, create new commit
+        git commit -m "$message"
+    fi
+}
+
 # function to update composer.json
 update_composer_version() {
     local new_version=$1
@@ -55,9 +68,21 @@ update_composer_version() {
         sed -i "s/\"version\": \".*\"/\"version\": \"$new_version\"/" composer.json
     fi
     
-    # commit the changes to the composer.json
+    # add the file to git
     git add composer.json
-    git commit -m "chore: bump version to $new_version"
+    ament_or_commit "chore: bump version to $new_version"
+}
+
+# function to update the changelog
+update_changelog() {
+    local new_version=$1
+    
+    # update the changelog
+    git cliff --changelog CHANGELOG.md
+    
+    # add the file to git
+    git add CHANGELOG.md
+    ament_or_commit "chore: update changelog for version $new_version"
 }
 
 # function to update the version in the current repository
@@ -70,6 +95,9 @@ update_version() {
     
     # update composer.json
     update_composer_version "$new_version"
+
+    # update the changelog
+    update_changelog "$new_version"
     
     # create and push the tag
     git tag -a "$new_version" -m "Release $new_version"

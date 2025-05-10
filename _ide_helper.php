@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.12.0.
+ * Generated for Laravel 12.13.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -13772,7 +13772,6 @@ namespace Illuminate\Support\Facades {
     /**
      * 
      *
-     * @method static array|(\Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null file(string|null $key = null, mixed $default = null)
      * @method static array validate(array $rules, ...$params)
      * @method static array validateWithBag(string $errorBag, array $rules, ...$params)
      * @method static bool hasValidSignature(bool $absolute = true)
@@ -14157,7 +14156,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string|null $key
          * @param mixed $default
-         * @return \Symfony\Component\HttpFoundation\InputBag|mixed 
+         * @return ($key is null ? \Symfony\Component\HttpFoundation\InputBag : mixed)
          * @static 
          */
         public static function json($key = null, $default = null)
@@ -14307,7 +14306,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string|null $param
          * @param mixed $default
-         * @return \Illuminate\Routing\Route|object|string|null 
+         * @return ($param is null ? \Illuminate\Routing\Route : object|string|null)
          * @static 
          */
         public static function route($param = null, $default = null)
@@ -27515,6 +27514,15 @@ namespace Staudenmeir\LaravelCte\Query {
             }
     }
 
+namespace Modules\Core\Cache {
+    /**
+     * 
+     *
+     */
+    class Repository {
+            }
+    }
+
 
 namespace  {
     class App extends \Illuminate\Support\Facades\App {}
@@ -30009,7 +30017,7 @@ namespace  {
         /**
          * Set the columns to be selected.
          *
-         * @param array|mixed $columns
+         * @param mixed $columns
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -30079,7 +30087,7 @@ namespace  {
         /**
          * Add a new select column to the query.
          *
-         * @param array|mixed $column
+         * @param mixed $column
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @static 
          */
@@ -31922,7 +31930,7 @@ namespace  {
         /**
          * Get the count of the total records for the paginator.
          *
-         * @param array $columns
+         * @param array<string|\Illuminate\Contracts\Database\Query\Expression> $columns
          * @return int 
          * @static 
          */
@@ -32232,7 +32240,7 @@ namespace  {
         /**
          * Get all of the query builder's columns in a text-only array with all expressions evaluated.
          *
-         * @return array 
+         * @return list<string> 
          * @static 
          */
         public static function getColumns()
@@ -32291,7 +32299,7 @@ namespace  {
          * Set the bindings on the query builder.
          *
          * @param list<mixed> $bindings
-         * @param string $type
+         * @param "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder" $type
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @throws \InvalidArgumentException
          * @static 
@@ -32306,7 +32314,7 @@ namespace  {
          * Add a binding to the query.
          *
          * @param mixed $value
-         * @param string $type
+         * @param "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder" $type
          * @return \Illuminate\Database\Eloquent\Builder<static> 
          * @throws \InvalidArgumentException
          * @static 
@@ -33354,8 +33362,8 @@ if (! function_exists('modules')) {
      * @param  bool  $showMainApp  add main app into modules list
      * @param  bool  $fullpath  return only module name or full path on file system
      * @param  bool  $onlyActive  return only active modules
-     * @param  null|string  $onlyModule  filter for specified module
-     * @param  null|bool  $prioritySort  sort modules by priority
+     * @param  string|null  $onlyModule  filter for specified module
+     * @param  bool|null  $prioritySort  sort modules by priority
      * @return array<int,string>
      */
     function modules(bool $showMainApp = false, bool $fullpath = false, bool $onlyActive = true, ?string $onlyModule = null, ?bool $prioritySort = false): array
@@ -33368,18 +33376,18 @@ if (! function_exists('modules')) {
             $remapped_modules[ucfirst($module)] = $class;
         }
 
-        if ($onlyModule) {
+        if ($onlyModule !== null && $onlyModule !== '' && $onlyModule !== '0') {
             $onlyModule = ucfirst($onlyModule);
-            $remapped_modules = array_filter($remapped_modules, fn (string $k) => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
+            $remapped_modules = array_filter($remapped_modules, fn(string $k): bool => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
 
-        if ($prioritySort) {
-            uasort($remapped_modules, fn (Module $a, Module $b) => $b->getPriority() <=> $a->getPriority());
+        if ($prioritySort === true) {
+            uasort($remapped_modules, fn(Module $a, Module $b): int => $b->getPriority() <=> $a->getPriority());
         }
 
-        $remapped_modules = $fullpath ? array_map(fn (Module $m) => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
+        $remapped_modules = $fullpath ? array_map(fn(Module $m): string => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
 
-        if ($showMainApp && (! $onlyModule || $onlyModule === 'App')) {
+        if ($showMainApp && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $onlyModule === 'App')) {
             if ($fullpath) {
                 $remapped_modules['App'] = app_path();
             } else {
@@ -33454,7 +33462,7 @@ if (! function_exists('translations')) {
         $app_languages = glob($app_dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
         $langs_subpath = config('modules.paths.generator.lang.path');
 
-        $modules_languages = $fullpath ? $app_languages : array_map(fn (string $l) => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
+        $modules_languages = $fullpath ? $app_languages : array_map(fn(string $l): string => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
 
         foreach (modules(false, true, $onlyActive) as $module) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $module);
@@ -33488,7 +33496,7 @@ if (! function_exists('migrations')) {
      * @param  bool  $count  return only count or full list
      * @param  bool  $onlyPending  return only pending migrations
      * @param  bool  $onlyActive  filter for only active modules
-     * @param  null|string  $onlyModule  filter for specified module
+     * @param  string|null  $onlyModule  filter for specified module
      * @return false|int|array<string> number if count requested, string[] if list requested, false if error occured
      */
     function migrations(bool $count = false, bool $onlyPending = false, bool $onlyActive = true, ?string $onlyModule = null): array|int|false
@@ -33528,7 +33536,7 @@ if (! function_exists('models')) {
      * list all Models.
      *
      * @param  bool  $onlyActive  filter for only active modules
-     * @param  null|string  $onlyModule  filter for specified module
+     * @param  string|null  $onlyModule  filter for specified module
      * @return list<class-string<Model>>
      */
     function models(bool $onlyActive = true, ?string $onlyModule = null): array
@@ -33579,7 +33587,7 @@ if (! function_exists('controllers')) {
      * list all Controllers.
      *
      * @param  bool  $onlyActive  filter for only active modules
-     * @param  null|string  $onlyModule  filter for specified module
+     * @param  string|null  $onlyModule  filter for specified module
      * @return array<int,string>
      *
      * @psalm-return list{0?: string,...}
@@ -33621,7 +33629,7 @@ if (! function_exists('routes')) {
      * list all Controllers.
      *
      * @param  bool  $onlyActive  filter for only active modules
-     * @param  null|string  $onlyModule  filter for specified module
+     * @param  string|null  $onlyModule  filter for specified module
      * @return array<int,Route>
      *
      * @psalm-return list{0?: string,...}
@@ -33632,7 +33640,7 @@ if (! function_exists('routes')) {
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
         $all_routes = app('router')->getRoutes()->getRoutes();
-        usort($all_routes, fn (Route $a, Route $b) => $a->uri() <=> $b->uri());
+        usort($all_routes, fn(Route $a, Route $b): int => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
             $reference = $route->action['namespace'] ?? $route->action['controller'] ?? $route->action['uses'];
@@ -33643,7 +33651,7 @@ if (! function_exists('routes')) {
             }
             $exploded = explode('\\', (string) $reference);
 
-            if (($exploded[0] !== 'Modules' && (! $onlyModule || $onlyModule === 'App')) || (in_array($exploded[1], $modules, true) && (! $onlyModule || $exploded[1] === $onlyModule))) {
+            if (($exploded[0] !== 'Modules' && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $onlyModule === 'App')) || (in_array($exploded[1], $modules, true) && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $exploded[1] === $onlyModule))) {
                 $routes[] = $route;
             }
         }
@@ -33695,7 +33703,7 @@ if (! function_exists('preview')) {
     /**
      * Getter/Setter for session preview flag.
      *
-     * @param  null|bool  $enablePreview  enable preview flag
+     * @param  bool|null  $enablePreview  enable preview flag
      */
     function preview(?bool $enablePreview = null): bool
     {
@@ -33774,11 +33782,11 @@ if (! function_exists('cast_value')) {
      * Cast a value to a specific type.
      *
      * @param  mixed  $value  The value to cast
-     * @param  null|string  $type  The type to cast to
+     * @param  string|null  $type  The type to cast to
      */
     function cast_value(mixed $value, ?string $type = null): mixed
     {
-        if ($type) {
+        if ($type !== null && $type !== '' && $type !== '0') {
             return match (mb_strtolower($type)) {
                 'int', 'integer' => (int) $value,
                 'float', 'double', 'real' => (float) $value,
@@ -33805,19 +33813,19 @@ if (! function_exists('cast_value')) {
             return (float) $value;
         }
 
-        if (mb_strtolower($value) === 'true') {
+        if (mb_strtolower((string) $value) === 'true') {
             return true;
         }
 
-        if (mb_strtolower($value) === 'false') {
+        if (mb_strtolower((string) $value) === 'false') {
             return false;
         }
 
         // JSON array or object
-        if ((mb_substr($value, 0, 1) === '[' && mb_substr($value, -1) === ']')
-            || (mb_substr($value, 0, 1) === '{' && mb_substr($value, -1) === '}')
+        if ((mb_substr((string) $value, 0, 1) === '[' && mb_substr((string) $value, -1) === ']')
+            || (mb_substr((string) $value, 0, 1) === '{' && mb_substr((string) $value, -1) === '}')
         ) {
-            $decoded = json_decode($value, true);
+            $decoded = json_decode((string) $value, true);
 
             if (json_last_error() === JSON_ERROR_NONE) {
                 return $decoded;

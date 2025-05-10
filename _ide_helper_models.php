@@ -53,7 +53,6 @@ namespace App\Models{
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User admin()
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User lockedBy(\Illuminate\Foundation\Auth\User $user)
@@ -63,7 +62,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User role($roles, $guard = null, $without = false)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User superAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User whereCreatedAt($value)
@@ -112,13 +110,10 @@ namespace Modules\Cms\Models{
  * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read bool $can_login
- * @property-read bool $is_signature
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
- * @property mixed $picture
  * @property-read \Modules\Cms\Models\Preset|null $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
@@ -184,9 +179,7 @@ namespace Modules\Cms\Models{
  * @property-read int|null $contents_count
  * @property-read \Modules\Cms\Models\Entity|null $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
- * @property-read mixed $full_name
  * @property-read array|null $preview
- * @property-read mixed $ids
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
@@ -218,7 +211,6 @@ namespace Modules\Cms\Models{
  * @property-read int|null $siblings_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $siblingsAndSelf All the parent's children.
  * @property-read int|null $siblings_and_self_count
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category active()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, static> all($columns = ['*'])
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category breadthFirst()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category depthFirst()
@@ -238,7 +230,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newModelQuery()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category onlyTrashed()
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered(string $direction = 'asc')
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category published()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category scheduled()
@@ -313,7 +305,7 @@ namespace Modules\Cms\Models{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property mixed $cover
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -340,13 +332,12 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content forEntity(\Modules\Cms\Models\Entity $entity)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content scheduled()
@@ -411,7 +402,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property mixed $cover
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -438,13 +429,12 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article forEntity(\Modules\Cms\Models\Entity $entity)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article scheduled()
@@ -509,7 +499,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property mixed $cover
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -536,13 +526,12 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event forEntity(\Modules\Cms\Models\Entity $entity)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event scheduled()
@@ -607,7 +596,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property mixed $cover
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -634,13 +623,12 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia forEntity(\Modules\Cms\Models\Entity $entity)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia scheduled()
@@ -705,7 +693,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property mixed $cover
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -732,13 +720,12 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Cms\Database\Factories\ContentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey forEntity(\Modules\Cms\Models\Entity $entity)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey lockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey scheduled()
@@ -899,8 +886,6 @@ namespace Modules\Cms\Models{
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property float|null $latitude
- * @property float|null $longitude
  * @property-read mixed $path
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
@@ -1079,7 +1064,7 @@ namespace Modules\Cms\Models\Pivot{
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereDefault($value)
@@ -1181,12 +1166,11 @@ namespace Modules\Cms\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $path
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag containing(string $name, $locale = null)
  * @method static \Modules\Cms\Database\Factories\TagFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereDeletedAt($value)
@@ -1198,7 +1182,6 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withType(?string $type = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag withoutTrashed()
  * @mixin \Eloquent
  */
@@ -1250,7 +1233,6 @@ namespace Modules\Core\Models{
  * @property-read \Modules\Core\Models\Permission|null $permission
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL forPermission($permission_id)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL onlyTrashed()
@@ -1346,10 +1328,8 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expiredAt(\Illuminate\Support\Carbon $date)
  * @method static \Modules\Core\Database\Factories\LicenseFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License free()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License occupied()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License scheduled()
@@ -1460,7 +1440,6 @@ namespace Modules\Core\Models{
  * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $connection_name
  * @property string|null $table_name
- * @property-read \Modules\Core\Casts\ActionEnum|null $action
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
@@ -1688,7 +1667,6 @@ namespace Modules\Core\Models{
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User admin()
  * @method static \Modules\Core\Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User locked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User lockedBy(\Illuminate\Foundation\Auth\User $user)
@@ -1698,7 +1676,6 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User role($roles, $guard = null, $without = false)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User superAdmin()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User unlocked()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User unlockedBy(\Illuminate\Foundation\Auth\User $user)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User whereCreatedAt($value)

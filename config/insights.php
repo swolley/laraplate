@@ -111,9 +111,9 @@ return [
         ForbiddenPrivateMethods::class => [
             'title' => 'The usage of private methods is not idiomatic in Laravel.',
         ],
-        // CyclomaticComplexitySniff::class => [
-        //     'maxComplexity' => 7,
-        // ],
+        CyclomaticComplexitySniff::class => [
+            'maxComplexity' => 7,
+        ],
     ],
 
     /*
