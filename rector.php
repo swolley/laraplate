@@ -13,12 +13,12 @@ $paths = array_merge(
         __DIR__ . '/app',
         __DIR__ . '/bootstrap/app.php',
         __DIR__ . '/database',
-        __DIR__ . '/pubilc',
+        // __DIR__ . '/pubilc',
     ],
     array_map(fn($module) => "{$module}/app", $modules),
     // array_map(fn($module) => "$module/tests", $modules),
 );
-$paths = array_merge($paths, array_map(fn($module) => "$module/tests", $modules));
+// $paths = array_merge($paths, array_map(fn($module) => "$module/tests", $modules));
 
 return RectorConfig::configure()
     ->withSkip([
