@@ -88,15 +88,13 @@
             "php artisan ide-helper:models -MN",
             "php artisan ide-helper:meta"
         ],
-        "check": "vendor/bin/phpstan analyse --memory-limit=2G -v",
-        "fix": "vendor/bin/phpstan analyse --memory-limit=2G -v --fix",
         "refactor": "rector",
         "test:type-coverage": "pest --type-coverage --exactly=100",
         "test:typos": "peck",
         "test:lint": "pint --test",
         "test:unit": "pest --parallel --coverage --exactly=100",
-        "test:types": "phpstan",
-        "test:refactor": "rector",
+        "test:types": "phpstan --memory-limit=2G",
+        "test:refactor": "rector --dry-run",
         "test": [
             "@test:type-coverage",
             "@test:typos",

@@ -1,5 +1,36 @@
 #!/bin/bash
 
+# function to get the last commit message
+get_last_commit_message() {
+    git log -1 --pretty=%B
+}
+
+# function to determine release type from commit message
+determine_release_type() {
+    local commit_message=$(get_last_commit_message)
+    
+    # Check for breaking changes (major)
+    if [[ "$commit_message" =~ ^(feat|fix|perf|refactor)(\([a-z0-9-]+\))?! ]]; then
+        echo "major"
+        return
+    fi
+    
+    # Check for features (minor)
+    if [[ "$commit_message" =~ ^feat(\([a-z0-9-]+\))?: ]]; then
+        echo "minor"
+        return
+    fi
+    
+    # Check for other conventional commit types (patch)
+    if [[ "$commit_message" =~ ^(fix|perf|refactor)(\([a-z0-9-]+\))?: ]]; then
+        echo "patch"
+        return
+    fi
+    
+    # If no recognizable pattern is found, default to null
+    echo "null"
+}
+
 # function to increment the version
 increment_version() {
     local version=$1
@@ -92,10 +123,10 @@ update_version() {
     local new_version=$(increment_version "$current_version" "$position")
     
     echo "Updating version from $current_version to $new_version"
-    
+        
     # update composer.json
     update_composer_version "$new_version"
-
+    
     # update the changelog
     update_changelog "$new_version"
     
@@ -104,16 +135,28 @@ update_version() {
     git push && git push origin "$new_version"
 }
 
-if [ -n "$2" ] && [ -d "Modules/$2" ]; then
-    cd Modules/$2 && update_version $1
+# Check if --nointeractive flag is present
+if [[ "$*" == *"--nointeractive"* ]]; then
+    # Determine release type from commit message
+    position=$(determine_release_type)
+    if [ "$position" != "null" ]; then
+        update_version "$position"
+    else
+        exit 0
+    fi
 else
+    # Interactive mode
     case $1 in
         "major"|"minor"|"patch")
             update_version $1
             ;;
+        "null")
+            echo "No version change detected"
+            exit 0
+            ;;
         *)
-            echo "Usage: $0 {major|minor|patch}"
+            echo "Usage: $0 {major|minor|patch} [--nointeractive]"
             exit 1
             ;;
-    esac 
+    esac
 fi
