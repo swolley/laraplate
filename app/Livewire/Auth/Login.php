@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Auth;
 
-use Livewire\Component;
 use Illuminate\Http\Request;
+use Livewire\Component;
 use Modules\Core\Auth\Services\AuthenticationService;
 
 final class Login extends Component
@@ -37,6 +37,7 @@ final class Login extends Component
         }
 
         $this->addError('email', 'These credentials do not match our records.');
+
         return null;
     }
 

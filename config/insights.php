@@ -2,29 +2,30 @@
 
 declare(strict_types=1);
 
-use PHP_CodeSniffer\Standards\Squiz\Sniffs\PHP\EvalSniff;
-use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits;
-use NunoMaduro\PhpInsights\Domain\Sniffs\ForbiddenSetterSniff;
-use NunoMaduro\PhpInsights\Domain\Metrics\Architecture\Classes;
-use SlevomatCodingStandard\Sniffs\Functions\FunctionLengthSniff;
-use SlevomatCodingStandard\Sniffs\TypeHints\ReturnTypeHintSniff;
-use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenFinalClasses;
-use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses;
-use SlevomatCodingStandard\Sniffs\TypeHints\PropertyTypeHintSniff;
-use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
-use SlevomatCodingStandard\Sniffs\TypeHints\ParameterTypeHintSniff;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenDefineFunctions;
-use SlevomatCodingStandard\Sniffs\TypeHints\DeclareStrictTypesSniff;
+use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses;
+use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
+use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits;
+use NunoMaduro\PhpInsights\Domain\Metrics\Architecture\Classes;
+use NunoMaduro\PhpInsights\Domain\Sniffs\ForbiddenSetterSniff;
+use PHP_CodeSniffer\Standards\Generic\Sniffs\WhiteSpace\DisallowTabIndentSniff;
+use PHP_CodeSniffer\Standards\PSR1\Sniffs\Methods\CamelCapsMethodNameSniff;
+use PHP_CodeSniffer\Standards\Squiz\Sniffs\PHP\EvalSniff;
 use SlevomatCodingStandard\Sniffs\Classes\ForbiddenPublicPropertySniff;
-use SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff;
-use SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff;
-use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
-use SlevomatCodingStandard\Sniffs\Commenting\UselessFunctionDocCommentSniff;
 use SlevomatCodingStandard\Sniffs\Classes\SuperfluousAbstractClassNamingSniff;
-use PHP_CodeSniffer\Standards\Generic\Sniffs\Metrics\CyclomaticComplexitySniff;
-use SlevomatCodingStandard\Sniffs\ControlStructures\RequireShortTernaryOperatorSniff;
+use SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff;
+use SlevomatCodingStandard\Sniffs\Commenting\UselessFunctionDocCommentSniff;
+use SlevomatCodingStandard\Sniffs\Complexity\CognitiveSniff;
 use SlevomatCodingStandard\Sniffs\ControlStructures\DisallowShortTernaryOperatorSniff;
-use PHP_CodeSniffer\Standards\Generic\Sniffs\NamingConventions\InterfaceNameSuffixSniff;
+use SlevomatCodingStandard\Sniffs\ControlStructures\RequireShortTernaryOperatorSniff;
+use SlevomatCodingStandard\Sniffs\Files\LineLengthSniff;
+use SlevomatCodingStandard\Sniffs\Functions\FunctionLengthSniff;
+use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\DeclareStrictTypesSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\ParameterTypeHintSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\PropertyTypeHintSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\ReturnTypeHintSniff;
 
 return [
     /*
@@ -81,7 +82,6 @@ return [
 
     'add' => [
         Classes::class => [
-            ForbiddenFinalClasses::class,
             RequireShortTernaryOperatorSniff::class,
         ],
     ],
@@ -99,20 +99,24 @@ return [
         UselessFunctionDocCommentSniff::class,
         ForbiddenSetterSniff::class,
         DisallowShortTernaryOperatorSniff::class,
-        InterfaceNameSuffixSniff::class,
         SuperfluousExceptionNamingSniff::class,
         SuperfluousAbstractClassNamingSniff::class,
         FunctionLengthSniff::class,
         EvalSniff::class,
         ForbiddenPublicPropertySniff::class,
+        LineLengthSniff::class,
+        CamelCapsMethodNameSniff::class,
+        DisallowTabIndentSniff::class,
     ],
 
     'config' => [
         ForbiddenPrivateMethods::class => [
             'title' => 'The usage of private methods is not idiomatic in Laravel.',
         ],
-        CyclomaticComplexitySniff::class => [
-            'maxComplexity' => 7,
+        CognitiveSniff::class => [
+            'title' => 'The usage of cognitive complexity is not idiomatic in Laravel.',
+            'warningThreshold' => 8,
+            'errorThreshold' => 10,
         ],
     ],
 
@@ -128,11 +132,11 @@ return [
     */
 
     'requirements' => [
-        //        'min-quality' => 0,
-        //        'min-complexity' => 0,
-        //        'min-architecture' => 0,
-        //        'min-style' => 0,
-        //        'disable-security-check' => false,
+        'min-quality' => 0,
+        'min-complexity' => 0,
+        'min-architecture' => 0,
+        'min-style' => 0,
+        'disable-security-check' => false,
     ],
 
     /*

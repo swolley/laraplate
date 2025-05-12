@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\ValueObject\PhpVersion;
 use RectorLaravel\Set\LaravelSetList;
-use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 
 $modules = array_filter(glob(__DIR__ . '/Modules/*'), 'is_dir');
 $paths = array_merge(
@@ -15,7 +15,7 @@ $paths = array_merge(
         __DIR__ . '/database',
         // __DIR__ . '/pubilc',
     ],
-    array_map(fn($module) => "{$module}/app", $modules),
+    array_map(fn ($module) => "{$module}/app", $modules),
     // array_map(fn($module) => "$module/tests", $modules),
 );
 // $paths = array_merge($paths, array_map(fn($module) => "$module/tests", $modules));

@@ -6,8 +6,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Lab404\Impersonate\Services\ImpersonateManager;
+use Symfony\Component\HttpFoundation\Response;
 
 final class FilamentImpersonateMiddleware
 {

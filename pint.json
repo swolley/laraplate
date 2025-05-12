@@ -186,7 +186,7 @@
             "less_and_greater": false
         },
         "ordered_imports": {
-            "sort_algorithm": "length",
+            "sort_algorithm": "alpha",
             "imports_order": ["const", "function", "class"]
         },
         "no_superfluous_phpdoc_tags": {

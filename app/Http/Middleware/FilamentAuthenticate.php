@@ -6,8 +6,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Modules\Core\Auth\Services\AuthenticationService;
+use Symfony\Component\HttpFoundation\Response;
 
 final class FilamentAuthenticate
 {
