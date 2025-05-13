@@ -12,7 +12,6 @@ final class Kernel extends HttpKernel
 
     protected $middlewareAliases = [
         // ... existing aliases ...
-        'filament.auth' => Middleware\FilamentAuthenticate::class,
     ];
 
     // ... existing code ...

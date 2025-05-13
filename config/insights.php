@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
+use NunoMaduro\PhpInsights\Domain\Insights\ClassMethodAverageCyclomaticComplexityIsHigh;
+use NunoMaduro\PhpInsights\Domain\Insights\CyclomaticComplexityIsHigh;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenDefineFunctions;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits;
+use NunoMaduro\PhpInsights\Domain\Insights\MethodCyclomaticComplexityIsHigh;
 use NunoMaduro\PhpInsights\Domain\Metrics\Architecture\Classes;
 use NunoMaduro\PhpInsights\Domain\Sniffs\ForbiddenSetterSniff;
+use PHP_CodeSniffer\Standards\Generic\Sniffs\Metrics\CyclomaticComplexitySniff;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\WhiteSpace\DisallowTabIndentSniff;
 use PHP_CodeSniffer\Standards\PSR1\Sniffs\Methods\CamelCapsMethodNameSniff;
 use PHP_CodeSniffer\Standards\Squiz\Sniffs\PHP\EvalSniff;
@@ -118,6 +122,23 @@ return [
             'warningThreshold' => 8,
             'errorThreshold' => 10,
         ],
+        CyclomaticComplexitySniff::class => [
+            'title' => 'The usage of cyclomatic complexity is not idiomatic in Laravel.',
+            'warningThreshold' => 8,
+            'errorThreshold' => 10,
+        ],
+        CyclomaticComplexityIsHigh::class => [
+            'title' => 'The usage of cyclomatic complexity is not idiomatic in Laravel.',
+            'maxComplexity' => 10,
+        ],
+        MethodCyclomaticComplexityIsHigh::class => [
+            'title' => 'The usage of cyclomatic complexity is not idiomatic in Laravel.',
+            'maxMethodComplexity' => 10,
+        ],
+        ClassMethodAverageCyclomaticComplexityIsHigh::class => [
+            'title' => 'The usage of cyclomatic complexity is not idiomatic in Laravel.',
+            'maxClassMethodAverageComplexity' => 10,
+        ],
     ],
 
     /*
@@ -132,10 +153,10 @@ return [
     */
 
     'requirements' => [
-        'min-quality' => 0,
-        'min-complexity' => 0,
-        'min-architecture' => 0,
-        'min-style' => 0,
+        'min-quality' => 70,
+        'min-complexity' => 70,
+        'min-architecture' => 70,
+        'min-style' => 70,
         'disable-security-check' => false,
     ],
 
