@@ -51,7 +51,7 @@ Laravel Best Practices
 -   Utilize Laravel's built-in authentication and authorization features (Sanctum, Policies)
 -   Leverage Laravel's caching mechanisms (Redis, Memcached) for improved performance
 -   Use job queues and Laravel Horizon for handling long-running tasks and background processing
--   Implement comprehensive testing using PHPUnit and Laravel Dusk for unit, feature, and browser tests
+-   Implement comprehensive testing using Pest and Laravel Dusk for unit, feature, and browser tests
 -   Use API resources and versioning for building robust and maintainable APIs
 -   Implement proper error handling and logging using Laravel's exception handler and logging facade
 -   Utilize Laravel's validation features, including Form Requests, for data integrity
