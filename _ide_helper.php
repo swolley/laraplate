@@ -24004,6 +24004,174 @@ namespace Nwidart\Modules\Facades {
             }
     }
 
+namespace PHPOpenSourceSaver\JWTAuth\Facades {
+    /**
+     * 
+     *
+     */
+    class JWTFactory {
+        /**
+         * Create the Payload instance.
+         *
+         * @param bool $resetClaims
+         * @return \PHPOpenSourceSaver\JWTAuth\Payload 
+         * @static 
+         */
+        public static function make($resetClaims = false)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->make($resetClaims);
+        }
+
+        /**
+         * Empty the claims collection.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function emptyClaims()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->emptyClaims();
+        }
+
+        /**
+         * Build and get the Claims Collection.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Claims\Collection 
+         * @static 
+         */
+        public static function buildClaimsCollection()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->buildClaimsCollection();
+        }
+
+        /**
+         * Get a Payload instance with a claims collection.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Payload 
+         * @static 
+         */
+        public static function withClaims($claims)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->withClaims($claims);
+        }
+
+        /**
+         * Set the default claims to be added to the Payload.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function setDefaultClaims($claims)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->setDefaultClaims($claims);
+        }
+
+        /**
+         * Helper to set the ttl.
+         *
+         * @param int|null $ttl
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function setTTL($ttl)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->setTTL($ttl);
+        }
+
+        /**
+         * Helper to get the ttl.
+         *
+         * @return int|null 
+         * @static 
+         */
+        public static function getTTL()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->getTTL();
+        }
+
+        /**
+         * Get the default claims.
+         *
+         * @return array 
+         * @static 
+         */
+        public static function getDefaultClaims()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->getDefaultClaims();
+        }
+
+        /**
+         * Get the PayloadValidator instance.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Validators\PayloadValidator 
+         * @static 
+         */
+        public static function validator()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->validator();
+        }
+
+        /**
+         * Set the custom claims.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function customClaims($customClaims)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->customClaims($customClaims);
+        }
+
+        /**
+         * Alias to set the custom claims.
+         *
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function claims($customClaims)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->claims($customClaims);
+        }
+
+        /**
+         * Get the custom claims.
+         *
+         * @return array 
+         * @static 
+         */
+        public static function getCustomClaims()
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->getCustomClaims();
+        }
+
+        /**
+         * Set the refresh flow flag.
+         *
+         * @param bool $refreshFlow
+         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
+         * @static 
+         */
+        public static function setRefreshFlow($refreshFlow = true)
+        {
+            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
+            return $instance->setRefreshFlow($refreshFlow);
+        }
+
+            }
+    }
+
 namespace Illuminate\Support {
     /**
      * 
@@ -32863,14 +33031,10 @@ namespace  {
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
     class Module extends \Nwidart\Modules\Facades\Module {}
+    class JWTFactory extends \PHPOpenSourceSaver\JWTAuth\Facades\JWTFactory {}
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 namespace {
     
@@ -33437,14 +33601,14 @@ if (! function_exists('modules')) {
 
         if ($onlyModule !== null && $onlyModule !== '' && $onlyModule !== '0') {
             $onlyModule = ucfirst($onlyModule);
-            $remapped_modules = array_filter($remapped_modules, fn(string $k): bool => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
+            $remapped_modules = array_filter($remapped_modules, fn (string $k): bool => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
 
         if ($prioritySort === true) {
-            uasort($remapped_modules, fn(Module $a, Module $b): int => $b->getPriority() <=> $a->getPriority());
+            uasort($remapped_modules, fn (Module $a, Module $b): int => $b->getPriority() <=> $a->getPriority());
         }
 
-        $remapped_modules = $fullpath ? array_map(fn(Module $m): string => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
+        $remapped_modules = $fullpath ? array_map(fn (Module $m): string => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
 
         if ($showMainApp && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $onlyModule === 'App')) {
             if ($fullpath) {
@@ -33521,7 +33685,7 @@ if (! function_exists('translations')) {
         $app_languages = glob($app_dir . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR);
         $langs_subpath = config('modules.paths.generator.lang.path');
 
-        $modules_languages = $fullpath ? $app_languages : array_map(fn(string $l): string => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
+        $modules_languages = $fullpath ? $app_languages : array_map(fn (string $l): string => str_replace($app_dir . DIRECTORY_SEPARATOR, '', $l), $app_languages);
 
         foreach (modules(false, true, $onlyActive) as $module) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $module);
@@ -33699,7 +33863,7 @@ if (! function_exists('routes')) {
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
         $all_routes = app('router')->getRoutes()->getRoutes();
-        usort($all_routes, fn(Route $a, Route $b): int => $a->uri() <=> $b->uri());
+        usort($all_routes, fn (Route $a, Route $b): int => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
             $reference = $route->action['namespace'] ?? $route->action['controller'] ?? $route->action['uses'];

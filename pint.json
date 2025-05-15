@@ -68,7 +68,7 @@
             "scalar_types": true
         },
         "phpdoc_types_order": {
-            "null_adjustment": "always_first",
+            "null_adjustment": "always_last",
             "sort_algorithm": "none"
         },
         "php_unit_method_casing": {
@@ -193,6 +193,9 @@
             "allow_mixed": false,
             "allow_unused_params": false,
             "remove_inheritdoc": true
+        },
+        "function_declaration": {
+            "spacing": "one"
         }
     }
 }

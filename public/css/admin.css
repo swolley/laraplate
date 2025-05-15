@@ -1,0 +1,12 @@
+.fi-panel-admin {
+    background-image: url(https://github.com/swolley/images/blob/master/swolley-1.jpg?raw=true);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: multiply;
+}
+
+.fi-panel-admin main.dark\:bg-gray-900:is(.dark *) {
+    background-color: rgba(var(--gray-900),0.9);
+} 

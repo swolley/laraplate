@@ -4,5 +4,9 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"intelephense.format.spaceAfterControlStructureKeyword": true,
+    	"intelephense.format.spaceAfterFunctionKeyword": true,
+    	"intelephense.format.spaceAfterArrowFunctionKeyword": true
+	}
 }

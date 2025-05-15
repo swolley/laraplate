@@ -1,7 +1,7 @@
 <p>&nbsp;</p>
 <p align="center">
 	<a href="https://github.com/swolley" target="_blank" style="color: #a5ac56">
-		<img src="https://github.com/swolley/images/blob/master/swolley-1.jpg?raw=true" />
+		<img src="https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg" />
     </a>
 </p>
 <p>&nbsp;</p>
