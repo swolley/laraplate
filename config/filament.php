@@ -1,7 +1,8 @@
 <?php
 
-return [
+declare(strict_types=1);
 
+return [
     /*
     |--------------------------------------------------------------------------
     | Broadcasting
@@ -15,7 +16,6 @@ return [
     */
 
     'broadcasting' => [
-
         // 'echo' => [
         //     'broadcaster' => 'pusher',
         //     'key' => env('VITE_PUSHER_APP_KEY'),
@@ -28,7 +28,6 @@ return [
         //     'encrypted' => true,
         //     'forceTLS' => true,
         // ],
-
     ],
 
     /*
@@ -143,7 +142,7 @@ return [
     'auth' => [
         'guard' => 'admin',
         'pages' => [
-            'login' => \Filament\Pages\Auth\Login::class,
+            'login' => Filament\Pages\Auth\Login::class,
         ],
     ],
 

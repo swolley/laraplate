@@ -24004,174 +24004,6 @@ namespace Nwidart\Modules\Facades {
             }
     }
 
-namespace PHPOpenSourceSaver\JWTAuth\Facades {
-    /**
-     * 
-     *
-     */
-    class JWTFactory {
-        /**
-         * Create the Payload instance.
-         *
-         * @param bool $resetClaims
-         * @return \PHPOpenSourceSaver\JWTAuth\Payload 
-         * @static 
-         */
-        public static function make($resetClaims = false)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->make($resetClaims);
-        }
-
-        /**
-         * Empty the claims collection.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function emptyClaims()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->emptyClaims();
-        }
-
-        /**
-         * Build and get the Claims Collection.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Claims\Collection 
-         * @static 
-         */
-        public static function buildClaimsCollection()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->buildClaimsCollection();
-        }
-
-        /**
-         * Get a Payload instance with a claims collection.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Payload 
-         * @static 
-         */
-        public static function withClaims($claims)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->withClaims($claims);
-        }
-
-        /**
-         * Set the default claims to be added to the Payload.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setDefaultClaims($claims)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->setDefaultClaims($claims);
-        }
-
-        /**
-         * Helper to set the ttl.
-         *
-         * @param int|null $ttl
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setTTL($ttl)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->setTTL($ttl);
-        }
-
-        /**
-         * Helper to get the ttl.
-         *
-         * @return int|null 
-         * @static 
-         */
-        public static function getTTL()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->getTTL();
-        }
-
-        /**
-         * Get the default claims.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getDefaultClaims()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->getDefaultClaims();
-        }
-
-        /**
-         * Get the PayloadValidator instance.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Validators\PayloadValidator 
-         * @static 
-         */
-        public static function validator()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->validator();
-        }
-
-        /**
-         * Set the custom claims.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function customClaims($customClaims)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->customClaims($customClaims);
-        }
-
-        /**
-         * Alias to set the custom claims.
-         *
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function claims($customClaims)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->claims($customClaims);
-        }
-
-        /**
-         * Get the custom claims.
-         *
-         * @return array 
-         * @static 
-         */
-        public static function getCustomClaims()
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->getCustomClaims();
-        }
-
-        /**
-         * Set the refresh flow flag.
-         *
-         * @param bool $refreshFlow
-         * @return \PHPOpenSourceSaver\JWTAuth\Factory 
-         * @static 
-         */
-        public static function setRefreshFlow($refreshFlow = true)
-        {
-            /** @var \PHPOpenSourceSaver\JWTAuth\Factory $instance */
-            return $instance->setRefreshFlow($refreshFlow);
-        }
-
-            }
-    }
-
 namespace Illuminate\Support {
     /**
      * 
@@ -33031,10 +32863,14 @@ namespace  {
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
     class Module extends \Nwidart\Modules\Facades\Module {}
-    class JWTFactory extends \PHPOpenSourceSaver\JWTAuth\Facades\JWTFactory {}
 }
 
 
+namespace Facades\Livewire\Features\SupportFileUploads {
+    /**
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
 
 namespace {
     

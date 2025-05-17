@@ -195,7 +195,8 @@
             "remove_inheritdoc": true
         },
         "function_declaration": {
-            "spacing": "one"
+            "closure_function_spacing": "one",
+            "closure_fn_spacing": "one"
         }
     }
 }

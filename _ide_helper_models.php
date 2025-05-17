@@ -99,6 +99,8 @@ namespace Modules\Cms\Models{
  *
  * @property int $id
  * @property int|null $user_id The user that the author belongs to
+ * @property int $entity_id
+ * @property int $preset_id The preset that the author belongs to
  * @property string $name The name of the author
  * @property array $components The author contents
  * @property \Carbon\CarbonImmutable $created_at
@@ -108,13 +110,13 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
- * @property-read \Modules\Cms\Models\Entity|null $entity
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
- * @property-read \Modules\Cms\Models\Preset|null $preset
+ * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -129,9 +131,11 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePresetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
@@ -153,6 +157,7 @@ namespace Modules\Cms\Models{
  *
  * @property int $id
  * @property int|null $entity_id
+ * @property int $preset_id The preset that the category belongs to
  * @property int|null $parent_id The parent category
  * @property int|null $parent_entity_id The entity that the parent category belongs to
  * @property string $name The name of the category
@@ -231,6 +236,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category onlyTrashed()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered(string $direction = 'asc')
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category priorityOrdered(string $direction = 'asc')
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category published()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category scheduled()
@@ -259,6 +265,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentEntityId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePresetId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSlug($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidFrom($value)
@@ -338,6 +345,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content scheduled()
@@ -435,6 +443,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article scheduled()
@@ -532,6 +541,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event scheduled()
@@ -629,6 +639,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia scheduled()
@@ -726,6 +737,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey ordered(string $direction = 'asc')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey scheduled()

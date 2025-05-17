@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\Models\Role;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->admin = User::factory()->create([
         'email' => 'admin@example.com',
         'password' => Hash::make('password'),
@@ -18,14 +18,14 @@ beforeEach(function () {
     $this->admin->roles()->attach($adminRole);
 });
 
-test('can list users', function () {
+test('can list users', function (): void {
     $response = actingAs($this->admin)
         ->get(route('filament.admin.resources.core.users.index'));
 
     $response->assertSuccessful();
 });
 
-test('can create user', function () {
+test('can create user', function (): void {
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -37,13 +37,13 @@ test('can create user', function () {
         ->post(route('filament.admin.resources.core.users.create'), $userData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('users')->where([
+    expect(Illuminate\Support\Facades\DB::table('users')->where([
         'name' => 'Test User',
         'email' => 'test@example.com',
     ])->exists())->toBeTrue();
 });
 
-test('can edit user', function () {
+test('can edit user', function (): void {
     $user = User::factory()->create();
 
     $response = actingAs($this->admin)
@@ -52,7 +52,7 @@ test('can edit user', function () {
     $response->assertSuccessful();
 });
 
-test('can update user', function () {
+test('can update user', function (): void {
     $user = User::factory()->create();
     $updateData = [
         'name' => 'Updated User',
@@ -65,26 +65,26 @@ test('can update user', function () {
         ->put(route('filament.admin.resources.core.users.update', ['record' => $user]), $updateData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('users')->where([
+    expect(Illuminate\Support\Facades\DB::table('users')->where([
         'id' => $user->id,
         'name' => 'Updated User',
         'email' => 'updated@example.com',
     ])->exists())->toBeTrue();
 });
 
-test('can delete user', function () {
+test('can delete user', function (): void {
     $user = User::factory()->create();
 
     $response = actingAs($this->admin)
         ->delete(route('filament.admin.resources.core.users.delete', ['record' => $user]));
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->exists())->toBeFalse();
+    expect(Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->exists())->toBeFalse();
 });
 
-test('user resource has required form fields', function () {
-    $resource = new \App\Filament\Resources\Core\UserResource();
-    $form = $resource->form(new \Filament\Forms\Form());
+test('user resource has required form fields', function (): void {
+    $resource = new App\Filament\Resources\Core\UserResource();
+    $form = $resource->form(new Filament\Forms\Form());
 
     expect($form->hasComponent('name', 'text'))->toBeTrue();
     expect($form->hasComponent('email', 'email'))->toBeTrue();
@@ -92,18 +92,18 @@ test('user resource has required form fields', function () {
     expect($form->hasComponent('password_confirmation', 'password'))->toBeTrue();
 });
 
-test('user resource has required table columns', function () {
-    $resource = new \App\Filament\Resources\Core\UserResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('user resource has required table columns', function (): void {
+    $resource = new App\Filament\Resources\Core\UserResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     expect($table->hasColumn('name', 'text'))->toBeTrue();
     expect($table->hasColumn('email', 'text'))->toBeTrue();
     expect($table->hasColumn('created_at', 'date'))->toBeTrue();
 });
 
-test('user resource has required actions', function () {
-    $resource = new \App\Filament\Resources\Core\UserResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('user resource has required actions', function (): void {
+    $resource = new App\Filament\Resources\Core\UserResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     $actions = $table->getActions();
     expect($actions)->toHaveKey('edit');

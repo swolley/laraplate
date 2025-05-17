@@ -3,21 +3,21 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\Models\License;
 use Modules\Core\Models\Role;
 use Tests\TestCase;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
 
 uses(TestCase::class);
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->admin = User::factory()->create([
         'email' => 'admin@example.com',
         'password' => Hash::make('password'),
@@ -27,14 +27,14 @@ beforeEach(function () {
     $this->admin->roles()->attach($adminRole);
 });
 
-test('can list licenses', function () {
+test('can list licenses', function (): void {
     $response = $this->actingAs($this->admin)
         ->get(route('filament.admin.resources.core.licenses.index'));
 
     $response->assertSuccessful();
 });
 
-test('can create license', function () {
+test('can create license', function (): void {
     $licenseData = [
         'name' => 'Test License',
         'key' => 'test-license-key',
@@ -56,7 +56,7 @@ test('can create license', function () {
         ->post(route('filament.admin.resources.core.licenses.create'), $licenseData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('licenses')->where([
+    expect(Illuminate\Support\Facades\DB::table('licenses')->where([
         'name' => 'Test License',
         'key' => 'test-license-key',
         'domain' => 'https://example.com',
@@ -73,7 +73,7 @@ test('can create license', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can edit license', function () {
+test('can edit license', function (): void {
     $license = License::factory()->create();
 
     $response = $this->actingAs($this->admin)
@@ -82,7 +82,7 @@ test('can edit license', function () {
     $response->assertSuccessful();
 });
 
-test('can update license', function () {
+test('can update license', function (): void {
     $license = License::factory()->create();
     $updateData = [
         'name' => 'Updated License',
@@ -105,7 +105,7 @@ test('can update license', function () {
         ->put(route('filament.admin.resources.core.licenses.update', ['record' => $license]), $updateData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('licenses')->where([
+    expect(Illuminate\Support\Facades\DB::table('licenses')->where([
         'id' => $license->id,
         'name' => 'Updated License',
         'key' => 'updated-license-key',
@@ -123,17 +123,17 @@ test('can update license', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can delete license', function () {
+test('can delete license', function (): void {
     $license = License::factory()->create();
 
     $response = $this->actingAs($this->admin)
         ->delete(route('filament.admin.resources.core.licenses.delete', ['record' => $license]));
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('licenses')->where('id', $license->id)->exists())->toBeFalse();
+    expect(Illuminate\Support\Facades\DB::table('licenses')->where('id', $license->id)->exists())->toBeFalse();
 });
 
-test('can validate license', function () {
+test('can validate license', function (): void {
     $license = License::factory()->create();
 
     $response = $this->actingAs($this->admin)
@@ -142,9 +142,9 @@ test('can validate license', function () {
     $response->assertSuccessful();
 });
 
-test('license resource has required form fields', function () {
-    $resource = new \App\Filament\Resources\Core\LicenseResource();
-    $form = $resource->form(new \Filament\Forms\Form());
+test('license resource has required form fields', function (): void {
+    $resource = new App\Filament\Resources\Core\LicenseResource();
+    $form = $resource->form(new Filament\Forms\Form());
 
     $fields = [
         'name' => TextInput::class,
@@ -169,9 +169,9 @@ test('license resource has required form fields', function () {
     }
 });
 
-test('license resource has required table columns', function () {
-    $resource = new \App\Filament\Resources\Core\LicenseResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('license resource has required table columns', function (): void {
+    $resource = new App\Filament\Resources\Core\LicenseResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     $columns = [
         'name' => TextColumn::class,
@@ -188,9 +188,9 @@ test('license resource has required table columns', function () {
     }
 });
 
-test('license resource has required actions', function () {
-    $resource = new \App\Filament\Resources\Core\LicenseResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('license resource has required actions', function (): void {
+    $resource = new App\Filament\Resources\Core\LicenseResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     $actions = $table->getActions();
     expect($actions)->toHaveKey('edit');

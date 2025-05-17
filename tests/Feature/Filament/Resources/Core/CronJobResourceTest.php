@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Core\Models\CronJob;
 use Modules\Core\Models\Role;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->admin = User::factory()->create([
         'email' => 'admin@example.com',
         'password' => Hash::make('password'),
@@ -19,14 +19,14 @@ beforeEach(function () {
     $this->admin->roles()->attach($adminRole);
 });
 
-test('can list cron jobs', function () {
+test('can list cron jobs', function (): void {
     $response = actingAs($this->admin)
         ->get(route('filament.admin.resources.core.cron-jobs.index'));
 
     $response->assertSuccessful();
 });
 
-test('can create cron job', function () {
+test('can create cron job', function (): void {
     $cronJobData = [
         'name' => 'Test Cron Job',
         'command' => 'test:command',
@@ -39,7 +39,7 @@ test('can create cron job', function () {
         ->post(route('filament.admin.resources.core.cron-jobs.create'), $cronJobData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('cron_jobs')->where([
+    expect(Illuminate\Support\Facades\DB::table('cron_jobs')->where([
         'name' => 'Test Cron Job',
         'command' => 'test:command',
         'schedule' => '* * * * *',
@@ -48,7 +48,7 @@ test('can create cron job', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can edit cron job', function () {
+test('can edit cron job', function (): void {
     $cronJob = CronJob::factory()->create();
 
     $response = actingAs($this->admin)
@@ -57,7 +57,7 @@ test('can edit cron job', function () {
     $response->assertSuccessful();
 });
 
-test('can update cron job', function () {
+test('can update cron job', function (): void {
     $cronJob = CronJob::factory()->create();
     $updateData = [
         'name' => 'Updated Cron Job',
@@ -71,7 +71,7 @@ test('can update cron job', function () {
         ->put(route('filament.admin.resources.core.cron-jobs.update', ['record' => $cronJob]), $updateData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('cron_jobs')->where([
+    expect(Illuminate\Support\Facades\DB::table('cron_jobs')->where([
         'id' => $cronJob->id,
         'name' => 'Updated Cron Job',
         'command' => 'updated:command',
@@ -81,17 +81,17 @@ test('can update cron job', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can delete cron job', function () {
+test('can delete cron job', function (): void {
     $cronJob = CronJob::factory()->create();
 
     $response = actingAs($this->admin)
         ->delete(route('filament.admin.resources.core.cron-jobs.delete', ['record' => $cronJob]));
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('cron_jobs')->where('id', $cronJob->id)->exists())->toBeFalse();
+    expect(Illuminate\Support\Facades\DB::table('cron_jobs')->where('id', $cronJob->id)->exists())->toBeFalse();
 });
 
-test('can run cron job', function () {
+test('can run cron job', function (): void {
     $cronJob = CronJob::factory()->create();
 
     $response = actingAs($this->admin)
@@ -100,9 +100,9 @@ test('can run cron job', function () {
     $response->assertSuccessful();
 });
 
-test('cron job resource has required form fields', function () {
-    $resource = new \App\Filament\Resources\Core\CronJobResource();
-    $form = $resource->form(new \Filament\Forms\Form());
+test('cron job resource has required form fields', function (): void {
+    $resource = new App\Filament\Resources\Core\CronJobResource();
+    $form = $resource->form(new Filament\Forms\Form());
 
     expect($form->hasComponent('name', 'text'))->toBeTrue();
     expect($form->hasComponent('command', 'text'))->toBeTrue();
@@ -111,9 +111,9 @@ test('cron job resource has required form fields', function () {
     expect($form->hasComponent('is_active', 'toggle'))->toBeTrue();
 });
 
-test('cron job resource has required table columns', function () {
-    $resource = new \App\Filament\Resources\Core\CronJobResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('cron job resource has required table columns', function (): void {
+    $resource = new App\Filament\Resources\Core\CronJobResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     expect($table->hasColumn('name', 'text'))->toBeTrue();
     expect($table->hasColumn('command', 'text'))->toBeTrue();
@@ -122,9 +122,9 @@ test('cron job resource has required table columns', function () {
     expect($table->hasColumn('created_at', 'date'))->toBeTrue();
 });
 
-test('cron job resource has required actions', function () {
-    $resource = new \App\Filament\Resources\Core\CronJobResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('cron job resource has required actions', function (): void {
+    $resource = new App\Filament\Resources\Core\CronJobResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     $actions = $table->getActions();
     expect($actions)->toHaveKey('edit');

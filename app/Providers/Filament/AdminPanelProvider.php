@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
@@ -37,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(fn() => config('app.name') . ' ' . __('Admin'))
+            ->brandName(fn () => config('app.name') . ' ' . __('Admin'))
             // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
             ->login()
             ->passwordReset()
@@ -81,7 +83,7 @@ class AdminPanelProvider extends PanelProvider
             if (is_dir($modulePath . '/Filament/Resources')) {
                 $panel->discoverResources(
                     in: $modulePath . '/Filament/Resources',
-                    for: "Modules\\{$moduleName}\\Filament\\Resources"
+                    for: "Modules\\{$moduleName}\\Filament\\Resources",
                 );
             }
 
@@ -89,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
             if (is_dir($modulePath . '/Filament/Pages')) {
                 $panel->discoverPages(
                     in: $modulePath . '/Filament/Pages',
-                    for: "Modules\\{$moduleName}\\Filament\\Pages"
+                    for: "Modules\\{$moduleName}\\Filament\\Pages",
                 );
             }
 
@@ -97,7 +99,7 @@ class AdminPanelProvider extends PanelProvider
             if (is_dir($modulePath . '/Filament/Widgets')) {
                 $panel->discoverWidgets(
                     in: $modulePath . '/Filament/Widgets',
-                    for: "Modules\\{$moduleName}\\Filament\\Widgets"
+                    for: "Modules\\{$moduleName}\\Filament\\Widgets",
                 );
             }
         }

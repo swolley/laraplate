@@ -8,9 +8,9 @@ use Modules\Core\Models\ACL;
 use Modules\Core\Models\Permission;
 use Modules\Core\Models\Role;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->admin = User::factory()->create([
         'email' => 'admin@example.com',
         'password' => Hash::make('password'),
@@ -20,14 +20,14 @@ beforeEach(function () {
     $this->admin->roles()->attach($adminRole);
 });
 
-test('can list acls', function () {
+test('can list acls', function (): void {
     $response = actingAs($this->admin)
         ->get(route('filament.admin.resources.core.acls.index'));
 
     $response->assertSuccessful();
 });
 
-test('can create acl', function () {
+test('can create acl', function (): void {
     $permission = Permission::factory()->create();
     $aclData = [
         'permission_id' => $permission->id,
@@ -40,7 +40,7 @@ test('can create acl', function () {
         ->post(route('filament.admin.resources.core.acls.create'), $aclData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('acls')->where([
+    expect(Illuminate\Support\Facades\DB::table('acls')->where([
         'permission_id' => $permission->id,
         'filters' => json_encode(['test' => 'value']),
         'sort' => json_encode(['field' => 'created_at', 'direction' => 'desc']),
@@ -48,7 +48,7 @@ test('can create acl', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can edit acl', function () {
+test('can edit acl', function (): void {
     $acl = ACL::factory()->create();
 
     $response = actingAs($this->admin)
@@ -57,7 +57,7 @@ test('can edit acl', function () {
     $response->assertSuccessful();
 });
 
-test('can update acl', function () {
+test('can update acl', function (): void {
     $acl = ACL::factory()->create();
     $permission = Permission::factory()->create();
     $updateData = [
@@ -71,7 +71,7 @@ test('can update acl', function () {
         ->put(route('filament.admin.resources.core.acls.update', ['record' => $acl]), $updateData);
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('acls')->where([
+    expect(Illuminate\Support\Facades\DB::table('acls')->where([
         'id' => $acl->id,
         'permission_id' => $permission->id,
         'filters' => json_encode(['updated' => 'value']),
@@ -80,19 +80,19 @@ test('can update acl', function () {
     ])->exists())->toBeTrue();
 });
 
-test('can delete acl', function () {
+test('can delete acl', function (): void {
     $acl = ACL::factory()->create();
 
     $response = actingAs($this->admin)
         ->delete(route('filament.admin.resources.core.acls.delete', ['record' => $acl]));
 
     $response->assertSuccessful();
-    expect(\Illuminate\Support\Facades\DB::table('acls')->where('id', $acl->id)->exists())->toBeFalse();
+    expect(Illuminate\Support\Facades\DB::table('acls')->where('id', $acl->id)->exists())->toBeFalse();
 });
 
-test('acl resource has required form fields', function () {
-    $resource = new \App\Filament\Resources\Core\ACLResource();
-    $form = $resource->form(new \Filament\Forms\Form());
+test('acl resource has required form fields', function (): void {
+    $resource = new App\Filament\Resources\Core\ACLResource();
+    $form = $resource->form(new Filament\Forms\Form());
 
     expect($form->hasComponent('permission_id', 'select'))->toBeTrue();
     expect($form->hasComponent('filters', 'json'))->toBeTrue();
@@ -100,9 +100,9 @@ test('acl resource has required form fields', function () {
     expect($form->hasComponent('description', 'textarea'))->toBeTrue();
 });
 
-test('acl resource has required table columns', function () {
-    $resource = new \App\Filament\Resources\Core\ACLResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('acl resource has required table columns', function (): void {
+    $resource = new App\Filament\Resources\Core\ACLResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     expect($table->hasColumn('permission.name', 'text'))->toBeTrue();
     expect($table->hasColumn('filters', 'json'))->toBeTrue();
@@ -111,9 +111,9 @@ test('acl resource has required table columns', function () {
     expect($table->hasColumn('created_at', 'date'))->toBeTrue();
 });
 
-test('acl resource has required actions', function () {
-    $resource = new \App\Filament\Resources\Core\ACLResource();
-    $table = $resource->table(new \Filament\Tables\Table());
+test('acl resource has required actions', function (): void {
+    $resource = new App\Filament\Resources\Core\ACLResource();
+    $table = $resource->table(new Filament\Tables\Table());
 
     $actions = $table->getActions();
     expect($actions)->toHaveKey('edit');
