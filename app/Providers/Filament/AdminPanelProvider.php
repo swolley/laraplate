@@ -74,36 +74,68 @@ class AdminPanelProvider extends PanelProvider
                 AdminMiddleware::class,
             ]);
 
-        // Carica risorse, widget e pagine dai moduli
+        $this->discoverModulesFilamentComponents($panel);
+
+        return $panel;
+    }
+
+    /**
+     * Discover resources, pages and widgets from modules.
+     */
+    private function discoverModulesFilamentComponents(Panel $panel): void
+    {
+        // Add resources, pages and widgets from modules
         foreach (Module::all() as $module) {
             $moduleName = $module->getName();
             $modulePath = module_path($moduleName) . '/app';
 
-            // Carica Resources dal modulo
-            if (is_dir($modulePath . '/Filament/Resources')) {
-                $panel->discoverResources(
-                    in: $modulePath . '/Filament/Resources',
-                    for: "Modules\\{$moduleName}\\Filament\\Resources",
-                );
-            }
+            // Add resources from module
+            $this->discoverModuleFilamentResources($panel, $moduleName, $modulePath);
 
-            // Carica Pages dal modulo
-            if (is_dir($modulePath . '/Filament/Pages')) {
-                $panel->discoverPages(
-                    in: $modulePath . '/Filament/Pages',
-                    for: "Modules\\{$moduleName}\\Filament\\Pages",
-                );
-            }
+            // Add pages from module
+            $this->discoverModuleFilamentPages($panel, $moduleName, $modulePath);
 
-            // Carica Widgets dal modulo
-            if (is_dir($modulePath . '/Filament/Widgets')) {
-                $panel->discoverWidgets(
-                    in: $modulePath . '/Filament/Widgets',
-                    for: "Modules\\{$moduleName}\\Filament\\Widgets",
-                );
-            }
+            // Add widgets from module
+            $this->discoverModuleFilamentWidgets($panel, $moduleName, $modulePath);
         }
+    }
 
-        return $panel;
+    /**
+     * Discover resources from module.
+     */
+    private function discoverModuleFilamentResources(Panel $panel, string $moduleName, string $modulePath): void
+    {
+        if (is_dir($modulePath . '/Filament/Resources')) {
+            $panel->discoverResources(
+                in: $modulePath . '/Filament/Resources',
+                for: "Modules\\{$moduleName}\\Filament\\Resources",
+            );
+        }
+    }
+
+    /**
+     * Discover pages from module.
+     */
+    private function discoverModuleFilamentPages(Panel $panel, string $moduleName, string $modulePath): void
+    {
+        if (is_dir($modulePath . '/Filament/Pages')) {
+            $panel->discoverPages(
+                in: $modulePath . '/Filament/Pages',
+                for: "Modules\\{$moduleName}\\Filament\\Pages",
+            );
+        }
+    }
+
+    /**
+     * Discover widgets from module.
+     */
+    private function discoverModuleFilamentWidgets(Panel $panel, string $moduleName, string $modulePath): void
+    {
+        if (is_dir($modulePath . '/Filament/Widgets')) {
+            $panel->discoverWidgets(
+                in: $modulePath . '/Filament/Widgets',
+                for: "Modules\\{$moduleName}\\Filament\\Widgets",
+            );
+        }
     }
 }

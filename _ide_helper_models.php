@@ -110,6 +110,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -156,10 +157,9 @@ namespace Modules\Cms\Models{
  * 
  *
  * @property int $id
- * @property int|null $entity_id
+ * @property int $entity_id
  * @property int $preset_id The preset that the category belongs to
- * @property int|null $parent_id The parent category
- * @property int|null $parent_entity_id The entity that the parent category belongs to
+ * @property int|null $parent_id
  * @property string $name The name of the category
  * @property string $slug The slug of the category
  * @property array $components The category contents
@@ -182,16 +182,19 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
- * @property-read \Modules\Cms\Models\Entity|null $entity
+ * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
+ * @property-read int|null $media_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Modification> $modifications
  * @property-read int|null $modifications_count
  * @property-read \Modules\Cms\Models\Category|null $parent
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset|null $preset
+ * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -262,7 +265,6 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereLogoFull($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereName($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrderColumn($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentEntityId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePresetId($value)
@@ -305,8 +307,6 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
- * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -330,8 +330,6 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
- * @property-read int|null $trashed_media_count
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -403,8 +401,6 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
- * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -428,8 +424,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
- * @property-read int|null $trashed_media_count
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -501,8 +495,6 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
- * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -526,8 +518,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
- * @property-read int|null $trashed_media_count
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -599,8 +589,6 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
- * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -624,8 +612,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
- * @property-read int|null $trashed_media_count
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -697,8 +683,6 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $allMedia
- * @property-read int|null $all_media_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -722,8 +706,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $trashedMedia
- * @property-read int|null $trashed_media_count
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
