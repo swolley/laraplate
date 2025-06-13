@@ -113,6 +113,8 @@ namespace Modules\Cms\Models{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read bool $can_login
+ * @property-read bool $is_signature
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
@@ -313,8 +315,6 @@ namespace Modules\Cms\Models{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
- * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -407,8 +407,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
- * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -501,8 +499,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
- * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -595,8 +591,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
- * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -689,8 +683,6 @@ namespace Modules\Cms\Models\Contents{
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
- * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
@@ -880,6 +872,8 @@ namespace Modules\Cms\Models{
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
+ * @property float|null $latitude
+ * @property float|null $longitude
  * @property-read mixed $path
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
@@ -1227,7 +1221,6 @@ namespace Modules\Core\Models{
  * @property-read \Modules\Core\Models\Permission|null $permission
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL forPermission($permission_id)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL onlyTrashed()
