@@ -4,7 +4,7 @@
     "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "version": "v1.8.1",
+    "version": "v1.8.2",
     "keywords": [
         "laravel",
         "laraplate",
@@ -25,6 +25,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "nwidart/laravel-modules": "^12.0",
+        "spatie/fork": "^1.2",
         "symfony/http-client": "^7.2"
     },
     "require-dev": {
