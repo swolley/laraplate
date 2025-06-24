@@ -3,7 +3,35 @@
 # Directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Run version script with --nointeractive
+# Run version script with --nointeractive for main repository
 "$SCRIPT_DIR/../version.sh" --nointeractive
+
+# Handle submodules
+echo "Checking submodules for version updates..."
+
+# Check if we're in a git repository
+if [ -d ".git" ]; then
+    # Get list of submodules
+    SUBMODULES=$(git submodule foreach --quiet 'echo $name')
+    
+    for submodule in $SUBMODULES; do
+        if [ -d "$submodule" ]; then
+            echo "Processing submodule: $submodule"
+            
+            # Check if submodule has changes
+            if [ -n "$(cd "$submodule" && git status --porcelain)" ]; then
+                echo "Submodule $submodule has uncommitted changes"
+                
+                # Check if submodule has version script
+                if [ -f "$submodule/scripts/version.sh" ]; then
+                    echo "Running version script for $submodule"
+                    cd "$submodule"
+                    ./scripts/version.sh --nointeractive
+                    cd - > /dev/null
+                fi
+            fi
+        fi
+    done
+fi
 
 exit 0

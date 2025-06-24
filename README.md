@@ -1,10 +1,12 @@
 <p>&nbsp;</p>
 <p align="center">
-	<a href="https://github.com/swolley" target="_blank" style="color: #a5ac56">
-		<img src="https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg" />
+	<a href="https://github.com/swolley" target="_blank">
+		<img src="https://raw.githubusercontent.com/swolley/images/refs/heads/master/logo_laraplate.png" width="400" alt="Laraplate Logo" />
     </a>
 </p>
 <p>&nbsp;</p>
+
+> **Caution**: This package is a **work in progress**. **Don't use this in production or use at your own risk**—no guarantees are provided... or better yet, collaborate with me to create the definitive Laravel boilerplate; that's the right place to instroduce your ideas. Let me know your ideas...
 
 ## About Laraplate
 
@@ -24,6 +26,9 @@ php artisan module:seed --all
 
 -   Core: main common boilerplate funzionalities. About [Core Module](./Modules/Core/README.md).
 -   Cms: common Cms funzionalities. About [Cms Module](./Modules/Cms/README.md).
+
+<br>
+<br>
 
 <p align="center">
 	<a href="https://laravel.com" target="_blank">
