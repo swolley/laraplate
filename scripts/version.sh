@@ -122,7 +122,7 @@ update_changelog() {
     local new_version=$1
     
     # update the changelog
-    git cliff --changelog CHANGELOG.md
+    git cliff --output CHANGELOG.md
     
     # add the file to git
     git add CHANGELOG.md
