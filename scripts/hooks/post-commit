@@ -4,10 +4,12 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Run version script with --nointeractive for main repository
+echo "Processing main repository"
 "$SCRIPT_DIR/../version.sh" --nointeractive
+echo
 
 # Handle submodules
-echo "Checking submodules for version updates..."
+# echo "Checking submodules for version updates..."
 
 # Check if we're in a git repository
 if [ -d ".git" ]; then
@@ -30,6 +32,7 @@ if [ -d ".git" ]; then
                     cd - > /dev/null
                 fi
             fi
+            echo
         fi
     done
 fi

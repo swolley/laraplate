@@ -5,10 +5,23 @@ get_last_commit_message() {
     git log -1 --pretty=%B
 }
 
+is_already_tagged() {
+    local last_commit_hash=$(git rev-parse HEAD)
+    local tag_at_commit=$(git tag --points-at "$last_commit_hash")
+    if [ -n "$tag_at_commit" ]; then
+        return 0
+    fi
+}
+
 # function to determine release type from commit message
 determine_release_type() {
     local commit_message=$(get_last_commit_message)
     
+    if is_already_tagged; then
+        echo "null" # Skip version bump if commit is already tagged
+        return
+    fi
+
     # Check for breaking changes (major)
     if [[ "$commit_message" =~ ^(feat|fix|perf|refactor)(\([a-z0-9-]+\))?! ]]; then
         echo "major"
@@ -119,43 +132,55 @@ update_changelog() {
 # function to update the version in the current repository
 update_version() {
     local position=$1
+    local silent=$2
     local current_version=$(get_latest_version)
     local new_version=$(increment_version "$current_version" "$position")
     
-    echo "Updating version from $current_version to $new_version"
+    
+    if [ "$silent" = true ]; then
+        echo "Silent mode: should update version from $current_version to $new_version"
+    else
+        echo "Updating version from $current_version to $new_version"
         
-    # update composer.json
-    update_composer_version "$new_version"
-    
-    # update the changelog
-    update_changelog "$new_version"
-    
-    # create and push the tag
-    git tag -a "$new_version" -m "Release $new_version"
-    git push && git push origin "$new_version"
+        # update composer.json
+        update_composer_version "$new_version"
+        
+        # update the changelog
+        update_changelog "$new_version"
+        
+        # create and push the tag
+        git tag -a "$new_version" -m "Release $new_version"
+        git push && git push origin "$new_version"
+    fi
 }
+
+SILENT=false
+if [[ "$*" == *"--silent"* ]]; then
+    SILENT=true
+fi
 
 # Check if --nointeractive flag is present
 if [[ "$*" == *"--nointeractive"* ]]; then
     # Determine release type from commit message
     position=$(determine_release_type)
     if [ "$position" != "null" ]; then
-        update_version "$position"
+        update_version "$position" "$SILENT"
     else
+        echo "No version change needed"
         exit 0
     fi
 else
     # Interactive mode
     case $1 in
         "major"|"minor"|"patch")
-            update_version $1
+            update_version $1 "$SILENT"
             ;;
         "null")
             echo "No version change detected"
             exit 0
             ;;
         *)
-            echo "Usage: $0 {major|minor|patch} [--nointeractive]"
+            echo "Usage: $0 {major|minor|patch} [--nointeractive] [--silent]"
             exit 1
             ;;
     esac
