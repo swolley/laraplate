@@ -1,0 +1,13 @@
+{
+    "intelephense.environment.includePaths": [
+        "./.stubs"
+    ],
+    "[php]": {
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    },
+    "editor.formatOnSave": true,
+    "intelephense.format.enable": false,
+    "php-cs-fixer.executablePath": "./vendor/bin/pint",
+    "editor.laravel.pint.enabled": true,
+    "editor.laravel.pint.path": "./vendor/bin/pint"
+}

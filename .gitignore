@@ -19,7 +19,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.nova
-/.vscode
 /.zed
 *.tmp
 .env.testing
