@@ -1,0 +1,49 @@
+# Testing and Development
+
+## Testing Strategy
+- Ensure Comprehensive Testing: Implement thorough testing strategies, including unit tests, integration tests, and end-to-end tests as appropriate for the project
+- Implement comprehensive testing using Pest and Laravel Dusk for unit, feature, and browser tests
+- Use PestPHP for testing
+- **Test Coverage**: Aim for 100% type coverage using `composer test:type-coverage`
+- **Module Testing**: Create tests within each module's `tests/` directory
+- **Test Organization**: Use `Feature/` and `Unit/` directories within each module
+- **Test Data**: Use factories for generating test data
+- **Test Isolation**: Ensure tests are independent and don't affect each other
+
+## Development Tools
+- Use Laravel Telescope for debugging and performance monitoring in development
+- Leverage Laravel Nova or Filament for rapid admin panel development
+- Use Laravel's built-in features and helpers to maximize efficiency
+- Use IDE Helper for better code completion and navigation
+- Use Laravel Pint for code style enforcement
+- Use PHPStan for static analysis
+- Use Rector for automated code refactoring
+
+## Code Quality
+- Enhance Code Maintainability: Write self-documenting code, provide clear comments
+- Create Modular & Reusable Code: Break functionality into self-contained, reusable components for flexibility and scalability
+- Adhere to Coding Standards: Follow language-specific best practices and maintain consistent naming, structure, and formatting. Be adaptable to different organizational standards
+- Support Continuous Integration/Continuous Deployment (CI/CD): Write code and tests that align with CI/CD practices, facilitating automated building, testing, and deployment processes
+
+## Development Workflow
+- Design for Scalability: Make architectural and design choices that allow for future growth, increased load, and potential changes in project requirements
+- Follow API Design Best Practices (when applicable): For projects involving APIs, adhere to RESTful principles, use clear naming conventions
+- Use API resources and versioning for building robust and maintainable APIs
+- Implement API versioning for maintainability and backward compatibility
+- Ensure the REST API follows Laravel standards, using API Resources for structured and consistent responses
+
+## Code Organization
+- Maintain consistent and organized routes
+- Create separate route files for each major model or feature area
+- Group related routes together (e.g., all user-related routes in routes/user.php)
+- Create a Services folder within the app directory
+- Organize services into model-specific services and other required services
+
+## Filament Development
+- **Admin Panel**: Use Filament for building admin interfaces
+- **Resources**: Create Filament resources for each model in modules
+- **Customization**: Extend Filament's base classes for custom functionality
+- **Theme**: Follow Filament's design patterns and use built-in components
+- **Forms**: Use Filament's form builder for consistent admin forms
+- **Tables**: Use Filament's table builder for data display
+- **Actions**: Implement custom actions using Filament's action system 

@@ -1,0 +1,51 @@
+# PHP and Laravel Standards
+
+## Dependencies
+- Composer for dependency management
+- PHP 8.4+
+- Laravel 12.0+
+- nwidart/laravel-modules ^12.0
+- filament/filament ^3.3
+- laravel/sanctum ^4.0
+
+## PHP Standards
+- Leverage PHP 8.4+ features when appropriate (e.g., typed properties, match expressions)
+- Adhere to PSR-12 coding standards for consistent code style
+- Always use strict typing: `declare(strict_types=1);`
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements
+- Use typehints and type declarations to make code more robust and easier to understand
+- Use new PHP syntax to override parent methods
+- Use Laravel Attributes to make code more readable and easier to understand
+
+## Laravel Standards
+- Utilize Laravel's built-in features and helpers to maximize efficiency
+- Follow Laravel's directory structure and file naming conventions
+- Use Eloquent ORM and Query Builder over raw SQL queries when possible
+- Use Laravel's query builder for complex database operations
+- Create and maintain proper database migrations and seeders
+- Implement database indexing and use Laravel's query optimization features for better performance
+
+## Code Style and Structure
+- Write concise, technical PHP code with accurate PHP/Laravel examples
+- Prioritize SOLID principles for object-oriented programming and clean architecture
+- Follow PHP and Laravel best practices, ensuring consistency and readability
+- Design for scalability and maintainability, ensuring the system can grow with ease
+- Prefer iteration and modularization over code duplication
+- Use consistent and descriptive names for variables, methods, and classes, with auxiliary verbs (e.g., isLoading, hasError) to improve readability
+- Use Laravel naming conventions for classes and methods
+- Use interfaces, abstract methods and traits to make code more modular and easier to maintain
+- Code comments must always be in English, don't use any other languages
+
+## Naming Conventions
+- Use consistent naming conventions for folders, classes, and files
+- Follow Laravel's conventions: singular for models, plural for controllers (e.g., User.php, UsersController.php)
+- Use PascalCase for class names, camelCase for method names (e.g., getUserById), and snake_case for database columns, local variables and functions (e.g., $user_id, calculate_sum)
+- Use local and private variables in snake_case format and all others in camelCase
+
+## Type Declarations
+- Always use explicit return type declarations for methods and functions
+- Use appropriate PHP type hints for method parameters
+- Leverage PHP 8.1+ features like union types and nullable types when necessary
+- Be consistent and explicit with data type declarations throughout the codebase
+- Use type hints for properties, method parameters, and return types
+- Leverage PHP's strict typing to catch type-related errors early 
