@@ -2,65 +2,15 @@
     "swagger": "2.0",
     "info": {
         "title": "Laraplate Core module",
-        "description": "",
-        "version": "1.5.0"
+        "description": "Core Module for Base Functionality (core, base, foundation, essential, framework, infrastructure, utilities, helpers, services, providers)",
+        "version": "v1.8.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
-        "\/api\/v1\/delete\/{entity}": {
-            "delete": {
-                "summary": "Remove the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "delete-api-v1-delete-entity",
-                "tags": [
-                    "Api",
-                    "Core"
-                ]
-            },
-            "post": {
-                "summary": "Remove the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "post-api-v1-delete-entity",
-                "tags": [
-                    "Api",
-                    "Core"
-                ]
-            }
-        },
-        "\/api\/v1\/detail\/{entity}": {
+        "\/admin\/core\/acls": {
             "get": {
-                "summary": "Show the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -68,52 +18,16 @@
                         "description": "OK"
                     }
                 },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-detail-entity",
+                "operationId": "get-admin-core-acls",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
             }
         },
-        "\/api\/v1\/history\/{entity}": {
+        "\/admin\/core\/acls\/create": {
             "get": {
-                "summary": "Show resource history",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -121,83 +35,14 @@
                         "description": "OK"
                     }
                 },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-history-entity",
+                "operationId": "get-admin-core-acls-create",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
             }
         },
-        "\/api\/v1\/insert\/{entity}": {
-            "post": {
-                "summary": "Insert the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "post-api-v1-insert-entity",
-                "tags": [
-                    "Api",
-                    "Core"
-                ]
-            }
-        },
-        "\/api\/v1\/search\/{entity}": {
+        "\/admin\/core\/acls\/{record}\/edit": {
             "get": {
                 "summary": "",
                 "description": "",
@@ -210,85 +55,55 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "qs",
+                        "name": "record",
                         "type": "string",
                         "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
                     }
                 ],
-                "operationId": "get-api-v1-search-entity",
+                "operationId": "get-admin-core-acls-record-edit",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
-            },
-            "post": {
+            }
+        },
+        "\/admin\/core\/cron-jobs": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-cron-jobs",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/cron-jobs\/create": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-cron-jobs-create",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/cron-jobs\/{record}\/edit": {
+            "get": {
                 "summary": "",
                 "description": "",
                 "deprecated": false,
@@ -300,67 +115,22 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "entity",
+                        "name": "record",
                         "type": "string",
-                        "required": false,
+                        "required": true,
                         "description": ""
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "required": [
-                                "qs"
-                            ],
-                            "properties": {
-                                "connection": {
-                                    "type": "string"
-                                },
-                                "columns": {
-                                    "type": "array",
-                                    "items": [
-                                        {
-                                            "type": "string"
-                                        }
-                                    ]
-                                },
-                                "pagination": {
-                                    "type": "integer"
-                                },
-                                "page": {
-                                    "type": "integer"
-                                },
-                                "from": {
-                                    "type": "integer"
-                                },
-                                "to": {
-                                    "type": "integer"
-                                },
-                                "limit": {
-                                    "type": "integer"
-                                },
-                                "filters": {
-                                    "type": "string"
-                                },
-                                "qs": {
-                                    "type": "string"
-                                }
-                            }
-                        }
                     }
                 ],
-                "operationId": "post-api-v1-search-entity",
+                "operationId": "get-admin-core-cron-jobs-record-edit",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
             }
         },
-        "\/api\/v1\/select\/{entity}": {
+        "\/admin\/core\/licenses": {
             "get": {
-                "summary": "List the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -368,225 +138,16 @@
                         "description": "OK"
                     }
                 },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "count",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "sort",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "group_by",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-select-entity",
+                "operationId": "get-admin-core-licenses",
                 "tags": [
-                    "Api",
-                    "Core"
-                ]
-            },
-            "post": {
-                "summary": "List the specified resource",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "connection": {
-                                    "type": "string"
-                                },
-                                "columns": {
-                                    "type": "array",
-                                    "items": [
-                                        {
-                                            "type": "string"
-                                        }
-                                    ]
-                                },
-                                "relations": {
-                                    "type": "array",
-                                    "items": [
-                                        {
-                                            "type": "string"
-                                        }
-                                    ]
-                                },
-                                "pagination": {
-                                    "type": "integer"
-                                },
-                                "page": {
-                                    "type": "integer"
-                                },
-                                "from": {
-                                    "type": "integer"
-                                },
-                                "to": {
-                                    "type": "integer"
-                                },
-                                "limit": {
-                                    "type": "integer"
-                                },
-                                "count": {
-                                    "type": "boolean"
-                                },
-                                "sort": {
-                                    "type": "array",
-                                    "items": [
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "property": {
-                                                    "type": "string"
-                                                },
-                                                "direction": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "asc",
-                                                        "desc",
-                                                        "ASC",
-                                                        "DESC"
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    ]
-                                },
-                                "filters": {
-                                    "type": "string"
-                                },
-                                "group_by": {
-                                    "type": "array",
-                                    "items": [
-                                        {
-                                            "type": "string"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                ],
-                "operationId": "post-api-v1-select-entity",
-                "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
             }
         },
-        "\/api\/v1\/tree\/{entity}": {
+        "\/admin\/core\/licenses\/create": {
             "get": {
-                "summary": "Get the specified resource data",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -594,66 +155,16 @@
                         "description": "OK"
                     }
                 },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "entity",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "parents",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "children",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-tree-entity",
+                "operationId": "get-admin-core-licenses-create",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
             }
         },
-        "\/api\/v1\/update\/{entity}": {
-            "patch": {
-                "summary": "Update the specified resource",
+        "\/admin\/core\/licenses\/{record}\/edit": {
+            "get": {
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -664,20 +175,56 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "entity",
+                        "name": "record",
                         "type": "string",
                         "required": true,
                         "description": ""
                     }
                 ],
-                "operationId": "patch-api-v1-update-entity",
+                "operationId": "get-admin-core-licenses-record-edit",
                 "tags": [
-                    "Api",
+                    "Others",
                     "Core"
                 ]
-            },
-            "put": {
-                "summary": "Update the specified resource",
+            }
+        },
+        "\/admin\/core\/permissions": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-permissions",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/permissions\/create": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-permissions-create",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/permissions\/{record}\/edit": {
+            "get": {
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -688,22 +235,202 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "entity",
+                        "name": "record",
                         "type": "string",
                         "required": true,
                         "description": ""
                     }
                 ],
-                "operationId": "put-api-v1-update-entity",
+                "operationId": "get-admin-core-permissions-record-edit",
                 "tags": [
-                    "Api",
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/roles": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-roles",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/roles\/create": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-roles-create",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/roles\/{record}\/edit": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "record",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-admin-core-roles-record-edit",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/settings": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-settings",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/settings\/create": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-settings-create",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/settings\/{record}\/edit": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "record",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-admin-core-settings-record-edit",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/users": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-users",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/users\/create": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-core-users-create",
+                "tags": [
+                    "Others",
+                    "Core"
+                ]
+            }
+        },
+        "\/admin\/core\/users\/{record}\/edit": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "record",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-admin-core-users-record-edit",
+                "tags": [
+                    "Others",
                     "Core"
                 ]
             }
         },
         "\/app\/auth\/impersonate": {
             "post": {
-                "summary": "Impersonate a user.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -738,7 +465,7 @@
         },
         "\/app\/auth\/leave-impersonate": {
             "post": {
-                "summary": "Leave user impersonation.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -755,7 +482,7 @@
         },
         "\/app\/auth\/still-here": {
             "get": {
-                "summary": "Maintain user session.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -772,7 +499,7 @@
         },
         "\/app\/auth\/user\/profile-information": {
             "get": {
-                "summary": "get current session user info.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -789,7 +516,7 @@
         },
         "\/app\/configs": {
             "get": {
-                "summary": "Get site configs.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -806,7 +533,7 @@
         },
         "\/app\/crud\/activate\/{entity}": {
             "patch": {
-                "summary": "Logically restore the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -832,7 +559,7 @@
         },
         "\/app\/crud\/approve\/{entity}": {
             "patch": {
-                "summary": "Approve current pending record modifications",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -858,7 +585,7 @@
         },
         "\/app\/crud\/cache-clear\/{entity}": {
             "delete": {
-                "summary": "Clear model cache",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -884,7 +611,7 @@
         },
         "\/app\/crud\/delete\/{entity}": {
             "delete": {
-                "summary": "Remove the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -908,7 +635,7 @@
                 ]
             },
             "post": {
-                "summary": "Remove the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -934,7 +661,7 @@
         },
         "\/app\/crud\/detail\/{entity}": {
             "get": {
-                "summary": "Show the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -987,7 +714,7 @@
         },
         "\/app\/crud\/disapprove\/{entity}": {
             "patch": {
-                "summary": "Register user disapprovation for pending record modifications",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1039,7 +766,7 @@
         },
         "\/app\/crud\/grid\/configs\/{entity}": {
             "get": {
-                "summary": "get all grid models configurations",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1463,7 +1190,7 @@
         },
         "\/app\/crud\/history\/{entity}": {
             "get": {
-                "summary": "Show resource history",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1523,7 +1250,7 @@
         },
         "\/app\/crud\/inactivate\/{entity}": {
             "patch": {
-                "summary": "Logically delete the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1549,7 +1276,7 @@
         },
         "\/app\/crud\/insert\/{entity}": {
             "post": {
-                "summary": "Insert the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1575,7 +1302,7 @@
         },
         "\/app\/crud\/lock\/{entity}": {
             "patch": {
-                "summary": "Lock resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1762,7 +1489,7 @@
         },
         "\/app\/crud\/select\/{entity}": {
             "get": {
-                "summary": "List the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1882,7 +1609,7 @@
                 ]
             },
             "post": {
-                "summary": "List the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1988,7 +1715,7 @@
         },
         "\/app\/crud\/tree\/{entity}": {
             "get": {
-                "summary": "Get the specified resource data",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2055,7 +1782,7 @@
         },
         "\/app\/crud\/unlock\/{entity}": {
             "patch": {
-                "summary": "Unlock resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2081,7 +1808,7 @@
         },
         "\/app\/crud\/update\/{entity}": {
             "patch": {
-                "summary": "Update the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2105,7 +1832,7 @@
                 ]
             },
             "put": {
-                "summary": "Update the specified resource",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2131,7 +1858,7 @@
         },
         "\/app\/info": {
             "get": {
-                "summary": "Get site info.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2148,7 +1875,7 @@
         },
         "\/app\/translations\/{lang}": {
             "get": {
-                "summary": "Get app translations for the specified locale.",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -2163,6 +1890,13 @@
                         "type": "string",
                         "required": false,
                         "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "prefix",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
                     }
                 ],
                 "operationId": "get-app-translations-lang",
@@ -2174,7 +1908,6 @@
         }
     },
     "tags": [
-        "Core",
-        "Api"
+        "Core"
     ]
 }

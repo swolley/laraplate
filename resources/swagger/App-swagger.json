@@ -3,11 +3,163 @@
     "info": {
         "title": "Laraplate",
         "description": "",
-        "version": "1.5.0"
+        "version": "v1.8.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
+        "\/admin": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/email-verification\/prompt": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-email-verification-prompt",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/email-verification\/verify\/{id}\/{hash}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "path",
+                        "name": "hash",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-admin-email-verification-verify-id-hash",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/login": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-login",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/logout": {
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-admin-logout",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/password-reset\/request": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-password-reset-request",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/password-reset\/reset": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-password-reset-reset",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/admin\/profile": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-admin-profile",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
         "\/email\/verification-notification": {
             "post": {
                 "summary": "Send a new email verification notification.",
@@ -75,6 +227,58 @@
                 ]
             }
         },
+        "\/filament\/exports\/{export}\/download": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "export",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-filament-exports-export-download",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/filament\/imports\/{import}\/failed-rows\/download": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "import",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-filament-imports-import-failed-rows-download",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
         "\/forgot-password": {
             "get": {
                 "summary": "Show the reset password link request view.",
@@ -101,6 +305,100 @@
                     }
                 },
                 "operationId": "post-forgot-password",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/livewire\/livewire.js": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-livewire-livewire.js",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/livewire\/livewire.min.js.map": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-livewire-livewire.min.js.map",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/livewire\/preview-file\/{filename}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "filename",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-livewire-preview-file-filename",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/livewire\/update": {
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-livewire-update",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/livewire\/upload-file": {
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-livewire-upload-file",
                 "tags": [
                     "Others",
                     "App"
@@ -327,6 +625,26 @@
                 ]
             }
         },
+        "\/up": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text\/html": []
+                        }
+                    }
+                },
+                "operationId": "get-up",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
         "\/user\/confirm-password": {
             "get": {
                 "summary": "Show the confirm password view.",
@@ -487,6 +805,21 @@
                     }
                 },
                 "operationId": "get-user-two-factor-recovery-codes",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "Generate a fresh set of two factor authentication recovery codes.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-user-two-factor-recovery-codes",
                 "tags": [
                     "Others",
                     "App"

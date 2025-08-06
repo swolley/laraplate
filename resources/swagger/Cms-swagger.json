@@ -2,15 +2,15 @@
     "swagger": "2.0",
     "info": {
         "title": "Laraplate Cms module",
-        "description": "",
-        "version": "1.5.0"
+        "description": "Content Management System Module (cms, content, management, articles, posts, pages, categories, tags, authors)",
+        "version": "v1.8.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
         "\/api\/v1\/tags\/{value}\/contents": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -132,7 +132,7 @@
         },
         "\/api\/v1\/tags\/{value}\/articles": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -252,131 +252,9 @@
                 ]
             }
         },
-        "\/api\/v1\/tags\/{value}\/events": {
-            "get": {
-                "summary": "Get contents by tag",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "value",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "count",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "sort",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "group_by",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-tags-value-events",
-                "tags": [
-                    "Api",
-                    "Cms"
-                ]
-            }
-        },
         "\/api\/v1\/tags\/{value}\/multimedia": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -496,9 +374,497 @@
                 ]
             }
         },
+        "\/api\/v1\/tags\/{value}\/events": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-tags-value-events",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/tags\/{value}\/surveys": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-tags-value-surveys",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/tags\/{value}\/authors": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-tags-value-authors",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/tags\/{value}\/categories": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-tags-value-categories",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
         "\/api\/v1\/categories\/{value}\/contents": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -620,7 +986,7 @@
         },
         "\/api\/v1\/categories\/{value}\/articles": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -740,131 +1106,9 @@
                 ]
             }
         },
-        "\/api\/v1\/categories\/{value}\/events": {
-            "get": {
-                "summary": "Get contents by tag",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "value",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "count",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "sort",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "group_by",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-categories-value-events",
-                "tags": [
-                    "Api",
-                    "Cms"
-                ]
-            }
-        },
         "\/api\/v1\/categories\/{value}\/multimedia": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -984,9 +1228,497 @@
                 ]
             }
         },
+        "\/api\/v1\/categories\/{value}\/events": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-categories-value-events",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/categories\/{value}\/surveys": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-categories-value-surveys",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/categories\/{value}\/authors": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-categories-value-authors",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/categories\/{value}\/categories": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-categories-value-categories",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
         "\/api\/v1\/locations\/{value}\/contents": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1108,7 +1840,7 @@
         },
         "\/api\/v1\/locations\/{value}\/articles": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1228,131 +1960,9 @@
                 ]
             }
         },
-        "\/api\/v1\/locations\/{value}\/events": {
-            "get": {
-                "summary": "Get contents by tag",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "value",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "connection",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "pagination",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "from",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "to",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "count",
-                        "type": "boolean",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "filters",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "sort",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "group_by",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "operationId": "get-api-v1-locations-value-events",
-                "tags": [
-                    "Api",
-                    "Cms"
-                ]
-            }
-        },
         "\/api\/v1\/locations\/{value}\/multimedia": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1472,9 +2082,497 @@
                 ]
             }
         },
+        "\/api\/v1\/locations\/{value}\/events": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-locations-value-events",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/locations\/{value}\/surveys": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-locations-value-surveys",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/locations\/{value}\/authors": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-locations-value-authors",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/locations\/{value}\/categories": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-locations-value-categories",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
         "\/api\/v1\/authors\/{value}\/contents": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1596,7 +2694,7 @@
         },
         "\/api\/v1\/authors\/{value}\/articles": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1716,9 +2814,131 @@
                 ]
             }
         },
+        "\/api\/v1\/authors\/{value}\/multimedia": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-authors-value-multimedia",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
         "\/api\/v1\/authors\/{value}\/events": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1838,9 +3058,9 @@
                 ]
             }
         },
-        "\/api\/v1\/authors\/{value}\/multimedia": {
+        "\/api\/v1\/authors\/{value}\/surveys": {
             "get": {
-                "summary": "Get contents by tag",
+                "summary": "",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -1953,7 +3173,251 @@
                         }
                     }
                 ],
-                "operationId": "get-api-v1-authors-value-multimedia",
+                "operationId": "get-api-v1-authors-value-surveys",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/authors\/{value}\/authors": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-authors-value-authors",
+                "tags": [
+                    "Api",
+                    "Cms"
+                ]
+            }
+        },
+        "\/api\/v1\/authors\/{value}\/categories": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "value",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "from",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "to",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "type": "boolean",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sort",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "group_by",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "operationId": "get-api-v1-authors-value-categories",
                 "tags": [
                     "Api",
                     "Cms"
