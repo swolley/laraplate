@@ -39,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(fn () => config('app.name') . ' ' . __('Admin'))
+            ->brandName(fn() => config('app.name') . ' ' . __('Admin'))
             // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
             ->login()
             ->passwordReset()

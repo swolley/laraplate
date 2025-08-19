@@ -10,3 +10,11 @@
 .fi-body main.dark\:bg-gray-900:is(.dark *) {
     background-color: rgba(var(--gray-900),0.9);
 }
+
+.fi-main.max-w-7xl {
+    max-width: 100%;
+}
+
+.fi-ta-actions a span, .fi-ta-actions button span {
+    display: none;
+}

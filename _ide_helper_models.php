@@ -1220,15 +1220,22 @@ namespace Modules\Cms\Models{
 
 namespace Modules\Core\Models{
 /**
- * @property \Modules\Core\Casts\FiltersGroup $filters
- * @property \Modules\Core\Casts\Sort $sort
+ * @property int $id
+ * @property int $permission_id
+ * @property \Modules\Core\Casts\FiltersGroup|null $filters The filters of the acl
+ * @property \Modules\Core\Casts\Sort|null $sort The sort of the acl
+ * @property string|null $description The description of the acl
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property \Carbon\CarbonImmutable $updated_at
+ * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read mixed $modified_by
- * @property-read \Modules\Core\Models\Permission|null $permission
+ * @property-read \Modules\Core\Models\Permission $permission
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL forPermission($permission_id)
@@ -1236,6 +1243,15 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereFilters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL wherePermissionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereSort($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\ACL withoutTrashed()
  * @mixin \Eloquent
@@ -1322,6 +1338,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string $valid_from
  * @property string|null $valid_to
+ * @property bool $is_active
  * @property-read \Modules\Core\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License draft()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expired()
@@ -1339,6 +1356,7 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidTo($value)
@@ -1435,6 +1453,8 @@ namespace Modules\Core\Models{
  * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $connection_name
  * @property string|null $table_name
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ACL> $acls
+ * @property-read int|null $acls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
