@@ -1338,7 +1338,6 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string $valid_from
  * @property string|null $valid_to
- * @property bool $is_active
  * @property-read \Modules\Core\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License draft()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License expired()
@@ -1356,7 +1355,6 @@ namespace Modules\Core\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License validityOrdered()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\License whereValidTo($value)

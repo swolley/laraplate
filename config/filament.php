@@ -40,7 +40,7 @@ return [
     |
     */
 
-    'default_filesystem_disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
+    'default_filesystem_disk' => env('FILESYSTEM_DISK', 'local'),
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +83,26 @@ return [
     |
     */
 
-    'livewire_loading_delay' => 'none',
+    'livewire_loading_delay' => 'default',
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Generation
+    |--------------------------------------------------------------------------
+    |
+    | Artisan commands that generate files can be configured here by setting
+    | configuration flags that will impact their location or content.
+    |
+    | Often, this is useful to preserve file generation behavior from a
+    | previous version of Filament, to ensure consistency between older and
+    | newer generated files. These flags are often documented in the upgrade
+    | guide for the version of Filament you are upgrading to.
+    |
+    */
+
+    'file_generation' => [
+        'flags' => [],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -96,101 +115,4 @@ return [
     */
 
     'system_route_prefix' => 'filament',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Layout
-    |--------------------------------------------------------------------------
-    |
-    | This is the configuration for the general layout of Filament.
-    |
-    */
-
-    'layout' => [
-        'sidebar' => [
-            'is_collapsible_on_desktop' => true,
-            'groups' => [
-                'are_collapsible' => true,
-            ],
-            'width' => '20rem',
-        ],
-        'footer' => [
-            'should_show_logo' => false,
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Favicon
-    |--------------------------------------------------------------------------
-    |
-    | This is the path to the favicon used for pages in the admin panel.
-    |
-    */
-
-    'favicon' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Auth
-    |--------------------------------------------------------------------------
-    |
-    | This is the configuration for Filament's authentication system.
-    |
-    */
-
-    'auth' => [
-        'guard' => 'admin',
-        'pages' => [
-            'login' => Filament\Pages\Auth\Login::class,
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pages
-    |--------------------------------------------------------------------------
-    |
-    | This is the namespace and directory that Filament will automatically
-    | register pages from. You may also register pages manually.
-    |
-    */
-
-    'pages' => [
-        'namespace' => 'App\\Filament\\Pages',
-        'path' => app_path('Filament/Pages'),
-        'register' => [],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Resources
-    |--------------------------------------------------------------------------
-    |
-    | This is the namespace and directory that Filament will automatically
-    | register resources from. You may also register resources manually.
-    |
-    */
-
-    'resources' => [
-        'namespace' => 'App\\Filament\\Resources',
-        'path' => app_path('Filament/Resources'),
-        'register' => [],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Widgets
-    |--------------------------------------------------------------------------
-    |
-    | This is the namespace and directory that Filament will automatically
-    | register widgets from. You may also register widgets manually.
-    |
-    */
-
-    'widgets' => [
-        'namespace' => 'App\\Filament\\Widgets',
-        'path' => app_path('Filament/Widgets'),
-        'register' => [],
-    ],
 ];

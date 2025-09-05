@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update model properties and enhance CSS styles
+- Update configurations, remove outdated tests, and enhance file structure
+
+## [1.9.0] - 2025-08-18
+
+### ⚙️ Miscellaneous Tasks
+
 - Update dependencies and submodules
 - Update composer.json and submodule commits
 - Update submodule commits and version script
