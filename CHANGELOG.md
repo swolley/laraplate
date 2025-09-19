@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update dependencies and enhance configurations
+
+## [1.10.0] - 2025-09-05
+
+### ⚙️ Miscellaneous Tasks
+
 - Update model properties and enhance CSS styles
 - Update configurations, remove outdated tests, and enhance file structure
 

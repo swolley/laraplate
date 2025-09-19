@@ -4,7 +4,7 @@
     "vendor": "swolley",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "version": "v1.10.0",
+    "version": "v1.11.0",
     "keywords": [
         "laravel",
         "laraplate",
@@ -111,7 +111,7 @@
             "@test:types",
             "@test:refactor"
         ],
-        "version": "v1.10.0",
+        "version": "v1.11.0",
         "version:silent": "./scripts/version.sh --silent --nointeractive",
         "version:major": "./scripts/version.sh major",
         "version:minor": "./scripts/version.sh minor",
