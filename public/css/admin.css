@@ -1,37 +1,165 @@
-.fi-body {
-    background-image: url(https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg);
+.fi-body:not(:where(.dark, .dark *)) {
+    /* background-image: url(https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
     background-size: cover;
-    background-blend-mode: multiply;
+    background-blend-mode: multiply; */
+    background-color: var(--gray-100);
+}
+
+
+:root {
+    --radius-xl: 0.4rem;
+    --radius-lg: 0.25rem;
 }
 
 /* #region Sidebar */
 
-aside {
-    background-color: var(--gray-950);
+.fi-sidebar .fi-sidebar-nav {
+    padding-block: calc(var(--spacing)*5);
 }
-.fi-sidebar-group-btn {
+
+aside:where(.dark, .dark *) {
     background-color: var(--gray-900);
-    border-radius: 0.5rem;
 }
+
+aside:not(:where(.dark, .dark *)) {
+    background-color: var(--color-white);
+}
+
+.fi-sidebar-group-btn:where(.dark, .dark *) {
+    background-color: var(--gray-800);
+    border-radius: var(--radius-xl);
+}
+
+.fi-sidebar-group-btn:not(:where(.dark, .dark *)) {
+    background-color: var(--gray-200);
+    border-radius: var(--radius-xl);
+}
+
 .fi-sidebar-nav-groups {
     row-gap: calc(var(--spacing)*3);
 }
 
+.fi-sidebar-item-btn {
+    padding-block: calc(var(--spacing)*1.75);
+}
+
 /* #endregion */
 
+/* #region Main */
 
+@media (min-width: 64rem) {
+    .fi-main {
+        padding-inline: calc(var(--spacing)*6);
+    }
+}
+
+.fi-main .fi-page-header-main-ctn {
+    padding-block: calc(var(--spacing)*6);
+}
+
+/* #endregion */
 
 /* #region Tables */
 
-.fi-ac-link-action {
-    font-size: 0;
+.fi-ta-row {
+    position: relative;
 }
+
+/* .fi-ac-link-action {
+    font-size: 0;
+} */
 
 .fi-ac-link-action svg {
     font-size: 1rem;
 }
+
+.fi-ta-cell .fi-toggle {
+    height: calc(var(--spacing)*5);
+    width: calc(var(--spacing)*10);
+}
+.fi-ta-cell .fi-toggle > :first-child {
+    width: calc(var(--spacing)*4);
+    height: calc(var(--spacing)*4);
+}
+.fi-ta-cell .fi-icon {
+    height: calc(var(--spacing)*5);
+    width: calc(var(--spacing)*5);
+}
+
+.fi-ta-text-item.fi-size-sm {
+    --tw-leading: calc(var(--spacing)*5);
+    line-height: calc(var(--spacing)*5);
+}
+
+.fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]) .fi-ta-actions {
+    transition: all 0.3s ease-in-out;
+}
+
+.fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]):hover .fi-ta-actions {
+    position: absolute;
+    top: 50%;
+    right: calc(var(--spacing)*4 - 0.5rem);
+    @media (min-width: 40rem) {
+        right: calc(var(--spacing)*6 - 0.5rem);
+    }
+    transform: translateY(-50%);
+    z-index: 10;
+    border: 1px solid var(--gray-600);
+    border-radius: var(--radius-xl);
+    padding: 1rem 2rem;
+    background-color: var(--gray-800);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]) .fi-link:not([data-action="display-actions"]) {
+    display: none;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]):hover .fi-link:not([data-action="display-actions"]) {
+    display: flex;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]):hover .fi-link[data-action="display-actions"] {
+    display: none !important;
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+@media (min-width: 40rem) {
+    .fi-ta-cell.fi-ta-selection-cell:first-of-type {
+        padding-inline-start: calc(var(--spacing)*4);
+    }
+}
+
+@media (min-width: 40rem) {
+    .fi-ta-cell:has(.fi-ta-actions):last-of-type {
+        padding-inline-end: calc(var(--spacing)*4);
+    }
+}
+
+:where(.fi-ta-table > tbody > :not(:last-child)) {
+    border-bottom-width: 0;
+}
+
+.fi-input-wrp .fi-input-wrp-prefix {
+    padding-inline-start: calc(var(--spacing)*2);
+}
+
+/* #endregion */
+
+/* #region Forms */
+
+/* .fi-sc-form .fi-input-wrp:where(.dark, .dark *) {
+    background-color: var(--gray-900);
+} */
+
 
 /* #endregion */

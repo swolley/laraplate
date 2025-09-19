@@ -85,7 +85,7 @@ get_latest_version() {
     fi
 }
 
-ament_or_commit() {
+amend_or_commit() {
     local message=$1
     
     local unpushed=$(git rev-list @{upstream}..HEAD 2>/dev/null)
@@ -114,7 +114,7 @@ update_composer_version() {
     
     # add the file to git
     git add composer.json
-    ament_or_commit "chore: bump version to $new_version"
+    amend_or_commit "chore: bump version to $new_version"
 }
 
 # function to update the changelog
@@ -126,13 +126,21 @@ update_changelog() {
     
     # add the file to git
     git add CHANGELOG.md
-    ament_or_commit "chore: update changelog for version $new_version"
+    amend_or_commit "chore: update changelog for version $new_version"
 }
 
 # function to update the version in the current repository
 update_version() {
     local position=$1
     local silent=$2
+
+    # Check for uncommitted changes
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "Error: There are uncommitted changes in the working directory."
+        echo "Please commit or stash your changes before updating the version."
+        exit 1
+    fi
+
     local current_version=$(get_latest_version)
     local new_version=$(increment_version "$current_version" "$position")
     

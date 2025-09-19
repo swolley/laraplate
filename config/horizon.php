@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'app/horizon'),
+    'path' => env('HORIZON_PATH', 'admin/health/horizon'),
 
     /*
     |--------------------------------------------------------------------------

@@ -15,6 +15,7 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -23,10 +24,13 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Modules\Core\Http\Middleware\AdminMiddleware;
+use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
+use Stephenjude\FilamentDebugger\DebuggerPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function __construct() {}
+
     public function boot(): void
     {
         FilamentAsset::register([
@@ -46,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)
             ->unsavedChangesAlerts()
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Green,
             ])
@@ -56,7 +61,25 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
-            ->plugin(ModulesPlugin::make())
+            ->plugins([
+                ModulesPlugin::make(),
+                EnvironmentIndicatorPlugin::make()
+                    ->visible(true)
+                    ->showBorder(false)
+                    ->showGitBranch()
+                    ->showDebugModeWarningInProduction(),
+                DebuggerPlugin::make()
+                    ->navigationGroup(label: 'Health')
+                    ->horizonNavigation(
+                        condition: class_exists('Laravel\Horizon\HorizonServiceProvider'),
+                        label: 'Queues',
+                        icon: 'heroicon-' . Heroicon::OutlinedQueueList->value,
+                        openInNewTab: false,
+                        url: url(config('horizon.path'))
+                    )
+                    ->telescopeNavigation(condition: class_exists('Laravel\Telescope\TelescopeServiceProvider'), openInNewTab: false, url: url('telescope'))
+                    ->pulseNavigation(condition: class_exists('Laravel\Pulse\PulseServiceProvider'), openInNewTab: false, url: url('pulse'))
+            ])
             // AUTHENTICATION
             ->login()
             ->profile()
@@ -75,13 +98,12 @@ class AdminPanelProvider extends PanelProvider
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
-                // DisableBladeIconComponents::class,
+                DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ], isPersistent: true)
+            ])
             ->authMiddleware([
                 Authenticate::class,
-                // AdminMiddleware::class,
-            ], isPersistent: true)
+            ])
         ;
 
         return $panel;
