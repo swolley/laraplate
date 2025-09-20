@@ -56,7 +56,12 @@ aside:not(:where(.dark, .dark *)) {
     }
 }
 
+.fi-sc.fi-sc-has-gap {
+    gap: calc(var(--spacing)*4);
+}
+
 .fi-main .fi-page-header-main-ctn {
+    row-gap: calc(var(--spacing)*4);
     padding-block: calc(var(--spacing)*6);
 }
 
