@@ -99,6 +99,14 @@ aside:not(:where(.dark, .dark *)) {
     line-height: calc(var(--spacing)*5);
 }
 
+.fi-ta-row.fi-ta-group-header-row {
+    border-top: 1px solid var(--primary-400);
+    border-bottom: 1px solid var(--primary-400);
+}
+.fi-ta-row .fi-ta-group-header .fi-ta-group-heading:where(.dark, .dark *) {
+    color: var(--primary-400);
+}
+
 .fi-ta-cell:has(.fi-ta-actions):has(.fi-link[data-action="display-actions"]) .fi-ta-actions {
     transition: all 0.3s ease-in-out;
 }
@@ -136,6 +144,16 @@ aside:not(:where(.dark, .dark *)) {
     display: none !important;
     transform: translateX(-100%);
     opacity: 0;
+}
+
+.fi-ta-cell.fi-ta-selection-cell {
+    padding-block: calc(var(--spacing)*3);
+}
+
+@media (min-width: 40rem) {
+    .fi-ta-cell.fi-ta-group-selection-cell:first-of-type {
+      padding-inline-start: calc(var(--spacing)*4);
+    }
 }
 
 @media (min-width: 40rem) {
