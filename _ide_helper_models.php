@@ -118,6 +118,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read bool $can_login
  * @property-read bool $is_signature
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
@@ -192,6 +193,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
@@ -248,6 +250,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Category onlyTrashed()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category ordered()
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category orderedTrait(string $direction = 'asc')
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category priorityOrdered(string $direction = 'asc')
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category published()
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category query()
@@ -322,9 +325,12 @@ namespace Modules\Cms\Models{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
@@ -352,6 +358,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content query()
@@ -416,9 +423,12 @@ namespace Modules\Cms\Models\Contents{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
@@ -446,6 +456,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article query()
@@ -510,9 +521,12 @@ namespace Modules\Cms\Models\Contents{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
@@ -540,6 +554,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event query()
@@ -604,9 +619,12 @@ namespace Modules\Cms\Models\Contents{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
@@ -634,6 +652,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia query()
@@ -698,9 +717,12 @@ namespace Modules\Cms\Models\Contents{
  * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
+ * @property-read int|null $embeddings_count
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
+ * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Location> $locations
@@ -728,6 +750,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey priorityOrdered(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey query()
@@ -1062,6 +1085,7 @@ namespace Modules\Cms\Models\Pivot{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Fieldable whereDefault($value)
@@ -1166,6 +1190,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag orderedTrait(string $direction = 'asc')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Tag whereDeletedAt($value)

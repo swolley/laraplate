@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.25.0.
+ * Generated for Laravel 12.31.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1481,7 +1481,7 @@ namespace Illuminate\Support\Facades {
          * Assign a set of tags to a given binding.
          *
          * @param array|string $abstracts
-         * @param array|mixed $tags
+         * @param mixed $tags
          * @return void
          * @static
          */
@@ -3721,7 +3721,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Begin broadcasting an event.
          *
-         * @param mixed|null $event
+         * @param mixed $event
          * @return \Illuminate\Broadcasting\PendingBroadcast
          * @static
          */
@@ -4496,6 +4496,15 @@ namespace Illuminate\Support\Facades {
      */
     class Cache {
         /**
+         * @static
+         */
+        public static function repository($store, $config = [])
+        {
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            return $instance->repository($store, $config);
+        }
+
+        /**
          * Get a cache store instance by name, wrapped in a repository.
          *
          * @param string|null $name
@@ -4504,7 +4513,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function store($name = null)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->store($name);
         }
 
@@ -4517,7 +4527,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function driver($driver = null)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->driver($driver);
         }
 
@@ -4530,7 +4541,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function memo($driver = null)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->memo($driver);
         }
 
@@ -4544,7 +4556,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function resolve($name)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->resolve($name);
         }
 
@@ -4557,22 +4570,9 @@ namespace Illuminate\Support\Facades {
          */
         public static function build($config)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->build($config);
-        }
-
-        /**
-         * Create a new cache repository with the given implementation.
-         *
-         * @param \Illuminate\Contracts\Cache\Store $store
-         * @param array $config
-         * @return \Illuminate\Cache\Repository
-         * @static
-         */
-        public static function repository($store, $config = [])
-        {
-            /** @var \Illuminate\Cache\CacheManager $instance */
-            return $instance->repository($store, $config);
         }
 
         /**
@@ -4583,7 +4583,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function refreshEventDispatcher()
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             $instance->refreshEventDispatcher();
         }
 
@@ -4595,7 +4596,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getDefaultDriver()
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->getDefaultDriver();
         }
 
@@ -4608,7 +4610,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function setDefaultDriver($name)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             $instance->setDefaultDriver($name);
         }
 
@@ -4616,12 +4619,13 @@ namespace Illuminate\Support\Facades {
          * Unset the given driver instances.
          *
          * @param array|string|null $name
-         * @return \Illuminate\Cache\CacheManager
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
          * @static
          */
         public static function forgetDriver($name = null)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->forgetDriver($name);
         }
 
@@ -4634,7 +4638,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function purge($name = null)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             $instance->purge($name);
         }
 
@@ -4644,12 +4649,13 @@ namespace Illuminate\Support\Facades {
          * @param string $driver
          * @param \Closure $callback
          * @param-closure-this $this  $callback
-         * @return \Illuminate\Cache\CacheManager
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
          * @static
          */
         public static function extend($driver, $callback)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->extend($driver, $callback);
         }
 
@@ -4657,13 +4663,23 @@ namespace Illuminate\Support\Facades {
          * Set the application instance used by the manager.
          *
          * @param \Illuminate\Contracts\Foundation\Application $app
-         * @return \Illuminate\Cache\CacheManager
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
          * @static
          */
         public static function setApplication($app)
         {
-            /** @var \Illuminate\Cache\CacheManager $instance */
+            //Method inherited from \Illuminate\Cache\CacheManager 
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
             return $instance->setApplication($app);
+        }
+
+        /**
+         * @static
+         */
+        public static function remember($key, $ttl, $callback)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->remember($key, $ttl, $callback);
         }
 
         /**
@@ -4675,7 +4691,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function has($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->has($key);
         }
 
@@ -4688,7 +4705,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function missing($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->missing($key);
         }
 
@@ -4702,7 +4720,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function get($key, $default = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->get($key, $default);
         }
 
@@ -4717,7 +4736,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function many($keys)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->many($keys);
         }
 
@@ -4735,7 +4755,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getMultiple($keys, $default = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->getMultiple($keys, $default);
         }
 
@@ -4749,7 +4770,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function pull($key, $default = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->pull($key, $default);
         }
 
@@ -4764,7 +4786,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function put($key, $value, $ttl = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->put($key, $value, $ttl);
         }
 
@@ -4784,7 +4807,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function set($key, $value, $ttl = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->set($key, $value, $ttl);
         }
 
@@ -4798,7 +4822,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function putMany($values, $ttl = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->putMany($values, $ttl);
         }
 
@@ -4818,7 +4843,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function setMultiple($values, $ttl = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->setMultiple($values, $ttl);
         }
 
@@ -4833,7 +4859,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function add($key, $value, $ttl = null)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->add($key, $value, $ttl);
         }
 
@@ -4847,7 +4874,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function increment($key, $value = 1)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->increment($key, $value);
         }
 
@@ -4861,7 +4889,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function decrement($key, $value = 1)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->decrement($key, $value);
         }
 
@@ -4875,24 +4904,9 @@ namespace Illuminate\Support\Facades {
          */
         public static function forever($key, $value)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->forever($key, $value);
-        }
-
-        /**
-         * Get an item from the cache, or execute the given Closure and store the result.
-         *
-         * @template TCacheValue
-         * @param string $key
-         * @param \Closure|\DateTimeInterface|\DateInterval|int|null $ttl
-         * @param \Closure():  TCacheValue  $callback
-         * @return TCacheValue
-         * @static
-         */
-        public static function remember($key, $ttl, $callback)
-        {
-            /** @var \Illuminate\Cache\Repository $instance */
-            return $instance->remember($key, $ttl, $callback);
         }
 
         /**
@@ -4906,7 +4920,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function sear($key, $callback)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->sear($key, $callback);
         }
 
@@ -4921,7 +4936,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function rememberForever($key, $callback)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->rememberForever($key, $callback);
         }
 
@@ -4939,7 +4955,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->flexible($key, $ttl, $callback, $lock, $alwaysDefer);
         }
 
@@ -4952,7 +4969,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function forget($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->forget($key);
         }
 
@@ -4968,7 +4986,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function delete($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->delete($key);
         }
 
@@ -4985,7 +5004,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function deleteMultiple($keys)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->deleteMultiple($keys);
         }
 
@@ -4998,21 +5018,23 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->clear();
         }
 
         /**
          * Begin executing a new tags operation if the store supports it.
          *
-         * @param array|mixed $names
+         * @param mixed $names
          * @return \Illuminate\Cache\TaggedCache
          * @throws \BadMethodCallException
          * @static
          */
         public static function tags($names)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->tags($names);
         }
 
@@ -5024,7 +5046,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getName()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->getName();
         }
 
@@ -5036,7 +5059,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function supportsTags()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->supportsTags();
         }
 
@@ -5048,7 +5072,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getDefaultCacheTime()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->getDefaultCacheTime();
         }
 
@@ -5056,12 +5081,13 @@ namespace Illuminate\Support\Facades {
          * Set the default cache time in seconds.
          *
          * @param int|null $seconds
-         * @return \Illuminate\Cache\Repository
+         * @return \Modules\Core\Cache\Repository
          * @static
          */
         public static function setDefaultCacheTime($seconds)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->setDefaultCacheTime($seconds);
         }
 
@@ -5073,7 +5099,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getStore()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->getStore();
         }
 
@@ -5086,7 +5113,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function setStore($store)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->setStore($store);
         }
 
@@ -5098,7 +5126,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getEventDispatcher()
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->getEventDispatcher();
         }
 
@@ -5111,7 +5140,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function setEventDispatcher($events)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             $instance->setEventDispatcher($events);
         }
 
@@ -5124,7 +5154,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function offsetExists($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->offsetExists($key);
         }
 
@@ -5137,7 +5168,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function offsetGet($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->offsetGet($key);
         }
 
@@ -5151,7 +5183,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function offsetSet($key, $value)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             $instance->offsetSet($key, $value);
         }
 
@@ -5164,7 +5197,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function offsetUnset($key)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             $instance->offsetUnset($key);
         }
 
@@ -5179,7 +5213,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function macro($name, $macro)
         {
-            \Illuminate\Cache\Repository::macro($name, $macro);
+            //Method inherited from \Illuminate\Cache\Repository 
+            \Modules\Core\Cache\Repository::macro($name, $macro);
         }
 
         /**
@@ -5193,7 +5228,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function mixin($mixin, $replace = true)
         {
-            \Illuminate\Cache\Repository::mixin($mixin, $replace);
+            //Method inherited from \Illuminate\Cache\Repository 
+            \Modules\Core\Cache\Repository::mixin($mixin, $replace);
         }
 
         /**
@@ -5205,7 +5241,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function hasMacro($name)
         {
-            return \Illuminate\Cache\Repository::hasMacro($name);
+            //Method inherited from \Illuminate\Cache\Repository 
+            return \Modules\Core\Cache\Repository::hasMacro($name);
         }
 
         /**
@@ -5216,7 +5253,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function flushMacros()
         {
-            \Illuminate\Cache\Repository::flushMacros();
+            //Method inherited from \Illuminate\Cache\Repository 
+            \Modules\Core\Cache\Repository::flushMacros();
         }
 
         /**
@@ -5230,58 +5268,72 @@ namespace Illuminate\Support\Facades {
          */
         public static function macroCall($method, $parameters)
         {
-            /** @var \Illuminate\Cache\Repository $instance */
+            //Method inherited from \Illuminate\Cache\Repository 
+            /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->macroCall($method, $parameters);
         }
 
         /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * Try to extract from cache or by specified callback using request info.
+         *
+         * @template TCacheValue
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
+         * @param \Closure(TCacheValue):  mixed  $callback
+         * @return TCacheValue
          * @static
          */
-        public static function tryByRequest(...$args)
+        public static function tryByRequest($entity, $request, $callback, $duration = null)
         {
-            return \Illuminate\Cache\Repository::tryByRequest(...$args);
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->tryByRequest($entity, $request, $callback, $duration);
         }
 
         /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * clear cache by specified entity.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>
          * @static
          */
-        public static function clearByEntity(...$args)
+        public static function clearByEntity($entity)
         {
-            return \Illuminate\Cache\Repository::clearByEntity(...$args);
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByEntity($entity);
         }
 
         /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * clear cache by request extracted info.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
          * @static
          */
-        public static function clearByRequest(...$args)
+        public static function clearByRequest($request, $entity = null)
         {
-            return \Illuminate\Cache\Repository::clearByRequest(...$args);
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByRequest($request, $entity);
         }
 
         /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * clear cache elements by user and only by entity if specified.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
          * @static
          */
-        public static function clearByUser(...$args)
+        public static function clearByUser($user, $entity = null)
         {
-            return \Illuminate\Cache\Repository::clearByUser(...$args);
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByUser($user, $entity);
         }
 
         /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * clear cache elements by user group and only by entity if specified.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
          * @static
          */
-        public static function clearByGroup(...$args)
+        public static function clearByGroup($role, $entity = null)
         {
-            return \Illuminate\Cache\Repository::clearByGroup(...$args);
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByGroup($role, $entity);
         }
 
         /**
@@ -7066,7 +7118,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get a database connection instance from the given configuration.
          *
-         * @param string $name
+         * @param \UnitEnum|string $name
          * @param array $config
          * @param bool $force
          * @return \Staudenmeir\LaravelCte\Connections\PostgresConnection
@@ -7081,7 +7133,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Disconnect from the given database and remove from local cache.
          *
-         * @param string|null $name
+         * @param \UnitEnum|string|null $name
          * @return void
          * @static
          */
@@ -7094,7 +7146,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Disconnect from the given database.
          *
-         * @param string|null $name
+         * @param \UnitEnum|string|null $name
          * @return void
          * @static
          */
@@ -7107,7 +7159,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Reconnect to the given database.
          *
-         * @param string|null $name
+         * @param \UnitEnum|string|null $name
          * @return \Illuminate\Database\Connection
          * @static
          */
@@ -7120,7 +7172,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Set the default database connection for the callback execution.
          *
-         * @param string $name
+         * @param \UnitEnum|string $name
          * @param callable $callback
          * @return mixed
          * @static
@@ -7691,7 +7743,7 @@ namespace Illuminate\Support\Facades {
          * Register a callback to be invoked when the connection queries for longer than a given amount of time.
          *
          * @param \DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold
-         * @param (callable(\Illuminate\Database\Connection, class-string<\Illuminate\Database\Events\QueryExecuted>): mixed) $handler
+         * @param (callable(\Illuminate\Database\Connection, \Illuminate\Database\Events\QueryExecuted): mixed) $handler
          * @return void
          * @static
          */
@@ -9834,7 +9886,7 @@ namespace Illuminate\Support\Facades {
          * Inspect the user for the given ability.
          *
          * @param \UnitEnum|string $ability
-         * @param array|mixed $arguments
+         * @param mixed $arguments
          * @return \Illuminate\Auth\Access\Response
          * @static
          */
@@ -9848,7 +9900,7 @@ namespace Illuminate\Support\Facades {
          * Get the raw result from the authorization callback.
          *
          * @param string $ability
-         * @param array|mixed $arguments
+         * @param mixed $arguments
          * @return mixed
          * @throws \Illuminate\Auth\Access\AuthorizationException
          * @static
@@ -11895,7 +11947,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Send the given notification to the given notifiable entities.
          *
-         * @param \Illuminate\Support\Collection|array|mixed $notifiables
+         * @param \Illuminate\Support\Collection|mixed $notifiables
          * @param mixed $notification
          * @return void
          * @static
@@ -11909,7 +11961,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Send the given notification immediately.
          *
-         * @param \Illuminate\Support\Collection|array|mixed $notifiables
+         * @param \Illuminate\Support\Collection|mixed $notifiables
          * @param mixed $notification
          * @param array|null $channels
          * @return void
@@ -15853,7 +15905,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Flash only some of the input to the session.
          *
-         * @param array|mixed $keys
+         * @param mixed $keys
          * @return void
          * @static
          */
@@ -15866,7 +15918,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Flash only some of the input to the session.
          *
-         * @param array|mixed $keys
+         * @param mixed $keys
          * @return void
          * @static
          */
@@ -15956,7 +16008,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get all of the input and files for the request.
          *
-         * @param array|mixed|null $keys
+         * @param mixed $keys
          * @return array
          * @static
          */
@@ -16397,7 +16449,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get a subset containing the provided keys with values from the instance data.
          *
-         * @param array|mixed $keys
+         * @param mixed $keys
          * @return array
          * @static
          */
@@ -16410,7 +16462,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get all of the data except for a specified array of items.
          *
-         * @param array|mixed $keys
+         * @param mixed $keys
          * @return array
          * @static
          */
@@ -17983,7 +18035,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes withoutOverlapping(int $expiresAt = 1440)
      * @method static void mergeAttributes(\Illuminate\Console\Scheduling\Event $event)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes user(string $user)
-     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(array|mixed $environments)
+     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes environments(mixed $environments)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes evenInMaintenanceMode()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes onOneServer()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes runInBackground()
@@ -18031,7 +18083,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes saturdays()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes sundays()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weekly()
-     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(array|mixed $dayOfWeek, string $time = '0:0')
+     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weeklyOn(mixed $dayOfWeek, string $time = '0:0')
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthly()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes monthlyOn(int $dayOfMonth = 1, string $time = '0:0')
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes twiceMonthly(int $first = 1, int $second = 16, string $time = '0:0')
@@ -18040,7 +18092,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes quarterlyOn(int $dayOfQuarter = 1, string $time = '0:0')
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearly()
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int $month = 1, int|string $dayOfMonth = 1, string $time = '0:0')
-     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|mixed $days)
+     * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(mixed $days)
      * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\UnitEnum|\DateTimeZone|string $timezone)
      * @see \Illuminate\Console\Scheduling\Schedule
      */
@@ -18959,7 +19011,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get the default session driver name.
          *
-         * @return string
+         * @return string|null
          * @static
          */
         public static function getDefaultDriver()
@@ -19371,7 +19423,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Reflash a subset of the current flash data.
          *
-         * @param array|mixed $keys
+         * @param mixed $keys
          * @return void
          * @static
          */
@@ -19392,6 +19444,18 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Session\Store $instance */
             $instance->flashInput($value);
+        }
+
+        /**
+         * Get the session cache instance.
+         *
+         * @return \Illuminate\Contracts\Cache\Repository
+         * @static
+         */
+        public static function cache()
+        {
+            /** @var \Illuminate\Session\Store $instance */
+            return $instance->cache();
         }
 
         /**
@@ -21768,7 +21832,7 @@ namespace Illuminate\Support\Facades {
          * Add a piece of shared data to the environment.
          *
          * @param array|string $key
-         * @param mixed|null $value
+         * @param mixed $value
          * @return mixed
          * @static
          */
@@ -22180,7 +22244,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param string $key
          * @param mixed $default
-         * @return mixed|null
+         * @return mixed
          * @static
          */
         public static function getConsumableComponentData($key, $default = null)
@@ -23080,65 +23144,6 @@ namespace AnourValar\EloquentSerialize\Facades {
         {
             /** @var \AnourValar\EloquentSerialize\Service $instance */
             return $instance->unserialize($package);
-        }
-
-            }
-    }
-
-namespace Laravel\Mcp\Server\Facades {
-    /**
-     * @see \Laravel\Mcp\Server\Registrar
-     */
-    class Mcp {
-        /**
-         * Register an web-based MCP server running over HTTP.
-         *
-         * @static
-         */
-        public static function web($handle, $serverClass)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->web($handle, $serverClass);
-        }
-
-        /**
-         * Register a local MCP server running over STDIO.
-         *
-         * @static
-         */
-        public static function local($handle, $serverClass)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->local($handle, $serverClass);
-        }
-
-        /**
-         * Get the server class for a local MCP.
-         *
-         * @static
-         */
-        public static function getLocalServer($handle)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->getLocalServer($handle);
-        }
-
-        /**
-         * @static
-         */
-        public static function getWebServer($handle)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->getWebServer($handle);
-        }
-
-        /**
-         * @static
-         */
-        public static function oauthRoutes($oauthPrefix = 'oauth')
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->oauthRoutes($oauthPrefix);
         }
 
             }
@@ -24322,6 +24327,102 @@ namespace Illuminate\Http {
             }
     }
 
+namespace Nwidart\Modules {
+    /**
+     */
+    class Module {
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string|null $relativeNamespace
+         * @static
+         */
+        public static function namespace($relativeNamespace = '')
+        {
+            return \Nwidart\Modules\Module::namespace($relativeNamespace);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @static
+         */
+        public static function getTitle()
+        {
+            return \Nwidart\Modules\Module::getTitle();
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativeNamespace
+         * @static
+         */
+        public static function appNamespace($relativeNamespace = '')
+        {
+            return \Nwidart\Modules\Module::appNamespace($relativeNamespace);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function appPath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::appPath($relativePath);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function databasePath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::databasePath($relativePath);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function resourcesPath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::resourcesPath($relativePath);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function migrationsPath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::migrationsPath($relativePath);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function seedersPath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::seedersPath($relativePath);
+        }
+
+        /**
+         * @see \Coolsam\Modules\ModulesServiceProvider::registerModuleMacros()
+         * @param string $relativePath
+         * @static
+         */
+        public static function factoriesPath($relativePath = '')
+        {
+            return \Nwidart\Modules\Module::factoriesPath($relativePath);
+        }
+
+            }
+    }
+
 namespace Illuminate\Routing {
     /**
      * @mixin \Illuminate\Routing\RouteRegistrar
@@ -24634,6 +24735,79 @@ namespace Illuminate\Database\Eloquent\Relations {
         public static function getPowerJoinExistenceCompareKey()
         {
             return \Illuminate\Database\Eloquent\Relations\Relation::getPowerJoinExistenceCompareKey();
+        }
+
+            }
+    }
+
+namespace Nwidart\Modules\Laravel {
+    /**
+     */
+    class Module extends \Nwidart\Modules\Module {
+            }
+    }
+
+namespace Modules\Core\Cache {
+    /**
+     * @template TDuration of Closure|DateInterval|DateTimeInterface|int|null
+     */
+    class Repository extends \Illuminate\Cache\Repository {
+            }
+    }
+
+namespace Illuminate\Cache {
+    /**
+     * @mixin \Illuminate\Contracts\Cache\Store
+     */
+    class Repository {
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function tryByRequest(...$args)
+        {
+            return \Illuminate\Cache\Repository::tryByRequest(...$args);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function clearByEntity(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByEntity(...$args);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function clearByRequest(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByRequest(...$args);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function clearByUser(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByUser(...$args);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function clearByGroup(...$args)
+        {
+            return \Illuminate\Cache\Repository::clearByGroup(...$args);
         }
 
             }
@@ -27335,76 +27509,10 @@ namespace Illuminate\View {
             }
     }
 
-namespace Illuminate\Cache {
-    /**
-     * @mixin \Illuminate\Contracts\Cache\Store
-     */
-    class Repository {
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function tryByRequest(...$args)
-        {
-            return \Illuminate\Cache\Repository::tryByRequest(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByEntity(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByEntity(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByRequest(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByRequest(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByUser(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByUser(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByGroup(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByGroup(...$args);
-        }
-
-            }
-    }
-
 namespace Staudenmeir\LaravelCte\Query {
     /**
      */
     class Builder extends \Illuminate\Database\Query\Builder {
-            }
-    }
-
-namespace Modules\Core\Cache {
-    /**
-     * @template TDuration of Closure|DateInterval|DateTimeInterface|int|null
-     */
-    class Repository extends \Illuminate\Cache\Repository {
             }
     }
 
@@ -27484,6 +27592,19 @@ namespace  {
         {
             /** @var \Illuminate\Database\Eloquent\Builder $instance */
             return $instance->withoutGlobalScopes($scopes);
+        }
+
+        /**
+         * Remove all global scopes except the given scopes.
+         *
+         * @param array $scopes
+         * @return \Illuminate\Database\Eloquent\Builder<static>
+         * @static
+         */
+        public static function withoutGlobalScopesExcept($scopes = [])
+        {
+            /** @var \Illuminate\Database\Eloquent\Builder $instance */
+            return $instance->withoutGlobalScopesExcept($scopes);
         }
 
         /**
@@ -29302,7 +29423,7 @@ namespace  {
          *
          * @param mixed $relations
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $function
+         * @param string|null $function
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -32687,25 +32808,19 @@ namespace  {
     class Session extends \Illuminate\Support\Facades\Session {}
     class Storage extends \Illuminate\Support\Facades\Storage {}
     class Str extends \Illuminate\Support\Str {}
-    class URL extends \Illuminate\Support\Facades\URL {}
     class Uri extends \Illuminate\Support\Uri {}
+    class URL extends \Illuminate\Support\Facades\URL {}
     class Validator extends \Illuminate\Support\Facades\Validator {}
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
     class EloquentSerialize extends \AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade {}
     class Horizon extends \Laravel\Horizon\Horizon {}
-    class Mcp extends \Laravel\Mcp\Server\Facades\Mcp {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
     class Module extends \Nwidart\Modules\Facades\Module {}
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 namespace {
     
@@ -32729,9 +32844,8 @@ if (! function_exists('append_config')) {
      * Assign high numeric IDs to a config item to force appending.
      *
      * @param  array  $array
-     * @return array
      */
-    function append_config(array $array)
+    function append_config(array $array): array
     {
         $start = 9999;
 
@@ -32756,9 +32870,8 @@ if (! function_exists('blank')) {
      * @phpstan-assert-if-true !=numeric|bool $value
      *
      * @param  mixed  $value
-     * @return bool
      */
-    function blank($value)
+    function blank($value): bool
     {
         if (is_null($value)) {
             return true;
@@ -32793,9 +32906,8 @@ if (! function_exists('class_basename')) {
      * Get the class "basename" of the given object / class.
      *
      * @param  string|object  $class
-     * @return string
      */
-    function class_basename($class)
+    function class_basename($class): string
     {
         $class = is_object($class) ? get_class($class) : $class;
 
@@ -32808,9 +32920,9 @@ if (! function_exists('class_uses_recursive')) {
      * Returns all traits used by a class, its parent classes and trait of their traits.
      *
      * @param  object|string  $class
-     * @return array
+     * @return array<string, string>
      */
-    function class_uses_recursive($class)
+    function class_uses_recursive($class): array
     {
         if (is_object($class)) {
             $class = get_class($class);
@@ -32832,9 +32944,8 @@ if (! function_exists('e')) {
      *
      * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $value
      * @param  bool  $doubleEncode
-     * @return string
      */
-    function e($value, $doubleEncode = true)
+    function e($value, $doubleEncode = true): string
     {
         if ($value instanceof DeferringDisplayableValue) {
             $value = $value->resolveDisplayableValue();
@@ -32875,9 +32986,8 @@ if (! function_exists('filled')) {
      * @phpstan-assert-if-false !=numeric|bool $value
      *
      * @param  mixed  $value
-     * @return bool
      */
-    function filled($value)
+    function filled($value): bool
     {
         return ! blank($value);
     }
@@ -32887,12 +32997,11 @@ if (! function_exists('fluent')) {
     /**
      * Create a Fluent object from the given value.
      *
-     * @param  object|array  $value
-     * @return \Illuminate\Support\Fluent
+     * @param  iterable|object|null  $value
      */
-    function fluent($value)
+    function fluent($value = null): Fluent
     {
-        return new Fluent($value);
+        return new Fluent($value ?? []);
     }
 }
 
@@ -32900,7 +33009,7 @@ if (! function_exists('literal')) {
     /**
      * Return a new literal or anonymous object using named arguments.
      *
-     * @return \stdClass
+     * @return mixed
      */
     function literal(...$arguments)
     {
@@ -32944,10 +33053,8 @@ if (! function_exists('object_get')) {
 if (! function_exists('laravel_cloud')) {
     /**
      * Determine if the application is running on Laravel Cloud.
-     *
-     * @return bool
      */
-    function laravel_cloud()
+    function laravel_cloud(): bool
     {
         return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
                ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
@@ -33002,9 +33109,8 @@ if (! function_exists('preg_replace_array')) {
      * @param  string  $pattern
      * @param  array  $replacements
      * @param  string  $subject
-     * @return string
      */
-    function preg_replace_array($pattern, array $replacements, $subject)
+    function preg_replace_array($pattern, array $replacements, $subject): string
     {
         return preg_replace_callback($pattern, function () use (&$replacements) {
             foreach ($replacements as $value) {
@@ -33167,9 +33273,9 @@ if (! function_exists('trait_uses_recursive')) {
      * Returns all traits used by a trait and its traits.
      *
      * @param  object|string  $trait
-     * @return array
+     * @return array<string, string>
      */
-    function trait_uses_recursive($trait)
+    function trait_uses_recursive($trait): array
     {
         $traits = class_uses($trait) ?: [];
 
@@ -33211,10 +33317,8 @@ if (! function_exists('transform')) {
 if (! function_exists('windows_os')) {
     /**
      * Determine whether the current environment is Windows based.
-     *
-     * @return bool
      */
-    function windows_os()
+    function windows_os(): bool
     {
         return PHP_OS_FAMILY === 'Windows';
     }

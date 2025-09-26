@@ -2,10 +2,18 @@
 
 # Directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+APP_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+# Check if this commit is a version bump commit
+commit_message=$(git log -1 --pretty=%B)
+if [[ "$commit_message" =~ ^(chore: bump version|chore: update changelog) ]]; then
+    echo "Skipping version script - this is a version bump commit"
+    exit 0
+fi
 
 # Run version script with --nointeractive for main repository
 echo "Processing main repository"
-"$SCRIPT_DIR/../version.sh" --nointeractive
+"$APP_DIR/scripts/version.sh" --nointeractive
 echo
 
 # Handle submodules
@@ -23,13 +31,15 @@ if [ -d ".git" ]; then
             # Check if submodule has changes
             if [ -n "$(cd "$submodule" && git status --porcelain)" ]; then
                 echo "Submodule $submodule has uncommitted changes"
-                
+            else
                 # Check if submodule has version script
                 if [ -f "$submodule/scripts/version.sh" ]; then
                     echo "Running version script for $submodule"
                     cd "$submodule"
                     ./scripts/version.sh --nointeractive
                     cd - > /dev/null
+                else
+                    echo "No version script found for $submodule"
                 fi
             fi
             echo

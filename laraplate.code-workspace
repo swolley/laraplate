@@ -8,6 +8,7 @@
 		"intelephense.format.spaceAfterControlStructureKeyword": true,
     	"intelephense.format.spaceAfterFunctionKeyword": true,
 		"intelephense.format.spaceAfterArrowFunctionKeyword": true,
-		"editor.defaultFormatter": "msamgan.laravel-pint-vscode"
+		"editor.defaultFormatter": "msamgan.laravel-pint-vscode",
+		"toggleexcludedfiles.statusBar.enabled": false
 	}
 }

@@ -3,7 +3,7 @@
     "info": {
         "title": "Laraplate Cms module",
         "description": "Content Management System Module (cms, content, management, articles, posts, pages, categories, tags, authors)",
-        "version": "v1.8.2"
+        "version": "v1.11.0"
     },
     "host": "localhost:8000",
     "basePath": "\/",

@@ -1,12 +1,13 @@
 #!/bin/bash
 
+ICON_CHECKMARK="\033[32m✓\033[0m"
+ICON_CROSS="\033[31m✗\033[0m"
+
 # Directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APP_DIR="$(dirname "$SCRIPT_DIR")"
 # Regular git repository
 GIT_DIR="$APP_DIR/.git"
-ICON_CHECKMARK="\033[32m✓\033[0m"
-ICON_CROSS="\033[31m✗\033[0m"
 
 echo "Installing git hooks in $APP_DIR"
 
@@ -18,10 +19,11 @@ fi
 
 # Make all hook scripts executable
 chmod +x "$SCRIPT_DIR"/*.sh
+chmod +x "$SCRIPT_DIR"/hooks/*
 
 # Check if hooks directory exists and contains files
 if [ ! -d "$SCRIPT_DIR/hooks" ] || [ -z "$(ls -A "$SCRIPT_DIR/hooks")" ]; then
-    echo "  No hooks found"
+    echo -e "   $ICON_CROSS No hooks found"
 else
     # Create symlinks for each hook
     for hook in "$SCRIPT_DIR"/hooks/*; do

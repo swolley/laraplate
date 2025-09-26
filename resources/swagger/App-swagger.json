@@ -3,298 +3,12 @@
     "info": {
         "title": "Laraplate",
         "description": "",
-        "version": "v1.8.2"
+        "version": "v1.11.0"
     },
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
-        "\/admin": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/email-verification\/prompt": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin-email-verification-prompt",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/email-verification\/verify\/{id}\/{hash}": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "path",
-                        "name": "hash",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-admin-email-verification-verify-id-hash",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/login": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin-login",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/logout": {
-            "post": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-admin-logout",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/password-reset\/request": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin-password-reset-request",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/password-reset\/reset": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin-password-reset-reset",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/admin\/profile": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-admin-profile",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/email\/verification-notification": {
-            "post": {
-                "summary": "Send a new email verification notification.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-email-verification-notification",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/email\/verify": {
-            "get": {
-                "summary": "Display the email verification prompt.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-email-verify",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/email\/verify\/{id}\/{hash}": {
-            "get": {
-                "summary": "Mark the authenticated user's email address as verified.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    },
-                    {
-                        "in": "path",
-                        "name": "hash",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-email-verify-id-hash",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/filament\/exports\/{export}\/download": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "export",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-filament-exports-export-download",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/filament\/imports\/{import}\/failed-rows\/download": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "import",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-filament-imports-import-failed-rows-download",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/forgot-password": {
-            "get": {
-                "summary": "Show the reset password link request view.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-forgot-password",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
+        "\/app\/auth\/forgot-password": {
             "post": {
                 "summary": "Send a reset link to the given user.",
                 "description": "",
@@ -304,9 +18,284 @@
                         "description": "OK"
                     }
                 },
-                "operationId": "post-forgot-password",
+                "operationId": "post-app-auth-forgot-password",
                 "tags": [
-                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/login": {
+            "post": {
+                "summary": "Attempt to authenticate a new session.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "email",
+                                "password"
+                            ],
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-login",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/logout": {
+            "post": {
+                "summary": "Destroy an authenticated session.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-logout",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/reset-password": {
+            "post": {
+                "summary": "Reset the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-reset-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/two-factor-challenge": {
+            "post": {
+                "summary": "Attempt to authenticate a new session using the two factor authentication code.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "recovery_code": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-two-factor-challenge",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirm-password": {
+            "post": {
+                "summary": "Confirm the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-confirm-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirmed-password-status": {
+            "get": {
+                "summary": "Get the password confirmation status.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-confirmed-password-status",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirmed-two-factor-authentication": {
+            "post": {
+                "summary": "Enable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-confirmed-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/password": {
+            "put": {
+                "summary": "Update the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "put-app-auth-user-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/profile-information": {
+            "put": {
+                "summary": "Update the user's profile information.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "put-app-auth-user-profile-information",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-authentication": {
+            "post": {
+                "summary": "Enable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            },
+            "delete": {
+                "summary": "Disable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "delete-app-auth-user-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-qr-code": {
+            "get": {
+                "summary": "Get the SVG element for the user's two factor authentication QR code.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-qr-code",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-recovery-codes": {
+            "get": {
+                "summary": "Get the two factor authentication recovery codes for authenticated user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-recovery-codes",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "Generate a fresh set of two factor authentication recovery codes.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-two-factor-recovery-codes",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-secret-key": {
+            "get": {
+                "summary": "Get the current user's two factor authentication setup \/ secret key.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-secret-key",
+                "tags": [
                     "App"
                 ]
             }
@@ -339,186 +328,6 @@
                     }
                 },
                 "operationId": "get-livewire-livewire.min.js.map",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/livewire\/preview-file\/{filename}": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "filename",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-livewire-preview-file-filename",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/livewire\/update": {
-            "post": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-livewire-update",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/livewire\/upload-file": {
-            "post": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-livewire-upload-file",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/login": {
-            "get": {
-                "summary": "Show the login view.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-login",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "post": {
-                "summary": "Attempt to authenticate a new session.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "required": [
-                                "email",
-                                "password"
-                            ],
-                            "properties": {
-                                "email": {
-                                    "type": "string"
-                                },
-                                "password": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "operationId": "post-login",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/logout": {
-            "post": {
-                "summary": "Destroy an authenticated session.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-logout",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/register": {
-            "get": {
-                "summary": "Show the registration view.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-register",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "post": {
-                "summary": "Create a new registered user.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-register",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/reset-password": {
-            "post": {
-                "summary": "Reset the user's password.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-reset-password",
                 "tags": [
                     "Others",
                     "App"
@@ -559,72 +368,6 @@
                 ]
             }
         },
-        "\/two-factor-challenge": {
-            "get": {
-                "summary": "Show the two factor authentication challenge view.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "code",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "recovery_code",
-                        "type": "string",
-                        "required": false,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-two-factor-challenge",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "post": {
-                "summary": "Attempt to authenticate a new session using the two factor authentication code.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "code": {
-                                    "type": "string"
-                                },
-                                "recovery_code": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "operationId": "post-two-factor-challenge",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
         "\/up": {
             "get": {
                 "summary": "",
@@ -639,204 +382,6 @@
                     }
                 },
                 "operationId": "get-up",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/confirm-password": {
-            "get": {
-                "summary": "Show the confirm password view.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-user-confirm-password",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "post": {
-                "summary": "Confirm the user's password.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-user-confirm-password",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/confirmed-password-status": {
-            "get": {
-                "summary": "Get the password confirmation status.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-user-confirmed-password-status",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/confirmed-two-factor-authentication": {
-            "post": {
-                "summary": "Enable two factor authentication for the user.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-user-confirmed-two-factor-authentication",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/password": {
-            "put": {
-                "summary": "Update the user's password.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "put-user-password",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/profile-information": {
-            "put": {
-                "summary": "Update the user's profile information.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "put-user-profile-information",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/two-factor-authentication": {
-            "post": {
-                "summary": "Enable two factor authentication for the user.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-user-two-factor-authentication",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "delete": {
-                "summary": "Disable two factor authentication for the user.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "delete-user-two-factor-authentication",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/two-factor-qr-code": {
-            "get": {
-                "summary": "Get the SVG element for the user's two factor authentication QR code.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-user-two-factor-qr-code",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/two-factor-recovery-codes": {
-            "get": {
-                "summary": "Get the two factor authentication recovery codes for authenticated user.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-user-two-factor-recovery-codes",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            },
-            "post": {
-                "summary": "Generate a fresh set of two factor authentication recovery codes.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "post-user-two-factor-recovery-codes",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/user\/two-factor-secret-key": {
-            "get": {
-                "summary": "Get the current user's two factor authentication setup \/ secret key.",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-user-two-factor-secret-key",
                 "tags": [
                     "Others",
                     "App"

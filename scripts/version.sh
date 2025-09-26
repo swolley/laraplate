@@ -16,8 +16,12 @@ is_already_tagged() {
 # function to determine release type from commit message
 determine_release_type() {
     local commit_message=$(get_last_commit_message)
+
+    echo "Last commit message: '$commit_message'"
+
     
     if is_already_tagged; then
+        echo "Commit is already tagged, skipping version bump"
         echo "null" # Skip version bump if commit is already tagged
         return
     fi
@@ -44,7 +48,12 @@ determine_release_type() {
     echo "null"
 }
 
-# function to increment the version
+# Function to increment the version
+# Arguments:
+#   $1: Version string
+#   $2: Position to increment (major, minor, patch)
+# Returns:
+#   Incremented version string
 increment_version() {
     local version=$1
     local position=$2
@@ -85,6 +94,11 @@ get_latest_version() {
     fi
 }
 
+# Function to amend or commit
+# Arguments:
+#   $1: Commit message
+# Returns:
+#   None
 amend_or_commit() {
     local message=$1
     
@@ -98,7 +112,11 @@ amend_or_commit() {
     fi
 }
 
-# function to update composer.json
+# Function to update composer.json
+# Arguments:
+#   $1: New version string
+# Returns:
+#   None
 update_composer_version() {
     local new_version=$1
     
@@ -117,7 +135,11 @@ update_composer_version() {
     amend_or_commit "chore: bump version to $new_version"
 }
 
-# function to update the changelog
+# Function to update the changelog
+# Arguments:
+#   $1: New version string
+# Returns:
+#   None
 update_changelog() {
     local new_version=$1
     
@@ -129,7 +151,12 @@ update_changelog() {
     amend_or_commit "chore: update changelog for version $new_version"
 }
 
-# function to update the version in the current repository
+# Function to update the version in the current repository
+# Arguments:
+#   $1: Position to increment (major, minor, patch)
+#   $2: Silent mode
+# Returns:
+#   None
 update_version() {
     local position=$1
     local silent=$2

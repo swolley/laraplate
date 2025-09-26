@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(fn() => config('app.name') . ' ' . __('Admin'))
+            ->brandName(fn () => config('app.name') . ' ' . __('Admin'))
             // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)
@@ -76,10 +76,10 @@ class AdminPanelProvider extends PanelProvider
                         label: 'Queues',
                         icon: 'heroicon-' . Heroicon::OutlinedQueueList->value,
                         openInNewTab: false,
-                        url: url(config('horizon.path'))
+                        url: url(config('horizon.path')),
                     )
                     ->telescopeNavigation(condition: class_exists('Laravel\Telescope\TelescopeServiceProvider'), openInNewTab: false, url: url('telescope'))
-                    ->pulseNavigation(condition: class_exists('Laravel\Pulse\PulseServiceProvider'), openInNewTab: false, url: url('pulse'))
+                    ->pulseNavigation(condition: class_exists('Laravel\Pulse\PulseServiceProvider'), openInNewTab: false, url: url('pulse')),
             ])
             // AUTHENTICATION
             ->login()
@@ -105,8 +105,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-        ;
+            ]);
 
         return $panel;
     }
