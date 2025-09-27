@@ -10,12 +10,5 @@
     "php-cs-fixer.executablePath": "./vendor/bin/pint",
     "editor.laravel.pint.enabled": true,
     "editor.laravel.pint.path": "./vendor/bin/pint",
-    "files.exclude": {
-        "node_modules": true,
-        "vendor": true,
-        ".stubs": true,
-        ".continue": true,
-        ".cursor": true,
-        ".vscode": true
-    }
+    "files.exclude": {}
 }
