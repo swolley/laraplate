@@ -20,31 +20,31 @@ echo
 # echo "Checking submodules for version updates..."
 
 # Check if we're in a git repository
-if [ -d ".git" ]; then
-    # Get list of submodules
-    SUBMODULES=$(git submodule foreach --quiet 'echo $name')
+# if [ -d ".git" ]; then
+#     # Get list of submodules
+#     SUBMODULES=$(git submodule foreach --quiet 'echo $name')
     
-    for submodule in $SUBMODULES; do
-        if [ -d "$submodule" ]; then
-            echo "Processing submodule: $submodule"
+#     for submodule in $SUBMODULES; do
+#         if [ -d "$submodule" ]; then
+#             echo "Processing submodule: $submodule"
             
-            # Check if submodule has changes
-            if [ -n "$(cd "$submodule" && git status --porcelain)" ]; then
-                echo "Submodule $submodule has uncommitted changes"
-            else
-                # Check if submodule has version script
-                if [ -f "$submodule/scripts/version.sh" ]; then
-                    echo "Running version script for $submodule"
-                    cd "$submodule"
-                    ./scripts/version.sh --nointeractive
-                    cd - > /dev/null
-                else
-                    echo "No version script found for $submodule"
-                fi
-            fi
-            echo
-        fi
-    done
-fi
+#             # Check if submodule has changes
+#             if [ -n "$(cd "$submodule" && git status --porcelain)" ]; then
+#                 echo "Submodule $submodule has uncommitted changes"
+#             else
+#                 # Check if submodule has version script
+#                 if [ -f "$submodule/scripts/version.sh" ]; then
+#                     echo "Running version script for $submodule"
+#                     cd "$submodule"
+#                     ./scripts/version.sh --nointeractive
+#                     cd - > /dev/null
+#                 else
+#                     echo "No version script found for $submodule"
+#                 fi
+#             fi
+#             echo
+#         fi
+#     done
+# fi
 
 exit 0
