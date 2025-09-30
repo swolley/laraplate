@@ -84,11 +84,7 @@ determine_max_importance() {
 # Determine the release type from the commit messages
 determine_release_type() {
     local commit_messages=$(get_last_commit_message)
-    
-    echo "Analyzing commits since last tag:"
-    echo "$commit_messages"
-    echo "---"
-    
+
     if is_already_tagged; then
         echo "Commit is already tagged, skipping version bump"
         echo "null"
@@ -97,7 +93,6 @@ determine_release_type() {
     
     # Determine the maximum importance among all commit messages
     local max_importance=$(determine_max_importance "$commit_messages")
-    echo "Maximum importance found: $max_importance"
     echo "$max_importance"
 }
 
@@ -224,6 +219,13 @@ update_version() {
 
     local current_version=$(get_latest_version)
     local new_version=$(increment_version "$current_version" "$position")
+
+    if [ "$silent" = true ]; then
+        echo "DEBUG: Current version: $current_version"
+        echo "DEBUG: Position: $position" 
+        echo "DEBUG: New version: $new_version"
+        echo "DEBUG: Are they equal? $([ "$current_version" == "$new_version" ] && echo "YES" || echo "NO")"
+    fi
     
     if [ $current_version == $new_version ]; then
         echo "Version is already up to date"
