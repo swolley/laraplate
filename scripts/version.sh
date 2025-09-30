@@ -172,6 +172,10 @@ update_version() {
     local current_version=$(get_latest_version)
     local new_version=$(increment_version "$current_version" "$position")
     
+    if [ $current_version == $new_version ]; then
+        echo "Version is already up to date"
+        exit 0
+    fi
     
     if [ "$silent" = true ]; then
         echo "Silent mode: should update version from $current_version to $new_version"
