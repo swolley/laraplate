@@ -24,30 +24,20 @@ determine_release_type() {
     
     if is_already_tagged; then
         echo "Commit is already tagged, skipping version bump"
-        return "null" # Skip version bump if commit is already tagged
-        # return
+        echo "null" # Skip version bump if commit is already tagged
+    elif [[ "$commit_message" =~ ^(feat|fix|perf|refactor)(\([a-z0-9-]+\))?! ]]; then
+        # Check for breaking changes (major)
+        echo "major"
+    elif [[ "$commit_message" =~ ^feat(\([a-z0-9-]+\))?: ]]; then
+        # Check for features (minor)
+        echo "minor"
+    elif [[ "$commit_message" =~ ^(fix|perf|refactor)(\([a-z0-9-]+\))?: ]]; then
+        # Check for other conventional commit types (patch)
+        echo "patch"
+    else
+        # If no recognizable pattern is found, default to null
+        echo "null"
     fi
-
-    # Check for breaking changes (major)
-    if [[ "$commit_message" =~ ^(feat|fix|perf|refactor)(\([a-z0-9-]+\))?! ]]; then
-        return "major"
-        # return
-    fi
-    
-    # Check for features (minor)
-    if [[ "$commit_message" =~ ^feat(\([a-z0-9-]+\))?: ]]; then
-        return "minor"
-        # return
-    fi
-    
-    # Check for other conventional commit types (patch)
-    if [[ "$commit_message" =~ ^(fix|perf|refactor)(\([a-z0-9-]+\))?: ]]; then
-        return "patch"
-        # return
-    fi
-    
-    # If no recognizable pattern is found, default to null
-    return "null"
 }
 
 # Function to increment the version
