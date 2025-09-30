@@ -10,6 +10,8 @@ is_already_tagged() {
     local tag_at_commit=$(git tag --points-at "$last_commit_hash")
     if [ -n "$tag_at_commit" ]; then
         return 0
+    else
+        return 1
     fi
 }
 
