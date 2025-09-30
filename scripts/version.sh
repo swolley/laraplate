@@ -120,14 +120,15 @@ amend_or_commit() {
 update_composer_version() {
     local new_version=$1
     
-    # use jq to update the version while keeping the file formatting
+    cd "$(git rev-parse --show-toplevel)"
+    
     if command -v jq >/dev/null 2>&1; then
-        # if jq is installed
+        # if jq is installed - modifica la proprietà version alla root
         tmp=$(mktemp)
         jq --arg version "$new_version" '.version = $version' composer.json > "$tmp" && mv "$tmp" composer.json
     else
         # fallback to sed if jq is not available
-        sed -i "s/\"version\": \".*\"/\"version\": \"$new_version\"/" composer.json
+        sed -i "s/^    \"version\": \".*\",$/    \"version\": \"$new_version\",/" composer.json
     fi
     
     # add the file to git
