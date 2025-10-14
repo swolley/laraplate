@@ -19,40 +19,20 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4",
-        "ext-exif": "*",
-        "ext-gd": "*",
         "coolsam/modules": "^5.0",
-        "filament/filament": "^4.0",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "nwidart/laravel-modules": "^12.0 <12.0.4",
-        "php-ffmpeg/php-ffmpeg": "^1.3",
-        "pxlrbt/filament-environment-indicator": "^3.1",
         "spatie/fork": "^1.2",
-        "symfony/http-client": "^7.2",
-        "tightenco/parental": "^1.4"
+        "symfony/http-client": "^7.2"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.5",
-        "driftingly/rector-laravel": "^2.0",
         "fakerphp/faker": "^1.23",
-        "filament/upgrade": "^4.0",
-        "larastan/larastan": "^3.1",
-        "laravel/boost": "^1.0",
-        "laravel/pail": "^1.2.2",
-        "laravel/pint": "^1.13",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.6",
-        "nunomaduro/phpinsights": "^2.13",
-        "peckphp/peck": "^0.1.3",
-        "pestphp/pest": "^3.8",
-        "pestphp/pest-plugin-laravel": "^3.2",
-        "pestphp/pest-plugin-stressless": "^3.1",
-        "pestphp/pest-plugin-type-coverage": "^3.5",
-        "rector/rector": "^2.0"
+        "nunomaduro/collision": "^8.6"
     },
     "autoload": {
         "psr-4": {
@@ -67,6 +47,18 @@
         }
     },
     "scripts": {
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "@php artisan migrate --force",
+            "npm install",
+            "npm run build"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
@@ -83,30 +75,35 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
-        "dev": [
-            "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
-        ],
         "lint": [
-            "pint",
+            "rector",
+            "pint --parallel",
             "php artisan ide-helper:generate",
             "php artisan ide-helper:models -MN",
             "php artisan ide-helper:meta"
         ],
+        "check": "vendor/bin/phpstan analyse --memory-limit=2G -v",
+        "fix": "vendor/bin/phpstan analyse --memory-limit=2G -v --fix",
         "refactor": "rector",
-        "test:type-coverage": "pest --type-coverage --exactly=100",
+        "test:type-coverage": "pest --type-coverage --min=100",
         "test:typos": "peck",
-        "test:lint": "pint --test",
+        "test:lint": [
+            "pint --parallel --test",
+            "rector --dry-run"
+        ],
         "test:unit": "pest --parallel --coverage --exactly=100",
-        "test:types": "phpstan --memory-limit=2G",
-        "test:refactor": "rector --dry-run",
+        "test:types": "phpstan",
+        "test:refactor": "rector",
         "test": [
             "@test:type-coverage",
-            "@test:typos",
             "@test:unit",
             "@test:lint",
             "@test:types",
             "@test:refactor"
+        ],
+        "update:requirements": [
+            "composer bump",
+            "npx npm-check-updates -u"
         ],
         "version": "./scripts/version.sh --nointeractive",
         "version:silent": "./scripts/version.sh --silent --nointeractive",
