@@ -155,7 +155,7 @@ return [
     */
 
     'ignored_models' => [
-        'Modules\\Core\\Models\\Version',
+        Modules\Core\Models\Version::class,
     ],
 
     /*
@@ -183,8 +183,8 @@ return [
     */
 
     'extra' => [
-        'Eloquent' => ['Illuminate\Database\Eloquent\Builder', 'Illuminate\Database\Query\Builder'],
-        'Session' => ['Illuminate\Session\Store'],
+        'Eloquent' => [Illuminate\Database\Eloquent\Builder::class, Illuminate\Database\Query\Builder::class],
+        'Session' => [Illuminate\Session\Store::class],
     ],
 
     'magic' => [],

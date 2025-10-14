@@ -15,11 +15,11 @@ $paths = array_merge(
         __DIR__ . '/bootstrap/app.php',
         __DIR__ . '/config',
         __DIR__ . '/database',
-        __DIR__ . '/pubilc',
+        __DIR__ . '/public',
         __DIR__ . '/routes',
         __DIR__ . '/tests',
     ],
-    array_map(fn($module) => "{$module}/app", $modules),
+    array_map(fn ($module) => "{$module}/app", $modules),
 );
 
 return RectorConfig::configure()

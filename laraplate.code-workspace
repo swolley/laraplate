@@ -9,6 +9,9 @@
     	"intelephense.format.spaceAfterFunctionKeyword": true,
 		"intelephense.format.spaceAfterArrowFunctionKeyword": true,
 		"editor.defaultFormatter": "msamgan.laravel-pint-vscode",
-		"toggleexcludedfiles.statusBar.enabled": false
+		"toggleexcludedfiles.statusBar.enabled": false,
+		"[json]": {
+			"editor.defaultFormatter": "vscode.json-language-features"
+		}
 	}
 }

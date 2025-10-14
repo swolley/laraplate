@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.31.1.
+ * Generated for Laravel 12.33.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -4500,7 +4500,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function repository($store, $config = [])
         {
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->repository($store, $config);
         }
 
@@ -4514,7 +4514,7 @@ namespace Illuminate\Support\Facades {
         public static function store($name = null)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->store($name);
         }
 
@@ -4528,7 +4528,7 @@ namespace Illuminate\Support\Facades {
         public static function driver($driver = null)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->driver($driver);
         }
 
@@ -4542,7 +4542,7 @@ namespace Illuminate\Support\Facades {
         public static function memo($driver = null)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->memo($driver);
         }
 
@@ -4557,7 +4557,7 @@ namespace Illuminate\Support\Facades {
         public static function resolve($name)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->resolve($name);
         }
 
@@ -4571,7 +4571,7 @@ namespace Illuminate\Support\Facades {
         public static function build($config)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->build($config);
         }
 
@@ -4584,7 +4584,7 @@ namespace Illuminate\Support\Facades {
         public static function refreshEventDispatcher()
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             $instance->refreshEventDispatcher();
         }
 
@@ -4597,7 +4597,7 @@ namespace Illuminate\Support\Facades {
         public static function getDefaultDriver()
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->getDefaultDriver();
         }
 
@@ -4611,7 +4611,7 @@ namespace Illuminate\Support\Facades {
         public static function setDefaultDriver($name)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             $instance->setDefaultDriver($name);
         }
 
@@ -4619,13 +4619,13 @@ namespace Illuminate\Support\Facades {
          * Unset the given driver instances.
          *
          * @param array|string|null $name
-         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3
          * @static
          */
         public static function forgetDriver($name = null)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->forgetDriver($name);
         }
 
@@ -4639,7 +4639,7 @@ namespace Illuminate\Support\Facades {
         public static function purge($name = null)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             $instance->purge($name);
         }
 
@@ -4649,13 +4649,13 @@ namespace Illuminate\Support\Facades {
          * @param string $driver
          * @param \Closure $callback
          * @param-closure-this $this  $callback
-         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3
          * @static
          */
         public static function extend($driver, $callback)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->extend($driver, $callback);
         }
 
@@ -4663,13 +4663,13 @@ namespace Illuminate\Support\Facades {
          * Set the application instance used by the manager.
          *
          * @param \Illuminate\Contracts\Foundation\Application $app
-         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3
+         * @return \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3
          * @static
          */
         public static function setApplication($app)
         {
             //Method inherited from \Illuminate\Cache\CacheManager 
-            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:396$a3 $instance */
+            /** @var \Illuminate\Cache\CacheManager@anonymous /srv/http/laraplate/Modules/Core/app/Providers/CoreServiceProvider.php:386$a3 $instance */
             return $instance->setApplication($app);
         }
 
@@ -8527,6 +8527,21 @@ namespace Illuminate\Support\Facades {
             $instance->afterCommit($callback);
         }
 
+        /**
+         * Execute the callback after a transaction rolls back.
+         *
+         * @param callable $callback
+         * @return void
+         * @throws \RuntimeException
+         * @static
+         */
+        public static function afterRollBack($callback)
+        {
+            //Method inherited from \Illuminate\Database\Connection 
+            /** @var \Staudenmeir\LaravelCte\Connections\PostgresConnection $instance */
+            $instance->afterRollBack($callback);
+        }
+
             }
     /**
      * @see \Illuminate\Events\Dispatcher
@@ -10310,6 +10325,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Http\Client\Response put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static \Illuminate\Http\Client\Response delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static array pool(callable $callback)
+     * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
      * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
      * @method static \GuzzleHttp\Client buildClient()
      * @method static \GuzzleHttp\Client createClient(\GuzzleHttp\HandlerStack $handlerStack)
@@ -27214,6 +27230,17 @@ namespace Livewire\Features\SupportTesting {
         }
 
         /**
+         * @see \Filament\Tables\Testing\TestsColumns::toggleAllTableColumns()
+         * @param bool $condition
+         * @return static
+         * @static
+         */
+        public static function toggleAllTableColumns($condition = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::toggleAllTableColumns($condition);
+        }
+
+        /**
          * @see \Filament\Tables\Testing\TestsFilters::filterTable()
          * @param string $name
          * @param mixed $data
@@ -32952,7 +32979,7 @@ if (! function_exists('e')) {
         }
 
         if ($value instanceof Htmlable) {
-            return $value->toHtml();
+            return $value->toHtml() ?? '';
         }
 
         if ($value instanceof BackedEnum) {
@@ -33390,7 +33417,7 @@ if (! function_exists('modules')) {
 
         $remapped_modules = $fullpath ? array_map(fn (Module $m): string => $m->getPath(), $remapped_modules) : array_keys($remapped_modules);
 
-        if ($showMainApp && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $onlyModule === 'App')) {
+        if ($showMainApp && (in_array($onlyModule, [null, '', '0', 'App'], true))) {
             if ($fullpath) {
                 $remapped_modules['App'] = app_path();
             } else {
@@ -33648,7 +33675,7 @@ if (! function_exists('routes')) {
         /** @var array<int,Route> $routes */
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
-        $all_routes = app('router')->getRoutes()->getRoutes();
+        $all_routes = app(Illuminate\Routing\Router::class)->getRoutes()->getRoutes();
         usort($all_routes, fn (Route $a, Route $b): int => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
@@ -33660,7 +33687,7 @@ if (! function_exists('routes')) {
             }
             $exploded = explode('\\', (string) $reference);
 
-            if (($exploded[0] !== 'Modules' && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $onlyModule === 'App')) || (in_array($exploded[1], $modules, true) && ($onlyModule === null || $onlyModule === '' || $onlyModule === '0' || $exploded[1] === $onlyModule))) {
+            if (($exploded[0] !== 'Modules' && (in_array($onlyModule, [null, '', '0', 'App'], true))) || (in_array($exploded[1], $modules, true) && (in_array($onlyModule, [null, '', '0'], true) || $exploded[1] === $onlyModule))) {
                 $routes[] = $route;
             }
         }
@@ -33691,7 +33718,7 @@ if (! function_exists('api_versions')) {
      */
     function api_versions(): array
     {
-        $routes = app('router')->getRoutes()->getRoutes();
+        $routes = app(Illuminate\Routing\Router::class)->getRoutes()->getRoutes();
         $versions = [];
 
         foreach ($routes as $route) {
@@ -33730,10 +33757,14 @@ if (! function_exists('class_uses_trait')) {
      *
      * @param  string|object  $class  The class to check
      * @param  string  $uses  The trait to check for
+     * @param  bool  $recursive  Check if the trait is used in the class or its parents
      */
-    function class_uses_trait(string|object $class, string $uses): bool
+    function class_uses_trait(string|object $class, string $uses, bool $recursive = true): bool
     {
-        return in_array($uses, class_uses_recursive(is_string($class) ? $class : $class::class), true);
+        $class = is_string($class) ? $class : $class::class;
+        $traits = $recursive ? class_uses_recursive($class) : class_uses($class);
+
+        return in_array($uses, $traits, true);
     }
 }
 

@@ -15,7 +15,6 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
-// use Filament\Support\Icons\Heroicon;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -26,7 +25,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
-// use Stephenjude\FilamentDebugger\DebuggerPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -46,7 +44,7 @@ final class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(fn() => config('app.name') . ' ' . __('Admin'))
+            ->brandName(fn () => config('app.name') . ' ' . __('Admin'))
             // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)

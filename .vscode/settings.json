@@ -1,14 +1,13 @@
 {
-    "intelephense.environment.includePaths": [
-        "./.stubs"
-    ],
-    "[php]": {
-        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
-    },
+    "php.suggest.basic": false,
+    "php.validate.enable": false,
+    "php.format.enable": false,
     "editor.formatOnSave": true,
-    "intelephense.format.enable": false,
-    "php-cs-fixer.executablePath": "./vendor/bin/pint",
-    "editor.laravel.pint.enabled": true,
-    "editor.laravel.pint.path": "./vendor/bin/pint",
-    "files.exclude": {}
+    "editor.defaultFormatter": "open-southeners.laravel-pint",
+    "[php]": {
+        "editor.defaultFormatter": "open-southeners.laravel-pint",
+        "editor.formatOnSave": true
+    },
+    "laravel-pint.enable": true,
+    "laravel-pint.configPath": "./pint.json"
 }
