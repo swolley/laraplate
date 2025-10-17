@@ -31,7 +31,7 @@
 - **Modular Architecture**: This is a Laravel Modules application using `nwidart/laravel-modules`
 - **Core Module**: Contains base functionality, authentication, permissions, and core services
 - **CMS Module**: Contains content management, media library, and geocoding features
-- **Module Structure**: Each module follows Laravel's standard structure with its own routes, controllers, models, etc.
+- **Module Structure**: Each module follows Laravel's standard structure with its own routes, controllers, models, commands, tests, etc.
 
 ## Module Development Standards
 - **Module Naming**: Use PascalCase for module names (e.g., `Core`, `Cms`)
