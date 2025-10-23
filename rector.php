@@ -53,6 +53,8 @@ return RectorConfig::configure()
         '**/Model.php',
         // Ignora file con troppe righe che potrebbero causare problemi di analisi
         '**/vendor/**',
+        // Esclude il file SortableTrait dalla regola di privatizzazione
+        __DIR__ . '/Modules/Core/app/Helpers/SortableTrait.php',
     ])
     ->withPreparedSets(
         deadCode: true,
@@ -60,6 +62,5 @@ return RectorConfig::configure()
         typeDeclarations: true,
         privatization: true,
         earlyReturn: true,
-        strictBooleans: true,
     )
     ->withPhpSets();

@@ -49,9 +49,6 @@ namespace App\Models{
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Modules\Core\Models\Pivot\ModelHasRole|null $pivot
- * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
- * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\App\Models\User admin()
@@ -111,7 +108,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Cms\Models\Entity $entity
@@ -187,13 +184,15 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
+ * @property-read mixed $full_name
  * @property-read array|null $preview
  * @property-read string $textual_only
+ * @property-read mixed $ids
  * @property-read \Modules\Core\Models\Version|null $lastVersion
  * @property-read \Modules\Core\Models\Version|null $latestVersion
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
@@ -206,6 +205,7 @@ namespace Modules\Cms\Models{
  * @property-read \Modules\Cms\Models\Preset $preset
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
+ * @property-read mixed $title
  * @property-read mixed $type
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -317,12 +317,12 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -415,12 +415,12 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -513,12 +513,12 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -611,12 +611,12 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -709,12 +709,12 @@ namespace Modules\Cms\Models\Contents{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
- * @property-read \Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
+ * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -1106,6 +1106,25 @@ namespace Modules\Cms\Models\Pivot{
 namespace Modules\Cms\Models\Pivot{
 /**
  * @property int $content_id
+ * @property int $location_id
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property \Carbon\CarbonImmutable $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable whereContentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable whereLocationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Locatable whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperLocatable {}
+}
+
+namespace Modules\Cms\Models\Pivot{
+/**
+ * @property int $content_id
  * @property int $related_content_id
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
@@ -1478,12 +1497,14 @@ namespace Modules\Core\Models{
  * @property string|null $table_name
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ACL> $acls
  * @property-read int|null $acls_count
+ * @property-read \Modules\Core\Casts\ActionEnum|null $action
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\User> $users
  * @property-read int|null $users_count
+ * @method static \Modules\Core\Database\Factories\PermissionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission permission($permissions, $without = false)
@@ -1704,8 +1725,6 @@ namespace Modules\Core\Models{
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Modules\Core\Models\Pivot\ModelHasRole|null $pivot
- * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\User admin()

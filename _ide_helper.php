@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.33.0.
+ * Generated for Laravel 12.35.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -3937,7 +3937,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Attempt to find the batch with the given ID.
          *
-         * @param string $batchId
          * @return \Illuminate\Bus\Batch|null
          * @static
          */
@@ -4030,7 +4029,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Set the pipes through which commands should be piped before dispatching.
          *
-         * @param array $pipes
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -4043,7 +4041,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Map a command to a handler.
          *
-         * @param array $map
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -4674,12 +4671,86 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the cache tags.
+         *
+         * @static
+         */
+        public static function getCacheTags($tags = [])
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->getCacheTags($tags);
+        }
+
+        /**
          * @static
          */
         public static function remember($key, $ttl, $callback)
         {
             /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->remember($key, $ttl, $callback);
+        }
+
+        /**
+         * Try to extract from cache or by specified callback using request info.
+         *
+         * @template TCacheValue
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
+         * @param \Closure(TCacheValue):  mixed  $callback
+         * @return TCacheValue
+         * @static
+         */
+        public static function tryByRequest($entity, $request, $callback, $duration = null)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->tryByRequest($entity, $request, $callback, $duration);
+        }
+
+        /**
+         * clear cache by specified entity.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>
+         * @static
+         */
+        public static function clearByEntity($entity)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByEntity($entity);
+        }
+
+        /**
+         * clear cache by request extracted info.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
+         * @static
+         */
+        public static function clearByRequest($request, $entity = null)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByRequest($request, $entity);
+        }
+
+        /**
+         * clear cache elements by user and only by entity if specified.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
+         * @static
+         */
+        public static function clearByUser($user, $entity = null)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByUser($user, $entity);
+        }
+
+        /**
+         * clear cache elements by user group and only by entity if specified.
+         *
+         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
+         * @static
+         */
+        public static function clearByGroup($role, $entity = null)
+        {
+            /** @var \Modules\Core\Cache\Repository $instance */
+            return $instance->clearByGroup($role, $entity);
         }
 
         /**
@@ -5271,69 +5342,6 @@ namespace Illuminate\Support\Facades {
             //Method inherited from \Illuminate\Cache\Repository 
             /** @var \Modules\Core\Cache\Repository $instance */
             return $instance->macroCall($method, $parameters);
-        }
-
-        /**
-         * Try to extract from cache or by specified callback using request info.
-         *
-         * @template TCacheValue
-         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
-         * @param \Closure(TCacheValue):  mixed  $callback
-         * @return TCacheValue
-         * @static
-         */
-        public static function tryByRequest($entity, $request, $callback, $duration = null)
-        {
-            /** @var \Modules\Core\Cache\Repository $instance */
-            return $instance->tryByRequest($entity, $request, $callback, $duration);
-        }
-
-        /**
-         * clear cache by specified entity.
-         *
-         * @param \Modules\Core\Cache\Model|string|array<string|object>
-         * @static
-         */
-        public static function clearByEntity($entity)
-        {
-            /** @var \Modules\Core\Cache\Repository $instance */
-            return $instance->clearByEntity($entity);
-        }
-
-        /**
-         * clear cache by request extracted info.
-         *
-         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
-         * @static
-         */
-        public static function clearByRequest($request, $entity = null)
-        {
-            /** @var \Modules\Core\Cache\Repository $instance */
-            return $instance->clearByRequest($request, $entity);
-        }
-
-        /**
-         * clear cache elements by user and only by entity if specified.
-         *
-         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
-         * @static
-         */
-        public static function clearByUser($user, $entity = null)
-        {
-            /** @var \Modules\Core\Cache\Repository $instance */
-            return $instance->clearByUser($user, $entity);
-        }
-
-        /**
-         * clear cache elements by user group and only by entity if specified.
-         *
-         * @param \Modules\Core\Cache\Model|string|array<string|object>|null
-         * @static
-         */
-        public static function clearByGroup($role, $entity = null)
-        {
-            /** @var \Modules\Core\Cache\Repository $instance */
-            return $instance->clearByGroup($role, $entity);
         }
 
         /**
@@ -6907,6 +6915,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param array $keys
          * @return \Illuminate\Encryption\Encrypter
+         * @throws \RuntimeException
          * @static
          */
         public static function previousKeys($keys)
@@ -7868,6 +7877,7 @@ namespace Illuminate\Support\Facades {
          * @param string|float|int|bool|null $value
          * @param bool $binary
          * @return string
+         * @throws \RuntimeException
          * @static
          */
         public static function escape($value, $binary = false)
@@ -13560,6 +13570,33 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the queue configuration array.
+         *
+         * @return array
+         * @static
+         */
+        public static function getConfig()
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            return $instance->getConfig();
+        }
+
+        /**
+         * Set the queue configuration array.
+         *
+         * @param array $config
+         * @return \Laravel\Horizon\RedisQueue
+         * @static
+         */
+        public static function setConfig($config)
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Laravel\Horizon\RedisQueue $instance */
+            return $instance->setConfig($config);
+        }
+
+        /**
          * Get the container instance being used by the connection.
          *
          * @return \Illuminate\Container\Container
@@ -18240,7 +18277,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Specify the cache store that should be used to store mutexes.
          *
-         * @param string $store
+         * @param \UnitEnum|string $store
          * @return \Illuminate\Console\Scheduling\Schedule
          * @static
          */
@@ -24826,6 +24863,24 @@ namespace Illuminate\Cache {
             return \Illuminate\Cache\Repository::clearByGroup(...$args);
         }
 
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $args
+         * @static
+         */
+        public static function getCacheTags(...$args)
+        {
+            return \Illuminate\Cache\Repository::getCacheTags(...$args);
+        }
+
+            }
+    /**
+     */
+    class RedisTaggedCache extends \Illuminate\Cache\TaggedCache {
+            }
+    /**
+     */
+    class TaggedCache extends \Illuminate\Cache\Repository {
             }
     }
 
@@ -25116,6 +25171,48 @@ namespace Livewire\Features\SupportTesting {
         }
 
         /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalSee()
+         * @param array|string $values
+         * @param mixed $escape
+         * @static
+         */
+        public static function assertMountedActionModalSee($values, $escape = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalSee($values, $escape);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalDontSee()
+         * @param array|string $values
+         * @param bool $escape
+         * @static
+         */
+        public static function assertMountedActionModalDontSee($values, $escape = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalDontSee($values, $escape);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalSeeHtml()
+         * @param array|string $values
+         * @static
+         */
+        public static function assertMountedActionModalSeeHtml($values)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalSeeHtml($values);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalDontSeeHtml()
+         * @param array|string $values
+         * @static
+         */
+        public static function assertMountedActionModalDontSeeHtml($values)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalDontSeeHtml($values);
+        }
+
+        /**
          * @see \Filament\Actions\Testing\TestsActions::assertActionMounted()
          * @param \Filament\Actions\Testing\TestAction|array|string $actions
          * @return static
@@ -25184,6 +25281,16 @@ namespace Livewire\Features\SupportTesting {
         public static function parseNestedActions($actions, $arguments = [], $areRelativeToMountedActions = true)
         {
             return \Livewire\Features\SupportTesting\Testable::parseNestedActions($actions, $arguments, $areRelativeToMountedActions);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::getMountedActionModalHtml()
+         * @return string
+         * @static
+         */
+        public static function getMountedActionModalHtml()
+        {
+            return \Livewire\Features\SupportTesting\Testable::getMountedActionModalHtml();
         }
 
         /**
@@ -32848,6 +32955,11 @@ namespace  {
 }
 
 
+namespace Facades\Livewire\Features\SupportFileUploads {
+    /**
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
 
 namespace {
     
@@ -33250,11 +33362,13 @@ if (! function_exists('throw_if')) {
      * Throw the given exception if the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
      * @throws TException
@@ -33262,6 +33376,10 @@ if (! function_exists('throw_if')) {
     function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
     {
         if ($condition) {
+            if ($exception instanceof Closure) {
+                $exception = $exception(...$parameters);
+            }
+
             if (is_string($exception) && class_exists($exception)) {
                 $exception = new $exception(...$parameters);
             }
@@ -33278,11 +33396,13 @@ if (! function_exists('throw_unless')) {
      * Throw the given exception unless the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is false ? never : ($condition is non-empty-mixed ? TValue : never))
      *
      * @throws TException
@@ -33373,6 +33493,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -33406,7 +33527,7 @@ if (! function_exists('modules')) {
             $remapped_modules[ucfirst($module)] = $class;
         }
 
-        if ($onlyModule !== null && $onlyModule !== '' && $onlyModule !== '0') {
+        if (! in_array($onlyModule, [null, '', '0'], true)) {
             $onlyModule = ucfirst($onlyModule);
             $remapped_modules = array_filter($remapped_modules, fn (string $k): bool => $k === $onlyModule || $onlyModule === null, ARRAY_FILTER_USE_KEY);
         }
@@ -33423,6 +33544,7 @@ if (! function_exists('modules')) {
             } else {
                 array_unshift($remapped_modules, 'App');
             }
+
             ksort($remapped_modules);
         }
 
@@ -33497,7 +33619,7 @@ if (! function_exists('translations')) {
         foreach (modules(false, true, $onlyActive) as $module) {
             $is_app = (bool) preg_match("/[\\\\\/]app$/", $module);
             $path = $module . DIRECTORY_SEPARATOR . ($is_app ? 'lang' : $langs_subpath) . DIRECTORY_SEPARATOR;
-            $files = glob("{$path}*", GLOB_ONLYDIR);
+            $files = glob($path . '*', GLOB_ONLYDIR);
 
             foreach ($files as $file) {
                 if (! $fullpath) {
@@ -33596,6 +33718,7 @@ if (! function_exists('models')) {
                 if ($model_file->getExtension() !== 'php') {
                     continue;
                 }
+
                 $class_subnamespace = $namespace . preg_replace(['/\.' . $model_file->getExtension() . '/', '/\//'], ['', '\\'], $model_file->getRelativePathName());
 
                 if (! is_subclass_of($class_subnamespace, Model::class)) {
@@ -33675,7 +33798,7 @@ if (! function_exists('routes')) {
         /** @var array<int,Route> $routes */
         $routes = [];
         $modules = modules(true, false, $onlyActive, $onlyModule);
-        $all_routes = app(Illuminate\Routing\Router::class)->getRoutes()->getRoutes();
+        $all_routes = app(Router::class)->getRoutes()->getRoutes();
         usort($all_routes, fn (Route $a, Route $b): int => $a->uri() <=> $b->uri());
 
         foreach ($all_routes as $route) {
@@ -33685,6 +33808,7 @@ if (! function_exists('routes')) {
                 $r = new ReflectionFunction($reference);
                 $reference = $r->getName();
             }
+
             $exploded = explode('\\', (string) $reference);
 
             if (($exploded[0] !== 'Modules' && (in_array($onlyModule, [null, '', '0', 'App'], true))) || (in_array($exploded[1], $modules, true) && (in_array($onlyModule, [null, '', '0'], true) || $exploded[1] === $onlyModule))) {
@@ -33718,7 +33842,7 @@ if (! function_exists('api_versions')) {
      */
     function api_versions(): array
     {
-        $routes = app(Illuminate\Routing\Router::class)->getRoutes()->getRoutes();
+        $routes = app(Router::class)->getRoutes()->getRoutes();
         $versions = [];
 
         foreach ($routes as $route) {
@@ -33826,7 +33950,7 @@ if (! function_exists('cast_value')) {
      */
     function cast_value(mixed $value, ?string $type = null): mixed
     {
-        if ($type !== null && $type !== '' && $type !== '0') {
+        if (! in_array($type, [null, '', '0'], true)) {
             return match (mb_strtolower($type)) {
                 'int', 'integer' => (int) $value,
                 'float', 'double', 'real' => (float) $value,
@@ -33835,7 +33959,7 @@ if (! function_exists('cast_value')) {
                 'array' => (array) $value,
                 'object' => (object) $value,
                 'null' => null,
-                default => throw new InvalidArgumentException("Unsupported type: {$type}"),
+                default => throw new InvalidArgumentException('Unsupported type: ' . $type),
             };
         }
 
