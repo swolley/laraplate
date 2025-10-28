@@ -98,7 +98,7 @@ namespace Modules\Cms\Models{
  * @property int $id
  * @property int|null $user_id The user that the author belongs to
  * @property int $entity_id
- * @property int $preset_id The preset that the author belongs to
+ * @property int $presettable_id
  * @property string $name The name of the author
  * @property array $components The author contents
  * @property \Carbon\CarbonImmutable $created_at
@@ -111,7 +111,7 @@ namespace Modules\Cms\Models{
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read bool $can_login
  * @property-read bool $is_signature
@@ -121,7 +121,8 @@ namespace Modules\Cms\Models{
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Modules\Cms\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read mixed $modified_by
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -140,7 +141,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
@@ -160,7 +161,7 @@ namespace Modules\Cms\Models{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the category belongs to
+ * @property int $presettable_id
  * @property int|null $parent_id
  * @property string $name The name of the category
  * @property string $slug The slug of the category
@@ -202,7 +203,8 @@ namespace Modules\Cms\Models{
  * @property-read mixed $modified_by
  * @property-read \Modules\Cms\Models\Category|null $parent
  * @property-read string $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $title
@@ -279,7 +281,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereOrderColumn($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
- * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePresetId($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePresettableId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSlug($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidFrom($value)
@@ -303,7 +305,7 @@ namespace Modules\Cms\Models{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the content belongs to
+ * @property int $presettable_id
  * @property string $title The title of the content
  * @property array $components The content contents
  * @property string $slug The slug of the content
@@ -327,7 +329,7 @@ namespace Modules\Cms\Models{
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read string $textual_only
@@ -341,7 +343,8 @@ namespace Modules\Cms\Models{
  * @property-read int|null $modifications_count
  * @property-read mixed $modified_by
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -378,7 +381,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereUpdatedAt($value)
@@ -401,7 +404,7 @@ namespace Modules\Cms\Models\Contents{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the content belongs to
+ * @property int $presettable_id
  * @property string $title The title of the content
  * @property array $components The content contents
  * @property string $slug The slug of the content
@@ -425,7 +428,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read string $textual_only
@@ -439,7 +442,8 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $modifications_count
  * @property-read mixed $modified_by
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -476,7 +480,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Article whereUpdatedAt($value)
@@ -499,7 +503,7 @@ namespace Modules\Cms\Models\Contents{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the content belongs to
+ * @property int $presettable_id
  * @property string $title The title of the content
  * @property array $components The content contents
  * @property string $slug The slug of the content
@@ -523,7 +527,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read string $textual_only
@@ -537,7 +541,8 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $modifications_count
  * @property-read mixed $modified_by
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -574,7 +579,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Event whereUpdatedAt($value)
@@ -597,7 +602,7 @@ namespace Modules\Cms\Models\Contents{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the content belongs to
+ * @property int $presettable_id
  * @property string $title The title of the content
  * @property array $components The content contents
  * @property string $slug The slug of the content
@@ -621,7 +626,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read string $textual_only
@@ -635,7 +640,8 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $modifications_count
  * @property-read mixed $modified_by
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -672,7 +678,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Multimedia whereUpdatedAt($value)
@@ -695,7 +701,7 @@ namespace Modules\Cms\Models\Contents{
 /**
  * @property int $id
  * @property int $entity_id
- * @property int $preset_id The preset that the content belongs to
+ * @property int $presettable_id
  * @property string $title The title of the content
  * @property array $components The content contents
  * @property string $slug The slug of the content
@@ -719,7 +725,7 @@ namespace Modules\Cms\Models\Contents{
  * @property-read mixed $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
  * @property-read int|null $embeddings_count
- * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read array|null $preview
  * @property-read string $textual_only
@@ -733,7 +739,8 @@ namespace Modules\Cms\Models\Contents{
  * @property-read int|null $modifications_count
  * @property-read mixed $modified_by
  * @property-read mixed $path
- * @property-read \Modules\Cms\Models\Preset $preset
+ * @property-read mixed $preset
+ * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read int|null $tags_count
  * @property-read mixed $type
@@ -770,7 +777,7 @@ namespace Modules\Cms\Models\Contents{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereLockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereOrderColumn($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey wherePresettableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Contents\Survey whereUpdatedAt($value)
@@ -1120,6 +1127,32 @@ namespace Modules\Cms\Models\Pivot{
  */
 	#[\AllowDynamicProperties]
 	final class IdeHelperLocatable {}
+}
+
+namespace Modules\Cms\Models\Pivot{
+/**
+ * @property int $id
+ * @property int $preset_id The preset that the entity preset relation belongs to
+ * @property int $entity_id The entity that the entity preset relation belongs to
+ * @property \Carbon\CarbonImmutable|null $deleted_at
+ * @property bool $is_deleted Whether the entity is deleted
+ * @property-read \Modules\Cms\Models\Entity $entity
+ * @property-read \Modules\Cms\Models\Preset $preset
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable whereEntityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable wherePresetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable withoutTrashed()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperPresettable {}
 }
 
 namespace Modules\Cms\Models\Pivot{
