@@ -19,7 +19,7 @@
                 "max_children": 100,
                 // "max_data": 2048,
                 "max_depth": 5
-            }
+            },
         }
     ]
 }
