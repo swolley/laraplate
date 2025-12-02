@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.35.0.
+ * Generated for Laravel 12.38.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -3822,7 +3822,7 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Disconnect the given disk and remove from local cache.
+         * Disconnect the given driver / connection and remove it from local cache.
          *
          * @param string|null $name
          * @return void
@@ -5355,7 +5355,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function lock($name, $seconds = 0, $owner = null)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\FailoverStore $instance */
             return $instance->lock($name, $seconds, $owner);
         }
 
@@ -5369,7 +5369,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function restoreLock($name, $owner)
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\FailoverStore $instance */
             return $instance->restoreLock($name, $owner);
         }
 
@@ -5381,7 +5381,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function flush()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\FailoverStore $instance */
             return $instance->flush();
         }
 
@@ -5393,70 +5393,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function flushStaleTags()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\FailoverStore $instance */
             $instance->flushStaleTags();
-        }
-
-        /**
-         * Get the Redis connection instance.
-         *
-         * @return \Illuminate\Redis\Connections\Connection
-         * @static
-         */
-        public static function connection()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->connection();
-        }
-
-        /**
-         * Get the Redis connection instance that should be used to manage locks.
-         *
-         * @return \Illuminate\Redis\Connections\Connection
-         * @static
-         */
-        public static function lockConnection()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->lockConnection();
-        }
-
-        /**
-         * Specify the name of the connection that should be used to store data.
-         *
-         * @param string $connection
-         * @return void
-         * @static
-         */
-        public static function setConnection($connection)
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            $instance->setConnection($connection);
-        }
-
-        /**
-         * Specify the name of the connection that should be used to manage locks.
-         *
-         * @param string $connection
-         * @return \Illuminate\Cache\RedisStore
-         * @static
-         */
-        public static function setLockConnection($connection)
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->setLockConnection($connection);
-        }
-
-        /**
-         * Get the Redis database instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            return $instance->getRedis();
         }
 
         /**
@@ -5467,21 +5405,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function getPrefix()
         {
-            /** @var \Illuminate\Cache\RedisStore $instance */
+            /** @var \Illuminate\Cache\FailoverStore $instance */
             return $instance->getPrefix();
-        }
-
-        /**
-         * Set the cache key prefix.
-         *
-         * @param string $prefix
-         * @return void
-         * @static
-         */
-        public static function setPrefix($prefix)
-        {
-            /** @var \Illuminate\Cache\RedisStore $instance */
-            $instance->setPrefix($prefix);
         }
 
             }
@@ -5705,6 +5630,7 @@ namespace Illuminate\Support\Facades {
          * @param string $key
          * @param (\Closure():(string|null))|string|null $default
          * @return string
+         * @throws \InvalidArgumentException
          * @static
          */
         public static function string($key, $default = null)
@@ -5719,6 +5645,7 @@ namespace Illuminate\Support\Facades {
          * @param string $key
          * @param (\Closure():(int|null))|int|null $default
          * @return int
+         * @throws \InvalidArgumentException
          * @static
          */
         public static function integer($key, $default = null)
@@ -5733,6 +5660,7 @@ namespace Illuminate\Support\Facades {
          * @param string $key
          * @param (\Closure():(float|null))|float|null $default
          * @return float
+         * @throws \InvalidArgumentException
          * @static
          */
         public static function float($key, $default = null)
@@ -5747,6 +5675,7 @@ namespace Illuminate\Support\Facades {
          * @param string $key
          * @param (\Closure():(bool|null))|bool|null $default
          * @return bool
+         * @throws \InvalidArgumentException
          * @static
          */
         public static function boolean($key, $default = null)
@@ -5761,6 +5690,7 @@ namespace Illuminate\Support\Facades {
          * @param string $key
          * @param (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null $default
          * @return array<array-key, mixed>
+         * @throws \InvalidArgumentException
          * @static
          */
         public static function array($key, $default = null)
@@ -7846,7 +7776,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Register a database query listener with the connection.
          *
-         * @param \Closure $callback
+         * @param \Closure(\Illuminate\Database\Events\QueryExecuted) $callback
          * @return void
          * @static
          */
@@ -9481,10 +9411,10 @@ namespace Illuminate\Support\Facades {
          * @return \Symfony\Component\Finder\SplFileInfo[]
          * @static
          */
-        public static function files($directory, $hidden = false)
+        public static function files($directory, $hidden = false, $depth = 0)
         {
             /** @var \Illuminate\Filesystem\Filesystem $instance */
-            return $instance->files($directory, $hidden);
+            return $instance->files($directory, $hidden, $depth);
         }
 
         /**
@@ -9508,10 +9438,22 @@ namespace Illuminate\Support\Facades {
          * @return array
          * @static
          */
-        public static function directories($directory)
+        public static function directories($directory, $depth = 0)
         {
             /** @var \Illuminate\Filesystem\Filesystem $instance */
-            return $instance->directories($directory);
+            return $instance->directories($directory, $depth);
+        }
+
+        /**
+         * Get all the directories within a given directory (recursive).
+         *
+         * @return array
+         * @static
+         */
+        public static function allDirectories($directory)
+        {
+            /** @var \Illuminate\Filesystem\Filesystem $instance */
+            return $instance->allDirectories($directory);
         }
 
         /**
@@ -10334,7 +10276,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Http\Client\Response patch(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static \Illuminate\Http\Client\Response put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static \Illuminate\Http\Client\Response delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
-     * @method static array pool(callable $callback)
+     * @method static array pool(callable $callback, int|null $concurrency = null)
      * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
      * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
      * @method static \GuzzleHttp\Client buildClient()
@@ -13405,116 +13347,6 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Get the number of queue jobs that are ready to process.
-         *
-         * @param string|null $queue
-         * @return int
-         * @static
-         */
-        public static function readyNow($queue = null)
-        {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->readyNow($queue);
-        }
-
-        /**
-         * Migrate the delayed jobs that are ready to the regular queue.
-         *
-         * @param string $from
-         * @param string $to
-         * @return void
-         * @static
-         */
-        public static function migrateExpiredJobs($from, $to)
-        {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            $instance->migrateExpiredJobs($from, $to);
-        }
-
-        /**
-         * Delete a reserved job from the queue.
-         *
-         * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
-         * @return void
-         * @static
-         */
-        public static function deleteReserved($queue, $job)
-        {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            $instance->deleteReserved($queue, $job);
-        }
-
-        /**
-         * Delete a reserved job from the reserved queue and release it.
-         *
-         * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
-         * @param int $delay
-         * @return void
-         * @static
-         */
-        public static function deleteAndRelease($queue, $job, $delay)
-        {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            $instance->deleteAndRelease($queue, $job, $delay);
-        }
-
-        /**
-         * Delete all of the jobs from the queue.
-         *
-         * @param string $queue
-         * @return int
-         * @static
-         */
-        public static function clear($queue)
-        {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->clear($queue);
-        }
-
-        /**
-         * Get the queue or return the default.
-         *
-         * @param string|null $queue
-         * @return string
-         * @static
-         */
-        public static function getQueue($queue)
-        {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->getQueue($queue);
-        }
-
-        /**
-         * Get the connection for the queue.
-         *
-         * @return \Illuminate\Redis\Connections\Connection
-         * @static
-         */
-        public static function getConnection()
-        {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Get the underlying Redis instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->getRedis();
-        }
-
-        /**
          * Get the maximum number of attempts for an object-based queue handler.
          *
          * @param mixed $job
@@ -13524,7 +13356,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -13538,7 +13370,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -13552,7 +13384,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -13566,7 +13398,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Laravel\Horizon\RedisQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\FailoverQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -13578,7 +13410,7 @@ namespace Illuminate\Support\Facades {
         public static function getConfig()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->getConfig();
         }
 
@@ -13586,13 +13418,13 @@ namespace Illuminate\Support\Facades {
          * Set the queue configuration array.
          *
          * @param array $config
-         * @return \Laravel\Horizon\RedisQueue
+         * @return \Illuminate\Queue\FailoverQueue
          * @static
          */
         public static function setConfig($config)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->setConfig($config);
         }
 
@@ -13605,7 +13437,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13619,7 +13451,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\FailoverQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -19762,6 +19594,31 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the previous route name from the session.
+         *
+         * @return string|null
+         * @static
+         */
+        public static function previousRoute()
+        {
+            /** @var \Illuminate\Session\Store $instance */
+            return $instance->previousRoute();
+        }
+
+        /**
+         * Set the "previous" route name in the session.
+         *
+         * @param string|null $route
+         * @return void
+         * @static
+         */
+        public static function setPreviousRoute($route)
+        {
+            /** @var \Illuminate\Session\Store $instance */
+            $instance->setPreviousRoute($route);
+        }
+
+        /**
          * Specify that the user has confirmed their password.
          *
          * @return void
@@ -23204,11 +23061,6 @@ namespace AnourValar\EloquentSerialize\Facades {
 
 namespace Laravel\Socialite\Facades {
     /**
-     * @method array getScopes()
-     * @method \Laravel\Socialite\Contracts\Provider scopes(array|string $scopes)
-     * @method \Laravel\Socialite\Contracts\Provider setScopes(array|string $scopes)
-     * @method \Laravel\Socialite\Contracts\Provider redirectUrl(string $url)
-     * @see \Laravel\Socialite\SocialiteManager
      */
     class Socialite extends \Illuminate\Support\Manager {
         /**
@@ -24259,6 +24111,59 @@ namespace Nwidart\Modules\Facades {
 
 namespace Illuminate\Support {
     /**
+     * @template TKey of array-key
+     * @template-covariant TValue
+     * @implements \ArrayAccess<TKey, TValue>
+     * @implements \Illuminate\Support\Enumerable<TKey, TValue>
+     */
+    class Collection {
+        /**
+         * @see \Modules\Cms\Models\Content::registerModelEvent()
+         * @static
+         */
+        public static function searchable()
+        {
+            return \Illuminate\Support\Collection::searchable();
+        }
+
+        /**
+         * @see \Modules\Cms\Models\Content::withoutRecursion()
+         * @static
+         */
+        public static function unsearchable()
+        {
+            return \Illuminate\Support\Collection::unsearchable();
+        }
+
+        /**
+         * @see \Modules\Cms\Models\Content::resolveObserveAttributes()
+         * @static
+         */
+        public static function searchableSync()
+        {
+            return \Illuminate\Support\Collection::searchableSync();
+        }
+
+        /**
+         * @see \Modules\Cms\Models\Content::forceDelete()
+         * @static
+         */
+        public static function unsearchableSync()
+        {
+            return \Illuminate\Support\Collection::unsearchableSync();
+        }
+
+        /**
+         * @see \Modules\Cms\Models\Content::performUpdate()
+         * @static
+         */
+        public static function withSearchableRelations()
+        {
+            return \Illuminate\Support\Collection::withSearchableRelations();
+        }
+
+            }
+    /**
      */
     class Str {
         /**
@@ -24270,17 +24175,6 @@ namespace Illuminate\Support {
         public static function sanitizeHtml($html)
         {
             return \Illuminate\Support\Str::sanitizeHtml($html);
-        }
-
-        /**
-         * @see \Filament\Support\SupportServiceProvider::packageBooted()
-         * @param string $value
-         * @return string
-         * @static
-         */
-        public static function ucwords($value)
-        {
-            return \Illuminate\Support\Str::ucwords($value);
         }
 
             }
@@ -24295,16 +24189,6 @@ namespace Illuminate\Support {
         public static function sanitizeHtml()
         {
             return \Illuminate\Support\Stringable::sanitizeHtml();
-        }
-
-        /**
-         * @see \Filament\Support\SupportServiceProvider::packageBooted()
-         * @return \Illuminate\Support\Stringable
-         * @static
-         */
-        public static function ucwords()
-        {
-            return \Illuminate\Support\Stringable::ucwords();
         }
 
             }
@@ -24790,6 +24674,43 @@ namespace Illuminate\Database\Eloquent\Relations {
             return \Illuminate\Database\Eloquent\Relations\Relation::getPowerJoinExistenceCompareKey();
         }
 
+        /**
+         * @see \Laravel\Scout\SearchableScope::extend()
+         * @param mixed $chunk
+         * @static
+         */
+        public static function searchable($chunk = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\Relation::searchable($chunk);
+        }
+
+        /**
+         * @see \Laravel\Scout\SearchableScope::extend()
+         * @param mixed $chunk
+         * @static
+         */
+        public static function unsearchable($chunk = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\Relation::unsearchable($chunk);
+        }
+
+            }
+    /**
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
+     */
+    class HasManyThrough extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough {
+            }
+    /**
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @template TResult
+     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TIntermediateModel, TResult>
+     */
+    class HasOneOrManyThrough extends \Illuminate\Database\Eloquent\Relations\Relation {
             }
     }
 
@@ -24816,6 +24737,7 @@ namespace Illuminate\Cache {
         /**
          * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
          * @param mixed $args
+         * @return mixed|null
          * @static
          */
         public static function tryByRequest(...$args)
@@ -24825,47 +24747,55 @@ namespace Illuminate\Cache {
 
         /**
          * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * @param mixed $entity
+         * @return void
          * @static
          */
-        public static function clearByEntity(...$args)
+        public static function clearByEntity($entity)
         {
-            return \Illuminate\Cache\Repository::clearByEntity(...$args);
+            \Illuminate\Cache\Repository::clearByEntity($entity);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $request
+         * @param mixed $entity
+         * @return void
+         * @static
+         */
+        public static function clearByRequest($request, $entity = null)
+        {
+            \Illuminate\Cache\Repository::clearByRequest($request, $entity);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $request
+         * @param mixed $entity
+         * @return void
+         * @static
+         */
+        public static function clearByUser($request, $entity = null)
+        {
+            \Illuminate\Cache\Repository::clearByUser($request, $entity);
+        }
+
+        /**
+         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
+         * @param mixed $role
+         * @param mixed $entity
+         * @return void
+         * @static
+         */
+        public static function clearByGroup($role, $entity = null)
+        {
+            \Illuminate\Cache\Repository::clearByGroup($role, $entity);
         }
 
         /**
          * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
          * @param mixed $args
-         * @static
-         */
-        public static function clearByRequest(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByRequest(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByUser(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByUser(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
-         * @static
-         */
-        public static function clearByGroup(...$args)
-        {
-            return \Illuminate\Cache\Repository::clearByGroup(...$args);
-        }
-
-        /**
-         * @see \Modules\Core\Providers\CoreServiceProvider::registerCache()
-         * @param mixed $args
+         * @return array
          * @static
          */
         public static function getCacheTags(...$args)
@@ -24873,10 +24803,6 @@ namespace Illuminate\Cache {
             return \Illuminate\Cache\Repository::getCacheTags(...$args);
         }
 
-            }
-    /**
-     */
-    class RedisTaggedCache extends \Illuminate\Cache\TaggedCache {
             }
     /**
      */
@@ -27647,6 +27573,26 @@ namespace Staudenmeir\LaravelCte\Query {
     /**
      */
     class Builder extends \Illuminate\Database\Query\Builder {
+            }
+    }
+
+namespace Illuminate\Database\Eloquent {
+    /**
+     * @template TKey of array-key
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @extends \Illuminate\Support\Collection<TKey, TModel>
+     */
+    class Collection extends \Illuminate\Support\Collection {
+            }
+    }
+
+namespace Spatie\MediaLibrary\MediaCollections\Models\Collections {
+    /**
+     * @template TKey of array-key
+     * @template TModel of \Spatie\MediaLibrary\MediaCollections\Models\Media
+     * @extends Collection<TKey, TModel>
+     */
+    class MediaCollection extends \Illuminate\Database\Eloquent\Collection {
             }
     }
 
@@ -32955,11 +32901,6 @@ namespace  {
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 namespace {
     
