@@ -145,7 +145,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laraplate')) . ':'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laraplate')) . ':'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
@@ -165,7 +165,7 @@ return [
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laraplate')) . ':cache:'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laraplate')) . ':cache:'),
         ],
 
         'queues' => [
@@ -175,7 +175,7 @@ return [
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_QUEUE_DB', '2'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laraplate')) . ':queues:'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laraplate')) . ':queues:'),
         ],
 
         'sessions' => [
@@ -185,7 +185,7 @@ return [
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_SESSION_DB', '3'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laraplate')) . ':sessions:'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laraplate')) . ':sessions:'),
         ],
     ],
 ];

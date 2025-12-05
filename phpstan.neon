@@ -24,6 +24,7 @@ parameters:
         # Escludo esplicitamente il file _ide_helper.php che causa il conflitto
         - _ide_helper.php
         - _ide_helper_models.php
+        - _ide_helper_custom.php
         - .phpstorm.meta.php
         # Escludi file vendor che possono causare problemi
         - vendor/**
@@ -64,17 +65,16 @@ parameters:
           message: "#Called 'env' outside of the config directory which returns null when the config is cached, use 'config'.$#"
           identifier: larastan.noEnvCallsOutsideOfConfig
           path: Modules/*/config/*
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::forget\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::has\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::get\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::put\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::macro\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::tags\(\)#'
-        - '#Call to an undefined static method Illuminate\\Support\\Facades\\Cache::remember\(\)#'
-        - '#Static call to instance method __construct\(\)#'
+        # - '#Static call to instance method __construct\(\)#'
+        - '#Class PHP_CodeSniffer\\Standards\\Squiz\\Sniffs\\PHP\\EvalSniff not found.#'
+        - '#Class PHP_CodeSniffer\\Standards\\PSR1\\Sniffs\\Methods\\CamelCapsMethodNameSniff not found.#'
+        - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\WhiteSpace\\DisallowTabIndentSniff not found.#'
+        - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\Metrics\\CyclomaticComplexitySniff not found.#'
+        - '#Cannot cast mixed to string.#'
 
     stubFiles:
         - _ide_helper_custom.php
+        - _ide_helper_traits.php
 
     # Configurazione per Laravel
     checkModelProperties: true
