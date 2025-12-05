@@ -8,7 +8,6 @@ use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRecto
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
 
-$modules = array_filter(glob(__DIR__ . '/Modules/*'), 'is_dir');
 $paths = array_merge(
     [
         __DIR__ . '/app',
@@ -19,7 +18,7 @@ $paths = array_merge(
         __DIR__ . '/routes',
         __DIR__ . '/tests',
     ],
-    array_map(fn ($module) => "{$module}/app", $modules),
+    array_map(fn ($module) => "{$module}/app", glob(__DIR__ . '/Modules/*', GLOB_ONLYDIR) ?: []),
 );
 
 return RectorConfig::configure()
