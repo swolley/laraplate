@@ -128,6 +128,7 @@ namespace Modules\Cms\Models{
  * @property-read mixed $path
  * @property-read mixed $preset
  * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
+ * @property-write mixed $component
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read mixed $slug
  * @property-read int|null $tags_count
@@ -169,6 +170,23 @@ namespace Modules\Cms\Models{
 
 namespace Modules\Cms\Models{
 /**
+ * @mixin \Modules\Core\Helpers\HasTranslations
+ * @mixin \Modules\Cms\Helpers\HasDynamicContents
+ * @mixin \Modules\Cms\Helpers\HasTranslatedDynamicContents
+ * @mixin \Modules\Core\Helpers\HasValidations
+ * @mixin \Modules\Core\Helpers\SoftDeletes
+ * @mixin \Modules\Cms\Helpers\HasSlug
+ * @mixin \Modules\Cms\Helpers\HasPath
+ * @mixin \Modules\Core\Helpers\SortableTrait
+ * @mixin \Spatie\EloquentSortable\SortableTrait
+ * @method void setHighestOrderNumber() Set the highest order number
+ * @method int getHighestOrderNumber() Get the highest order number
+ * @method int getLowestOrderNumber() Get the lowest order number
+ * @method \Illuminate\Database\Eloquent\Builder scopeOrdered(\Illuminate\Database\Eloquent\Builder $query, string $direction = 'asc') Scope to order by order column
+ * @method static void setNewOrder(array|\ArrayAccess $ids, int $startOrder = 1, ?string $primaryKeyColumn = null, ?callable $modifyQuery = null) Set new order for multiple models
+ * @method bool shouldSortWhenCreating() Check if should sort when creating
+ * @method string determineOrderColumnName() Determine the order column name
+ * @method \Illuminate\Database\Eloquent\Builder buildSortQuery() Build query for sorting
  * @property int $id
  * @property int $entity_id
  * @property int $presettable_id
@@ -214,6 +232,7 @@ namespace Modules\Cms\Models{
  * @property-read string $path
  * @property-read mixed $preset
  * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
+ * @property-write mixed $component
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read mixed $slug
  * @property-read int|null $tags_count
@@ -314,6 +333,22 @@ namespace Modules\Cms\Models{
 
 namespace Modules\Cms\Models{
 /**
+ * @mixin \Modules\Core\Helpers\HasTranslations
+ * @mixin \Modules\Cms\Helpers\HasDynamicContents
+ * @mixin \Modules\Cms\Helpers\HasTranslatedDynamicContents
+ * @mixin \Modules\Core\Helpers\HasValidations
+ * @mixin \Modules\Core\Helpers\HasApprovals
+ * @mixin \Modules\Core\Helpers\HasVersions
+ * @mixin \Modules\Core\Helpers\HasValidity
+ * @mixin \Modules\Core\Helpers\SoftDeletes
+ * @mixin \Modules\Core\Search\Traits\Searchable
+ * @mixin \Modules\Cms\Helpers\HasSlug
+ * @mixin \Modules\Cms\Helpers\HasPath
+ * @mixin \Modules\Cms\Helpers\HasTags
+ * @mixin \Modules\Cms\Helpers\HasMultimedia
+ * @mixin \Modules\Core\Locking\Traits\HasLocks
+ * @mixin \Modules\Core\Locking\HasOptimisticLocking
+ * @mixin \Modules\Core\Helpers\SortableTrait
  * @property int $id
  * @property int $entity_id
  * @property int $presettable_id
@@ -355,6 +390,7 @@ namespace Modules\Cms\Models{
  * @property-read mixed $path
  * @property-read mixed $preset
  * @property-read \Modules\Cms\Models\Pivot\Presettable $presettable
+ * @property-write mixed $component
  * @property \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Tag> $tags
  * @property-read mixed $slug
  * @property-read int|null $tags_count
@@ -849,6 +885,12 @@ namespace Modules\Cms\Models{
 
 namespace Modules\Cms\Models{
 /**
+ * @mixin \Modules\Core\Helpers\HasTranslations
+ * @mixin \Modules\Core\Helpers\HasValidations
+ * @mixin \Modules\Core\Helpers\SoftDeletes
+ * @mixin \Modules\Cms\Helpers\HasSlug
+ * @mixin \Modules\Cms\Helpers\HasPath
+ * @mixin \Modules\Core\Helpers\SortableTrait
  * @property int $id
  * @property string|null $type The type of the tag
  * @property int $order_column The order of the tag
