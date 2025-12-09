@@ -23,8 +23,6 @@ parameters:
     excludePaths:
         # Escludo esplicitamente il file _ide_helper.php che causa il conflitto
         - _ide_helper.php
-        - _ide_helper_models.php
-        - _ide_helper_custom.php
         - .phpstorm.meta.php
         # Escludi file vendor che possono causare problemi
         - vendor/**
@@ -71,10 +69,12 @@ parameters:
         - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\WhiteSpace\\DisallowTabIndentSniff not found.#'
         - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\Metrics\\CyclomaticComplexitySniff not found.#'
         - '#Cannot cast mixed to string.#'
+        - '#PHPDoc tag @mixin contains unknown class.*IdeHelper.*#'
 
     stubFiles:
         - _ide_helper_custom.php
         - _ide_helper_traits.php
+        - _ide_helper_models.php
 
     # Configurazione per Laravel
     checkModelProperties: true
