@@ -14,8 +14,6 @@ abstract class TestCase extends BaseTestCase
      */
     public function createApplication(): Application
     {
-        $app = require __DIR__ . '/../bootstrap/app.php';
-
-        return $app;
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

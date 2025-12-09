@@ -44,7 +44,7 @@ final class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(fn () => sprintf('%s %s', (string) (config('app.name')), (string) (__('Admin'))))
+            ->brandName(fn (): string => sprintf('%s %s', (string) (config('app.name')), (string) (__('Admin'))))
             // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)
