@@ -69,6 +69,9 @@ namespace Modules\Core\Search\Traits {
      * @method void searchable() Make the model searchable
      * @method void unsearchable() Make the model unsearchable
      * @method \Illuminate\Database\Eloquent\Builder|\Laravel\Scout\Builder search(string $query) Search for models
+     * @method string searchableAs() Get the index name for the model
+     * @method \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder makeSearchable() Make the model searchable
+     * @method void makeUnsearchable() Make the model unsearchable
      */
     trait Searchable {}
 }
