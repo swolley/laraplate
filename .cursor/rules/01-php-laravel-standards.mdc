@@ -24,6 +24,7 @@
 - Use Laravel's query builder for complex database operations
 - Create and maintain proper database migrations and seeders
 - Implement database indexing and use Laravel's query optimization features for better performance
+- Use cache, singletons and optimize ways of retrieving data
 
 ## Code Style and Structure
 - Write concise, technical PHP code with accurate PHP/Laravel examples
