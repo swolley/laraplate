@@ -21,11 +21,13 @@
 ### Technology Stack
 - **Framework**: Laravel 12.0+ with PHP 8.5+
 - **Modules**: nwidart/laravel-modules for modular architecture
-- **Admin Panel**: Filament4.0+ for admin interface
-- **Database**: MySQL/PostgreSQL with Eloquent ORM, maintain compatibility for oracle database if whenever it's possible
-- **Cache**: Redis for caching and session storage
-- **Testing**: PestPHP with comprehensive coverage
-- **Code Quality**: Pint, PHPStan, Rector for static analysis
+- **Admin Panel**: Filament 4.0+ for admin interface
+- **Database**: **Maintain compatibility for MySQL, PostgreSQL, SQLite, and Oracle (whenever possible)** - use Eloquent ORM abstractions
+- **Cache**: Use database, file, or array cache drivers - maintain compatibility across different cache backends
+- **Queues**: Use Laravel Queues extensively for background processing, embedding generation, and media processing
+- **Embeddings**: Implement AI-powered embeddings for semantic search using queued jobs
+- **Testing**: PestPHP with comprehensive coverage - every change must be tested
+- **Code Quality**: Pint (always run before finalizing), PHPStan, Rector for static analysis
 
 ## Application Architecture
 - **Modular Architecture**: This is a Laravel Modules application using `nwidart/laravel-modules`
@@ -125,11 +127,25 @@
 - **API Versioning**: Implement versioning for API endpoints
 - **Authentication**: Use Laravel Sanctum for API authentication
 
+## Embeddings and AI-Powered Search
+- **Embedding Generation**: Use `GenerateEmbeddingsJob` for async embedding creation
+- **Queue Processing**: Always dispatch embedding jobs to queues - never generate embeddings synchronously in request handlers
+- **Model Embeddings**: Store embeddings in `ModelEmbedding` model with polymorphic relationship
+- **Vector Search**: Implement semantic search using embeddings for AI-powered content discovery
+- **Text Preparation**: Use `prepareTextForEmbedding()` method to extract and format text from models
+- **Configuration**: Configure embedding provider, dimension, and model connection via environment variables
+- **Rate Limiting**: Apply rate limiting to embedding queue to prevent API throttling
+
 ## Performance and Caching
-- **Redis**: Use Redis for caching and session storage
+- **Caching**: Use database, file, or array cache drivers - maintain compatibility across different cache backends
 - **Queue Management**: Use Laravel Horizon for queue monitoring
-- **Media Processing**: Use queues for media file processing
-- **Database Optimization**: Use proper indexing and query optimization
+- **Background Processing**: Always use queues for time-consuming operations:
+  - Media file processing (uploads, resizing, transformations)
+  - Embedding generation for AI-powered search
+  - Email sending
+  - Any operation that could block the request
+- **Embeddings**: Implement AI-powered embeddings using queued jobs (`GenerateEmbeddingsJob`) for semantic search capabilities
+- **Database Optimization**: Use proper indexing and query optimization - maintain compatibility across database engines
 
 ## Security Considerations
 - **Authentication**: Use Laravel's built-in authentication with module-specific models

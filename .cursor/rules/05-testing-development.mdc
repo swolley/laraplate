@@ -1,23 +1,41 @@
 # Testing and Development
 
 ## Testing Strategy
+- **Every change must be programmatically tested**: Write a new test or update an existing test, then run the affected tests to make sure they pass
 - Ensure Comprehensive Testing: Implement thorough testing strategies, including unit tests, integration tests, and end-to-end tests as appropriate for the project
-- Implement comprehensive testing using Pest and Laravel Dusk for unit, feature, and browser tests
-- Use PestPHP for testing
+- Implement comprehensive testing using Pest for unit, feature, and browser tests
+- **Use PestPHP for all testing** - use `php artisan make:test --pest <name>` to create tests
 - **Test Coverage**: Aim for 100% type coverage using `composer test:type-coverage`
 - **Module Testing**: Create tests within each module's `tests/` directory
-- **Test Organization**: Use `Feature/` and `Unit/` directories within each module
-- **Test Data**: Use factories for generating test data
+- **Test Organization**: Use `Feature/` and `Unit/` directories within each module - most tests should be feature tests
+- **Test Data**: Use factories for generating test data - check if factories have custom states before manually setting up models
 - **Test Isolation**: Ensure tests are independent and don't affect each other
+- **Test All Paths**: Tests should test all of the happy paths, failure paths, and weird paths
+- **Run Minimal Tests**: Run the minimum number of tests needed to ensure code quality and speed - use `php artisan test` with specific filename or filter
 
 ## Development Tools
 - Use Laravel Telescope for debugging and performance monitoring in development
-- Leverage Laravel Nova or Filament for rapid admin panel development
+- Leverage Filament for rapid admin panel development
 - Use Laravel's built-in features and helpers to maximize efficiency
 - Use IDE Helper for better code completion and navigation
-- Use Laravel Pint for code style enforcement
-- Use PHPStan for static analysis
+- **Always run Laravel Pint before finalizing changes**: Use `vendor/bin/pint --dirty` to ensure code matches the project's expected style
+- Use PHPStan (Larastan) for static analysis
 - Use Rector for automated code refactoring
+
+## Static Analysis Suppressions
+- **When bypassing PHPStan/Pint is unavoidable**, use comments and attributes to provide more specific type information
+- **PHPStan Suppressions**: Use targeted suppressions with error codes:
+  - `@phpstan-ignore property.uninitializedReadonly` for readonly properties
+  - `@phpstan-ignore-next-line` for specific lines
+  - Always document why the suppression is necessary
+- **PHPDoc Enhancements**: Enhance type information with detailed PHPDoc:
+  - `@param Collection<string> $items` for generic collections
+  - `@var TestCase $this` for test context
+  - Array shapes: `@param array{id: int, name: string} $data`
+- **Attributes**: Use PHP 8 attributes for additional type safety:
+  - `#[Override]` when overriding parent methods
+  - Laravel attributes for validation and routing
+- **Document Suppressions**: Always add a comment explaining why a suppression is needed
 
 ## Code Quality
 - Enhance Code Maintainability: Write self-documenting code, provide clear comments
