@@ -11,14 +11,15 @@
 ## Laravel Best Practices
 - Implement Repository and Service patterns for better code organization and reusability
 - Utilize Laravel's built-in authentication and authorization features (Sanctum, Policies)
-- Leverage Laravel's caching mechanisms (Redis, Memcached) for improved performance
-- Use job queues and Laravel Horizon for handling long-running tasks and background processing
-- Implement comprehensive testing using Pest and Laravel Dusk for unit, feature, and browser tests
+- Leverage Laravel's caching mechanisms (database, file, array) for improved performance - maintain compatibility across different cache drivers
+- **Use job queues and Laravel Horizon for handling long-running tasks and background processing** - always prefer queues for time-consuming operations
+- **Use queued jobs for embedding generation and AI-powered features** - implement `ShouldQueue` interface for async processing
+- Implement comprehensive testing using Pest for unit, feature, and browser tests
 - Use API resources and versioning for building robust and maintainable APIs
 - Implement proper error handling and logging using Laravel's exception handler and logging facade
 - Utilize Laravel's validation features, including Form Requests, for data integrity
 - Use Laravel Telescope for debugging and performance monitoring in development
-- Leverage Laravel Nova or Filament for rapid admin panel development
+- Leverage Filament for rapid admin panel development
 - Implement proper security measures, including CSRF protection, XSS prevention, and input sanitization
 
 ## Module Architecture
@@ -57,7 +58,9 @@
 - Ensure the REST API follows Laravel standards, using API Resources for structured and consistent responses
 - Leverage task scheduling and event listeners to automate recurring tasks and decouple logic
 - Implement database transactions using Laravel's database facade to ensure data consistency
+- **Maintain database compatibility**: Support MySQL, PostgreSQL, SQLite, and Oracle (whenever possible) - avoid database-specific features unless necessary
 - Use Eloquent ORM for database interactions, enforcing relationships and optimizing queries
 - Implement API versioning for maintainability and backward compatibility
-- Optimize performance with caching mechanisms like Redis and Memcached
+- **Use job queues extensively**: Dispatch jobs for background processing, embedding generation, media processing, and any time-consuming operations
+- **Implement embeddings for AI-powered search**: Use queued jobs to generate embeddings asynchronously, store them in the database, and leverage them for semantic search
 - Ensure robust error handling and logging using Laravel's exception handler and logging features 
