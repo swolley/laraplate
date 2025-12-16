@@ -18,7 +18,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "coolsam/modules": "^5.0",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^12.0",

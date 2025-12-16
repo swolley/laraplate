@@ -12,6 +12,7 @@
 		"toggleexcludedfiles.statusBar.enabled": false,
 		"[json]": {
 			"editor.defaultFormatter": "vscode.json-language-features"
-		}
+		},
+		"phpunit.phpunit": "vendor/bin/pest"
 	}
 }

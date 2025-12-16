@@ -10,6 +10,21 @@
 
 ## About Laraplate
 
+### Requirements
+
+-   PHP >= 8.5
+-   Laravel 12.x
+-   Composer merge-plugin for modular loading (`composer.*.json`, `Modules/*/composer.json`)
+-   Node.js for Vite build (`npm run dev` / `npm run build`)
+
+### Core Dependencies (project root)
+
+-   `laravel/framework` ^12
+-   `laravel/sanctum` ^4 for API auth
+-   `nwidart/laravel-modules` ^12 (<12.0.4) + `coolsam/modules` + `joshbrw/laravel-module-installer` for modular structure
+-   `spatie/fork` for parallel tasks
+-   `symfony/http-client` for HTTP integrations
+
 ### Install
 
 ```sh
@@ -24,8 +39,21 @@ php artisan module:seed --all
 
 ### Laraplate Modules
 
--   Core: main common boilerplate funzionalities. About [Core Module](https://github.com/swolley/laraplate-core).
--   Cms: common Cms funzionalities. About [Cms Module](https://github.com/swolley/laraplate-cms).
+-   Core: main common boilerplate functionalities. About [Core Module](https://github.com/swolley/laraplate-core).
+-   Cms: common Cms functionalities. About [Cms Module](https://github.com/swolley/laraplate-cms).
+
+### Environment (principali variabili)
+
+-   `APP_*`: ambiente, URL, porta, localizzazione, logo.
+-   `DB_*`: connessione (default `pgsql`), host/porta, credenziali.
+-   `SESSION_*`: driver (default `redis`), lifetime e dominio.
+-   `CACHE_STORE`, `QUEUE_CONNECTION`, `FILESYSTEM_DISK`, `BROADCAST_CONNECTION`: store/driver predefiniti (failover/redis/local/log).
+-   `REDIS_*`, `MEMCACHED_HOST`: configurazioni cache/sessioni.
+-   `LOG_*`: canale/stack/livello log.
+-   `MAIL_*`, `AWS_*`: mail e S3 (commentati di default).
+-   `ELASTICSEARCH_*`, `SCOUT_QUEUE`: ricerca avanzata (commentati o disattivati di default).
+-   `OPENAI_API_KEY`: chiave AI (commentata).
+-   Core toggles: `ENABLE_USER_REGISTRATION`, `ENABLE_SOCIAL_LOGIN`, `ENABLE_USER_LICENSES`, `ENABLE_USER_2FA`, `VERIFY_NEW_USER`, `ENABLE_DYNAMIC_ENTITIES`, `ENABLE_DYNAMIC_GRIDUTILS`, `EXPOSE_CRUD_API`, `FORCE_HTTPS`, `SOFT_DELETES_EXPIRATION_DAYS`, `VECTOR_SEARCH_ENABLED`, `VECTOR_SEARCH_PROVIDER`.
 
 <br>
 <br>
