@@ -19,10 +19,10 @@
 - **Development Tools**: IDE Helper, Pint, PHPStan, Rector for code quality
 
 ### Technology Stack
-- **Framework**: Laravel 12.0+ with PHP 8.4+
+- **Framework**: Laravel 12.0+ with PHP 8.5+
 - **Modules**: nwidart/laravel-modules for modular architecture
-- **Admin Panel**: Filament 3.3+ for admin interface
-- **Database**: MySQL/PostgreSQL with Eloquent ORM
+- **Admin Panel**: Filament4.0+ for admin interface
+- **Database**: MySQL/PostgreSQL with Eloquent ORM, maintain compatibility for oracle database if whenever it's possible
 - **Cache**: Redis for caching and session storage
 - **Testing**: PestPHP with comprehensive coverage
 - **Code Quality**: Pint, PHPStan, Rector for static analysis

@@ -16,7 +16,7 @@
     "endOfLine": "lf",
     "embeddedLanguageFormatting": "auto",
     "singleAttributePerLine": false,
-    "phpVersion": "8.4",
+    "phpVersion": "8.5",
     "trailingCommaPHP": true,
     "braceStyle": "psr-2",
     "plugins": [
@@ -28,22 +28,30 @@
             "options": {
                 "parser": "php",
                 "tabWidth": 4,
-                "phpVersion": "8.4",
+                "phpVersion": "8.5",
                 "trailingCommaPHP": true,
                 "braceStyle": "psr-2"
             }
         },
         {
-            "files": ["*.css", "*.scss", "*.less"],
+            "files": [
+                "*.css",
+                "*.scss",
+                "*.less"
+            ],
             "options": {
                 "tabWidth": 2
             }
         },
         {
-            "files": ["*.json", "*.yaml", "*.yml"],
+            "files": [
+                "*.json",
+                "*.yaml",
+                "*.yml"
+            ],
             "options": {
                 "tabWidth": 2
             }
         }
     ]
-} 
+}
