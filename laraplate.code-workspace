@@ -13,6 +13,7 @@
 		"[json]": {
 			"editor.defaultFormatter": "vscode.json-language-features"
 		},
-		"phpunit.phpunit": "vendor/bin/pest"
+		"phpunit.phpunit": "vendor/bin/pest",
+		"postman.settings.dotenv-detection-notification-visibility": false
 	}
 }
