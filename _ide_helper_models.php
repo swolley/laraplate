@@ -116,7 +116,7 @@ namespace Modules\Cms\Models{
  * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read bool $can_login
- * @property array $components
+ * @property array<string, mixed> $components
  * @property-read bool $is_signature
  * @property-read string $textual_only
  * @property-read \Modules\Core\Models\Version|null $lastVersion
@@ -216,7 +216,7 @@ namespace Modules\Cms\Models{
  * @property-read mixed $entity
  * @property-read \Modules\Core\Models\Version|null $firstVersion
  * @property-read mixed $full_name
- * @property array $components
+ * @property array<string, mixed> $components
  * @property-read array|null $preview
  * @property-read string $textual_only
  * @property-read mixed $ids
@@ -333,22 +333,6 @@ namespace Modules\Cms\Models{
 
 namespace Modules\Cms\Models{
 /**
- * @mixin \Modules\Core\Helpers\HasTranslations
- * @mixin \Modules\Cms\Helpers\HasDynamicContents
- * @mixin \Modules\Cms\Helpers\HasTranslatedDynamicContents
- * @mixin \Modules\Core\Helpers\HasValidations
- * @mixin \Modules\Core\Helpers\HasApprovals
- * @mixin \Modules\Core\Helpers\HasVersions
- * @mixin \Modules\Core\Helpers\HasValidity
- * @mixin \Modules\Core\Helpers\SoftDeletes
- * @mixin \Modules\Core\Search\Traits\Searchable
- * @mixin \Modules\Cms\Helpers\HasSlug
- * @mixin \Modules\Cms\Helpers\HasPath
- * @mixin \Modules\Cms\Helpers\HasTags
- * @mixin \Modules\Cms\Helpers\HasMultimedia
- * @mixin \Modules\Core\Locking\Traits\HasLocks
- * @mixin \Modules\Core\Locking\HasOptimisticLocking
- * @mixin \Modules\Core\Helpers\SortableTrait
  * @property int $id
  * @property int $entity_id
  * @property int $presettable_id
@@ -367,7 +351,7 @@ namespace Modules\Cms\Models{
  * @property-read int|null $authors_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
- * @property array $components
+ * @property array<string, mixed> $components
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Media|null $cover
  * @property-read mixed $created_by
  * @property-read mixed $creator
@@ -970,6 +954,7 @@ namespace Modules\Cms\Models\Translations{
  * @property array<array-key, mixed> $components The translated author components
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
+ * @property string|null $slug
  * @property-read \Modules\Cms\Models\Author $author
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation newQuery()
@@ -979,6 +964,7 @@ namespace Modules\Cms\Models\Translations{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation whereLocale($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation whereUpdatedAt($value)
  * @mixin \Eloquent
  */
