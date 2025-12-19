@@ -47,7 +47,7 @@ postprocessors = [
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
-filter_unconventional = true
+filter_unconventional = false
 # process each line of a commit as an individual commit
 split_commits = false
 # regex for preprocessing the commit messages
@@ -63,6 +63,7 @@ commit_parsers = [
   { message = "^\\(Merge branch ", skip = true },
   { message = "^\\(merge conflict\\)$", skip = true },
   { message = "^\\(merge divergent conflict\\)$", skip = true },
+  { message = "^[Ii]nitial commit$", skip = true },
   { body = "$^", skip = true },
   { message = "^feat", group = "<!-- 0 -->🚀 Features" },
   { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
