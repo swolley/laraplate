@@ -210,11 +210,14 @@ update_version() {
     local position=$1
     local silent=$2
 
-    # Check for uncommitted changes
-    if [ -n "$(git status --porcelain)" ]; then
+    # Check for uncommitted changes unless allowed or dry-run
+    if [ "$DRY_RUN" != true ] && [ "$ALLOW_DIRTY" != true ] && [ -n "$(git status --porcelain)" ]; then
         echo "Error: There are uncommitted changes in the working directory."
-        echo "Please commit or stash your changes before updating the version."
+        echo "Please commit or stash your changes before updating the version, or re-run with --allow-dirty."
         exit 1
+    fi
+    if [ "$DRY_RUN" != true ] && [ "$ALLOW_DIRTY" = true ] && [ -n "$(git status --porcelain)" ]; then
+        echo "Warning: proceeding with a dirty working tree; only composer.json and CHANGELOG.md will be staged."
     fi
 
     local current_version=$(get_latest_version)
@@ -232,26 +235,40 @@ update_version() {
         exit 0
     fi
     
+    if [ "$DRY_RUN" = true ]; then
+        echo "Dry run: would update version from $current_version to $new_version"
+        return
+    fi
+
     if [ "$silent" = true ]; then
         echo "Silent mode: should update version from $current_version to $new_version"
-    else
-        echo "Updating version from $current_version to $new_version"
-        
-        # update composer.json
-        update_composer_version "$new_version"
-        
-        # update the changelog
-        update_changelog "$new_version"
-        
-        # create and push the tag
-        git tag -a "$new_version" -m "Release $new_version"
-        git push && git push origin "$new_version"
+        return
     fi
+
+    echo "Updating version from $current_version to $new_version"
+    
+    # update composer.json
+    update_composer_version "$new_version"
+    
+    # update the changelog
+    update_changelog "$new_version"
+    
+    # create and push the tag
+    git tag -a "$new_version" -m "Release $new_version"
+    git push && git push origin "$new_version"
 }
 
 SILENT=false
+DRY_RUN=false
+ALLOW_DIRTY=false
 if [[ "$*" == *"--silent"* ]]; then
     SILENT=true
+fi
+if [[ "$*" == *"--dry-run"* ]]; then
+    DRY_RUN=true
+fi
+if [[ "$*" == *"--allow-dirty"* ]]; then
+    ALLOW_DIRTY=true
 fi
 
 # Check if --nointeractive flag is present
