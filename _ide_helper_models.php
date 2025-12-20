@@ -18,7 +18,6 @@ namespace App\Models{
  * @property string $email
  * @property \Carbon\CarbonImmutable|null $email_verified_at
  * @property string $password
- * @property string|null $two_factor_secret The two factor secret of the user
  * @property string|null $remember_token
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
@@ -26,12 +25,13 @@ namespace App\Models{
  * @property string|null $lang The language of the user
  * @property string|null $last_login_at The last login date of the user
  * @property string|null $license_id The license id of the user
+ * @property string|null $two_factor_secret The two factor secret of the user
  * @property string|null $two_factor_recovery_codes The two factor recovery codes of the user
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read mixed $created_by
@@ -106,7 +106,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
@@ -199,10 +199,10 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property string $valid_from
  * @property string|null $valid_to
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
@@ -340,10 +340,10 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
  * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
@@ -437,12 +437,12 @@ namespace Modules\Cms\Models{
  * @property string $slug The slug of the entity
  * @property \Modules\Cms\Casts\EntityType $type The type of the entity
  * @property bool $is_active Whether the entity is active
- * @property int $is_default Whether the entity is the default entity for same type
+ * @property bool $is_default Whether the entity is the default entity for same type
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $categories
  * @property-read int|null $categories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
@@ -483,12 +483,12 @@ namespace Modules\Cms\Models{
  * @property int $id
  * @property string $name The name of the field
  * @property \Modules\Cms\Casts\FieldType $type The type of the field
- * @property int $is_slug Whether the field takes part in the slug
+ * @property bool $is_slug Whether the field takes part in the slug
  * @property bool $is_active Whether the field is active
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -548,10 +548,10 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ModelEmbedding> $embeddings
@@ -628,7 +628,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $extension
  * @property-read \Illuminate\Support\Carbon|null $expires_at
  * @property-read mixed $human_readable_size
@@ -720,7 +720,7 @@ namespace Modules\Cms\Models\Pivot{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -774,7 +774,7 @@ namespace Modules\Cms\Models\Pivot{
  * @property int $preset_id The preset that the entity preset relation belongs to
  * @property int $entity_id The entity that the entity preset relation belongs to
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Modules\Cms\Models\Entity $entity
  * @property-read \Modules\Cms\Models\Preset $preset
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Pivot\Presettable newModelQuery()
@@ -819,12 +819,12 @@ namespace Modules\Cms\Models{
  * @property int $entity_id
  * @property string $name The name of the preset
  * @property bool $is_active Whether the preset is active
- * @property int $is_default Whether the preset is the default preset for same entity
+ * @property bool $is_default Whether the preset is the default preset for same entity
  * @property int|null $template_id
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
  * @property-read mixed $created_by
@@ -881,7 +881,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $locale
  * @property-read mixed $path
  * @property-read mixed $slug
@@ -921,7 +921,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -951,10 +951,10 @@ namespace Modules\Cms\Models\Translations{
  * @property int $id
  * @property int $author_id
  * @property string $locale The locale of the translation
- * @property string|null $slug
  * @property array<array-key, mixed> $components The translated author components
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
+ * @property string|null $slug
  * @property-read \Modules\Cms\Models\Author $author
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Translations\AuthorTranslation newQuery()
@@ -1064,7 +1064,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -1108,7 +1108,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -1233,8 +1233,8 @@ namespace Modules\Core\Models{
  * @property string|null $modifiable_type The type of the modifiable model
  * @property int|null $modifier_id The id of the modifier model
  * @property string|null $modifier_type The type of the modifier model
- * @property int $active Whether the modification is active
- * @property int $is_update Whether the modification is an update
+ * @property bool $active Whether the modification is active
+ * @property bool $is_update Whether the modification is an update
  * @property int $approvers_required The number of approvers required
  * @property int $disapprovers_required The number of disapprovers required
  * @property string $md5 The md5 hash of the modifications
@@ -1286,7 +1286,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property string|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $connection_name
  * @property string|null $table_name
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\ACL> $acls
@@ -1342,10 +1342,10 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property int|null $parent_id The parent id of the role
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $children
  * @property-read int|null $children_count
@@ -1443,7 +1443,7 @@ namespace Modules\Core\Models{
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -1488,7 +1488,6 @@ namespace Modules\Core\Models{
  * @property string $email
  * @property \Carbon\CarbonImmutable|null $email_verified_at
  * @property string $password
- * @property string|null $two_factor_secret The two factor secret of the user
  * @property string|null $remember_token
  * @property \Carbon\CarbonImmutable|null $created_at
  * @property \Carbon\CarbonImmutable|null $updated_at
@@ -1496,12 +1495,13 @@ namespace Modules\Core\Models{
  * @property string|null $lang The language of the user
  * @property string|null $last_login_at The last login date of the user
  * @property string|null $license_id The license id of the user
+ * @property string|null $two_factor_secret The two factor secret of the user
  * @property string|null $two_factor_recovery_codes The two factor recovery codes of the user
  * @property \Carbon\CarbonImmutable|null $deleted_at
- * @property int|null $is_deleted Whether the entity is deleted
+ * @property bool $is_deleted Whether the entity is deleted
  * @property string|null $locked_at The date and time when the entity was locked
  * @property string|null $locked_user_id The user who locked the entity
- * @property int|null $is_locked Whether the entity is locked
+ * @property bool $is_locked Whether the entity is locked
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Approval\Models\Approval> $approvals
  * @property-read int|null $approvals_count
  * @property-read mixed $created_by
