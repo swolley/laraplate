@@ -18,6 +18,7 @@
 - Use new PHP syntax to override parent methods with `#[Override]` attribute
 - Use Laravel Attributes to make code more readable and easier to understand
 - Leverage PHP 8.5 features: readonly properties, enums, match expressions, named arguments, union types, intersection types
+- All functions, arrow functions, closures and methods that don't refers to external variables or instance must be declared as static
 
 ## Laravel Standards
 - Utilize Laravel's built-in features and helpers to maximize efficiency
@@ -37,7 +38,7 @@
 - Use consistent and descriptive names for variables, methods, and classes, with auxiliary verbs (e.g., isLoading, hasError) to improve readability
 - Use Laravel naming conventions for classes and methods
 - Use interfaces, abstract methods and traits to make code more modular and easier to maintain
-- **Code comments and PHPDoc blocks must always be in English, don't use any other languages**
+- Code comments and PHPDoc blocks must always be in English, don't use any other languages
 - Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very complex going on
 - Always run `vendor/bin/pint --dirty` before finalizing changes to ensure code matches the project's expected style
 
