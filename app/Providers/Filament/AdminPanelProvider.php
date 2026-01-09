@@ -45,7 +45,7 @@ final class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName(static fn (): string => sprintf('%s %s', (string) (config('app.name')), (string) (__('Admin'))))
-            // ->brandLogo('https://raw.githubusercontent.com/swolley/images/refs/heads/master/swolley-1.jpg')
+            ->brandLogo(static fn (): ?string => config('app.logo') ?: 'https://raw.githubusercontent.com/swolley/images/refs/heads/master/logo_laraplate.png?raw=true')
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)
             ->unsavedChangesAlerts()
@@ -55,10 +55,19 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->pages([
                 Pages\Dashboard::class,
+                \Modules\Core\Filament\Pages\Documentation\Welcome::class,
+                \Modules\Core\Filament\Pages\Documentation\Swagger::class,
             ])
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                \Modules\Core\Filament\Widgets\WelcomeLinkWidget::class,
+                \Modules\Core\Filament\Widgets\CoreStatsWidget::class,
+                \Modules\Core\Filament\Widgets\CmsStatsWidget::class,
+                \Modules\Core\Filament\Widgets\HorizonStatsWidget::class,
+                \Modules\Core\Filament\Widgets\SystemHealthWidget::class,
+                \Modules\Core\Filament\Widgets\RecentActivityWidget::class,
+                \Modules\Core\Filament\Widgets\LicenseStatsWidget::class,
+                \Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget::class,
             ])
             ->plugins([
                 ModulesPlugin::make(),
@@ -74,6 +83,7 @@ final class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->emailVerification()
             ->emailChangeVerification()
+            // TODO: da attivare a sviluppi finiti
             // ->requiresMultiFactorAuthentication()
             ->revealablePasswords(false)
             ->authGuard('admin')

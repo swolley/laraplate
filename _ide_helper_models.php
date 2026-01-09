@@ -107,6 +107,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
  * @property bool $is_deleted Whether the entity is deleted
+ * @property array<array-key, mixed>|null $shared_components
  * @property-read \Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Content> $contents
  * @property-read int|null $contents_count
@@ -136,7 +137,7 @@ namespace Modules\Cms\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Translations\AuthorTranslation> $translations
  * @property-read int|null $translations_count
  * @property-read mixed $type
- * @property-read \Modules\Core\Models\User|null $user
+ * @property-read \App\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
  * @method static \Modules\Cms\Database\Factories\AuthorFactory factory($count = null, $state = [])
@@ -152,6 +153,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author wherePresettableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereSharedComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Author withAllTags(\ArrayAccess|\Modules\Cms\Models\Tag|array|string $tags, ?string $type = null)
@@ -205,6 +207,7 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked Whether the entity is locked
  * @property string $valid_from
  * @property string|null $valid_to
+ * @property array<array-key, mixed>|null $shared_components
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Cms\Models\Category> $children
  * @property-read int|null $children_count
  * @property-read \Modules\Cms\Models\Pivot\Categorizable|null $pivot
@@ -312,6 +315,7 @@ namespace Modules\Cms\Models{
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereParentId($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePersistence($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category wherePresettableId($value)
+ * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereSharedComponents($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereUpdatedAt($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidFrom($value)
  * @method static \Staudenmeir\LaravelAdjacencyList\Eloquent\Builder<static>|\Modules\Cms\Models\Category whereValidTo($value)
@@ -346,6 +350,7 @@ namespace Modules\Cms\Models{
  * @property bool $is_locked Whether the entity is locked
  * @property string|null $valid_from
  * @property string|null $valid_to
+ * @property array<array-key, mixed>|null $shared_components
  * @property-read \Modules\Cms\Models\Pivot\Locatable|\Modules\Cms\Models\Pivot\Categorizable|\Modules\Cms\Models\Pivot\Authorable|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Cms\Models\Author> $authors
  * @property-read int|null $authors_count
@@ -413,6 +418,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereLockedUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereOrderColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content wherePresettableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereSharedComponents($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereValidFrom($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Content whereValidTo($value)
@@ -489,6 +495,7 @@ namespace Modules\Cms\Models{
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
  * @property bool $is_deleted Whether the entity is deleted
+ * @property bool $is_translatable
  * @property-read mixed $created_by
  * @property-read mixed $creator
  * @property-read \Modules\Core\Models\Version|null $firstVersion
@@ -512,6 +519,7 @@ namespace Modules\Cms\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsDeleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereIsTranslatable($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereOptions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Cms\Models\Field whereType($value)
@@ -1296,7 +1304,7 @@ namespace Modules\Core\Models{
  * @property-read int|null $permissions_count
  * @property-read \Staudenmeir\LaravelAdjacencyList\Eloquent\Collection<int, \Modules\Core\Models\Role> $roles
  * @property-read int|null $roles_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
  * @method static \Modules\Core\Database\Factories\PermissionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\Permission newModelQuery()
@@ -1359,7 +1367,7 @@ namespace Modules\Core\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Modules\Core\Models\Pivot\ModelHasRole|null $pivot
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\User> $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Core\Models\Version> $versions
  * @property-read int|null $versions_count
@@ -1575,7 +1583,7 @@ namespace Modules\Core\Models{
  * @property array<array-key, mixed> $config The config of the user grid config
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
- * @property-read \Modules\Core\Models\User|null $user
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\Core\Models\UserGridConfig query()

@@ -186,3 +186,16 @@ aside:not(:where(.dark, .dark *)) {
 
 
 /* #endregion */
+
+/* #region Login Page Logo */
+
+/* Logo più grande solo nella pagina di login */
+.fi-simple-page .fi-simple-header .fi-logo,
+.fi-simple-page .fi-simple-header .fi-logo img {
+    height: 7rem !important;
+    max-width: 100% !important;
+    width: auto !important;
+    object-fit: contain !important;
+}
+
+/* #endregion */
