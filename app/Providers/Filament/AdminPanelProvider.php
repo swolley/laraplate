@@ -23,6 +23,15 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Cms\Filament\Widgets\CmsStatsWidget;
+use Modules\Core\Filament\Pages\Swagger;
+use Modules\Core\Filament\Pages\Welcome;
+use Modules\Core\Filament\Widgets\CoreStatsWidget;
+use Modules\Core\Filament\Widgets\HorizonStatsWidget;
+use Modules\Core\Filament\Widgets\RecentActivityWidget;
+use Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget;
+use Modules\Core\Filament\Widgets\SystemHealthWidget;
+use Modules\Core\Filament\Widgets\WelcomeLinkWidget;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 
@@ -55,19 +64,18 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->pages([
                 Pages\Dashboard::class,
-                \Modules\Core\Filament\Pages\Documentation\Welcome::class,
-                \Modules\Core\Filament\Pages\Documentation\Swagger::class,
+                Welcome::class,
+                Swagger::class,
             ])
             ->widgets([
                 Widgets\AccountWidget::class,
-                \Modules\Core\Filament\Widgets\WelcomeLinkWidget::class,
-                \Modules\Core\Filament\Widgets\CoreStatsWidget::class,
-                \Modules\Core\Filament\Widgets\CmsStatsWidget::class,
-                \Modules\Core\Filament\Widgets\HorizonStatsWidget::class,
-                \Modules\Core\Filament\Widgets\SystemHealthWidget::class,
-                \Modules\Core\Filament\Widgets\RecentActivityWidget::class,
-                \Modules\Core\Filament\Widgets\LicenseStatsWidget::class,
-                \Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget::class,
+                WelcomeLinkWidget::class,
+                CoreStatsWidget::class,
+                CmsStatsWidget::class,
+                HorizonStatsWidget::class,
+                SystemHealthWidget::class,
+                RecentActivityWidget::class,
+                SearchEngineHealthTableWidget::class,
             ])
             ->plugins([
                 ModulesPlugin::make(),
