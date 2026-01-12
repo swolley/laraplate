@@ -22,6 +22,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Cms\Filament\Widgets\CmsStatsWidget;
 use Modules\Core\Filament\Pages\Swagger;
@@ -42,6 +43,7 @@ final class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         FilamentAsset::register([
+            Css::make('app-css', Vite::asset('resources/css/app.css')),
             Css::make('admin-css', asset('css/admin.css')),
         ]);
     }
