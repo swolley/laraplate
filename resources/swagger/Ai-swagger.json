@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Laraplate AI module",
+        "description": "AI Module for Embeddings, Vector Search and Automatic Translation (ai, artificial-intelligence, embeddings, vector-search, translation, machine-learning)",
+        "version": "v1.11.1"
+    },
+    "host": "localhost:8000",
+    "basePath": "\/",
+    "paths": [],
+    "tags": [
+        "Ai"
+    ]
+}
