@@ -3,7 +3,7 @@
     "info": {
         "title": "Laraplate Core module",
         "description": "Core Module for Base Functionality (core, base, foundation, essential, framework, infrastructure, utilities, helpers, services, providers)",
-        "version": "v1.11.0"
+        "version": "v1.11.1"
     },
     "host": "localhost:8000",
     "basePath": "\/",
@@ -85,7 +85,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "columns",
+                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -95,7 +95,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "relations",
+                        "name": "columns",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -138,14 +138,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
+                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -155,7 +148,14 @@
                     },
                     {
                         "in": "query",
-                        "name": "relations",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -221,6 +221,16 @@
                         "type": "string",
                         "required": false,
                         "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     {
                         "in": "query",
@@ -326,6 +336,10 @@
                                         }
                                     ]
                                 },
+                                "relations": {
+                                    "type": "array",
+                                    "items": []
+                                },
                                 "pagination": {
                                     "type": "integer"
                                 },
@@ -385,6 +399,16 @@
                     },
                     {
                         "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
                         "name": "pagination",
                         "type": "integer",
                         "required": false,
@@ -435,16 +459,6 @@
                     {
                         "in": "query",
                         "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -611,6 +625,16 @@
                     },
                     {
                         "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
                         "name": "parents",
                         "type": "boolean",
                         "required": false,
@@ -626,16 +650,6 @@
                     {
                         "in": "query",
                         "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -959,7 +973,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "columns",
+                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -969,7 +983,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "relations",
+                        "name": "columns",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -1488,14 +1502,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "limit",
-                        "type": "integer",
-                        "required": false,
-                        "description": ""
-                    },
-                    {
-                        "in": "query",
-                        "name": "columns",
+                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -1505,7 +1512,14 @@
                     },
                     {
                         "in": "query",
-                        "name": "relations",
+                        "name": "limit",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "columns",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -1626,6 +1640,16 @@
                     },
                     {
                         "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
                         "name": "pagination",
                         "type": "integer",
                         "required": false,
@@ -1728,6 +1752,10 @@
                                         }
                                     ]
                                 },
+                                "relations": {
+                                    "type": "array",
+                                    "items": []
+                                },
                                 "pagination": {
                                     "type": "integer"
                                 },
@@ -1787,6 +1815,16 @@
                     },
                     {
                         "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
                         "name": "pagination",
                         "type": "integer",
                         "required": false,
@@ -1837,16 +1875,6 @@
                     {
                         "in": "query",
                         "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
@@ -2013,6 +2041,16 @@
                     },
                     {
                         "in": "query",
+                        "name": "relations",
+                        "type": "array",
+                        "required": false,
+                        "description": "",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
                         "name": "parents",
                         "type": "boolean",
                         "required": false,
@@ -2028,16 +2066,6 @@
                     {
                         "in": "query",
                         "name": "columns",
-                        "type": "array",
-                        "required": false,
-                        "description": "",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "relations",
                         "type": "array",
                         "required": false,
                         "description": "",
