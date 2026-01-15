@@ -168,20 +168,26 @@ amend_or_commit() {
 update_composer_version() {
     local new_version=$1
     
-    cd "$(git rev-parse --show-toplevel)"
+    local repo_root=$(git rev-parse --show-toplevel)
+    local composer_file="$repo_root/composer.json"
+    
+    # Ensure we're working with the root composer.json only
+    if [ ! -f "$composer_file" ]; then
+        echo "Error: composer.json not found in repository root"
+        exit 1
+    fi
     
     if command -v jq >/dev/null 2>&1; then
         # if jq is installed - modifica la proprietà version alla root
         tmp=$(mktemp)
-        jq --arg version "$new_version" '.version = $version' composer.json > "$tmp" && mv "$tmp" composer.json
+        jq --arg version "$new_version" '.version = $version' "$composer_file" > "$tmp" && mv "$tmp" "$composer_file"
     else
         # fallback to sed if jq is not available
-        sed -i "s/^    \"version\": \".*\",$/    \"version\": \"$new_version\",/" composer.json
+        sed -i "s/^    \"version\": \".*\",$/    \"version\": \"$new_version\",/" "$composer_file"
     fi
     
-    # add the file to git
-    git add composer.json
-    amend_or_commit "chore: bump version to $new_version"
+    # add only the root composer.json file to git (but don't commit yet)
+    git add "$composer_file"
 }
 
 # Function to update the changelog
@@ -195,9 +201,8 @@ update_changelog() {
     # update the changelog
     git cliff --output CHANGELOG.md
     
-    # add the file to git
+    # add the file to git (but don't commit yet)
     git add CHANGELOG.md
-    amend_or_commit "chore: update changelog for version $new_version"
 }
 
 # Function to update the version in the current repository
@@ -247,15 +252,25 @@ update_version() {
 
     echo "Updating version from $current_version to $new_version"
     
-    # update composer.json
+    # update composer.json (stages the file)
     update_composer_version "$new_version"
     
-    # update the changelog
+    # update the changelog (stages the file)
     update_changelog "$new_version"
+    
+    # create a single commit with all changes
+    amend_or_commit "chore: bump version to $new_version"
     
     # create and push the tag
     git tag -a "$new_version" -m "Release $new_version"
-    git push && git push origin "$new_version"
+    
+    # try to push, but don't fail if credentials are not available
+    if git push 2>/dev/null; then
+        git push origin "$new_version" 2>/dev/null || echo "Warning: Could not push tag. You may need to push manually: git push origin $new_version"
+    else
+        echo "Warning: Could not push commits. You may need to push manually: git push"
+        echo "Warning: Could not push tag. You may need to push manually: git push origin $new_version"
+    fi
 }
 
 SILENT=false

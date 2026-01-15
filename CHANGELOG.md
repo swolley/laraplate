@@ -6,6 +6,57 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update dependencies and enhance functionality
+- Update package-lock.json and enhance CSS styles
+- Update IDE helper models and improve documentation
+- Update .vscode settings and submodule commits
+- Update composer.json and submodule commits
+- Update submodule commits and improve version script
+- Update submodule commits and enhance version script validation
+- Update versioning method in composer.json
+- Update submodule commits and enhance version script logic
+- Update submodule commits and refine version script logic
+- Update submodule commits and enhance version script functionality
+- Update submodule commits and enhance version script debugging
+- Update submodule commits for Cms and Core modules
+- Clean up post-commit hook script
+- Update dependencies and remove unused package
+- Update dependencies and submodule commits
+- Update project configuration and dependencies
+- Update coding principles and module structure
+- Update submodule URLs to use HTTPS
+- Update module links in README
+- Update IDE helper and module configurations
+- Update IDE helper models and package dependencies
+- Update environment configurations and dependencies
+- Update dependencies and improve package configurations
+- Update IDE helper files and improve cache functionality
+- Enhance IDE helper files and add new traits
+- Update Cms submodule and add pushurl synchronization script
+- Update submodule commits and improve type hinting
+- Enhance IDE helper files and update submodule references
+- Enhance IDE helper traits and update PHPStan configuration
+- Update Laravel standards and enhance test case structure
+- Update environment and configuration files for PHP 8.5 compatibility
+- Update Laravel standards and enhance performance optimization guidelines
+- Enhance IDE helper models and update workspace configuration
+- Update dependencies and enhance configuration files
+- Enhance IDE helper models and update submodule references
+- Update commit parsing rules and enhance version update script
+- Update submodule references for Cms and Core modules
+- Update commit parsing rules and submodule references
+- Update IDE helper models and configuration files
+- Update environment variable names and package versions
+- Update package versions in composer.lock and submodule reference for Core module
+- Update IDE helper models, environment variables, and package versions
+- Add filament/spatie-laravel-media-library-plugin and update package versions
+- Add AI module and update submodule references
+- Update composer.json and submodule references for AI, Cms, and Core modules
+
+## [1.11.0] - 2025-09-19
+
+### ⚙️ Miscellaneous Tasks
+
 - Update dependencies and enhance configurations
 
 ## [1.10.0] - 2025-09-05
