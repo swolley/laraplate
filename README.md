@@ -39,8 +39,9 @@ php artisan module:seed --all
 
 ### Laraplate Modules
 
--   Core: main common boilerplate functionalities. About [Core Module](https://github.com/swolley/laraplate-core).
--   Cms: common Cms functionalities. About [Cms Module](https://github.com/swolley/laraplate-cms).
+-   ⚡ **Core**: main common boilerplate functionalities. About [Core Module](https://github.com/swolley/laraplate-core).
+-   ✎ **Cms**: common Cms functionalities. About [Cms Module](https://github.com/swolley/laraplate-cms).
+-   ✨ **AI**: artificial intelligence capabilities (embeddings, vector search, automatic translation). About [AI Module](https://github.com/swolley/laraplate-ai).
 
 ### Environment (principali variabili)
 
@@ -97,3 +98,4 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 For a complete and detailed list of TODOs, read:
 - [Core Module TODO](Modules/Core/README.md#todo-and-fixme)
 - [CMS Module TODO](Modules/Cms/README.md#todo-and-fixme)
+- [AI Module TODO](Modules/AI/README.md#todo-and-fixme)
