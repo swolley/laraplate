@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update submodule references and enhance Swagger documentation
+- Enhance README and update submodule references
+- Update package versions and submodule references
+
+## [1.11.1] - 2026-01-15
+
+### ⚙️ Miscellaneous Tasks
+
 - Update dependencies and enhance functionality
 - Update package-lock.json and enhance CSS styles
 - Update IDE helper models and improve documentation

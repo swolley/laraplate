@@ -15,7 +15,6 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -24,15 +23,9 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Modules\Cms\Filament\Widgets\CmsStatsWidget;
+use Modules\Core\Filament\Pages\PhpInfo;
 use Modules\Core\Filament\Pages\Swagger;
 use Modules\Core\Filament\Pages\Welcome;
-use Modules\Core\Filament\Widgets\CoreStatsWidget;
-use Modules\Core\Filament\Widgets\HorizonStatsWidget;
-use Modules\Core\Filament\Widgets\RecentActivityWidget;
-use Modules\Core\Filament\Widgets\SearchEngineHealthTableWidget;
-use Modules\Core\Filament\Widgets\SystemHealthWidget;
-use Modules\Core\Filament\Widgets\WelcomeLinkWidget;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 
@@ -68,16 +61,9 @@ final class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
                 Welcome::class,
                 Swagger::class,
+                PhpInfo::class,
             ])
             ->widgets([
-                Widgets\AccountWidget::class,
-                WelcomeLinkWidget::class,
-                CoreStatsWidget::class,
-                CmsStatsWidget::class,
-                HorizonStatsWidget::class,
-                SystemHealthWidget::class,
-                RecentActivityWidget::class,
-                SearchEngineHealthTableWidget::class,
             ])
             ->plugins([
                 ModulesPlugin::make(),
