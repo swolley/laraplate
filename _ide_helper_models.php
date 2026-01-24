@@ -96,6 +96,63 @@ namespace App\Models{
 	final class IdeHelperUser {}
 }
 
+namespace Modules\AI\Models{
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $title Conversation title (auto-generated or manual)
+ * @property string|null $system_message Custom system prompt for this conversation
+ * @property array<array-key, mixed>|null $metadata Additional context data
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property \Carbon\CarbonImmutable $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\AI\Models\Message> $messages
+ * @property-read int|null $messages_count
+ * @property-read \Modules\Core\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereSystemMessage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Conversation whereUserId($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperConversation {}
+}
+
+namespace Modules\AI\Models{
+/**
+ * @property int $id
+ * @property int $conversation_id
+ * @property string $role Message role: system, user, assistant
+ * @property string $content Message content
+ * @property array<array-key, mixed>|null $metadata Additional data: context, tool calls, citations, etc.
+ * @property int|null $token_count Token count for cost tracking
+ * @property \Carbon\CarbonImmutable $created_at
+ * @property \Carbon\CarbonImmutable $updated_at
+ * @property-read \Modules\AI\Models\Conversation $conversation
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message byRole(string $role)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereConversationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereTokenCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|\Modules\AI\Models\Message whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperMessage {}
+}
+
 namespace Modules\Cms\Models{
 /**
  * @property int $id
