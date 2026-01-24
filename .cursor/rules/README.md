@@ -1,75 +1,77 @@
 # Cursor Rules Configuration
 
-Questa cartella contiene le regole di configurazione per Cursor, organizzate in file tematici per una migliore gestione e manutenzione.
+Questa cartella contiene le regole di configurazione per Cursor, ottimizzate per ridurre il consumo di token e applicate contestualmente.
 
 ## Formato File
 
-I file di configurazione utilizzano l'estensione `.mdc` (Markdown Configuration) per una migliore integrazione con Cursor e per seguire le best practices della community.
+I file utilizzano l'estensione `.mdc` (Markdown Configuration) con frontmatter YAML per controllare quando vengono applicati:
+- `alwaysApply: true` - Applicato sempre
+- `globs: ["**/*.php"]` - Applicato solo quando si lavora con file matching il pattern
 
-## Struttura dei File
+## Struttura Ottimizzata
 
-### 01-php-laravel-standards.mdc
-- Standard PHP e Laravel
+### 00-master.mdc (Always Applied)
+- File master leggero che referenzia le altre regole
+- Principi chiave sempre attivi
+
+### laravel-boost.mdc (Always Applied)
+- **Regola principale** - Linee guida complete per l'ecosistema Laravel
+- Copre: Filament, Livewire, Pest, Pint, PHPStan, Tailwind, ecc.
+- **Non duplicare contenuti già presenti qui**
+
+### 01-php-laravel-standards.mdc (Contextual: PHP files)
+- Standard PHP e Laravel specifici
 - Convenzioni di naming
 - Dichiarazioni di tipo
-- Dipendenze e versioni
+- **Riferimenti a laravel-boost per contenuti duplicati**
 
-### 02-architecture-patterns.mdc
-- Pattern di design (Singleton, Factory, Middleware, Controller)
-- Best practices Laravel
-- Architettura del codice (Controller, Model, Services, Routing)
-- Punti chiave architetturali
+### 02-architecture-patterns.mdc (Contextual: Controllers, Services, Models)
+- Pattern di design
+- Architettura del codice
+- **Riferimenti a laravel-boost per best practices Laravel**
 
-### 03-performance-optimization.mdc
+### 03-performance-optimization.mdc (Contextual: Models, Services, Jobs, Migrations)
 - Strategie di caching
-- Elaborazione in background
 - Ottimizzazione database
-- Ottimizzazione del codice
-- Monitoraggio e debugging
+- **Riferimenti a laravel-boost per Eloquent e query builder**
 
-### 04-error-handling-security.mdc
-- Gestione degli errori
+### 04-error-handling-security.mdc (Contextual: Controllers, Middleware, Exceptions)
+- Gestione degli errori (Laravel 12 Context)
 - Best practices di sicurezza
-- Validazione e integrità dei dati
+- **Riferimenti a laravel-boost per validazione**
 
-### 05-testing-development.mdc
-- Strategie di testing
+### 05-testing-development.mdc (Contextual: Test files)
+- Strategie di testing con Pest
 - Strumenti di sviluppo
-- Qualità del codice
-- Workflow di sviluppo
-- Organizzazione del codice
+- **Riferimenti a laravel-boost per Filament, Telescope, ecc.**
 
-### 06-coding-principles.mdc
-- Principi generali di coding
+### 06-coding-principles.mdc (Always Applied)
+- Principi generali di coding (minimali)
 - Modifiche al codice e bug fix
-- Struttura del codice
 - Lingua e comunicazione
-- Contesto e requisiti
+- **Solo contenuti unici, non duplicati**
 
-### 07-laraplate-specific.mdc
-- Architettura modulare Laravel
+### 07-laraplate-specific.mdc (Contextual: Module files)
+- Architettura modulare specifica del progetto
 - Standard di sviluppo moduli
-- Integrazione Filament
-- Strumenti di sviluppo e script
-- Strategie di testing specifiche
-- Gestione database e migrazioni
-- Configurazione e API
-- Performance e sicurezza
-- Organizzazione del codice
-- Deployment e CI/CD
+- **Riferimenti a altre regole per contenuti generici**
+
+## Ottimizzazioni Implementate
+
+1. **Eliminazione duplicazioni**: Contenuti duplicati rimossi, sostituiti con riferimenti a `laravel-boost.mdc`
+2. **Contestualizzazione**: Regole applicate solo quando rilevanti tramite `globs` patterns
+3. **File master leggero**: `00-master.mdc` serve come entry point minimale
+4. **Riduzione token**: ~60% di riduzione del contenuto totale rimuovendo duplicazioni
 
 ## Utilizzo
 
-Queste regole vengono applicate automaticamente da Cursor durante lo sviluppo per garantire:
-- Consistenza nel codice
-- Aderenza agli standard PHP/Laravel
-- Best practices di sicurezza e performance
-- Qualità e manutenibilità del codice
+Le regole vengono applicate automaticamente da Cursor:
+- **Sempre attive**: `00-master.mdc`, `laravel-boost.mdc`, `06-coding-principles.mdc`
+- **Contestuali**: Le altre regole si attivano quando si lavora con file matching i pattern
 
 ## Manutenzione
 
-Per modificare le regole:
-1. Apri il file appropriato nella cartella `.cursor/rules/`
-2. Modifica le regole secondo necessità
-3. Salva il file
-4. Le modifiche saranno applicate automaticamente nelle prossime sessioni di Cursor 
+1. **Per modifiche generali**: Modifica `laravel-boost.mdc` (regola principale)
+2. **Per modifiche specifiche**: Modifica il file appropriato nella cartella `.cursor/rules/`
+3. **Evita duplicazioni**: Se un contenuto esiste già in `laravel-boost.mdc`, fai riferimento a quello invece di duplicare
+4. **Mantieni contestualizzazione**: Usa `globs` per applicare regole solo quando rilevanti 
