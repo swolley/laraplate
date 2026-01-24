@@ -1,3 +1,8 @@
+---
+description: General coding principles and best practices
+alwaysApply: true
+---
+
 # Coding Principles and Best Practices
 
 ## General Principles
@@ -33,8 +38,7 @@
 - If requirements are not clear or if there are doubts, please feel free to ask for details before answering
 
 ## Development Workflow
-- **Code Quality**: Run `composer lint` before committing to ensure code quality
-- **Code Style**: **Always run `vendor/bin/pint --dirty` before finalizing changes** to ensure code matches the project's expected style
+- **Code Style**: Always run `vendor/bin/pint --dirty` before finalizing changes (see `laravel-boost.mdc`)
 - **Testing**: Run `composer test` to execute all tests before deployment - run minimal tests with filters when appropriate
 - **Refactoring**: Use `composer refactor` for automated code improvements
 - **Type Safety**: Ensure 100% type coverage with `composer test:type-coverage`
