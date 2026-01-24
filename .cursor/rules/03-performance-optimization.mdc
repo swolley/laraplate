@@ -1,14 +1,19 @@
+---
+description: Performance optimization strategies
+globs: ["**/Models/**", "**/Services/**", "**/Jobs/**", "**/database/migrations/**"]
+alwaysApply: false
+---
+
 # Performance Optimization
 
 ## Caching Strategies
 - Prefer usage of Laravel Cache helpers to speed up queries if values are used a lot and they don't change often
 - Use database, file, or array cache drivers - maintain compatibility across different cache backends
 - Use static properties in classes if it can prevent unnecessary queries for instances of the same class
-- Leverage Laravel's caching mechanisms for improved performance - use cache drivers that are compatible with the deployment environment
+- See `laravel-boost.mdc` for comprehensive caching guidelines
 
 ## Background Processing
-- Use Laravel Queues and Jobs to handle background tasks and improve performance
-- Use job queues and Laravel Horizon for handling long-running tasks and background processing
+- See `laravel-boost.mdc` for queue and job guidelines - always prefer queues for time-consuming operations
 
 ## Database Optimization
 - **Maintain database compatibility**: Write queries that work across MySQL, PostgreSQL, SQLite, and Oracle (whenever possible)
@@ -28,6 +33,5 @@
 - Use Laravel's query builder for complex database operations
 
 ## Monitoring and Debugging
-- Use Laravel Telescope for debugging and performance monitoring in development
-- Implement comprehensive error handling and logging using Laravel's exception handler and logging facade
-- Develop comprehensive error handling strategies and implement detailed logging for effective debugging and monitoring in production environments 
+- See `04-error-handling-security.mdc` for error handling and logging guidelines
+- See `laravel-boost.mdc` for Telescope and debugging tools 

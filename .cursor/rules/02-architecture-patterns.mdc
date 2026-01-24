@@ -1,3 +1,9 @@
+---
+description: Architecture patterns and design principles
+globs: ["**/Controllers/**", "**/Services/**", "**/Models/**", "**/Repositories/**"]
+alwaysApply: false
+---
+
 # Architecture Patterns and Best Practices
 
 ## Design Patterns
@@ -53,14 +59,7 @@
 
 ## Key Architectural Points
 - Follow Laravel's MVC architecture for clear separation of business logic, data, and presentation layers
-- Implement request validation using Form Requests to ensure secure and validated data inputs
-- Use Laravel's built-in authentication system, including Laravel Sanctum for API token management
-- Ensure the REST API follows Laravel standards, using API Resources for structured and consistent responses
-- Leverage task scheduling and event listeners to automate recurring tasks and decouple logic
-- Implement database transactions using Laravel's database facade to ensure data consistency
 - **Maintain database compatibility**: Support MySQL, PostgreSQL, SQLite, and Oracle (whenever possible) - avoid database-specific features unless necessary
-- Use Eloquent ORM for database interactions, enforcing relationships and optimizing queries
-- Implement API versioning for maintainability and backward compatibility
 - **Use job queues extensively**: Dispatch jobs for background processing, embedding generation, media processing, and any time-consuming operations
 - **Implement embeddings for AI-powered search**: Use queued jobs to generate embeddings asynchronously, store them in the database, and leverage them for semantic search
-- Ensure robust error handling and logging using Laravel's exception handler and logging features 
+- See `laravel-boost.mdc` for: Form Requests, authentication, API Resources, Eloquent ORM, error handling, logging 

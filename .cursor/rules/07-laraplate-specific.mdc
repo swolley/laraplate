@@ -1,3 +1,9 @@
+---
+description: Laraplate project-specific architecture and conventions
+globs: ["**/Modules/**", "**/module.json", "**/module.php"]
+alwaysApply: false
+---
+
 # Laraplate Specific Rules
 
 ## Project Overview
@@ -22,12 +28,12 @@
 - **Framework**: Laravel 12.0+ with PHP 8.5+
 - **Modules**: nwidart/laravel-modules for modular architecture
 - **Admin Panel**: Filament 4.0+ for admin interface
-- **Database**: **Maintain compatibility for MySQL, PostgreSQL, SQLite, and Oracle (whenever possible)** - use Eloquent ORM abstractions
+- **Database**: Maintain compatibility for MySQL, PostgreSQL, SQLite, and Oracle (whenever possible) - use Eloquent ORM abstractions
 - **Cache**: Use database, file, or array cache drivers - maintain compatibility across different cache backends
 - **Queues**: Use Laravel Queues extensively for background processing, embedding generation, and media processing
 - **Embeddings**: Implement AI-powered embeddings for semantic search using queued jobs
-- **Testing**: PestPHP with comprehensive coverage - every change must be tested
-- **Code Quality**: Pint (always run before finalizing), PHPStan, Rector for static analysis
+- **Testing**: See `05-testing-development.mdc` and `laravel-boost.mdc` for testing guidelines
+- **Code Quality**: See `laravel-boost.mdc` for Pint, PHPStan, Rector guidelines
 
 ## Application Architecture
 - **Modular Architecture**: This is a Laravel Modules application using `nwidart/laravel-modules`
@@ -80,10 +86,7 @@
 - **Priority**: 1 (loads after Core)
 
 ## Filament Integration
-- **Admin Panel**: Use Filament for admin panel development
-- **Resources**: Create Filament resources for models in each module
-- **Customization**: Extend Filament's base classes for custom functionality
-- **Theme**: Follow Filament's design patterns and components
+- See `laravel-boost.mdc` for comprehensive Filament guidelines
 
 ## Development Tools and Scripts
 - **IDE Helper**: Always run `composer lint` to generate IDE helper files
@@ -105,10 +108,7 @@
 - `composer refactor` - Run Rector for automated refactoring
 
 ## Testing Strategy
-- **PestPHP**: Use Pest for all testing (unit, feature, browser)
-- **Module Testing**: Create tests within each module's `tests/` directory
-- **Test Coverage**: Aim for 100% type coverage and comprehensive test coverage
-- **Test Organization**: Follow Pest's structure with `Feature/` and `Unit/` directories
+- See `05-testing-development.mdc` and `laravel-boost.mdc` for comprehensive testing guidelines
 
 ## Database and Migrations
 - **Module Migrations**: Keep migrations within each module's `database/migrations/` directory
@@ -137,27 +137,15 @@
 - **Rate Limiting**: Apply rate limiting to embedding queue to prevent API throttling
 
 ## Performance and Caching
-- **Caching**: Use database, file, or array cache drivers - maintain compatibility across different cache backends
-- **Queue Management**: Use Laravel Horizon for queue monitoring
-- **Background Processing**: Always use queues for time-consuming operations:
-  - Media file processing (uploads, resizing, transformations)
-  - Embedding generation for AI-powered search
-  - Email sending
-  - Any operation that could block the request
-- **Embeddings**: Implement AI-powered embeddings using queued jobs (`GenerateEmbeddingsJob`) for semantic search capabilities
-- **Database Optimization**: Use proper indexing and query optimization - maintain compatibility across database engines
+- See `03-performance-optimization.mdc` and `laravel-boost.mdc` for comprehensive performance guidelines
+- **Background Processing**: Always use queues for time-consuming operations (media processing, embeddings, emails)
+- **Embeddings**: Implement AI-powered embeddings using queued jobs (`GenerateEmbeddingsJob`) for semantic search
 
 ## Security Considerations
-- **Authentication**: Use Laravel's built-in authentication with module-specific models
-- **Authorization**: Implement policies for model access control
-- **Input Validation**: Use Form Requests for validation
-- **CSRF Protection**: Always enable CSRF protection for web routes
+- See `04-error-handling-security.mdc` and `laravel-boost.mdc` for comprehensive security guidelines
 
 ## Code Organization
-- **Service Classes**: Use services for complex business logic
-- **Repository Pattern**: Implement repositories for data access
-- **Event-Driven**: Use events and listeners for decoupled functionality
-- **Observer Pattern**: Use observers for model lifecycle events
+- See `02-architecture-patterns.mdc` for service classes, repositories, and design patterns
 
 ## Deployment and CI/CD
 - **Environment Configuration**: Use proper environment variables

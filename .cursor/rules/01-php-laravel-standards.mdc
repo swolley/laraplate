@@ -1,3 +1,9 @@
+---
+description: PHP and Laravel coding standards
+globs: ["**/*.php", "**/*.blade.php"]
+alwaysApply: false
+---
+
 # PHP and Laravel Standards
 
 ## Dependencies
@@ -21,13 +27,8 @@
 - All functions, arrow functions, closures and methods that don't refers to external variables or instance must be declared as static
 
 ## Laravel Standards
-- Utilize Laravel's built-in features and helpers to maximize efficiency
 - Follow Laravel's directory structure and file naming conventions
-- Use Eloquent ORM and Query Builder over raw SQL queries when possible
-- Use Laravel's query builder for complex database operations
-- Create and maintain proper database migrations and seeders
-- Implement database indexing and use Laravel's query optimization features for better performance
-- Use cache, singletons and optimize ways of retrieving data
+- See `laravel-boost.mdc` for Eloquent, query builder, caching, and database optimization guidelines
 
 ## Code Style and Structure
 - Write concise, technical PHP code with accurate PHP/Laravel examples
@@ -40,7 +41,7 @@
 - Use interfaces, abstract methods and traits to make code more modular and easier to maintain
 - Code comments and PHPDoc blocks must always be in English, don't use any other languages
 - Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very complex going on
-- Always run `vendor/bin/pint --dirty` before finalizing changes to ensure code matches the project's expected style
+- See `laravel-boost.mdc` for Pint usage (always run before finalizing)
 
 ## Naming Conventions
 - Use consistent naming conventions for folders, classes, and files

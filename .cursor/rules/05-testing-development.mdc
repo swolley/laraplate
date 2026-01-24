@@ -1,3 +1,9 @@
+---
+description: Testing strategies and development tools
+globs: ["**/tests/**", "**/*Test.php", "**/phpunit.xml", "**/pest.php"]
+alwaysApply: false
+---
+
 # Testing and Development
 
 ## Testing Strategy
@@ -14,54 +20,15 @@
 - **Run Minimal Tests**: Run the minimum number of tests needed to ensure code quality and speed - use `php artisan test` with specific filename or filter
 
 ## Development Tools
-- Use Laravel Telescope for debugging and performance monitoring in development
-- Leverage Filament for rapid admin panel development
-- Use Laravel's built-in features and helpers to maximize efficiency
+- See `laravel-boost.mdc` for Pint, PHPStan, Rector, Telescope, and Filament guidelines
 - Use IDE Helper for better code completion and navigation
-- **Always run Laravel Pint before finalizing changes**: Use `vendor/bin/pint --dirty` to ensure code matches the project's expected style
-- Use PHPStan (Larastan) for static analysis
-- Use Rector for automated code refactoring
 
 ## Static Analysis Suppressions
-- **When bypassing PHPStan/Pint is unavoidable**, use comments and attributes to provide more specific type information
-- **PHPStan Suppressions**: Use targeted suppressions with error codes:
-  - `@phpstan-ignore property.uninitializedReadonly` for readonly properties
-  - `@phpstan-ignore-next-line` for specific lines
-  - Always document why the suppression is necessary
-- **PHPDoc Enhancements**: Enhance type information with detailed PHPDoc:
-  - `@param Collection<string> $items` for generic collections
-  - `@var TestCase $this` for test context
-  - Array shapes: `@param array{id: int, name: string} $data`
-- **Attributes**: Use PHP 8 attributes for additional type safety:
-  - `#[Override]` when overriding parent methods
-  - Laravel attributes for validation and routing
-- **Document Suppressions**: Always add a comment explaining why a suppression is needed
+- See `01-php-laravel-standards.mdc` for comprehensive PHPStan/Pint suppression guidelines
 
 ## Code Quality
-- Enhance Code Maintainability: Write self-documenting code, provide clear comments
-- Create Modular & Reusable Code: Break functionality into self-contained, reusable components for flexibility and scalability
-- Adhere to Coding Standards: Follow language-specific best practices and maintain consistent naming, structure, and formatting. Be adaptable to different organizational standards
-- Support Continuous Integration/Continuous Deployment (CI/CD): Write code and tests that align with CI/CD practices, facilitating automated building, testing, and deployment processes
-
-## Development Workflow
-- Design for Scalability: Make architectural and design choices that allow for future growth, increased load, and potential changes in project requirements
-- Follow API Design Best Practices (when applicable): For projects involving APIs, adhere to RESTful principles, use clear naming conventions
-- Use API resources and versioning for building robust and maintainable APIs
-- Implement API versioning for maintainability and backward compatibility
-- Ensure the REST API follows Laravel standards, using API Resources for structured and consistent responses
-
-## Code Organization
-- Maintain consistent and organized routes
-- Create separate route files for each major model or feature area
-- Group related routes together (e.g., all user-related routes in routes/user.php)
-- Create a Services folder within the app directory
-- Organize services into model-specific services and other required services
+- See `06-coding-principles.mdc` for general coding principles
+- See `laravel-boost.mdc` for API design, routing, and code organization guidelines
 
 ## Filament Development
-- **Admin Panel**: Use Filament for building admin interfaces
-- **Resources**: Create Filament resources for each model in modules
-- **Customization**: Extend Filament's base classes for custom functionality
-- **Theme**: Follow Filament's design patterns and use built-in components
-- **Forms**: Use Filament's form builder for consistent admin forms
-- **Tables**: Use Filament's table builder for data display
-- **Actions**: Implement custom actions using Filament's action system 
+- See `laravel-boost.mdc` for comprehensive Filament guidelines 
