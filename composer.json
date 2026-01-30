@@ -20,13 +20,11 @@
     "require": {
         "php": ">=8.5",
         "coolsam/modules": "^5.0",
-        "filament/spatie-laravel-media-library-plugin": "^4.0",
         "joshbrw/laravel-module-installer": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "nwidart/laravel-modules": "^12.0 <12.0.4",
-        "spatie/fork": "^1.2",
         "symfony/http-client": "^7.2"
     },
     "require-dev": {

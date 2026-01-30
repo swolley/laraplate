@@ -9,5 +9,6 @@
         "editor.formatOnSave": true
     },
     "laravel-pint.enable": true,
-    "laravel-pint.configPath": "./pint.json"
+    "laravel-pint.configPath": "./pint.json",
+    "postman.settings.dotenv-detection-notification-visibility": false
 }
