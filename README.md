@@ -91,7 +91,7 @@ If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Lar
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Laraplate and its modules are open-sourced software licensed under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ## TODO and FIXME
 

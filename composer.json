@@ -16,7 +16,14 @@
             "email": "myentity@inwind.it"
         }
     ],
-    "license": "MIT",
+    "license": "AGPL-3.0-or-later",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/swolley/license-compliance-checker.git",
+            "no-api": true
+        }
+    ],
     "require": {
         "php": ">=8.5",
         "coolsam/modules": "^5.0",
@@ -28,6 +35,7 @@
         "symfony/http-client": "^7.2"
     },
     "require-dev": {
+        "swolley/license-compliance-checker": "dev-master",
         "fakerphp/faker": "^1.23",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
@@ -93,12 +101,14 @@
         "test:unit": "pest --parallel --coverage --exactly=100",
         "test:types": "phpstan",
         "test:refactor": "rector",
+        "test:licenses": "@php vendor/bin/check-licenses",
         "test": [
             "@test:type-coverage",
             "@test:unit",
             "@test:lint",
             "@test:types",
-            "@test:refactor"
+            "@test:refactor",
+            "@test:licenses"
         ],
         "update:requirements": [
             "composer bump",
