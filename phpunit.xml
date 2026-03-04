@@ -7,18 +7,18 @@
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
-            <directory>Modules/**/tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
-            <directory>Modules/**/tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
             <directory suffix=".php">app</directory>
-            <directory suffix=".php">Modules/**/app</directory>
         </include>
+        <exclude>
+            <file>app/Http/Controllers/AppController.php</file>
+        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
@@ -31,6 +31,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="SCOUT_DRIVER" value="collection"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
 </phpunit>

@@ -51,9 +51,7 @@ final class AppController extends Controller
         $models = $this->modelsForModule($module_info['name']);
         $known_model = collect($models)->firstWhere('fqcn', $decoded_model);
 
-        if (! is_array($known_model)) {
-            throw new NotFoundHttpException();
-        }
+        throw_unless(is_array($known_model), NotFoundHttpException::class);
 
         return view('app.model', [
             'modules' => $modules,
@@ -101,7 +99,7 @@ final class AppController extends Controller
                     /** @var array<string, mixed> $composer */
                     $composer = json_decode((string) File::get($composer_path), true) ?: [];
                     $description = (string) ($composer['description'] ?? '');
-                    $version = is_string($composer['version'] ?? null) ? (string) $composer['version'] : null;
+                    $version = is_string($composer['version'] ?? null) ? $composer['version'] : null;
                 }
 
                 return [
@@ -180,8 +178,8 @@ final class AppController extends Controller
             return null;
         }
 
-        $namespace = mb_trim((string) ($ns_matches[1] ?? ''));
-        $class = mb_trim((string) ($class_matches[1] ?? ''));
+        $namespace = mb_trim($ns_matches[1] ?? '');
+        $class = mb_trim($class_matches[1] ?? '');
 
         if ($namespace === '' || $class === '') {
             return null;
@@ -196,7 +194,7 @@ final class AppController extends Controller
             return null;
         }
 
-        $raw = mb_trim((string) ($matches[1] ?? ''));
+        $raw = mb_trim($matches[1] ?? '');
         $raw = mb_trim($raw, " \t\n\r\0\x0B");
 
         if (! str_ends_with($raw, '::class')) {
@@ -216,7 +214,7 @@ final class AppController extends Controller
             return null;
         }
 
-        return mb_ltrim((string) ($use_matches[1] ?? ''), '\\');
+        return mb_ltrim($use_matches[1] ?? '', '\\');
     }
 
     private function encodeModelKey(string $fqcn): string
@@ -229,9 +227,7 @@ final class AppController extends Controller
         $padded = $key . str_repeat('=', (4 - (mb_strlen($key) % 4)) % 4);
         $decoded = base64_decode(strtr($padded, '-_', '+/'), true);
 
-        if (! is_string($decoded) || $decoded === '') {
-            throw new NotFoundHttpException();
-        }
+        throw_if(! is_string($decoded) || $decoded === '', NotFoundHttpException::class);
 
         return $decoded;
     }
