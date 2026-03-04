@@ -99,6 +99,14 @@
             "rector --dry-run"
         ],
         "test:unit": "pest --parallel --coverage --exactly=100",
+        "test:cms": "pest --configuration=Modules/Cms/phpunit.xml --test-directory=Modules/Cms/tests --parallel --coverage",
+        "test:core": "pest --configuration=Modules/Core/phpunit.xml --test-directory=Modules/Core/tests --parallel --coverage",
+        "test:ai": "pest --configuration=Modules/AI/phpunit.xml --test-directory=Modules/AI/tests --parallel --coverage",
+        "test:modules": [
+            "@test:core",
+            "@test:cms",
+            "@test:ai"
+        ],
         "test:types": "phpstan",
         "test:refactor": "rector",
         "test:licenses": "@php vendor/bin/check-licenses",
