@@ -1973,7 +1973,7 @@
         },
         {
             "name": "filament/actions",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/actions.git",
@@ -2022,16 +2022,16 @@
         },
         {
             "name": "filament/filament",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/panels.git",
-                "reference": "eb404cafc48131d387c634c072f5bb441cdb9d67"
+                "reference": "412d902ab770caddbbc60c79166d8163058da471"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/panels/zipball/eb404cafc48131d387c634c072f5bb441cdb9d67",
-                "reference": "eb404cafc48131d387c634c072f5bb441cdb9d67",
+                "url": "https://api.github.com/repos/filamentphp/panels/zipball/412d902ab770caddbbc60c79166d8163058da471",
+                "reference": "412d902ab770caddbbc60c79166d8163058da471",
                 "shasum": ""
             },
             "require": {
@@ -2075,11 +2075,11 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-02-28T22:52:21+00:00"
+            "time": "2026-03-03T09:26:16+00:00"
         },
         {
             "name": "filament/forms",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/forms.git",
@@ -2129,7 +2129,7 @@
         },
         {
             "name": "filament/infolists",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/infolists.git",
@@ -2174,7 +2174,7 @@
         },
         {
             "name": "filament/notifications",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/notifications.git",
@@ -2221,7 +2221,7 @@
         },
         {
             "name": "filament/query-builder",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/query-builder.git",
@@ -2267,7 +2267,7 @@
         },
         {
             "name": "filament/schemas",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/schemas.git",
@@ -2312,7 +2312,7 @@
         },
         {
             "name": "filament/spatie-laravel-media-library-plugin",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/spatie-laravel-media-library-plugin.git",
@@ -2349,7 +2349,7 @@
         },
         {
             "name": "filament/support",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/support.git",
@@ -2407,7 +2407,7 @@
         },
         {
             "name": "filament/tables",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/tables.git",
@@ -2453,7 +2453,7 @@
         },
         {
             "name": "filament/widgets",
-            "version": "v5.3.0",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/widgets.git",
