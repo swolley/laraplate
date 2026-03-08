@@ -1,9 +1,13 @@
 {
     "preset": "laravel",
-    "exclude": ["tests/Fixtures", "build"],
+    "exclude": [
+        "tests/Fixtures",
+        "build"
+    ],
     "notPath": [
         "tests/TestCase.php",
-        "tmp"
+        "tmp",
+        "Modules"
     ],
     "rules": {
         "array_push": true,
@@ -127,14 +131,24 @@
             "position": "beginning"
         },
         "no_alias_functions": {
-            "sets": ["@all"]
+            "sets": [
+                "@all"
+            ]
         },
         "single_line_comment_style": {
-            "comment_types": ["asterisk", "hash"]
+            "comment_types": [
+                "asterisk",
+                "hash"
+            ]
         },
         "trailing_comma_in_multiline": {
             "after_heredoc": true,
-            "elements": ["arrays", "arguments", "parameters", "match"]
+            "elements": [
+                "arrays",
+                "arguments",
+                "parameters",
+                "match"
+            ]
         },
         "blank_line_before_statement": {
             "statements": [
@@ -186,7 +200,11 @@
         },
         "ordered_imports": {
             "sort_algorithm": "alpha",
-            "imports_order": ["const", "function", "class"]
+            "imports_order": [
+                "const",
+                "function",
+                "class"
+            ]
         },
         "no_superfluous_phpdoc_tags": {
             "allow_mixed": false,
