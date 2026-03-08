@@ -18,6 +18,7 @@
         </include>
         <exclude>
             <file>app/Http/Controllers/AppController.php</file>
+            <directory>Modules</directory>
         </exclude>
     </source>
     <php>
