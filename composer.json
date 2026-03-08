@@ -31,7 +31,7 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "nwidart/laravel-modules": "^12.0 <12.0.4",
+        "nwidart/laravel-modules": "^12.0",
         "symfony/http-client": "^7.2"
     },
     "require-dev": {
@@ -99,14 +99,6 @@
             "rector --dry-run"
         ],
         "test:unit": "pest --parallel --coverage --exactly=100",
-        "test:cms": "pest --configuration=Modules/Cms/phpunit.xml --test-directory=Modules/Cms/tests --parallel --coverage",
-        "test:core": "pest --configuration=Modules/Core/phpunit.xml --test-directory=Modules/Core/tests --parallel --coverage",
-        "test:ai": "pest --configuration=Modules/AI/phpunit.xml --test-directory=Modules/AI/tests --parallel --coverage",
-        "test:modules": [
-            "@test:core",
-            "@test:cms",
-            "@test:ai"
-        ],
         "test:types": "phpstan",
         "test:refactor": "rector",
         "test:licenses": "@php vendor/bin/check-licenses",

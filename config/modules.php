@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Modules\Core\Helpers\ModuleDatabaseActivator;
+use Modules\Core\Helpers\ModuleMultiActivator;
 use Nwidart\Modules\Activators\FileActivator;
 use Nwidart\Modules\Providers\ConsoleServiceProvider;
 
@@ -276,7 +278,19 @@ return [
             'class' => FileActivator::class,
             'statuses-file' => base_path('modules_statuses.json'),
         ],
+        'database' => [
+            'class' => ModuleDatabaseActivator::class,
+        ],
+        'multi' => [
+            'class' => ModuleMultiActivator::class,
+        ],
     ],
 
-    'activator' => 'file',
+    /*
+    |--------------------------------------------------------------------------
+    | Default activator: "multi" (database if settings table exists, else file),
+    | "database", or "file". Set MODULES_ACTIVATOR in .env to override.
+    |--------------------------------------------------------------------------
+    */
+    'activator' => env('MODULES_ACTIVATOR', 'multi'),
 ];
