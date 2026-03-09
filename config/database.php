@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Support\Str;
 
+$read_hosts = array_values(array_unique(array_merge(
+    [env('DB_HOST', '127.0.0.1')],
+    array_filter(explode(',', (string) env('DB_READ_HOSTS', ''))),
+)));
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -28,6 +33,19 @@ return [
     | An example configuration is provided for each database system which
     | is supported by Laravel. You're free to add / remove connections.
     |
+    | Read/Write semantics (mysql, mariadb, pgsql, sqlsrv):
+    | - DB_HOST: primary read-write instance; used for both read and write
+    |   when DB_READ_HOSTS is not set.
+    | - DB_READ_HOSTS: optional comma-separated list of read replicas; when set,
+    |   DB_HOST is always included in the read pool so the primary shares read
+    |   load (optimal with one or few replicas).
+    | - sticky => true: after a write, all reads in the same request use the
+    |   write connection to avoid replica lag.
+    |
+    | Oracle (yajra/laravel-oci8): connection is only registered when the PHP
+    | extension oci8 is loaded. Use DB_CONNECTION=oracle only on environments
+    | where OCI8 and Oracle Instant Client are installed.
+    |
     */
 
     'connections' => [
@@ -45,7 +63,13 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'read' => [
+                'host' => $read_hosts,
+            ],
+            'write' => [
+                'host' => [env('DB_HOST', '127.0.0.1')],
+            ],
+            'sticky' => true,
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -67,7 +91,13 @@ return [
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'read' => [
+                'host' => $read_hosts,
+            ],
+            'write' => [
+                'host' => [env('DB_HOST', '127.0.0.1')],
+            ],
+            'sticky' => true,
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -89,7 +119,13 @@ return [
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'read' => [
+                'host' => $read_hosts,
+            ],
+            'write' => [
+                'host' => [env('DB_HOST', '127.0.0.1')],
+            ],
+            'sticky' => true,
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -104,7 +140,13 @@ return [
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', 'localhost'),
+            'read' => [
+                'host' => $read_hosts,
+            ],
+            'write' => [
+                'host' => [env('DB_HOST', '127.0.0.1')],
+            ],
+            'sticky' => true,
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
@@ -114,6 +156,32 @@ return [
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
+        
+        'oracle' => [
+            'driver' => 'oracle',
+            'tns' => env('DB_TNS', ''),
+            'host' => env('DB_HOST', ''),
+            'port' => env('DB_PORT', '1521'),
+            'database' => env('DB_DATABASE', ''),
+            'service_name' => env('DB_SERVICE_NAME', ''),
+            'username' => env('DB_USERNAME', ''),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'AL32UTF8'),
+            'prefix' => env('DB_PREFIX', ''),
+            'prefix_schema' => env('DB_SCHEMA_PREFIX', ''),
+            'edition' => env('DB_EDITION', 'ora$base'),
+            'server_version' => env('DB_SERVER_VERSION', '11g'),
+            'load_balance' => env('DB_LOAD_BALANCE', 'yes'),
+            'dynamic' => [],
+            'max_name_len' => env('ORA_MAX_NAME_LEN', 30),
+            'read' => [
+                'host' => $read_hosts,
+            ],
+            'write' => [
+                'host' => [env('DB_HOST', '')],
+            ],
+            'sticky' => true,
         ],
     ],
 
