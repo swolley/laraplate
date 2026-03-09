@@ -3216,6 +3216,68 @@
             "time": "2025-03-22T16:26:16+00:00"
         },
         {
+            "name": "inspector-apm/inspector-php",
+            "version": "3.16.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inspector-apm/inspector-php.git",
+                "reference": "38e76f5f6883745094d641f86a09001a1d7b5eea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inspector-apm/inspector-php/zipball/38e76f5f6883745094d641f86a09001a1d7b5eea",
+                "reference": "38e76f5f6883745094d641f86a09001a1d7b5eea",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "friendsofphp/php-cs-fixer": "^3.75",
+                "neuron-core/neuron-ai": "^2.8",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.0",
+                "rector/rector": "^2.2",
+                "tomasvotruba/type-coverage": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.16.x-dev",
+                    "dev-develop": "3.16.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Inspector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valerio Barbera",
+                    "email": "valerio@inspector.dev"
+                }
+            ],
+            "description": "Inspector monitoring for PHP applications.",
+            "keywords": [
+                "inspector",
+                "monitoring",
+                "observability",
+                "php",
+                "telemetry"
+            ],
+            "support": {
+                "issues": "https://github.com/inspector-apm/inspector-php/issues",
+                "source": "https://github.com/inspector-apm/inspector-php/tree/3.16.15"
+            },
+            "time": "2026-02-26T11:18:52+00:00"
+        },
+        {
             "name": "jfcherng/php-color-output",
             "version": "3.0.0",
             "source": {
@@ -3911,16 +3973,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.45.0",
+            "version": "v5.45.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "7126ddf27fe9750c43ab0b567085dee3917d0510"
+                "reference": "637e065ae0a704288595b896ad1c7c3c9741869b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/7126ddf27fe9750c43ab0b567085dee3917d0510",
-                "reference": "7126ddf27fe9750c43ab0b567085dee3917d0510",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/637e065ae0a704288595b896ad1c7c3c9741869b",
+                "reference": "637e065ae0a704288595b896ad1c7c3c9741869b",
                 "shasum": ""
             },
             "require": {
@@ -3985,9 +4047,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.45.0"
+                "source": "https://github.com/laravel/horizon/tree/v5.45.1"
             },
-            "time": "2026-02-21T14:20:09+00:00"
+            "time": "2026-03-06T15:31:27+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -5912,6 +5974,78 @@
                 "source": "https://github.com/nette/utils/tree/v4.1.3"
             },
             "time": "2026-02-13T03:05:33+00:00"
+        },
+        {
+            "name": "neuron-core/neuron-ai",
+            "version": "3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/neuron-core/neuron-ai.git",
+                "reference": "7e0cb18a2233500b7dc7257672867d810200a473"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/neuron-core/neuron-ai/zipball/7e0cb18a2233500b7dc7257672867d810200a473",
+                "reference": "7e0cb18a2233500b7dc7257672867d810200a473",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.9",
+                "inspector-apm/inspector-php": "^3.16.12",
+                "php": "^8.1",
+                "psr/http-message": "^1.0|^2.0"
+            },
+            "require-dev": {
+                "amphp/amp": "^3.1.1",
+                "amphp/http-client": "^5.3",
+                "aws/aws-sdk-php": "^3.209",
+                "elasticsearch/elasticsearch": "^8.0",
+                "ext-pdo": "*",
+                "friendsofphp/php-cs-fixer": "^3.75",
+                "google/auth": "^1.49",
+                "html2text/html2text": "^4.3",
+                "illuminate/database": "^10.0|^11.0|^12.0",
+                "laudis/neo4j-php-client": "^3.4",
+                "opensearch-project/opensearch-php": "^2.5",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.0",
+                "rector/rector": "^2.0",
+                "spatie/fork": "^1.2",
+                "tomasvotruba/type-coverage": "^2.0",
+                "typesense/typesense-php": "^5.0",
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "bin": [
+                "bin/neuron"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "NeuronAI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valerio Barbera",
+                    "email": "valerio@inspector.dev"
+                }
+            ],
+            "description": "The PHP Agentic Framework.",
+            "support": {
+                "issues": "https://github.com/neuron-core/neuron-ai/issues",
+                "source": "https://github.com/neuron-core/neuron-ai/tree/3.1.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/neuron-core",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-07T16:49:42+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -8198,16 +8332,16 @@
         },
         {
             "name": "pxlrbt/filament-environment-indicator",
-            "version": "v3.4.1",
+            "version": "v3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pxlrbt/filament-environment-indicator.git",
-                "reference": "e81132c7751351b421889bb1d93396edc0ef549c"
+                "reference": "0e242ca10db6a0955b16624cbcbefa63f1f3e4a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pxlrbt/filament-environment-indicator/zipball/e81132c7751351b421889bb1d93396edc0ef549c",
-                "reference": "e81132c7751351b421889bb1d93396edc0ef549c",
+                "url": "https://api.github.com/repos/pxlrbt/filament-environment-indicator/zipball/0e242ca10db6a0955b16624cbcbefa63f1f3e4a1",
+                "reference": "0e242ca10db6a0955b16624cbcbefa63f1f3e4a1",
                 "shasum": ""
             },
             "require": {
@@ -8248,7 +8382,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pxlrbt/filament-environment-indicator/issues",
-                "source": "https://github.com/pxlrbt/filament-environment-indicator/tree/v3.4.1"
+                "source": "https://github.com/pxlrbt/filament-environment-indicator/tree/v3.5.1"
             },
             "funding": [
                 {
@@ -8256,7 +8390,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-24T16:35:58+00:00"
+            "time": "2026-03-09T09:55:23+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

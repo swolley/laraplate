@@ -12,6 +12,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
+use Filament\Support\Assets\Js;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
@@ -38,7 +39,8 @@ final class AdminPanelProvider extends PanelProvider
         FilamentAsset::register([
             Css::make('app-css', Vite::asset('resources/css/app.css')),
             Css::make('admin-css', asset('css/admin.css')),
-        ]);
+            Js::make('sidebar-scroll', asset('js/sidebar-scroll.js')),
+        ], 'admin');
     }
 
     public function panel(Panel $panel): Panel
