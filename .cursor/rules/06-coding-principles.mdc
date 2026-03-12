@@ -11,6 +11,7 @@ alwaysApply: true
 - Keep It Simple: Prioritize readability and maintainability, avoid over-engineering solutions, use standard libraries and patterns when possible
 - Omit "else" statements only when possible to prevent long code inside parenthesis. Prefer to return default values in "then" reverting if conditions and then continue with the main code instead of the else
 - Comit messages must be always in the conventional commit standard.
+- Implementations should be always done following TDD principles
 
 ## Code Changes and Bug Fixes
 - Propose a clear plan before making changes
