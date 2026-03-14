@@ -3,11 +3,28 @@
     "info": {
         "title": "Laraplate",
         "description": "",
-        "version": "v1.11.1"
+        "version": "v1.11.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
+        "\/": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
         "\/app\/auth\/forgot-password": {
             "post": {
                 "summary": "Send a reset link to the given user.",
@@ -318,6 +335,82 @@
                 ]
             }
         },
+        "\/login": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-login",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/modules\/{module}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "module",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-modules-module",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/modules\/{module}\/models\/{model}": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "module",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "path",
+                        "name": "model",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    }
+                ],
+                "operationId": "get-modules-module-models-model",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
         "\/sanctum\/csrf-cookie": {
             "get": {
                 "summary": "Return an empty response simply to trigger the storage of the CSRF cookie in the browser.",
@@ -329,23 +422,6 @@
                     }
                 },
                 "operationId": "get-sanctum-csrf-cookie",
-                "tags": [
-                    "Others",
-                    "App"
-                ]
-            }
-        },
-        "\/storage\/.*": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-storage-.*",
                 "tags": [
                     "Others",
                     "App"

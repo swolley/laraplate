@@ -3,7 +3,7 @@
     "info": {
         "title": "Laraplate Core module",
         "description": "Core Module for Base Functionality (core, base, foundation, essential, framework, infrastructure, utilities, helpers, services, providers)",
-        "version": "v1.11.1"
+        "version": "v1.11.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",
@@ -24,6 +24,13 @@
                         "name": "entity",
                         "type": "string",
                         "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
                         "description": ""
                     }
                 ],
@@ -49,6 +56,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "post-api-v1-delete-entity",
@@ -92,6 +112,13 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
                     },
                     {
                         "in": "query",
@@ -148,6 +175,13 @@
                     },
                     {
                         "in": "query",
+                        "name": "id",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
                         "name": "limit",
                         "type": "integer",
                         "required": false,
@@ -188,6 +222,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "post-api-v1-insert-entity",
@@ -507,6 +554,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-api-v1-update-entity",
@@ -531,6 +591,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "put-api-v1-update-entity",
@@ -626,23 +699,6 @@
                 ]
             }
         },
-        "\/app\/configs": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-app-configs",
-                "tags": [
-                    "App",
-                    "Core"
-                ]
-            }
-        },
         "\/app\/crud\/activate\/{entity}": {
             "patch": {
                 "summary": "",
@@ -660,6 +716,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-activate-entity",
@@ -686,6 +755,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-approve-entity",
@@ -738,6 +820,13 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "query",
+                        "name": "connection",
+                        "type": "string",
+                        "required": false,
+                        "description": ""
                     }
                 ],
                 "operationId": "delete-app-crud-delete-entity",
@@ -762,6 +851,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "post-app-crud-delete-entity",
@@ -808,6 +910,13 @@
                     },
                     {
                         "in": "query",
+                        "name": "id",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
                         "name": "columns",
                         "type": "array",
                         "required": false,
@@ -841,6 +950,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-disapprove-entity",
@@ -1337,6 +1459,13 @@
                     },
                     {
                         "in": "query",
+                        "name": "id",
+                        "type": "string",
+                        "required": true,
+                        "description": ""
+                    },
+                    {
+                        "in": "query",
                         "name": "limit",
                         "type": "integer",
                         "required": false,
@@ -1377,6 +1506,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-inactivate-entity",
@@ -1403,6 +1545,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "post-app-crud-insert-entity",
@@ -1429,6 +1584,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-lock-entity",
@@ -1748,6 +1916,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-unlock-entity",
@@ -1774,6 +1955,19 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "patch-app-crud-update-entity",
@@ -1798,26 +1992,22 @@
                         "type": "string",
                         "required": true,
                         "description": ""
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "connection": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 ],
                 "operationId": "put-app-crud-update-entity",
-                "tags": [
-                    "App",
-                    "Core"
-                ]
-            }
-        },
-        "\/app\/info": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "operationId": "get-app-info",
                 "tags": [
                     "App",
                     "Core"
