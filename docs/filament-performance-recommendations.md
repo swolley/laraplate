@@ -88,3 +88,74 @@ return parent::getTableQuery()
 4. **Poi:** Widget dashboard – lazy o cache per le statistiche.
 
 Dopo questi interventi, in produzione con DB e cache adeguati puoi aspettarti un pannello sensibilmente più reattivo; senza, il guadagno sarà limitato soprattutto dalla combinazione Filament + DB lento.
+
+---
+
+## Interventi applicati (refactoring tabelle)
+
+Le seguenti ottimizzazioni sono state introdotte nelle Resources e Tables:
+
+- **UserResource:** `with('roles')` + `defaultSort('name')`.
+- **RoleResource:** `with('permissions')` + `defaultSort('name')`.
+- **ACLResource:** `with('permission')` + `defaultSort('sort')`.
+- **ModificationResource:** `with('modifier')` (le tab continuano a filtrare per `modifiable_type` nella List page).
+- **PermissionResource / PermissionsTable:** opzioni dei filtri `guard_name`, `connection_name`, `table_name` in cache (TTL da `core.filament.tabs_counts_ttl_seconds` o 300s) + `defaultSort('name')`.
+- **SettingResource / SettingsTable:** opzioni del filtro `group_name` in cache (stesso TTL).
+- **ContentResource:** `with(['entity', 'preset', 'media'])` (ContentsTable aveva già `defaultSort('created_at', 'desc')`).
+- **CategoryResource:** `with(['entity', 'preset', 'ancestors'])`.
+- **PresetResource:** `with(['entity', 'template'])`.
+
+Entities, Tags, Fields, Locations, Templates, CronJobs, Licenses non usano relazioni nelle colonne della table (o solo attributi in memoria), quindi non è stato aggiunto eager load.
+
+---
+
+## Linee guida per nuove Filament Tables
+
+Checklist da rispettare quando si aggiunge o si modifica una table Filament:
+
+1. **Query e eager loading**
+   - Per ogni colonna che usa una relazione (es. `TextColumn::make('entity.name')`, `->relationship()`, badge su relazioni), la Resource deve applicare `->modifyQueryUsing(fn ($query) => $query->with([...]))` con tutte le relazioni necessarie.
+   - Preferire `with(['relation1', 'relation2'])` nella Resource piuttosto che caricare le relazioni solo in alcune List pages.
+
+2. **Ordinamento di default**
+   - Impostare sempre un `->defaultSort()` sensato (es. `'name'`, `'created_at' desc`) nella Table o nella Resource per evitare ordinamenti impliciti e per migliorare la predicibilità delle query.
+
+3. **Paginazione**
+   - Non usare `->paginated(false)` per tabelle che possono crescere; mantenere la paginazione (default 25) già configurata in `HasTable`.
+
+4. **Filtri con opzioni da DB**
+   - Se un `SelectFilter` usa `Model::query()->distinct()->pluck(...)` (o query simili), preferire:
+     - opzioni in cache con TTL breve (es. `Cache::remember('filament_...', 300, fn () => ...)`),
+     - oppure `->relationship()` con `->searchable()->preload()` quando il filtro è su una relazione.
+   - Evitare di eseguire query pesanti per le opzioni dei filtri ad ogni caricamento della lista.
+
+5. **Colonne costose**
+   - Per colonne con `formatStateUsing` / `getStateUsing` che chiamano metodi sul modello o relazioni, assicurarsi che le relazioni usate siano incluse in `with()`.
+   - Per gerarchie (es. `ancestors->count()`), includere `ancestors` (o la relazione equivalente) nell’eager loading.
+
+6. **Toggle e colonne nascoste**
+   - Usare `->toggleable(isToggledHiddenByDefault: true)` per colonne secondarie o pesanti (path, JSON, descrizioni lunghe) per ridurre il lavoro di rendering di default.
+
+---
+
+## Come misurare e verificare i miglioramenti
+
+1. **TTFB (Time To First Byte)**
+   - Aprire la lista (es. Users, Contents, Categories) nel browser, scheda Network.
+   - Leggere il tempo della richiesta che carica la tabella (tipicamente la prima richiesta alla route admin o la richiesta Livewire che restituisce l’HTML/JSON della table).
+   - Confrontare prima e dopo le ottimizzazioni (stesso ambiente, stessi dati approssimativi).
+
+2. **Numero di query**
+   - Abilitare il log delle query (es. `DB::enableQueryLog()` in un middleware di debug, o usare Laravel Telescope / Debugbar).
+   - Caricare una pagina di lista (es. 25 record) e contare le query eseguite.
+   - Obiettivo: nessun N+1 (es. da ~1 + 25×3 a ~1 + 2–3 query con eager load).
+
+3. **Pagine prioritarie da tenere d’occhio**
+   - List Users (molti ruoli/utenti).
+   - List Contents (entity, preset, media).
+   - List Categories (entity, preset, ancestors).
+   - List Modifications (modifier).
+   - List Permissions (filtri: dopo la cache le opzioni non devono più generare 3 query a ogni load).
+
+4. **Ambiente di produzione**
+   - Ripetere le stesse verifiche (o solo TTFB) in staging/produzione con OPcache attivo e `APP_DEBUG=false` per stimare il guadagno reale.
