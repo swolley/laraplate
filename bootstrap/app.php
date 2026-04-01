@@ -86,7 +86,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->create();
 
-$app->beforeBootstrapping(RegisterProviders::class, function (Illuminate\Contracts\Foundation\Application $application): void {
+$app->beforeBootstrapping(RegisterProviders::class, static function (Illuminate\Contracts\Foundation\Application $application): void {
     $early_providers = [
         Illuminate\Redis\RedisServiceProvider::class,
         Illuminate\Cache\CacheServiceProvider::class,
