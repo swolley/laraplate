@@ -1,5 +1,6 @@
 {
     "Core": true,
     "Cms": true,
+    "Crm": true,
     "AI": true
 }

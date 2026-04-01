@@ -165,28 +165,36 @@ amend_or_commit() {
 #   $1: New version string
 # Returns:
 #   None
+#
+# Resolves the package composer.json next to this script (repository root or module root).
+# Only the root JSON key "version" is updated; never scripts.version (the composer script name).
 update_composer_version() {
     local new_version=$1
-    
-    local repo_root=$(git rev-parse --show-toplevel)
-    local composer_file="$repo_root/composer.json"
-    
-    # Ensure we're working with the root composer.json only
+
+    local version_script_dir
+    version_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+    local composer_file
+    composer_file="$(cd "$version_script_dir/.." && pwd)/composer.json"
+
     if [ ! -f "$composer_file" ]; then
-        echo "Error: composer.json not found in repository root"
+        echo "Error: composer.json not found at $composer_file"
         exit 1
     fi
-    
+
     if command -v jq >/dev/null 2>&1; then
-        # if jq is installed - modifica la proprietà version alla root
+        local tmp
         tmp=$(mktemp)
         jq --arg version "$new_version" '.version = $version' "$composer_file" > "$tmp" && mv "$tmp" "$composer_file"
+    elif command -v composer >/dev/null 2>&1; then
+        if ! composer config --file "$composer_file" version "$new_version"; then
+            echo "Error: could not set version via composer (invalid semver?). Install jq for reliable updates."
+            exit 1
+        fi
     else
-        # fallback to sed if jq is not available
-        sed -i "s/^    \"version\": \".*\",$/    \"version\": \"$new_version\",/" "$composer_file"
+        echo "Error: install jq or ensure composer is available to update composer.json safely (sed cannot target root version without breaking scripts.version)."
+        exit 1
     fi
-    
-    # add only the root composer.json file to git (but don't commit yet)
+
     git add "$composer_file"
 }
 
