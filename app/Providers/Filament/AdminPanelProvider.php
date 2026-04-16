@@ -36,8 +36,14 @@ final class AdminPanelProvider extends PanelProvider
 
     public function boot(): void
     {
+        /**
+         * App panel theme CSS is built by Vite. {@see \Filament\Support\Commands\AssetsCommand} copies
+         * registered styles from {@see \Filament\Support\Assets\Asset::getPath()} into the public Filament
+         * asset tree; a remote placeholder path marks this entry as non-local so that step is skipped,
+         * while {@see Css::html()} resolves the real URL when the panel renders.
+         */
         FilamentAsset::register([
-            Css::make('app-css', Vite::asset('resources/css/app.css')),
+            Css::make('app-css', 'https://__vite__.invalid/app.css')->html(static fn (): string => Vite::asset('resources/css/app.css')),
             Css::make('admin-css', asset('css/admin.css')),
             Js::make('sidebar-scroll', asset('js/sidebar-scroll.js')),
         ], 'admin');
