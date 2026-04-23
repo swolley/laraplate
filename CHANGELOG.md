@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚀 Features
+
+- Add master rule file and enhance existing rules with descriptions
+- Implement app structure with authentication and module management
+- Add initial Business module plan and structure
+
+### ⚙️ Miscellaneous Tasks
+
+- Update package versions and submodule references
+- Update composer.lock with new package versions and dependencies
+- Remove CLAUDE.md and update dependencies
+- Update submodule references and composer.lock content-hash
+- Add Laravel Boost guidelines and update dependencies
+- Update submodule references for Cms and Core modules
+- Update dependencies and improve component functionality
+- Update Core submodule and add pagination component
+- Remove IDE helper files and update .gitignore
+- Update Cms submodule to latest commit
+- Enhance testing setup and update dependencies
+- Update submodule references for AI, Cms, and Core modules
+- Update filament packages and submodule references
+- Update phpunit configuration and Core submodule reference
+- Update module activators and testing configuration
+- Update dependencies and add sidebar scroll functionality
+- Update database configuration for read/write semantics
+- Enhance coding principles documentation
+- Update composer dependencies and configuration settings
+- Update filament packages to version 5.3.5 and enhance documentation
+- Update dependencies and enhance performance optimizations
+- Update dependencies and submodule references
+- Add new CRM module and update dependencies
+- Update module structure and dependencies
+- Update submodule references and enhance seeder functionality
+- Add Business module as a subproject
+
+## [1.11.2] - 2026-01-22
+
 ### ⚙️ Miscellaneous Tasks
 
 - Update submodule references and enhance Swagger documentation
