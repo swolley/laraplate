@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "redis-development": {
+      "enabled": true
+    },
+    "superpowers": {
+      "enabled": true
+    },
+    "elastic": {
+      "enabled": true
+    }
+  }
+}
