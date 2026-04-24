@@ -1,3 +1,6 @@
+# Orchestra / Core testbench fake module tree (symlinks to Modules/Core, Modules/Cms)
+/Modules/.testbench-modules
+
 /.phpunit.cache
 /node_modules
 /public/build
