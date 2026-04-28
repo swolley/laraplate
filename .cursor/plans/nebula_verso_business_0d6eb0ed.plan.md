@@ -15,8 +15,8 @@ todos:
     content: "Meta-MVP pre-contabilità: listino (`price_lists`+valuta, `price_list_items`+`taxonomy_id`+`unit_price` 15,4) + preventivo (`quotations` con `customer_id`+`currency` obbl., righe tabella `quotations_items` + `unit_price`) + `projects` (`customer_id` obbl., **no** `lead_user_id`) + `tasks` (`taxonomy_id` obbl.) + `time_entries` (`started_at`/`ended_at`, più righe per utente consentite; sovrapposizione **solo validazione app**). Modelli MVP + `getRules()` create/update su entità principali; **restano** seed dev tassonomie operativo + validazione sovrapposizione `TimeEntry` (todo `time-domain`) + test/migrate verificati su DB pulito. Escluso: cassa/movimenti/bilanci/Filament pieno (vedi todo dedicati)."
     status: completed
   - id: glossary-map
-    content: Glossario entità Business per sviluppatori; naming neutro vs alias verticali; Task/TimeEntry/settlement/bilancio
-    status: pending
+    content: "Glossario sviluppatori in `Modules/Business/docs/GLOSSARY.md` (EN): tenant, taxonomies+EntityType, TaxCode/TaxLineCalculator, journal, documenti, MovementType, invoice stub."
+    status: completed
   - id: fix-task-activity-migrations
     content: "Schema Business: aggiunte migration `191728` `price_lists`, `191729` `price_list_items` (prima delle righe preventivo); `191747` `time_entries`; `tasks` usa `taxonomy_id`→`taxonomies`; `quotations` (`customer_id`+`currency`), `quotations_items` (+`unit_price` 15,4), `projects` (`customer_id` obbl.); pivot `contactables` (file `191727_create_contactables_table`); `QuotationItem::$table = 'quotations_items'`. Verifica `migrate` su DB **pulito** ancora da chiudere in CI."
     status: completed
@@ -30,8 +30,8 @@ todos:
     content: "Completare dominio tempo: validazione sovrapposizione `TimeEntry` **solo applicativa** (accettato) — **da implementare**; regole `getRules()` su `Task`/`TimeEntry` (intervalli `started_at`/`ended_at`, `taxonomy_id`, FK opzionali) **fatte a livello modello**; eventuali scope/query per aggregati per `taxonomy_id` su sessione. Nessun enum ActivityType."
     status: completed
   - id: business-enums-and-taxonomy-trees
-    content: "Documentare in codice/README modulo: `EntityType` (Business) = quale albero `taxonomies`; foglie = dati/seed/UI. **Rimuovere `EntityType::MOVEMENTS`** (assorbito dal Chart of Accounts: ogni `JournalEntryLine` ha `account_id`; tag analitici extra restano colonne `project_id`, `site_id`). Conservare `EntityType::ACTIVITIES`. **Aggiungere `EntityType::OPPORTUNITY_STAGES`** per la pipeline CRM (fase M3.1). `MovementType` enum (income/expense) resta come direzione contabile sintetica per gli adapter cassa Tricount."
-    status: pending
+    content: "Chiuso: `EntityType` senza MOVEMENTS, con OPPORTUNITY_STAGES + modello `OpportunityStage`, entity+preset in `BusinessDatabaseSeeder`, dev seed `DevBusinessOpportunityStagesTaxonomySeeder`, enum `MovementType` (income/expense), PHPDoc + GLOSSARY."
+    status: completed
   - id: settlements-quotes-lines
     content: Quote lines; movimenti soci/clienti; pool/cassa Tricount + split righe + (opz.) suggerimento settle-up
     status: pending
@@ -67,19 +67,19 @@ todos:
     status: completed
   - id: accounting-coa
     content: "M1 — Chart of Accounts. Tabella `accounts` (id, `code` immutabile, `name`, `kind` enum {asset, liability, equity, revenue, expense}, `parent_id` self-FK, `meta` JSON con `civilistico_code` ed eventuali codifiche italiane, `company_id` obbl., `is_active`). Interfaccia `ChartOfAccountsProvider` con default italiano `ItalianCoaProvider` pluggable per altre giurisdizioni. Seed PDC italiano dev-only. Test: integrita' parent/kind, vincoli company scope."
-    status: completed
+    status: pending
   - id: accounting-journal
     content: "M1 — Partita doppia (chiuso in modulo): `JournalPostingService::post/reverse`, immutabilità post-`posted_at` su header/righe, `reverses_journal_entry_id`+`reversal_reason`, doppio controllo saldo `amount_local` (validazione + somma persistita). CHECK SQL cross-row non portabile — backlog se si fissa un solo DB di produzione."
-    status: completed
+    status: pending
   - id: accounting-fiscal-periods
     content: "M1 — Tabelle `fiscal_years` (id, company_id, `year`, `start_date`, `end_date`, `status` ∈ open/closing/closed) + `fiscal_periods` (id, fiscal_year_id, `code` es. M1..M12, `start_date`, `end_date`, `status`, `closed_at`, `closed_by`). Lock progressivo: chiusura periodo blocca posting su entry con `posted_at` nel range. Refattorizzare lo stub `balances` come snapshot legato a `fiscal_periods`. Servizio `FiscalPeriodCloser` con re-open tracciato. Test: posting impossibile su periodo chiuso, reopen registra audit."
-    status: completed
+    status: pending
   - id: document-sequences
     content: "M1 — Numeratori (chiuso in modulo): `document_sequences` con `format_pattern`+`suffix`, lock pessimistico, `DocumentType::defaultGapAllowed()` (quotation=true, altri false), `DocumentNumberFormatter`. Test unicità su molte allocazioni; stress multi-process 50 worker rimandato a `accounting-test-plan`."
-    status: completed
-  - id: accounting-vat-withholdings
-    content: "M2 — Tabella `tax_codes` (`code` univoco e **immutabile**, `kind` ∈ {vat, withholding}, `country`, `rate`, `label`, `company_id`, `is_active` bool, `effective_from` date, `replaced_by_tax_code_id` self-FK nullable). **Versionamento per nuovo row**: cambio aliquota -> nuovo `tax_code` (es. `IT_VAT_22_PRE2027` -> `IT_VAT_24_2027`); il vecchio si disattiva e si compila `replaced_by_tax_code_id`. Strategy `TaxLineCalculator` interroga solo i `tax_codes` attivi alla data di posting. **Snapshot fiscale** denormalizzato su `invoice_lines`/`journal_entry_lines`: `tax_code` (string), `tax_rate` (decimal), `tax_label` (string) congelati al posting. Seed dev-only set storico italiano (IVA 22/10/4/0 fuori campo, ritenute base). Test: cambio aliquota crea nuovo row + lascia il vecchio intatto + righe storiche conservano lo snapshot al rate originale."
     status: pending
+  - id: accounting-vat-withholdings
+    content: "M2 base chiusa: `tax_codes`, `TaxKind`, `TaxCode` (immutabilità ORM su chiave fiscale), `TaxLineCalculator`+`TaxCodeSupersessionService` (update DB raw per versioning), `tax_code_id` opzionale su `journal_entry_lines`, tabelle `invoices`/`invoice_lines` stub con snapshot, `ItalianTaxCodesSeeder`. TaxLineCalculator completo in M3.5 con posting fattura."
+    status: completed
   - id: accounting-refactor-cash-tricount
     content: "M2 — Refactor di [Movement](file:///srv/http/laraplate/Modules/Business/app/Models/Movement.php) / `PartnerPool` / `PoolTransaction` come **specializzazioni / adapter contabili** che generano `JournalEntry` via `JournalPostingService`. Eliminare la logica saldo parallela: il saldo cassa torna a essere **derivato** dalle entry contabili (vista o servizio dedicato). Mantenere l'API/UX Tricount lato Filament/Livewire ma sotto-cofano scrive solo in journal. Migrazione dati: per ogni Movement esistente, generare entry equivalente; flag su Movement `posted_journal_entry_id`."
     status: pending
