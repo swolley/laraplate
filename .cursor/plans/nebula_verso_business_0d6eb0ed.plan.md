@@ -67,13 +67,13 @@ todos:
     status: completed
   - id: accounting-coa
     content: "M1 — Chart of Accounts. Tabella `accounts` (id, `code` immutabile, `name`, `kind` enum {asset, liability, equity, revenue, expense}, `parent_id` self-FK, `meta` JSON con `civilistico_code` ed eventuali codifiche italiane, `company_id` obbl., `is_active`). Interfaccia `ChartOfAccountsProvider` con default italiano `ItalianCoaProvider` pluggable per altre giurisdizioni. Seed PDC italiano dev-only. Test: integrita' parent/kind, vincoli company scope."
-    status: pending
+    status: completed
   - id: accounting-journal
     content: M1 — Partita doppia. Tabelle `journal_entries` (id, `posted_at`, `posted_by`, `fiscal_period_id`, `company_id`, `reference_type`+`reference_id` morph, `description`) + `journal_entry_lines` (account_id, `amount_doc`+`currency_doc`+`fx_rate`+`amount_local`, snapshot `tax_code`/`tax_rate`/`tax_label` se applicabile). **Vincolo partita doppia bilanciato sull'`amount_local`** (la moneta funzionale company), sia in app che con check DB. Servizio `JournalPostingService::post(...)` unico entry-point. Niente update/delete diretto dopo posting. Reverse via `JournalPostingService::reverse(JournalEntry, string reason)` che crea entry di storno collegato. Tutti i contabili (Invoice, cassa Tricount, eventuali rivalutazioni FX future) passano da qui.
     status: pending
   - id: accounting-fiscal-periods
     content: "M1 — Tabelle `fiscal_years` (id, company_id, `year`, `start_date`, `end_date`, `status` ∈ open/closing/closed) + `fiscal_periods` (id, fiscal_year_id, `code` es. M1..M12, `start_date`, `end_date`, `status`, `closed_at`, `closed_by`). Lock progressivo: chiusura periodo blocca posting su entry con `posted_at` nel range. Refattorizzare lo stub `balances` come snapshot legato a `fiscal_periods`. Servizio `FiscalPeriodCloser` con re-open tracciato. Test: posting impossibile su periodo chiuso, reopen registra audit."
-    status: pending
+    status: completed
   - id: document-sequences
     content: "M1 — Tabella `document_sequences` con chiave composita `(company_id, document_type, fiscal_year)`, colonne `last_number` int unsigned, `format_pattern` string, `gap_allowed` bool, `prefix`, `suffix`, `padding` tinyint. Servizio `DocumentNumberAllocator::next(Company $company, DocumentType $type, ?int $fiscalYear=null): string` con **lock pessimistico DB** (`lockForUpdate` Eloquent / `SELECT ... FOR UPDATE`) all'interno della transazione di creazione documento, per garantire **0 buchi** sui tipi fiscali (`invoice_sale`, `invoice_purchase`, `tax_credit_note`). Per i tipi non fiscali (`quotation`, `sales_order`, `purchase_order`, `delivery_note`, `goods_receipt`) flag `gap_allowed=true`: numero allocato in transazione 'best-effort' (gap accettati su rollback). Reset automatico al cambio `fiscal_year`. Pattern formattazione configurabile per tipo (es. `IT-{company}-FAT-{YYYY}-{NNNNNN}`). Test concorrenza: 50 process paralleli su `invoice_sale` -> 50 numeri sequenziali univoci, 0 buchi."
     status: pending
