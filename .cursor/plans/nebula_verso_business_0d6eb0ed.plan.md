@@ -1,6 +1,6 @@
 ---
 name: Laraplate Business modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. Filament Business = ultimo passo modulo (slice UI opzionale solo dopo dominio stabile)."
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili Business (companies, tax codes, accounts, journal bozza/view, fiscal years/periods, document sequences) — todo `business-filament-erp-core-slice` **completed**; CRM/magazzino/fatture/BI Filament restano in `erp-filament-resources`."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi Business `sites.place_id` / ICS"
@@ -50,8 +50,11 @@ todos:
   - id: calendar-ics-export
     content: Generazione ICS/promemoria mobile da Task (DTSTART/END) + LOCATION da Place/Site + partecipanti da Contact/User; eventuale persistenza UID export in seguito
     status: pending
+  - id: business-filament-erp-core-slice
+    content: "Chiuso (slice): risorse Filament in `Modules/Business/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `Business`; test `Modules/Business/tests/Feature/Filament/BusinessFilamentResourcesTest.php`. Escluso: posting da UI, quotation/project/customer, CRM, magazzino, fatture complete (restano sotto `erp-filament-resources`)."
+    status: completed
   - id: business-filament-final
-    content: "Ultimo passo modulo Business: risorse Filament (pagine, tabelle, form, relazioni) dopo che schema DB, modelli Core e flussi dominio sono stabili; API mobile opzionale in parallelo o dopo"
+    content: "Ampliamento UI modulo Business oltre la slice `business-filament-erp-core-slice`: risorse MVP commerciali (quotations, projects, customers/anagrafica), poi CRM/magazzino quando le entità esistono; API mobile opzionale in parallelo o dopo."
     status: pending
   - id: inventory-magazzino-nebula
     content: "**ASSORBITO da `inventory-erp-base`** (M3.3, vedi Roadmap ERP). Non e' piu' un verticale rinviato: il magazzino e' integrato nel piano ERP come prerequisito di DDT vendita (M3.4) e Goods Receipt acquisto (M3.6). Resta come rimando storico per eventuali scelte ETL legacy specifiche."
@@ -67,16 +70,16 @@ todos:
     status: completed
   - id: accounting-coa
     content: "M1 — Chart of Accounts. Tabella `accounts` (id, `code` immutabile, `name`, `kind` enum {asset, liability, equity, revenue, expense}, `parent_id` self-FK, `meta` JSON con `civilistico_code` ed eventuali codifiche italiane, `company_id` obbl., `is_active`). Interfaccia `ChartOfAccountsProvider` con default italiano `ItalianCoaProvider` pluggable per altre giurisdizioni. Seed PDC italiano dev-only. Test: integrita' parent/kind, vincoli company scope."
-    status: pending
+    status: completed
   - id: accounting-journal
     content: "M1 — Partita doppia (chiuso in modulo): `JournalPostingService::post/reverse`, immutabilità post-`posted_at` su header/righe, `reverses_journal_entry_id`+`reversal_reason`, doppio controllo saldo `amount_local` (validazione + somma persistita). CHECK SQL cross-row non portabile — backlog se si fissa un solo DB di produzione."
-    status: pending
+    status: completed
   - id: accounting-fiscal-periods
     content: "M1 — Tabelle `fiscal_years` (id, company_id, `year`, `start_date`, `end_date`, `status` ∈ open/closing/closed) + `fiscal_periods` (id, fiscal_year_id, `code` es. M1..M12, `start_date`, `end_date`, `status`, `closed_at`, `closed_by`). Lock progressivo: chiusura periodo blocca posting su entry con `posted_at` nel range. Refattorizzare lo stub `balances` come snapshot legato a `fiscal_periods`. Servizio `FiscalPeriodCloser` con re-open tracciato. Test: posting impossibile su periodo chiuso, reopen registra audit."
-    status: pending
+    status: completed
   - id: document-sequences
     content: "M1 — Numeratori (chiuso in modulo): `document_sequences` con `format_pattern`+`suffix`, lock pessimistico, `DocumentType::defaultGapAllowed()` (quotation=true, altri false), `DocumentNumberFormatter`. Test unicità su molte allocazioni; stress multi-process 50 worker rimandato a `accounting-test-plan`."
-    status: pending
+    status: completed
   - id: accounting-vat-withholdings
     content: "M2 base chiusa: `tax_codes`, `TaxKind`, `TaxCode` (immutabilità ORM su chiave fiscale), `TaxLineCalculator`+`TaxCodeSupersessionService` (update DB raw per versioning), `tax_code_id` opzionale su `journal_entry_lines`, tabelle `invoices`/`invoice_lines` stub con snapshot, `ItalianTaxCodesSeeder`. TaxLineCalculator completo in M3.5 con posting fattura."
     status: completed
@@ -108,7 +111,7 @@ todos:
     content: "M4 — Policies + permessi su: chiusura/riapertura periodo, posting/unposting journal, fatturazione (genera/annulla), sblocco quotations/SO, switch company corrente, modifica `tax_codes` (riservata ad amministratori), gestione `document_sequences`. Allineamento al pattern Core (gates + policies). Test feature: utente standard non puo' ri-aprire periodo chiuso, non puo' modificare tax_code, ecc."
     status: pending
   - id: erp-filament-resources
-    content: "M4 — Risorse Filament per: Companies, Chart of Accounts, JournalEntries (read-only post-posting), FiscalPeriods, DocumentSequences, Leads, Opportunities, SalesOrders, DeliveryNotes, Invoices (sale + purchase), Parties (filtri per role), PurchaseOrders, GoodsReceipts, Items, Warehouses, StockLevels (read-only). Pagine BI minime: bilancio, report IVA, sales pipeline funnel. Dipende da `business-filament-final` (architettura Filament Business)."
+    content: "M4 — Filament **parziale**: già coperti Companies, CoA (`AccountResource`), JournalEntry (bozza + view postata), TaxCode, FiscalYear, FiscalPeriod, DocumentSequence. **Da fare**: Leads, Opportunities, SalesOrders, DeliveryNotes, Invoices sale/purchase, Parties+role, PO, GoodsReceipts, Items, Warehouses, StockLevels read-only; azioni UI per posting/chiusure se richiesto. BI minime: bilancio, registro IVA, funnel pipeline."
     status: pending
   - id: erp-reporting-stub
     content: "M4 — Servizi report come query/jobs (no BI completa): `BalanceSheetService`, `IncomeStatementService`, `VatLedgerService` (registro IVA vendite/acquisti), `SalesPipelineService` (funnel opportunity -> won), `StockValuationService` (valore magazzino al costing method scelto). Output structurato (JSON/array), pagine Filament minime per consumarli, export CSV/PDF rinviati."
@@ -138,7 +141,7 @@ Obiettivo: un **ciclo chiuso dati** commessa / commerciale / tempo **senza** cas
 **Fuori dal MVP v1** (contabilità / cassa / chiusure)
 
 - `movements`, `movement_allocations`, `balances`, partner pool, settle-up, `PaymentRequest`, enum cassa a regime, ETL, magazzino.
-- **Filament** modulo Business: resta **dopo** il dominio stabile (`business-filament-final`); per “utilizzabile” nel MVP si intende **backend verificabile** (test/artisan/tinker/API opzionale), non obbligatoriamente UI completa.
+- **Filament** modulo Business: **slice contabile ERP** in admin (`business-filament-erp-core-slice`); resto UI MVP commerciale + CRM/magazzino/fatture in `erp-filament-resources` / `business-filament-final`. Per MVP pre-contabilità si intende **backend verificabile** anche senza tutta l'UI.
 
 **Ordine di lavoro suggerito**
 
@@ -622,10 +625,10 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 ## Struttura modulo `Modules/Business` (stato + prossimi file)
 
 - Migration principali: `create_customers_table`, `create_contacts_table`, `create_contactables_table`, `create_price_lists_table`, `create_price_list_items_table`, `create_quotations_table`, `create_quotation_items_table` (`quotations_items`), `create_projects_table`, `create_sites_table`, `create_tasks_table`, `create_time_entries_table`, stub `movements` / `balances`.
-- Ordine consigliato **post-MVP**: movimenti / allocazioni / bilanci; Filament (`business-filament-final`).
+- Ordine consigliato **post-MVP**: movimenti / allocazioni / bilanci; resto Filament commerciale/CRM (`business-filament-final`); **slice contabile Filament già presente** (`business-filament-erp-core-slice`).
 - `app/Contracts`: `BillingStrategyInterface` per ore vs preventivo; `BalanceCalculatorInterface` per snapshot + runtime.
 - **Test**: somme allocazioni, congelamento; se presente ETL legacy, campioni di parità su totali noti (evitare bug tipo closure che non muta accumulatori).
-- **Filament**: **non** come primo deliverable del modulo Business; vedi **§ Fase finale — Filament** (ultimo passo).
+- **Filament**: risorse **accounting-first** in admin (vedi `business-filament-erp-core-slice`); il resto del back-office Business (`business-filament-final`, `erp-filament-resources`) dopo dominio stabilizzato.
 
 ---
 
@@ -679,9 +682,9 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 
 ### Fase finale — Filament (modulo Business)
 
-- **Regola di delivery**: tutto il **back-office Filament** del modulo `Modules/Business` (Resources, Pages, relation managers, policy UI) è l’**ultimo passo** del modulo: si affronta **dopo** migrazioni, modelli allineati a `Modules\Core\Overrides\Model`, validazioni, e i flussi di dominio principali (anagrafica, progetti, preventivi, tempo, movimenti/bilanci dove previsti).
-- **Motivo**: evitare risorse UI che inseguono schema instabile; Filament resta consumatore del dominio, non driver del modello dati.
-- **API / mobile**: da pianificare in parallelo o subito dopo Filament, a seconda del primo consumatore reale (vedi todo `business-filament-final`).
+- **Regola di delivery (aggiornata)**: il back-office Filament **contabile** (tenant, PdC, prima nota bozza/view, periodi, numeratori, codici fiscali) è **già iniziato** (`business-filament-erp-core-slice`). Risorse **commerciali/CRM/magazzino/fatture** restano l’ultimo grosso blocco UI (`business-filament-final` / `erp-filament-resources`), dopo migrazioni e modelli allineati.
+- **Motivo**: la UI resta consumatore del dominio; la slice contabile è utile per smoke test/admin senza bloccare il resto del modulo.
+- **API / mobile**: da pianificare in parallelo o dopo l’ampliamento Filament commerciale, a seconda del primo consumatore reale (vedi todo `business-filament-final`).
 
 ---
 
@@ -774,7 +777,7 @@ Ispirazione **Tricount / Splitwise**: ogni spesa ha **quote di riparto** per soc
 
 **Processo**: se un tool propone un nuovo file piano, **ignorarlo o incorporarlo** in questo documento; il tracking operativo resta nei **todo YAML** sotto. File duplicato `business_schema_dominio_acf1d12b.plan.md` **eliminato** dopo merge nel piano Nebula.
 
-**Ordine modulo Business**: **Filament (UI)** è l’**ultimo passo** del modulo — dopo schema e dominio stabili (todo `business-filament-final`).
+**Ordine modulo Business**: **Filament contabile (admin)** come slice anticipata (`business-filament-erp-core-slice` **completed**); **Filament commerciale/CRM/magazzino** resta da completare (`business-filament-final`, `erp-filament-resources`).
 
 Decisioni **confermate**:
 
