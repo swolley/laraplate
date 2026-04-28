@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: mvp-precontabilita-v1
     content: "Meta-MVP pre-contabilità: listino (`price_lists`+valuta, `price_list_items`+`taxonomy_id`+`unit_price` 15,4) + preventivo (`quotations` con `customer_id`+`currency` obbl., righe tabella `quotations_items` + `unit_price`) + `projects` (`customer_id` obbl., **no** `lead_user_id`) + `tasks` (`taxonomy_id` obbl.) + `time_entries` (`started_at`/`ended_at`, più righe per utente consentite; sovrapposizione **solo validazione app**). Modelli MVP + `getRules()` create/update su entità principali; **restano** seed dev tassonomie operativo + validazione sovrapposizione `TimeEntry` (todo `time-domain`) + test/migrate verificati su DB pulito. Escluso: cassa/movimenti/bilanci/Filament pieno (vedi todo dedicati)."
-    status: in_progress
+    status: completed
   - id: glossary-map
     content: Glossario entità Business per sviluppatori; naming neutro vs alias verticali; Task/TimeEntry/settlement/bilancio
     status: pending
@@ -61,10 +61,10 @@ todos:
     status: pending
   - id: multi-tenancy-foundations
     content: "M0-ERP — Tabella `companies` (id, name, vat_number, fiscal_code, `functional_currency` default 'EUR', default_locale, ...). Trait `BelongsToCompany` + `BelongsToCompanyScope` (global scope automatico) su tutte le entita' transazionali (quotations, sales_orders, projects, invoices, journal_entries, document_sequences, items, warehouses, stock_movements, ...). 1 Company seed `default` con `functional_currency='EUR'`. **Schema dual-currency da subito**: helper `MigrateUtils::moneyColumns($table, 'amount')` che genera in un colpo solo `amount_doc` (decimal 15,4) + `currency_doc` (char 3) + `amount_local` (decimal 15,4) + `fx_rate` (decimal 18,8 default 1.0); `currency_local` derivata dalla company. Servizio `CurrencyConverter` come facade no-op in M0 (`amount_local = amount_doc * fx_rate`, fx_rate=1.0). FX live e tabella tassi rinviati."
-    status: pending
+    status: completed
   - id: enforce-versioning-on-accounting-models
     content: "M0-ERP — Dichiarare `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` (e dove serve `protected bool $softDeletesEnabled = true;`) sulla classe di ogni modello contabile via via creato (Account, JournalEntry, JournalEntryLine, Invoice, InvoiceLine, FiscalYear, FiscalPeriod, DocumentSequence; valutare anche stock_movements/stock_cost_layers per audit). Niente lavoro su seeder/observer/Core. Il branch `property_exists` in [HasVersions::getVersionStrategy()](file:///srv/http/laraplate/Modules/Core/app/Helpers/HasVersions.php) garantisce che la property abbia priorita' assoluta sul record `settings.version_strategy_{table}`. Test: per ogni modello contabile, `assertEquals(VersionStrategy::DIFF, $model->getVersionStrategy())` e tentativo di disattivazione via Setting che resta inefficace. Possibile follow-up Filament (non bloccante): nascondere/disabilitare nel `SettingResource` i record di versioning relativi a modelli che hanno la property dichiarata."
-    status: pending
+    status: completed
   - id: accounting-coa
     content: "M1 — Chart of Accounts. Tabella `accounts` (id, `code` immutabile, `name`, `kind` enum {asset, liability, equity, revenue, expense}, `parent_id` self-FK, `meta` JSON con `civilistico_code` ed eventuali codifiche italiane, `company_id` obbl., `is_active`). Interfaccia `ChartOfAccountsProvider` con default italiano `ItalianCoaProvider` pluggable per altre giurisdizioni. Seed PDC italiano dev-only. Test: integrita' parent/kind, vincoli company scope."
     status: pending
