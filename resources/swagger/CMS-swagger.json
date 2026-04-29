@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laraplate Cms module",
+        "title": "Laraplate CMS module",
         "description": "Content Management System Module (cms, content, management, articles, posts, pages, categories, tags, contributors)",
         "version": "v1.11.2"
     },
@@ -126,7 +126,7 @@
                 "operationId": "get-api-v1-tags-value-contents",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -248,7 +248,7 @@
                 "operationId": "get-api-v1-tags-value-articles",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -370,7 +370,7 @@
                 "operationId": "get-api-v1-tags-value-authors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -492,7 +492,7 @@
                 "operationId": "get-api-v1-tags-value-categories",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -614,7 +614,7 @@
                 "operationId": "get-api-v1-tags-value-contributors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -736,7 +736,7 @@
                 "operationId": "get-api-v1-tags-value-events",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -858,7 +858,7 @@
                 "operationId": "get-api-v1-tags-value-multimedia",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -980,7 +980,7 @@
                 "operationId": "get-api-v1-tags-value-posts",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1102,7 +1102,7 @@
                 "operationId": "get-api-v1-tags-value-surveys",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1224,7 +1224,7 @@
                 "operationId": "get-api-v1-categories-value-contents",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1346,7 +1346,7 @@
                 "operationId": "get-api-v1-categories-value-articles",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1468,7 +1468,7 @@
                 "operationId": "get-api-v1-categories-value-authors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1590,7 +1590,7 @@
                 "operationId": "get-api-v1-categories-value-categories",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1712,7 +1712,7 @@
                 "operationId": "get-api-v1-categories-value-contributors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1834,7 +1834,7 @@
                 "operationId": "get-api-v1-categories-value-events",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -1956,7 +1956,7 @@
                 "operationId": "get-api-v1-categories-value-multimedia",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2078,7 +2078,7 @@
                 "operationId": "get-api-v1-categories-value-posts",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2200,7 +2200,7 @@
                 "operationId": "get-api-v1-categories-value-surveys",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2322,7 +2322,7 @@
                 "operationId": "get-api-v1-locations-value-contents",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2444,7 +2444,7 @@
                 "operationId": "get-api-v1-locations-value-articles",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2566,7 +2566,7 @@
                 "operationId": "get-api-v1-locations-value-authors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2688,7 +2688,7 @@
                 "operationId": "get-api-v1-locations-value-categories",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2810,7 +2810,7 @@
                 "operationId": "get-api-v1-locations-value-contributors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -2932,7 +2932,7 @@
                 "operationId": "get-api-v1-locations-value-events",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3054,7 +3054,7 @@
                 "operationId": "get-api-v1-locations-value-multimedia",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3176,7 +3176,7 @@
                 "operationId": "get-api-v1-locations-value-posts",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3298,7 +3298,7 @@
                 "operationId": "get-api-v1-locations-value-surveys",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3420,7 +3420,7 @@
                 "operationId": "get-api-v1-contributors-value-contents",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3542,7 +3542,7 @@
                 "operationId": "get-api-v1-contributors-value-articles",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3664,7 +3664,7 @@
                 "operationId": "get-api-v1-contributors-value-authors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3786,7 +3786,7 @@
                 "operationId": "get-api-v1-contributors-value-categories",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -3908,7 +3908,7 @@
                 "operationId": "get-api-v1-contributors-value-contributors",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -4030,7 +4030,7 @@
                 "operationId": "get-api-v1-contributors-value-events",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -4152,7 +4152,7 @@
                 "operationId": "get-api-v1-contributors-value-multimedia",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -4274,7 +4274,7 @@
                 "operationId": "get-api-v1-contributors-value-posts",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -4396,7 +4396,7 @@
                 "operationId": "get-api-v1-contributors-value-surveys",
                 "tags": [
                     "Api",
-                    "Cms"
+                    "CMS"
                 ]
             }
         },
@@ -4443,13 +4443,13 @@
                 "operationId": "get-app-locations-geocode",
                 "tags": [
                     "App",
-                    "Cms"
+                    "CMS"
                 ]
             }
         }
     },
     "tags": [
-        "Cms",
+        "CMS",
         "Api"
     ]
 }

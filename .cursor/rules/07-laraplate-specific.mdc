@@ -42,7 +42,7 @@ alwaysApply: false
 - **Module Structure**: Each module follows Laravel's standard structure with its own routes, controllers, models, commands, tests, etc.
 
 ## Module Development Standards
-- **Module Naming**: Use PascalCase for module names (e.g., `Core`, `Cms`)
+- **Module Naming**: Use PascalCase for module names; use all caps for acronyms (e.g., `Core`, `CMS`, `ERP`, `AI`)
 - **Module Structure**: Follow the standard Laravel Modules structure:
   ```
   Modules/
