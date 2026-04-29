@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚜 Refactor
+
+- Rename **Business** submodule to **ERP** (`Modules/ERP`), Composer package `swolley/laraplate-erp`, PSR-4 namespace `Modules\ERP`, and update `modules_statuses.json` / `.gitmodules`.
+
 ### 🚀 Features
 
 - Add master rule file and enhance existing rules with descriptions

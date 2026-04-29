@@ -1,6 +1,6 @@
 ---
-name: Laraplate Business modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili Business (companies, tax codes, accounts, journal bozza/view, fiscal years/periods, document sequences) — todo `business-filament-erp-core-slice` **completed**; CRM/magazzino/fatture/BI Filament restano in `erp-filament-resources`."
+name: Laraplate ERP modulo
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (companies, tax codes, accounts, journal bozza/view, fiscal years/periods, document sequences) — todo `business-filament-erp-core-slice` **completed**; CRM/magazzino/fatture/BI Filament restano in `erp-filament-resources`."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi Business `sites.place_id` / ICS"
@@ -15,7 +15,7 @@ todos:
     content: "Meta-MVP pre-contabilità: listino (`price_lists`+valuta, `price_list_items`+`taxonomy_id`+`unit_price` 15,4) + preventivo (`quotations` con `customer_id`+`currency` obbl., righe tabella `quotations_items` + `unit_price`) + `projects` (`customer_id` obbl., **no** `lead_user_id`) + `tasks` (`taxonomy_id` obbl.) + `time_entries` (`started_at`/`ended_at`, più righe per utente consentite; sovrapposizione **solo validazione app**). Modelli MVP + `getRules()` create/update su entità principali; **restano** seed dev tassonomie operativo + validazione sovrapposizione `TimeEntry` (todo `time-domain`) + test/migrate verificati su DB pulito. Escluso: cassa/movimenti/bilanci/Filament pieno (vedi todo dedicati)."
     status: completed
   - id: glossary-map
-    content: "Glossario sviluppatori in `Modules/Business/docs/GLOSSARY.md` (EN): tenant, taxonomies+EntityType, TaxCode/TaxLineCalculator, journal, documenti, MovementType, invoice stub."
+    content: "Glossario sviluppatori in `Modules/ERP/docs/GLOSSARY.md` (EN): tenant, taxonomies+EntityType, TaxCode/TaxLineCalculator, journal, documenti, MovementType, invoice stub."
     status: completed
   - id: fix-task-activity-migrations
     content: "Schema Business: aggiunte migration `191728` `price_lists`, `191729` `price_list_items` (prima delle righe preventivo); `191747` `time_entries`; `tasks` usa `taxonomy_id`→`taxonomies`; `quotations` (`customer_id`+`currency`), `quotations_items` (+`unit_price` 15,4), `projects` (`customer_id` obbl.); pivot `contactables` (file `191727_create_contactables_table`); `QuotationItem::$table = 'quotations_items'`. Verifica `migrate` su DB **pulito** ancora da chiudere in CI."
@@ -30,7 +30,7 @@ todos:
     content: "Completare dominio tempo: validazione sovrapposizione `TimeEntry` **solo applicativa** (accettato) — **da implementare**; regole `getRules()` su `Task`/`TimeEntry` (intervalli `started_at`/`ended_at`, `taxonomy_id`, FK opzionali) **fatte a livello modello**; eventuali scope/query per aggregati per `taxonomy_id` su sessione. Nessun enum ActivityType."
     status: completed
   - id: business-enums-and-taxonomy-trees
-    content: "Chiuso: `EntityType` senza MOVEMENTS, con OPPORTUNITY_STAGES + modello `OpportunityStage`, entity+preset in `BusinessDatabaseSeeder`, dev seed `DevBusinessOpportunityStagesTaxonomySeeder`, enum `MovementType` (income/expense), PHPDoc + GLOSSARY."
+    content: "Chiuso: `EntityType` senza MOVEMENTS, con OPPORTUNITY_STAGES + modello `OpportunityStage`, entity+preset in `ERPDatabaseSeeder`, dev seed `DevERPOpportunityStagesTaxonomySeeder`, enum `MovementType` (income/expense), PHPDoc + GLOSSARY."
     status: completed
   - id: settlements-quotes-lines
     content: Quote lines; movimenti soci/clienti; pool/cassa Tricount + split righe + (opz.) suggerimento settle-up
@@ -51,7 +51,7 @@ todos:
     content: Generazione ICS/promemoria mobile da Task (DTSTART/END) + LOCATION da Place/Site + partecipanti da Contact/User; eventuale persistenza UID export in seguito
     status: pending
   - id: business-filament-erp-core-slice
-    content: "Chiuso (slice): risorse Filament in `Modules/Business/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `Business`; test `Modules/Business/tests/Feature/Filament/BusinessFilamentResourcesTest.php`. Escluso: posting da UI, quotation/project/customer, CRM, magazzino, fatture complete (restano sotto `erp-filament-resources`)."
+    content: "Chiuso (slice): risorse Filament in `Modules/ERP/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `ERP`; test `Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php`. Escluso: posting da UI, quotation/project/customer, CRM, magazzino, fatture complete (restano sotto `erp-filament-resources`)."
     status: completed
   - id: business-filament-final
     content: "Ampliamento UI modulo Business oltre la slice `business-filament-erp-core-slice`: risorse MVP commerciali (quotations, projects, customers/anagrafica), poi CRM/magazzino quando le entità esistono; API mobile opzionale in parallelo o dopo."
@@ -84,7 +84,7 @@ todos:
     content: "M2 base chiusa: `tax_codes`, `TaxKind`, `TaxCode` (immutabilità ORM su chiave fiscale), `TaxLineCalculator`+`TaxCodeSupersessionService` (update DB raw per versioning), `tax_code_id` opzionale su `journal_entry_lines`, tabelle `invoices`/`invoice_lines` stub con snapshot, `ItalianTaxCodesSeeder`. TaxLineCalculator completo in M3.5 con posting fattura."
     status: completed
   - id: accounting-refactor-cash-tricount
-    content: "M2 — Refactor di [Movement](file:///srv/http/laraplate/Modules/Business/app/Models/Movement.php) / `PartnerPool` / `PoolTransaction` come **specializzazioni / adapter contabili** che generano `JournalEntry` via `JournalPostingService`. Eliminare la logica saldo parallela: il saldo cassa torna a essere **derivato** dalle entry contabili (vista o servizio dedicato). Mantenere l'API/UX Tricount lato Filament/Livewire ma sotto-cofano scrive solo in journal. Migrazione dati: per ogni Movement esistente, generare entry equivalente; flag su Movement `posted_journal_entry_id`."
+    content: "M2 — Refactor di [Movement](file:///srv/http/laraplate/Modules/ERP/app/Models/Movement.php) / `PartnerPool` / `PoolTransaction` come **specializzazioni / adapter contabili** che generano `JournalEntry` via `JournalPostingService`. Eliminare la logica saldo parallela: il saldo cassa torna a essere **derivato** dalle entry contabili (vista o servizio dedicato). Mantenere l'API/UX Tricount lato Filament/Livewire ma sotto-cofano scrive solo in journal. Migrazione dati: per ogni Movement esistente, generare entry equivalente; flag su Movement `posted_journal_entry_id`."
     status: pending
   - id: crm-leads-opportunities
     content: "M3.1 — Tabella `leads` (party_id nullable opt., source, status enum, owner_user_id, company_id, primi contatti) + `opportunities` (lead_id?, party_id obbl., `stage_taxonomy_id` -> taxonomy con `EntityType::OPPORTUNITY_STAGES`, `expected_close_date`, `expected_amount_local`+`amount_doc`+fx, `probability`, `won_at`/`lost_at`/`lost_reason`). Conversione `Opportunity -> Quotation` con `lineage`: `quotations.opportunity_id` opt. + observer che chiude opportunity al win. Filament resource minimale (resta in M4 per integrazione)."
@@ -164,7 +164,7 @@ Obiettivo: un **ciclo chiuso dati** commessa / commerciale / tempo **senza** cas
 
 ## Contesto verificato (repo Laraplate)
 
-- **Modulo Business** (`[Modules/Business](file:///srv/http/laraplate/Modules/Business)`): migration per `price_lists`, `price_list_items`, `time_entries`, `tasks.taxonomy_id`, `quotations`/`quotations_items`, `projects`, pivot `contactables`; modelli MVP su `Core\\Overrides\\Model` incluso **`Movement`** (stub tabella). **`getRules()`** su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem (+ anagrafica/preventivo già coperti). Restano seed dev tassonomie operativo, validazione sovrapposizione `TimeEntry`, test/`migrate` su DB pulito. Stub `movements`/`balances` fuori MVP pre-contabilità.
+- **Modulo Business** (`[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`): migration per `price_lists`, `price_list_items`, `time_entries`, `tasks.taxonomy_id`, `quotations`/`quotations_items`, `projects`, pivot `contactables`; modelli MVP su `Core\\Overrides\\Model` incluso **`Movement`** (stub tabella). **`getRules()`** su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem (+ anagrafica/preventivo già coperti). Restano seed dev tassonomie operativo, validazione sovrapposizione `TimeEntry`, test/`migrate` su DB pulito. Stub `movements`/`balances` fuori MVP pre-contabilità.
 
 ---
 
@@ -274,7 +274,7 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 
 | Concetto Business (generico)                                                               | Tabella / classe sorgente (solo ETL)                           | Note implementative                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Customer + Contact                                                                         | `Client`, `Contact`                                            | Già in `[customers](file:///srv/http/laraplate/Modules/Business/database/migrations/2026_04_08_191717_create_customers_table.php)` / `[contacts](file:///srv/http/laraplate/Modules/Business/database/migrations/2026_04_08_191726_create_contacts_table.php)` + pivot **`contactables`**. **Nessun** `customer_id` su `contacts` (M:N); v1 senza dati fiscali estesi su `customers`; **nessun contatto primario**.                   |
+| Customer + Contact                                                                         | `Client`, `Contact`                                            | Già in `[customers](file:///srv/http/laraplate/Modules/ERP/database/migrations/2026_04_08_191717_create_customers_table.php)` / `[contacts](file:///srv/http/laraplate/Modules/ERP/database/migrations/2026_04_08_191726_create_contacts_table.php)` + pivot **`contactables`**. **Nessun** `customer_id` su `contacts` (M:N); v1 senza dati fiscali estesi su `customers`; **nessun contatto primario**.                   |
 | Project obbligatorio su Customer, opzionale su offerta, **owner interno** (`lead_user_id`) | `Work` + `client_id`, `quotation` opzionale                    | `lead_user_id` → `users` (Core). Distinto dal contatto principale cliente.                                                                                                                                                                                                                                                                      |
 | Task = todo/appuntamento pianificato                                                       | `Appointment` (calendario) + meta su `Work`                    | Non fondere todo e sessione sulla stessa riga: la **pianificazione** (stime, calendario) e l’**effettivo** (ore lavorate) hanno cicli di vita diversi.                                                                                                                                                                                          |
 | Sessione / lavoro effettivo                                                                | `WorkSession` (con `event_start`/`event_end` + utenti)         | La “pivot utente–todo” **sola** non basta per parallelismo o fasce orarie: serve una entità **TimeEntry** (o `work_sessions`) con `user_id`, `actual_start`, `actual_end`, **`taxonomy_id`** (catalogo attività), `quotation_item_id` **opzionale**, `task_id` **nullable**, `project_id` **nullable** (denormalizzato da task o libero per lavoro non pianificato). Più righe = più persone o turni. |
@@ -352,7 +352,7 @@ Concetto trasversale utile: **audit** trail sulle entità commerciali — in Lar
 
 ## Modello dati Laraplate (tabelle / entità target)
 
-Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo Business (salvo `users` in Core). Colonna «Stato» rispetto al repo `[Modules/Business](file:///srv/http/laraplate/Modules/Business)`.
+Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo Business (salvo `users` in Core). Colonna «Stato» rispetto al repo `[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`.
 
 
 | Entità (concettuale)       | Tabella (prevista)     | Ruolo sintetico                                                                                                                           | Stato repo                                 |
@@ -622,7 +622,7 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 
 ---
 
-## Struttura modulo `Modules/Business` (stato + prossimi file)
+## Struttura modulo `Modules/ERP` (stato + prossimi file)
 
 - Migration principali: `create_customers_table`, `create_contacts_table`, `create_contactables_table`, `create_price_lists_table`, `create_price_list_items_table`, `create_quotations_table`, `create_quotation_items_table` (`quotations_items`), `create_projects_table`, `create_sites_table`, `create_tasks_table`, `create_time_entries_table`, stub `movements` / `balances`.
 - Ordine consigliato **post-MVP**: movimenti / allocazioni / bilanci; resto Filament commerciale/CRM (`business-filament-final`); **slice contabile Filament già presente** (`business-filament-erp-core-slice`).
@@ -765,7 +765,7 @@ Ispirazione **Tricount / Splitwise**: ogni spesa ha **quote di riparto** per soc
 
 **Stato milestone**: **P0** e **P1** completati; **anagrafica** aggiornata (pivot `contactables`). **`fix-task-activity-migrations` completato** (listino, preventivo, tasks/tassonomia, `time_entries`, vincoli `customer_id`/`currency` su `quotations`, ecc.). **`business-models-rules-casts-relations` completato** (`getRules()` su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem; `Movement` su `Core\\Overrides\\Model` con tabella stub). **Obiettivo corrente**: **`time-domain`** (sovrapposizione applicativa + eventuali scope aggregati), poi chiusura **`mvp-precontabilita-v1`** (seed dev tassonomie operativo + prova `migrate` su DB pulito).
 
-**Implementazione recente (repo, tracciamento)** — schema + modelli MVP pre-contabilità: file migration `191728`–`191729` (listino), `191747` (`time_entries`), aggiornamenti `quotations`/`projects`/`tasks`/`quotations_items`, pivot `contactables` rinominata; modelli `Quotation`, `Project`, `Task`, `TimeEntry`, `PriceList`, `PriceListItem`, `QuotationItem`, `Contact`/`Customer` (M:N), `Activity` (inverse `tasks`/`time_entries`/`price_list_items`); `getRules()` create/update sui modelli MVP elencati; seeder dev stub `DevBusinessTaxonomySeeder`.
+**Implementazione recente (repo, tracciamento)** — schema + modelli MVP pre-contabilità: file migration `191728`–`191729` (listino), `191747` (`time_entries`), aggiornamenti `quotations`/`projects`/`tasks`/`quotations_items`, pivot `contactables` rinominata; modelli `Quotation`, `Project`, `Task`, `TimeEntry`, `PriceList`, `PriceListItem`, `QuotationItem`, `Contact`/`Customer` (M:N), `Activity` (inverse `tasks`/`time_entries`/`price_list_items`); `getRules()` create/update sui modelli MVP elencati; seeder dev stub `DevERPTaxonomySeeder`.
 
 **Definizioni entità**: sezione **[Definizioni entità Business](#definizioni-entità-business)** con scopo, anti-pattern, relazioni e gap rispetto al repo (`Task`/`activities`, `Project` senza `lead_user_id`, ecc.).
 
@@ -811,7 +811,7 @@ Decisioni **confermate**:
 - **Ciclo passivo completo** (M3.6): `PurchaseOrder`, `GoodsReceipt`, `Invoice direction=purchase`, riconciliazione 3-way PO/GR/Invoice. **Magazzino integrato** (`StockMovementService`) per i carichi GR. Anagrafica unica `parties` con colonna `roles` (json: customer/supplier/both); rename in-place `customers` -> `parties` + rinomina FK `customer_id` -> `party_id` su tutti i documenti.
 - **Inventory full costing in v1**: FIFO + media ponderata (scelta per articolo via `costing_method`). Tabelle `items`, `warehouses`, `stock_levels` (con `weighted_avg_cost`), `stock_movements`, `stock_cost_layers`. `StockMovementService` come unico entry-point: in carico apre layer + aggiorna media; in scarico consuma FIFO o legge media; calcola `unit_cost` per il COGS del journal posting.
 - **E-invoicing**: solo contratti `EInvoiceProvider` + DTO neutri nel modulo (M3.5). Provider concreti SDI/Peppol restano package separati / verticali. Tabella `e_invoice_submissions` per tracciamento.
-- **Migration in-place fino al build**: durante la **fase di creazione** del modulo Business, le migration di `Modules/Business/database/migrations/*` possono essere modificate **in-place** invece di creare ALTER (DB ricreato da zero ad ogni passaggio). **Eccezione**: rename `customers` -> `parties` deve avvenire prima del passaggio a build. Le migration di `Modules/Core/*` restano **immutate**.
+- **Migration in-place fino al build**: durante la **fase di creazione** del modulo Business, le migration di `Modules/ERP/database/migrations/*` possono essere modificate **in-place** invece di creare ALTER (DB ricreato da zero ad ogni passaggio). **Eccezione**: rename `customers` -> `parties` deve avvenire prima del passaggio a build. Le migration di `Modules/Core/*` restano **immutate**.
 - **ETL legacy riscritto** in chiave ERP: `Movement` legacy -> `JournalEntry` via `JournalPostingService`; eventuali movimenti magazzino legacy -> `stock_movements` via `StockMovementService`. ETL gira **dopo M2** (contabilita' base) e **dopo M3.3** se include flussi magazzino.
 - **Test plan dedicato** (`accounting-test-plan`, trasversale M1-M3): partita doppia bilanciata su `amount_local`, snapshot fiscale immutabile, concorrenza numerazione, scope multi-company, versioning forzato, lock-chain SO, FIFO/avg, currency converter no-op. Suite di golden master che funge da regression baseline per i PR successivi.
 
@@ -837,7 +837,7 @@ Decisioni **confermate**:
 
 Siamo nella **fase di creazione** del modulo `Business`. Finche' non si entra in `build` definitivo, le migration del modulo possono essere modificate **in-place** invece di creare nuove migration `ALTER`: il database verra' rigenerato da zero (`migrate:fresh` + seeder) ad ogni passaggio, e questo riduce drammaticamente il rumore in code review e mantiene un solo file per concetto.
 
-- **Ambito**: solo `Modules/Business/database/migrations/*`. Le migration di `Modules/Core/*` restano **immutate**: Core non sa dell'esistenza di Business, e modificare migration Core retroattivamente romperebbe ambienti gia' in build.
+- **Ambito**: solo `Modules/ERP/database/migrations/*`. Le migration di `Modules/Core/*` restano **immutate**: Core non sa dell'esistenza di Business, e modificare migration Core retroattivamente romperebbe ambienti gia' in build.
 - **Eccezione su rename `customers` -> `parties`**: rinomina della migration originale + ridenominazione colonne FK su tutte le altre migration Business che le referenziano, **prima** di entrare in build. Test di migrate-fresh + seeder dev su DB pulito a ogni rinomina.
 - **Quando si entra in build**: la regola si chiude. Da quel punto in poi, ogni cambio di schema = nuova migration `ALTER` che si somma in coda.
 
@@ -1032,4 +1032,4 @@ flowchart TB
 
 ## Nota per maintainers — fonte informazioni iniziali (solo questo documento di piano)
 
-Le prime analisi sono state confrontate con un **gestionale Symfony legacy** dell’autore, percorso file: `/srv/http/utilities/nebula_old` (nome storico interno del repo: **Nebula**). **Non** citare questo nome, quel path o quel progetto nel modulo `**Modules/Business`**, nel suo README rivolto agli utenti, né nel codice. Questa sezione serve solo a tracciare l’origine delle idee per chi cura il piano.
+Le prime analisi sono state confrontate con un **gestionale Symfony legacy** dell’autore, percorso file: `/srv/http/utilities/nebula_old` (nome storico interno del repo: **Nebula**). **Non** citare questo nome, quel path o quel progetto nel modulo `**Modules/ERP`**, nel suo README rivolto agli utenti, né nel codice. Questa sezione serve solo a tracciare l’origine delle idee per chi cura il piano.
