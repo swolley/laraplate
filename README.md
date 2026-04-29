@@ -40,7 +40,7 @@ php artisan module:seed --all
 ### Laraplate Modules
 
 -   ⚡ **Core**: main common boilerplate functionalities. About [Core Module](https://github.com/swolley/laraplate-core).
--   ✎ **Cms**: common Cms functionalities. About [Cms Module](https://github.com/swolley/laraplate-cms).
+-   ✎ **CMS**: common content management functionalities. About [CMS module](https://github.com/swolley/laraplate-cms).
 -   ✨ **AI**: artificial intelligence capabilities (embeddings, vector search, automatic translation). About [AI Module](https://github.com/swolley/laraplate-ai).
 
 ### Environment (principali variabili)
@@ -97,5 +97,5 @@ Laraplate and its modules are open-sourced software licensed under the [GNU AGPL
 
 For a complete and detailed list of TODOs, read:
 - [Core Module TODO](Modules/Core/README.md#todo-and-fixme)
-- [CMS Module TODO](Modules/Cms/README.md#todo-and-fixme)
+- [CMS Module TODO](Modules/CMS/README.md#todo-and-fixme)
 - [AI Module TODO](Modules/AI/README.md#todo-and-fixme)

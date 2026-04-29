@@ -2,8 +2,8 @@
 	path = Modules/Core
 	url = https://github.com/swolley/laraplate-core.git
 	pushurl = git@github.com:swolley/laraplate-core.git
-[submodule "Modules/Cms"]
-	path = Modules/Cms
+[submodule "Modules/CMS"]
+	path = Modules/CMS
 	url = https://github.com/swolley/laraplate-cms.git
 	pushurl = git@github.com:swolley/laraplate-cms.git
 [submodule "Modules/AI"]

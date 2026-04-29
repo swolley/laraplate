@@ -1,4 +1,4 @@
-# Orchestra / Core testbench fake module tree (symlinks to Modules/Core, Modules/Cms)
+# Orchestra / Core testbench fake module tree (symlinks to Modules/Core, Modules/CMS)
 /Modules/.testbench-modules
 
 /.phpunit.cache
