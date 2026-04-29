@@ -10,7 +10,7 @@
 	path = Modules/AI
 	url = https://github.com/swolley/laraplate-ai.git
 	pushurl = git@github.com:swolley/laraplate-ai.git
-[submodule "Modules/Business"]
-	path = Modules/Business
-	url = https://github.com/swolley/laraplate-business.git
-	pushurl = git@github.com:swolley/laraplate-business.git
+[submodule "Modules/ERP"]
+	path = Modules/ERP
+	url = https://github.com/swolley/laraplate-erp.git
+	pushurl = git@github.com:swolley/laraplate-erp.git
