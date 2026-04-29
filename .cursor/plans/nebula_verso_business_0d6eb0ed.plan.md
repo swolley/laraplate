@@ -3,10 +3,10 @@ name: Laraplate ERP modulo
 overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (companies, tax codes, accounts, journal bozza/view, fiscal years/periods, document sequences) — todo `business-filament-erp-core-slice` **completed**; CRM/magazzino/fatture/BI Filament restano in `erp-filament-resources`."
 todos:
   - id: p0-core-place-location-refactor
-    content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi Business `sites.place_id` / ICS"
+    content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi ERP `sites.place_id` / ICS"
     status: completed
   - id: p1-core-taxonomy-category-refactor
-    content: "P1 — Taxonomy + Category (dopo P0): tabella `taxonomies` + `abstract class Taxonomy` con `$table = 'taxonomies'`; refactor `Category extends Taxonomy` + migrazione dati Cms; scope/EntityType per contesto; Business `taxonomy_id` su Task/TimeEntry/listino. (Correzioni PSR-4/tabella/regole `exists` già allineate dove applicabile.)"
+    content: "P1 — Taxonomy + Category (dopo P0): tabella `taxonomies` + `abstract class Taxonomy` con `$table = 'taxonomies'`; refactor `Category extends Taxonomy` + migrazione dati Cms; scope/EntityType per contesto; ERP `taxonomy_id` su Task/TimeEntry/listino. (Correzioni PSR-4/tabella/regole `exists` già allineate dove applicabile.)"
     status: completed
   - id: business-anagrafica-v1
     content: "Anagrafica v1: `customers` (+`is_active`), `sites` (`place_id`→`places`); `contacts` **senza** `customer_id` (legame M:N con `customers` via pivot **`contactables`**); modelli Customer/Contact/Site aggiornati."
@@ -18,7 +18,7 @@ todos:
     content: "Glossario sviluppatori in `Modules/ERP/docs/GLOSSARY.md` (EN): tenant, taxonomies+EntityType, TaxCode/TaxLineCalculator, journal, documenti, MovementType, invoice stub."
     status: completed
   - id: fix-task-activity-migrations
-    content: "Schema Business: aggiunte migration `191728` `price_lists`, `191729` `price_list_items` (prima delle righe preventivo); `191747` `time_entries`; `tasks` usa `taxonomy_id`→`taxonomies`; `quotations` (`customer_id`+`currency`), `quotations_items` (+`unit_price` 15,4), `projects` (`customer_id` obbl.); pivot `contactables` (file `191727_create_contactables_table`); `QuotationItem::$table = 'quotations_items'`. Verifica `migrate` su DB **pulito** ancora da chiudere in CI."
+    content: "Schema ERP: aggiunte migration `191728` `price_lists`, `191729` `price_list_items` (prima delle righe preventivo); `191747` `time_entries`; `tasks` usa `taxonomy_id`→`taxonomies`; `quotations` (`customer_id`+`currency`), `quotations_items` (+`unit_price` 15,4), `projects` (`customer_id` obbl.); pivot `contactables` (file `191727_create_contactables_table`); `QuotationItem::$table = 'quotations_items'`. Verifica `migrate` su DB **pulito** ancora da chiudere in CI."
     status: completed
   - id: business-models-rules-casts-relations
     content: "Eloquent MVP: Quotation/Project/Task/TimeEntry/PriceList/PriceListItem/QuotationItem su `Core\\Overrides\\Model` con `fillable`+relazioni+casts principali; Quotation `HasLocks`+`HasValidity`; `getRules()` (create/update) su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem (oltre Customer/Site/Quotation già presenti). `Movement` su `Core\\Overrides\\Model` stub (nessun attributo mass-assignable finché la tabella resta vuota). Opzionale backlog: accessor valuta listino→riga, rifiniture relazioni `taxonomy()` vs modello Taxonomy Core."
@@ -54,7 +54,7 @@ todos:
     content: "Chiuso (slice): risorse Filament in `Modules/ERP/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `ERP`; test `Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php`. Escluso: posting da UI, quotation/project/customer, CRM, magazzino, fatture complete (restano sotto `erp-filament-resources`)."
     status: completed
   - id: business-filament-final
-    content: "Ampliamento UI modulo Business oltre la slice `business-filament-erp-core-slice`: risorse MVP commerciali (quotations, projects, customers/anagrafica), poi CRM/magazzino quando le entità esistono; API mobile opzionale in parallelo o dopo."
+    content: "Ampliamento UI modulo ERP oltre la slice `business-filament-erp-core-slice`: risorse MVP commerciali (quotations, projects, customers/anagrafica), poi CRM/magazzino quando le entità esistono; API mobile opzionale in parallelo o dopo."
     status: pending
   - id: inventory-magazzino-nebula
     content: "**ASSORBITO da `inventory-erp-base`** (M3.3, vedi Roadmap ERP). Non e' piu' un verticale rinviato: il magazzino e' integrato nel piano ERP come prerequisito di DDT vendita (M3.4) e Goods Receipt acquisto (M3.6). Resta come rimando storico per eventuali scelte ETL legacy specifiche."
@@ -63,7 +63,7 @@ todos:
     content: "Meta-todo Roadmap ERP completo (post-MVP): Laraplate ERP italian-first pluggable, e-invoice solo come interfaccia, multi-company + multi-currency predisposti, ciclo passivo completo, magazzino integrato, accounting-first phasing. Vedi sezione 'Roadmap ERP completo (post-MVP)' nel corpo del piano."
     status: pending
   - id: multi-tenancy-foundations
-    content: "M0-ERP — Tabella `companies` (id, name, vat_number, fiscal_code, `functional_currency` default 'EUR', default_locale, ...). Trait `BelongsToCompany` + `BelongsToCompanyScope` (global scope automatico) su tutte le entita' transazionali (quotations, sales_orders, projects, invoices, journal_entries, document_sequences, items, warehouses, stock_movements, ...). 1 Company seed `default` con `functional_currency='EUR'`. **Schema dual-currency da subito**: helper `MigrateUtils::moneyColumns($table, 'amount')` che genera in un colpo solo `amount_doc` (decimal 15,4) + `currency_doc` (char 3) + `amount_local` (decimal 15,4) + `fx_rate` (decimal 18,8 default 1.0); `currency_local` derivata dalla company. Servizio `CurrencyConverter` come facade no-op in M0 (`amount_local = amount_doc * fx_rate`, fx_rate=1.0). FX live e tabella tassi rinviati."
+    content: "M0-ERP — Tabella `companies` (id, name, vat_number, fiscal_code, `functional_currency` default 'EUR', default_locale, ...). Trait `BelongsToCompany` + `BelongsToCompanyScope` (global scope automatico) su tutte le entita' transazionali (quotations, sales_orders, projects, invoices, journal_entries, document_sequences, items, warehouses, stock_movements, ...). 1 Company seed `default` con `functional_currency='EUR'`. **Schema dual-currency da subito**: helper `ERPMigrateUtils::moneyColumns($table, 'amount')` che genera in un colpo solo `amount_doc` (decimal 15,4) + `currency_doc` (char 3) + `amount_local` (decimal 15,4) + `fx_rate` (decimal 18,8 default 1.0); `currency_local` derivata dalla company. Servizio `CurrencyConverter` come facade no-op in M0 (`amount_local = amount_doc * fx_rate`, fx_rate=1.0). FX live e tabella tassi rinviati."
     status: completed
   - id: enforce-versioning-on-accounting-models
     content: "M0-ERP — Dichiarare `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` (e dove serve `protected bool $softDeletesEnabled = true;`) sulla classe di ogni modello contabile via via creato (Account, JournalEntry, JournalEntryLine, Invoice, InvoiceLine, FiscalYear, FiscalPeriod, DocumentSequence; valutare anche stock_movements/stock_cost_layers per audit). Niente lavoro su seeder/observer/Core. Il branch `property_exists` in [HasVersions::getVersionStrategy()](file:///srv/http/laraplate/Modules/Core/app/Helpers/HasVersions.php) garantisce che la property abbia priorita' assoluta sul record `settings.version_strategy_{table}`. Test: per ogni modello contabile, `assertEquals(VersionStrategy::DIFF, $model->getVersionStrategy())` e tentativo di disattivazione via Setting che resta inefficace. Possibile follow-up Filament (non bloccante): nascondere/disabilitare nel `SettingResource` i record di versioning relativi a modelli che hanno la property dichiarata."
@@ -102,7 +102,7 @@ todos:
     content: M3.5 — `invoices` (header) + `invoice_lines` con `direction` ∈ {sale, purchase}; ogni Invoice postata genera `JournalEntry` automatico via `JournalPostingService`; righe con `tax_code_id` + snapshot fiscale (`tax_code`, `rate`, `label` denormalizzati al posting). Vincolo a `delivery_notes` opt. (per fattura accompagnatoria/differita). Numerazione progressiva via `DocumentNumberAllocator` con `gap_allowed=false` per `invoice_sale`/`invoice_purchase`.
     status: pending
   - id: einvoice-interface
-    content: "M3.5 — Solo contratti `EInvoiceProvider` (`prepare(Invoice): EInvoicePayload`, `submit(EInvoicePayload): EInvoiceSubmissionResult`, `status(string id): EInvoiceStatus`) + DTO neutri (no XML/SDI specifico). Nessuna implementazione concreta nel modulo Business; provider concreti restano package separati / verticali. Tabella `e_invoice_submissions` (invoice_id, provider_code, external_id, status, last_payload_path, submitted_at, response_payload) per tracciamento."
+    content: "M3.5 — Solo contratti `EInvoiceProvider` (`prepare(Invoice): EInvoicePayload`, `submit(EInvoicePayload): EInvoiceSubmissionResult`, `status(string id): EInvoiceStatus`) + DTO neutri (no XML/SDI specifico). Nessuna implementazione concreta nel modulo ERP; provider concreti restano package separati / verticali. Tabella `e_invoice_submissions` (invoice_id, provider_code, external_id, status, last_payload_path, submitted_at, response_payload) per tracciamento."
     status: pending
   - id: purchasing-cycle
     content: "M3.6 — Ciclo passivo completo ERP. **Anagrafica unica `parties`**: rename in-place di `customers` -> `parties`, aggiunta colonna `roles` (json array: customer/supplier/both), classe PHP `Party` con scope `customers()`/`suppliers()`; rinomina FK `customer_id` -> `party_id` su `quotations`, `projects`, `invoices`, `sales_orders`, `delivery_notes`, `leads`, `opportunities`. Documenti: `purchase_orders` (ordine al fornitore, party.role=supplier), `goods_receipts` (bolla di ingresso, **genera `stock_movements` di carico** via `StockMovementService` con `unit_cost` dal PO/Invoice), `invoices direction=purchase` (collegabile a uno o piu' GR; postaggio journal automatico). Riconciliazione tre-vie PO/GR/Invoice: validazione coerenza prezzi/quantita' al posting con scarti tracciati."
@@ -122,7 +122,11 @@ todos:
 isProject: false
 ---
 
-# Modulo Business in Laraplate (scaffolding gestionale agnostico)
+> **Repo / cartella (2026-04):** il modulo si chiama **ERP** nel monorepo: cartella **`Modules/ERP`**, package Composer **`swolley/laraplate-erp`**, namespace PHP **`Modules\ERP`**, chiave config **`erp`**, remote git **`laraplate-erp`**. I todo YAML con prefisso `business-*` / `business-filament-*` sono **id storici** Cursor; il contenuto si riferisce al modulo ERP.
+
+# Modulo ERP in Laraplate (Nebula)
+
+Scaffolding gestionale agnostico: tutti i path nel piano puntano a **`Modules/ERP`** / **`Modules\ERP`** salvo diversa indicazione.
 
 ## MVP v1 — perimetro **pre-contabilità** (primo utilizzabile)
 
@@ -136,12 +140,12 @@ Obiettivo: un **ciclo chiuso dati** commessa / commerciale / tempo **senza** cas
 - **Commessa**: `projects` con **`customer_id` obbl.** e `quotation_id` opz.; **nessun** `lead_user_id` (decisione prodotto).
 - **Pianificazione**: `tasks` con **`taxonomy_id` obbl.** → `taxonomies` (niente tabella `activities` dedicata).
 - **Consuntivo**: `time_entries` con `user_id`, **`started_at` / `ended_at`**, `taxonomy_id` obbl., FK opz. a `task`, `project`, `quotation_item`; più righe per utente (pause); sovrapposizione solo **validazione app**.
-- **Dominio**: modelli su `Core\Overrides\Model`, `fillable`, `casts`, `$rules`, relazioni Eloquent; **migrate** su DB vuoto + **seed** minimo (albero attività Business).
+- **Dominio**: modelli su `Core\Overrides\Model`, `fillable`, `casts`, `$rules`, relazioni Eloquent; **migrate** su DB vuoto + **seed** minimo (albero attività tassonomie nel modulo ERP).
 
 **Fuori dal MVP v1** (contabilità / cassa / chiusure)
 
 - `movements`, `movement_allocations`, `balances`, partner pool, settle-up, `PaymentRequest`, enum cassa a regime, ETL, magazzino.
-- **Filament** modulo Business: **slice contabile ERP** in admin (`business-filament-erp-core-slice`); resto UI MVP commerciale + CRM/magazzino/fatture in `erp-filament-resources` / `business-filament-final`. Per MVP pre-contabilità si intende **backend verificabile** anche senza tutta l'UI.
+- **Filament** modulo ERP: **slice contabile ERP** in admin (`business-filament-erp-core-slice`); resto UI MVP commerciale + CRM/magazzino/fatture in `erp-filament-resources` / `business-filament-final`. Per MVP pre-contabilità si intende **backend verificabile** anche senza tutta l'UI.
 
 **Ordine di lavoro suggerito**
 
@@ -155,7 +159,7 @@ Obiettivo: un **ciclo chiuso dati** commessa / commerciale / tempo **senza** cas
 ## Principi prodotto (Laraplate ≠ applicazione verticale)
 
 - **Laraplate** è **piattaforma** per costruire applicazioni (gestionali, CMS, ecommerce, agenti, siti): moduli prefatti, estendibili, componibili. **Non** è un singolo prodotto verticale chiuso né un ERP monolitico tipo SAP.
-- Il modulo **Business** deve restare **settore-neutro**: vocabolario da **economia / operatività / amministrazione leggera** comprensibile a **programmatori** che montano soluzioni per clienti diversi. Dove un nome è ambiguo (`Quote`, `Project`), il piano accetta **alias documentati** (config, interfaccia, o subclass) senza cambiare il cuore dati se non serve.
+- Il modulo **ERP** deve restare **settore-neutro**: vocabolario da **economia / operatività / amministrazione leggera** comprensibile a **programmatori** che montano soluzioni per clienti diversi. Dove un nome è ambiguo (`Quote`, `Project`), il piano accetta **alias documentati** (config, interfaccia, o subclass) senza cambiare il cuore dati se non serve.
 - **Obiettivo di profondità**: core **snello** + punti di estensione (`BillingStrategy`, provider pagamenti, policy lock) + verticali opzionali (professionisti, retail, …) **fuori** dal contratto minimo del modulo.
 - **Regole di naming** (per commit e PR degli integratori):
   - evitare nomi o strutture giustificati solo con «così avevamo fatto in un progetto interno» senza valutazione di dominio generico;
@@ -164,11 +168,11 @@ Obiettivo: un **ciclo chiuso dati** commessa / commerciale / tempo **senza** cas
 
 ## Contesto verificato (repo Laraplate)
 
-- **Modulo Business** (`[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`): migration per `price_lists`, `price_list_items`, `time_entries`, `tasks.taxonomy_id`, `quotations`/`quotations_items`, `projects`, pivot `contactables`; modelli MVP su `Core\\Overrides\\Model` incluso **`Movement`** (stub tabella). **`getRules()`** su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem (+ anagrafica/preventivo già coperti). Restano seed dev tassonomie operativo, validazione sovrapposizione `TimeEntry`, test/`migrate` su DB pulito. Stub `movements`/`balances` fuori MVP pre-contabilità.
+- **Modulo ERP** (`[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`; Composer `swolley/laraplate-erp`; namespace `Modules\ERP`): migration per `price_lists`, `price_list_items`, `time_entries`, `tasks.taxonomy_id`, `quotations`/`quotations_items`, `projects`, pivot `contactables`; modelli MVP su `Core\\Overrides\\Model` incluso **`Movement`** (stub tabella). **`getRules()`** su Project, Task, TimeEntry, PriceList, PriceListItem, QuotationItem (+ anagrafica/preventivo già coperti). Restano seed dev tassonomie operativo, validazione sovrapposizione `TimeEntry`, test/`migrate` su DB pulito. Stub `movements`/`balances` fuori MVP pre-contabilità.
 
 ---
 
-## Definizioni entità Business
+## Definizioni entità ERP
 
 Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassetto** sono i concetti; tra parentesi il nome attuale in repo se diverso dal piano storico.
 
@@ -176,15 +180,15 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 
 - Il modello e la tabella reali sono **`Quotation`** / **`quotations`**; le righe sono **`QuotationItem`** / **`quotation_items`** (stesso schema di naming di `PriceList` / `PriceListItem`). Il termine **Quote** resta solo sinonimo discorsivo di «offerta/preventivo» se serve in prosa, non come nome di tabella.
 
-### Core / Cms (solo confine con Business)
+### Core / Cms (solo confine con ERP)
 
 | Entità | Ruolo | Confine |
 |--------|--------|---------|
-| **`Place`** | Luogo geografico neutro (indirizzo, coordinate opz.) | Business **non** duplica colonne indirizzo su `Site`: usa `place_id` → `places`. |
-| **`Taxonomy`** (tabella `taxonomies`) | Albero configurabile (parent, traduzioni, preset dove previsto) | **Foglie e rami** = dati applicativi. **`Modules\Business\Casts\EntityType`** indica **quale albero** (es. attività lavorative vs etichette movimento cassa). **Non** enum per ogni tipo di lavoro del cliente. |
-| **`Category` (Cms)** | Tassonomia contenuti CMS | Fuori dal perimetro Business salvo riuso concettuale del pattern. |
+| **`Place`** | Luogo geografico neutro (indirizzo, coordinate opz.) | ERP **non** duplica colonne indirizzo su `Site`: usa `place_id` → `places`. |
+| **`Taxonomy`** (tabella `taxonomies`) | Albero configurabile (parent, traduzioni, preset dove previsto) | **Foglie e rami** = dati applicativi. **`Modules\ERP\Casts\EntityType`** indica **quale albero** (es. attività lavorative vs etichette movimento cassa). **Non** enum per ogni tipo di lavoro del cliente. |
+| **`Category` (Cms)** | Tassonomia contenuti CMS | Fuori dal perimetro ERP salvo riuso concettuale del pattern. |
 
-### Business — anagrafica e sedi
+### ERP — anagrafica e sedi
 
 | Entità (modello) | Scopo | Non è | Relazioni note | Stato / gap |
 |------------------|--------|-------|----------------|-------------|
@@ -192,7 +196,7 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 | **`Contact`** | Persona / punto di contatto; legame a **uno o più** `Customer` tramite pivot **`contactables`** (stesso record contatto riusabile su più clienti). Può avere **`User`**. | Non è il “lead progetto” (non esiste più `lead_user_id` su `Project`). | `belongsToMany` Customer via `contactables`; opz. `belongsTo` User. | **Nessun** `customer_id` sulla tabella `contacts`. **Nessun contatto primario** in v1. |
 | **`Site`** | Sede operativa **dell’organizzazione** che usa il gestionale (studio, cantiere, filiale), per calendario e contesto fisico. | Un indirizzo cliente (quello resta su Customer/Contact/Place lato anagrafica se serve). | `place_id` (da aggiungere); Task opz. `site_id`. | Migrare da colonne duplicate a `Place`. |
 
-### Business — commessa e commerciale
+### ERP — commessa e commerciale
 
 | Entità | Scopo | Non è | Relazioni note | Stato / gap |
 |--------|--------|-------|----------------|-------------|
@@ -202,14 +206,14 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 | **`PriceList`** | Contenitore listino con **`currency`** (ISO 4217); voci ereditano la valuta. | Non è il progetto né il preventivo. | `hasMany` PriceListItem. | Migration `price_lists` + `HasValidity`. |
 | **`PriceListItem`** | Voce listino: **`taxonomy_id` obbl.**, `unit_price` 15,4, UOM opz. | Non enum applicativo chiuso nel modulo. | → `taxonomies` / `Activity`. | Migration `price_list_items`. |
 
-### Business — pianificazione e tempo
+### ERP — pianificazione e tempo
 
 | Entità | Scopo | Non è | Relazioni note | Stato / gap |
 |--------|--------|-------|----------------|-------------|
 | **`Task`** | **Impegno calendarizzato o backlog pianificato**. | **Non** sostituisce le ore consuntive. | `project_id` opz., `site_id` opz., **`taxonomy_id` obbl.** → `taxonomies`. | FK verso `taxonomies` (no tabella `activities`). |
 | **`TimeEntry`** | **Lavoro effettivo** / sessione (pause = più righe stesso utente). | Non è movimento di cassa. | **`taxonomy_id` obbl.**; `user_id`; **`started_at` / `ended_at`**; `task_id` / `project_id` / `quotation_item_id` opz. | Tabella `time_entries`; sovrapposizione **solo app**. |
 
-### Business — contabilità leggera (dopo organizzativo)
+### ERP — contabilità leggera (dopo organizzativo)
 
 | Entità | Scopo | Non è | Nota |
 |--------|--------|-------|------|
@@ -217,7 +221,7 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 | **`MovementAllocation`** (prevista) | Quota di riparto su socio / attore. | — | Posticipato con il modello movimenti. |
 | **`Balance`** | Snapshot / congelamento periodo (es. anno). | — | Stub; regole lock da affinare con movimenti. |
 
-### Business — entità ERP roadmap (post-MVP, da Roadmap ERP)
+### ERP — entità ERP roadmap (post-MVP, da Roadmap ERP)
 
 > Riepilogo concettuale delle entita' introdotte nelle fasi M0-ERP -> M3.6. Per il dettaglio operativo (colonne, lock-chain, servizi) vedi sezione **Roadmap ERP completo (post-MVP)** + i todo dedicati nel frontmatter.
 
@@ -241,12 +245,12 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 
 ### Regole trasversali (da rispettare in analisi)
 
-1. **Tipo di attività lavorativa** = nodo **`Taxonomy`** (dati), discriminato da **`EntityType`** Business, **mai** enum chiuso nel modulo per le foglie cliente-specifiche.
+1. **Tipo di attività lavorativa** = nodo **`Taxonomy`** (dati), discriminato da **`EntityType`** (cast `Modules\ERP\Casts\EntityType`), **mai** enum chiuso nel modulo per le foglie cliente-specifiche.
 2. **Pianificazione (`Task`) ≠ consuntivo (`TimeEntry`)**; il secondo può esistere senza il primo (sessione libera).
 3. **Listino** è la **fonte** del tipo attività per righe che nascono da `PriceListItem`; **sessione** porta comunque **`taxonomy_id`** per report e casi senza preventivo/riga.
 4. **`QuotationItem`** (via `quotation_item_id`) opzionale su **`TimeEntry`** per confronto commerciale, non per sostituire `taxonomy_id` sulle aggregazioni per tipo attività.
 5. **`TimeEntry` ha esattamente un’activity (tassonomia)** — cardinalità **1:1** lato sessione verso il nodo scelto; niente tabella pivot tipo `categorizables` per questo legame.
-6. **Multi-company sempre attivo** (post-M0-ERP): ogni entita' transazionale Business ha `company_id` + global scope `BelongsToCompanyScope`. In M0 1 sola company `default`, ma il vincolo strutturale c'e' da subito.
+6. **Multi-company sempre attivo** (post-M0-ERP): ogni entità transazionale ERP ha `company_id` + global scope `BelongsToCompanyScope`. In M0 1 sola company `default`, ma il vincolo strutturale c'e' da subito.
 7. **Multi-currency predisposto** (post-M0-ERP): ogni amount monetario ha colonne `amount_doc` + `currency_doc` + `amount_local` + `fx_rate`. `amount_local` e' la base per la partita doppia.
 8. **Versioning forzato** sui modelli contabili tramite property `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` sulla classe — vince sempre sul `Setting` (vedi todo `enforce-versioning-on-accounting-models`).
 9. **Snapshot fiscale immutabile** sulle righe documento al posting; cambi aliquota = nuovo `tax_code` (no UPDATE retroattivo).
@@ -265,48 +269,48 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 | `Quotation` (+ parent)                    | Offerta con revisioni         | Mappa → `Quotation` + duplica + lineage     |
 | `PriceList`                               | Listino                       | Mappa → `PriceList` / `PriceListItem`       |
 | `Movement` IN/OUT, `MovementUser`         | Entrate/uscite e riparti      | Mappa → `Movement`, `MovementAllocation`    |
-| `Equipment`                               | Asset                         | **Non** nel core Business; verticali        |
+| `Equipment`                               | Asset                         | **Non** nel core ERP; verticali        |
 | `Transfer`                                | Compensazioni tra soci        | Mappa → pool / settlements (piano Tricount) |
 
 
-## Modello Business (requisiti) e glossario implementativo
+## Modello ERP (requisiti) e glossario implementativo
 
 
-| Concetto Business (generico)                                                               | Tabella / classe sorgente (solo ETL)                           | Note implementative                                                                                                                                                                                                                                                                                                                             |
+| Concetto di dominio (generico)                                                               | Tabella / classe sorgente (solo ETL)                           | Note implementative                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Customer + Contact                                                                         | `Client`, `Contact`                                            | Già in `[customers](file:///srv/http/laraplate/Modules/ERP/database/migrations/2026_04_08_191717_create_customers_table.php)` / `[contacts](file:///srv/http/laraplate/Modules/ERP/database/migrations/2026_04_08_191726_create_contacts_table.php)` + pivot **`contactables`**. **Nessun** `customer_id` su `contacts` (M:N); v1 senza dati fiscali estesi su `customers`; **nessun contatto primario**.                   |
 | Project obbligatorio su Customer, opzionale su offerta, **owner interno** (`lead_user_id`) | `Work` + `client_id`, `quotation` opzionale                    | `lead_user_id` → `users` (Core). Distinto dal contatto principale cliente.                                                                                                                                                                                                                                                                      |
 | Task = todo/appuntamento pianificato                                                       | `Appointment` (calendario) + meta su `Work`                    | Non fondere todo e sessione sulla stessa riga: la **pianificazione** (stime, calendario) e l’**effettivo** (ore lavorate) hanno cicli di vita diversi.                                                                                                                                                                                          |
 | Sessione / lavoro effettivo                                                                | `WorkSession` (con `event_start`/`event_end` + utenti)         | La “pivot utente–todo” **sola** non basta per parallelismo o fasce orarie: serve una entità **TimeEntry** (o `work_sessions`) con `user_id`, `actual_start`, `actual_end`, **`taxonomy_id`** (catalogo attività), `quotation_item_id` **opzionale**, `task_id` **nullable**, `project_id` **nullable** (denormalizzato da task o libero per lavoro non pianificato). Più righe = più persone o turni. |
 | Attività non pianificate                                                                   | Sessioni senza appuntamento collegato                          | `task_id` null + `project_id` opzionale (progetto) o null (solo attività interna organizzazione).                                                                                                                                                                                                                                               |
-| Tipologia attività (calendario vs consuntivo)                                              | (nel sorgente: accoppiamento listino / sessione)               | **Nessun enum “ActivityType” nel Business** (troppo dipendente dalla verticale). **Catalogo = nodi `taxonomies`** con discriminante `Modules\Business\Casts\EntityType::ACTIVITIES` (e modelli concreti che estendono `Taxonomy`). Sul **Task**: `taxonomy_id` indicativo. Sul **TimeEntry**: `taxonomy_id` consuntivo per aggregati; `quotation_item_id` opzionale per allineamento commerciale. Opzionale: snapshot tipo su `quotation_item` se il listino cambia dopo l’offerta. |
+| Tipologia attività (calendario vs consuntivo)                                              | (nel sorgente: accoppiamento listino / sessione)               | **Nessun enum “ActivityType” nel modulo ERP** (troppo dipendente dalla verticale). **Catalogo = nodi `taxonomies`** con discriminante `Modules\ERP\Casts\EntityType::ACTIVITIES` (e modelli concreti che estendono `Taxonomy`). Sul **Task**: `taxonomy_id` indicativo. Sul **TimeEntry**: `taxonomy_id` consuntivo per aggregati; `quotation_item_id` opzionale per allineamento commerciale. Opzionale: snapshot tipo su `quotation_item` se il listino cambia dopo l’offerta. |
 | Movimenti IN/OUT, categorie, riparti                                                       | `Movement`, `MovementType`/`Category`, `MovementUser`          | **Posticipato** dopo il livello organizzativo (progetti, tempo, listino, preventivo). Classificazione cassa: enum `MovementType` (income/expense) + alberi `taxonomies` con `EntityType::MOVEMENTS` dove serve granularità. Dettaglio riparti/IN-OUT da affrontare in conversazione dedicata.                                                                                                                    |
 | Versamenti soci per quadrare spese                                                         | `Transfer` + (idea) `Payment`                                  | Modellare come movimenti di **rettifica** o tabella `partner_settlements` che referenzia movimento spesa + movimento versamento, per evitare doppi conteggi nel bilancio.                                                                                                                                                                       |
 | Congelamento anno + totali                                                                 | (nel sorgente: report mensili aggregati; lock globale assente) | Tabella `balances` (snapshot: anno, total_in, total_out, crediti/debiti clienti, debiti/crediti soci, `frozen_at`). Flag `movements.locked_by_balance_id` o `locked_at` + anno competenza. Runtime: somma solo righe non lockate + somma snapshot anni chiusi.                                                                                  |
 
 
-### Luoghi: `Place` (Core) — `Location` (Cms) — `Site` (Business)
+### Luoghi: `Place` (Core) — `Location` (Cms) — `Site` (ERP)
 
-- **P0 — Place + Location** (Core + Cms): **completato**; consolidare Business su `sites.place_id` / ICS quando si tocca il modulo Business. Riferimento todo: `p0-core-place-location-refactor`.
+- **P0 — Place + Location** (Core + Cms): **completato**; consolidare il codice ERP su `sites.place_id` / ICS quando si tocca il modulo ERP. Riferimento todo: `p0-core-place-location-refactor`.
 - **Non** spostare in Core il modello Cms `**Location`** così com’è: è accoppiato a slug, tag, Typesense, spatial avanzato, pivot con **Content**, Filament.
 - **Sì** a `**Place`** in **Core**: identità geografica neutra — etichetta, righe indirizzo testuale, opz. coordinate (decimali o spatial **solo** se accettabile in Core senza dipendenze Cms).
 - `**GeoPoint`** separato: **solo** se serve riuso forte dello stesso punto; altrimenti coordinate su `Place`. Composizione **1:1** preferibile a ereditarietà SQL.
 - **Cms `Location`**: colonna `**place_id**` (FK Core); slug, search, tag, **Content** restano in Cms.
 - **Trait trasparente (stesso spirito di `HasTranslations` / `HasDynamicContents`)**: un trait (nome da scegliere, es. `HasBridgedPlace` o `DefersGeographyToPlace`) su `**Location`** che intercetta **getter/setter** (o `getAttribute` / `setAttribute` con le stesse priorità del pattern esistente) così che i campi “geografici” usati oggi in app (`address`, `city`, `province`, `country`, `postcode`, coordinate…) **leggano e scrivano** sul `**Place`** collegato, creando/aggiornando `Place` al bisogno. Obiettivo: **non rompere** Filament, API e codice che già fa `$location->city = …` / `$location->address`.
 - **Rotte e servizi**: spostare in **Core** ciò che è **generico** (interfacce geocoding, HTTP client verso provider, eventuale controller/route registrata dal Core o route Cms che delega a servizio Core) — stesso approccio “logica condivisa in Core, wiring UI in Cms”. Oggi es. rotta Cms `[web.php](file:///srv/http/laraplate/Modules/Cms/routes/web.php)` `locations.geocode` e servizi tipo `AbstractGeocodingService` / `NominatimService` / `GoogleMapsService` vanno **ripacchettizzati** (contratti + implementazioni Core dove non servono dipendenze Cms).
-- **Business `Site`**: evolvere con `**sites.place_id**` e deprecazione colonne duplicate (P0 disponibile).
+- **`Site` (ERP)**: evolvere con `**sites.place_id**` e deprecazione colonne duplicate (P0 disponibile).
 - **ICS / calendario**: dopo `Place` stabile; vedi `calendar-ics-export`.
 
 ### Tassonomie: `Taxonomy` astratta (Core), tabella `taxonomies`
 
 - **P1 — Taxonomy + Category** (Core + Cms): **completato**. Todo: `p1-core-taxonomy-category-refactor`.
-- **Regola architetturale Laraplate**: tutto dipende da **Core**; **Core non referenzia** altri moduli. I moduli (Cms, Business, …) **estendono** classi Core.
+- **Regola architetturale Laraplate**: tutto dipende da **Core**; **Core non referenzia** altri moduli. I moduli (Cms, ERP, …) **estendono** classi Core.
 - `**Entity` + `Preset`** restano il precedente di astrazione Core / concretezza nei moduli.
 - **Naming**: in Core la base non si chiama `Category` (nome troppo legato al CMS); si introduce `**Taxonomy`** come `**abstract class`** (o equivalente idiom Laravel) con **tabella unica** `**taxonomies`** (plurale coerente con il resto del framework).
-- `**protected $table = 'taxonomies';`** va dichiarato **sul modello base** `Taxonomy` così **tutte le sottoclassi** ereditano lo stesso nome tabella e Laravel **non** inferisce nomi diversi dal nome corto della classe (`categories`, `activity_types`, …). Le sottoclassi (`Modules\Cms\Models\Category`, eventuali `BusinessActivityTaxonomy`, …) aggiungono solo **scope globali**, **cast**, **relazioni** e trait Cms-specifici dove serve; oppure restano classi “vuote” che servono solo da **type hint** / query builder dedicato.
-- **Schema tabella** (indicativo): `parent_id`, `scope` o `domain` (stringa enum applicativa: es. `cms.content`, `business.activity`, `business.movement`), ordinamento, `meta` JSON opzionale, soft delete coerente Core; eventuale colonna **STI** `type` se un giorno servono sotto-modelli con cast diversi sulla stessa tabella (valutare vs solo `scope`).
+- `**protected $table = 'taxonomies';`** va dichiarato **sul modello base** `Taxonomy` così **tutte le sottoclassi** ereditano lo stesso nome tabella e Laravel **non** inferisce nomi diversi dal nome corto della classe (`categories`, `activity_types`, …). Le sottoclassi (`Modules\Cms\Models\Category`, eventuali classi `ActivityTaxonomy` nel modulo ERP, …) aggiungono solo **scope globali**, **cast**, **relazioni** e trait Cms-specifici dove serve; oppure restano classi “vuote” che servono solo da **type hint** / query builder dedicato.
+- **Schema tabella** (indicativo): `parent_id`, `scope` o `domain` (stringa enum applicativa: es. `cms.content`, `erp.activity`, `erp.movement`), ordinamento, `meta` JSON opzionale, soft delete coerente Core; eventuale colonna **STI** `type` se un giorno servono sotto-modelli con cast diversi sulla stessa tabella (valutare vs solo `scope`).
 - `**Category` Cms** oggi è ricca (media, traduzioni, approvals, pivot Content, …): **refactor** verso `**Category extends Taxonomy`** (stessa tabella `taxonomies` + scope Cms), mantenendo i trait Cms sulla sottoclasse; **migrazione dati** da `categories` → `taxonomies` dove si unifica lo storage.
-- **Business**: `taxonomy_id` → `taxonomies` per attività su Task/TimeEntry e (in seguito) per etichette movimento cassa; **enum `Modules\Business\Casts\EntityType`** (`MOVEMENTS`, `ACTIVITIES`, …) indica **quale albero / entità dinamica** (stesso ruolo concettuale di `Modules\Cms\Casts\EntityType` per Cms), non le singole foglie del catalogo.
+- **ERP**: `taxonomy_id` → `taxonomies` per attività su Task/TimeEntry e (in seguito) per etichette movimento cassa; **enum `Modules\ERP\Casts\EntityType`** (`MOVEMENTS`, `ACTIVITIES`, …) indica **quale albero / entità dinamica** (stesso ruolo concettuale di `Modules\Cms\Casts\EntityType` per Cms), non le singole foglie del catalogo.
 - **Effetto**: alberi multipli riusabili (attività lavorative, etichette movimento, …) con vincoli per contesto lato app (es. “solo foglie su TimeEntry”). **Non** si introduce `MovementCategory` come tabella separata: la gerarchia è nei nodi tassonomia per lo scope scelto.
 
 ### Task vs sessione: significato e flusso UI (calendario + timbrature)
@@ -342,7 +346,7 @@ Obiettivo: **stessa semantica** in piano, codice, API e UI. I nomi in **grassett
 - **Versioning negoziabile via Setting**: per i modelli contabili la property `versionStrategy` direttamente sulla classe vince sul record `settings` (M0-ERP). Disattivazione a runtime via UI = vietata.
 - **Magazzino prima del DDT**: il DDT vendita scarica magazzino e calcola COGS; senza `inventory-erp-base` (M3.3) la fattura sale **non** ha valutazione costo. Sequenza M3.3 -> M3.4 -> M3.5 va rispettata.
 - **Lock-chain SalesOrder**: senza lock progressivo su righe parzialmente evase, l'utente puo' modificare retroattivamente quantita' gia' fatturate -> rottura del legame contabile. Tutte le modifiche radicali vanno via amendment SO con `amends_sales_order_id`.
-- **E-invoice in Business**: implementare un provider concreto (es. SDI) **dentro** il modulo accoppia Business a una giurisdizione. Tenere solo il contratto (M3.5).
+- **E-invoice nel modulo ERP**: implementare un provider concreto (es. SDI) **dentro** il modulo accoppia Laraplate a una giurisdizione. Tenere solo il contratto (M3.5).
 - **Refactor cassa Tricount**: il saldo parallelo attuale di `Movement`/`PartnerPool` va deprecato in favore del libro giornale derivato (M2). Non lasciare due fonti di verita' del saldo.
 - **Anagrafica `parties`**: rinominare `customers` in `parties` deve avvenire **prima** di entrare in build. Dopo, la rinomina richiederebbe migration `ALTER` complessa su FK gia' popolate.
 
@@ -352,7 +356,7 @@ Concetto trasversale utile: **audit** trail sulle entità commerciali — in Lar
 
 ## Modello dati Laraplate (tabelle / entità target)
 
-Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo Business (salvo `users` in Core). Colonna «Stato» rispetto al repo `[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`.
+Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo ERP (salvo `users` in Core). Colonna «Stato» rispetto al repo `[Modules/ERP](file:///srv/http/laraplate/Modules/ERP)`.
 
 
 | Entità (concettuale)       | Tabella (prevista)     | Ruolo sintetico                                                                                                                           | Stato repo                                 |
@@ -360,18 +364,18 @@ Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo B
 | Customer                   | `customers`            | Anagrafica cliente                                                                                                                        | Presente                                   |
 | Contact                    | `contacts`             | Contatti; `user_id` opz.; legame clienti via **`contactables`** (M:N)                                                                      | Migration + modello                        |
 | Taxonomy (abstract)        | `taxonomies`           | Core: albero gerarchico generico; `**abstract class Taxonomy`** con `**$table = 'taxonomies'`**; sottoclassi senza inferenza nome tabella | **P1 completato** (Core+Cms)               |
-| Place                      | `places`               | Luogo geografico neutro (Core): indirizzo + opz. coordinate; condiviso da Cms/Business                                                    | **P0 completato** (Core+Cms)               |
+| Place                      | `places`               | Luogo geografico neutro (Core): indirizzo + opz. coordinate; condiviso da Cms/ERP                                                    | **P0 completato** (Core+Cms)               |
 | Site                       | `sites`                | Sede operativa; `place_id` → `places`                                                                                                     | Presente                                   |
 | Quotation                  | `quotations`           | Preventivo; `customer_id`+`currency` obbl.; lock colonne (HasLocks); lineage in backlog                                                   | Migration + modello                        |
 | QuotationItem             | `quotations_items`     | Voci preventivo (`billing_mode`, `unit_price` 15,4, FK `price_list_item_id` opz.)                                                          | Migration + modello                        |
 | PriceList                  | `price_lists`          | Listino + **`currency`** + validità (`HasValidity`)                                                                                      | Migration + modello                        |
 | PriceListItem              | `price_list_items`     | Voce: **`taxonomy_id` obbl.**, `unit_price` 15,4, UOM opz.                                                                                 | Migration + modello                        |
 | Project                    | `projects`             | Commessa: `customer_id` obbl., `quotation_id` opt.; **nessun** `lead_user_id`                                                               | Migration + modello                        |
-| Activity / movement labels | `taxonomies`           | Stesso albero Core (`taxonomy_id` su Task/TimeEntry; movements dopo); discriminante `EntityType` Business + scope app; **no** tabella `activity_types` obbligatoria nel core modulo | P1 fatto (infra); FK Business da aggiungere con evoluzione schema |
+| Activity / movement labels | `taxonomies`           | Stesso albero Core (`taxonomy_id` su Task/TimeEntry; movements dopo); discriminante `EntityType` (ERP) + scope app; **no** tabella `activity_types` obbligatoria nel core modulo | P1 fatto (infra); FK del modulo ERP da aggiungere con evoluzione schema |
 | Task                       | `tasks`                | **Lavoro calendarizzato**; opz. `**site_id`** per sede; non Gantt teorico                                                                 | Presente (FK da correggere vs tassonomia)  |
 | TimeEntry                  | `time_entries`         | Sessione lavoro reale per `user_id`; **`taxonomy_id`** = un solo nodo attività (no pivot); `quotation_item_id` opz. se legame a voce preventivo | Da creare                                  |
 | Movement labels (gerarchia)| `taxonomies`           | Macro/tipi cassa come **nodi** sotto `EntityType::MOVEMENTS` (nessuna `movement_categories` dedicata)                                      | Dopo strato organizzativo                  |
-| MovementType (enum cassa)| (enum / colonne)       | Solo **direzione contabile** `income` / `expense` in `Modules\Business\Casts\MovementType` — **non** il catalogo foglie                    | Presente (enum); uso pieno posticipato   |
+| MovementType (enum cassa)| (enum / colonne)       | Solo **direzione contabile** `income` / `expense` in `Modules\ERP\Casts\MovementType` — **non** il catalogo foglie                    | Presente (enum); uso pieno posticipato   |
 | Movement                   | `movements`            | Movimento IN/OUT; lock su bilancio                                                                                                        | Stub                                       |
 | MovementAllocation         | `movement_allocations` | Quota su socio (OUT) o meta riparto IN                                                                                                    | Da creare                                  |
 | PartnerPool                | `partner_pools`        | Cassa soci (v1: tipicamente una riga per org)                                                                                             | Da creare                                  |
@@ -412,7 +416,7 @@ Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo B
 
 ## Diagrammi UML (Mermaid `classDiagram`)
 
-**Nota**: la classe `User` modella la tabella `**users`** del modulo Core; tutte le FK verso utenti restano in Business. `**Taxonomy`** è il modello astratto Core sulla tabella `**taxonomies`** (con `$table` esplicito sul base); nel diagramma è mostrato come tipo di dominio per le FK attività e listino. **`Modules\Business\Casts\EntityType`** (e/o scope su query) distingue **quale albero** si sta usando (attività vs movimenti cassa, ecc.).
+**Nota**: la classe `User` modella la tabella `**users`** del modulo Core; tutte le FK verso utenti restano nel modulo ERP. `**Taxonomy`** è il modello astratto Core sulla tabella `**taxonomies`** (con `$table` esplicito sul base); nel diagramma è mostrato come tipo di dominio per le FK attività e listino. **`Modules\ERP\Casts\EntityType`** (e/o scope su query) distingue **quale albero** si sta usando (attività vs movimenti cassa, ecc.).
 
 ### Dominio anagrafica — preventivo — progetto — tempo
 
@@ -497,14 +501,14 @@ classDiagram
 
 ## Principio di design: core agnostico + verticali
 
-Il modulo **Business** espone linguaggio di dominio **riusabile** (commessa, pianificazione, consuntivo, documento commerciale, listino, movimenti, riparti, pool liquidità). I **verticali di settore** restano in **moduli o package** che *usano* Business, non nel vocabolario minimo delle migration core:
+Il modulo **ERP** espone linguaggio di dominio **riusabile** (commessa, pianificazione, consuntivo, documento commerciale, listino, movimenti, riparti, pool liquidità). I **verticali di settore** restano in **moduli o package** che *usano* il modulo ERP, non nel vocabolario minimo delle migration core:
 
 - **Estensione** via moduli Laraplate, oppure
 - **Riferimenti polimorfici** / metadata dove serve agganciare entità esterne senza accoppiare il core a un CRM specifico.
 
 ```mermaid
 flowchart LR
-  subgraph business [Business agnostico]
+  subgraph erp_domain [ERP domain — sector-neutral]
     Project[Project_or_Engagement]
     Time[TimeBlock]
     Catalog[PriceListItem]
@@ -528,7 +532,7 @@ flowchart LR
 ### 1. Contenitore di lavoro (`Work` → **Project**)
 
 - **Tenere**: stato attivo, descrizione, aggregazione tempo e incassi; **offerta** (`quotation_id`) opzionale (pattern comune: commessa con o senza preventivo accettato).
-- **Nel tuo Business**: `customer_id` **obbligatorio**, `quotation_id` **nullable**, `lead_user_id` **obbligatorio** → utente/socio responsabile interno. **`Contact`**: `customer_id` **sempre obbligatorio** (nessun contatto orfano). **Contatto primario**: non previsto in v1. **Fornitore / `Party`**: interessante ma **posticipato** (tocca dominio movimenti, non ancora definito).
+- **Nel perimetro ERP (progetto Nebula)**: `customer_id` **obbligatorio**, `quotation_id` **nullable**, `lead_user_id` **obbligatorio** → utente/socio responsabile interno. **`Contact`**: `customer_id` **sempre obbligatorio** (nessun contatto orfano). **Contatto primario**: non previsto in v1. **Fornitore / `Party`**: interessante ma **posticipato** (tocca dominio movimenti, non ancora definito).
 - **Comportamento**: `isPaid()` / saldo progetto = **servizio dominio** sulle righe movimento IN collegate a `project_id` / `contact_id`, più eventuale confronto con totale `quotations` + `quotation_items`.
 
 ### 2. Eventi temporali (`AbstractEvent` → **TimeBlock** unificato o due tipi)
@@ -599,21 +603,21 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 - **Tenere**: direzione (entrata/uscita), importo totale, data di competenza, tipo classificatorio, allegato, **periodo** per uscite rateizzate/amortizzate (`period_from` / `period_to`), riparto tra attori (`MovementUser` → **EntryAllocation** con `user_id` o morph `participant`).
 - **Generalizzare**: niente STI su tabella unica obbligatoria: in Laravel puoi usare **una tabella** + `direction` enum, oppure tabelle separate `inbound_entries` / `outbound_entries` se vuoi vincoli diversi; l’importante è un **unico servizio di registrazione** che valida tipo vs direzione (come `setType` in `MovementIN`/`OUT`).
 - `**MovementCalculation`**: resta enum/config su come allocare importo tra partecipanti (equal/presence) — utile e generico.
-- **N non nel core Business**: `MovementOUT` → `Equipment` resta **estensione** (tabella `business_assets` nel verticale o `ledger_entry_id` su equipment).
+- **N non nel core ERP**: `MovementOUT` → `Equipment` resta **estensione** (tabella `business_assets` nel verticale o `ledger_entry_id` su equipment).
 
 ### 6. Reportistica (viste `month_expenses`, `month_total`)
 
 - **Tenere**: l’**idea** (aggregazioni per mese/categoria/durata), non SQL hardcoded su uno schema legacy fisso.
-- **In Laraplate**: query builder / materialized reporting table / job notturno; in alternativa viste DB **nel modulo** con prefisso tabelle Business, generate da migration.
+- **In Laraplate**: query builder / materialized reporting table / job notturno; in alternativa viste DB **nel modulo** con prefisso/convenzione tabelle del modulo ERP, generate da migration.
 
 ### 7. `Transfer` e `Payment` (riferimento legacy)
 
-- `**Transfer`**: concetto di **giroconto interno** tra allocazioni — utile se in futuro gestisci split revenue; nel core Business può essere `internal_transfer` tra due `EntryAllocation` collegate allo stesso o diverso `LedgerEntry`, oppure lasciato al verticale finché non serve.
-- `**Payment`**: in schema DB esiste tabella `payment`; nel codice entity gran parte è commentata — in Business agnostico conviene `**LedgerEntry` di tipo "payment"** o tabella `payments` legata 1–1 a una riga di entrata, senza accoppiamento stretto a `MovementUser` finché non chiarisci il modello contabile.
+- `**Transfer`**: concetto di **giroconto interno** tra allocazioni — utile se in futuro gestisci split revenue; nel core ERP può essere `internal_transfer` tra due `EntryAllocation` collegate allo stesso o diverso `LedgerEntry`, oppure lasciato al verticale finché non serve.
+- `**Payment`**: in schema DB esiste tabella `payment`; nel codice entity gran parte è commentata — in un ERP settore-neutro conviene `**LedgerEntry` di tipo "payment"** o tabella `payments` legata 1–1 a una riga di entrata, senza accoppiamento stretto a `MovementUser` finché non chiarisci il modello contabile.
 
 ---
 
-## Cosa non mettere nel core Business (o solo come plugin)
+## Cosa non mettere nel core ERP (o solo come plugin)
 
 - **Equipment** e tassonomia type/category hardware.
 - **Client** come entità nominata: sostituisci con **Party** generico o integrazione esterna.
@@ -628,7 +632,7 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 - Ordine consigliato **post-MVP**: movimenti / allocazioni / bilanci; resto Filament commerciale/CRM (`business-filament-final`); **slice contabile Filament già presente** (`business-filament-erp-core-slice`).
 - `app/Contracts`: `BillingStrategyInterface` per ore vs preventivo; `BalanceCalculatorInterface` per snapshot + runtime.
 - **Test**: somme allocazioni, congelamento; se presente ETL legacy, campioni di parità su totali noti (evitare bug tipo closure che non muta accumulatori).
-- **Filament**: risorse **accounting-first** in admin (vedi `business-filament-erp-core-slice`); il resto del back-office Business (`business-filament-final`, `erp-filament-resources`) dopo dominio stabilizzato.
+- **Filament**: risorse **accounting-first** in admin (vedi `business-filament-erp-core-slice`); il resto del back-office ERP (`business-filament-final`, `erp-filament-resources`) dopo dominio stabilizzato.
 
 ---
 
@@ -646,7 +650,7 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 
 - Migration Core `taxonomies` + `**abstract class Taxonomy`** con `**protected $table = 'taxonomies';`**.
 - Refactor `**Category extends Taxonomy`**: scope `cms.content` (o equivalente), trait Cms esistenti sulla sottoclasse; migrazione `categories` → `taxonomies` se si unifica lo storage; aggiornare pivot **Content**, Filament, search Typesense, regole validazione.
-- Predisporre scope `**business.activity`** / `**business.movement`** per FK successive da Business (`taxonomy_id` su Task, TimeEntry, movements).
+- Predisporre scope convenzionali `**erp.activity`** / `**erp.movement**` (o equivalente) per FK successive dal modulo ERP (`taxonomy_id` su Task, TimeEntry, movements).
 - Test regressione: CRUD Category, contenuti categorizzati, query gerarchiche.
 
 ### Fase 0 — Confini dati
@@ -680,7 +684,7 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 
 - Mapping (solo se si importa da DB legacy): entità calendario → `Task` / `TimeEntry`; sessioni lavoro → `TimeEntry`; documenti offerta → `Quotation` / `quotation_items`; movimenti e riparti → `Movement` / `MovementAllocation`; compensazioni interne → pool / settlements (secondo schema sorgente).
 
-### Fase finale — Filament (modulo Business)
+### Fase finale — Filament (modulo ERP)
 
 - **Regola di delivery (aggiornata)**: il back-office Filament **contabile** (tenant, PdC, prima nota bozza/view, periodi, numeratori, codici fiscali) è **già iniziato** (`business-filament-erp-core-slice`). Risorse **commerciali/CRM/magazzino/fatture** restano l’ultimo grosso blocco UI (`business-filament-final` / `erp-filament-resources`), dopo migrazioni e modelli allineati.
 - **Motivo**: la UI resta consumatore del dominio; la slice contabile è utile per smoke test/admin senza bloccare il resto del modulo.
@@ -703,14 +707,14 @@ Campi previsti sulla tabella **`quotations`** (nomi colonna possono restare suff
 
 - **Moneta e arrotondamenti**: usare **decimal** a livello DB e importi in minor unit o `bcmath` (evitare `float` in contabilità).
 - **Soft delete / audit**: allineare a `[Modules\Core\Overrides\Model](file:///srv/http/laraplate/Modules/Core/app/Overrides/Model.php)` (o pattern già usato nei moduli) + versioning dove serve.
-- **Filament / API**: **Filament Business = fase finale** del modulo (vedi § Fase finale — Filament). Il primo consumatore (solo back-office vs anche API mobile) si decide in quella fase; non cambia il modello dati ma influenza ordine di lavoro e permessi.
+- **Filament / API**: **Filament ERP = fase finale** del modulo (vedi § Fase finale — Filament). Il primo consumatore (solo back-office vs anche API mobile) si decide in quella fase; non cambia il modello dati ma influenza ordine di lavoro e permessi.
 - **`Quotation` / `QuotationItem`**: modello Core + `**HasLocks`** + `HasVersions` opz.; colonne **duplica + lineage**; `**ProjectObserver`** + **trigger DB** opz. per mutazioni quando locked; niente merge ad albero legacy.
 
 ---
 
 ## Esito atteso
 
-Modulo **Business** come **scaffolding** per applicazioni gestionali: **anagrafiche**, **commessa** (`Project`) con **offerta** opzionale (`Quotation`: **duplica + lineage**; **lock** su offerta e righe al bind commessa via `**HasLocks`** + observer + trigger DB opzionali), **owner interno**, **pianificazione** e **consuntivo** (`quotation_item_id` opzionale), **listino** (`price_lists` / `price_list_items`), **movimenti** e **pool soci** (modello Tricount), **bilanci**. Estensioni verticali e **ETL da DB legacy** restano **opzionali**; policy listino/overflow in `**BillingStrategy`**.
+Modulo **ERP** come **scaffolding** per applicazioni gestionali: **anagrafiche**, **commessa** (`Project`) con **offerta** opzionale (`Quotation`: **duplica + lineage**; **lock** su offerta e righe al bind commessa via `**HasLocks`** + observer + trigger DB opzionali), **owner interno**, **pianificazione** e **consuntivo** (`quotation_item_id` opzionale), **listino** (`price_lists` / `price_list_items`), **movimenti** e **pool soci** (modello Tricount), **bilanci**. Estensioni verticali e **ETL da DB legacy** restano **opzionali**; policy listino/overflow in `**BillingStrategy`**.
 
 ## Modello tipo Tricount (cassa soci) — bozza in piano
 
@@ -767,23 +771,23 @@ Ispirazione **Tricount / Splitwise**: ogni spesa ha **quote di riparto** per soc
 
 **Implementazione recente (repo, tracciamento)** — schema + modelli MVP pre-contabilità: file migration `191728`–`191729` (listino), `191747` (`time_entries`), aggiornamenti `quotations`/`projects`/`tasks`/`quotations_items`, pivot `contactables` rinominata; modelli `Quotation`, `Project`, `Task`, `TimeEntry`, `PriceList`, `PriceListItem`, `QuotationItem`, `Contact`/`Customer` (M:N), `Activity` (inverse `tasks`/`time_entries`/`price_list_items`); `getRules()` create/update sui modelli MVP elencati; seeder dev stub `DevERPTaxonomySeeder`.
 
-**Definizioni entità**: sezione **[Definizioni entità Business](#definizioni-entità-business)** con scopo, anti-pattern, relazioni e gap rispetto al repo (`Task`/`activities`, `Project` senza `lead_user_id`, ecc.).
+**Definizioni entità**: sezione **[Definizioni entità ERP](#definizioni-entità-erp)** con scopo, anti-pattern, relazioni e gap rispetto al repo (`Task`/`activities`, `Project` senza `lead_user_id`, ecc.).
 
-**Piano unico (fonte di verità)**: per Nebula→Business usare **solo questo file** (`.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md`). **Non creare piani `.plan.md` paralleli** (né lasciare bozze generate da tool come sostituto): ogni iterazione va **fusa qui** — aggiornare frontmatter `todos` e, se serve, questa sezione Registro.
+**Piano unico (fonte di verità)**: per Nebula→ERP usare **solo questo file** (`.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md`). **Non creare piani `.plan.md` paralleli** (né lasciare bozze generate da tool come sostituto): ogni iterazione va **fusa qui** — aggiornare frontmatter `todos` e, se serve, questa sezione Registro.
 
 **Nomenclatura righe offerta (parità listino)**: come `PriceList` → `PriceListItem`, il documento **`Quotation`** ha righe **`QuotationItem`** (tabella target consigliata **`quotation_items`**, FK `quotation_item_id`). Evitare `QuoteLine` / `quote_lines` nei nuovi artefatti. Se in DB la tabella ha altro nome (es. `quotations_items`), **allineare** migration o `protected $table` sul modello — una sola fonte di verità.
 
-**Migration Business — refactor file separati (2026)**: `quotations` e righe preventivo in **due migration** (`create_quotations_table`, `create_quotation_items_table`) per **rollback** e dipendenze più chiare; pivot **`contactables`** in migration dedicata. **Convenzione piano**: va bene **un file per entità** *oppure* **pivot/figlia nello stesso file della seconda tabella** purché l’**ordine globale** dei filename rispetti tutte le FK; file multipli non sono obbligatori ma sono **accettabili** quando migliorano `down()` e review.
+**Migration ERP — refactor file separati (2026)**: `quotations` e righe preventivo in **due migration** (`create_quotations_table`, `create_quotation_items_table`) per **rollback** e dipendenze più chiare; pivot **`contactables`** in migration dedicata. **Convenzione piano**: va bene **un file per entità** *oppure* **pivot/figlia nello stesso file della seconda tabella** purché l’**ordine globale** dei filename rispetti tutte le FK; file multipli non sono obbligatori ma sono **accettabili** quando migliorano `down()` e review.
 
 **Processo**: se un tool propone un nuovo file piano, **ignorarlo o incorporarlo** in questo documento; il tracking operativo resta nei **todo YAML** sotto. File duplicato `business_schema_dominio_acf1d12b.plan.md` **eliminato** dopo merge nel piano Nebula.
 
-**Ordine modulo Business**: **Filament contabile (admin)** come slice anticipata (`business-filament-erp-core-slice` **completed**); **Filament commerciale/CRM/magazzino** resta da completare (`business-filament-final`, `erp-filament-resources`).
+**Ordine modulo ERP**: **Filament contabile (admin)** come slice anticipata (`business-filament-erp-core-slice` **completed**); **Filament commerciale/CRM/magazzino** resta da completare (`business-filament-final`, `erp-filament-resources`).
 
 Decisioni **confermate**:
 
-- **`Modules\Business\Casts\EntityType`**: enum per **discriminare gli alberi** in `taxonomies` (es. `MOVEMENTS`, `ACTIVITIES`), analogamente al ruolo di `EntityType` in Cms — **non** elenca foglie tipo “imbiancatura” / “programmazione”.
-- **Nessun enum `ActivityType`** nel modulo Business: i tipi attività dipendono dalla verticale; restano **nodi di tassonomia** (dati/seed/admin).
-- **`Modules\Business\Casts\MovementType`** (`income` / `expense`): riservato alla parte **cassa / contabile leggera**, non al catalogo attività.
+- **`Modules\ERP\Casts\EntityType`**: enum per **discriminare gli alberi** in `taxonomies` (es. `MOVEMENTS`, `ACTIVITIES`), analogamente al ruolo di `EntityType` in Cms — **non** elenca foglie tipo “imbiancatura” / “programmazione”.
+- **Nessun enum `ActivityType`** nel modulo ERP: i tipi attività dipendono dalla verticale; restano **nodi di tassonomia** (dati/seed/admin).
+- **`Modules\ERP\Casts\MovementType`** (`income` / `expense`): riservato alla parte **cassa / contabile leggera**, non al catalogo attività.
 - **`TimeEntry`**: **esattamente un’activity** tramite **`taxonomy_id`** (`belongsTo` tassonomia attività, **senza pivot**); **`quotation_item_id`** opzionale per contesto/confronto con offerta; sessioni senza task/preventivo coperte dal solo nodo tassonomia sulla sessione.
 - **`PriceListItem`**: **fonte** del riferimento catalogo per la voce listino; `QuotationItem` → via `price_list_item_id` (eventuale **snapshot** sulla riga se serve immutabilità).
 - **Gerarchia movimenti “categoria/tipo”**: su **`taxonomies`** con scope/EntityType movimenti — **no** tabella dedicata `MovementCategory` nel modello target.
@@ -796,14 +800,14 @@ Decisioni **confermate**:
 
 ### Decisioni Roadmap ERP completo (consolidate 2026-04)
 
-> Conversazione 2026-04: il MVP pre-contabilita' resta condizione d'ingresso, ma il modulo Business mira a un **ERP completo** (italian-first ma pluggable, no e-invoicing concreto nel modulo, predisposizione multi-company + multi-currency da subito). Decisioni puntuali consolidate:
+> Conversazione 2026-04: il MVP pre-contabilita' resta condizione d'ingresso, ma il modulo ERP mira a un **ERP completo** (italian-first ma pluggable, no e-invoicing concreto nel modulo, predisposizione multi-company + multi-currency da subito). Decisioni puntuali consolidate:
 
-- **Visione ERP**: modulo Business punta a coprire CRM (Lead/Opportunity), Quotation, **SalesOrder** intermedio, Project (commessa), DeliveryNote (DDT), Invoice (sale + purchase), Magazzino full-costing FIFO+media, Ciclo passivo (PO/GR/Invoice purchase), Contabilita' italiana (CoA, Journal, Periodi fiscali, IVA + ritenute, Numerazione progressiva). Vedi sezione **Roadmap ERP completo (post-MVP)** + todo dedicati nel frontmatter.
+- **Visione ERP**: modulo ERP punta a coprire CRM (Lead/Opportunity), Quotation, **SalesOrder** intermedio, Project (commessa), DeliveryNote (DDT), Invoice (sale + purchase), Magazzino full-costing FIFO+media, Ciclo passivo (PO/GR/Invoice purchase), Contabilita' italiana (CoA, Journal, Periodi fiscali, IVA + ritenute, Numerazione progressiva). Vedi sezione **Roadmap ERP completo (post-MVP)** + todo dedicati nel frontmatter.
 - **`SalesOrder` introdotto come intermediario** tra `Quotation` e `Project` (M3.2). Cardinalita' definitiva: 1 Quotation -> N SalesOrder; 1 SalesOrder -> N Project; N SalesOrder -> 1 Project (un progetto puo' aggregare piu' ordini).
 - **Lock-chain SO progressivo** (sostituisce il vecchio "lock al `Project::created`"): confirm SO -> `Quotation` lockata + header SO lockato; prima `DeliveryNote` / prima `Invoice` su una riga -> riga lockata su `qty_ordered`. Modifiche radicali via `SalesOrderAmendmentService::amend(...)` con `amends_sales_order_id` (audit trail). Vedi paragrafo **3quater. Lock preventivo / lock SO** aggiornato.
 - **Multi-company predisposto da subito** (M0-ERP): tabella `companies` + trait `BelongsToCompany` + global scope `BelongsToCompanyScope` automatico su tutte le entita' transazionali. In v1 1 sola company `default`, ma il vincolo strutturale c'e'.
-- **Multi-currency predisposto da subito** (M0-ERP): helper `MigrateUtils::moneyColumns($table, 'amount')` -> ogni amount ha `amount_doc` + `currency_doc` + `amount_local` + `fx_rate` (decimal 18,8). `amount_local` e' la base per la partita doppia. `CurrencyConverter` no-op in M0 (EUR/EUR fx=1.0). Tabella tassi + provider live rinviati.
-- **Versioning forzato sui modelli contabili**: niente lock sul record `settings` (Core non sa di Business), niente seeder custom. Si dichiara `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` direttamente sulla classe del modello contabile (Account, JournalEntry, JournalEntryLine, Invoice/InvoiceLine, FiscalYear, FiscalPeriod, DocumentSequence, valutare anche StockMovement/StockCostLayer per audit). Il branch `property_exists` in [HasVersions::getVersionStrategy()](file:///srv/http/laraplate/Modules/Core/app/Helpers/HasVersions.php) garantisce priorita' assoluta della property sul `Setting`. Nessuna modifica a Core. Idem per `softDeletesEnabled`. Possibile follow-up Filament (non bloccante): nascondere/disabilitare i record Setting di versioning relativi a modelli che hanno la property dichiarata.
+- **Multi-currency predisposto da subito** (M0-ERP): helper `ERPMigrateUtils::moneyColumns($table, 'amount')` -> ogni amount ha `amount_doc` + `currency_doc` + `amount_local` + `fx_rate` (decimal 18,8). `amount_local` e' la base per la partita doppia. `CurrencyConverter` no-op in M0 (EUR/EUR fx=1.0). Tabella tassi + provider live rinviati.
+- **Versioning forzato sui modelli contabili**: niente lock sul record `settings` (Core non sa del modulo ERP), niente seeder custom. Si dichiara `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` direttamente sulla classe del modello contabile (Account, JournalEntry, JournalEntryLine, Invoice/InvoiceLine, FiscalYear, FiscalPeriod, DocumentSequence, valutare anche StockMovement/StockCostLayer per audit). Il branch `property_exists` in [HasVersions::getVersionStrategy()](file:///srv/http/laraplate/Modules/Core/app/Helpers/HasVersions.php) garantisce priorita' assoluta della property sul `Setting`. Nessuna modifica a Core. Idem per `softDeletesEnabled`. Possibile follow-up Filament (non bloccante): nascondere/disabilitare i record Setting di versioning relativi a modelli che hanno la property dichiarata.
 - **Tassonomia movimenti assorbita dal Chart of Accounts**: rimosso `EntityType::MOVEMENTS`. Ogni `JournalEntryLine` ha `account_id`; tag analitici extra restano colonne (`project_id`, `site_id`). Conservato `EntityType::ACTIVITIES`. Aggiunto `EntityType::OPPORTUNITY_STAGES` per la pipeline CRM (M3.1).
 - **`document_sequences`** con chiave composita `(company_id, document_type, fiscal_year)`: lock pessimistico DB (`lockForUpdate`) per i tipi fiscali (`invoice_sale`/`invoice_purchase`/`tax_credit_note`) -> 0 buchi sotto contesa. Per i tipi non fiscali (`quotation`/`sales_order`/`purchase_order`/`delivery_note`/`goods_receipt`) flag `gap_allowed=true` (gap accettati su rollback). Servizio `DocumentNumberAllocator::next(Company, DocumentType, fiscalYear?)`. Test concorrenza obbligatorio (50 process paralleli su `invoice_sale` -> 50 numeri sequenziali univoci).
 - **Snapshot fiscale immutabile**: aliquote, codici e label IVA/ritenute denormalizzati al posting su `invoice_lines` e `journal_entry_lines`. Cambio aliquota = nuovo `tax_code` + `replaced_by_tax_code_id` sul vecchio (mai UPDATE retroattivo). Strategy `TaxLineCalculator` interroga solo `tax_codes` attivi alla data di posting.
@@ -811,7 +815,7 @@ Decisioni **confermate**:
 - **Ciclo passivo completo** (M3.6): `PurchaseOrder`, `GoodsReceipt`, `Invoice direction=purchase`, riconciliazione 3-way PO/GR/Invoice. **Magazzino integrato** (`StockMovementService`) per i carichi GR. Anagrafica unica `parties` con colonna `roles` (json: customer/supplier/both); rename in-place `customers` -> `parties` + rinomina FK `customer_id` -> `party_id` su tutti i documenti.
 - **Inventory full costing in v1**: FIFO + media ponderata (scelta per articolo via `costing_method`). Tabelle `items`, `warehouses`, `stock_levels` (con `weighted_avg_cost`), `stock_movements`, `stock_cost_layers`. `StockMovementService` come unico entry-point: in carico apre layer + aggiorna media; in scarico consuma FIFO o legge media; calcola `unit_cost` per il COGS del journal posting.
 - **E-invoicing**: solo contratti `EInvoiceProvider` + DTO neutri nel modulo (M3.5). Provider concreti SDI/Peppol restano package separati / verticali. Tabella `e_invoice_submissions` per tracciamento.
-- **Migration in-place fino al build**: durante la **fase di creazione** del modulo Business, le migration di `Modules/ERP/database/migrations/*` possono essere modificate **in-place** invece di creare ALTER (DB ricreato da zero ad ogni passaggio). **Eccezione**: rename `customers` -> `parties` deve avvenire prima del passaggio a build. Le migration di `Modules/Core/*` restano **immutate**.
+- **Migration in-place fino al build**: durante la **fase di creazione** del modulo ERP, le migration di `Modules/ERP/database/migrations/*` possono essere modificate **in-place** invece di creare ALTER (DB ricreato da zero ad ogni passaggio). **Eccezione**: rename `customers` -> `parties` deve avvenire prima del passaggio a build. Le migration di `Modules/Core/*` restano **immutate**.
 - **ETL legacy riscritto** in chiave ERP: `Movement` legacy -> `JournalEntry` via `JournalPostingService`; eventuali movimenti magazzino legacy -> `stock_movements` via `StockMovementService`. ETL gira **dopo M2** (contabilita' base) e **dopo M3.3** se include flussi magazzino.
 - **Test plan dedicato** (`accounting-test-plan`, trasversale M1-M3): partita doppia bilanciata su `amount_local`, snapshot fiscale immutabile, concorrenza numerazione, scope multi-company, versioning forzato, lock-chain SO, FIFO/avg, currency converter no-op. Suite di golden master che funge da regression baseline per i PR successivi.
 
@@ -824,7 +828,7 @@ Decisioni **confermate**:
 ### Principi di vision
 
 - **Italian-first ma pluggable**: il default e' italiano (Chart of Accounts, IVA, ritenute, formati documento) ma ogni regola fiscalmente specifica passa da un'interfaccia (`ChartOfAccountsProvider`, `TaxLineCalculator`, `EInvoiceProvider`, `DocumentNumberAllocator`). Una giurisdizione diversa = nuova implementazione, **mai** fork del modulo.
-- **No fatturazione elettronica nel modulo**: solo i contratti (`EInvoiceProvider` + DTO) restano in Business; ogni provider concreto (SDI italiano, Peppol, ecc.) e' package separato/verticale. Test sul modulo coprono solo che il payload neutro sia generato correttamente.
+- **No fatturazione elettronica nel modulo**: solo i contratti (`EInvoiceProvider` + DTO) restano nel modulo ERP; ogni provider concreto (SDI italiano, Peppol, ecc.) e' package separato/verticale. Test sul modulo coprono solo che il payload neutro sia generato correttamente.
 - **Accounting-first phasing**: prima si costruisce la spina dorsale contabile (CoA -> Journal -> Periodi fiscali -> Sequenze documenti), poi i flussi commerciali (CRM, Quotation, SO, DDT, Invoice) e il magazzino (M3.3) **prima** di DDT (M3.4) e Goods Receipt (M3.6). Ogni documento gestionale **deve** poter postare contro il libro giornale.
 - **Predisposizione multi-tenant + multi-currency da subito**: aggiungere `company_id` + dual-currency dopo e' costoso e rischioso. Si fa una volta, oggi resta inerte (1 company default, 1 currency = EUR, fx_rate=1.0).
 - **Versioning forzato sui modelli contabili**: la verita' contabile non e' negoziabile via `Setting`. La property a livello modello vince sempre.
@@ -835,10 +839,10 @@ Decisioni **confermate**:
 
 ### Regola operativa: migration **in-place** fino al build
 
-Siamo nella **fase di creazione** del modulo `Business`. Finche' non si entra in `build` definitivo, le migration del modulo possono essere modificate **in-place** invece di creare nuove migration `ALTER`: il database verra' rigenerato da zero (`migrate:fresh` + seeder) ad ogni passaggio, e questo riduce drammaticamente il rumore in code review e mantiene un solo file per concetto.
+Siamo nella **fase di creazione** del modulo **ERP** (`Modules/ERP`). Finche' non si entra in `build` definitivo, le migration del modulo possono essere modificate **in-place** invece di creare nuove migration `ALTER`: il database verra' rigenerato da zero (`migrate:fresh` + seeder) ad ogni passaggio, e questo riduce drammaticamente il rumore in code review e mantiene un solo file per concetto.
 
-- **Ambito**: solo `Modules/ERP/database/migrations/*`. Le migration di `Modules/Core/*` restano **immutate**: Core non sa dell'esistenza di Business, e modificare migration Core retroattivamente romperebbe ambienti gia' in build.
-- **Eccezione su rename `customers` -> `parties`**: rinomina della migration originale + ridenominazione colonne FK su tutte le altre migration Business che le referenziano, **prima** di entrare in build. Test di migrate-fresh + seeder dev su DB pulito a ogni rinomina.
+- **Ambito**: solo `Modules/ERP/database/migrations/*`. Le migration di `Modules/Core/*` restano **immutate**: Core non sa dell'esistenza del modulo ERP, e modificare migration Core retroattivamente romperebbe ambienti gia' in build.
+- **Eccezione su rename `customers` -> `parties`**: rinomina della migration originale + ridenominazione colonne FK su tutte le altre migration ERP che le referenziano, **prima** di entrare in build. Test di migrate-fresh + seeder dev su DB pulito a ogni rinomina.
 - **Quando si entra in build**: la regola si chiude. Da quel punto in poi, ogni cambio di schema = nuova migration `ALTER` che si somma in coda.
 
 ### Fase M0-ERP — Multi-tenancy + scaffolding cross-cutting
@@ -846,7 +850,7 @@ Siamo nella **fase di creazione** del modulo `Business`. Finche' non si entra in
 Todo: `multi-tenancy-foundations`, `enforce-versioning-on-accounting-models`.
 
 - Tabella `companies` + 1 row `default` con `functional_currency='EUR'`. Trait `BelongsToCompany` + global scope automatico `BelongsToCompanyScope` su tutte le entita' transazionali (esistenti via in-place migration: `quotations`, `projects`, `tasks`, `time_entries`, `price_lists`, `price_list_items`, `quotations_items`; future: `journal_entries`, `invoices`, `sales_orders`, `delivery_notes`, `tax_codes`, `document_sequences`, `items`, `warehouses`, `stock_movements`, `parties`).
-- Helper `MigrateUtils::moneyColumns($table, 'amount')` per generare `amount_doc` + `currency_doc` + `amount_local` + `fx_rate` insieme. Anche se in M0 ogni amount viene salvato con `currency_doc='EUR'` e `fx_rate=1.0`, la colonna esiste e i servizi futuri non dovranno fare retrofit.
+- Helper `ERPMigrateUtils::moneyColumns($table, 'amount')` per generare `amount_doc` + `currency_doc` + `amount_local` + `fx_rate` insieme. Anche se in M0 ogni amount viene salvato con `currency_doc='EUR'` e `fx_rate=1.0`, la colonna esiste e i servizi futuri non dovranno fare retrofit.
 - `CurrencyConverter` come facade no-op in M0 (`amount_local = amount_doc * fx_rate` con `fx_rate=1.0` su EUR/EUR). Lo abilitiamo davvero quando arriva un cliente con valuta diversa: aggiunta tabella `fx_rates` + provider live.
 - Property `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;` direttamente sulla classe di ogni modello contabile (Account, JournalEntry, JournalEntryLine, Invoice/InvoiceLine, FiscalYear, FiscalPeriod, DocumentSequence, valutare anche StockMovement/StockCostLayer per audit). Idem `protected bool $softDeletesEnabled = true;` dove serve. **Nessuna modifica a Core**, nessun seeder custom: il branch `property_exists` in [HasVersions::getVersionStrategy()](file:///srv/http/laraplate/Modules/Core/app/Helpers/HasVersions.php) garantisce la priorita' assoluta della property sul record `settings.version_strategy_{table}` (eventualmente popolato in modo inerte da `defaultSettings()` del Core seeder).
 
@@ -998,7 +1002,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-  subgraph models [Modelli contabili Business]
+  subgraph models [Modelli contabili ERP]
     Account
     JournalEntry
     JournalEntryLine
