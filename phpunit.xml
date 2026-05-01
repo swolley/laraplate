@@ -6,10 +6,19 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+            <directory suffix="Test.php">tests/Unit</directory>
+            <directory suffix="Test.php">Modules/Core/tests/Unit</directory>
+            <directory suffix="Test.php">Modules/Core/tests/UnitShell</directory>
+            <directory suffix="Test.php">Modules/CMS/tests/Unit</directory>
+            <directory suffix="Test.php">Modules/AI/tests/Unit</directory>
+            <directory suffix="Test.php">Modules/ERP/tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
+            <directory suffix="Test.php">Modules/Core/tests/Feature</directory>
+            <directory suffix="Test.php">Modules/CMS/tests/Feature</directory>
+            <directory suffix="Test.php">Modules/AI/tests/Feature</directory>
+            <directory suffix="Test.php">Modules/ERP/tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>

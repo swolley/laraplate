@@ -1,6 +1,6 @@
 ---
 name: Laraplate ERP modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (companies, tax codes, accounts, journal bozza/view, fiscal years/periods, document sequences) — todo `business-filament-erp-core-slice` **completed**; CRM/magazzino/fatture/BI Filament restano in `erp-filament-resources`."
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (`business-filament-erp-core-slice` **completed**) + **slice commerciale MVP** (`erp-filament-mvp-commercial-slice` **completed**). **M3.1 completato** in repo (win opportunità su preventivo `accepted`). **M3.2 sostanzialmente completato** (lock quotation/header/righe, `SalesOrderEvasionService`); restano amendment dedicato e wiring DDT/Invoice. **Foundation M3.3–M3.6** (tabelle `items`/`warehouses`/`stock_levels`/`delivery_notes`/`purchase_orders`/`goods_receipts` + Filament scaffold) in repo; mancano `stock_movements`, costing, posting integrato. E-invoice (`einvoice-interface` **completed**). Policies/BI e ciclo completo restano in `erp-filament-resources` / `erp-policies-permissions`."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi ERP `sites.place_id` / ICS"
@@ -27,7 +27,7 @@ todos:
     content: "**ASSORBITO da `accounting-refactor-cash-tricount`** (vedi Roadmap ERP). Resta come rimando storico: nessuna implementazione separata. Per il MVP non-contabile: solo eventuali colonne/lock su progetto↔preventivo già coperti da `quote-revisions-core`; non bloccare MVP su trigger DB."
     status: pending
   - id: time-domain
-    content: "Completare dominio tempo: validazione sovrapposizione `TimeEntry` **solo applicativa** (accettato) — **da implementare**; regole `getRules()` su `Task`/`TimeEntry` (intervalli `started_at`/`ended_at`, `taxonomy_id`, FK opzionali) **fatte a livello modello**; eventuali scope/query per aggregati per `taxonomy_id` su sessione. Nessun enum ActivityType."
+    content: "Dominio tempo: validazione sovrapposizione `TimeEntry` **applicativa** via regola `TimeEntryOverlap` + `TimeEntryObserver` su update; regole `getRules()` su `Task`/`TimeEntry` (intervalli, `taxonomy_id`, FK opzionali) a livello modello; eventuali scope/query aggregati per `taxonomy_id` restano backlog opzionale. Nessun enum ActivityType."
     status: completed
   - id: business-enums-and-taxonomy-trees
     content: "Chiuso: `EntityType` senza MOVEMENTS, con OPPORTUNITY_STAGES + modello `OpportunityStage`, entity+preset in `ERPDatabaseSeeder`, dev seed `DevERPOpportunityStagesTaxonomySeeder`, enum `MovementType` (income/expense), PHPDoc + GLOSSARY."
@@ -51,10 +51,13 @@ todos:
     content: Generazione ICS/promemoria mobile da Task (DTSTART/END) + LOCATION da Place/Site + partecipanti da Contact/User; eventuale persistenza UID export in seguito
     status: pending
   - id: business-filament-erp-core-slice
-    content: "Chiuso (slice): risorse Filament in `Modules/ERP/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `ERP`; test `Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php`. Escluso: posting da UI, quotation/project/customer, CRM, magazzino, fatture complete (restano sotto `erp-filament-resources`)."
+    content: "Chiuso (slice): risorse Filament in `Modules/ERP/app/Filament/Resources/` — `CompanyResource`, `TaxCodeResource`, `AccountResource`, `JournalEntryResource` (index/create/edit solo bozza `posted_at` null; pagina `view` + infolist righe; `canEdit`/`canDelete` bloccati se postata), `FiscalYearResource`, `FiscalPeriodResource`, `DocumentSequenceResource`; gruppo nav `ERP`; test `Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php`. Escluso: posting da UI, magazzino, fatture complete (restano sotto `erp-filament-resources`). **CRM commerciale** (Lead/Opportunity/SO) è negli slice successivi, non in questa risorsa core. **Nota:** anagrafica/preventivo/progetto in Filament sono coperti da `erp-filament-mvp-commercial-slice`."
+    status: completed
+  - id: erp-filament-mvp-commercial-slice
+    content: "Chiuso: Filament gruppo `ERP` — `CustomerResource`, `ContactResource` (sync M:N `contactables` via `customer_ids` in create/edit), `QuotationResource` (repeater `quotations_items`; `opportunity_id` filtrato per `customer_id` con campo `live()`), `ProjectResource` (validità + preventivo opzionale); slugs `business/customers`, `business/contacts`, `business/quotations`, `business/projects`; test `ERPFilamentCommercialResourcesTest.php`. **Agg. 2026-04:** validazione modello `Quotation` su `opportunity_id` (stesso customer/company) + test `QuotationOpportunityAlignmentTest.php`."
     status: completed
   - id: business-filament-final
-    content: "Ampliamento UI modulo ERP oltre la slice `business-filament-erp-core-slice`: risorse MVP commerciali (quotations, projects, customers/anagrafica), poi CRM/magazzino quando le entità esistono; API mobile opzionale in parallelo o dopo."
+    content: "Ampliamento UI oltre slice contabile + commerciale MVP: **Leads/Opportunities/SalesOrder** + **scaffold Filament** per Items/Warehouses/StockLevels/DeliveryNotes/Invoices/PurchaseOrders/GoodsReceipts (2026-04-30). Restano UX mature (posting, righe DDT/GR, parties M3.6), BI, API mobile opzionale."
     status: pending
   - id: inventory-magazzino-nebula
     content: "**ASSORBITO da `inventory-erp-base`** (M3.3, vedi Roadmap ERP). Non e' piu' un verticale rinviato: il magazzino e' integrato nel piano ERP come prerequisito di DDT vendita (M3.4) e Goods Receipt acquisto (M3.6). Resta come rimando storico per eventuali scelte ETL legacy specifiche."
@@ -87,31 +90,31 @@ todos:
     content: "M2 — Refactor di [Movement](file:///srv/http/laraplate/Modules/ERP/app/Models/Movement.php) / `PartnerPool` / `PoolTransaction` come **specializzazioni / adapter contabili** che generano `JournalEntry` via `JournalPostingService`. Eliminare la logica saldo parallela: il saldo cassa torna a essere **derivato** dalle entry contabili (vista o servizio dedicato). Mantenere l'API/UX Tricount lato Filament/Livewire ma sotto-cofano scrive solo in journal. Migrazione dati: per ogni Movement esistente, generare entry equivalente; flag su Movement `posted_journal_entry_id`."
     status: pending
   - id: crm-leads-opportunities
-    content: "M3.1 — Tabella `leads` (party_id nullable opt., source, status enum, owner_user_id, company_id, primi contatti) + `opportunities` (lead_id?, party_id obbl., `stage_taxonomy_id` -> taxonomy con `EntityType::OPPORTUNITY_STAGES`, `expected_close_date`, `expected_amount_local`+`amount_doc`+fx, `probability`, `won_at`/`lost_at`/`lost_reason`). Conversione `Opportunity -> Quotation` con `lineage`: `quotations.opportunity_id` opt. + observer che chiude opportunity al win. Filament resource minimale (resta in M4 per integrazione)."
-    status: pending
+    content: "M3.1 — **Completato (repo 2026-04-30):** `leads` + `opportunities` (MVP `customer_id`; `party_id` rimandato a M3.6); `quotations.opportunity_id` + validazione allineamento; Filament `LeadResource`/`OpportunityResource`; `OpportunityLifecycleService` + `QuotationObserver` → opportunità `won` + `won_at` quando `Quotation.status=accepted`; helper test `OpportunityStageTaxonomy`; test `CrmLeadsAndOpportunitiesSchemaTest`, `QuotationOpportunityAlignmentTest`. **Backlog opzionale:** lineage esteso oltre FK, automazioni aggiuntive su altri stati preventivo."
+    status: completed
   - id: sales-order
-    content: "M3.2 — `sales_orders` da `Quotation` accettata; **lock `Quotation` al confirm SO** (sostituisce lock alla creazione Project: vedi paragrafo 'Lock preventivo' aggiornato). `project_id` opzionale; cardinalita' 1 Q -> N SO, 1 SO -> N Project, N SO -> 1 Project. Modello `SalesOrder` con `status` ∈ {draft, confirmed, partially_delivered, partially_invoiced, closed, cancelled, amended} + colonna `amends_sales_order_id` (self-FK). Modello `SalesOrderLine` con `qty_ordered`, `qty_delivered` (default 0), `qty_invoiced` (default 0), `status` ∈ {open, partially_evased, fully_evased, cancelled}. **Lock progressivo**: al confirm header lockato (anagrafica/condizioni/totali immutabili); riga bloccata su `qty_ordered` non appena `qty_delivered>0` o `qty_invoiced>0`. Servizio `SalesOrderEvasionService::registerDelivery(SalesOrder, lines, qty)` e `::registerInvoice(...)` chiamato dagli observer di `DeliveryNote::created` e `Invoice::posted`; aggiorna le qty di riga, ricalcola lo `status` SO. Workflow di amendment: `SalesOrderAmendmentService::amend(SalesOrder)` clona righe non evase + delta in nuovo SO con `amends_sales_order_id`."
+    content: "M3.2 — **Sostanzialmente completato (repo 2026-04-30):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header); test `SalesOrderSchemaTest`. **Backlog M3.2:** `SalesOrderAmendmentService` dedicato; wiring evasion da observer `DeliveryNote`/`Invoice` posted; versionamento SO (disabilitato via `shouldVersioning()` dove applicabile)."
     status: pending
   - id: inventory-erp-base
-    content: "M3.3 — Magazzino full-costing in v1 (FIFO + media ponderata). Tabelle: `items` (codice, nome, uom, taxonomy_id?, `costing_method` ∈ {fifo, weighted_avg}, company_id), `warehouses` (sede magazzino, opz. `place_id` Core, company_id), `stock_levels` (qty + `weighted_avg_cost` per item × warehouse × company, opz. lotto/seriale), `stock_movements` (`direction` in/out/transfer, `source_type` morph: GR / DDT / manuale / inventario, quantity, `unit_cost`, `currency_doc`+`currency_local`+fx, company_id), `stock_cost_layers` (FIFO: qty_remaining, unit_cost, source_movement_id). Servizio `StockMovementService` come unico entry-point: in carico apre layer + aggiorna media; in scarico consuma FIFO o legge media; calcola COGS che il `JournalPostingService` usa per il journal del DDT/Invoice sale. Test plan dedicato per FIFO/avg per matchare i totali contabili."
+    content: "M3.3 — **Foundation in repo (2026-04-30):** migrazioni + modelli `items`, `warehouses`, `stock_levels` (+ Filament scaffold). **Rimanente M3.3:** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing FIFO/media completo, integrazione journal/COGS, test golden master piano."
     status: pending
   - id: sales-delivery
-    content: M3.4 — `delivery_notes` (DDT vendita) da SO con righe `delivery_note_lines` (sales_order_line_id, qty). **Genera `stock_movements` di scarico** via `StockMovementService` (richiede `inventory-erp-base`); il servizio ritorna il `unit_cost` valorizzato che alimenta il COGS del journal posting al momento della Invoice. Observer su DDT::created che invoca `SalesOrderEvasionService::registerDelivery`.
+    content: "M3.4 — **Foundation in repo (2026-04-30):** tabella `delivery_notes` (header) + `DeliveryNoteResource` Filament. **Rimanente M3.4:** righe `delivery_note_lines`, collegamento SO, `StockMovementService` + observer che chiama `SalesOrderEvasionService::registerDelivery`, COGS/journal come da piano."
     status: pending
   - id: sales-invoice-document
-    content: M3.5 — `invoices` (header) + `invoice_lines` con `direction` ∈ {sale, purchase}; ogni Invoice postata genera `JournalEntry` automatico via `JournalPostingService`; righe con `tax_code_id` + snapshot fiscale (`tax_code`, `rate`, `label` denormalizzati al posting). Vincolo a `delivery_notes` opt. (per fattura accompagnatoria/differita). Numerazione progressiva via `DocumentNumberAllocator` con `gap_allowed=false` per `invoice_sale`/`invoice_purchase`.
+    content: "M3.5 — **Foundation in repo (2026-04-30):** tabelle `invoices`/`invoice_lines` stub + `InvoiceResource` Filament scaffold. **Rimanente M3.5:** posting completo (`JournalPostingService`), snapshot fiscale righe, vincolo opzionale a `delivery_notes`, numerazione `DocumentNumberAllocator` con `gap_allowed=false` per `invoice_sale`/`invoice_purchase`, UI azioni post/unpost."
     status: pending
   - id: einvoice-interface
-    content: "M3.5 — Solo contratti `EInvoiceProvider` (`prepare(Invoice): EInvoicePayload`, `submit(EInvoicePayload): EInvoiceSubmissionResult`, `status(string id): EInvoiceStatus`) + DTO neutri (no XML/SDI specifico). Nessuna implementazione concreta nel modulo ERP; provider concreti restano package separati / verticali. Tabella `e_invoice_submissions` (invoice_id, provider_code, external_id, status, last_payload_path, submitted_at, response_payload) per tracciamento."
-    status: pending
+    content: "Chiuso in modulo (solo contratto): `Modules/ERP/app/Contracts/EInvoiceProvider.php` — `prepare()`, `submit()`, `remoteStatus()` + DTO `EInvoicePayload`, `EInvoiceSubmissionResult`, enum `EInvoiceRemoteStatus`; cast `EInvoiceSubmissionStatus`; modello `EInvoiceSubmission` + relazione `Invoice::eInvoiceSubmissions()`; migration `2026_04_29_150000_create_e_invoice_submissions_table.php`; test `EInvoiceSubmissionSchemaTest.php`. Nessun binding SDI/PEPPOL in `ERPServiceProvider`."
+    status: completed
   - id: purchasing-cycle
-    content: "M3.6 — Ciclo passivo completo ERP. **Anagrafica unica `parties`**: rename in-place di `customers` -> `parties`, aggiunta colonna `roles` (json array: customer/supplier/both), classe PHP `Party` con scope `customers()`/`suppliers()`; rinomina FK `customer_id` -> `party_id` su `quotations`, `projects`, `invoices`, `sales_orders`, `delivery_notes`, `leads`, `opportunities`. Documenti: `purchase_orders` (ordine al fornitore, party.role=supplier), `goods_receipts` (bolla di ingresso, **genera `stock_movements` di carico** via `StockMovementService` con `unit_cost` dal PO/Invoice), `invoices direction=purchase` (collegabile a uno o piu' GR; postaggio journal automatico). Riconciliazione tre-vie PO/GR/Invoice: validazione coerenza prezzi/quantita' al posting con scarti tracciati."
+    content: "M3.6 — **Foundation in repo (2026-04-30):** tabelle `purchase_orders`, `goods_receipts` + modelli Filament scaffold (ancora su `customer_id` come fornitore MVP). **Rimanente M3.6:** rename `customers`→`parties` + `party_id`; righe PO/GR; stock movements carico; riconciliazione 3-way; posting purchase invoice."
     status: pending
   - id: erp-policies-permissions
     content: "M4 — Policies + permessi su: chiusura/riapertura periodo, posting/unposting journal, fatturazione (genera/annulla), sblocco quotations/SO, switch company corrente, modifica `tax_codes` (riservata ad amministratori), gestione `document_sequences`. Allineamento al pattern Core (gates + policies). Test feature: utente standard non puo' ri-aprire periodo chiuso, non puo' modificare tax_code, ecc."
     status: pending
   - id: erp-filament-resources
-    content: "M4 — Filament **parziale**: già coperti Companies, CoA (`AccountResource`), JournalEntry (bozza + view postata), TaxCode, FiscalYear, FiscalPeriod, DocumentSequence. **Da fare**: Leads, Opportunities, SalesOrders, DeliveryNotes, Invoices sale/purchase, Parties+role, PO, GoodsReceipts, Items, Warehouses, StockLevels read-only; azioni UI per posting/chiusure se richiesto. BI minime: bilancio, registro IVA, funnel pipeline."
+    content: "M4 — Filament **parziale**: slice contabile + MVP commerciale + CRM + **scaffold risorse** `Item`/`Warehouse`/`StockLevel`/`DeliveryNote`/`Invoice`/`PurchaseOrder`/`GoodsReceipt` (2026-04-30) + test `ERPFilamentCommercialResourcesTest` / `FoundationM3SchemaTablesTest`. **Da fare:** UI posting/chiusure, righe documenti, parties (M3.6), permessi granulari (`erp-policies-permissions`), BI (`erp-reporting-stub`)."
     status: pending
   - id: erp-reporting-stub
     content: "M4 — Servizi report come query/jobs (no BI completa): `BalanceSheetService`, `IncomeStatementService`, `VatLedgerService` (registro IVA vendite/acquisti), `SalesPipelineService` (funnel opportunity -> won), `StockValuationService` (valore magazzino al costing method scelto). Output structurato (JSON/array), pagine Filament minime per consumarli, export CSV/PDF rinviati."
@@ -123,6 +126,14 @@ isProject: false
 ---
 
 > **Repo / cartella (2026-04):** il modulo si chiama **ERP** nel monorepo: cartella **`Modules/ERP`**, package Composer **`swolley/laraplate-erp`**, namespace PHP **`Modules\ERP`**, chiave config **`erp`**, remote git **`laraplate-erp`**. I todo YAML con prefisso `business-*` / `business-filament-*` sono **id storici** Cursor; il contenuto si riferisce al modulo ERP.
+
+### Sync piano ↔ repo (2026-04-30, sera)
+
+Commit submodule ERP: **`0655deb`** (`feat(erp): complete CRM/SO baseline and add M3 foundation resources`). Bump monorepo: **`6fbe51d`**.
+
+**Fatto:** M3.1 (win opportunità su preventivo `accepted`); M3.2 (lock quotation/header/riga, `SalesOrderEvasionService`, test); foundation tabelle M3.3–M3.6 header-level + Filament scaffold; test `FoundationM3SchemaTablesTest` + estensioni commercial/Filament.
+
+**Prossimi passi chiari:** `StockMovementService` + tabelle movimenti/layer; righe DDT/GR; `SalesOrderAmendmentService`; collegare DDT/Invoice a evasion; M3.5 posting fattura; M3.6 `parties`; policies M4 (`erp-policies-permissions`).
 
 # Modulo ERP in Laraplate (Nebula)
 
@@ -781,7 +792,7 @@ Ispirazione **Tricount / Splitwise**: ogni spesa ha **quote di riparto** per soc
 
 **Processo**: se un tool propone un nuovo file piano, **ignorarlo o incorporarlo** in questo documento; il tracking operativo resta nei **todo YAML** sotto. File duplicato `business_schema_dominio_acf1d12b.plan.md` **eliminato** dopo merge nel piano Nebula.
 
-**Ordine modulo ERP**: **Filament contabile (admin)** come slice anticipata (`business-filament-erp-core-slice` **completed**); **Filament commerciale/CRM/magazzino** resta da completare (`business-filament-final`, `erp-filament-resources`).
+**Ordine modulo ERP**: **Filament contabile (admin)** come slice anticipata (`business-filament-erp-core-slice` **completed**); **Filament commerciale MVP** Customer/Contact/Quotation/Project (`erp-filament-mvp-commercial-slice` **completed**); **CRM/magazzino/fatture UI complete** restano in (`business-filament-final`, `erp-filament-resources`).
 
 Decisioni **confermate**:
 
@@ -874,7 +885,7 @@ Todo: `accounting-vat-withholdings`, `accounting-refactor-cash-tricount`.
 
 ### Fase M3 — Cicli commerciali (vendita, magazzino, acquisto)
 
-Todo: `crm-leads-opportunities` (M3.1), `sales-order` (M3.2), `inventory-erp-base` (M3.3), `sales-delivery` (M3.4), `sales-invoice-document` + `einvoice-interface` (M3.5), `purchasing-cycle` (M3.6).
+Todo: `crm-leads-opportunities` (M3.1), `sales-order` (M3.2), `inventory-erp-base` (M3.3), `sales-delivery` (M3.4), `sales-invoice-document` (M3.5; **contratto/tab tracciamento e-invoice già in modulo** → todo `einvoice-interface` **completed**), `purchasing-cycle` (M3.6).
 
 #### M3.1 — CRM (Lead + Opportunity)
 
