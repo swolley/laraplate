@@ -1,6 +1,6 @@
 ---
 name: Laraplate ERP modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (`business-filament-erp-core-slice` **completed**) + **slice commerciale MVP** (`erp-filament-mvp-commercial-slice` **completed**). **M3.1 completato** in repo (win opportunità su preventivo `accepted`). **M3.2 sostanzialmente completato** (lock quotation/header/righe, `SalesOrderEvasionService`); restano amendment dedicato e wiring DDT/Invoice. **Foundation M3.3–M3.6** (tabelle `items`/`warehouses`/`stock_levels`/`delivery_notes`/`purchase_orders`/`goods_receipts` + Filament scaffold) in repo; mancano `stock_movements`, costing, posting integrato. E-invoice (`einvoice-interface` **completed**). Policies/BI e ciclo completo restano in `erp-filament-resources` / `erp-policies-permissions`."
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (`business-filament-erp-core-slice` **completed**) + **slice commerciale MVP** (`erp-filament-mvp-commercial-slice` **completed**). **M3.1 completato** in repo (win opportunità su preventivo `accepted`). **M3.2 sostanzialmente completato** (lock quotation/header/righe, `SalesOrderEvasionService`); restano amendment dedicato e wiring DDT/Invoice. **M3.3–M3.4 avanzati (2026-05-04):** `stock_movements`/`stock_cost_layers`, servizi posting DDT/GR, righe documenti, **COGS/journal su posting DDT**; backlog storno COGS/amendment SO. **M3.6 acquisti:** righe PO/GR, tabella PO con somme righe, numerazione `DocumentType::PurchaseOrder` + allocator su create; restano `parties` e 3-way. E-invoice (`einvoice-interface` **completed**). Policies/BI in `erp-filament-resources` / `erp-policies-permissions`."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi ERP `sites.place_id` / ICS"
@@ -96,10 +96,10 @@ todos:
     content: "M3.2 — **Sostanzialmente completato (repo 2026-04-30):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header); test `SalesOrderSchemaTest`. **Backlog M3.2:** `SalesOrderAmendmentService` dedicato; wiring evasion da observer `DeliveryNote`/`Invoice` posted; versionamento SO (disabilitato via `shouldVersioning()` dove applicabile)."
     status: pending
   - id: inventory-erp-base
-    content: "M3.3 — **Foundation in repo (2026-04-30):** migrazioni + modelli `items`, `warehouses`, `stock_levels` (+ Filament scaffold). **Rimanente M3.3:** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing FIFO/media completo, integrazione journal/COGS, test golden master piano."
+    content: "M3.3 — **In repo (2026-05-04):** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing base, test servizi magazzino. **Rimanente M3.3:** integrazione journal/COGS completa, golden master piano esteso."
     status: pending
   - id: sales-delivery
-    content: "M3.4 — **Foundation in repo (2026-04-30):** tabella `delivery_notes` (header) + `DeliveryNoteResource` Filament. **Rimanente M3.4:** righe `delivery_note_lines`, collegamento SO, `StockMovementService` + observer che chiama `SalesOrderEvasionService::registerDelivery`, COGS/journal come da piano."
+    content: "M3.4 — **In repo (2026-05-04):** `delivery_note_lines`, collegamento SO, `DeliveryNoteInventoryService` + observer/posting, **COGS/journal** su posting magazzino DDT (`DeliveryNoteCogsJournalService`, `cogs_journal_entry_id`), test. **Rimanente M3.4:** storno COGS su annullo DDT (se in scope), rifiniture evasion wiring da UI fattura."
     status: pending
   - id: sales-invoice-document
     content: "M3.5 — **Foundation in repo (2026-04-30):** tabelle `invoices`/`invoice_lines` stub + `InvoiceResource` Filament scaffold. **Rimanente M3.5:** posting completo (`JournalPostingService`), snapshot fiscale righe, vincolo opzionale a `delivery_notes`, numerazione `DocumentNumberAllocator` con `gap_allowed=false` per `invoice_sale`/`invoice_purchase`, UI azioni post/unpost."
@@ -108,13 +108,13 @@ todos:
     content: "Chiuso in modulo (solo contratto): `Modules/ERP/app/Contracts/EInvoiceProvider.php` — `prepare()`, `submit()`, `remoteStatus()` + DTO `EInvoicePayload`, `EInvoiceSubmissionResult`, enum `EInvoiceRemoteStatus`; cast `EInvoiceSubmissionStatus`; modello `EInvoiceSubmission` + relazione `Invoice::eInvoiceSubmissions()`; migration `2026_04_29_150000_create_e_invoice_submissions_table.php`; test `EInvoiceSubmissionSchemaTest.php`. Nessun binding SDI/PEPPOL in `ERPServiceProvider`."
     status: completed
   - id: purchasing-cycle
-    content: "M3.6 — **Foundation in repo (2026-04-30):** tabelle `purchase_orders`, `goods_receipts` + modelli Filament scaffold (ancora su `customer_id` come fornitore MVP). **Rimanente M3.6:** rename `customers`→`parties` + `party_id`; righe PO/GR; stock movements carico; riconciliazione 3-way; posting purchase invoice."
+    content: "M3.6 — **In repo (2026-05-04):** righe PO/GR, posting GR, stato PO; tabella Filament PO con `lines_count` / somme qty; `DocumentType::PurchaseOrder` + `DocumentNumberAllocator` su create PO (reference vuota) + migrazione ENUM MySQL; test dominio PO. **Rimanente M3.6:** `parties`/`party_id`; riconciliazione 3-way; posting fattura acquisto."
     status: pending
   - id: erp-policies-permissions
     content: "M4 — Policies + permessi su: chiusura/riapertura periodo, posting/unposting journal, fatturazione (genera/annulla), sblocco quotations/SO, switch company corrente, modifica `tax_codes` (riservata ad amministratori), gestione `document_sequences`. Allineamento al pattern Core (gates + policies). Test feature: utente standard non puo' ri-aprire periodo chiuso, non puo' modificare tax_code, ecc."
     status: pending
   - id: erp-filament-resources
-    content: "M4 — Filament **parziale**: slice contabile + MVP commerciale + CRM + **scaffold risorse** `Item`/`Warehouse`/`StockLevel`/`DeliveryNote`/`Invoice`/`PurchaseOrder`/`GoodsReceipt` (2026-04-30) + test `ERPFilamentCommercialResourcesTest` / `FoundationM3SchemaTablesTest`. **Da fare:** UI posting/chiusure, righe documenti, parties (M3.6), permessi granulari (`erp-policies-permissions`), BI (`erp-reporting-stub`)."
+    content: "M4 — Filament **parziale**: slice contabile + MVP commerciale + CRM + risorse M3 con righe DDT/GR/PO (2026-05-04) + colonne riepilogo PO + test `ERPFilamentCommercialResourcesTest` / `FoundationM3SchemaTablesTest` / dominio PO. **Da fare:** UI posting/chiusure contabili complete, parties (M3.6), permessi granulari (`erp-policies-permissions`), BI (`erp-reporting-stub`)."
     status: pending
   - id: erp-reporting-stub
     content: "M4 — Servizi report come query/jobs (no BI completa): `BalanceSheetService`, `IncomeStatementService`, `VatLedgerService` (registro IVA vendite/acquisti), `SalesPipelineService` (funnel opportunity -> won), `StockValuationService` (valore magazzino al costing method scelto). Output structurato (JSON/array), pagine Filament minime per consumarli, export CSV/PDF rinviati."
@@ -134,6 +134,18 @@ Commit submodule ERP: **`0655deb`** (`feat(erp): complete CRM/SO baseline and ad
 **Fatto:** M3.1 (win opportunità su preventivo `accepted`); M3.2 (lock quotation/header/riga, `SalesOrderEvasionService`, test); foundation tabelle M3.3–M3.6 header-level + Filament scaffold; test `FoundationM3SchemaTablesTest` + estensioni commercial/Filament.
 
 **Prossimi passi chiari:** `StockMovementService` + tabelle movimenti/layer; righe DDT/GR; `SalesOrderAmendmentService`; collegare DDT/Invoice a evasion; M3.5 posting fattura; M3.6 `parties`; policies M4 (`erp-policies-permissions`).
+
+### Sync piano ↔ repo (2026-05-04)
+
+**Fatto in questa sessione:** tabella Filament `PurchaseOrder` con colonne aggregate righe (`lines_count`, somme `qty_ordered` / `qty_received`) via `getEloquentQuery()`; `DocumentType::PurchaseOrder` con `defaultGapAllowed()` allineato a SO; `CreatePurchaseOrder` assegna reference da `DocumentNumberAllocator` se vuota; migration MySQL ENUM `document_sequences` per `purchase_order`; test in `PurchaseOrderDomainTest` (numeratore + aggregati query).
+
+**Prossimi passi:** COGS/journal da DDT; `SalesOrderAmendmentService`; M3.5 posting fattura; M3.6 `parties` e 3-way match; policies M4.
+
+### Sync piano ↔ repo (2026-05-04, proseguimento)
+
+**Fatto:** posting contabile **COGS** alla conferma magazzino DDT: conti PdC italiani `146` (magazzino merci, `meta.erp_role=inventory_merchandise`) e `590` (costo merci vendute, `erp_role=cost_of_goods_sold`); `DeliveryNoteCogsJournalService` aggrega costo dagli `StockMovement` outbound delle righe DDT e chiama `JournalPostingService::post` con `reference` = `DeliveryNote`; colonna `delivery_notes.cogs_journal_entry_id`; estensione `JournalPostingService::post(..., ?Model $reference)`; test `DeliveryNoteInventoryServiceTest` + schema `FoundationM3SchemaTablesTest`.
+
+**Prossimi passi:** storno COGS su annullo DDT (se previsto); `SalesOrderAmendmentService`; posting fattura M3.5; `parties` / 3-way M3.6.
 
 # Modulo ERP in Laraplate (Nebula)
 

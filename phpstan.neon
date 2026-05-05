@@ -27,7 +27,6 @@ parameters:
         - vendor/**
         - storage/*
         - bootstrap/cache/*
-        - Modules
     
     # Ignora errori specifici
     ignoreErrors:

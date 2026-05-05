@@ -1,0 +1,89 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/*.php', '**/*.blade.php']
+---
+
+# PHP and Laravel Standards
+
+## Dependencies
+- Composer for dependency management
+- PHP 8.5+
+- Laravel 12.0+
+- nwidart/laravel-modules ^12.0
+- filament/filament ^4.0
+- laravel/sanctum ^4.0
+
+## PHP Standards
+- Leverage PHP 8.5+ features when appropriate (e.g., typed properties, match expressions, readonly properties, enums, attributes)
+- Adhere to PSR-12 coding standards for consistent code style
+- Always use strict typing: `declare(strict_types=1);`
+- Always use curly braces for control structures, even if it has one line
+- Use typehints and type declarations to make code more robust and easier to understand
+- Use PHP 8 constructor property promotion in `__construct()`
+- Use new PHP syntax to override parent methods with `#[Override]` attribute
+- Use Laravel Attributes to make code more readable and easier to understand
+- Leverage PHP 8.5 features: readonly properties, enums, match expressions, named arguments, union types, intersection types
+- All functions, arrow functions, closures and methods that don't refers to external variables or instance must be declared as static
+
+## Laravel Standards
+- Follow Laravel's directory structure and file naming conventions
+- See `laravel-boost.mdc` for Eloquent, query builder, caching, and database optimization guidelines
+
+## Code Style and Structure
+- Write concise, technical PHP code with accurate PHP/Laravel examples
+- Prioritize SOLID principles for object-oriented programming and clean architecture
+- Follow PHP and Laravel best practices, ensuring consistency and readability
+- Design for scalability and maintainability, ensuring the system can grow with ease
+- Prefer iteration and modularization over code duplication
+- Use consistent and descriptive names for variables, methods, and classes, with auxiliary verbs (e.g., isLoading, hasError) to improve readability
+- Use Laravel naming conventions for classes and methods
+- Use interfaces, abstract methods and traits to make code more modular and easier to maintain
+- Code comments and PHPDoc blocks must always be in English, don't use any other languages
+- Prefer PHPDoc blocks over inline comments. Never use comments within the code itself unless there is something very complex going on
+- See `laravel-boost.mdc` for Pint usage (always run before finalizing)
+
+## Naming Conventions
+- Use consistent naming conventions for folders, classes, and files
+- Follow Laravel's conventions: singular for models, plural for controllers (e.g., User.php, UsersController.php)
+- **Classes**: Use PascalCase (e.g., `UserController`, `ProductService`)
+- **Methods and Properties**: Use camelCase (e.g., `getUserById()`, `isActive`, `userName`)
+- **Local Variables and Private Properties**: Use snake_case (e.g., `$user_id`, `$calculated_sum`, `private $pending_translations`)
+- **Database Columns**: Use snake_case (e.g., `user_id`, `created_at`)
+- **Constants**: Use UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- **Enums**: Use PascalCase for enum cases (e.g., `FavoritePerson`, `BestLake`, `Monthly`)
+
+## Type Declarations
+- Always use explicit return type declarations for methods and functions
+- Use appropriate PHP type hints for method parameters
+- Leverage PHP 8.5 features: union types, intersection types, nullable types, readonly properties, pipe operators, strict types
+- Be consistent and explicit with data type declarations throughout the codebase
+- Use type hints for properties, method parameters, and return types
+- Leverage PHP's strict typing to catch type-related errors early
+- Add useful array shape type definitions in PHPDoc blocks when appropriate
+- Use readonly properties when values should not be modified after initialization
+
+## Static Analysis and Code Quality Tools
+- **When bypassing PHPStan/Pint checks is unavoidable**, use comments and attributes to make type definitions more specific and clear
+- **PHPStan Suppressions**: Use `@phpstan-ignore` or `@phpstan-ignore-next-line` with specific error codes when necessary:
+  ```php
+  /** @phpstan-ignore property.uninitializedReadonly */
+  public ?string $foreignConnection;
+  ```
+- **PHPDoc Type Annotations**: Use detailed PHPDoc annotations to provide more specific type information:
+  ```php
+  /**
+   * @param  Collection<string>  $columns
+   * @param  Collection<string>  $foreignColumns
+   */
+  ```
+- **Variable Type Hints**: Use `@var` annotations for complex types that PHPStan cannot infer:
+  ```php
+  /** @var TestCase $this */
+  ```
+- **Attributes for Override**: Use `#[Override]` attribute when overriding parent methods to ensure type safety:
+  ```php
+  #[Override]
+  public function handle(Request $request, Closure $next): Response
+  ```
+- **Pint Suppressions**: When Pint formatting conflicts with readability, use inline comments sparingly and document why
+- **Always document the reason** for bypassing static analysis checks in a comment above the suppression 

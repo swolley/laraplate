@@ -21,13 +21,21 @@
             <directory suffix="Test.php">Modules/ERP/tests/Feature</directory>
         </testsuite>
     </testsuites>
+    <!--
+        Used by PHPUnit code coverage and by pestphp/pest-plugin-type-coverage (include dirs only).
+        Module application code lives under Modules/*/app.
+    -->
     <source>
         <include>
             <directory suffix=".php">app</directory>
+            <directory suffix=".php">Modules/Core/app</directory>
+            <directory suffix=".php">Modules/CMS/app</directory>
+            <directory suffix=".php">Modules/AI/app</directory>
+            <directory suffix=".php">Modules/ERP/app</directory>
+            <directory suffix=".php">Modules/MES/app</directory>
         </include>
         <exclude>
             <file>app/Http/Controllers/AppController.php</file>
-            <directory>Modules</directory>
         </exclude>
     </source>
     <php>

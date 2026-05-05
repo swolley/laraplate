@@ -1,0 +1,64 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/Controllers/**', '**/Middleware/**', '**/Exceptions/**', '**/Requests/**']
+---
+
+# Error Handling and Security
+
+## Error Handling
+- Implement robust error handling and logging
+- Use Laravel's exception handling and logging features
+- Create custom exceptions when necessary
+- Employ try-catch blocks for expected exceptions
+- Handle exceptions gracefully and return appropriate responses
+
+## Laravel 12 Context for Exhaustive Logging
+- **Use Laravel's Context feature** to add contextual information that will be automatically included in all log entries
+- **Add Context in Middleware**: Use `Context::add()` to add request-level context that persists throughout the request:
+  ```php
+  Context::add([
+      'scope' => 'web',
+      'locale' => App::getLocale(),
+      'user' => Auth::user()?->id,
+      'url' => $request->fullUrl(),
+      'route' => $request->route()?->getName(),
+  ]);
+  ```
+- **Share Context Across Channels**: Use `Log::shareContext()` or `Context::shareContext()` to share context across all logging channels
+- **Scoped Context**: Use `Context::scope()` for temporary context that is automatically restored after execution
+- **Hidden Context**: Use `Context::addHidden()` for sensitive data that should be available in code but not written to logs
+- **Exception Context**: Define a `context()` method on custom exceptions to add specific context to exception logs:
+  ```php
+  public function context(): array
+  {
+      return ['order_id' => $this->orderId];
+  }
+  ```
+- **Global Exception Context**: Add global context in `bootstrap/app.php` using `withExceptions()`:
+  ```php
+  ->withExceptions(function (Exceptions $exceptions): void {
+      $exceptions->context(fn () => [
+          'environment' => app()->environment(),
+      ]);
+  })
+  ```
+- **Context in Jobs**: Context is automatically shared with queued jobs - add context before dispatching jobs to include it in job logs
+- **Structured Logging**: Always include relevant context (user ID, request ID, trace ID, route, etc.) to enable better log analysis and debugging
+- **Context Best Practices**:
+  - Add request ID or trace ID early in the request lifecycle (middleware)
+  - Include user information when available
+  - Add route and URL information for web requests
+  - Include command name for console commands
+  - Use hidden context for sensitive data (passwords, tokens, etc.)
+
+## Security Best Practices
+- Prioritize security throughout the development process
+- Implement CSRF protection, XSS prevention, and input sanitization
+- Use Laravel's built-in authentication system, including Laravel Sanctum for API token management
+- Utilize guards and policies to handle authentication and authorization
+- Implement middleware for request filtering and modification
+- See `laravel-boost.mdc` for comprehensive validation and security guidelines
+
+## Validation and Data Integrity
+- Always use Form Requests for validation (see `laravel-boost.mdc`)
+- Never use inline validation in controllers 

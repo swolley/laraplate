@@ -4,7 +4,7 @@
   "vendor": "swolley",
   "type": "project",
   "description": "The skeleton application for the Laravel framework.",
-  "version": "v1.12.0",
+  "version": "v2.0.0",
   "keywords": [
     "laravel",
     "laraplate",
@@ -93,7 +93,10 @@
     "check": "vendor/bin/phpstan analyse --memory-limit=2G -v",
     "fix": "vendor/bin/phpstan analyse --memory-limit=2G -v --fix",
     "refactor": "rector",
-    "test:type-coverage": "pest --type-coverage --min=100",
+    "test:type-coverage": [
+      "Composer\\Config::disableProcessTimeout",
+      "php -d memory_limit=2G vendor/bin/pest --type-coverage --min=100"
+    ],
     "test:typos": "peck",
     "test:lint": [
       "pint --parallel --test",
@@ -153,6 +156,7 @@
     }
   },
   "config": {
+    "process-timeout": 7200,
     "optimize-autoloader": true,
     "preferred-install": "dist",
     "sort-packages": true,

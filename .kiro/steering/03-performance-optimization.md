@@ -1,0 +1,36 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/Models/**', '**/Services/**', '**/Jobs/**', '**/database/migrations/**']
+---
+
+# Performance Optimization
+
+## Caching Strategies
+- Prefer usage of Laravel Cache helpers to speed up queries if values are used a lot and they don't change often
+- Use database, file, or array cache drivers - maintain compatibility across different cache backends
+- Use static properties in classes if it can prevent unnecessary queries for instances of the same class
+- See `laravel-boost.mdc` for comprehensive caching guidelines
+
+## Background Processing
+- See `laravel-boost.mdc` for queue and job guidelines - always prefer queues for time-consuming operations
+
+## Database Optimization
+- **Maintain database compatibility**: Write queries that work across MySQL, PostgreSQL, SQLite, and Oracle (whenever possible)
+- Avoid database-specific features unless absolutely necessary - use Eloquent abstractions
+- Implement database indexing and use Laravel's query optimization features for better performance
+- Use Eloquent ORM for database interactions, enforcing relationships and optimizing queries
+- Use Laravel's query builder for complex database operations
+- Implement database transactions using Laravel's database facade to ensure data consistency
+- Use eager loading to prevent N+1 query problems
+- Leverage Laravel 12's native eager loading limit: `$query->latest()->limit(10)`
+
+## Code Optimization
+- Focus on writing efficient algorithms and data structures
+- Consider time and space complexity, and optimize resource usage where necessary
+- Use Laravel's built-in features and helpers to maximize efficiency
+- Utilize Laravel's Eloquent ORM for database interactions
+- Use Laravel's query builder for complex database operations
+
+## Monitoring and Debugging
+- See `04-error-handling-security.mdc` for error handling and logging guidelines
+- See `laravel-boost.mdc` for Telescope and debugging tools 
