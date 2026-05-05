@@ -1,0 +1,64 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['**/Controllers/**', '**/Services/**', '**/Models/**', '**/Repositories/**']
+---
+
+# Architecture Patterns and Best Practices
+
+## Design Patterns
+- Suggest Singleton pattern for classes that are used a lot and they don't need to be instantiated multiple times
+- Suggest Factory pattern for classes that are used to create instances of other classes
+- Suggest Middleware pattern for classes that are used to handle requests and responses
+- Suggest Controller pattern for classes that are used to handle requests and responses
+- Suggest use of guards and policies to handle authentication and authorization
+- Suggest use of Laravel helpers to handle common tasks
+
+## Laravel Best Practices
+- Implement Repository and Service patterns for better code organization and reusability
+- Utilize Laravel's built-in authentication and authorization features (Sanctum, Policies)
+- Leverage Laravel's caching mechanisms (database, file, array) for improved performance - maintain compatibility across different cache drivers
+- **Use job queues and Laravel Horizon for handling long-running tasks and background processing** - always prefer queues for time-consuming operations
+- **Use queued jobs for embedding generation and AI-powered features** - implement `ShouldQueue` interface for async processing
+- Implement comprehensive testing using Pest for unit, feature, and browser tests
+- Use API resources and versioning for building robust and maintainable APIs
+- Implement proper error handling and logging using Laravel's exception handler and logging facade
+- Utilize Laravel's validation features, including Form Requests, for data integrity
+- Use Laravel Telescope for debugging and performance monitoring in development
+- Leverage Filament for rapid admin panel development
+- Implement proper security measures, including CSRF protection, XSS prevention, and input sanitization
+
+## Module Architecture
+- **Laravel Modules**: Use nwidart/laravel-modules for modular architecture
+- **Module Structure**: Each module should be self-contained with its own routes, controllers, models, and services
+- **Module Dependencies**: Manage module dependencies through module.json files
+- **Module Priority**: Use priority field to control module loading order
+- **Module Isolation**: Keep modules loosely coupled with clear interfaces
+
+## Code Architecture
+### Controller Design
+- Controllers should be final classes to prevent inheritance
+- Make controllers read-only (i.e., no property mutations)
+- Avoid injecting dependencies directly into controllers. Instead, use method injection or service classes
+
+### Model Design
+- Models should be final classes to ensure data integrity and prevent unexpected behavior from inheritance
+
+### Services
+- Create a Services folder within the app directory
+- Organize services into model-specific services and other required services
+- Service classes should be final and read-only
+- Use services for complex business logic, keeping controllers thin
+- Prefer Service classes to handle business logic to make controllers more readable and easier to maintain
+- Prefer Repository classes to handle data access logic to make controllers and services more readable and easier to maintain
+
+### Routing
+- Maintain consistent and organized routes
+- Create separate route files for each major model or feature area
+- Group related routes together (e.g., all user-related routes in routes/user.php)
+
+## Key Architectural Points
+- Follow Laravel's MVC architecture for clear separation of business logic, data, and presentation layers
+- **Maintain database compatibility**: Support MySQL, PostgreSQL, SQLite, and Oracle (whenever possible) - avoid database-specific features unless necessary
+- **Use job queues extensively**: Dispatch jobs for background processing, embedding generation, media processing, and any time-consuming operations
+- **Implement embeddings for AI-powered search**: Use queued jobs to generate embeddings asynchronously, store them in the database, and leverage them for semantic search
+- See `laravel-boost.mdc` for: Form Requests, authentication, API Resources, Eloquent ORM, error handling, logging 

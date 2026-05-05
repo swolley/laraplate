@@ -4,15 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
-### 🚜 Refactor
-
-- Rename **Business** submodule to **ERP** (`Modules/ERP`), Composer package `swolley/laraplate-erp`, PSR-4 namespace `Modules\ERP`, and update `modules_statuses.json` / `.gitmodules`.
-
 ### 🚀 Features
 
 - Add master rule file and enhance existing rules with descriptions
 - Implement app structure with authentication and module management
 - Add initial Business module plan and structure
+- [**breaking**] Point monorepo to ERP submodule (laraplate-erp)
+
+### 🐛 Bug Fixes
+
+- Standardize module naming and update dependencies
+
+### 📚 Documentation
+
+- *(plan)* Mark Filament ERP core slice in Nebula roadmap
+- *(plan)* Align Nebula plan with ERP module paths and naming
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -42,6 +48,14 @@ All notable changes to this project will be documented in this file.
 - Update module structure and dependencies
 - Update submodule references and enhance seeder functionality
 - Add Business module as a subproject
+- Update .env.example and submodule references
+- Update .gitignore, add cursor settings, and update submodule references
+- Bump submodules to B0+B1 milestones and sync ERP plan
+- Bump Business submodule to B2 (M0-ERP) and sync plan
+- Bump Business submodule and update Nebula ERP plan
+- *(business)* Bump submodule for Filament accounting domain
+- Update dependencies and enhance test configurations
+- Add MES module and update configurations
 
 ## [1.11.2] - 2026-01-22
 

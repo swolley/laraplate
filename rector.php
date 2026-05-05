@@ -50,6 +50,8 @@ return RectorConfig::configure()
         '**/Model.php',
         // Ignora file con troppe righe che potrebbero causare problemi di analisi
         '**/vendor/**',
+        '**/node_modules/**',
+        '**/storage/**',
         // Esclude il file SortableTrait dalla regola di privatizzazione
         __DIR__ . '/Modules/Core/app/Helpers/SortableTrait.php',
     ])
