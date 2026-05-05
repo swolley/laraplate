@@ -93,16 +93,16 @@ todos:
     content: "M3.1 — **Completato (repo 2026-04-30):** `leads` + `opportunities` (MVP `customer_id`; `party_id` rimandato a M3.6); `quotations.opportunity_id` + validazione allineamento; Filament `LeadResource`/`OpportunityResource`; `OpportunityLifecycleService` + `QuotationObserver` → opportunità `won` + `won_at` quando `Quotation.status=accepted`; helper test `OpportunityStageTaxonomy`; test `CrmLeadsAndOpportunitiesSchemaTest`, `QuotationOpportunityAlignmentTest`. **Backlog opzionale:** lineage esteso oltre FK, automazioni aggiuntive su altri stati preventivo."
     status: completed
   - id: sales-order
-    content: "M3.2 — **Sostanzialmente completato (repo 2026-04-30):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header); test `SalesOrderSchemaTest`. **Backlog M3.2:** `SalesOrderAmendmentService` dedicato; wiring evasion da observer `DeliveryNote`/`Invoice` posted; versionamento SO (disabilitato via `shouldVersioning()` dove applicabile)."
+    content: "M3.2 — **Completato operativo (repo 2026-05-05):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header) + rollback delivery/invoice; **`SalesOrderAmendmentService` dedicato** (nuovo SO draft con `amends_sales_order_id`, righe su qty residue); wiring evasion da `Invoice` posted/unposted tramite `InvoicePostingService` + `InvoiceObserver`; test estesi."
     status: pending
   - id: inventory-erp-base
     content: "M3.3 — **In repo (2026-05-04):** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing base, test servizi magazzino. **Rimanente M3.3:** integrazione journal/COGS completa, golden master piano esteso."
     status: pending
   - id: sales-delivery
-    content: "M3.4 — **In repo (2026-05-04):** `delivery_note_lines`, collegamento SO, `DeliveryNoteInventoryService` + observer/posting, **COGS/journal** su posting magazzino DDT (`DeliveryNoteCogsJournalService`, `cogs_journal_entry_id`), test. **Rimanente M3.4:** storno COGS su annullo DDT (se in scope), rifiniture evasion wiring da UI fattura."
+    content: "M3.4 — **In repo (2026-05-05):** `delivery_note_lines`, collegamento SO, `DeliveryNoteInventoryService` + observer/posting, **COGS/journal** su posting magazzino DDT (`DeliveryNoteCogsJournalService`, `cogs_journal_entry_id`) e **storno su annullo DDT** (reverse journal + ripristino stock + `qty_delivered` SO), test. **Rimanente M3.4:** rifiniture evasion wiring da UI fattura."
     status: pending
   - id: sales-invoice-document
-    content: "M3.5 — **Foundation in repo (2026-04-30):** tabelle `invoices`/`invoice_lines` stub + `InvoiceResource` Filament scaffold. **Rimanente M3.5:** posting completo (`JournalPostingService`), snapshot fiscale righe, vincolo opzionale a `delivery_notes`, numerazione `DocumentNumberAllocator` con `gap_allowed=false` per `invoice_sale`/`invoice_purchase`, UI azioni post/unpost."
+    content: "M3.5 — **In forte avanzamento (2026-05-05):** `InvoicePostingService` + `InvoiceObserver` per post/unpost, scrittura journal con `JournalPostingService` e reverse su annullo, snapshot fiscale righe (`tax_code`/`tax_rate`/`tax_label`), FK `invoices.journal_entry_id`, FK `invoice_lines.sales_order_line_id`, wiring qty invoiced SO su sale invoice, Filament create/edit con righe. **Rimanente M3.5:** numerazione `DocumentNumberAllocator` per invoice_sale/invoice_purchase con policy gap; eventuale vincolo opzionale a `delivery_notes`; rifiniture UI azioni dedicate post/unpost."
     status: pending
   - id: einvoice-interface
     content: "Chiuso in modulo (solo contratto): `Modules/ERP/app/Contracts/EInvoiceProvider.php` — `prepare()`, `submit()`, `remoteStatus()` + DTO `EInvoicePayload`, `EInvoiceSubmissionResult`, enum `EInvoiceRemoteStatus`; cast `EInvoiceSubmissionStatus`; modello `EInvoiceSubmission` + relazione `Invoice::eInvoiceSubmissions()`; migration `2026_04_29_150000_create_e_invoice_submissions_table.php`; test `EInvoiceSubmissionSchemaTest.php`. Nessun binding SDI/PEPPOL in `ERPServiceProvider`."
@@ -146,6 +146,24 @@ Commit submodule ERP: **`0655deb`** (`feat(erp): complete CRM/SO baseline and ad
 **Fatto:** posting contabile **COGS** alla conferma magazzino DDT: conti PdC italiani `146` (magazzino merci, `meta.erp_role=inventory_merchandise`) e `590` (costo merci vendute, `erp_role=cost_of_goods_sold`); `DeliveryNoteCogsJournalService` aggrega costo dagli `StockMovement` outbound delle righe DDT e chiama `JournalPostingService::post` con `reference` = `DeliveryNote`; colonna `delivery_notes.cogs_journal_entry_id`; estensione `JournalPostingService::post(..., ?Model $reference)`; test `DeliveryNoteInventoryServiceTest` + schema `FoundationM3SchemaTablesTest`.
 
 **Prossimi passi:** storno COGS su annullo DDT (se previsto); `SalesOrderAmendmentService`; posting fattura M3.5; `parties` / 3-way M3.6.
+
+### Sync piano ↔ repo (2026-05-05)
+
+**Fatto:** gestione annullo DDT postato: observer chiama `unpostInventory()` quando `posted_at` torna `null`; `DeliveryNoteInventoryService` ripristina stock con movimenti inbound di compensazione, richiama `SalesOrderEvasionService::unregisterDelivery()` e azzera `inventory_posted_at`; `DeliveryNoteCogsJournalService` crea lo storno del journal COGS via `JournalPostingService::reverse()` e azzera `cogs_journal_entry_id`; test feature dedicato.
+
+**Prossimi passi (priorita' attuale):** `SalesOrderAmendmentService`; posting fattura M3.5; `parties` / 3-way M3.6; policies M4.
+
+### Sync piano ↔ repo (2026-05-05, amendment SO)
+
+**Fatto:** introdotto `SalesOrderAmendmentService` (servizio dedicato): ammette amendment solo da SO `confirmed`/`partially_evased`, crea nuovo SO `draft` con `amends_sales_order_id`, genera `reference` via `DocumentNumberAllocator`, clona solo righe con qty residua (`qty_ordered - max(qty_delivered, qty_invoiced)`), status riga `open`; aggiunto anche `unregisterDelivery()` in `SalesOrderEvasionService` e relativo utilizzo nel rollback DDT. Test estesi in `SalesOrderSchemaTest`.
+
+**Prossimi passi:** wiring evasion da `Invoice` posted (M3.2); posting fattura M3.5; `parties` / 3-way M3.6; policies M4.
+
+### Sync piano ↔ repo (2026-05-05, invoice posting)
+
+**Fatto:** completato wiring evasione da invoice (`registerInvoice`/`unregisterInvoice` su `SalesOrderEvasionService`) e implementato posting fattura M3.5 con `InvoicePostingService` + `InvoiceObserver`: journal post/reverse (`invoices.journal_entry_id`), snapshot fiscale righe, link `invoice_lines.sales_order_line_id`, aggiornamento qty invoiced su SO, create/edit Filament con repeater righe.
+
+**Prossimi passi:** numerazione invoice con `DocumentNumberAllocator` (stream dedicati, policy gap), eventuale vincolo invoice↔delivery_notes, `parties` / 3-way M3.6.
 
 # Modulo ERP in Laraplate (Nebula)
 
