@@ -115,4 +115,28 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Duration Registry
+    |--------------------------------------------------------------------------
+    |
+    | Named TTL constants used throughout the application. Services should
+    | reference these by name rather than hardcoding numeric values.
+    |
+    | short   — 60s    — volatile data (rate limits, temporary flags)
+    | medium  — 300s   — default API responses, short-lived aggregates
+    | long    — 3600s  — ACL resolution, search plans, session data
+    | day     — 86400s — geocoding results, infrequently-changing data
+    | forever — null   — version strategies, settings (invalidated on change)
+    |
+    */
+
+    'duration' => [
+        'short' => 60,
+        'medium' => 300,
+        'long' => 3600,
+        'day' => 86400,
+        'forever' => null,
+    ],
 ];
