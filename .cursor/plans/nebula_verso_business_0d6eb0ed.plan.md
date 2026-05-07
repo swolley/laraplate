@@ -1,6 +1,6 @@
 ---
 name: Laraplate ERP modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry — schema e dominio coerenti, verificabile con migrate/seed/test; **senza** cassa/movimenti/bilanci/settlement. Dopo MVP: contabilità leggera (IN/OUT), ETL. **Slice Filament** (admin): risorse contabili ERP (`business-filament-erp-core-slice` **completed**) + **slice commerciale MVP** (`erp-filament-mvp-commercial-slice` **completed**). **M3.1 completato** in repo (win opportunità su preventivo `accepted`). **M3.2 sostanzialmente completato** (lock quotation/header/righe, `SalesOrderEvasionService`); restano amendment dedicato e wiring DDT/Invoice. **M3.3–M3.4 avanzati (2026-05-04):** `stock_movements`/`stock_cost_layers`, servizi posting DDT/GR, righe documenti, **COGS/journal su posting DDT**; backlog storno COGS/amendment SO. **M3.6 acquisti:** righe PO/GR, tabella PO con somme righe, numerazione `DocumentType::PurchaseOrder` + allocator su create; restano `parties` e 3-way. E-invoice (`einvoice-interface` **completed**). Policies/BI in `erp-filament-resources` / `erp-policies-permissions`."
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry. **Slice Filament** completati (contabile + commerciale). **M3.1 completato** (CRM win). **M3.2 completato** (SO + lock-chain + evasion + amendment). **M3.3 completato** (magazzino + costing). **M3.4 completato** (DDT + COGS/journal + storno). **M3.5 completato (2026-05-07):** posting fattura + numerazione `DocumentNumberAllocator` + pivot Invoice↔DDT + `InvoiceCompactionService`. **M3.6 avanzato (2026-05-07):** `parties` (rename da customers, flag `is_customer`/`is_supplier`, validazione tipo su modelli + filtro Filament), `ThreeWayMatchService` tolerance-based, trigger DB lock; **restano** posting fattura acquisto. **E-invoice** interfaccia completata (`EInvoiceProvider`). **M4 non avviato:** policies/permessi, Filament completo, reporting. **M5 completato (2026-05-07):** M5.1 Scadenzario+pagamenti (`PaymentScheduleGeneratorService`, `PaymentAllocationService`, `AgingReportService`, integrazione `InvoicePostingService`); M5.2 Note credito/debito (`CreditNoteService`, `InvoiceType` enum, sezionali NC/ND, journal invertito); M5.3 Registri IVA+liquidazione (`VatRegisterService`, `VatSettlementService`, protocol_number progressivo, integrazione posting); M5.4 Bilancio/Conto Economico (`TrialBalanceService`, `BalanceSheetService`, `IncomeStatementService`, pagine Filament con Blade). **M6 pending:** M6.1 Bank reconciliation, M6.2 Resi, M6.3 Binding SDI. **M7 pending:** M7.1 Listino avanzato."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi ERP `sites.place_id` / ICS"
@@ -57,7 +57,7 @@ todos:
     content: "Chiuso: Filament gruppo `ERP` — `CustomerResource`, `ContactResource` (sync M:N `contactables` via `customer_ids` in create/edit), `QuotationResource` (repeater `quotations_items`; `opportunity_id` filtrato per `customer_id` con campo `live()`), `ProjectResource` (validità + preventivo opzionale); slugs `business/customers`, `business/contacts`, `business/quotations`, `business/projects`; test `ERPFilamentCommercialResourcesTest.php`. **Agg. 2026-04:** validazione modello `Quotation` su `opportunity_id` (stesso customer/company) + test `QuotationOpportunityAlignmentTest.php`."
     status: completed
   - id: business-filament-final
-    content: "Ampliamento UI oltre slice contabile + commerciale MVP: **Leads/Opportunities/SalesOrder** + **scaffold Filament** per Items/Warehouses/StockLevels/DeliveryNotes/Invoices/PurchaseOrders/GoodsReceipts (2026-04-30). Restano UX mature (posting, righe DDT/GR, parties M3.6), BI, API mobile opzionale."
+    content: "Ampliamento UI oltre slice contabile + commerciale MVP: **Leads/Opportunities/SalesOrder** completati; **scaffold Filament** per Items/Warehouses/StockLevels/DeliveryNotes/Invoices/PurchaseOrders/GoodsReceipts completato (2026-04-30); righe DDT/GR/PO/Invoice con repeater in create/edit; tabella PO con aggregati righe. **Rimanente:** UX posting/unposting da azioni Filament dedicate, parties (M3.6), BI dashboard (`erp-reporting-stub`), API mobile opzionale."
     status: pending
   - id: inventory-magazzino-nebula
     content: "**ASSORBITO da `inventory-erp-base`** (M3.3, vedi Roadmap ERP). Non e' piu' un verticale rinviato: il magazzino e' integrato nel piano ERP come prerequisito di DDT vendita (M3.4) e Goods Receipt acquisto (M3.6). Resta come rimando storico per eventuali scelte ETL legacy specifiche."
@@ -93,22 +93,22 @@ todos:
     content: "M3.1 — **Completato (repo 2026-04-30):** `leads` + `opportunities` (MVP `customer_id`; `party_id` rimandato a M3.6); `quotations.opportunity_id` + validazione allineamento; Filament `LeadResource`/`OpportunityResource`; `OpportunityLifecycleService` + `QuotationObserver` → opportunità `won` + `won_at` quando `Quotation.status=accepted`; helper test `OpportunityStageTaxonomy`; test `CrmLeadsAndOpportunitiesSchemaTest`, `QuotationOpportunityAlignmentTest`. **Backlog opzionale:** lineage esteso oltre FK, automazioni aggiuntive su altri stati preventivo."
     status: completed
   - id: sales-order
-    content: "M3.2 — **Completato operativo (repo 2026-05-05):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header) + rollback delivery/invoice; **`SalesOrderAmendmentService` dedicato** (nuovo SO draft con `amends_sales_order_id`, righe su qty residue); wiring evasion da `Invoice` posted/unposted tramite `InvoicePostingService` + `InvoiceObserver`; test estesi."
-    status: pending
+    content: "M3.2 — **Completato (repo 2026-05-05):** `sales_orders`/`sales_order_lines`, validazioni dominio, Filament, `DocumentNumberAllocator` su create, titolo record; lock `Quotation` a SO `confirmed`; lock header SO su stati confermati/evasi; blocco `qty_ordered` dopo inizio evasione; `SalesOrderEvasionService` (delivery/invoice qty + stato riga/header) + rollback delivery/invoice; **`SalesOrderAmendmentService` dedicato** (nuovo SO draft con `amends_sales_order_id`, righe su qty residue); wiring evasion da `Invoice` posted/unposted tramite `InvoicePostingService` + `InvoiceObserver`; test estesi."
+    status: completed
   - id: inventory-erp-base
-    content: "M3.3 — **In repo (2026-05-04):** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing base, test servizi magazzino. **Rimanente M3.3:** integrazione journal/COGS completa, golden master piano esteso."
-    status: pending
+    content: "M3.3 — **Completato operativo (2026-05-05):** `stock_movements`, `stock_cost_layers`, `StockMovementService`, costing base, test servizi magazzino; integrazione journal/COGS tramite `DeliveryNoteCogsJournalService` (posting + storno); golden master piano esteso rimandato a `accounting-test-plan`."
+    status: completed
   - id: sales-delivery
-    content: "M3.4 — **In repo (2026-05-05):** `delivery_note_lines`, collegamento SO, `DeliveryNoteInventoryService` + observer/posting, **COGS/journal** su posting magazzino DDT (`DeliveryNoteCogsJournalService`, `cogs_journal_entry_id`) e **storno su annullo DDT** (reverse journal + ripristino stock + `qty_delivered` SO), test. **Rimanente M3.4:** rifiniture evasion wiring da UI fattura."
-    status: pending
+    content: "M3.4 — **Completato operativo (2026-05-05):** `delivery_note_lines`, collegamento SO, `DeliveryNoteInventoryService` + observer/posting, **COGS/journal** su posting magazzino DDT (`DeliveryNoteCogsJournalService`, `cogs_journal_entry_id`), **storno completo su annullo DDT** (reverse journal + ripristino stock + rollback `qty_delivered` SO via `unregisterDelivery`), test feature dedicati. Rifiniture UI opzionali (azioni post/unpost da pagina Filament) non bloccanti."
+    status: completed
   - id: sales-invoice-document
-    content: "M3.5 — **In forte avanzamento (2026-05-05):** `InvoicePostingService` + `InvoiceObserver` per post/unpost, scrittura journal con `JournalPostingService` e reverse su annullo, snapshot fiscale righe (`tax_code`/`tax_rate`/`tax_label`), FK `invoices.journal_entry_id`, FK `invoice_lines.sales_order_line_id`, wiring qty invoiced SO su sale invoice, Filament create/edit con righe. **Rimanente M3.5:** numerazione `DocumentNumberAllocator` per invoice_sale/invoice_purchase con policy gap; eventuale vincolo opzionale a `delivery_notes`; rifiniture UI azioni dedicate post/unpost."
-    status: pending
+    content: "M3.5 — **Completato (2026-05-07):** `InvoicePostingService` post/unpost con `DocumentNumberAllocator::next()` al posting (`DocumentType::SalesInvoice`/`PurchaseInvoice`, fiscal year scope, gap_allowed=false); colonna `invoices.reference` assegnata al posting e azzerata su unpost; snapshot fiscale righe; wiring qty invoiced SO; pivot `invoice_line_delivery_note_line` per collegamento flessibile Invoice↔DDT con `InvoiceCompactionService` (compact/expand); Filament form con reference disabled + tabella con reference searchable; test `InvoicePostingServiceTest` con asserzioni su reference. **Backlog opzionale:** azioni UI dedicate post/unpost in pagina Filament (non bloccanti)."
+    status: completed
   - id: einvoice-interface
     content: "Chiuso in modulo (solo contratto): `Modules/ERP/app/Contracts/EInvoiceProvider.php` — `prepare()`, `submit()`, `remoteStatus()` + DTO `EInvoicePayload`, `EInvoiceSubmissionResult`, enum `EInvoiceRemoteStatus`; cast `EInvoiceSubmissionStatus`; modello `EInvoiceSubmission` + relazione `Invoice::eInvoiceSubmissions()`; migration `2026_04_29_150000_create_e_invoice_submissions_table.php`; test `EInvoiceSubmissionSchemaTest.php`. Nessun binding SDI/PEPPOL in `ERPServiceProvider`."
     status: completed
   - id: purchasing-cycle
-    content: "M3.6 — **In repo (2026-05-04):** righe PO/GR, posting GR, stato PO; tabella Filament PO con `lines_count` / somme qty; `DocumentType::PurchaseOrder` + `DocumentNumberAllocator` su create PO (reference vuota) + migrazione ENUM MySQL; test dominio PO. **Rimanente M3.6:** `parties`/`party_id`; riconciliazione 3-way; posting fattura acquisto."
+    content: "M3.6 — **Avanzato (2026-05-07):** righe PO/GR, posting GR, stato PO; tabella Filament PO; `DocumentType::PurchaseOrder` + allocator; rename `customers`->`parties` completato (flag `is_customer`+`is_supplier`); `ThreeWayMatchService` tolerance-based implementato (enum `MatchStatus`, colonne `match_status`/`match_discrepancy`/`purchase_order_line_id`/`goods_receipt_line_id` su `invoice_lines`, test); colonne 3-way su migration `invoice_lines` in-place. **Rimanente M3.6:** posting fattura acquisto; wiring `ThreeWayMatchService` in `InvoicePostingService` per direction=purchase."
     status: pending
   - id: erp-policies-permissions
     content: "M4 — Policies + permessi su: chiusura/riapertura periodo, posting/unposting journal, fatturazione (genera/annulla), sblocco quotations/SO, switch company corrente, modifica `tax_codes` (riservata ad amministratori), gestione `document_sequences`. Allineamento al pattern Core (gates + policies). Test feature: utente standard non puo' ri-aprire periodo chiuso, non puo' modificare tax_code, ecc."
@@ -121,6 +121,30 @@ todos:
     status: pending
   - id: accounting-test-plan
     content: "Trasversale M1-M3 — Suite di golden master + concorrenza + invarianti: (a) partita doppia bilanciata su `amount_local` per ogni Invoice/cassa/refactor Tricount; (b) IVA + ritenute con snapshot fiscale immutabile; (c) numerazione progressiva sotto contesa: 50 process paralleli su `invoice_sale` -> 50 numeri sequenziali univoci, 0 buchi; stesso test su tipo `gap_allowed=true` -> consentire buchi su rollback; (d) scope `company_id`: query da company A non vede dati company B; (e) versioning forzato: per ogni modello contabile `getVersionStrategy()===DIFF` anche dopo aver alterato il record `settings.version_strategy_{table}`; (f) lock-chain SO: confirm SO -> Q lockata; primo DDT su una riga -> riga locked su qty_ordered; chiusura SO impossibile finche' qty_invoiced<qty_delivered; amendment crea nuovo SO con `amends_sales_order_id` valorizzato; (g) magazzino FIFO+media: scarico su item `costing_method=fifo` consuma layer in ordine cronologico; cambio costing_method a item esistente vietato; COGS calcolato dal `StockMovementService` quadra con il journal del DDT; (h) `CurrencyConverter` no-op in M0: ogni `amount_local = amount_doc` con `fx_rate=1.0` su EUR/EUR. Test feature + unit; baseline per regression sui future PR."
+    status: pending
+  - id: payment-schedule-receivables
+    content: "M5.1 — **Completato (2026-05-07).** Scadenzario e Incassi/Pagamenti. Tabella `payment_terms` (company_id, name, rate_lines JSON con [{days, percent, payment_method}]). Tabella `payment_schedule_lines` (invoice_id, due_date, amount_doc, amount_local, currency_doc, fx_rate, status enum [open, partial, paid, cancelled], paid_amount_doc, paid_at). Generazione automatica scadenze al posting fattura (da `InvoicePostingService`) in base al `payment_term_id` su Invoice. Tabella `payments` (party_id, company_id, direction enum [inbound, outbound], payment_date, amount_doc/local, reference, bank_account_id nullable, notes) + pivot `payment_payment_schedule_line` (payment_id, payment_schedule_line_id, allocated_amount). Servizio `PaymentAllocationService::allocate(Payment, array $allocations)` che aggiorna status scadenze. Report **aging AR/AP**: query per fasce scaduto 30/60/90/120+ giorni raggruppato per party. Partitario aperto: elenco scadenze non saldate filtrabili per party/periodo. Filament: form PaymentTerm, tabella scadenze su pagina Invoice view, form registrazione pagamento con allocazione multipla, pagina aging report. Test: generazione scadenze, allocazione, aging corretto."
+    status: completed
+  - id: credit-debit-notes
+    content: "M5.2 — **Completato (2026-05-07).** Note di Credito e Note di Debito. Estensione modello `Invoice` con `invoice_type` enum [invoice, credit_note, debit_note] (o campo `is_credit_note` + `credited_invoice_id` FK nullable). La nota di credito inverte il segno delle righe e genera journal entry speculare (dare↔avere invertiti). `DocumentType::SalesCreditNote` / `PurchaseCreditNote` per numerazione separata (sezionale NC). Collegamento NC → fattura originale via `credited_invoice_id`. Aggiornamento `PaymentScheduleService`: la NC riduce/azzera scadenze aperte della fattura collegata. Flusso completo: reso merce → DDT reso (M6.2) → NC automatica o manuale; abbuono/errore → NC manuale senza DDT. Validazioni: NC non può eccedere importo residuo fattura originale. Filament: azione 'Crea nota di credito' dalla pagina fattura, form con righe pre-compilate da originale (modificabili). Test: posting NC, storno scadenze, journal invertito, numerazione separata."
+    status: completed
+  - id: vat-registers-settlement
+    content: "M5.3 — **Completato (2026-05-07).** Registri IVA e Liquidazione. Tabella `vat_register_entries` (invoice_id, register_type enum [sales, purchases], protocol_number progressivo per registro/anno, registration_date, tax_code_id, taxable_amount, tax_amount, company_id, fiscal_year_id). Servizio `VatRegisterService`: alla conferma/posting di una fattura (vendita o acquisto), inserisce riga nel registro corrispondente con protocol_number progressivo. `VatSettlementService::compute(company_id, period)`: calcola IVA a debito (registro vendite) − IVA a credito (registro acquisti) − eventuale credito periodo precedente = IVA da versare (o credito). Tabella `vat_settlements` (company_id, fiscal_period_id, vat_sales, vat_purchases, previous_credit, settlement_amount, status enum [draft, confirmed], confirmed_at). Report: stampa registro IVA vendite/acquisti (ordinato per protocol_number), prospetto liquidazione periodica. Filament: pagine registro IVA vendite/acquisti con filtro periodo, pagina liquidazione con calcolo automatico e conferma. Seeder: aliquote IVA italiane standard (22%, 10%, 5%, 4%, esente, non imponibile, escluso). Test: protocollo progressivo, calcolo liquidazione, quadratura IVA registri vs journal."
+    status: completed
+  - id: financial-statements
+    content: "M5.4 — **Completato (2026-05-07).** Bilancio e Conto Economico. Servizio `BalanceSheetService::generate(company_id, date)`: genera bilancio patrimoniale da saldi GL (asset/liability/equity) alla data. Servizio `IncomeStatementService::generate(company_id, fiscal_period_range)`: genera conto economico (revenue − expense) per intervallo periodi. Servizio `TrialBalanceService::generate(company_id, date)`: bilancio di verifica (saldi dare/avere per ogni conto). Output strutturato (array/DTO) consumabile da Filament e export. Integrazione con `FiscalPeriodCloser`: chiusura periodo genera snapshot saldi. Report: pagine Filament con filtro date/periodi, export CSV. Aggiorna `erp-reporting-stub` da M4 a M5.4. Test: quadratura dare=avere su trial balance, coerenza bilancio/conto economico, effetto chiusura periodo."
+    status: completed
+  - id: bank-reconciliation
+    content: "M6.1 — **Riconciliazione Bancaria.** Tabella `bank_accounts` (company_id, name, iban, bic, currency, is_active). Tabella `bank_statements` (bank_account_id, statement_date, opening_balance, closing_balance, imported_at). Tabella `bank_statement_lines` (bank_statement_id, transaction_date, description, amount, reference, status enum [unmatched, matched, excluded]). Import: servizio `BankStatementImportService` con driver CSV base (estendibile a CAMT.053/MT940 via contratto `BankStatementParser`). Servizio `BankReconciliationService::match(bank_statement_line_id, payment_id)`: collega riga estratto conto a pagamento registrato, aggiorna status. Suggerimento automatico match per importo+data+reference. Gestione differenze (arrotondamenti, commissioni bancarie) con journal entry automatico. Filament: pagina riconciliazione con righe non matchate a sinistra, pagamenti non allocati a destra, drag-and-drop o selezione per associare. Test: import CSV, match automatico, journal differenze."
+    status: pending
+  - id: returns-management
+    content: "M6.2 — **Gestione Resi.** Flusso reso da cliente: `ReturnOrder` (party_id, sales_order_id/invoice_id opzionale, reason, status). DDT di reso: `DeliveryNote` con `direction=inbound` + observer che genera `StockMovement` inbound (ripristino magazzino e layer FIFO/WA). NC automatica opzionale: setting `erp.auto_credit_note_on_return` → genera `Invoice` tipo `credit_note` dal DDT reso. Flusso reso a fornitore: `SupplierReturn` (party_id, purchase_order_id/goods_receipt_id, reason, status). DDT reso acquisto: `DeliveryNote` outbound a fornitore + `StockMovement` outbound. Nota di debito a fornitore da reso. Aggiornamento qty su SO/PO lines al reso. Filament: form reso con righe da documenti originali, azione 'Genera reso' da pagina DDT/fattura. Test: flusso completo reso vendita (DDT reso → stock → NC → scadenze), reso acquisto."
+    status: pending
+  - id: einvoice-sdi-binding
+    content: "M6.3 — **Binding SDI per e-fattura Italia.** Implementazione concreta di `EInvoiceProvider` per almeno un intermediario SDI (es. Aruba, Fatture in Cloud, o SDK open Agenzia Entrate). Generazione XML FatturaPA conforme da `Invoice` + `InvoiceLine` + dati fiscali party (P.IVA, CF, regime fiscale, indirizzo PEC/codice SDI). Mapping campi: `TipoDocumento` (TD01 fattura, TD04 nota credito, TD05 nota debito), `RegimeFiscale`, aliquote IVA con `Natura` per operazioni esenti/NI/escluse, ritenuta d'acconto se applicabile. Ricezione: polling/webhook status da SDI (inviata, consegnata, scartata, impossibilita' recapito) → aggiornamento `EInvoiceSubmission`. Conservazione sostitutiva: almeno marcatura temporale e hash XML per compliance. Filament: azione 'Invia a SDI' su pagina fattura, stato invio visibile, log errori SDI. Test: generazione XML valido contro XSD FatturaPA, round-trip submit+status."
+    status: pending
+  - id: advanced-pricelists
+    content: "M7.1 — **Listino Prezzi Avanzato.** Estensione `price_list_items` con `valid_from`/`valid_to` (validità temporale). Tabella `party_price_rules` (party_id, item_id nullable, taxonomy_id nullable, discount_type enum [percentage, fixed, cascade], discount_value, priority, valid_from, valid_to) per condizioni di prezzo personalizzate per party. Sconti a cascata: `discount_value` come JSON array `[10, 5, 3]` → -10%, poi -5% sul risultato, poi -3%. Servizio `PriceResolverService::resolve(item_id, party_id, qty, date)`: applica in ordine: listino base → regole per party → sconti volume opzionali → prezzo finale. Integrazione: `QuotationItem`/`SalesOrderLine`/`InvoiceLine` richiamano `PriceResolverService` come suggerimento (prezzo modificabile dall'utente). Filament: gestione regole prezzo per party, preview prezzo calcolato nel form riga. Test: risoluzione con priorità, scadenza temporale, cascade, override manuale."
     status: pending
 isProject: false
 ---
@@ -164,6 +188,152 @@ Commit submodule ERP: **`0655deb`** (`feat(erp): complete CRM/SO baseline and ad
 **Fatto:** completato wiring evasione da invoice (`registerInvoice`/`unregisterInvoice` su `SalesOrderEvasionService`) e implementato posting fattura M3.5 con `InvoicePostingService` + `InvoiceObserver`: journal post/reverse (`invoices.journal_entry_id`), snapshot fiscale righe, link `invoice_lines.sales_order_line_id`, aggiornamento qty invoiced su SO, create/edit Filament con repeater righe.
 
 **Prossimi passi:** numerazione invoice con `DocumentNumberAllocator` (stream dedicati, policy gap), eventuale vincolo invoice↔delivery_notes, `parties` / 3-way M3.6.
+
+### Sync piano ↔ repo (2026-05-07, allineamento piano)
+
+**Allineamento TODO frontmatter al codice effettivo in repo.** Nessuna modifica al codice sorgente.
+
+**Todo aggiornati a `completed`:**
+- `sales-order` (M3.2): `SalesOrderAmendmentService`, `SalesOrderEvasionService` (delivery + invoice), `InvoiceObserver` wiring, lock chain, test — tutto presente in repo.
+- `inventory-erp-base` (M3.3): `StockMovementService`, `stock_movements`/`stock_cost_layers`, costing base, integrazione COGS/journal completata via `DeliveryNoteCogsJournalService`.
+- `sales-delivery` (M3.4): `DeliveryNoteInventoryService`, COGS posting, storno completo su annullo DDT (reverse journal + ripristino stock + rollback `qty_delivered` SO), test feature.
+
+**Todo confermati `pending` con content aggiornato:**
+- `sales-invoice-document` (M3.5): posting/unposting implementato (`InvoicePostingService` + `InvoiceObserver`), snapshot fiscale, wiring SO; **manca** numerazione `DocumentNumberAllocator` per `SalesInvoice`/`PurchaseInvoice` in `CreateInvoice` Filament, vincolo opzionale DDT, azioni UI dedicate.
+- `purchasing-cycle` (M3.6): righe PO/GR, posting GR, tabella Filament PO, `DocumentType::PurchaseOrder` + allocator; **mancano** `parties`/`party_id`, 3-way match, posting fattura acquisto.
+- `business-filament-final`: scaffold Filament M3 completato; **mancano** UX posting/unposting da azioni Filament, parties, BI, API mobile.
+- `erp-policies-permissions` (M4): non avviato — nessuna Policy, Gate o permesso granulare nel modulo ERP.
+- `erp-filament-resources` (M4): parziale; attende policies e reporting.
+- `erp-reporting-stub` (M4): non avviato.
+- `accounting-test-plan`: non avviato.
+
+**Confermati `pending` senza modifiche:** `enrich-projects-movements`, `settlements-quotes-lines`, `etl-legacy-import`, `payment-requests-stub`, `gantt-planning-entity`, `quote-revisions-core`, `calendar-ics-export`, `inventory-magazzino-nebula`, `erp-vision-roadmap`, `accounting-refactor-cash-tricount`.
+
+**Prossimi passi (priorità):**
+1. Numerazione invoice `DocumentNumberAllocator` (M3.5 — chiusura milestone).
+2. `parties`/`party_id` + 3-way match + posting fattura acquisto (M3.6 — chiusura milestone).
+3. Policies + permessi granulari (M4 `erp-policies-permissions`).
+4. Filament posting/unposting UX + reporting stub (M4).
+5. Test plan trasversale (`accounting-test-plan`).
+
+### Decisioni consolidate (2026-05-07)
+
+Le seguenti decisioni sono state discusse e confermate. Sovrascrivono eventuali indicazioni precedenti nel piano.
+
+#### D1 — Rename `customers` -> `parties` con flag booleani
+
+Confermato **opzione A** (anagrafica unificata). Dettagli implementativi:
+
+- Rename in-place `customers` -> `parties` (siamo in fase di creazione, migration in-place consentita).
+- **Due flag booleani** `is_customer` (default `true`) + `is_supplier` (default `false`) al posto del JSON `roles`. Motivazione: indicizzabili, queryabili senza JSON parsing, validazione banale (`CHECK (is_customer OR is_supplier)`). Il set di ruoli e chiuso e noto (customer/supplier/both).
+- Modello PHP: `Customer` rinominato in `Party` con scope `scopeCustomers()` / `scopeSuppliers()`.
+- FK rinominate: `customer_id` -> `party_id` su `quotations`, `projects`, `invoices`, `sales_orders`, `delivery_notes`, `purchase_orders`, `leads`, `opportunities`, `contactables`.
+- Filament: `CustomerResource` -> `PartyResource` con filtro per ruolo.
+- **Timing:** primo step, prima di chiudere M3.5 (cosi le FK invoice nascono gia come `party_id`).
+
+#### D2 — Numerazione invoice al posting
+
+La `reference` della fattura viene assegnata da `DocumentNumberAllocator::next()` **al posting** (quando `posted_at` viene valorizzato), non alla creazione del draft. Coerente con la prassi fiscale italiana. Implementazione: dentro `InvoicePostingService::post()`, con `DocumentType::SalesInvoice` o `DocumentType::PurchaseInvoice` in base a `Invoice::$direction`. Il draft non ha reference finche non e postato.
+
+#### D3 — Vincolo Invoice <-> DeliveryNote via pivot
+
+Adottato **pattern 3** (pivot flessibile):
+
+- Tabella pivot `invoice_line_delivery_note_line`: `invoice_line_id` FK, `delivery_note_line_id` FK, `quantity` (quanta qty di quella riga DDT e coperta da questa riga fattura).
+- Setting per company: `erp.invoice_generation_mode` = `'expanded'` | `'compact'`. Default: `'expanded'`.
+  - **Expanded:** 1 `InvoiceLine` per ogni `DeliveryNoteLine`, pivot 1:1.
+  - **Compact:** raggruppamento per `item_id` + `unit_price`, 1 `InvoiceLine` con qty sommata, pivot 1:N.
+- Servizio `InvoiceCompactionService::compact(Invoice)`: prende una fattura espansa, raggruppa righe per item+prezzo, somma qty, aggiorna la pivot. Operazione reversibile (`expand()` ri-espande leggendo la pivot).
+
+#### D4 — Riconciliazione 3-way PO/GR/Invoice (tolerance-based)
+
+Adottato **approccio B** (tolerance-based, standard SAP/Oracle/NetSuite):
+
+- Setting per company: `erp.three_way_match.price_tolerance_percent` (default **0%**) e `erp.three_way_match.qty_tolerance_percent` (default **0%**). Default conservativi (strict), l'utente allarga se serve.
+- Servizio `ThreeWayMatchService::validate(InvoiceLine): MatchResult`:
+  - Confronta qty e prezzo unitario con `PurchaseOrderLine` e `GoodsReceiptLine`.
+  - Se scarto entro tolerance -> posting consentito, `match_status = 'tolerance'`, scarto tracciato.
+  - Se scarto eccede tolerance -> `ValidationException`, serve override esplicito (`force_post` con permesso dedicato da `erp-policies-permissions`).
+- Colonne su `invoice_lines` (fattura acquisto): `purchase_order_line_id` FK nullable, `goods_receipt_line_id` FK nullable, `match_status` enum (`matched`, `tolerance`, `forced`, `unmatched`), `match_discrepancy` JSON nullable.
+
+#### D5 — Trigger DB per lock-chain (hardening pre-produzione)
+
+Confermato: trigger DB **dopo** chiusura M3.5/M3.6, come safety net pre-produzione.
+
+- Un unico file migration che installa trigger `BEFORE UPDATE` e `BEFORE DELETE` su tutte le tabelle con `HasLocks` (`quotations`, `quotation_items`, `sales_orders`, `sales_order_lines`).
+- Logica trigger: `IF OLD.locked_at IS NOT NULL AND (NEW.locked_at IS NOT NULL OR NEW.locked_at = OLD.locked_at) THEN SIGNAL SQLSTATE '45000'`. Lo sblocco (`UPDATE SET locked_at = NULL`) resta possibile per l'admin.
+- Observer e trigger convivono: l'observer **applica** il lock (logica di business), il trigger lo **difende** (safety net contro accessi raw/bug).
+
+#### D5b — Domande residue Tricount/cassa (M2)
+
+Confermate come **backlog non bloccante** per M3.5/M3.6. Saranno affrontate quando si riprende `accounting-refactor-cash-tricount`.
+
+#### D6 — Validazione tipo party su modelli e Filament (2026-05-07)
+
+Aggiunta validazione `saving()` su tutti i modelli sales-side (Quotation, SalesOrder, Lead, Opportunity, Project) che verifica `party->is_customer === true`. Su PurchaseOrder verifica `party->is_supplier === true`. Se il party non ha il flag corretto → `ValidationException`. I form Filament filtrano il dropdown party con `modifyQueryUsing` usando gli scope `->customers()` / `->suppliers()` di Party.
+
+### Sync piano ↔ repo (2026-05-07, nuovi milestone)
+
+**Fatto:** validazione tipo party (D6) su 6 modelli + 6 form Filament. Analisi comparativa con SAP/Odoo/ERPNext completata.
+
+**Nuovi todo aggiunti al frontmatter** (ordinati per priorità / criticità):
+
+| ID | Milestone | Descrizione | Priorità |
+|----|-----------|-------------|----------|
+| `payment-schedule-receivables` | M5.1 | Scadenzario, payment terms, incassi/pagamenti, aging AR/AP | CRITICO |
+| `credit-debit-notes` | M5.2 | Note di credito/debito, storno scadenze, numerazione sezionale NC | CRITICO |
+| `vat-registers-settlement` | M5.3 | Registri IVA vendite/acquisti, liquidazione periodica, protocollo progressivo | OBBLIGO LEGALE |
+| `financial-statements` | M5.4 | Bilancio patrimoniale, conto economico, bilancio di verifica | IMPORTANTE |
+| `bank-reconciliation` | M6.1 | Import estratti conto, riconciliazione bancaria, journal differenze | IMPORTANTE |
+| `returns-management` | M6.2 | Resi cliente (DDT reso → NC), resi fornitore (DDT reso → ND) | IMPORTANTE |
+| `einvoice-sdi-binding` | M6.3 | Implementazione concreta `EInvoiceProvider` per SDI (FatturaPA XML) | IMPORTANTE per go-live IT |
+| `advanced-pricelists` | M7.1 | Listino con validità temporale, sconti per party, sconti a cascata | MEDIO |
+
+**Ordine di implementazione suggerito:**
+1. M5.1 → M5.2 → M5.3 (M5 in sequenza, formano il ciclo finanziario minimo legale)
+2. M5.4 (reporting finanziario, dipende da M5.1-M5.3 per dati completi)
+3. M6.1 → M6.2 → M6.3 (M6 in parallelo dove possibile)
+4. M7.1 (enhancement, non bloccante)
+
+**Nota:** `erp-reporting-stub` (ex M4) è stato sostituito da `financial-statements` (M5.4) per i report contabili. `VatLedgerService` migra dentro `vat-registers-settlement` (M5.3). `SalesPipelineService` e `StockValuationService` restano in `erp-reporting-stub` come backlog opzionale.
+
+### Sync piano ↔ repo (2026-05-07, M5 completato)
+
+**Fatto — M5.1 Scadenzario & incassi/pagamenti:**
+- Enum `PaymentScheduleStatus` (open/partial/paid/cancelled), `PaymentDirection` (inbound/outbound).
+- Migration: `payment_terms`, `payments`, `payment_schedule_lines`, `payment_allocations`, FK `payment_term_id` su `invoices`.
+- Modelli: `PaymentTerm`, `Payment`, `PaymentScheduleLine`, `PaymentAllocation`.
+- Servizi: `PaymentScheduleGeneratorService` (integrato in `InvoicePostingService::post/unpost`), `PaymentAllocationService`, `AgingReportService` (aging 30/60/90/120+).
+- Filament: `PaymentTermResource`, `PaymentResource` (con allocazioni e schedule lines).
+- Test: `PaymentScheduleServiceTest`.
+
+**Fatto — M5.2 Note di credito/debito:**
+- Enum `InvoiceType` (invoice/credit_note/debit_note).
+- `DocumentType` esteso: `SalesCreditNote`, `PurchaseCreditNote`, `SalesDebitNote`, `PurchaseDebitNote`.
+- Migration: colonne `invoice_type` e `credited_invoice_id` su `invoices`, estensione ENUM `document_sequences`.
+- `CreditNoteService`: crea CN da fattura postata, copia righe, valida totale ≤ residuo creditabile.
+- `InvoicePostingService` aggiornato: negazione importi per journal invertito, selezione `DocumentType` per NC/ND, check `abs()` su tax_total.
+- Filament: azione "Create Credit Note" su `EditInvoice`, campi `invoice_type`/`credited_invoice_id` condizionali.
+- Test: `CreditNoteServiceTest`.
+
+**Fatto — M5.3 Registri IVA e liquidazione:**
+- Enum `VatRegisterType` (sales/purchases), `VatSettlementStatus` (draft/confirmed).
+- Migration: `vat_register_entries`, `vat_settlements`.
+- Modelli: `VatRegisterEntry` (protocol_number progressivo per company/type/year), `VatSettlement`.
+- `VatRegisterService`: registrazione automatica al posting fattura (integrato in `InvoicePostingService`), un entry per codice IVA, deregistrazione su unpost.
+- `VatSettlementService`: calcolo IVA debito − IVA credito − credito precedente, conferma con carry-forward.
+- Filament: `VatRegisterResource` (read-only), `VatSettlementResource` (read-only).
+- Test: `VatRegisterServiceTest`.
+
+**Fatto — M5.4 Bilancio e report finanziari:**
+- Servizi: `TrialBalanceService`, `BalanceSheetService`, `IncomeStatementService` (derivano tutto da journal postati, nessuna tabella snapshot).
+- Filament: pagine custom `TrialBalancePage`, `BalanceSheetPage`, `IncomeStatementPage` con viste Blade tabulari.
+- Test: `FinancialStatementsTest`.
+
+**Fatto — Documentazione:**
+- Aggiornati `README.md`, `docs/rag/MODULE.md`, `docs/GLOSSARY.md` con tutte le funzionalità M0–M5.
+
+**Prossimi step:** M6.1 Bank reconciliation, M6.2 Resi, M6.3 SDI binding, M7.1 Listino avanzato.
 
 # Modulo ERP in Laraplate (Nebula)
 
@@ -875,7 +1045,7 @@ Decisioni **confermate**:
 - **Versioning forzato sui modelli contabili**: la verita' contabile non e' negoziabile via `Setting`. La property a livello modello vince sempre.
 - **Snapshot fiscale immutabile**: aliquote, codici e label IVA/ritenute sono **denormalizzati** sulle righe documento al posting; cambi rate aliquota = nuovo `tax_code` (no UPDATE retroattivo).
 - **Numerazione progressiva**: sequenziale e robusta sotto contesa per i tipi fiscali (lock pessimistico, 0 buchi); piu' tollerante per quelli non fiscali (`gap_allowed=true`).
-- **Una sola anagrafica `parties`**: customer + supplier + dual role tramite colonna `roles` (json array). Le FK applicative (`party_id`) sono unificate, gli scope di lettura derivano dal flag `roles`.
+- **Una sola anagrafica `parties`**: customer + supplier + dual role tramite flag booleani `is_customer` + `is_supplier` (decisione D1, 2026-05-07). Le FK applicative (`party_id`) sono unificate, gli scope di lettura derivano dai flag.
 - **Tricount/cassa esistente non viene buttata**: viene **rifondata** come adapter contabile sopra `JournalPostingService` (M2). UX/Filament restano; il saldo cassa torna a essere derivato.
 
 ### Regola operativa: migration **in-place** fino al build
@@ -964,7 +1134,7 @@ E-invoicing nel modulo: solo `EInvoiceProvider` (interfaccia) + DTO neutri + tab
 
 #### M3.6 — Ciclo passivo + anagrafica unificata `parties`
 
-- **Rename `customers` -> `parties`** in-place (siamo ancora in fase di creazione modulo). Aggiunta colonna `roles` (json array: customer/supplier/both). Modello PHP `Party` con scope `customers()`/`suppliers()`. Rinomina FK `customer_id` -> `party_id` su `quotations`, `projects`, `invoices`, `sales_orders`, `delivery_notes`, `leads`, `opportunities`.
+- **Rename `customers` -> `parties`** in-place (siamo ancora in fase di creazione modulo). Due flag booleani `is_customer` (default true) + `is_supplier` (default false) al posto del JSON `roles` (decisione D1, 2026-05-07): indicizzabili, queryabili senza JSON parsing, set di ruoli chiuso. `CHECK (is_customer OR is_supplier)`. Modello PHP `Party` con scope `scopeCustomers()`/`scopeSuppliers()`. Rinomina FK `customer_id` -> `party_id` su `quotations`, `projects`, `invoices`, `sales_orders`, `delivery_notes`, `purchase_orders`, `leads`, `opportunities`, `contactables`.
 - `purchase_orders` (header + lines, party.role=supplier).
 - `goods_receipts` (bolla di ingresso): observer -> `StockMovementService::receive(...)` -> aggiorna stock + costo.
 - `invoices` direction=`purchase`: collegabile a uno o piu' GR; postaggio journal automatico.
