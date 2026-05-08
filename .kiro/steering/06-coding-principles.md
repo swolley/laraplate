@@ -2,45 +2,34 @@
 inclusion: always
 ---
 
-# Coding Principles and Best Practices
+# Coding Principles
 
-## General Principles
-- Prioritize Clean, Efficient Code: Write clear, optimized code that is easy to understand and modify. Balance efficiency with readability based on project requirements
-- Focus on End-User Experience: Ensure that all code contributes to an excellent end-user experience, whether it's a UI, API, or backend service
-- Keep It Simple: Prioritize readability and maintainability, avoid over-engineering solutions, use standard libraries and patterns when possible
-- Omit "else" statements only when possible to prevent long code inside parenthesis. Prefer to return default values in "then" reverting if conditions and then continue with the main code instead of the else
-- Comit messages must be always in the conventional commit standard.
-- Implementations should be always done following TDD principles
+## General
+- Clean, readable, simple code. No over-engineering.
+- SOLID principles.
+- No `else` when avoidable — early return instead.
+- No code duplication — iterate/modularize.
+- Descriptive names with aux verbs (`isLoading`, `hasError`).
+- Self-documenting code. PHPDoc over inline comments.
+- No inline comments unless very complex logic.
+- Comments/PHPDoc: English only.
+- Commit messages: conventional commit format.
+- TDD always.
 
-## Code Changes and Bug Fixes
-- Propose a clear plan before making changes
-- Apply all modifications to a single file at once
-- Do not alter unrelated files
-- Analyze the problem thoroughly before suggesting fixes
-- Provide precise, targeted solutions
-- Explain the root cause of the bug
+## Changes & Fixes
+- Plan before coding.
+- One file at a time.
+- Don't touch unrelated files.
+- Explain root cause before fixing.
 
-## Code Structure
-- Use interfaces, abstract methods and traits to make code more modular and easier to maintain
-- Prefer iteration and modularization over code duplication
-- Use consistent and descriptive names for variables, methods, and classes, with auxiliary verbs (e.g., isLoading, hasError) to improve readability
-- Write self-documenting code, provide clear comments
-- **Code comments and PHPDoc blocks must always be in English, don't use any other languages**
-- Prefer PHPDoc blocks over inline comments - never use comments within the code itself unless there is something very complex going on
-- **When static analysis suppressions are needed**: Use PHPDoc comments and PHP attributes to provide more specific type information rather than just suppressing errors
+## Language
+- Chat: Italian. Code/comments: English.
+- Ask if requirements unclear.
 
-## Language and Communication
-- Respond always in Italiano into the chat but code must be written in English
-- Comments and code documentation must be always in English
-
-## Context and Requirements
-- Remember to always consider the context and specific requirements of each project
-- If requirements are not clear or if there are doubts, please feel free to ask for details before answering
-
-## Development Workflow
-- **Code Style**: Always run `vendor/bin/pint --dirty` before finalizing changes (see `laravel-boost.mdc`)
-- **Testing**: Run `composer test` to execute all tests before deployment - run minimal tests with filters when appropriate
-- **Refactoring**: Use `composer refactor` for automated code improvements
-- **Type Safety**: Ensure 100% type coverage with `composer test:type-coverage`
-- **Static Analysis**: Use `composer test:types` for PHPStan analysis
-- **Code Style Check**: Use `composer test:lint` for Pint code style checking 
+## Workflow
+- `vendor/bin/pint --dirty` before done
+- `composer test` before deploy
+- `composer refactor` for automated improvements
+- `composer test:type-coverage` — 100% target
+- `composer test:types` — PHPStan
+- `composer test:lint` — Pint

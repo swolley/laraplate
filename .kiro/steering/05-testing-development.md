@@ -3,31 +3,28 @@ inclusion: fileMatch
 fileMatchPattern: ['**/tests/**', '**/*Test.php', '**/phpunit.xml', '**/pest.php']
 ---
 
-# Testing and Development
+# Testing
 
-## Testing Strategy
-- **Every change must be programmatically tested**: Write a new test or update an existing test, then run the affected tests to make sure they pass
-- Ensure Comprehensive Testing: Implement thorough testing strategies, including unit tests, integration tests, and end-to-end tests as appropriate for the project
-- Implement comprehensive testing using Pest for unit, feature, and browser tests
-- **Use PestPHP for all testing** - use `php artisan make:test --pest <name>` to create tests
-- **Test Coverage**: Aim for 100% type coverage using `composer test:type-coverage`
-- **Module Testing**: Create tests within each module's `tests/` directory
-- **Test Organization**: Use `Feature/` and `Unit/` directories within each module - most tests should be feature tests
-- **Test Data**: Use factories for generating test data - check if factories have custom states before manually setting up models
-- **Test Isolation**: Ensure tests are independent and don't affect each other
-- **Test All Paths**: Tests should test all of the happy paths, failure paths, and weird paths
-- **Run Minimal Tests**: Run the minimum number of tests needed to ensure code quality and speed - use `php artisan test` with specific filename or filter
+## Rules
+- Every change needs a test. Write or update, then run.
+- PestPHP only — `php artisan make:test --pest <name>`
+- Most tests: Feature. Unit only when truly isolated.
+- Tests live in `Modules/{Name}/tests/Feature/` or `Unit/`
+- Use factories. Check for existing states before manual setup.
+- Test happy path + failure path + edge cases.
+- Run minimum tests needed: `php artisan test --compact --filter=X`
 
-## Development Tools
-- See `laravel-boost.mdc` for Pint, PHPStan, Rector, Telescope, and Filament guidelines
-- Use IDE Helper for better code completion and navigation
+## `final` Classes
+- NEVER remove `final` to make something testable.
+- Instead:
+  - Mock with `Mockery::mock(FinalClass::class)`
+  - Extract interface → mock the interface
+  - Create `Fake*`/`Stub*` implementing same interface
+  - Test via public API (HTTP, service calls)
 
-## Static Analysis Suppressions
-- See `01-php-laravel-standards.mdc` for comprehensive PHPStan/Pint suppression guidelines
+## Coverage
+- Target: 100% type coverage (`composer test:type-coverage`)
 
-## Code Quality
-- See `06-coding-principles.mdc` for general coding principles
-- See `laravel-boost.mdc` for API design, routing, and code organization guidelines
-
-## Filament Development
-- See `laravel-boost.mdc` for comprehensive Filament guidelines 
+## Tools
+- Pint, PHPStan, Rector — see `laravel-boost.md`
+- IDE Helper for autocomplete

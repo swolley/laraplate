@@ -2,24 +2,26 @@
 inclusion: always
 ---
 
-# Master Rules Reference
+# Master Rules
 
-This file serves as a lightweight entry point. Most rules are contextual and loaded automatically by Cursor based on file patterns and context.
+## Always Active
+- `laravel-boost.md` — Laravel ecosystem rules
+- `06-coding-principles.md` — coding principles
+- `spec-task-execution-rules.md` — spec task rules
+- `product.md` — modules & dependencies
+- `structure.md` — directory layout
+- `tech.md` — stack, versions, commands
 
-## Core Rules (Always Applied)
-- `laravel-boost.mdc` - Comprehensive Laravel ecosystem guidelines (always active)
+## Contextual (auto-loaded by file pattern)
+- `01-php-laravel-standards.md` — PHP files
+- `02-architecture-patterns.md` — Controllers, Services, Models
+- `03-performance-optimization.md` — Models, Jobs, migrations
+- `04-error-handling-security.md` — Controllers, Middleware, Exceptions
+- `05-testing-development.md` — test files
+- `07-laraplate-specific.md` — Modules/**
 
-## Contextual Rules (Applied When Relevant)
-- `01-php-laravel-standards.mdc` - PHP/Laravel standards (applies to PHP files)
-- `02-architecture-patterns.mdc` - Architecture patterns (applies to controllers, services, models)
-- `03-performance-optimization.mdc` - Performance guidelines (applies to database queries, caching, queues)
-- `04-error-handling-security.mdc` - Security and error handling (applies to controllers, middleware, exceptions)
-- `05-testing-development.mdc` - Testing guidelines (applies to test files)
-- `06-coding-principles.mdc` - General coding principles (always active, minimal)
-- `07-laraplate-specific.mdc` - Project-specific architecture (applies to module files)
-
-## Key Principles (Always Active)
-- Respond in Italian, code in English
-- Always run `vendor/bin/pint --dirty` before finalizing
-- Every change must be tested
-- Follow Laravel Boost guidelines for ecosystem packages
+## Non-negotiable
+- Chat: Italian. Code/comments: English.
+- Run `vendor/bin/pint --dirty` before done.
+- Every change needs a test.
+- Never remove `final`, `readonly`, `static`.

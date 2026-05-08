@@ -1,121 +1,78 @@
-# Project Structure
-
-## Root Layout
-
-```
-laraplate/
-├── app/                        # Minimal host application (thin shell)
-│   ├── Console/Kernel.php
-│   ├── Http/
-│   │   ├── Controllers/        # Only AppController + base Controller
-│   │   ├── Middleware/
-│   │   └── Kernel.php          # Middleware registration (Laravel 10 structure)
-│   ├── Models/
-│   ├── Policies/
-│   ├── Providers/              # AppServiceProvider, RouteServiceProvider, etc.
-│   └── View/
-├── Modules/                    # All feature code lives here
-│   ├── Core/                   # Priority 0 — loads first
-│   ├── Cms/                    # Priority 1
-│   ├── AI/                     # AI/ML features
-│   └── Business/               # Priority 999 — loads last (ERP, WIP)
-├── config/
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── resources/
-├── routes/
-├── tests/
-├── modules_statuses.json       # Enable/disable modules here
-└── composer.json               # Merges all Modules/*/composer.json via merge-plugin
-```
-
-> The host `app/` is intentionally thin. All domain logic belongs in a module.
-
+---
+inclusion: always
 ---
 
-## Module Structure
+# Project Structure
 
-Every module follows this standard layout (each is an independent git submodule):
+## Root
+```
+laraplate/
+├── app/                    # Thin shell — minimal host app
+│   ├── Console/Kernel.php
+│   ├── Http/Controllers/   # Only AppController + base Controller
+│   ├── Http/Middleware/
+│   ├── Http/Kernel.php     # Middleware registration
+│   ├── Models/, Policies/
+│   ├── Providers/          # AppServiceProvider, RouteServiceProvider, etc.
+│   └── View/
+├── Modules/                # All domain code lives here
+│   ├── Core/               # Priority 0
+│   ├── Cms/                # Priority 1
+│   ├── AI/
+│   └── ERP/                # Priority 999
+├── config/, database/, resources/, routes/, tests/
+├── modules_statuses.json   # Enable/disable modules
+└── composer.json           # Merges all Modules/*/composer.json
+```
 
+## Module Layout
 ```
 Modules/{Name}/
 ├── app/
-│   ├── Actions/
-│   ├── Casts/
-│   ├── Console/
-│   ├── Contracts/
-│   ├── Events/
-│   ├── Filament/
-│   │   └── Resources/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   └── Requests/           # Form Request classes for all validation
-│   ├── Jobs/
-│   ├── Listeners/
-│   ├── Models/
-│   ├── Observers/
-│   ├── Providers/
-│   │   ├── {Name}ServiceProvider.php
-│   │   ├── EventServiceProvider.php
-│   │   └── RouteServiceProvider.php
-│   ├── Rules/
-│   ├── Services/
-│   └── Helpers/helpers.php     # Global helper functions (autoloaded)
-├── config/config.php           # Accessed via config('{alias}.key')
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── lang/
-├── resources/views/
-├── routes/
-│   ├── web.php
-│   └── api.php
-├── tests/
-│   ├── Feature/
-│   ├── Unit/
-│   ├── Pest.php
-│   └── TestCase.php
-├── module.json                 # Name, alias, priority, providers
-├── composer.json               # Module dependencies (merged into root)
-├── phpstan.neon
-├── pint.json
-└── rector.php
+│   ├── Actions/, Casts/, Console/, Contracts/, Events/
+│   ├── Filament/Resources/
+│   ├── Http/Controllers/, Http/Requests/
+│   ├── Jobs/, Listeners/, Models/, Observers/
+│   ├── Providers/{Name}ServiceProvider.php
+│   │              EventServiceProvider.php
+│   │              RouteServiceProvider.php
+│   ├── Rules/, Services/
+│   └── Helpers/helpers.php
+├── config/config.php
+├── database/factories/, migrations/, seeders/
+├── lang/, resources/views/
+├── routes/web.php, routes/api.php
+├── tests/Feature/, tests/Unit/, tests/Pest.php, tests/TestCase.php
+├── module.json, composer.json, phpstan.neon, pint.json, rector.php
 ```
 
----
-
-## Key Conventions
+## Conventions
 
 ### Namespaces
-- Host app: `App\`
-- Modules: `Modules\{Name}\` (maps to `Modules/{Name}/app/`)
-- Module tests: `Modules\{Name}\Tests\Feature\` / `Modules\{Name}\Tests\Unit\`
+- Host: `App\`
+- Modules: `Modules\{Name}\` → `Modules/{Name}/app/`
+- Tests: `Modules\{Name}\Tests\Feature\` / `Unit\`
 
-### Module Registration
-- `module.json` declares the module name, alias, priority, and service providers
-- `modules_statuses.json` at root controls which modules are active
-- Module `composer.json` files are auto-merged into root via `wikimedia/composer-merge-plugin`
+### Registration
+- `module.json` — name, alias, priority, providers
+- `modules_statuses.json` — active/inactive
+- `wikimedia/composer-merge-plugin` — merges module composer.json
 
 ### Routing
-- Split route files by concern: `web.php`, `api.php`, `auth.php`, `crud.php`
-- Use named routes and the `route()` helper — never hardcode URLs
+- Split by concern: `web.php`, `api.php`, `auth.php`, `crud.php`
+- Named routes + `route()` — never hardcode URLs
 
-### Laravel 12 App Structure
-This project uses the **Laravel 12 directory structure** (not the newer streamlined layout):
-- Middleware → `app/Http/Middleware/` + registered in `app/Http/Kernel.php`
-- Exception handling → `app/Exceptions/Handler.php`
-- Console schedule → `app/Console/Kernel.php`
-- Do not migrate to the new structure unless explicitly requested
+### App Structure (Laravel 10 layout — do not migrate)
+- Middleware → `app/Http/Middleware/` + `app/Http/Kernel.php`
+- Exceptions → `app/Exceptions/Handler.php`
+- Schedule → `app/Console/Kernel.php`
 
-### Class Design Rules
-- Controllers: `final` classes, no property mutations, use method injection
-- Models: `final` classes
-- Services: `final` and `readonly`, contain business logic
-- All static-safe functions/closures must be declared `static`
+### Class Rules
+- Controllers: `final`, no property mutations, method injection
+- Models: `final`
+- Services: `final readonly`
+- Static-safe closures/functions: `static`
 
 ### Migrations
-- Always live inside the owning module's `database/migrations/`
-- When modifying a column, re-declare **all** existing column attributes to avoid data loss
+- Live in module's `database/migrations/`
+- When modifying column: re-declare ALL existing attributes
