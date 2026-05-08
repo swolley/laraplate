@@ -3,34 +3,25 @@ inclusion: fileMatch
 fileMatchPattern: ['**/Models/**', '**/Services/**', '**/Jobs/**', '**/database/migrations/**']
 ---
 
-# Performance Optimization
+# Performance
 
-## Caching Strategies
-- Prefer usage of Laravel Cache helpers to speed up queries if values are used a lot and they don't change often
-- Use database, file, or array cache drivers - maintain compatibility across different cache backends
-- Use static properties in classes if it can prevent unnecessary queries for instances of the same class
-- See `laravel-boost.mdc` for comprehensive caching guidelines
+## Caching
+- Cache values that are read often and change rarely
+- Drivers: `database`, `file`, `array` only — no driver-specific features
+- Static class properties to avoid repeated queries within same instance
 
-## Background Processing
-- See `laravel-boost.mdc` for queue and job guidelines - always prefer queues for time-consuming operations
+## Queues
+- Slow ops go to queue — always. Embeddings, media, emails, AI tasks.
+- `ShouldQueue` interface on jobs
 
-## Database Optimization
-- **Maintain database compatibility**: Write queries that work across MySQL, PostgreSQL, SQLite, and Oracle (whenever possible)
-- Avoid database-specific features unless absolutely necessary - use Eloquent abstractions
-- Implement database indexing and use Laravel's query optimization features for better performance
-- Use Eloquent ORM for database interactions, enforcing relationships and optimizing queries
-- Use Laravel's query builder for complex database operations
-- Implement database transactions using Laravel's database facade to ensure data consistency
-- Use eager loading to prevent N+1 query problems
-- Leverage Laravel 12's native eager loading limit: `$query->latest()->limit(10)`
+## DB
+- Eloquent ORM first, query builder for complex ops, `DB::` never
+- Eager load to prevent N+1
+- Index columns used in WHERE/ORDER/JOIN
+- Transactions for multi-step writes
+- `$query->latest()->limit(10)` — native in Laravel 12, no package needed
+- Cross-DB compatible queries only
 
-## Code Optimization
-- Focus on writing efficient algorithms and data structures
-- Consider time and space complexity, and optimize resource usage where necessary
-- Use Laravel's built-in features and helpers to maximize efficiency
-- Utilize Laravel's Eloquent ORM for database interactions
-- Use Laravel's query builder for complex database operations
-
-## Monitoring and Debugging
-- See `04-error-handling-security.mdc` for error handling and logging guidelines
-- See `laravel-boost.mdc` for Telescope and debugging tools 
+## Code
+- Efficient algorithms, mind time/space complexity
+- Use Laravel helpers and built-ins

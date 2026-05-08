@@ -32,8 +32,6 @@ use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
-    public function __construct() {}
-
     public function boot(): void
     {
         /**
