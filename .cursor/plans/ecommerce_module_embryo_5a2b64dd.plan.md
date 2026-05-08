@@ -4,7 +4,7 @@ overview: "Salvare in un piano dedicato l'intuizione architetturale per un futur
 todos:
   - id: create-ecommerce-plan-file
     content: Creare .cursor/plans/ecommerce_module_embryo.plan.md con front-matter, principio guida, diagramma Mermaid (anchor Product), schema dati bozza, vincoli, trappole, criteri di ready e todos pending
-    status: in_progress
+    status: completed
 isProject: false
 ---
 
