@@ -3,24 +3,23 @@ description: Master rule file - references other contextual rules
 alwaysApply: true
 ---
 
-# Master Rules Reference
+# Master Rules (caveman)
 
-This file serves as a lightweight entry point. Most rules are contextual and loaded automatically by Cursor based on file patterns and context.
+- This file = entrypoint.
+- `laravel-boost.mdc` = main law.
+- Other files = context law by file type.
 
-## Core Rules (Always Applied)
-- `laravel-boost.mdc` - Comprehensive Laravel ecosystem guidelines (always active)
+- Always:
+  - Chat in Italian.
+  - Code/docs comments in English.
+  - Run `vendor/bin/pint --dirty` before finish.
+  - Every code change must have tests.
 
-## Contextual Rules (Applied When Relevant)
-- `01-php-laravel-standards.mdc` - PHP/Laravel standards (applies to PHP files)
-- `02-architecture-patterns.mdc` - Architecture patterns (applies to controllers, services, models)
-- `03-performance-optimization.mdc` - Performance guidelines (applies to database queries, caching, queues)
-- `04-error-handling-security.mdc` - Security and error handling (applies to controllers, middleware, exceptions)
-- `05-testing-development.mdc` - Testing guidelines (applies to test files)
-- `06-coding-principles.mdc` - General coding principles (always active, minimal)
-- `07-laraplate-specific.mdc` - Project-specific architecture (applies to module files)
-
-## Key Principles (Always Active)
-- Respond in Italian, code in English
-- Always run `vendor/bin/pint --dirty` before finalizing
-- Every change must be tested
-- Follow Laravel Boost guidelines for ecosystem packages
+- Rule map:
+  - `01-php-laravel-standards.mdc` PHP/Blade.
+  - `02-architecture-patterns.mdc` controllers/services/models/repos.
+  - `03-performance-optimization.mdc` models/services/jobs/migrations.
+  - `04-error-handling-security.mdc` controller/middleware/exception/request.
+  - `05-testing-development.mdc` tests and Pest.
+  - `06-coding-principles.mdc` always-on coding principles.
+  - `07-laraplate-specific.mdc` module architecture rules.

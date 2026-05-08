@@ -631,15 +631,20 @@ Riferimento unico per **nome concettuale** → **tabella** prevista nel modulo E
 
 ### Dominio anagrafica — preventivo — progetto — tempo
 
-**Nota anagrafica**: `Contact` e `Customer` sono in relazione **M:N** tramite pivot **`contactables`** (nessun `customer_id` su `contacts`).
+**Nota anagrafica (aggiornato 2026-05)**: il rename `customers → parties` (M3.6) è completato: `Party` ha flag `is_customer`/`is_supplier` che distinguono ruolo cliente vs fornitore. `Contact` e `Party` sono in relazione **M:N** tramite pivot **`contactables`** (nessun `party_id` su `contacts`). `Lead` e `Opportunity` (M3.1) sono parte del flusso CRM: `Lead` → `Opportunity` → `Quotation` (l'opportunità diventa `won` quando il preventivo passa a `accepted`).
 
 ```mermaid
 classDiagram
   direction TB
   class User
-  class Customer
+  class Party {
+    +bool is_customer
+    +bool is_supplier
+  }
   class Contact
   class Site
+  class Lead
+  class Opportunity
   class Quotation
   class QuotationItem
   class PriceList
@@ -648,16 +653,20 @@ classDiagram
   class Taxonomy
   class Task
   class TimeEntry
-  Customer "1" --> "*" Contact
+  Party "*" --> "*" Contact
   Contact --> User
-  Customer "1" --> "*" Quotation
-  Customer "1" --> "*" Project
+  Party "1" --> "*" Lead
+  Party "1" --> "*" Opportunity
+  Party "1" --> "*" Quotation
+  Party "1" --> "*" Project
+  Lead "0..1" --> "0..1" Opportunity
+  Opportunity "1" --> "*" Quotation
   Quotation "1" --> "*" QuotationItem
   Quotation --> Quotation
   PriceList "1" --> "*" PriceListItem
   QuotationItem --> PriceListItem
   Taxonomy "1" --> "*" PriceListItem
-  Project --> Customer
+  Project --> Party
   Project --> Quotation
   Project --> User
   Taxonomy "1" --> "*" Task
@@ -672,38 +681,82 @@ classDiagram
 
 
 
-### Dominio movimenti — cassa soci — bilancio — richieste pagamento
+### Dominio scadenzario, pagamenti e allocazioni (M5.1)
 
-**Nota (2026-04)**: diagramma semplificato rispetto al piano originale — **niente** `MovementCategory` / tabella `movement_types` per la gerarchia: classificazione **su `Taxonomy`** dove serve il dettaglio; direzione cassa minima con enum `MovementType`. **Regole IN/OUT, allocazioni e UX** restano da definire **dopo** il perimetro organizzativo.
+**Nota (2026-05)**: il vecchio dominio `Movement` / `MovementAllocation` / `PartnerPool` / `PoolTransaction` / `Balance` / `PaymentRequest` è stato **superato**. Il refactor `accounting-refactor-cash-tricount` resta `pending`: la cassa diventa **derivata** dal journal contabile (vedi M2). Il dominio attuale dei pagamenti è M5.1: `PaymentTerm` (regole rateali in JSON `rate_lines`), `PaymentScheduleLine` generato automaticamente al posting fattura, `Payment` con direzione `inbound`/`outbound` allocato alle scadenze tramite la pivot `PaymentAllocation`. Lo stato della scadenza transita `open → partial → paid` in funzione delle allocazioni; `AgingReportService` fornisce il partitario per fasce 30/60/90/120+ giorni.
 
 ```mermaid
 classDiagram
   direction TB
-  class User
-  class Customer
-  class Contact
-  class Project
-  class Taxonomy
-  class Movement
-  class MovementAllocation
-  class PartnerPool
-  class PoolTransaction
-  class Balance
-  class PaymentRequest
-  Taxonomy "0..1" --> "*" Movement
-  Movement --> Customer
-  Movement --> Contact
-  Movement --> Project
-  Movement "1" --> "*" MovementAllocation
-  MovementAllocation --> User
-  PartnerPool "1" --> "*" PoolTransaction
-  PoolTransaction --> User
-  PoolTransaction ..> Movement
-  PoolTransaction ..> PaymentRequest
-  Balance "1" --> "*" Movement
-  PaymentRequest --> Customer
-  PaymentRequest --> Contact
-  PaymentRequest --> User
+  class Party {
+    +bool is_customer
+    +bool is_supplier
+  }
+  class Invoice {
+    +InvoiceDirection direction
+    +InvoiceType invoice_type
+  }
+  class PaymentTerm {
+    +json rate_lines
+  }
+  class PaymentScheduleLine {
+    +PaymentScheduleStatus status
+    +date due_date
+    +decimal amount_doc
+    +decimal paid_amount_doc
+  }
+  class Payment {
+    +PaymentDirection direction
+    +date payment_date
+    +decimal amount_doc
+  }
+  class PaymentAllocation {
+    +decimal allocated_amount
+  }
+  class JournalEntry
+  Party "1" --> "*" Invoice
+  Party "1" --> "*" Payment
+  Invoice --> PaymentTerm
+  Invoice "1" --> "*" PaymentScheduleLine
+  Payment "1" --> "*" PaymentAllocation
+  PaymentScheduleLine "1" --> "*" PaymentAllocation
+  Payment ..> JournalEntry : posts
+  Invoice ..> JournalEntry : posts
+```
+
+### Dominio registri IVA + liquidazione (M5.3)
+
+**Nota (2026-05)**: il posting della fattura registra una `VatRegisterEntry` per ogni `tax_code` con un `protocol_number` progressivo per `register_type` (vendite/acquisti) per anno fiscale. Il `VatSettlementService` calcola la liquidazione periodica come differenza IVA a debito − IVA a credito − credito periodo precedente.
+
+```mermaid
+classDiagram
+  direction TB
+  class Invoice {
+    +InvoiceDirection direction
+    +InvoiceType invoice_type
+  }
+  class TaxCode
+  class FiscalYear
+  class FiscalPeriod
+  class VatRegisterEntry {
+    +VatRegisterType register_type
+    +int protocol_number
+    +decimal taxable_amount
+    +decimal tax_amount
+  }
+  class VatSettlement {
+    +VatSettlementStatus status
+    +decimal vat_sales
+    +decimal vat_purchases
+    +decimal previous_credit
+    +decimal settlement_amount
+  }
+  Invoice "1" --> "*" VatRegisterEntry
+  TaxCode "1" --> "*" VatRegisterEntry
+  FiscalYear "1" --> "*" VatRegisterEntry
+  FiscalYear "1" --> "*" FiscalPeriod
+  FiscalPeriod "1" --> "1" VatSettlement
+  VatSettlement ..> VatRegisterEntry : aggregates
 ```
 
 
@@ -719,19 +772,21 @@ Il modulo **ERP** espone linguaggio di dominio **riusabile** (commessa, pianific
 
 ```mermaid
 flowchart LR
-  subgraph erp_domain [ERP domain — sector-neutral]
-    Project[Project_or_Engagement]
-    Time[TimeBlock]
+  subgraph erp_domain [ERP domain - sector-neutral]
+    Project[Project]
+    Time[TimeEntry]
     Catalog[PriceListItem]
-    Quotation[CommercialDocument]
-    Ledger[LedgerEntry]
-    Alloc[EntryAllocation]
+    Quotation[Quotation / Invoice]
+    Ledger[JournalEntry]
+    Lines[JournalEntryLine]
   end
   subgraph optionalVertical [Verticale opzionale]
     ExtensionAdapter[TenantDomainExtension]
   end
-  ExtensionAdapter -->|morph o FK| Project
-  ExtensionAdapter -->|policy pricing| Catalog
+  ExtensionAdapter -->|"morph o FK"| Project
+  ExtensionAdapter -->|"policy pricing"| Catalog
+  Quotation -.->|"posting"| Ledger
+  Ledger --> Lines
 ```
 
 
@@ -1152,7 +1207,9 @@ Todo: `erp-policies-permissions`, `erp-filament-resources`, `erp-reporting-stub`
 
 Todo: `accounting-test-plan`. Vedi descrizione dettagliata nel todo: invarianti partita doppia, snapshot fiscale, concorrenza numerazione, scope multi-company, versioning forzato, lock-chain SO, FIFO/avg, currency converter no-op.
 
-### Diagramma — Flusso documenti -> Journal con SalesOrder e ciclo passivo
+### Diagramma — Flusso documenti -> Journal (M3.1-M5.3)
+
+**Note (aggiornato 2026-05)**: il flusso include ora i blocchi M5.1 (scadenzario+pagamenti), M5.2 (note credito/debito), M5.3 (registri IVA + liquidazione), M3.6 (3-way match PO/GR/Invoice tramite `ThreeWayMatchService` con tolerance e `match_status` su `InvoiceLine`), e l'interfaccia e-invoice (`EInvoiceProvider` + `EInvoiceSubmission`).
 
 ```mermaid
 flowchart TB
@@ -1165,17 +1222,29 @@ flowchart TB
     SalesOrder
     SalesOrderLine
     DeliveryNote
-    InvoiceSale[Invoice<br/>direction=sale]
+    InvoiceSale["Invoice direction=sale"]
+    CreditNote["Invoice invoice_type=credit_note"]
   end
   subgraph inventory [M3.3 Magazzino]
-    StockMovementOut[StockMovement<br/>direction=out]
-    StockMovementIn[StockMovement<br/>direction=in]
+    StockMovementOut["StockMovement direction=out"]
+    StockMovementIn["StockMovement direction=in"]
     StockCostLayer
   end
   subgraph purchasing [M3.6 Ciclo passivo]
     PurchaseOrder
     GoodsReceipt
-    InvoicePurchase[Invoice<br/>direction=purchase]
+    InvoicePurchase["Invoice direction=purchase"]
+    ThreeWay[ThreeWayMatchService]
+  end
+  subgraph payments [M5.1 Scadenzario + pagamenti]
+    PaymentTerm
+    PaymentScheduleLine
+    Payment
+    PaymentAllocation
+  end
+  subgraph vat [M5.3 Registri IVA]
+    VatRegisterEntry
+    VatSettlement
   end
   subgraph accounting [M1-M2 Backbone contabile]
     JournalEntry
@@ -1183,33 +1252,55 @@ flowchart TB
     TaxCode
     DocumentSequence
   end
+  subgraph einvoice [E-invoice interface]
+    EInvoiceSubmission
+  end
 
   Lead --> Opportunity
-  Opportunity -->|conversione| Quotation
-  Quotation -->|confirm SO -> Q lockata| SalesOrder
+  Opportunity -->|"conversione"| Quotation
+  Quotation -->|"confirm SO -> Q lockata"| SalesOrder
   SalesOrder --> SalesOrderLine
-  SalesOrderLine -->|delivery -> qty_delivered++| DeliveryNote
-  DeliveryNote -->|StockMovementService| StockMovementOut
-  StockMovementOut -.->|consuma FIFO| StockCostLayer
-  SalesOrderLine -->|invoice -> qty_invoiced++| InvoiceSale
-  DeliveryNote -.->|fattura differita| InvoiceSale
-  InvoiceSale -->|posting| JournalEntry
-  StockMovementOut -.->|COGS unit_cost| JournalEntry
+  SalesOrderLine -->|"delivery -> qty_delivered++"| DeliveryNote
+  DeliveryNote -->|"StockMovementService"| StockMovementOut
+  StockMovementOut -.->|"consuma FIFO"| StockCostLayer
+  SalesOrderLine -->|"invoice -> qty_invoiced++"| InvoiceSale
+  DeliveryNote -.->|"fattura differita pivot"| InvoiceSale
+  InvoiceSale -->|"posting"| JournalEntry
+  StockMovementOut -.->|"COGS unit_cost"| JournalEntry
+  InvoiceSale -.->|"CreditNoteService"| CreditNote
+  CreditNote -->|"posting reverse"| JournalEntry
 
   PurchaseOrder --> GoodsReceipt
-  GoodsReceipt -->|StockMovementService| StockMovementIn
-  StockMovementIn -.->|apre layer / aggiorna media| StockCostLayer
-  GoodsReceipt -.->|coerenza 3-way| InvoicePurchase
-  PurchaseOrder -.->|coerenza 3-way| InvoicePurchase
-  InvoicePurchase -->|posting| JournalEntry
+  GoodsReceipt -->|"StockMovementService"| StockMovementIn
+  StockMovementIn -.->|"apre layer / aggiorna media"| StockCostLayer
+  PurchaseOrder --> ThreeWay
+  GoodsReceipt --> ThreeWay
+  ThreeWay -->|"match_status su InvoiceLine"| InvoicePurchase
+  InvoicePurchase -->|"posting"| JournalEntry
+
+  InvoiceSale -->|"PaymentScheduleGeneratorService"| PaymentScheduleLine
+  PaymentTerm -.->|"rate_lines"| PaymentScheduleLine
+  Payment -->|"PaymentAllocationService"| PaymentAllocation
+  PaymentAllocation -->|"updates status"| PaymentScheduleLine
+  CreditNote -.->|"riduce scadenze aperte"| PaymentScheduleLine
+
+  InvoiceSale -->|"VatRegisterService"| VatRegisterEntry
+  InvoicePurchase -->|"VatRegisterService"| VatRegisterEntry
+  VatRegisterEntry --> VatSettlement
+  TaxCode --> VatRegisterEntry
+
+  InvoiceSale -.->|"submit"| EInvoiceSubmission
 
   JournalEntry --> Account
   JournalEntry --> TaxCode
-  InvoiceSale -.->|next number| DocumentSequence
-  InvoicePurchase -.->|next number| DocumentSequence
+  InvoiceSale -.->|"next number"| DocumentSequence
+  InvoicePurchase -.->|"next number"| DocumentSequence
+  CreditNote -.->|"next number sezionale NC"| DocumentSequence
 ```
 
 ### Diagramma — Multi-company + versioning forzato lato modello
+
+**Nota (aggiornato 2026-05)**: il subgraph `models` riflette ora anche i modelli M5 (`Payment`, `PaymentScheduleLine`, `PaymentAllocation`, `PaymentTerm`, `VatRegisterEntry`, `VatSettlement`) e l'interfaccia e-invoice (`EInvoiceSubmission`), tutti soggetti a `BelongsToCompany` e versionati.
 
 ```mermaid
 flowchart TB
@@ -1218,29 +1309,37 @@ flowchart TB
     JournalEntry
     JournalEntryLine
     Invoice
+    InvoiceLine
     FiscalYear
     FiscalPeriod
     DocumentSequence
     TaxCode
+    Payment
+    PaymentScheduleLine
+    PaymentAllocation
+    PaymentTerm
+    VatRegisterEntry
+    VatSettlement
+    EInvoiceSubmission
   end
   subgraph traits [Trait/scope cross-cutting]
     BelongsToCompanyScope
     HasVersions
   end
   subgraph core [Core inalterato]
-    SettingsTable[settings table<br/>version_strategy_*<br/>soft_deletes_*]
+    SettingsTable["settings table: version_strategy_*, soft_deletes_*"]
     HasVersionsCore[HasVersions trait]
     CompaniesTable[companies table]
   end
 
-  models -->|global scope automatico| BelongsToCompanyScope
-  BelongsToCompanyScope -->|company_id = current_company_id| CompaniesTable
-  models -->|use trait| HasVersions
-  HasVersions -.->|getVersionStrategy resolution| HasVersionsCore
-  HasVersionsCore -->|1- legge property modello| ModelProperty[protected VersionStrategy versionStrategy = DIFF]
-  HasVersionsCore -.->|2- fallback| SettingsTable
-  ModelProperty -->|priorita' assoluta| HasVersionsCore
-  SettingsTable -->|inerte per modelli con property dichiarata| HasVersionsCore
+  models -->|"global scope automatico"| BelongsToCompanyScope
+  BelongsToCompanyScope -->|"company_id = current_company_id"| CompaniesTable
+  models -->|"use trait"| HasVersions
+  HasVersions -.->|"getVersionStrategy resolution"| HasVersionsCore
+  HasVersionsCore -->|"1 - legge property modello"| ModelProperty["protected VersionStrategy versionStrategy = DIFF"]
+  HasVersionsCore -.->|"2 - fallback"| SettingsTable
+  ModelProperty -->|"priorita' assoluta"| HasVersionsCore
+  SettingsTable -->|"inerte per modelli con property dichiarata"| HasVersionsCore
 ```
 
 ---
