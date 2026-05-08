@@ -4,151 +4,21 @@ globs: ["**/Modules/**", "**/module.json", "**/module.php"]
 alwaysApply: false
 ---
 
-# Laraplate Specific Rules
+# Laraplate Specific (caveman)
 
-## Project Overview
-**Laraplate** is a modular Laravel application skeleton designed for building scalable web applications with a focus on content management and administrative functionality.
+- App is modular Laravel (`nwidart/laravel-modules`).
+- Core is foundation, loaded first, reused by all.
+- CMS/ERP/AI/MES build on Core contracts and services.
 
-### Project Purpose
-- **Boilerplate**: Provides a solid foundation for Laravel applications
-- **Modularity**: Enables easy extension through Laravel Modules
-- **Admin Interface**: Built with Filament for rapid admin panel development
-- **Content Management**: Includes CMS capabilities with media management
-- **Enterprise Ready**: Designed for production applications with proper testing and CI/CD
+- Module rules:
+  - Keep module self-contained.
+  - Keep dependency explicit in `module.json`.
+  - Respect load priority.
+  - Do not duplicate shared Core logic.
 
-### Key Features
-- **Core Module**: Authentication, permissions, user management, and core services
-- **CMS Module**: Content management, media library, geocoding, and dynamic entities
-- **Filament Admin**: Modern admin interface with customizable resources
-- **API Ready**: RESTful API with proper authentication and versioning
-- **Testing Suite**: Comprehensive testing with PestPHP and 100% type coverage
-- **Development Tools**: IDE Helper, Pint, PHPStan, Rector for code quality
+- Stack baseline:
+  - Laravel 12, PHP 8.5+, Filament, Sanctum, Pest.
+  - Queue for heavy async jobs.
+  - Eloquent-first, API-ready, test-first mindset.
 
-### Technology Stack
-- **Framework**: Laravel 12.0+ with PHP 8.5+
-- **Modules**: nwidart/laravel-modules for modular architecture
-- **Admin Panel**: Filament 4.0+ for admin interface
-- **Database**: Maintain compatibility for MySQL, PostgreSQL, SQLite, and Oracle (whenever possible) - use Eloquent ORM abstractions
-- **Cache**: Use database, file, or array cache drivers - maintain compatibility across different cache backends
-- **Queues**: Use Laravel Queues extensively for background processing, embedding generation, and media processing
-- **Embeddings**: Implement AI-powered embeddings for semantic search using queued jobs
-- **Testing**: See `05-testing-development.mdc` and `laravel-boost.mdc` for testing guidelines
-- **Code Quality**: See `laravel-boost.mdc` for Pint, PHPStan, Rector guidelines
-
-## Application Architecture
-- **Modular Architecture**: This is a Laravel Modules application using `nwidart/laravel-modules`
-- **Core Module**: Contains base functionality, authentication, permissions, and core services
-- **CMS Module**: Contains content management, media library, and geocoding features
-- **Module Structure**: Each module follows Laravel's standard structure with its own routes, controllers, models, commands, tests, etc.
-
-## Module Development Standards
-- **Module Naming**: Use PascalCase for module names; use all caps for acronyms (e.g., `Core`, `CMS`, `ERP`, `AI`)
-- **Module Structure**: Follow the standard Laravel Modules structure:
-  ```
-  Modules/
-  ├── ModuleName/
-  │   ├── app/
-  │   │   ├── Http/
-  │   │   ├── Models/
-  │   │   ├── Providers/
-  │   │   └── Services/
-  │   ├── config/
-  │   ├── database/
-  │   ├── resources/
-  │   ├── routes/
-  │   └── module.json
-  ```
-- **Module Dependencies**: Always check module dependencies in `module.json`
-- **Module Priority**: Use priority field in `module.json` for load order
-
-## Current Modules
-
-### Core Module
-- **Purpose**: Foundation module providing essential functionality
-- **Features**: 
-  - User authentication and authorization
-  - Permission and role management
-  - Core services and helpers
-  - Optimistic locking system
-  - Dynamic entities support
-  - CRUD API capabilities
-- **Priority**: 0 (highest priority, loads first)
-
-### CMS Module
-- **Purpose**: Content management system with media handling
-- **Features**:
-  - Content management with dynamic types
-  - Media library with file processing
-  - Geocoding services (Nominatim/Google Maps)
-  - Author and category management
-  - Content analytics and location tracking
-- **Dependencies**: Requires Core module
-- **Priority**: 1 (loads after Core)
-
-## Filament Integration
-- See `laravel-boost.mdc` for comprehensive Filament guidelines
-
-## Development Tools and Scripts
-- **IDE Helper**: Always run `composer lint` to generate IDE helper files
-- **Code Quality**: Use the provided scripts:
-  - `composer test:lint` - Code style checking with Pint
-  - `composer test:types` - Static analysis with PHPStan
-  - `composer test:unit` - Unit tests with Pest
-  - `composer refactor` - Code refactoring with Rector
-- **Development Workflow**: Use `composer dev` for local development
-
-### Development Commands
-- `composer dev` - Start development environment (server, queue, logs, vite)
-- `composer lint` - Generate IDE helper files and run code quality tools
-- `composer test` - Run complete test suite (type coverage, linting, unit tests, static analysis)
-- `composer test:type-coverage` - Check 100% type coverage
-- `composer test:unit` - Run Pest tests with coverage
-- `composer test:types` - Run PHPStan static analysis
-- `composer test:lint` - Run Pint code style checking
-- `composer refactor` - Run Rector for automated refactoring
-
-## Testing Strategy
-- See `05-testing-development.mdc` and `laravel-boost.mdc` for comprehensive testing guidelines
-
-## Database and Migrations
-- **Module Migrations**: Keep migrations within each module's `database/migrations/` directory
-- **Migration Naming**: Use descriptive names with timestamps
-- **Seeders**: Create module-specific seeders in `database/seeders/`
-- **Factories**: Use factories for testing data generation
-
-## Configuration Management
-- **Environment Variables**: Use `.env` for configuration (see module READMEs for specific variables)
-- **Module Config**: Each module should have its own config files
-- **Service Providers**: Register module services in module's service provider
-
-## API Development
-- **RESTful APIs**: Follow Laravel's REST conventions
-- **API Resources**: Use API Resources for consistent response formatting
-- **API Versioning**: Implement versioning for API endpoints
-- **Authentication**: Use Laravel Sanctum for API authentication
-
-## Embeddings and AI-Powered Search
-- **Embedding Generation**: Use `GenerateEmbeddingsJob` for async embedding creation
-- **Queue Processing**: Always dispatch embedding jobs to queues - never generate embeddings synchronously in request handlers
-- **Model Embeddings**: Store embeddings in `ModelEmbedding` model with polymorphic relationship
-- **Vector Search**: Implement semantic search using embeddings for AI-powered content discovery
-- **Text Preparation**: Use `prepareTextForEmbedding()` method to extract and format text from models
-- **Configuration**: Configure embedding provider, dimension, and model connection via environment variables
-- **Rate Limiting**: Apply rate limiting to embedding queue to prevent API throttling
-
-## Performance and Caching
-- See `03-performance-optimization.mdc` and `laravel-boost.mdc` for comprehensive performance guidelines
-- **Background Processing**: Always use queues for time-consuming operations (media processing, embeddings, emails)
-- **Embeddings**: Implement AI-powered embeddings using queued jobs (`GenerateEmbeddingsJob`) for semantic search
-
-## Security Considerations
-- See `04-error-handling-security.mdc` and `laravel-boost.mdc` for comprehensive security guidelines
-
-## Code Organization
-- See `02-architecture-patterns.mdc` for service classes, repositories, and design patterns
-
-## Deployment and CI/CD
-- **Environment Configuration**: Use proper environment variables
-- **Database Migrations**: Always run migrations in deployment
-- **Asset Compilation**: Compile assets for production
-- **Queue Workers**: Ensure queue workers are running in production 
+- Global ecosystem details in `laravel-boost.mdc`.
