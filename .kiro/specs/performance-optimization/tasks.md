@@ -184,7 +184,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che dopo tutti i retry falliti le coordinate originali del `Location` rimangano invariate
     - File: `Modules/CMS/tests/Unit/Jobs/GeocodeLocationJobTest.php`
 
-- [ ] 13. Creare o aggiornare `LocationObserver` per dispatchare `GeocodeLocationJob`
+- [x] 13. Creare o aggiornare `LocationObserver` per dispatchare `GeocodeLocationJob`
   - Creare `Modules/CMS/app/Observers/LocationObserver.php` (o aggiornarlo se esiste)
   - Nel metodo `saved()`, se i campi indirizzo (`address`, `city`, `province`, `country`) sono stati modificati, dispatchare `GeocodeLocationJob::dispatch($location)`
   - Registrare l'observer nel `CMSServiceProvider` o tramite attributo `#[ObservedBy]` sul modello `Location`
@@ -195,7 +195,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
   - Verificare PHPStan level max e type coverage per il modulo CMS
   - Chiedere all'utente se ci sono domande prima di procedere.
 
-- [ ] 15. Correggere `AclResolverService::clearCacheForPermission()` con invalidazione mirata
+- [x] 15. Correggere `AclResolverService::clearCacheForPermission()` con invalidazione mirata
   - Modificare `Modules/Core/app/Services/AclResolverService.php`
   - Cambiare la firma in `clearCacheForPermission(Permission $permission): void`
   - Implementare l'iterazione sugli utenti che hanno quel permesso e cancellare solo le loro chiavi ACL cache (`CacheManager::key('acl', 'user', $user_id, 'perm', $permission->id)`)
@@ -215,7 +215,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che quando il numero di utenti supera la soglia, non vengano tentate cancellazioni individuali per chiave utente
     - File: `Modules/Core/tests/Unit/Services/AclResolverServiceTest.php`
 
-- [ ] 16. Ottimizzare `AclResolverService::resolveAcls()` con batch query su `whereIn`
+- [x] 16. Ottimizzare `AclResolverService::resolveAcls()` con batch query su `whereIn`
   - Modificare `resolveAcls()` in `Modules/Core/app/Services/AclResolverService.php` per caricare tutti gli ACL rilevanti in una singola query usando `whereIn` sugli ID dei ruoli dell'utente
   - Eager-load la relazione `permission.roles` nella query batch per evitare N+1 nel matching dei ruoli
   - Mantenere la logica di inheritance (role → ancestor fallback) dopo l'ottimizzazione della query
@@ -233,7 +233,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che il set di ACL effettivi restituiti dopo l'ottimizzazione sia identico a quello dell'implementazione originale per-ruolo
     - File: `Modules/Core/tests/Unit/Services/AclResolverServiceTest.php`
 
-- [ ] 17. Modificare `HandleModelIndexingListener` per forzare async in contesto web
+- [x] 17. Modificare `HandleModelIndexingListener` per forzare async in contesto web
   - Modificare `Modules/AI/app/Listeners/HandleModelIndexingListener.php`
   - Nel metodo `handle()`, quando `$event->sync === true`, verificare `app()->runningInConsole()`:
     - Se CLI: eseguire sincronamente (comportamento attuale)
@@ -253,7 +253,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che un evento con `sync = true` in contesto CLI esegua il job sincronamente
     - File: `Modules/Core/tests/Unit/Listeners/HandleModelIndexingListenerTest.php`
 
-- [ ] 18. Aggiungere scope `forModel()` al modello `ModelEmbedding`
+- [x] 18. Aggiungere scope `forModel()` al modello `ModelEmbedding`
   - Modificare `Modules/Core/app/Models/ModelEmbedding.php` per aggiungere il metodo `scopeForModel(Builder $query, Model $model): Builder`
   - Lo scope deve filtrare su entrambi `model_type` e `model_id` per sfruttare l'indice composito `morphs()`
   - _Requirements: 15.1, 15.4_
@@ -264,7 +264,7 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che `ModelEmbedding::forModel($model)` generi una query che filtra su entrambi `model_type` e `model_id`
     - File: `Modules/Core/tests/Unit/Models/ModelEmbeddingTest.php`
 
-- [ ] 19. Creare il comando artisan `core:cache:warm`
+- [x] 19. Creare il comando artisan `core:cache:warm`
   - Creare `Modules/Core/app/Console/WarmCacheCommand.php` con signature `core:cache:warm`
   - Il comando deve pre-popolare: tutti i `Setting` (tutti i gruppi), cron jobs, version strategies, permission existence map (tutti i nomi di `Permission` → `true`)
   - Ogni step deve essere wrappato in try/catch: se uno step fallisce, loggare l'errore e continuare
@@ -278,12 +278,12 @@ I sub-task di test sono marcati con `*` e sono opzionali.
     - Verificare che eseguire `core:cache:warm` due volte produca lo stesso stato finale della cache
     - File: `Modules/Core/tests/Unit/Console/WarmCacheCommandTest.php`
 
-- [ ] 20. Aggiungere `cache.warm_on_boot` in `config/core.php` e hook in `CoreServiceProvider`
+- [x] 20. Aggiungere `cache.warm_on_boot` in `config/core.php` e hook in `CoreServiceProvider`
   - Aggiungere la chiave `cache.warm_on_boot` (default: `false`) in `Modules/Core/config/config.php`
   - Modificare `CoreServiceProvider::boot()` per registrare un hook `$this->app->booted()` che, se `config('core.cache.warm_on_boot')` è `true`, esegue il warming tramite `WarmCacheCommand`
   - _Requirements: 16.4, 16.5_
 
-- [ ] 21. Mitigare Issue A: aggiungere guard `Cache::supportsTags()` in `Repository`
+- [x] 21. Mitigare Issue A: aggiungere guard `Cache::supportsTags()` in `Repository`
   - Modificare `Modules/Core/app/Cache/Repository.php`
   - In `clearByEntity()`: wrappare la chiamata `$this->tags(...)` con un check `Cache::supportsTags()`; se i tag non sono supportati, usare `Cache::forget($model->getCacheKey())` come fallback
   - Applicare lo stesso pattern a `clearByRequest()`, `clearByUser()`, `clearByGroup()`
