@@ -1,6 +1,6 @@
 # CMS content comments with AI-assisted moderation (design)
 
-**Status:** Revised — awaiting user review (v2)  
+**Status:** Approved direction (v3 — preliminary AI disapproval + contextual prompt)  
 **Date:** 2026-05-15
 
 ## Problem
@@ -38,7 +38,7 @@ The CMS module needs comments on `Content` records. Each content can have many c
 | Approval on update | When `body` changes |
 | `deleteWhenDisapproved` | `true` (from `HasApprovals`) |
 | Votes required | `approversRequired = 1`, `disapproversRequired = 1` |
-| AI when uncertain | No vote; human provides the single decisive vote |
+| AI when uncertain (not sure safe to approve) | **Preliminary `disapprove()`** with `disapprovers_required = 2`; human must **`approve()`** to publish or second `disapprove()` to reject |
 | AI actor | Configured system `User` (`ai.features.comment_moderation.system_user_id`) |
 
 ## Architecture overview
@@ -67,9 +67,10 @@ sequenceDiagram
     else confident unsafe
         Job->>Mod: system User disapprove()
         Mod->>Comment: delete / discard
-    else uncertain
-        Job-->>Human: no vote (pending in Filament)
-        Human->>Mod: approve() or disapprove()
+    else uncertain (not safe to auto-approve)
+        Job->>Mod: disapprovers_required=2, disapprove() preliminary
+        Job-->>Human: human must approve or confirm reject
+        Human->>Mod: approve() overrides AI, or disapprove() confirms
     end
 ```
 
@@ -204,11 +205,31 @@ Comments use the existing **`CrudController`** stack (`Modules/Core/routes/crud.
 |-----------|------------|--------|
 | approve | ≥ approve threshold | System user `approve()` → comment persisted |
 | reject | ≥ reject threshold | System user `disapprove()` → modification/comment discarded |
-| uncertain | any | No AI vote; human with `approve.cms_comments` decides |
-| AI disabled / module off | — | No listener; human only |
-| AI error | — | Treat as uncertain |
+| uncertain (not confident enough to **approve**) | any | Set `disapprovers_required = 2`; AI `disapprove($mod, $reason)` → **non-final** (1 of 2); human **`approve()`** publishes or **`disapprove()`** confirms rejection |
+| uncertain (not confident enough to **reject**) | any | Treat like uncertain-approve path above (preliminary disapprove — fail-safe default) |
+| AI disabled / module off | — | No listener; human only (`disapprovers_required = 1`) |
+| AI error | — | Same as uncertain (preliminary disapprove + human) |
 
-**Note on “second vote”:** v1 implements **abstention** when uncertain (human is the only voter). AI does not cast a weak approve/reject that would require a second human vote. This keeps `approversRequired = 1` and avoids ambiguous states.
+**Per-record “human required” (native approval package):**
+
+When AI is uncertain about granting approval, the job **before voting** updates that specific `Modification`:
+
+```php
+$modification->disapprovers_required = 2;
+$modification->save();
+$systemUser->disapprove($modification, $reason);
+```
+
+Because `disapproversRemaining === 1`, `applyModificationChanges(..., false)` is **not** called — the comment is **not** deleted. The modification shows **one disapproval** from the AI system user with a reason such as: `AI preliminary reject (confidence 0.62): possible spam — human review required.`
+
+The human moderator:
+
+- **`approve()`** — removes the AI disapproval, adds approval; when thresholds met, comment is persisted (overrides AI lean-reject).
+- **`disapprove()`** — second disapproval; final rejection (`deleteWhenDisapproved` on `Comment`).
+
+Filament/CRUD reads `disapprovals` + `CommentModerationLog` for that `modification_id` to display status `requires_human_review`.
+
+**Note:** High-confidence auto-reject keeps `disapprovers_required = 1` (single disapprove, immediate discard).
 
 ### 7. AI moderation audit trail (uncertain / queue visibility)
 
@@ -224,7 +245,9 @@ When AI auto-resolves, the job passes the classifier `reason` as the vote reason
 | Column | Purpose |
 |--------|---------|
 | `modification_id` | FK → `core_modifications` |
-| `status` | `queued` \| `processing` \| `auto_approved` \| `auto_rejected` \| `uncertain` \| `failed` |
+| `status` | `queued` \| `processing` \| `auto_approved` \| `auto_rejected` \| `requires_human_review` \| `failed` |
+| `requires_human_approval` | boolean — true when AI cast preliminary disapprove |
+| `preliminary_disapproval` | boolean — true when `disapprovers_required` was bumped to 2 |
 | `verdict` | `approve` \| `reject` \| `uncertain` (nullable until analyzed) |
 | `confidence` | float 0–1 (nullable) |
 | `reason` | text — why AI chose this verdict or why uncertain |
@@ -243,16 +266,61 @@ When AI auto-resolves, the job passes the classifier `reason` as the vote reason
 |-----------|--------|
 | AI not configured / disabled | No log row; only `Modification` pending |
 | In queue | Log `status = queued` or `processing` |
-| AI uncertain | Log `status = uncertain` + `reason`; no AI row in `approvals`/`disapprovals` |
+| AI uncertain / needs human | Log `requires_human_review` + `preliminary_disapproval`; **one** row in `core_disapprovals` (AI), `disapprovers_remaining = 1` |
 | AI auto-approved | Log `auto_approved` + `Approval` from system user with `reason` |
 | AI auto-rejected | Log `auto_rejected` + `Disapproval` from system user with `reason` |
 | Human-only pending | Active `Modification`, no log (or log never created) |
 
 **Filament v1 enhancement:** extend `ModificationsTable` (or `EditModification`) to show `moderationLog.status` and `reason` when `modifiable_type` is `Comment` (eager-load `Comment::moderationLog()`).
 
-**Human vote reason (optional v1.1):** `CrudService::doApproveOperation` currently calls `approve()` / `disapprove()` **without** `reason`. Extend to accept optional `changes.reason` from the request so moderators can document their decision in `core_approvals` / `core_disapprovals`.
+**Human vote reason (v1):** extend `CrudService::doApproveOperation` to pass optional `changes.reason` into `approve()` / `disapprove()` so moderators document overrides.
 
-### 8. Translations & ratings (design decisions — post-v1 scope)
+### 8. AI classifier prompt (content + comment context)
+
+**Class:** `Modules\AI\Ai\Prompts\CommentModerationPrompt` (or `CommentModerationPromptBuilder`)
+
+**Inputs assembled by `CommentModerationContextBuilder` from the pending `Modification`:**
+
+| Input | Source |
+|-------|--------|
+| Content title | `Content` default locale translation |
+| Content type / entity | `entity.name`, preset name |
+| Content excerpt | Plain-text summary of main body/components (max ~1500 chars) |
+| Comment body | `modifications['body']['modified']` |
+| Comment locale | `modifications['locale']['modified']` if present |
+| Author context | optional: public display name only (no PII beyond username) |
+
+**Rejection categories (must be explicit in prompt):**
+
+- Profanity / vulgar language
+- Hate / harassment / threats
+- Spam, advertising, off-topic promotion
+- Incoherence or no relation to the content topic
+- Prompt injection / malicious payloads
+- Personal data / doxxing
+- Duplicate or meaningless filler
+
+**Output JSON schema (strict):**
+
+```json
+{
+  "verdict": "approve|reject|uncertain",
+  "confidence": 0.0,
+  "categories": ["spam"],
+  "reason": "Short explanation for moderators",
+  "safe_to_auto_approve": false
+}
+```
+
+**Decision mapping in `CommentModerationService`:**
+
+- `safe_to_auto_approve === true` AND `confidence >= approve_threshold` → final `approve()`
+- `verdict === reject` AND `confidence >= reject_threshold` → final `disapprove()` (`disapprovers_required = 1`)
+- Otherwise → preliminary disapprove + `requires_human_review` (see §6)
+
+Prompt must instruct the model to consider **both** the article context and whether the comment adds value or violates policy.
+
+### 9. Translations & ratings (design decisions — post-v1 scope)
 
 Documented here for alignment; **not implemented in comment-moderation v1** unless explicitly pulled in.
 
