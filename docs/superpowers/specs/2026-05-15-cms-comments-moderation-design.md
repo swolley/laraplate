@@ -1,6 +1,6 @@
 # CMS content comments with AI-assisted moderation (design)
 
-**Status:** Draft — awaiting user review  
+**Status:** Revised — awaiting user review (v2)  
 **Date:** 2026-05-15
 
 ## Problem
@@ -20,17 +20,20 @@ The CMS module needs comments on `Content` records. Each content can have many c
 
 - Threading / replies (`parent_id`)
 - Guest comments (name/email without user)
-- Translations, ratings, media attachments
-- Comment likes/dislikes
+- Full `HasTranslations` on comment body (see **Translations & ratings**)
+- Media attachments on comments
+- Comment likes/dislikes (distinct from content star rating)
 - Indexing comments in Elasticsearch
 - Dedicated Filament Comment resource (moderation reuses `ModificationResource`)
+- Custom CMS API routes (use standard `CrudController` CRUD)
 
 ## Assumptions (v1 defaults)
 
 | Topic | Default |
 |-------|---------|
 | Author | Authenticated `User` only |
-| Fields | `content_id`, `user_id`, `body` (text, max 5000) |
+| Fields | `content_id`, `user_id`, `body`, `locale` (see translations) |
+| Table name | `CMSTables::Comments` (`cms_comments`) — **mandatory** in migrations, raw SQL, and `QueryBuilder` when not using the model |
 | Approval on create | Always (any non-empty `body`) |
 | Approval on update | When `body` changes |
 | `deleteWhenDisapproved` | `true` (from `HasApprovals`) |
@@ -91,7 +94,15 @@ sequenceDiagram
 - `requiresApprovalWhen`: always `true` when `body` is in dirty attributes (or on create)
 - `modifier()`: `auth()->user()`
 - Relations: `content(): BelongsTo`, `user(): BelongsTo`
-- **Global scope `approvedOnly`:** for public/list APIs, only rows that exist in DB (post-approval). Pending items exist only as `Modification` records.
+- **Visibility:** no extra global scope required. `HasApprovals` blocks `save` until approved; only approved comments exist in `cms_comments`. Pending submissions live only as active `Modification` rows (same pattern as other moderated entities).
+
+**Naming convention:** add to `Modules\CMS\Enums\CMSTables`:
+
+```php
+case Comments = 'cms_comments';
+```
+
+Use `CMSTables::Comments->value` in migrations, seeders, and any raw/`DB::table()` access.
 
 **Content:**
 
@@ -122,28 +133,21 @@ final class CommentRequiresModeration
 
 This works for both creations (`is_update = false`, `modifiable_id = null`) and edits.
 
-### 3. CMS — API (v1)
+### 3. CMS — API via standard CRUD (no custom routes)
 
-| Method | Route | Behavior |
-|--------|-------|----------|
-| `GET` | `/api/cms/contents/{content}/comments` | Paginated approved comments for content |
-| `POST` | `/api/cms/contents/{content}/comments` | Auth required; validates `body`; triggers approval flow; returns `202` with modification id / pending status |
+Comments use the existing **`CrudController`** stack (`Modules/Core/routes/crud.php` + module entity registration), same as other CMS models.
 
-**Authorization:**
+| Operation | Mechanism |
+|-----------|-----------|
+| List / detail | `CrudController::list` / `detail` on entity `comments` — returns only persisted (approved) rows |
+| Insert | `CrudController::insert` — triggers `HasApprovals`; save intercepted → `Modification` created |
+| Update body | `CrudController::update` — new `Modification` if `body` dirty |
+| Approve / disapprove | `PATCH /crud/approve/{module}/comments` and `.../disapprove/...` (existing Core routes) |
+| Moderator queue | `Modification` records (`modifiable_type = Comment`) — not the `comments` list |
 
-- Create: authenticated user
-- List: same as content visibility (reuse existing content policies/scopes)
+**Insert response:** follows existing CRUD behaviour for moderated creates (modification pending; no row in `cms_comments` until approved). Frontend filters by `content_id` like any other relation.
 
-**Response shape (pending create):**
-
-```json
-{
-  "status": "pending_moderation",
-  "modification_id": 123
-}
-```
-
-Approved comment list returns normal comment resource (id, body, user summary, timestamps).
+**No** dedicated `CommentsController` or nested `/contents/{id}/comments` routes in v1.
 
 ### 4. Core — permissions & Filament
 
@@ -178,7 +182,7 @@ Approved comment list returns normal comment resource (id, body, user summary, t
 2. Call `CommentModerationService::analyze(string $body): ModerationVerdict`
 3. If `verdict === approve` and `confidence >= approve_threshold` → `$systemUser->approve($modification, $reason)`
 4. If `verdict === reject` and `confidence >= reject_threshold` → `$systemUser->disapprove($modification, $reason)`
-5. If `verdict === uncertain` or below threshold → **no vote**; log at info; optional metrics hook later
+5. If `verdict === uncertain` or below threshold → **no vote**; persist audit row (see below)
 
 **Service:** `Modules\AI\Services\CommentModerationService`
 
@@ -205,6 +209,80 @@ Approved comment list returns normal comment resource (id, body, user summary, t
 | AI error | — | Treat as uncertain |
 
 **Note on “second vote”:** v1 implements **abstention** when uncertain (human is the only voter). AI does not cast a weak approve/reject that would require a second human vote. This keeps `approversRequired = 1` and avoids ambiguous states.
+
+### 7. AI moderation audit trail (uncertain / queue visibility)
+
+The `laravel-approval` package stores a **`reason`** on each vote:
+
+- `User::approve(Modification $mod, ?string $reason)` → `core_approvals.reason`
+- `User::disapprove(Modification $mod, ?string $reason)` → `core_disapprovals.reason`
+
+When AI auto-resolves, the job passes the classifier `reason` as the vote reason. **Uncertain outcomes do not create an approval/disapproval row** (no vote), so the reason must live elsewhere.
+
+**CMS audit table:** `cms_comment_moderation_logs` (`CMSTables::CommentModerationLogs`)
+
+| Column | Purpose |
+|--------|---------|
+| `modification_id` | FK → `core_modifications` |
+| `status` | `queued` \| `processing` \| `auto_approved` \| `auto_rejected` \| `uncertain` \| `failed` |
+| `verdict` | `approve` \| `reject` \| `uncertain` (nullable until analyzed) |
+| `confidence` | float 0–1 (nullable) |
+| `reason` | text — why AI chose this verdict or why uncertain |
+| `analyzed_at` | timestamp (nullable while queued) |
+
+**Lifecycle:**
+
+1. AI listener creates log with `status = queued`, dispatches job.
+2. Job sets `processing` at start.
+3. On completion: update to final status + `verdict`, `confidence`, `reason`, `analyzed_at`.
+4. On auto approve/reject: also call `approve()` / `disapprove()` with same `reason` string.
+
+**How the human moderator knows (Filament / CRUD):**
+
+| Situation | Signal |
+|-----------|--------|
+| AI not configured / disabled | No log row; only `Modification` pending |
+| In queue | Log `status = queued` or `processing` |
+| AI uncertain | Log `status = uncertain` + `reason`; no AI row in `approvals`/`disapprovals` |
+| AI auto-approved | Log `auto_approved` + `Approval` from system user with `reason` |
+| AI auto-rejected | Log `auto_rejected` + `Disapproval` from system user with `reason` |
+| Human-only pending | Active `Modification`, no log (or log never created) |
+
+**Filament v1 enhancement:** extend `ModificationsTable` (or `EditModification`) to show `moderationLog.status` and `reason` when `modifiable_type` is `Comment` (eager-load `Comment::moderationLog()`).
+
+**Human vote reason (optional v1.1):** `CrudService::doApproveOperation` currently calls `approve()` / `disapprove()` **without** `reason`. Extend to accept optional `changes.reason` from the request so moderators can document their decision in `core_approvals` / `core_disapprovals`.
+
+### 8. Translations & ratings (design decisions — post-v1 scope)
+
+Documented here for alignment; **not implemented in comment-moderation v1** unless explicitly pulled in.
+
+#### Comments — translatable?
+
+**Recommendation: no `HasTranslations` on comments.**
+
+- UGC is written once in the language the user used; store `locale` (from `LocaleContext` at insert) alongside `body`.
+- Listing can filter/display by locale if needed later without a translation table.
+- Avoids empty translation rows and moderation per locale.
+
+If product later requires translated comments, prefer **optional machine translation as a separate async feature**, not blocking moderation v1.
+
+#### Content rating — separate from comment text
+
+**Recommendation: separate entity, not a column on `Comment`.**
+
+| Concept | Model / table | Notes |
+|---------|---------------|-------|
+| Comment (text) | `cms_comments` | Moderated via `HasApprovals` |
+| Star rating | `cms_content_ratings` (`CMSTables::ContentRatings`) | `content_id`, `user_id`, `score` (1–5), optional `comment_id` |
+
+**Rules:**
+
+- **Rate without comment:** row in `cms_content_ratings` with `comment_id = null` (unique `user_id` + `content_id`).
+- **Comment without rating:** comment only; no rating row (or rating row omitted).
+- **Both together:** create modification for comment; on approval, persist comment and link rating row with `comment_id`.
+- Rating values are **not** moderated through `HasApprovals` in v1 (optional: simple validation + anti-spam later).
+
+Rating moderation policy (if toxic text in rating-only submissions) is out of scope unless ratings get a text field later.
 
 ## Error handling
 
@@ -236,16 +314,16 @@ Approved comment list returns normal comment resource (id, body, user summary, t
 - `app/Models/Comment.php`
 - `app/Events/CommentRequiresModeration.php`
 - `app/Providers/EventServiceProvider.php` — dispatch hook
-- `app/Http/Controllers/CommentsController.php` (or nested under contents)
-- `app/Http/Requests/StoreCommentRequest.php`
-- `routes/api.php`
+- Entity registration for CRUD (`comments`) — seeder / `Entity` config (follow CMS patterns)
+- `database/migrations/*_create_cms_comment_moderation_logs_table.php`
+- `app/Models/CommentModerationLog.php`
 - `database/factories/CommentFactory.php`
 - `tests/Feature/CommentTest.php`
 
 **AI**
 
 - `config/config.php` — `comment_moderation` block
-- `app/Listeners/HandleCommentModerationListener.php`
+- `app/Listeners/HandleCommentModerationListener.php` — creates/updates `CommentModerationLog`
 - `app/Jobs/ModerateCommentJob.php`
 - `app/Services/CommentModerationService.php`
 - `app/Data/ModerationVerdict.php` (or enum in Services)
@@ -255,6 +333,7 @@ Approved comment list returns normal comment resource (id, body, user summary, t
 **Core**
 
 - Permission seed: `approve.cms_comments`
+- Optional v1.1: `CrudService::doApproveOperation` pass-through `reason`
 
 ## Risks
 
