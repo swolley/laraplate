@@ -7,6 +7,7 @@ namespace App\Models;
 use Modules\Core\Models\User as CoreUser;
 
 /**
+ * @mixin \Eloquent
  * @mixin IdeHelperUser
  */
 final class User extends CoreUser

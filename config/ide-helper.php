@@ -170,7 +170,7 @@ return [
     */
 
     'model_hooks' => [
-        // App\Support\IdeHelper\MyModelHook::class
+        Modules\Core\IdeHelper\EloquentMixinModelHook::class,
     ],
 
     /*
