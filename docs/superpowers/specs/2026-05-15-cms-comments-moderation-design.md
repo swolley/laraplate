@@ -211,9 +211,26 @@ Comments use the existing **`CrudController`** stack (`Modules/Core/routes/crud.
 - Must use `ApprovesChanges` trait (already on `User`)
 - Not shown in normal user pickers
 
-### 6. Approval modes (Option A default, Option B config)
+### 6. Approval modes (configurable A / B)
 
-Two policies; choose via config `ai.features.comment_moderation.dual_approval_mode` (default `false`).
+Two policies; **one config key** selects the behaviour for all comment moderations when AI participates.
+
+**Config** (`ai.features.comment_moderation.approval_mode`):
+
+| Value | Mode | Env example |
+|-------|------|-------------|
+| `threshold` | **A** — threshold-based (default) | `AI_COMMENT_APPROVAL_MODE=threshold` |
+| `dual` | **B** — always two votes (AI + human) | `AI_COMMENT_APPROVAL_MODE=dual` |
+
+Validated at boot / in job: only `threshold` and `dual` allowed; invalid value → log warning and fall back to `threshold`.
+
+**Related flags:**
+
+- `enabled` — master switch for AI comment moderation listener/job
+- `ai_participates_in_approvals` — if `false`, AI does not vote (both modes degrade to human-only `1/1`)
+- When AI module disabled or `enabled=false`, **ignore `approval_mode`** → human moderator only
+
+**Implementation:** `Modules\AI\Enums\CommentApprovalMode` enum (`Threshold`, `Dual`) resolved from config in `ModerateCommentJob`.
 
 #### Option A — threshold-based (default, recommended)
 
@@ -240,9 +257,9 @@ $systemUser->disapprove($modification, $reason);
 
 So: uncertain = “serve umano”, con **voto negativo preliminare AI** visibile su quel record.
 
-#### Option B — dual approval (config flag)
+#### Option B — dual approval (`approval_mode = dual`)
 
-When `dual_approval_mode === true` **and** AI module enabled **and** `ai_participates_in_approvals === true`:
+When `approval_mode === dual` **and** AI module enabled **and** `ai_participates_in_approvals === true`:
 
 - **Every** comment modification starts with `approvers_required = 2` and `disapprovers_required = 2` (set on `Modification` at create or before AI job).
 - AI always casts the **first** vote (approve or disapprove as appropriate).
@@ -256,13 +273,17 @@ When `dual_approval_mode === true` **and** AI module enabled **and** `ai_partici
 
 **Trade-off:** Option B = maximum safety/compliance; Option A = better UX (auto-resolve when confident).
 
-**Config keys:**
+**Config block:**
 
 ```php
 'comment_moderation' => [
-  'dual_approval_mode' => env('AI_COMMENT_DUAL_APPROVAL', false),
-  'ai_participates_in_approvals' => env('AI_COMMENT_AI_VOTES', true),
-  // ...
+    'enabled' => env('AI_COMMENT_MODERATION_ENABLED', true),
+    'approval_mode' => env('AI_COMMENT_APPROVAL_MODE', 'threshold'), // threshold | dual
+    'ai_participates_in_approvals' => env('AI_COMMENT_AI_VOTES', true),
+    'approve_confidence_threshold' => (float) env('AI_COMMENT_MOD_APPROVE_THRESHOLD', 0.85),
+    'reject_confidence_threshold' => (float) env('AI_COMMENT_MOD_REJECT_THRESHOLD', 0.85),
+    'system_user_id' => env('AI_MODERATOR_USER_ID'),
+    'queue' => env('AI_COMMENT_MOD_QUEUE', 'default'),
 ],
 ```
 
