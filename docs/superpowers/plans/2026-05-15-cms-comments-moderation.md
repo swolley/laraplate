@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add moderated `Comment` entities on CMS `Content` (single locale on write; locale-aware read with fallback to original), exposed via standard CRUD, with optional AI classification. **Option A (default):** confident approve/reject closes immediately (`1/1`); uncertain sets `approvers_required=1`, `disapprovers_required=2` + preliminary AI `disapprove()` so humans can override. **Option B (config):** always 2 votes (AI first, human second).
+**Goal:** Add moderated `Comment` entities on CMS `Content` using `HasTranslations` (`CommentTranslation`) with CMS overrides (`HasCommentTranslations`: write current locale only; read current locale or chronological original). Standard CRUD + optional AI classification. **Option A (default):** confident approve/reject closes immediately (`1/1`); uncertain sets `approvers_required=1`, `disapprovers_required=2` + preliminary AI `disapprove()` so humans can override. **Option B (config):** always 2 votes (AI first, human second).
 
 **Architecture:** CMS owns `Comment`, `CommentModerationLog`, and `CommentRequiresModeration` event. AI listens only when configured. `CommentModerationService` builds context from the parent `Content`, runs a structured JSON classifier prompt, then either final approve/reject or preliminary disapprove + audit log. No custom comment API routes — `CrudController` + `HasApprovals` handle visibility.
 
@@ -23,10 +23,11 @@
 
 ```php
 case Comments = 'cms_comments';
+case CommentsTranslations = 'cms_comments_translations';
 case CommentModerationLogs = 'cms_comment_moderation_logs';
 ```
 
-- [ ] **Step 2: Migration uses enum values only**
+- [ ] **Step 2: Parent table migration** (`cms_comments` — no `body` column)
 
 ```php
 $table_name = CMSTables::Comments->value;
@@ -38,18 +39,29 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
     $table->foreignId('user_id')
         ->constrained(CoreTables::Users->value, 'id', "{$table_name}_user_id_FK")
         ->cascadeOnDelete();
-    $table->text('body');
-    $table->string('locale', 10);
-    $table->foreignId('original_comment_id')
-        ->nullable()
-        ->constrained($table_name, 'id', "{$table_name}_original_comment_id_FK")
-        ->nullOnDelete();
     MigrateUtils::timestamps($table, hasCreateUpdate: true);
     $table->index(['content_id', 'created_at'], "{$table_name}_content_created_IDX");
 });
 ```
 
-- [ ] **Step 3:** `php artisan migrate --no-interaction --path=Modules/CMS/database/migrations/2026_05_15_100000_create_cms_comments_table.php`
+- [ ] **Step 3: Translations table migration**
+
+```php
+$table_name = CMSTables::CommentsTranslations->value;
+Schema::create($table_name, function (Blueprint $table) use ($table_name): void {
+    $table->id();
+    $table->foreignId('comment_id')
+        ->constrained(CMSTables::Comments->value, 'id', "{$table_name}_comment_id_FK")
+        ->cascadeOnDelete();
+    $table->string('locale', 10);
+    $table->text('body');
+    MigrateUtils::timestamps($table, hasCreateUpdate: true);
+    $table->unique(['comment_id', 'locale'], "{$table_name}_comment_locale_UN");
+    $table->index(['comment_id', 'created_at'], "{$table_name}_comment_created_IDX");
+});
+```
+
+- [ ] **Step 4:** Run both migrations
 
 - [ ] **Step 4:** Commit
 
@@ -92,53 +104,76 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
 
 ---
 
-### Task 3: `Comment` model + `Content::comments()`
+### Task 3: `HasCommentTranslations` trait + `CommentTranslation` model
+
+**Files:**
+
+- Create: `Modules/CMS/app/Helpers/HasCommentTranslations.php`
+- Create: `Modules/CMS/app/Models/Translations/CommentTranslation.php`
+- Create: `Modules/CMS/app/Scopes/CommentTranslationScope.php`
+- Create: `Modules/CMS/tests/Unit/Helpers/HasCommentTranslationsTest.php`
+
+- [ ] **Step 1: Failing tests**
+
+```php
+it('returns current locale body when translation exists', function (): void { ... });
+it('falls back to oldest created translation when current locale missing', function (): void {
+    // create comment with only 'it' translation, read under 'en' → still 'it' body
+});
+it('does not fall back to config app.locale when older original is another locale', function (): void { ... });
+```
+
+- [ ] **Step 2: `CommentTranslation` model** (mirror `TagTranslation` pattern, fillable `comment_id`, `locale`, `body`)
+
+- [ ] **Step 3: `HasCommentTranslations`** — alias `HasTranslations` methods; override `getTranslatableFieldValue`, `getTranslation`, `translation()`; `getOriginalTranslation()` ordered by `created_at`, `id`
+
+- [ ] **Step 4: `CommentTranslationScope`** — `whereHas('translations')` (any locale) + eager load via overridden `translation()`
+
+- [ ] **Step 5: `bootHasTranslations` on Comment** — use `CommentTranslationScope`, **omit** `TranslatedModelSaved` dispatches (v1)
+
+- [ ] **Step 6:** Tests green + commit
+
+---
+
+### Task 4: `Comment` model + approval bridge + `Content::comments()`
 
 **Files:**
 
 - Create: `Modules/CMS/app/Models/Comment.php`
+- Create: `Modules/CMS/app/Services/CommentApprovalCapture.php` (optional helper)
 - Create: `Modules/CMS/database/factories/CommentFactory.php`
 - Modify: `Modules/CMS/app/Models/Content.php`
 - Create: `Modules/CMS/tests/Unit/Models/CommentTest.php`
 
-- [ ] **Step 1: Write failing unit test**
+- [ ] **Step 1: `Comment` uses `HasApprovals`, `HasCommentTranslations`**
+
+- `fillable: content_id, user_id` only (body via translation)
+
+- `requiresApprovalWhen($modifications)`:
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-use Modules\CMS\Models\Comment;
-use Modules\CMS\Models\Content;
-use Modules\Core\Helpers\HasApprovals;
-
-it('uses HasApprovals and belongs to content', function (): void {
-    expect(class_uses_trait(Comment::class, HasApprovals::class))->toBeTrue();
-    $comment = new Comment();
-    expect($comment->content())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
-});
+protected function requiresApprovalWhen($modifications): bool
+{
+    return $this->hasPendingBodyForCurrentLocale()
+        || (isset($modifications['body']) && $modifications !== []);
+}
 ```
 
-- [ ] **Step 2: Implement `Comment`**
+- `hasPendingBodyForCurrentLocale(): bool` checks `pending_translations[LocaleContext::get()]['body']`
 
-Key points:
+- **Saving hook** (before approval trait): if pending body and empty dirty, build synthetic diff or call `CommentApprovalCapture::capture($this)` so `Modification` stores `body` + `locale` + `content_id`
 
-- `protected $table = CMSTables::Comments->value;`
-- `fillable: content_id, user_id, body, locale`
-- `requiresApprovalWhen`: return true when `body` in dirty or on create
-- On `creating`: set `locale` from `LocaleContext::getCurrent()` if not set
-- `getRules()` with body required|string|max:5000
-- `content()`, `user()` relations
-- `moderationLog(): HasOne` → `CommentModerationLog`
-- `resolveForLocale(string $locale): self` — static/group helper: prefer matching locale, else `original_comment_id` root with `MIN(id)`
+- [ ] **Step 2: Factory** creates approved comment with translation row
 
-- [ ] **Step 3: Add `comments()` on `Content`**
+- [ ] **Step 3: `Content::comments()` HasMany**
 
-- [ ] **Step 4:** Run test + pint + commit
+- [ ] **Step 4:** Feature test insert via CRUD → modification contains `body` in JSON
+
+- [ ] **Step 5:** Commit
 
 ---
 
-### Task 4: `CommentModerationLog` model
+### Task 5: `CommentModerationLog` model
 
 **Files:**
 
@@ -153,7 +188,7 @@ Key points:
 
 ---
 
-### Task 5: CMS entity registration for CRUD
+### Task 6: CMS entity registration for CRUD
 
 **Files:**
 
@@ -167,7 +202,7 @@ Key points:
 
 ---
 
-### Task 6: `CommentRequiresModeration` event + dispatch
+### Task 7: `CommentRequiresModeration` event + dispatch
 
 **Files:**
 
@@ -202,7 +237,7 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 
 ---
 
-### Task 7: AI config + system moderator user
+### Task 8: AI config + system moderator user
 
 **Files:**
 
@@ -230,7 +265,7 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 
 ---
 
-### Task 8: `CommentModerationContextBuilder`
+### Task 9: `CommentModerationContextBuilder`
 
 **Files:**
 
@@ -270,7 +305,7 @@ final readonly class CommentModerationContextBuilder
 
 ---
 
-### Task 9: Prompt + `CommentModerationService` (classifier)
+### Task 10: Prompt + `CommentModerationService` (classifier)
 
 **Files:**
 
@@ -331,7 +366,7 @@ Comment text:
 
 ---
 
-### Task 10: `ModerateCommentJob` — vote logic
+### Task 11: `ModerateCommentJob` — vote logic
 
 **Files:**
 
@@ -430,7 +465,7 @@ public function handle(
 
 ---
 
-### Task 11: AI listener + EventServiceProvider
+### Task 12: AI listener + EventServiceProvider
 
 **Files:**
 
@@ -453,7 +488,7 @@ On `CommentRequiresModeration`:
 
 ---
 
-### Task 12: Filament — show AI state on Comment modifications
+### Task 13: Filament — show AI state on Comment modifications
 
 **Files:**
 
@@ -480,7 +515,7 @@ On `CommentRequiresModeration`:
 
 ---
 
-### Task 13: `CrudService` — pass moderator `reason`
+### Task 14: `CrudService` — pass moderator `reason`
 
 **Files:**
 
@@ -504,7 +539,7 @@ if ($operation === 'approve') {
 
 ---
 
-### Task 14: End-to-end CMS feature tests
+### Task 15: End-to-end CMS feature tests
 
 **Files:**
 
@@ -522,7 +557,7 @@ if ($operation === 'approve') {
 
 ---
 
-### Task 15: Final verification
+### Task 16: Final verification
 
 - [ ] Run `vendor/bin/pint --dirty`
 - [ ] Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php`
@@ -538,7 +573,8 @@ if ($operation === 'approve') {
 | `HasApprovals` / CRUD only | 3, 5, 14 |
 | Event decoupling CMS→AI | 6, 11 |
 | Option A/B approval modes | 10 |
-| Locale read fallback | 3 |
+| HasCommentTranslations + scope | 3 |
+| Approval + pending translations bridge | 4 |
 | v2 auto-translate flag | spec only |
 | Audit log per modification | 2, 4, 10 |
 | Contextual prompt + categories | 8, 9 |

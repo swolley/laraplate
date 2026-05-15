@@ -1,6 +1,6 @@
 # CMS content comments with AI-assisted moderation (design)
 
-**Status:** Approved direction (v4 — locale read rule + approval modes)  
+**Status:** Approved direction (v5 — HasTranslations + comment locale overrides)  
 **Date:** 2026-05-15
 
 ## Problem
@@ -20,7 +20,6 @@ The CMS module needs comments on `Content` records. Each content can have many c
 
 - Threading / replies (`parent_id`)
 - Guest comments (name/email without user)
-- Full `HasTranslations` on comment body (see **Translations & ratings**)
 - Media attachments on comments
 - Comment likes/dislikes (distinct from content star rating)
 - Indexing comments in Elasticsearch
@@ -32,14 +31,16 @@ The CMS module needs comments on `Content` records. Each content can have many c
 | Topic | Default |
 |-------|---------|
 | Author | Authenticated `User` only |
-| Fields | `content_id`, `user_id`, `body`, `locale` (see translations) |
-| Table name | `CMSTables::Comments` (`cms_comments`) — **mandatory** in migrations, raw SQL, and `QueryBuilder` when not using the model |
-| Approval on create | Always (any non-empty `body`) |
-| Approval on update | When `body` changes |
+| Fields (parent) | `content_id`, `user_id` |
+| Translatable | `body` via `HasTranslations` + `CommentTranslation` |
+| Table names | `CMSTables::Comments`, `CMSTables::CommentsTranslations` — **mandatory** in migrations/raw SQL |
+| Approval on create | Always when `body` pending/saved for current locale |
+| Approval on update | When `body` changes in any pending/saved translation |
 | `deleteWhenDisapproved` | `true` (from `HasApprovals`) |
 | Votes required (default mode) | See **§6 Approval modes** — Option A (default) |
-| Locale on create | Single locale from `LocaleContext` (no `HasTranslations` in v1) |
-| Locale on read | Current locale if a version exists; else oldest row (= original) — see **§9 Locale** |
+| Locale on create | **Only** current `LocaleContext` (standard trait write path) |
+| Locale on read | Override trait: current locale translation, else **original** (oldest `created_at`) — see **§9** |
+| AI auto-translate | **v2** — disable `TranslatedModelSaved` hooks on `Comment` in v1 |
 | AI actor | Configured system `User` (`ai.features.comment_moderation.system_user_id`) |
 
 ## Architecture overview
@@ -86,16 +87,24 @@ sequenceDiagram
 | `id` | bigint PK | |
 | `content_id` | FK → `cms_contents` | cascade on delete |
 | `user_id` | FK → `core_users` | cascade on delete |
-| `body` | text | moderated field |
-| `locale` | string(10) | set at create from `LocaleContext` |
-| `original_comment_id` | FK self, nullable | **v2** — links translated variants; `null` = original |
 | `created_at` / `updated_at` | timestamps | set when approved and persisted |
+
+**Translation table:** `cms_comments_translations` (`CMSTables::CommentsTranslations`)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | bigint PK | |
+| `comment_id` | FK → `cms_comments` | cascade |
+| `locale` | string(10) | |
+| `body` | text | translatable + moderated |
+| `created_at` / `updated_at` | timestamps | **used to pick original** (oldest = original) |
 
 **Model:** `Modules\CMS\Models\Comment`
 
 - Extends `Modules\Core\Overrides\Model`
-- Uses `HasApprovals` (same as `Content`)
-- `requiresApprovalWhen`: always `true` when `body` is in dirty attributes (or on create)
+- Uses `HasApprovals` + **`HasCommentTranslations`** (CMS trait wrapping `HasTranslations`)
+- `CommentTranslation` in `Modules\CMS\Models\Translations\CommentTranslation` — `$fillable: ['comment_id', 'locale', 'body']`
+- `requiresApprovalWhen`: `true` if `body` in dirty **or** `pending_translations` contains `body` for current locale (see §9 approval bridge)
 - `modifier()`: `auth()->user()`
 - Relations: `content(): BelongsTo`, `user(): BelongsTo`
 - **Visibility:** no extra global scope required. `HasApprovals` blocks `save` until approved; only approved comments exist in `cms_comments`. Pending submissions live only as active `Modification` rows (same pattern as other moderated entities).
@@ -350,30 +359,67 @@ When AI auto-resolves, the job passes the classifier `reason` as the vote reason
 
 Prompt must instruct the model to consider **both** the article context and whether the comment adds value or violates policy.
 
-### 9. Locale (v1 write / read, v2 auto-translate)
+### 9. `HasTranslations` with comment-specific overrides
 
-**No `HasTranslations` on `Comment`.**
+**Trait:** `Modules\CMS\Helpers\HasCommentTranslations`
 
-#### v1 — create
+Uses `HasTranslations` but **overrides** read/fallback behaviour (does not change Core trait globally).
 
-- On insert, set `locale` from `LocaleContext::getCurrent()` (or app locale).
-- One moderated `body` in that language only.
-- `original_comment_id` stays `null` (column reserved for v2).
+#### v1 — create (standard trait write)
 
-#### v1 — read (resolution rule)
+- Assign `body` via normal attribute: `$comment->body = '...'` → `pending_translations[current_locale]`.
+- On approved save → `savePendingTranslations()` persists **one** row in `cms_comments_translations` for `LocaleContext::get()`.
+- Do **not** create other locales in v1.
+- **Disable** `TranslatedModelSaved` hooks in `Comment::bootHasTranslations()` until v2 (`auto_translate_enabled`).
 
-When presenting a logical comment (v1: the row itself; v2: group by `original_comment_id`):
+#### v1 — read (override default-locale fallback)
 
-1. If a version exists with `locale ===` current locale → return that `body`.
-2. Else return the **first created** row in the group (`MIN(id)` where `original_comment_id` is the group root, or the row itself when no variants).
+Stock `HasTranslations` / `LocaleScope` fallback = `config('app.locale')`.  
+**Comments** use **chronological original** instead:
 
-Implement as `Comment::resolveBodyForLocale(string $locale): string` or a repository scope used by CRUD/detail transformers.
+| Priority | Source |
+|----------|--------|
+| 1 | `pending_translations[current_locale].body` |
+| 2 | Saved translation where `locale = LocaleContext::get()` |
+| 3 | **Original translation** — `translations()->orderBy('created_at')->orderBy('id')->first()` |
 
-#### v2 — multiple locale rows + AI translate
+**Methods to override** (alias parent, then custom logic):
 
-- User or system can add sibling rows: same `content_id`, `user_id`, shared `original_comment_id` → first approved comment id.
-- Config flag: `ai.features.comment_moderation.auto_translate_enabled` (default `false`).
-- When enabled, after approval of original, AI module may create translated variants (separate modifications) — **out of v1 implementation plan**.
+- `getTranslatableFieldValue(string $key)`
+- `getTranslation(?string $locale = null, ?bool $with_fallback = null)` — when `$with_fallback` true or null, fall back to original not default app locale
+- `translation(): HasOne` — eager load: prefer current locale, else oldest `created_at`
+
+**Listing scope:** replace `LocaleScope` with `CommentTranslationScope`:
+
+- Include comment if it has **at least one** translation (any locale).
+- Eager-load resolved `translation` via overridden `translation()` relation.
+
+#### HasApprovals + translations bridge
+
+`RequiresApproval::captureSave()` uses `getDirty()`; translatable `body` lives in `pending_translations`.
+
+**`Comment` must:**
+
+1. `requiresApprovalWhen($modifications)`: return true if `$modifications` contains `body` **or** `hasPendingBodyForCurrentLocale()`.
+2. Before approval capture (or custom `captureTranslatableSave()`): build modification diff including:
+
+```php
+'body' => [
+  'original' => $existing?->body,
+  'modified' => $pending_or_new_body,
+],
+'locale' => ['original' => null, 'modified' => LocaleContext::get()],
+'content_id' => [...],
+```
+
+Reuse package `captureSave` by temporarily syncing pending body into attributes or delegate to a `CommentApprovalCapture` helper used from overridden `bootRequiresApproval` saving hook.
+
+AI `CommentModerationContextBuilder` reads `body` / `locale` from this modification JSON (unchanged).
+
+#### v2 — AI auto-translate
+
+- Re-enable `TranslatedModelSaved` on `Comment` when `ai.features.comment_moderation.auto_translate_enabled`.
+- AI listener creates additional `cms_comments_translations` rows (each with own moderation if required — product decision: inherit approved parent vs re-moderate; default **inherit** without re-moderation in v2 spec draft).
 
 ### 10. Ratings (post-v1 scope)
 
