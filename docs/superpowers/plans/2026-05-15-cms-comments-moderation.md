@@ -244,13 +244,29 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/database/seeders/AIDatabaseSeeder.php` (or Core seeder)
 
-- [ ] **Step 1: Config block**
+- [ ] **Step 1: `CommentApprovalMode` enum + config block** (document `AI_COMMENT_APPROVAL_MODE=threshold|dual`)
+
+```php
+enum CommentApprovalMode: string
+{
+    case Threshold = 'threshold'; // Mode A
+    case Dual = 'dual';           // Mode B
+
+    public static function fromConfig(): self
+    {
+        $raw = (string) config('ai.features.comment_moderation.approval_mode', 'threshold');
+        return self::tryFrom($raw) ?? self::Threshold;
+    }
+}
+```
+
+- [ ] **Step 2: Config array**
 
 ```php
 'comment_moderation' => [
     'enabled' => env('AI_COMMENT_MODERATION_ENABLED', true),
+    'approval_mode' => env('AI_COMMENT_APPROVAL_MODE', 'threshold'), // threshold = A, dual = B
     'ai_participates_in_approvals' => env('AI_COMMENT_AI_VOTES', true),
-    'dual_approval_mode' => env('AI_COMMENT_DUAL_APPROVAL', false), // Option B
     'approve_confidence_threshold' => (float) env('AI_COMMENT_MOD_APPROVE_THRESHOLD', 0.85),
     'reject_confidence_threshold' => (float) env('AI_COMMENT_MOD_REJECT_THRESHOLD', 0.85),
     'system_user_id' => env('AI_MODERATOR_USER_ID'),
@@ -310,6 +326,7 @@ final readonly class CommentModerationContextBuilder
 **Files:**
 
 - Create: `Modules/AI/app/Ai/Prompts/CommentModerationPrompt.php`
+- Create: `Modules/AI/app/Enums/CommentApprovalMode.php` (`Threshold`, `Dual` + `fromConfig()`)
 - Create: `Modules/AI/app/Data/CommentModerationResult.php` (verdict enum, confidence, categories, reason, safeToAutoApprove)
 - Create: `Modules/AI/app/Services/CommentModerationService.php`
 - Create: `Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php`
@@ -406,9 +423,9 @@ public function handle(
         $result = $service->analyze($context);
         $system_user = User::query()->findOrFail((int) config('ai.features.comment_moderation.system_user_id'));
 
-        $dual_mode = config('ai.features.comment_moderation.dual_approval_mode', false);
+        $approval_mode = CommentApprovalMode::fromConfig(); // threshold | dual
 
-        if ($dual_mode) {
+        if ($approval_mode === CommentApprovalMode::Dual) {
             $modification->approvers_required = 2;
             $modification->disapprovers_required = 2;
             $modification->save();
