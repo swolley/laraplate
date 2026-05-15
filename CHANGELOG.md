@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update submodule references and Swagger documentation for AI, CMS, Core, ERP, and MES modules
+
+## [2.0.1] - 2026-05-15
+
+### ⚙️ Miscellaneous Tasks
+
 - Update submodule references and clean up package-lock.json
 - Add MES requirements revision document
 - Update ERP submodule and development plan for M3.5-M5

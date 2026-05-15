@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laraplate Testing Environment",
+        "title": "Laraplate",
         "description": "",
-        "version": "v2.0.0"
+        "version": "v2.0.1"
     },
     "host": "localhost:8000",
     "basePath": "\/",

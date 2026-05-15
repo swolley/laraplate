@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Laraplate MES module",
+        "description": "MES module \u2014 Manufacturing Execution System for production orders, work centres, scheduling and traceability. (mes, manufacturing, production, laraplate)",
+        "version": "v2.0.1"
+    },
+    "host": "localhost:8000",
+    "basePath": "\/",
+    "paths": [],
+    "tags": [
+        "MES"
+    ]
+}
