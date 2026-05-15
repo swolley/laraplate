@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### ⚙️ Miscellaneous Tasks
+
+- Update submodule references and clean up package-lock.json
+- Add MES requirements revision document
+- Update ERP submodule and development plan for M3.5-M5
+- Add cache duration registry to configuration
+- Update dependencies and refine documentation
+- *(plans)* Add initial ecommerce module development plan
+- *(plans)* Mark ecommerce module development plan as completed
+- Update dependencies and add bugfix for HasValidations trait
+- Complete performance optimization tasks in documentation
+- *(plans)* Update ecommerce module embryo plan with architectural decisions and todos
+- Update dependencies and enhance rich editor functionality
+- Update environment and configuration files for MES module integration
+
+## [2.0.0] - 2026-05-05
+
 ### 🚀 Features
 
 - Add master rule file and enhance existing rules with descriptions

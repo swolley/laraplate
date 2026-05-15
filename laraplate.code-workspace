@@ -5,6 +5,14 @@
 		}
 	],
 	"settings": {
+		"intelephense.files.associations": [
+			"*.php",
+			"*.phtml",
+			"_ide_helper.php",
+			"_ide_helper_models.php",
+			"_ide_helper_traits.php",
+			".phpstorm.meta.php"
+		],
 		"intelephense.format.spaceAfterControlStructureKeyword": true,
     	"intelephense.format.spaceAfterFunctionKeyword": true,
 		"intelephense.format.spaceAfterArrowFunctionKeyword": true,

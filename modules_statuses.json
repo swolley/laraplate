@@ -2,5 +2,6 @@
     "Core": true,
     "CMS": true,
     "ERP": true,
-    "AI": true
+    "AI": true,
+    "MES": true
 }

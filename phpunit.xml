@@ -12,6 +12,7 @@
             <directory suffix="Test.php">Modules/CMS/tests/Unit</directory>
             <directory suffix="Test.php">Modules/AI/tests/Unit</directory>
             <directory suffix="Test.php">Modules/ERP/tests/Unit</directory>
+            <directory suffix="Test.php">Modules/MES/tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
@@ -19,6 +20,7 @@
             <directory suffix="Test.php">Modules/CMS/tests/Feature</directory>
             <directory suffix="Test.php">Modules/AI/tests/Feature</directory>
             <directory suffix="Test.php">Modules/ERP/tests/Feature</directory>
+            <directory suffix="Test.php">Modules/MES/tests/Feature</directory>
         </testsuite>
     </testsuites>
     <!--

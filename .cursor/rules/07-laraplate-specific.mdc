@@ -15,6 +15,7 @@ alwaysApply: false
   - Keep dependency explicit in `module.json`.
   - Respect load priority.
   - Do not duplicate shared Core logic.
+  - Table names prefixed by lowercase module name
 
 - Stack baseline:
   - Laravel 12, PHP 8.5+, Filament, Sanctum, Pest.
@@ -22,3 +23,11 @@ alwaysApply: false
   - Eloquent-first, API-ready, test-first mindset.
 
 - Global ecosystem details in `laravel-boost.mdc`.
+
+- Eloquent model traits (IDE / PHPStan):
+  - Use `@phpstan-require-extends \Illuminate\Database\Eloquent\Model` on traits meant for Eloquent models.
+  - Do not use `@mixin Model` on traits (duplicate API across traits, IDE conflicts).
+  - Use `@mixin \Eloquent` and `@mixin IdeHelper{Model}` on concrete models (`ide-helper:models -MN` + `EloquentMixinModelHook`).
+  - Intelephense does not chain mixins: `IdeHelper*` alone hides inherited Eloquent instance methods (`hasManyThrough`, etc.).
+  - Add `@property` on the trait only for host-specific fields the trait reads (not the full Model API).
+  - Factory/command traits that are not used on models must not declare `require-extends Model`.

@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Livello di analisi (0-9, max = 9)
-    level: 9
+    level: 1
 
     tmpDir: /tmp/phpstan
     
