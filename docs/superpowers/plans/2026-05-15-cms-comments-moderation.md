@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add moderated `Comment` entities on CMS `Content`, exposed via standard CRUD, with optional AI classification using full content+comment context; uncertain cases get a **preliminary AI disapproval** on that specific `Modification` (`disapprovers_required = 2`) so humans see an existing negative vote and must confirm or override.
+**Goal:** Add moderated `Comment` entities on CMS `Content` (single locale on write; locale-aware read with fallback to original), exposed via standard CRUD, with optional AI classification. **Option A (default):** confident approve/reject closes immediately (`1/1`); uncertain sets `approvers_required=1`, `disapprovers_required=2` + preliminary AI `disapprove()` so humans can override. **Option B (config):** always 2 votes (AI first, human second).
 
 **Architecture:** CMS owns `Comment`, `CommentModerationLog`, and `CommentRequiresModeration` event. AI listens only when configured. `CommentModerationService` builds context from the parent `Content`, runs a structured JSON classifier prompt, then either final approve/reject or preliminary disapprove + audit log. No custom comment API routes — `CrudController` + `HasApprovals` handle visibility.
 
@@ -39,7 +39,11 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
         ->constrained(CoreTables::Users->value, 'id', "{$table_name}_user_id_FK")
         ->cascadeOnDelete();
     $table->text('body');
-    $table->string('locale', 10)->default(config('app.locale'));
+    $table->string('locale', 10);
+    $table->foreignId('original_comment_id')
+        ->nullable()
+        ->constrained($table_name, 'id', "{$table_name}_original_comment_id_FK")
+        ->nullOnDelete();
     MigrateUtils::timestamps($table, hasCreateUpdate: true);
     $table->index(['content_id', 'created_at'], "{$table_name}_content_created_IDX");
 });
@@ -122,9 +126,11 @@ Key points:
 - `protected $table = CMSTables::Comments->value;`
 - `fillable: content_id, user_id, body, locale`
 - `requiresApprovalWhen`: return true when `body` in dirty or on create
+- On `creating`: set `locale` from `LocaleContext::getCurrent()` if not set
 - `getRules()` with body required|string|max:5000
 - `content()`, `user()` relations
 - `moderationLog(): HasOne` → `CommentModerationLog`
+- `resolveForLocale(string $locale): self` — static/group helper: prefer matching locale, else `original_comment_id` root with `MIN(id)`
 
 - [ ] **Step 3: Add `comments()` on `Content`**
 
@@ -208,10 +214,13 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 ```php
 'comment_moderation' => [
     'enabled' => env('AI_COMMENT_MODERATION_ENABLED', true),
+    'ai_participates_in_approvals' => env('AI_COMMENT_AI_VOTES', true),
+    'dual_approval_mode' => env('AI_COMMENT_DUAL_APPROVAL', false), // Option B
     'approve_confidence_threshold' => (float) env('AI_COMMENT_MOD_APPROVE_THRESHOLD', 0.85),
     'reject_confidence_threshold' => (float) env('AI_COMMENT_MOD_REJECT_THRESHOLD', 0.85),
     'system_user_id' => env('AI_MODERATOR_USER_ID'),
     'queue' => env('AI_COMMENT_MOD_QUEUE', 'default'),
+    // v2: 'auto_translate_enabled' => env('AI_COMMENT_AUTO_TRANSLATE', false),
 ],
 ```
 
@@ -362,19 +371,39 @@ public function handle(
         $result = $service->analyze($context);
         $system_user = User::query()->findOrFail((int) config('ai.features.comment_moderation.system_user_id'));
 
+        $dual_mode = config('ai.features.comment_moderation.dual_approval_mode', false);
+
+        if ($dual_mode) {
+            $modification->approvers_required = 2;
+            $modification->disapprovers_required = 2;
+            $modification->save();
+            // AI first vote only — human always second (see spec §6 Option B)
+            $this->castAiFirstVote($system_user, $modification, $result);
+            $log->update(['status' => 'requires_human_review', 'requires_human_approval' => true, ...]);
+            return;
+        }
+
+        // Option A (default)
         if ($result->safeToAutoApprove && $result->confidence >= config('ai.features.comment_moderation.approve_confidence_threshold')) {
+            $modification->approvers_required = 1;
+            $modification->disapprovers_required = 1;
+            $modification->save();
             $system_user->approve($modification, $result->reason);
             $log->update(['status' => 'auto_approved', ...]);
             return;
         }
 
         if ($result->verdict === ModerationVerdict::Reject && $result->confidence >= config('ai.features.comment_moderation.reject_confidence_threshold')) {
+            $modification->approvers_required = 1;
+            $modification->disapprovers_required = 1;
+            $modification->save();
             $system_user->disapprove($modification, $result->reason);
             $log->update(['status' => 'auto_rejected', ...]);
             return;
         }
 
-        // Uncertain — preliminary disapprove, human must approve or confirm reject
+        // Uncertain — approvers=1, disapprovers=2, preliminary disapprove
+        $modification->approvers_required = 1;
         $modification->disapprovers_required = 2;
         $modification->save();
         $system_user->disapprove($modification, 'AI preliminary reject (confidence ' . $result->confidence . '): ' . $result->reason);
@@ -508,7 +537,9 @@ if ($operation === 'approve') {
 | `CMSTables` enum everywhere | 1–2 |
 | `HasApprovals` / CRUD only | 3, 5, 14 |
 | Event decoupling CMS→AI | 6, 11 |
-| Preliminary disapprove uncertain | 10 |
+| Option A/B approval modes | 10 |
+| Locale read fallback | 3 |
+| v2 auto-translate flag | spec only |
 | Audit log per modification | 2, 4, 10 |
 | Contextual prompt + categories | 8, 9 |
 | Filament visibility | 12 |

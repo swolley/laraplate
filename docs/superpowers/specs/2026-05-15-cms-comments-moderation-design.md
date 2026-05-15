@@ -1,6 +1,6 @@
 # CMS content comments with AI-assisted moderation (design)
 
-**Status:** Approved direction (v3 — preliminary AI disapproval + contextual prompt)  
+**Status:** Approved direction (v4 — locale read rule + approval modes)  
 **Date:** 2026-05-15
 
 ## Problem
@@ -37,8 +37,9 @@ The CMS module needs comments on `Content` records. Each content can have many c
 | Approval on create | Always (any non-empty `body`) |
 | Approval on update | When `body` changes |
 | `deleteWhenDisapproved` | `true` (from `HasApprovals`) |
-| Votes required | `approversRequired = 1`, `disapproversRequired = 1` |
-| AI when uncertain (not sure safe to approve) | **Preliminary `disapprove()`** with `disapprovers_required = 2`; human must **`approve()`** to publish or second `disapprove()` to reject |
+| Votes required (default mode) | See **§6 Approval modes** — Option A (default) |
+| Locale on create | Single locale from `LocaleContext` (no `HasTranslations` in v1) |
+| Locale on read | Current locale if a version exists; else oldest row (= original) — see **§9 Locale** |
 | AI actor | Configured system `User` (`ai.features.comment_moderation.system_user_id`) |
 
 ## Architecture overview
@@ -86,6 +87,8 @@ sequenceDiagram
 | `content_id` | FK → `cms_contents` | cascade on delete |
 | `user_id` | FK → `core_users` | cascade on delete |
 | `body` | text | moderated field |
+| `locale` | string(10) | set at create from `LocaleContext` |
+| `original_comment_id` | FK self, nullable | **v2** — links translated variants; `null` = original |
 | `created_at` / `updated_at` | timestamps | set when approved and persisted |
 
 **Model:** `Modules\CMS\Models\Comment`
@@ -199,37 +202,64 @@ Comments use the existing **`CrudController`** stack (`Modules/Core/routes/crud.
 - Must use `ApprovesChanges` trait (already on `User`)
 - Not shown in normal user pickers
 
-### 6. Moderation rules summary
+### 6. Approval modes (Option A default, Option B config)
 
-| AI result | Confidence | Action |
-|-----------|------------|--------|
-| approve | ≥ approve threshold | System user `approve()` → comment persisted |
-| reject | ≥ reject threshold | System user `disapprove()` → modification/comment discarded |
-| uncertain (not confident enough to **approve**) | any | Set `disapprovers_required = 2`; AI `disapprove($mod, $reason)` → **non-final** (1 of 2); human **`approve()`** publishes or **`disapprove()`** confirms rejection |
-| uncertain (not confident enough to **reject**) | any | Treat like uncertain-approve path above (preliminary disapprove — fail-safe default) |
-| AI disabled / module off | — | No listener; human only (`disapprovers_required = 1`) |
-| AI error | — | Same as uncertain (preliminary disapprove + human) |
+Two policies; choose via config `ai.features.comment_moderation.dual_approval_mode` (default `false`).
 
-**Per-record “human required” (native approval package):**
+#### Option A — threshold-based (default, recommended)
 
-When AI is uncertain about granting approval, the job **before voting** updates that specific `Modification`:
+Per **that** `Modification`, set counters **before** the AI vote:
+
+| AI outcome | `approvers_required` | `disapprovers_required` | AI action | Result |
+|------------|---------------------|-------------------------|-----------|--------|
+| **Approve** (confident) | `1` | `1` | `approve($mod, $reason)` | **APPROVED** — comment persisted immediately |
+| **Reject** (confident) | `1` | `1` | `disapprove($mod, $reason)` | **DISAPPROVED** — discarded immediately |
+| **Uncertain** | `1` | `2` | `disapprove($mod, $reason)` — **1 of 2** | Pending — AI lean-reject, **not** final |
+
+**Uncertain row explained (your idea):**
 
 ```php
+$modification->approvers_required = 1;
 $modification->disapprovers_required = 2;
 $modification->save();
 $systemUser->disapprove($modification, $reason);
 ```
 
-Because `disapproversRemaining === 1`, `applyModificationChanges(..., false)` is **not** called — the comment is **not** deleted. The modification shows **one disapproval** from the AI system user with a reason such as: `AI preliminary reject (confidence 0.62): possible spam — human review required.`
+- `disapprovers_remaining = 1` → comment **not** deleted yet.
+- Human **`approve()`** → removes AI disapproval, adds 1 approval → `approvers_remaining = 0` → **APPROVED** (ribalta la situazione).
+- Human **`disapprove()`** → second disapproval → `disapprovers_remaining = 0` → **DISAPPROVED**.
 
-The human moderator:
+So: uncertain = “serve umano”, con **voto negativo preliminare AI** visibile su quel record.
 
-- **`approve()`** — removes the AI disapproval, adds approval; when thresholds met, comment is persisted (overrides AI lean-reject).
-- **`disapprove()`** — second disapproval; final rejection (`deleteWhenDisapproved` on `Comment`).
+#### Option B — dual approval (config flag)
 
-Filament/CRUD reads `disapprovals` + `CommentModerationLog` for that `modification_id` to display status `requires_human_review`.
+When `dual_approval_mode === true` **and** AI module enabled **and** `ai_participates_in_approvals === true`:
 
-**Note:** High-confidence auto-reject keeps `disapprovers_required = 1` (single disapprove, immediate discard).
+- **Every** comment modification starts with `approvers_required = 2` and `disapprovers_required = 2` (set on `Modification` at create or before AI job).
+- AI always casts the **first** vote (approve or disapprove as appropriate).
+- Human **always** casts the **second** vote — nothing publishes or deletes without human confirmation, even when AI is confident.
+
+| AI outcome | AI first vote | Human second vote | Final |
+|------------|---------------|-------------------|-------|
+| Approve | `approve` (1/2) | `approve` (2/2) | APPROVED |
+| Reject | `disapprove` (1/2) | `disapprove` (2/2) | DISAPPROVED |
+| Uncertain | `disapprove` (1/2) lean-reject | `approve` OR `disapprove` | Override or confirm |
+
+**Trade-off:** Option B = maximum safety/compliance; Option A = better UX (auto-resolve when confident).
+
+**Config keys:**
+
+```php
+'comment_moderation' => [
+  'dual_approval_mode' => env('AI_COMMENT_DUAL_APPROVAL', false),
+  'ai_participates_in_approvals' => env('AI_COMMENT_AI_VOTES', true),
+  // ...
+],
+```
+
+#### AI disabled
+
+No AI listener → `approvers_required = 1`, `disapprovers_required = 1`; human moderator only.
 
 ### 7. AI moderation audit trail (uncertain / queue visibility)
 
@@ -320,21 +350,34 @@ When AI auto-resolves, the job passes the classifier `reason` as the vote reason
 
 Prompt must instruct the model to consider **both** the article context and whether the comment adds value or violates policy.
 
-### 9. Translations & ratings (design decisions — post-v1 scope)
+### 9. Locale (v1 write / read, v2 auto-translate)
 
-Documented here for alignment; **not implemented in comment-moderation v1** unless explicitly pulled in.
+**No `HasTranslations` on `Comment`.**
 
-#### Comments — translatable?
+#### v1 — create
 
-**Recommendation: no `HasTranslations` on comments.**
+- On insert, set `locale` from `LocaleContext::getCurrent()` (or app locale).
+- One moderated `body` in that language only.
+- `original_comment_id` stays `null` (column reserved for v2).
 
-- UGC is written once in the language the user used; store `locale` (from `LocaleContext` at insert) alongside `body`.
-- Listing can filter/display by locale if needed later without a translation table.
-- Avoids empty translation rows and moderation per locale.
+#### v1 — read (resolution rule)
 
-If product later requires translated comments, prefer **optional machine translation as a separate async feature**, not blocking moderation v1.
+When presenting a logical comment (v1: the row itself; v2: group by `original_comment_id`):
 
-#### Content rating — separate from comment text
+1. If a version exists with `locale ===` current locale → return that `body`.
+2. Else return the **first created** row in the group (`MIN(id)` where `original_comment_id` is the group root, or the row itself when no variants).
+
+Implement as `Comment::resolveBodyForLocale(string $locale): string` or a repository scope used by CRUD/detail transformers.
+
+#### v2 — multiple locale rows + AI translate
+
+- User or system can add sibling rows: same `content_id`, `user_id`, shared `original_comment_id` → first approved comment id.
+- Config flag: `ai.features.comment_moderation.auto_translate_enabled` (default `false`).
+- When enabled, after approval of original, AI module may create translated variants (separate modifications) — **out of v1 implementation plan**.
+
+### 10. Ratings (post-v1 scope)
+
+#### Content rating — separate from comment text (unchanged)
 
 **Recommendation: separate entity, not a column on `Comment`.**
 
