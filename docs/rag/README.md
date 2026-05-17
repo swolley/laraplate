@@ -1,11 +1,21 @@
 # Laraplate RAG corpus (application level)
 
-This folder holds **global** documentation you want available to the documentation assistant / RAG.
+This folder holds **global** documentation you want available to the documentation assistant / RAG (`php artisan ai:laraplate-help`, FAQ chat when RAG is enabled).
+
+## Not the same as Elasticsearch / Scout indexing
+
+| Concern | Corpus location | Command / trigger |
+|---------|-----------------|-------------------|
+| **FAQ / assistant RAG** | `docs/rag/`, `Modules/*/docs/rag/` | `php artisan ai:index-docs` |
+| **Search index (models)** | Scout engine + embeddings tables | `ModelRequiresIndexing`, `queueMakeSearchable()` |
+
+Event orchestration (moderation + search pre-processing) is documented for humans in `Modules/Core/docs/EVENT_ORCHESTRATION.md` and mirrored for the assistant under `Modules/Core/docs/rag/EVENT_ORCHESTRATION.md` (plus `Modules/AI/docs/rag/`, `Modules/CMS/docs/rag/` where relevant).
 
 ## Convention
 
 - Application: `docs/rag/`
 - Modules: `Modules/{ModuleName}/docs/rag/`
+- General module docs (`Modules/*/docs/*.md` **without** `rag/`) are **not** indexed by default — copy or summarize into `docs/rag/` when the assistant should answer from them.
 
 Indexing without `--path` uses `rag_paths()`; see `docs/README.md` for rules (native vs custom modules, env paths).
 
