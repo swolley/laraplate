@@ -24,6 +24,7 @@ pest()->extend(Modules\AI\Tests\TestCase::class)
     ->in(__DIR__ . '/../Modules/AI/tests/Feature');
 
 pest()->extend(Modules\AI\Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
     ->in(__DIR__ . '/../Modules/AI/tests/Unit');
 
 /*
