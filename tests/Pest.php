@@ -13,19 +13,11 @@ require_once __DIR__ . '/../Modules/Core/tests/Pest.php';
 
 require_once __DIR__ . '/../Modules/CMS/tests/Pest.php';
 
-require_once __DIR__ . '/../Modules/AI/tests/bootstrap-test-fakes.php';
+require_once __DIR__ . '/../Modules/AI/tests/Pest.php';
 
 require_once __DIR__ . '/../Modules/ERP/tests/Pest.php';
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-pest()->extend(Modules\AI\Tests\TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in(__DIR__ . '/../Modules/AI/tests/Feature');
-
-pest()->extend(Modules\AI\Tests\TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in(__DIR__ . '/../Modules/AI/tests/Unit');
+require_once __DIR__ . '/../Modules/MES/tests/Pest.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +26,7 @@ pest()->extend(Modules\AI\Tests\TestCase::class)
 */
 
 pest()->extend(Tests\TestCase::class)
-    ->in('Feature', 'Unit');
+    ->in(__DIR__ . '/Feature', __DIR__ . '/Unit', __DIR__ . '/Integration');
 
 /*
 |--------------------------------------------------------------------------
