@@ -17,3 +17,4 @@
 [submodule "Modules/MES"]
 	path = Modules/MES
 	url = https://github.com/swolley/laraplate-mes.git
+	pushurl = git@github.com:swolley/laraplate-mes.git

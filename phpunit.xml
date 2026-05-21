@@ -8,11 +8,20 @@
         <testsuite name="Unit">
             <directory suffix="Test.php">tests/Unit</directory>
             <directory suffix="Test.php">Modules/Core/tests/Unit</directory>
-            <directory suffix="Test.php">Modules/Core/tests/UnitShell</directory>
             <directory suffix="Test.php">Modules/CMS/tests/Unit</directory>
             <directory suffix="Test.php">Modules/AI/tests/Unit</directory>
             <directory suffix="Test.php">Modules/ERP/tests/Unit</directory>
             <directory suffix="Test.php">Modules/MES/tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+            <directory suffix="Test.php">Modules/Core/tests/Integration</directory>
+            <directory suffix="Test.php">Modules/Core/tests/UnitShell</directory>
+            <directory suffix="Test.php">Modules/CMS/tests/Integration</directory>
+            <directory suffix="Test.php">Modules/CMS/tests/UnitShell</directory>
+            <directory suffix="Test.php">Modules/AI/tests/Integration</directory>
+            <directory suffix="Test.php">Modules/ERP/tests/Integration</directory>
+            <directory suffix="Test.php">Modules/MES/tests/Integration</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
