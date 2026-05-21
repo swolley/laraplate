@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -61,6 +62,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // $middleware->api([
         //     'throttle:api',
         // ]);
+
+        // The "auth" middleware group shadows the "auth" alias (see MiddlewareNameResolver).
+        // Prepend Authenticate so Route::middleware('auth') actually requires a logged-in user.
+        $middleware->prependToGroup('auth', [
+            Authenticate::class,
+        ]);
 
         $middleware->appendToGroup('auth', [
             EncryptCookies::class,
