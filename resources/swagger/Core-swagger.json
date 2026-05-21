@@ -3,7 +3,7 @@
     "info": {
         "title": "Laraplate Testing Environment Core module",
         "description": "Core Module for Base Functionality (core, base, foundation, essential, framework, infrastructure, utilities, helpers, services, providers)",
-        "version": "v1.53.0"
+        "version": "v1.53.1"
     },
     "host": "localhost:8000",
     "basePath": "\/",

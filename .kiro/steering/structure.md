@@ -9,7 +9,7 @@ inclusion: always
 laraplate/
 ├── app/                    # Thin shell — minimal host app
 │   ├── Console/Kernel.php
-│   ├── Http/Controllers/   # Only AppController + base Controller
+│   ├── Http/Controllers/   # Base Controller only
 │   ├── Http/Middleware/
 │   ├── Http/Kernel.php     # Middleware registration
 │   ├── Models/, Policies/

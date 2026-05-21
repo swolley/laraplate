@@ -36,9 +36,6 @@
             <directory suffix=".php">Modules/ERP/app</directory>
             <directory suffix=".php">Modules/MES/app</directory>
         </include>
-        <exclude>
-            <file>app/Http/Controllers/AppController.php</file>
-        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
