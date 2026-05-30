@@ -8,9 +8,519 @@
     "host": "localhost:8000",
     "basePath": "\/",
     "paths": {
-        "\/api\/item\/{id}": {
+        "\/": {
             "get": {
                 "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "put": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "put-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "patch": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "patch-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "delete": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "delete-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            },
+            "options": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "options-",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/forgot-password": {
+            "post": {
+                "summary": "Send a reset link to the given user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "email"
+                            ],
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-forgot-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/login": {
+            "post": {
+                "summary": "Attempt to authenticate a new session.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "email",
+                                "password"
+                            ],
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                },
+                                "remember": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-login",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/logout": {
+            "post": {
+                "summary": "Destroy an authenticated session.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-logout",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/passkeys\/confirm": {
+            "post": {
+                "summary": "Confirm the user's password via passkey verification.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "credential",
+                                "credential.id",
+                                "credential.rawId",
+                                "credential.type",
+                                "credential.response"
+                            ],
+                            "properties": {
+                                "credential": {
+                                    "type": "object",
+                                    "items": [],
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "rawId": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "public-key"
+                                            ]
+                                        },
+                                        "response": {
+                                            "type": "array",
+                                            "items": []
+                                        }
+                                    }
+                                },
+                                "remember": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-passkeys-confirm",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/passkeys\/confirm\/options": {
+            "get": {
+                "summary": "Get passkey confirmation options for the authenticated user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-passkeys-confirm-options",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/passkeys\/login": {
+            "post": {
+                "summary": "Verify the passkey and log the user in.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "credential",
+                                "credential.id",
+                                "credential.rawId",
+                                "credential.type",
+                                "credential.response"
+                            ],
+                            "properties": {
+                                "credential": {
+                                    "type": "object",
+                                    "items": [],
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "rawId": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "public-key"
+                                            ]
+                                        },
+                                        "response": {
+                                            "type": "array",
+                                            "items": []
+                                        }
+                                    }
+                                },
+                                "remember": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-passkeys-login",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/passkeys\/login\/options": {
+            "get": {
+                "summary": "Get passkey login options.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-passkeys-login-options",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/reset-password": {
+            "post": {
+                "summary": "Reset the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-reset-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/two-factor-challenge": {
+            "post": {
+                "summary": "Attempt to authenticate a new session using the two factor authentication code.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "recovery_code": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-two-factor-challenge",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirm-password": {
+            "post": {
+                "summary": "Confirm the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-confirm-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirmed-password-status": {
+            "get": {
+                "summary": "Get the password confirmation status.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-confirmed-password-status",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/confirmed-two-factor-authentication": {
+            "post": {
+                "summary": "Enable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-confirmed-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/passkeys": {
+            "post": {
+                "summary": "Store a new passkey for the authenticated user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "credential",
+                                "credential.id",
+                                "credential.rawId",
+                                "credential.type",
+                                "credential.response"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "credential": {
+                                    "type": "object",
+                                    "items": [],
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "rawId": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "public-key"
+                                            ]
+                                        },
+                                        "response": {
+                                            "type": "array",
+                                            "items": []
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "operationId": "post-app-auth-user-passkeys",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/passkeys\/options": {
+            "get": {
+                "summary": "Get passkey registration options for the authenticated user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-passkeys-options",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/passkeys\/{passkey}": {
+            "delete": {
+                "summary": "Delete a passkey for the authenticated user.",
                 "description": "",
                 "deprecated": false,
                 "responses": {
@@ -21,22 +531,181 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "id",
+                        "name": "passkey",
                         "type": "string",
                         "required": true,
                         "description": ""
                     }
                 ],
-                "operationId": "get-api-item-id",
+                "operationId": "delete-app-auth-user-passkeys-passkey",
                 "tags": [
-                    "Api",
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/password": {
+            "put": {
+                "summary": "Update the user's password.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "put-app-auth-user-password",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/profile-information": {
+            "put": {
+                "summary": "Update the user's profile information.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "put-app-auth-user-profile-information",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-authentication": {
+            "post": {
+                "summary": "Enable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            },
+            "delete": {
+                "summary": "Disable two factor authentication for the user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "delete-app-auth-user-two-factor-authentication",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-qr-code": {
+            "get": {
+                "summary": "Get the SVG element for the user's two factor authentication QR code.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-qr-code",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-recovery-codes": {
+            "get": {
+                "summary": "Get the two factor authentication recovery codes for authenticated user.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-recovery-codes",
+                "tags": [
+                    "App"
+                ]
+            },
+            "post": {
+                "summary": "Generate a fresh set of two factor authentication recovery codes.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "post-app-auth-user-two-factor-recovery-codes",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/app\/auth\/user\/two-factor-secret-key": {
+            "get": {
+                "summary": "Get the current user's two factor authentication setup \/ secret key.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-app-auth-user-two-factor-secret-key",
+                "tags": [
+                    "App"
+                ]
+            }
+        },
+        "\/sanctum\/csrf-cookie": {
+            "get": {
+                "summary": "Return an empty response simply to trigger the storage of the CSRF cookie in the browser.",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "operationId": "get-sanctum-csrf-cookie",
+                "tags": [
+                    "Others",
+                    "App"
+                ]
+            }
+        },
+        "\/up": {
+            "get": {
+                "summary": "",
+                "description": "",
+                "deprecated": false,
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text\/html": []
+                        }
+                    }
+                },
+                "operationId": "get-up",
+                "tags": [
+                    "Others",
                     "App"
                 ]
             }
         }
     },
     "tags": [
-        "App",
-        "Api"
+        "App"
     ]
 }

@@ -3,40 +3,12 @@
     "info": {
         "title": "Laraplate Testing Environment ERP module",
         "description": "ERP module \u2014 accounting and operations domain for Laraplate. (erp, laraplate)",
-        "version": "v1.8.1"
+        "version": "v1.10.0"
     },
     "host": "localhost:8000",
     "basePath": "\/",
-    "paths": {
-        "\/api\/item\/{id}": {
-            "get": {
-                "summary": "",
-                "description": "",
-                "deprecated": false,
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "type": "string",
-                        "required": true,
-                        "description": ""
-                    }
-                ],
-                "operationId": "get-api-item-id",
-                "tags": [
-                    "Api",
-                    "\\ERP"
-                ]
-            }
-        }
-    },
+    "paths": [],
     "tags": [
-        "ERP",
-        "Api"
+        "ERP"
     ]
 }
