@@ -136,11 +136,14 @@ Test scenarios:
 
 - Implemented: `erp_bank_accounts`, `erp_bank_statements`, `erp_bank_statement_lines`, bank
   account FK on payments, Eloquent models, CSV importer, manual match/unmatch/ignore
-  reconciliation service, bank account/statement Filament resources, CSV upload action, and a
-  minimal `BankReconciliationPage`.
+  reconciliation service, ranked payment suggestions, bank account/statement Filament resources,
+  CSV upload action, and a minimal `BankReconciliationPage`.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementImportServiceTest.php Modules/ERP/tests/Feature/Services/BankReconciliationServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note
   - `php artisan migrate --pretend --no-interaction` -> `Nothing to migrate`
   - `vendor/bin/pint --dirty`
-- Follow-up: enrich the reconciliation page with ranked suggestions instead of only manual selects.
+- Additional verification on 2026-05-30:
+  - `php artisan test --compact Modules/ERP/tests/Feature/Services/BankReconciliationServiceTest.php`
+  - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php --filter "bank reconciliation"`
+  - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`

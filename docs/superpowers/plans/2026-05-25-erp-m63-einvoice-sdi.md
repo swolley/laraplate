@@ -27,8 +27,9 @@ posted sale invoices.
 - Persistence status enum: `Modules\ERP\Casts\EInvoiceSubmissionStatus` with `Draft`, `Queued`,
   `Submitted`, `Accepted`, `Rejected`, `Error`.
 - `EInvoiceProvider::remoteStatus()` accepts `string $externalId`, not an `EInvoiceSubmission`.
-- Current invoices do not have a direct `party_id`, so a complete FatturaPA customer mapping is
-  not available in this milestone.
+- Current invoices have a nullable `party_id`, but complete FatturaPA mapping still needs
+  anagraphic, transmitter, recipient, PEC/SDI, fiscal-regime, address, and provider-specific fields
+  that are outside this stub milestone.
 
 ## Task 1: Config And Binding
 
@@ -163,13 +164,17 @@ Test scenarios:
   - included in the combined ERP focused command documented in the final verification note
   - `php artisan migrate --pretend --no-interaction` -> `Nothing to migrate`
   - `vendor/bin/pint --dirty`
-- Still pending: browser check for the invoice edit actions.
+- Additional smoke verification on 2026-05-30:
+  - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`
+  - Confirms ERP Filament routes are registered and the invoice edit page renders server-side for
+    a posted sale invoice. Full browser click-through remains optional if a browser runner is added.
 
 ## Optional / Backlog: Full FatturaPA
 
 Full FatturaPA remains a separate optional milestone:
 
-- Add missing anagraphic/company/customer fields only after deciding invoice-party modeling.
+- Add missing anagraphic/company/customer fields after completing the fiscal data model and provider
+  package decision.
 - Build FatturaPA XML and validate against the official XSD fixture.
 - Add `natura_code`, fiscal regime, PEC/SDI, transmitter data, and required address fields.
 - Add Aruba or other intermediary driver with HTTP fakes.

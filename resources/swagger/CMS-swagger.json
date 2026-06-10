@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laraplate Testing Environment CMS module",
+        "title": "Laraplate CMS module",
         "description": "Content Management System Module (cms, content, management, articles, posts, pages, categories, tags, contributors, comments, content_ratings)",
-        "version": "v1.32.0"
+        "version": "v1.32.1"
     },
     "host": "localhost:8000",
     "basePath": "\/",
