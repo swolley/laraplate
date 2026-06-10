@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laraplate Testing Environment Core module",
+        "title": "Laraplate Core module",
         "description": "Core Module for Base Functionality (core, base, foundation, essential, framework, infrastructure, utilities, helpers, services, providers)",
-        "version": "v1.54.1"
+        "version": "v1.54.2"
     },
     "host": "localhost:8000",
     "basePath": "\/",

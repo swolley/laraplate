@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Laraplate Testing Environment AI module",
+        "title": "Laraplate AI module",
         "description": "AI Module for Embeddings, Vector Search and Automatic Translation (ai, artificial-intelligence, embeddings, vector-search, translation, machine-learning)",
         "version": "v2.10.0"
     },

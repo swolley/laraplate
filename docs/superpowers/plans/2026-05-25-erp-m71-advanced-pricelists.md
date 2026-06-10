@@ -175,10 +175,14 @@ Test scenarios:
   `DiscountType`, `PartyPriceRule`, `PriceResolutionResult`, and `PriceResolverService`.
 - Sales order line form integration is implemented through `PriceResolverService`.
 - Quotation line form integration is implemented through the existing `price_list_item_id` source.
-- Invoice form integration remains deferred because the current invoice line schema does not expose
-  a direct item or price-list source.
+- Sale invoice line integration is implemented through the existing `sales_order_line_id` source;
+  selecting a sales order line fills description, remaining quantity, and resolved unit price when
+  the current line has not been customized.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/PriceResolverServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note
   - `php artisan migrate --pretend --no-interaction` -> `Nothing to migrate`
   - `vendor/bin/pint --dirty`
+- Additional verification on 2026-05-30:
+  - `php artisan test --compact Modules/ERP/tests/Feature/Services/InvoiceLinePricingServiceTest.php`
+  - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php --filter "invoice resource form"`
