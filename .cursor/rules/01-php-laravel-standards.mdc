@@ -9,7 +9,7 @@ alwaysApply: false
 - Use PHP 8.5+ features when useful.
 - Always `declare(strict_types=1);` in php files.
 - Always braces in control flow.
-- Use explicit param + return types.
+- Always use explicit types.
 - Use constructor property promotion.
 - Use `#[Override]` when overriding.
 - Use static method/closure when no external state.

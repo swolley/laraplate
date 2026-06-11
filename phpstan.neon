@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Livello di analisi (0-9, max = 9)
-    level: 1
+    level: 7
 
     tmpDir: /tmp/phpstan
     
@@ -60,22 +60,9 @@ parameters:
         - '#Call to an undefined method.*::searchableAs\(\)#'
         # Cache::remember con array come TTL (probabilmente un bug, ma ignoriamo per ora)
         - '#Parameter.*\$ttl.*Cache::remember.*array given#'
-        # Ignora errori PHPDoc nei file IDE helper (generati automaticamente, analizzati come stub)
-        - 
-          message: '#PHPDoc tag @method.*parameter.*no value type specified#'
-          path: _ide_helper*.php
-        - 
-          message: '#PHPDoc tag @method.*return type contains unknown class#'
-          path: _ide_helper*.php
-        - 
-          message: '#PHPDoc tag @method.*return type has no value type specified#'
-          path: _ide_helper*.php
-
-    # File stub per definizioni di tipo (non vengono analizzati per errori)
+    # File stub per definizioni di tipo (trait methods e facade custom)
     stubFiles:
-        - _ide_helper_custom.php
         - _ide_helper_traits.php
-        - _ide_helper_models.php
     
     # Non segnalare pattern non corrispondenti (per evitare warning sui file IDE helper)
     reportUnmatchedIgnoredErrors: false
