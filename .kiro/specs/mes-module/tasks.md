@@ -18,7 +18,8 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
     { "wave": 7, "tasks": ["T9", "T10"] },
     { "wave": 8, "tasks": ["T14"] },
     { "wave": 9, "tasks": ["T15"] },
-    { "wave": 10, "tasks": ["T16"] }
+    { "wave": 10, "tasks": ["T16"] },
+    { "wave": 11, "tasks": ["T17"] }
   ]
 }
 ```
@@ -33,7 +34,7 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
 - [x] 4. Creare il contratto `Modules\MES\Contracts\StockMovementRecorder`
 - [x] 5. Creare il DTO `Modules\MES\Data\StockMovementData`
 - [x] 6. Creare `Modules\MES\Services\ErpStockMovementRecorder` (nel MES, non nell'ERP) che implementa il contratto usando `Modules\ERP\Services\Inventory\StockMovementService`
-- [ ] 7. Registrare il binding `StockMovementRecorder → ErpStockMovementRecorder` nel `MESServiceProvider` (il MES conosce ERP, l'ERP non sa nulla del MES)
+- [x] 7. Registrare il binding `StockMovementRecorder → ErpStockMovementRecorder` nel `MESServiceProvider` (il MES conosce ERP, l'ERP non sa nulla del MES)
 - [x] 8. Aggiungere `Modules/MES` a `modules_statuses.json`
 - [ ] 9. Creare `Modules/MES/tests/Pest.php` e `TestCase.php`
 
@@ -44,7 +45,7 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
 ### T2 — Migration aggiuntiva su tabella ERP
 
 - [x] 1. Creare migration MES che aggiunge `tracing_type` enum(`none`, `lot`, `serial`) default `none` alla tabella `items`
-- [ ] 2. Aggiungere `tracing_type` al `$fillable` e ai `casts()` del modello `Item` dell'ERP
+- [x] 2. Aggiungere `tracing_type` al `$fillable` e ai `casts()` del modello `Item` dell'ERP
 - [ ] 3. Scrivere test: `Item` con `tracing_type` corretto viene letto dal MES tramite relazione Eloquent
 
 **Requisiti coperti**: R7
@@ -54,10 +55,10 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
 ### T3 — Work Center
 
 - [x] 1. Creare migration `mes_work_centers` (company_id FK, code, name, type enum, capacity_per_hour, capacity_uom, is_active)
-- [ ] 2. Creare migration `mes_work_center_calendars` (work_center_id FK, day_of_week, start_time, end_time)
-- [ ] 3. Creare modello `WorkCenter` (final, BelongsToCompany, getRules, relazioni)
-- [ ] 4. Creare modello `WorkCenterCalendar` (final, belongsTo WorkCenter)
-- [ ] 5. Creare Form Request `WorkCenterRequest` con validazione unicità codice per company
+- [x] 2. Creare migration `mes_work_center_calendars` (work_center_id FK, day_of_week, start_time, end_time)
+- [x] 3. Creare modello `WorkCenter` (final, BelongsToCompany, getRules, relazioni)
+- [x] 4. Creare modello `WorkCenterCalendar` (final, belongsTo WorkCenter)
+- [x] 5. Creare Form Request `WorkCenterRequest` con validazione unicità codice per company
 - [ ] 6. Scrivere test: creazione, aggiornamento, disattivazione, unicità codice per company
 
 **Requisiti coperti**: R1
@@ -67,7 +68,7 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
 ### T4 — Distinta Base (BOM)
 
 - [x] 1. Creare migration `mes_boms` (company_id FK, item_id FK → items, version, valid_from, valid_to, is_active)
-- [ ] 2. Creare migration `mes_bom_lines` (bom_id FK, item_id FK → items, quantity, uom, consumption_method enum, sort_order)
+- [x] 2. Creare migration `mes_bom_lines` (bom_id FK, item_id FK → items, quantity, uom, consumption_method enum, sort_order)
 - [ ] 3. Creare modello `Bom` (final, BelongsToCompany, relazioni: item ERP, bomLines)
 - [ ] 4. Creare modello `BomLine` (final, relazioni: bom, item ERP)
 - [ ] 5. Creare `BomExplosionService` con metodi `getActiveBom()` e `explode()`
@@ -244,10 +245,22 @@ Piano di implementazione del modulo MES (Manufacturing Execution System) per Lar
 
 ---
 
+### T17 — Documentazione modulo
+
+- [ ] 1. Creare `Modules/MES/docs/GLOSSARY.md` — glossario tecnico completo dei termini MES (WorkCenter, BOM, Routing, ProductionOrder, LotNumber, ecc.) rivolto agli sviluppatori
+- [ ] 2. Creare `Modules/MES/docs/MES_GUIDA_SEMPLICE.md` — guida all'utilizzo del modulo per l'utente finale (responsabile produzione, operatore, pianificatore): flussi principali, come creare un ordine di produzione, come registrare avanzamento, come leggere OEE. Senza tecnicismi.
+- [ ] 3. Creare `Modules/MES/docs/rag/GLOSSARY.md` — versione RAG-ottimizzata del glossario, con definizioni brevi e precise adatte alla ricerca semantica di un assistente AI
+- [ ] 4. Creare `Modules/MES/docs/rag/MODULE.md` — descrizione sintetica del modulo MES per RAG: scopo, entità principali, flussi chiave, integrazione con ERP e ERPBridge
+
+**Nota**: La struttura replica il pattern esistente in `Modules/ERP/docs/` e `Modules/Core/docs/`.
+
+---
+
 ## Notes
 
 - Le migration del MES che aggiungono colonne a tabelle ERP (es. `tracing_type` su `items`) devono essere eseguite dopo le migration ERP. Garantire l'ordine tramite timestamp del filename.
-- Il binding `StockMovementRecorder` viene registrato dall'ERP solo se il modulo MES è attivo. Verificare con `app()->bound()` prima di registrare.
+- Il binding `StockMovementRecorder` viene registrato nel `MESServiceProvider` del MES (non nell'ERP). L'ERP non ha nessun riferimento al MES — la dipendenza è unidirezionale: MES → ERP.
 - Tutti i modelli MES usano il trait `BelongsToCompany` e il global scope `BelongsToCompanyScope` dell'ERP — importare da `Modules\ERP\Concerns\BelongsToCompany`.
 - Il prefisso `mes_` su tutte le tabelle evita collisioni con tabelle ERP o Core.
 - I job `BackflushMaterialsJob` e `CreateProductionOrderFromSalesOrderJob` devono implementare `ShouldQueue` e usare la queue configurata nel modulo.
+- **Strategia di integrazione ERP**: Il MES assume sempre che le tabelle ERP di Laraplate (`items`, `warehouses`, `companies`, `sales_orders`) siano presenti e popolate. Quando si usa un ERP esterno (SAP, Odoo, ecc.), si crea un modulo **ERPBridge** separato — non parte del MES — che: (1) sincronizza i dati dall'ERP esterno verso le tabelle ERP di Laraplate in modo trasparente, e (2) implementa il contratto `StockMovementRecorder` per rimandare i movimenti di magazzino al sistema esterno. Il MES non cambia in nessun modo: vede sempre e solo le tabelle ERP di Laraplate.

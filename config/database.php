@@ -81,11 +81,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                // PDO::MYSQL_ATTR_SSL_CA is deprecated in PHP 8.4+
-                // Use 'sslmode' in connection string or remove if not needed
-                // PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => [],
         ],
 
         'mariadb' => [
@@ -109,11 +105,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                // PDO::MYSQL_ATTR_SSL_CA is deprecated in PHP 8.4+
-                // Use 'sslmode' in connection string or remove if not needed
-                // PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => [],
         ],
 
         'pgsql' => [

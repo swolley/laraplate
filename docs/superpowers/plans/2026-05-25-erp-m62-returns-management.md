@@ -185,8 +185,12 @@ Test scenarios:
   supplier returns; edit forms keep status read-only and filter parties by role.
 - DDT direction support is implemented with `DeliveryNoteDirection`, cost resolution from
   original outbound stock movements, Filament DDT direction fields, and focused inventory tests.
-- Still open for full M6.2 alignment: explicit return-to-DDT generation/linking, returned-quantity
-  tracking against source lines, and manual credit/debit-note follow-up actions from return pages.
+- Implemented on 2026-06-10: customer and supplier return completion now generates/links posted
+  delivery notes for the physical stock movement. Customer returns create inbound DDTs and supplier
+  returns create outbound DDTs; DDT lines keep quantity/source links only and stock movements are
+  posted through `DeliveryNoteInventoryService`.
+- Still open for full M6.2 alignment: returned-quantity tracking against source lines and manual
+  credit/debit-note follow-up actions from return pages.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note
