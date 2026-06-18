@@ -189,8 +189,10 @@ Test scenarios:
   delivery notes for the physical stock movement. Customer returns create inbound DDTs and supplier
   returns create outbound DDTs; DDT lines keep quantity/source links only and stock movements are
   posted through `DeliveryNoteInventoryService`.
-- Still open for full M6.2 alignment: returned-quantity tracking against source lines and manual
-  credit/debit-note follow-up actions from return pages.
+- Implemented on 2026-06-18: returned-quantity tracking against invoice/sales-order and
+  purchase-order/goods-receipt source lines is covered by return completion tests. Return edit pages
+  now expose manual credit/debit-note follow-up actions; generated notes are linked back to the
+  return headers through `credit_note_invoice_id` and `debit_note_invoice_id`.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note
@@ -199,5 +201,6 @@ Test scenarios:
 - Verified on 2026-05-30:
   - `php artisan test --compact Modules/ERP/tests/Feature/DeliveryNoteInventoryServiceTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`
-- Follow-up: optional credit/debit-note automation remains deferred until invoice source-party
-  modeling is explicit.
+- Follow-up: optional automatic credit/debit-note creation remains deferred; v1 keeps the action
+  manual and requires explicit source invoice or purchase-order line contracts before creating
+  fiscal document drafts.
