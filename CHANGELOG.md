@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(core)* Bump submodule for MySQL taxonomies migration trigger fix
+
+### 📚 Documentation
+
+- Add CMS comments with AI moderation design spec
+- Revise CMS comments spec per review feedback
+- Add preliminary AI disapproval and implementation plan
+- Clarify locale read rule and approval Option A/B
+- Use HasTranslations for comments with locale overrides
+- Add approval_mode config for comment moderation A/B
+- Add RTK documentation and update AGENTS.md
+
+### ⚙️ Miscellaneous Tasks
+
+- Update submodule references and composer.lock for module dependencies
+- Update module versions and Swagger documentation for testing environment
+- Add .cursorignore and AGENTS.md, update package-lock.json, and clean up project structure
+- Reorganize testing structure and update module configurations
+- *(core)* Bump Core module for GELF logging improvements
+- Update .env.example and composer.lock for module dependencies
+- Update composer.lock and package-lock.json for new dependencies
+- Update submodule references and API documentation
+
+## [2.0.2] - 2026-05-15
+
 ### ⚙️ Miscellaneous Tasks
 
 - Update submodule references and Swagger documentation for AI, CMS, Core, ERP, and MES modules
