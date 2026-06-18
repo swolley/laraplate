@@ -11,6 +11,9 @@ alwaysApply: true
 - Each module may define Composer version scripts in its own `composer.json`.
 - Version commands must be executed from the affected module subdirectory, not from the project root.
 - If multiple modules are affected, evaluate and bump each affected module separately.
+- Before running any version command, always ask the user to confirm the proposed bump type.
+- Briefly explain why that bump type fits the changes.
+- The user may confirm, choose a different bump type, or skip the version bump.
 
 - Command format:
   - `composer version`
@@ -27,9 +30,13 @@ alwaysApply: true
   - Inspect changed files and identify affected modules.
   - Decide whether the changes are meaningful enough to tag.
   - Check the affected module `composer.json` for available version scripts.
+  - Propose the bump type with a brief reason.
+  - Ask the user for confirmation before running the command.
+  - If the user chooses a different bump type, use that type.
+  - If the user declines the bump, do not run a version command.
   - Run the selected command inside that module directory, for example:
     - `cd Modules/ERP && composer version:patch`
   - Include generated version/tag changes in the commit when they are part of the requested release bump.
 
 - Do not run version commands for docs-only, formatting-only, or exploratory changes unless the user explicitly asks.
-- If the bump type is ambiguous, ask the user before running the version command.
+- If the bump type is ambiguous, explain the ambiguity and ask the user before running the version command.
