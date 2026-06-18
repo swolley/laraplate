@@ -1,0 +1,35 @@
+---
+description: Semantic module versioning workflow for commit and push tasks
+alwaysApply: true
+---
+
+# Semantic Versioning (caveman)
+
+- When the user asks to commit and push changes, evaluate whether a semantic version bump is appropriate.
+- Version bumps are not mandatory for every commit.
+- Small changes may not deserve a tag, even when they touch a module.
+- Each module may define Composer version scripts in its own `composer.json`.
+- Version commands must be executed from the affected module subdirectory, not from the project root.
+- If multiple modules are affected, evaluate and bump each affected module separately.
+
+- Command format:
+  - `composer version`
+  - `composer version:patch`
+  - `composer version:minor`
+  - `composer version:major`
+
+- Bump selection:
+  - `patch`: bug fixes, tests, refactors, compatible internal changes.
+  - `minor`: new backward-compatible features or public behavior additions.
+  - `major`: breaking changes, removed APIs, incompatible migrations, or incompatible behavior changes.
+
+- Workflow before commit/push:
+  - Inspect changed files and identify affected modules.
+  - Decide whether the changes are meaningful enough to tag.
+  - Check the affected module `composer.json` for available version scripts.
+  - Run the selected command inside that module directory, for example:
+    - `cd Modules/ERP && composer version:patch`
+  - Include generated version/tag changes in the commit when they are part of the requested release bump.
+
+- Do not run version commands for docs-only, formatting-only, or exploratory changes unless the user explicitly asks.
+- If the bump type is ambiguous, ask the user before running the version command.

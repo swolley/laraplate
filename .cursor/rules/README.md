@@ -20,6 +20,7 @@
 - `05-testing-development.mdc` Pest testing workflow.
 - `06-coding-principles.mdc` always-on coding principles.
 - `07-laraplate-specific.mdc` module architecture context.
+- `08-versioning.mdc` semantic module versioning workflow.
 - `laravel-boost.mdc` ecosystem source of truth.
 
 ## Maintenance

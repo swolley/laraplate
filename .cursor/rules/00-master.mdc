@@ -23,3 +23,4 @@ alwaysApply: true
   - `05-testing-development.mdc` tests and Pest.
   - `06-coding-principles.mdc` always-on coding principles.
   - `07-laraplate-specific.mdc` module architecture rules.
+  - `08-versioning.mdc` semantic module versioning workflow.
