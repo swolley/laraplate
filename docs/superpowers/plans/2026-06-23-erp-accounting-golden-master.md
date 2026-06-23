@@ -69,7 +69,7 @@ end-to-end accounting outcomes from realistic ERP documents.
 **Files:**
 - Create: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Add deterministic setup helpers**
+- [x] **Step 1: Add deterministic setup helpers**
 
 Create the file with strict types, imports, `RefreshDatabase`, and helper functions:
 
@@ -161,7 +161,7 @@ function goldenMasterPostedInvoiceJournalLines(Invoice $invoice): array
 }
 ```
 
-- [ ] **Step 2: Write the sale invoice golden-master regression test**
+- [x] **Step 2: Write the sale invoice golden-master regression test**
 
 Append this regression test:
 
@@ -216,7 +216,7 @@ it('posts sale invoice into journal, VAT register, payment schedule, and trial b
 });
 ```
 
-- [ ] **Step 3: Run the test and verify the baseline**
+- [x] **Step 3: Run the test and verify the baseline**
 
 Run:
 
@@ -227,7 +227,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 Expected: the test should pass if the existing ERP posting workflow is stable. If it fails, stop
 and inspect the exact journal/VAT/schedule difference before changing production code.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -239,7 +239,7 @@ git commit -m "test(erp): add sale invoice accounting golden master"
 **Files:**
 - Modify: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Write the purchase invoice regression test**
+- [x] **Step 1: Write the purchase invoice regression test**
 
 Append:
 
@@ -283,7 +283,7 @@ it('posts purchase invoice into expense, VAT input, payable, and purchase VAT re
 });
 ```
 
-- [ ] **Step 2: Run the test**
+- [x] **Step 2: Run the test**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php --filter "posts purchase invoice"
@@ -293,7 +293,7 @@ Expected: pass with exact signed journal lines. If the purchase test posts witho
 links, keep this test as the clean accounting baseline and leave linked PO/GR matching in
 `InvoicePostingServiceTest.php` / `ThreeWayMatchServiceTest.php`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -305,7 +305,7 @@ git commit -m "test(erp): add purchase invoice accounting golden master"
 **Files:**
 - Modify: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 Add:
 
@@ -315,7 +315,7 @@ use Modules\ERP\Models\DocumentSequence;
 use Modules\ERP\Services\Accounting\CreditNoteService;
 ```
 
-- [ ] **Step 2: Write the credit note regression test**
+- [x] **Step 2: Write the credit note regression test**
 
 Append:
 
@@ -367,7 +367,7 @@ it('posts sale credit note as negative journal and negative VAT register entry',
 });
 ```
 
-- [ ] **Step 3: Run the test**
+- [x] **Step 3: Run the test**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php --filter "posts sale credit note"
@@ -376,7 +376,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 Expected: pass. If order of journal lines differs, do not relax the signed amounts; adjust the
 helper to compare by description as shown in Task 1.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -388,7 +388,7 @@ git commit -m "test(erp): add credit note accounting golden master"
 **Files:**
 - Modify: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 Add:
 
@@ -397,7 +397,7 @@ use Modules\ERP\Casts\VatSettlementStatus;
 use Modules\ERP\Services\Accounting\VatSettlementService;
 ```
 
-- [ ] **Step 2: Write the VAT settlement regression test**
+- [x] **Step 2: Write the VAT settlement regression test**
 
 Append:
 
@@ -457,7 +457,7 @@ it('computes period VAT settlement from posted sale purchase and credit note reg
 });
 ```
 
-- [ ] **Step 3: Run the test**
+- [x] **Step 3: Run the test**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php --filter "computes period VAT settlement"
@@ -466,7 +466,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 Expected: pass. This locks the period-level VAT formula: sales VAT minus credit-note VAT minus
 purchase VAT minus previous credit.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -478,7 +478,7 @@ git commit -m "test(erp): add vat settlement golden master"
 **Files:**
 - Modify: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 Add:
 
@@ -488,7 +488,7 @@ use Modules\ERP\Services\Reporting\IncomeStatementService;
 use Modules\ERP\Services\Reporting\TrialBalanceService;
 ```
 
-- [ ] **Step 2: Write the statement regression test**
+- [x] **Step 2: Write the statement regression test**
 
 Append:
 
@@ -552,7 +552,7 @@ it('rolls posted documents into trial balance income statement and balance sheet
 });
 ```
 
-- [ ] **Step 3: Run the statement test**
+- [x] **Step 3: Run the statement test**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php --filter "rolls posted documents"
@@ -561,7 +561,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 Expected: pass. If `BalanceSheetService` reports not balanced, inspect whether VAT receivable /
 payable accounts are classified correctly before changing the assertion.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -573,7 +573,7 @@ git commit -m "test(erp): add statement golden master"
 **Files:**
 - Modify: `Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php`
 
-- [ ] **Step 1: Write the reversal regression test**
+- [x] **Step 1: Write the reversal regression test**
 
 Append:
 
@@ -614,7 +614,7 @@ it('unposts invoice by reversing journal clearing VAT register and removing sche
 });
 ```
 
-- [ ] **Step 2: Run the reversal test**
+- [x] **Step 2: Run the reversal test**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php --filter "unposts invoice"
@@ -622,7 +622,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 
 Expected: pass. This locks the cross-service rollback behavior.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
@@ -640,7 +640,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 Then run the adjacent accounting suites:
 
 ```bash
-php artisan test --compact Modules/ERP/tests/Feature/InvoicePostingServiceTest.php Modules/ERP/tests/Feature/CreditNoteServiceTest.php Modules/ERP/tests/Feature/VatRegisterServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php Modules/ERP/tests/Feature/PaymentScheduleServiceTest.php
+php artisan test --compact Modules/ERP/tests/Feature/InvoicePostingServiceTest.php Modules/ERP/tests/Feature/CreditNoteServiceTest.php Modules/ERP/tests/Feature/VatRegisterServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php Modules/ERP/tests/Feature/PaymentScheduleServiceTest.php Modules/ERP/tests/Feature/AccountingSequencesAndPostingTest.php
 ```
 
 Before committing final cleanup:
