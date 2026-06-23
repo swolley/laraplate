@@ -29,39 +29,27 @@ Filament resource/page structure.
 **Files:**
 - Modify: `Modules/ERP/database/seeders/ERPDatabaseSeeder.php`
 
-- [ ] Add a small private method such as `ensureDomainPermissions()` and call it after Core tables
+- [x] Add a small private method such as `ensureDomainPermissions()` and call it after Core tables
   are available.
-- [ ] Seed custom permissions with `Permission::firstOrCreate()` and `guard_name => web`.
-- [ ] Use names based on `ERPTables`, for example:
-  - `default.erp_invoices.post`
-  - `default.erp_invoices.unpost`
-  - `default.erp_invoices.force_post`
-  - `default.erp_delivery_notes.post`
-  - `default.erp_delivery_notes.unpost`
-  - `default.erp_fiscal_periods.close`
-  - `default.erp_fiscal_periods.reopen`
-  - `default.erp_journal_entries.reverse`
-  - `default.erp_sales_orders.amend`
-  - `default.erp_quotations.unlock`
-  - `default.erp_document_sequences.reset`
-- [ ] Do not seed `viewAny`, `view`, or `create`; those are not Core action names.
+- [x] Seed custom permissions with `Permission::firstOrCreate()`.
+- [x] Use permission names based on each model's actual connection and table name.
+- [x] Do not seed `viewAny`, `view`, or `create`; those are not Core action names.
+- [ ] Follow-up: seed additional custom abilities only when the matching UI/service action is
+  implemented. Candidate abilities include `force_post`, `close`, `reopen`, `reverse`, `amend`,
+  `unlock`, and `reset`.
 
 ## Task 2: Register Policies
 
 **Files:**
 - Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php`
-- Create: `Modules/ERP/app/Policies/InvoicePolicy.php`
-- Create only additional policies needed by actions implemented in this milestone.
+- Create: `Modules/ERP/app/Policies/ERPModelPolicy.php`
 
-- [ ] Register policies with `Gate::policy()` in `boot()` or the established Laravel provider
-  pattern used by this app.
-- [ ] Policy methods should combine table permissions and state checks:
-  - `post`: permission exists and record is not posted.
-  - `unpost`: permission exists and record is posted.
-  - `forcePost`: permission exists, invoice is purchase, and record is not posted.
-  - `close/reopen`: fiscal period status allows the transition.
-  - `reverse`: journal entry is posted and has no reversal.
-- [ ] Use `Modules\Core\Models\User` as the user type.
+- [x] Register policies with `Gate::policy()` in `boot()` using the established provider pattern.
+- [x] Use `Modules\Core\Models\User` as the user type.
+- [x] Centralize table-permission checks in `ERPModelPolicy` for the ERP models covered by v1.
+- [ ] Follow-up: add state-aware policy methods only for domain actions that are exposed in UI or
+  services. Examples: invoice `post`/`unpost` state guards, fiscal period `close`/`reopen`, journal
+  `reverse`, sales order `amend`, quotation `unlock`, and document sequence `reset`.
 
 ## Task 3: Reuse Filament Invoice Actions
 
@@ -69,14 +57,14 @@ Filament resource/page structure.
 - Modify: `Modules/ERP/app/Filament/Resources/Invoices/Actions/InvoicePostingActions.php`
 - Modify: `Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php`
 
-- [ ] Add authorization checks to existing `post()` and `unpost()` actions rather than creating
+- [x] Add authorization checks to existing `post()` and `unpost()` actions rather than creating
   duplicate page-local actions.
-- [ ] Preserve force 3-way match checkbox behavior for purchase invoices.
-- [ ] Keep the current observer-driven posting entry point:
+- [x] Preserve force 3-way match checkbox behavior for purchase invoices.
+- [x] Keep the current observer-driven posting entry point:
   `InvoicePostingActions::postInvoice()` sets `forceThreeWayMatchOnPosting` and updates
   `posted_at`.
-- [ ] Add focused Filament action tests only if this project already has a compatible Livewire /
-  Filament testing pattern; otherwise cover policy decisions directly.
+- [x] Cover Filament resource/page registration and server-side rendering with smoke tests. Full
+  browser click-through remains optional until a browser runner is part of the test workflow.
 
 ## Task 4: Add Delivery Note, Fiscal Period, Journal Actions
 
@@ -86,17 +74,16 @@ Filament resource/page structure.
   - `Modules/ERP/app/Filament/Resources/FiscalPeriods/Pages/`
   - `Modules/ERP/app/Filament/Resources/JournalEntries/Pages/`
 
-- [ ] Delivery note actions must call existing service methods:
+- [ ] Follow-up: delivery note post/unpost page actions must call existing service methods:
   - post inventory: set `posted_at` if needed, then rely on observer/service path;
   - unpost inventory: use `DeliveryNoteInventoryService::unpostInventory()`.
-- [ ] Do not call non-existent `DeliveryNoteInventoryService::post()` or `::unpost()`.
-- [ ] Fiscal period **close** action must call `FiscalPeriodCloser::closePeriod()` (exists).
-- [ ] Fiscal period **reopen** action: `FiscalPeriodCloser` has no `reopen()` method.
-  Before implementing the action, add `reopenPeriod(FiscalPeriod $period): void` to
-  `FiscalPeriodCloser` with appropriate state-machine guard (`status === 'closed'`), or
-  mark the reopen ability as backlog and skip it from this milestone.
-- [ ] Journal reversal must use `JournalPostingService::reverse()` with the current method
-  signature.
+- [x] Do not call non-existent `DeliveryNoteInventoryService::post()` or `::unpost()`.
+- [ ] Follow-up: fiscal period **close** page action must call `FiscalPeriodCloser::closePeriod()`.
+- [x] `FiscalPeriodCloser::reopenPeriod(FiscalPeriod $period): void` exists for future UI actions.
+- [ ] Follow-up: fiscal period **reopen** page action must call `FiscalPeriodCloser::reopenPeriod()`
+  and keep the state-machine guard (`status === 'closed'`).
+- [ ] Follow-up: journal reversal page action must use `JournalPostingService::reverse()` with the
+  current method signature.
 
 ## Task 5: Reporting Services
 
@@ -153,6 +140,9 @@ the reason.
   Filament 5 non-static page view override.
 - Operational `SalesPipelineService` and `StockValuationService` are implemented as read-only
   service-layer summaries with read-only Filament pages.
+- Still deferred from the original expanded M4 idea: explicit Delivery Note post/unpost page
+  actions, Fiscal Period close/reopen page actions, Journal Entry reversal page action, and the
+  matching extra custom abilities/state-aware policy checks.
 - Verified on 2026-06-23:
   - `php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`

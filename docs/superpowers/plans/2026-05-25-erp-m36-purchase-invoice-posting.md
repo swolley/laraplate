@@ -36,26 +36,26 @@ php artisan test --compact Modules/ERP/tests/Feature/ThreeWayMatchServiceTest.ph
 - Inspect: `Modules/ERP/tests/Feature/ThreeWayMatchServiceTest.php`
 - Inspect: `Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`
 
-- [ ] Run the focused command above and confirm the current baseline.
-- [ ] Confirm purchase invoice posting coverage includes:
+- [x] Run the focused command above and confirm the current baseline.
+- [x] Confirm purchase invoice posting coverage includes:
   - purchase document sequence allocation;
   - 3-way match matched/tolerance/forced/failure behavior;
   - purchase journal lines with expense, VAT input, and trade payable;
   - unpost reversal and reference clearing.
-- [ ] If a behavior is missing, add a focused test using manual model setup, following the
-  existing test style in the same files.
+- [x] No missing behavior was identified during the focused verification; no extra test was needed
+  beyond the existing focused coverage.
 
 ## Task 2: Remove Stale Planning Assumptions
 
 **Files:**
 - Modify only docs or tests that still reference stale M3.6 names.
 
-- [ ] Replace the old accounts-payable role name with `trade_payable` when referring to current code.
-- [ ] Replace the old plural purchases-expense role name with `purchase_expense`.
-- [ ] Remove stale exceeded-status references; hard failures are `ValidationException`,
+- [x] Replace the old accounts-payable role name with `trade_payable` when referring to current code.
+- [x] Replace the old plural purchases-expense role name with `purchase_expense`.
+- [x] Remove stale exceeded-status references; hard failures are `ValidationException`,
   while forced breaches return `MatchStatus::Forced`.
-- [ ] Do not add `ThreeWayMatchException` unless a separate refactor is approved.
-- [ ] Do not introduce `MatchResult` unless a separate service API refactor is approved.
+- [x] Do not add `ThreeWayMatchException` unless a separate refactor is approved.
+- [x] Do not introduce `MatchResult` unless a separate service API refactor is approved.
 
 ## Task 3: Optional Code Cleanup Only If Tests Expose A Gap
 
@@ -64,9 +64,9 @@ php artisan test --compact Modules/ERP/tests/Feature/ThreeWayMatchServiceTest.ph
 - Potentially modify: `ThreeWayMatchService.php`
 - Potentially modify: focused tests in `Modules/ERP/tests/Feature`
 
-- [ ] Keep current public method signatures unless a failing test proves an API issue.
-- [ ] Preserve account-role names already seeded by `ItalianCoaProvider`.
-- [ ] Keep `InvoicePostingActions::postInvoice()` as the Filament-facing entry point for forced
+- [x] Keep current public method signatures unless a failing test proves an API issue.
+- [x] Preserve account-role names already seeded by `ItalianCoaProvider`.
+- [x] Keep `InvoicePostingActions::postInvoice()` as the Filament-facing entry point for forced
   three-way match posting.
 
 ## Verification

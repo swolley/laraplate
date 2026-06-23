@@ -64,11 +64,10 @@ then applies the highest-priority valid discount rule.
 final readonly class PriceResolutionResult
 {
     public function __construct(
-        public string $unitPrice,
-        public string $discountPercentEffective,
-        public string $source,
-        public bool $noPriceFound,
-        public ?string $ruleDescription = null,
+        public PriceListItem $priceListItem,
+        public string $baseUnitPrice,
+        public string $resolvedUnitPrice,
+        public ?PartyPriceRule $appliedRule = null,
     ) {}
 }
 ```
@@ -85,23 +84,29 @@ surprises in service internals.
 **Method:**
 
 ```php
-public function resolve(int $itemId, int $partyId, string $quantity = '1.0000', ?CarbonImmutable $date = null): PriceResolutionResult;
+public function resolve(
+    int $companyId,
+    int $itemId,
+    ?int $partyId = null,
+    string $currency = 'EUR',
+    ?CarbonInterface $date = null,
+): PriceResolutionResult;
 ```
 
 **Resolution order:**
 - Load `Item` and its `taxonomy_id`.
 - Find an active base price from `PriceListItem` through taxonomy and active date window.
-- If no base price exists, return `noPriceFound = true`.
+- If no base price exists, throw a validation error for the missing active price.
 - Apply the first valid rule by priority in this order:
   - party + item;
   - party + taxonomy;
   - global + item;
   - global + taxonomy;
-  - optional global all-items rule only if explicitly implemented.
+  - global all-items rules are out of scope unless explicitly implemented and tested.
 - Discount types:
-  - `percentage`: base price multiplied by `(1 - value / 100)`;
-  - `fixed`: `max(0, base - value)`;
-  - `cascade`: apply each percentage sequentially.
+  - `percent`: base price multiplied by `(1 - value / 100)`;
+  - `fixed_amount`: `max(0, base - value)`;
+  - `override_price`: use the rule value as the resolved unit price.
 
 **Constraints:**
 - Do not assume `PriceListItem::item_id`.
@@ -114,6 +119,9 @@ public function resolve(int $itemId, int $partyId, string $quantity = '1.0000', 
 **Files:**
 - Modify: `Modules/ERP/app/Models/Party.php`
 - Modify existing Party resource files under `Modules/ERP/app/Filament/Resources/Parties/`
+
+**Status:** Deferred from v1. `PartyPriceRule` exists and is consumed by `PriceResolverService`,
+but the Party Filament resource does not yet expose a price-rule management section.
 
 **Behavior:**
 - Add `Party::price_rules()` relation.
@@ -159,7 +167,7 @@ Test scenarios:
 - Party taxonomy rule overrides base price.
 - Party item rule overrides taxonomy rule when item rules are enabled.
 - Global taxonomy rule applies when no party rule exists.
-- Cascade discount math is deterministic.
+- Override price and fixed/percent discount math is deterministic.
 - Invalid rule with both item and taxonomy fails validation.
 
 ## Assumptions
@@ -178,6 +186,9 @@ Test scenarios:
 - Sale invoice line integration is implemented through the existing `sales_order_line_id` source;
   selecting a sales order line fills description, remaining quantity, and resolved unit price when
   the current line has not been customized.
+- Deferred from v1: Party resource price-rule management UI and `Party::price_rules()` relation.
+  Price rules can be managed at model/service level and are applied by the resolver, but the Party
+  edit screen does not yet expose a dedicated "Price Rules" section.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/PriceResolverServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note
