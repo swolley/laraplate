@@ -1,0 +1,676 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "9. Creare `Modules/MES/tests/Pest.php` e `TestCase.php`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760078
+      }
+    ],
+    "3. Scrivere test: `Item` con `tracing_type` corretto viene letto dal MES tramite relazione Eloquent": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760186
+      }
+    ],
+    "6. Scrivere test: creazione, aggiornamento, disattivazione, unicità codice per company": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760291
+      }
+    ],
+    "4. Creare modello `BomLine` (final, relazioni: bom, item ERP)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760394
+      }
+    ],
+    "5. Creare `BomExplosionService` con metodi `getActiveBom()` e `explode()`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760522
+      }
+    ],
+    "6. Implementare risoluzione versione attiva (valid_from ≤ date, valid_to null o ≥ date)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760649
+      }
+    ],
+    "7. Implementare lock BOM se associata a ProductionOrder rilasciato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760817
+      }
+    ],
+    "8. Scrivere test: versioning BOM, esplosione multi-livello, lock su ordine rilasciato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820760989
+      }
+    ],
+    "1. Creare migration `mes_routings` (company_id FK, item_id FK → items, version, valid_from, valid_to, is_active)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820761355
+      },
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820809421
+      },
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781821151835
+      }
+    ],
+    "2. Creare migration `mes_routing_operations` (routing_id FK, work_center_id FK, sequence, description, setup_time_minutes, cycle_time_minutes, is_parallel)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820761624
+      },
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781821171001
+      }
+    ],
+    "3. Creare modello `Routing` (final, BelongsToCompany, relazioni: item ERP, routingOperations)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820761903
+      }
+    ],
+    "4. Creare modello `RoutingOperation` (final, relazioni: routing, workCenter)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820762161
+      }
+    ],
+    "5. Implementare risoluzione versione attiva (stesso pattern BOM)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820762564
+      }
+    ],
+    "6. Implementare lock Routing se associato a ProductionOrder rilasciato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820762990
+      }
+    ],
+    "7. Scrivere test: versioning routing, operazioni parallele, lock su ordine rilasciato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820763751
+      }
+    ],
+    "1. Creare migration `mes_production_orders` (company_id, number, item_id FK, qty_planned, qty_produced, qty_scrapped, uom, status enum, planned/actual timestamps, warehouse_id FK, sales_order_id FK nullable, bom_snapshot json, routing_snapshot json)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820764194
+      },
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781821174373
+      }
+    ],
+    "2. Creare modello `ProductionOrder` (final, BelongsToCompany, relazioni: item ERP, warehouse ERP, salesOrder ERP, operations, materialConsumptions, lotNumbers)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820764499
+      }
+    ],
+    "3. Creare `ProductionOrderService` con metodi: `create()`, `release()`, `complete()`, `cancel()`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820764792
+      }
+    ],
+    "4. Implementare snapshot BOM/Routing alla creazione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820765068
+      }
+    ],
+    "5. Implementare generazione `ProductionOrderOperation` al rilascio": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820765387
+      }
+    ],
+    "6. Implementare numerazione progressiva per company+anno": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820765726
+      }
+    ],
+    "7. Creare `ProductionOrderObserver` per transizioni di stato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820766176
+      }
+    ],
+    "8. Creare `HandleSalesOrderConfirmedListener` + `CreateProductionOrderFromSalesOrderJob`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820766618
+      }
+    ],
+    "9. Scrivere test: snapshot immutabile, generazione operazioni, completamento parziale, unicità numero": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820766947
+      }
+    ],
+    "1. Creare migration `mes_production_order_operations` (production_order_id FK, routing_operation_id FK, work_center_id FK, sequence, status enum, planned/actual timestamps, quantity_produced, operator_user_id FK nullable, notes, efficiency)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820767256
+      }
+    ],
+    "2. Creare modello `ProductionOrderOperation` (final, relazioni: productionOrder, routingOperation, workCenter, operatorLogs)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820767608
+      }
+    ],
+    "3. Creare `ProductionOrderOperationObserver` che al completamento dispatcha `BackflushMaterialsJob` e crea QualityCheck se esiste piano": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820767987
+      }
+    ],
+    "4. Implementare calcolo efficienza (tempo effettivo / tempo standard × 100)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820768485
+      }
+    ],
+    "5. Implementare controllo capacità work center (warning non bloccante)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820768955
+      }
+    ],
+    "6. Scrivere test: avvio/completamento, calcolo efficienza, transizioni di stato": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820769452
+      }
+    ],
+    "1. Creare migration `mes_material_consumptions` (production_order_id FK, operation_id FK nullable, item_id FK, warehouse_id FK, lot_number_id FK nullable, quantity_theoretical, quantity_actual, uom, variance, method enum, stock_shortage)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820770025
+      }
+    ],
+    "2. Creare modello `MaterialConsumption` (final, relazioni: productionOrder, operation, item ERP, warehouse ERP, lotNumber)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820770413
+      }
+    ],
+    "3. Creare `BackflushMaterialsJob` (queued, ShouldQueue): legge BomLines backflush, crea MaterialConsumption, invoca `StockMovementRecorder`, calcola variance, gestisce stock_shortage": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820770706
+      }
+    ],
+    "4. Implementare consumo manuale via Form Request": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820771021
+      }
+    ],
+    "5. Scrivere test: backflush automatico, consumo manuale, calcolo variance, stock_shortage": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820771455
+      }
+    ],
+    "1. Creare migration `mes_lot_numbers` (company_id FK, item_id FK, code unique per company, production_order_id FK nullable, quantity, uom, produced_at, expires_at)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820772059
+      }
+    ],
+    "2. Creare migration `mes_serial_numbers` (company_id FK, item_id FK, code unique per company, production_order_id FK nullable, lot_number_id FK nullable, produced_at)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820772433
+      }
+    ],
+    "3. Creare migration `mes_lot_lineages` (parent_lot_id FK, child_lot_id FK, production_order_id FK, quantity_used)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820772804
+      }
+    ],
+    "4. Creare modelli `LotNumber`, `SerialNumber`, `LotLineage` (tutti final)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820773192
+      }
+    ],
+    "5. Creare `LotTracingService` con metodi: `generateLotCode()`, `forwardTrace()`, `backwardTrace()`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820773606
+      }
+    ],
+    "6. Integrare assegnazione lotto in `ProductionOrderService::complete()`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820774150
+      }
+    ],
+    "7. Scrivere test: generazione codice, forward/backward trace multi-livello, bidirezionalità": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820774517
+      }
+    ],
+    "1. Creare migration `mes_quality_plans` (company_id FK, item_id FK nullable, routing_operation_id FK nullable, name, is_active)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820774986
+      }
+    ],
+    "2. Creare migration `mes_quality_plan_parameters` (quality_plan_id FK, name, uom, min_value, max_value, is_required)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820775391
+      }
+    ],
+    "3. Creare migration `mes_quality_checks` (operation_id FK, quality_plan_id FK, lot_number_id FK nullable, operator_user_id FK nullable, status enum, checked_at, notes)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820775977
+      }
+    ],
+    "4. Creare migration `mes_quality_check_measurements` (quality_check_id FK, parameter_id FK, value, is_within_limits)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820776439
+      }
+    ],
+    "5. Creare migration `mes_non_conformances` (company_id FK, production_order_id FK, quality_check_id FK nullable, rework_production_order_id FK nullable, description, quantity_nonconforming, root_cause, corrective_action, disposition enum nullable, status enum)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820776905
+      }
+    ],
+    "6. Creare modelli: `QualityPlan`, `QualityPlanParameter`, `QualityCheck`, `QualityCheckMeasurement`, `NonConformance` (tutti final)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820777552
+      }
+    ],
+    "7. Implementare creazione automatica QualityCheck in `ProductionOrderOperationObserver`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820777951
+      }
+    ],
+    "8. Implementare esecuzione QualityCheck con calcolo esito e creazione automatica NonConformance se failed": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820778341
+      }
+    ],
+    "9. Implementare creazione ProductionOrder di rilavorazione da NonConformance con disposition=rework": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820778796
+      }
+    ],
+    "10. Scrivere test: creazione automatica check, esito failed → non conformità, rilavorazione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820779320
+      }
+    ],
+    "1. Creare `CapacityService` con metodi: `getCapacityLoad()`, `getSchedule()`, `estimateCompletionDate()`, `checkOverload()`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820779836
+      }
+    ],
+    "2. Implementare ripianificazione manuale (spostamento operazione a work center/finestra diversa)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820780271
+      }
+    ],
+    "3. Scrivere test: calcolo carico, stima data fine, warning sovraccarico, CapacityLoad ≥ 0": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820780691
+      }
+    ],
+    "1. Creare migration `mes_downtimes` (work_center_id FK, cause enum, started_at, ended_at nullable, duration_minutes nullable, notes)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820781122
+      }
+    ],
+    "2. Creare modello `Downtime` (final, relazione workCenter)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820781678
+      }
+    ],
+    "3. Creare `OeeCalculatorService` con metodo `calculate()` (Availability × Performance × Quality)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820782194
+      }
+    ],
+    "4. Implementare calcolo durata downtime alla chiusura": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820782559
+      }
+    ],
+    "5. Scrivere test: OEE ∈ [0,1], calcolo su dati noti, downtime attivo → work center non disponibile": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820782946
+      }
+    ],
+    "1. Creare migration `mes_shifts` (company_id FK, name, start_time, end_time, days_of_week json, is_active)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820783471
+      }
+    ],
+    "2. Creare migration `mes_shift_work_centers` pivot (shift_id FK, work_center_id FK)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820783944
+      }
+    ],
+    "3. Creare migration `mes_shift_instances` (shift_id FK, date, operator_user_id FK, work_center_id FK)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820784403
+      }
+    ],
+    "4. Creare migration `mes_operator_logs` (operation_id FK, operator_user_id FK, action enum, occurred_at)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820784786
+      }
+    ],
+    "5. Creare modelli: `Shift`, `ShiftInstance`, `OperatorLog` (tutti final)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820785311
+      }
+    ],
+    "6. Implementare verifica ShiftInstance attivo all'avvio operazione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820785739
+      }
+    ],
+    "7. Implementare creazione automatica OperatorLog a ogni avvio/completamento operazione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820786207
+      }
+    ],
+    "8. Implementare calcolo efficienza media per operatore e turno": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820786707
+      }
+    ],
+    "9. Scrivere test: verifica turno attivo, log automatico, calcolo efficienza": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820787094
+      }
+    ],
+    "1. Creare `routes/api.php` con tutti gli endpoint sotto `/api/v1/mes/` con autenticazione Sanctum e rate limiting": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820787504
+      }
+    ],
+    "2. Creare controller API (tutti final, method injection): WorkCenter, Bom, Routing, ProductionOrder, ProductionOrderOperation, MaterialConsumption, LotNumber, QualityCheck, NonConformance, Downtime, Schedule": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820788189
+      }
+    ],
+    "3. Creare API Resources per ogni entità (struttura: data, meta, errors)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820788559
+      }
+    ],
+    "4. Scrivere test feature: 401 senza token, 403 senza permesso, 422 su dati invalidi, 200 su richieste valide": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820789009
+      }
+    ],
+    "1. Creare `WorkCenterResource` con form e calendario inline": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820789436
+      }
+    ],
+    "2. Creare `BomResource` con repeater BomLines e select Item da ERP": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820789956
+      }
+    ],
+    "3. Creare `RoutingResource` con repeater RoutingOperations": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820790394
+      }
+    ],
+    "4. Creare `ProductionOrderResource` con pagina view (tab: Operazioni, Consumi, Qualità, Lotti), azioni (Rilascia, Completa, Cancella), link a SalesOrder ERP": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820790740
+      }
+    ],
+    "5. Creare `QualityCheckResource` con form esecuzione misurazioni": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820791163
+      }
+    ],
+    "6. Creare `NonConformanceResource` con workflow stati e azione crea rilavorazione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820791657
+      }
+    ],
+    "7. Creare `DowntimeResource` con azione chiudi fermo": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820792080
+      }
+    ],
+    "8. Creare `ShiftResource` con assegnazione work center e operatori": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820792516
+      }
+    ],
+    "9. Creare `ProductionDashboardWidget` (ordini in produzione, downtime attivi, quality check pending, OEE medio)": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820792951
+      }
+    ],
+    "10. Applicare policy Core (BelongsToCompany scope) a tutte le Resources": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820793454
+      }
+    ],
+    "11. Scrivere test Filament: render Resources, azioni principali, widget": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820793891
+      }
+    ],
+    "1. Creare factory per tutti i modelli MES": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820794237
+      }
+    ],
+    "2. Scrivere property-based test per le invarianti: snapshot immutabile, tracciabilità bidirezionale, OEE ∈ [0,1], unicità numero ordine, coerenza stati, CapacityLoad ≥ 0, bilanciamento consumi": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820794593
+      }
+    ],
+    "3. Scrivere test di integrazione end-to-end: ciclo completo produzione": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820795009
+      }
+    ],
+    "4. Verificare 100% type coverage con `composer test:type-coverage`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820795410
+      }
+    ],
+    "5. Eseguire `vendor/bin/pint --dirty` e `composer test:types`": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820795951
+      }
+    ],
+    "1. Creare `Modules/MES/docs/GLOSSARY.md` — glossario tecnico completo dei termini MES (WorkCenter, BOM, Routing, ProductionOrder, LotNumber, ecc.) rivolto agli sviluppatori": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820796544
+      }
+    ],
+    "2. Creare `Modules/MES/docs/MES_GUIDA_SEMPLICE.md` — guida all'utilizzo del modulo per l'utente finale (responsabile produzione, operatore, pianificatore): flussi principali, come creare un ordine di produzione, come registrare avanzamento, come leggere OEE. Senza tecnicismi.": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820796912
+      }
+    ],
+    "3. Creare `Modules/MES/docs/rag/GLOSSARY.md` — versione RAG-ottimizzata del glossario, con definizioni brevi e precise adatte alla ricerca semantica di un assistente AI": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820797238
+      }
+    ],
+    "4. Creare `Modules/MES/docs/rag/MODULE.md` — descrizione sintetica del modulo MES per RAG: scopo, entità principali, flussi chiave, integrazione con ERP e ERPBridge": [
+      {
+        "executionId": "662a4a7b-ca7c-4102-9f7f-6c610bd02aee",
+        "chatSessionId": "sess_16cff2e1-bb79-492b-8659-0e27ae8ef15e",
+        "timestamp": 1781820797786
+      }
+    ]
+  }
+}

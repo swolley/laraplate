@@ -1,0 +1,1117 @@
+# Modulo MES — Piano di implementazione completo
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Completare il modulo MES (Manufacturing Execution System) di Laraplate — da dominio produzione a API REST, Filament, test suite e documentazione — seguendo le spec Kiro (`.kiro/specs/mes-module/`) e i vincoli in `Modules/MES/.cursor/rules/module-context.mdc`.
+
+**Architecture:** Modulo Laravel (`Modules/MES`, submodule git) con dipendenza unidirezionale MES→ERP. Modelli MES con prefisso tabella `mes_`, trait `BelongsToCompany`, FK fisiche verso `items`, `warehouses`, `companies`, `sales_orders`. Movimenti magazzino via contratto `StockMovementRecorder` (adapter `ErpStockMovementRecorder`). Numerazione ordini produzione via `DocumentNumberAllocator` ERP (nuovo `DocumentType::ProductionOrder`). Servizi di dominio orchestrano snapshot BOM/Routing, backflush, tracciabilità lotti, qualità, capacità e OEE.
+
+**Tech Stack:** PHP 8.5, Laravel 12, Filament 5, Livewire 4, Sanctum 4, Pest 4, nwidart/laravel-modules, Tailwind 4.
+
+---
+
+## Assunzioni (conferma utente consigliata)
+
+Queste decisioni non erano esplicite nella chat; il piano le adotta come default coerenti con `module-context.mdc`. Modificare prima dell’implementazione se serve.
+
+| # | Decisione | Default adottato |
+|---|-----------|------------------|
+| A1 | Priorità consegna | Backend dominio + test prima; API e Filament dopo T6–T10 |
+| A2 | Numerazione ordini | `DocumentNumberAllocator` + nuovo `DocumentType::ProductionOrder` in ERP (non numerazione manuale company+anno) |
+| A3 | Auto-PO da SalesOrder | Creare evento ERP `SalesOrderConfirmed` + listener/job MES (non esiste oggi) |
+| A4 | `sales_order_line_id` | Aggiungere colonna nullable su `mes_production_orders` per coerenza header/linea |
+| A5 | Verifica turno operatore | Warning non bloccante (come capacità WC); log sempre creato |
+| A6 | Property-based testing | Pest con dataset ripetuti + invarianti esplicite; no nuova dipendenza PBT |
+| A7 | Git workflow | Commit nel repo `Modules/MES`; bump puntatore submodule nel monorepo Laraplate |
+| A8 | DIFF audit | Applicare trait/pattern Core DIFF solo su `ProductionOrder`, `Bom`, `Routing` (modelli ad alto valore) |
+
+**Domande aperte per l’utente:** confermare A1–A8; indicare se il backflush deve scattare a **fine operazione** (design Kiro) o solo a **fine ordine**; confermare se ERP Filament Resources esistono in un branch/submodule non presente in workspace (il pattern Filament segue `Modules/Core/app/Filament/Resources/Users/UserResource.php`).
+
+---
+
+## Current Truth (stato reale vs `tasks.md` Kiro)
+
+| Wave Kiro | Stato reale nel codice | Gap principale |
+|-----------|------------------------|----------------|
+| T1 Scaffolding | ✅ Fatto | TestCase/Pest ok; verificare binding |
+| T2 `tracing_type` | ✅ Migration + cast ERP | ❌ 4 test falliscono: import `TracingType` errato |
+| T3 Work Center | ✅ Modelli, migration, factory | ❌ Test slug >64 char; test unicità codice mancante |
+| T4 BOM | ⚠️ Solo migration | ❌ Modelli, enum, service, test, lock |
+| T5 Routing | ⚠️ Solo migration `mes_routings` | ❌ `mes_routing_operations`, modelli, service, test |
+| T6 ProductionOrder | ⚠️ Solo migration | ❌ Tutto il dominio ordini |
+| T7–T13 | ❌ Assente | Migration, modelli, servizi, job, observer |
+| T14 API | ❌ `routes/api.php` vuoto | Controller, resources, auth |
+| T15 Filament | ❌ Assente | 8 resources + widget |
+| T16 Test suite | ⚠️ Parziale | Factory mancanti, E2E, type coverage |
+| T17 Docs | ⚠️ Parziale | Mancano `MES_GUIDA_SEMPLICE.md`, `docs/rag/MODULE.md` |
+
+**Test attuali:** `php artisan test Modules/MES/tests --compact` → 31 pass, 5 fail (baseline da sistemare in Task 0).
+
+**Riferimenti obbligatori prima di ogni task:**
+
+- Spec: `.kiro/specs/mes-module/{requirements,design,tasks}.md`
+- Modello esistente: `Modules/MES/app/Models/WorkCenter.php`
+- Contratto stock: `Modules/MES/app/Contracts/StockMovementRecorder.php`
+- Numerazione ERP: `Modules/ERP/app/Services/Accounting/DocumentNumberAllocator.php`
+- Filament pattern: `Modules/Core/app/Filament/Resources/Users/UserResource.php`
+
+---
+
+## File Structure Map
+
+### Enums (`Modules/MES/app/Enums/`)
+
+| File | Responsabilità |
+|------|----------------|
+| `MESTables.php` | Nomi tabella centralizzati (espandere) |
+| `WorkCenterType.php` | ✅ Esiste |
+| `ConsumptionMethod.php` | `backflush`, `manual` |
+| `ProductionOrderStatus.php` | `draft`, `released`, `in_progress`, `completed`, `cancelled` |
+| `ProductionOrderOperationStatus.php` | `planned`, `ready`, `in_progress`, `completed`, `skipped` |
+| `QualityCheckStatus.php` | `pending`, `passed`, `failed`, `conditional` |
+| `NonConformanceStatus.php` | `open`, `under_review`, `resolved`, `closed` |
+| `NonConformanceDisposition.php` | `scrap`, `rework`, `use_as_is`, `return_to_supplier` |
+| `DowntimeCause.php` | cause da design |
+| `OperatorLogAction.php` | `started`, `completed`, `paused`, `resumed` |
+
+### Modifiche ERP (solo dove richiesto da MES)
+
+| File | Modifica |
+|------|----------|
+| `Modules/ERP/app/Casts/DocumentType.php` | Aggiungere `ProductionOrder` case |
+| `Modules/ERP/app/Events/SalesOrderConfirmed.php` | Nuovo evento |
+| `Modules/ERP/app/Models/Item.php` | ✅ `tracing_type` già presente |
+
+### Test support
+
+| File | Responsabilità |
+|------|----------------|
+| `Modules/MES/tests/Support/MesTestHelpers.php` | Factory helpers company/item/warehouse con slug bounded |
+
+---
+
+## Wave dependency graph
+
+```
+Task 0 (baseline)
+  → Task 1–3 (verify/finish T1–T3)
+  → Task 4 (BOM)
+  → Task 5 (Routing)
+  → Task 6 (ProductionOrder + ERP DocumentType)
+  → Task 7 (Operations)
+  → Task 8 (Material consumption + Backflush job)
+  → Task 9 (Lots/serials)
+  → Task 10 (Quality)
+  → Task 11 (Capacity) ∥ Task 12 (Downtime/OEE) ∥ Task 13 (Shifts)
+  → Task 14 (API)
+  → Task 15 (Filament)
+  → Task 16 (Test suite hardening)
+  → Task 17 (Docs)
+```
+
+---
+
+### Task 0: Baseline test verde
+
+**Files:**
+- Create: `Modules/MES/tests/Support/MesTestHelpers.php`
+- Modify: `Modules/MES/tests/Feature/ItemTracingTypeTest.php`
+- Modify: `Modules/MES/tests/Feature/WorkCenterModelTest.php`
+- Modify: `Modules/MES/tests/Feature/WorkCenterCalendarModelTest.php`
+- Modify: `Modules/MES/tests/Pest.php`
+
+- [ ] **Step 1: Creare helper con slug bounded**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\MES\Tests\Support;
+
+use Modules\ERP\Models\Company;
+use Modules\ERP\Models\Item;
+use Modules\ERP\Models\Warehouse;
+
+final class MesTestHelpers
+{
+    public static function makeCompany(): Company
+    {
+        return Company::query()->withoutGlobalScopes()->create([
+            'slug' => mb_substr(fake()->unique()->slug(), 0, 64),
+            'name' => fake()->company(),
+            'fiscal_country' => 'IT',
+            'default_currency' => 'EUR',
+        ]);
+    }
+
+    public static function makeItem(int $company_id): Item
+    {
+        return Item::query()->withoutGlobalScopes()->create([
+            'company_id' => $company_id,
+            'name' => fake()->words(3, true),
+            'sku' => fake()->unique()->bothify('SKU-####'),
+            'uom' => 'pcs',
+            'costing_method' => 'fifo',
+        ]);
+    }
+
+    public static function makeWarehouse(int $company_id): Warehouse
+    {
+        return Warehouse::query()->withoutGlobalScopes()->create([
+            'company_id' => $company_id,
+            'code' => fake()->unique()->bothify('WH-##'),
+            'name' => fake()->words(2, true),
+        ]);
+    }
+}
+```
+
+- [ ] **Step 2: Correggere import TracingType**
+
+In `ItemTracingTypeTest.php` sostituire:
+
+```php
+use Modules\ERP\Enums\TracingType;
+```
+
+con:
+
+```php
+use Modules\ERP\Casts\TracingType;
+```
+
+- [ ] **Step 3: Usare helper nei test Feature**
+
+In `WorkCenterModelTest.php`, `WorkCenterCalendarModelTest.php`, `ItemTracingTypeTest.php` sostituire helper locali con `MesTestHelpers::makeCompany()` e aggiungere in `Pest.php`:
+
+```php
+uses(Modules\MES\Tests\Support\MesTestHelpers::class);
+```
+
+(opzionale: funzioni globali `mesCompany()` che delegano al helper)
+
+- [ ] **Step 4: Eseguire test baseline**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan test Modules/MES/tests --compact
+```
+
+Expected: 0 failures.
+
+- [ ] **Step 5: Commit (submodule MES)**
+
+```bash
+cd Modules/MES && git add tests/Support/MesTestHelpers.php tests/Feature/ItemTracingTypeTest.php tests/Feature/WorkCenterModelTest.php tests/Feature/WorkCenterCalendarModelTest.php tests/Pest.php
+git commit -m "test(mes): fix tracing type import and bounded company slug helpers"
+```
+
+---
+
+### Task 1: Verifica scaffolding T1
+
+**Files:**
+- Verify: `Modules/MES/module.json`, `composer.json`, `app/Providers/*`, `app/Contracts/StockMovementRecorder.php`, `app/Services/ErpStockMovementRecorder.php`
+- Verify root: `modules_statuses.json` contiene `"MES": true`
+
+- [ ] **Step 1: Verificare modulo abilitato**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan module:list | rg MES
+```
+
+Expected: MES enabled.
+
+- [ ] **Step 2: Verificare binding contratto**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/ServiceProviderBindingTest.php --compact
+```
+
+Expected: PASS.
+
+- [ ] **Step 3: Commit solo se mancano file (già presenti → skip)**
+
+---
+
+### Task 2: Completare T2 tracing_type
+
+**Files:**
+- Modify: `Modules/MES/tests/Feature/ItemTracingTypeTest.php` (copertura relazione MES→Item)
+- Verify: `Modules/MES/database/migrations/2026_05_08_000000_add_tracing_type_to_items_table.php`
+
+- [ ] **Step 1: Aggiungere test relazione Eloquent**
+
+```php
+it('reads tracing_type from ERP item via Eloquent', function (): void {
+    $company = MesTestHelpers::makeCompany();
+    $item = MesTestHelpers::makeItem($company->id);
+    $item->update(['tracing_type' => TracingType::Lot]);
+
+    $fresh = Item::query()->withoutGlobalScopes()->findOrFail($item->id);
+
+    expect($fresh->tracing_type)->toBe(TracingType::Lot);
+});
+```
+
+- [ ] **Step 2: Run test file**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/ItemTracingTypeTest.php --compact
+```
+
+Expected: PASS.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd Modules/MES && git commit -am "test(mes): cover ERP item tracing_type reads"
+```
+
+---
+
+### Task 3: Completare T3 Work Center
+
+**Files:**
+- Create: `Modules/MES/tests/Feature/WorkCenterCrudTest.php`
+- Modify: `Modules/MES/app/Http/Requests/WorkCenterRequest.php` (se manca unique per company)
+
+- [ ] **Step 1: Scrivere test unicità codice per company**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
+use Modules\MES\Enums\WorkCenterType;
+use Modules\MES\Models\WorkCenter;
+use Modules\MES\Tests\Support\MesTestHelpers;
+
+uses(RefreshDatabase::class);
+
+it('rejects duplicate work center code within same company', function (): void {
+    $company = MesTestHelpers::makeCompany();
+
+    WorkCenter::withoutGlobalScopes()->create([
+        'company_id' => $company->id,
+        'code' => 'WC-DUP',
+        'name' => 'First',
+        'type' => WorkCenterType::Machine->value,
+        'capacity_per_hour' => 10,
+        'capacity_uom' => 'pcs',
+    ]);
+
+    expect(fn () => WorkCenter::withoutGlobalScopes()->create([
+        'company_id' => $company->id,
+        'code' => 'WC-DUP',
+        'name' => 'Second',
+        'type' => WorkCenterType::Machine->value,
+        'capacity_per_hour' => 10,
+        'capacity_uom' => 'pcs',
+    ]))->toThrow(\Illuminate\Database\QueryException::class);
+});
+
+it('deactivates work center', function (): void {
+    $company = MesTestHelpers::makeCompany();
+    $wc = WorkCenter::withoutGlobalScopes()->create([
+        'company_id' => $company->id,
+        'code' => 'WC-OFF',
+        'name' => 'To deactivate',
+        'type' => WorkCenterType::Machine->value,
+        'capacity_per_hour' => 10,
+        'capacity_uom' => 'pcs',
+        'is_active' => true,
+    ]);
+
+    $wc->update(['is_active' => false]);
+
+    expect($wc->fresh()->is_active)->toBeFalse();
+});
+```
+
+- [ ] **Step 2: Run test**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/WorkCenterCrudTest.php Modules/MES/tests/Feature/WorkCenterModelTest.php --compact
+```
+
+Expected: PASS.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m "test(mes): work center uniqueness and deactivation"
+```
+
+---
+
+### Task 4: Distinta base (BOM) — T4
+
+**Files:**
+- Modify: `Modules/MES/app/Enums/MESTables.php`
+- Create: `Modules/MES/app/Enums/ConsumptionMethod.php`
+- Create: `Modules/MES/app/Models/Bom.php`
+- Create: `Modules/MES/app/Models/BomLine.php`
+- Create: `Modules/MES/app/Services/BomExplosionService.php`
+- Create: `Modules/MES/app/Exceptions/BomLockedException.php`
+- Create: `Modules/MES/database/factories/BomFactory.php`
+- Create: `Modules/MES/database/factories/BomLineFactory.php`
+- Create: `Modules/MES/tests/Feature/BomExplosionServiceTest.php`
+
+- [ ] **Step 1: Espandere MESTables e ConsumptionMethod**
+
+```php
+// Modules/MES/app/Enums/ConsumptionMethod.php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\MES\Enums;
+
+enum ConsumptionMethod: string
+{
+    case Backflush = 'backflush';
+    case Manual = 'manual';
+
+    public static function validationRule(): string
+    {
+        return 'in:' . implode(',', array_column(self::cases(), 'value'));
+    }
+}
+```
+
+Aggiungere a `MESTables.php` i case già usati dalle migration (`Boms`, `BomLines` già presenti).
+
+- [ ] **Step 2: Scrivere test fallente esplosione multi-livello**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\MES\Services\BomExplosionService;
+use Modules\MES\Tests\Support\MesTestHelpers;
+
+uses(RefreshDatabase::class);
+
+it('explodes multi-level bom quantities', function (): void {
+    $company = MesTestHelpers::makeCompany();
+    $finished = MesTestHelpers::makeItem($company->id);
+    $semi = MesTestHelpers::makeItem($company->id);
+    $raw = MesTestHelpers::makeItem($company->id);
+
+    // parent bom: 1 finished = 2 semi
+    $parent_bom = \Modules\MES\Models\Bom::factory()->create([
+        'company_id' => $company->id,
+        'item_id' => $finished->id,
+        'valid_from' => now()->subDay()->toDateString(),
+    ]);
+    \Modules\MES\Models\BomLine::factory()->create([
+        'bom_id' => $parent_bom->id,
+        'item_id' => $semi->id,
+        'quantity' => 2,
+        'uom' => 'pcs',
+    ]);
+
+    // child bom: 1 semi = 3 raw
+    $child_bom = \Modules\MES\Models\Bom::factory()->create([
+        'company_id' => $company->id,
+        'item_id' => $semi->id,
+        'valid_from' => now()->subDay()->toDateString(),
+    ]);
+    \Modules\MES\Models\BomLine::factory()->create([
+        'bom_id' => $child_bom->id,
+        'item_id' => $raw->id,
+        'quantity' => 3,
+        'uom' => 'pcs',
+    ]);
+
+    $lines = resolve(BomExplosionService::class)->explode($finished->id, 10, now());
+
+    $raw_line = collect($lines)->firstWhere('item_id', $raw->id);
+    expect($raw_line)->not->toBeNull()
+        ->and($raw_line['quantity'])->toEqual(60.0); // 10 * 2 * 3
+});
+```
+
+- [ ] **Step 3: Run test → FAIL**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/BomExplosionServiceTest.php --compact
+```
+
+Expected: FAIL (class not found).
+
+- [ ] **Step 4: Implementare modelli Bom e BomLine**
+
+Seguire pattern `WorkCenter.php`:
+
+- `final class`, `BelongsToCompany`, `MESTables` per `$table`
+- Relazioni: `Bom` → `item()` BelongsTo ERP Item, `bomLines()` HasMany
+- `BomLine` → `bom()`, `item()`
+- `getRules()` con validazione version, date, quantity > 0
+
+- [ ] **Step 5: Implementare BomExplosionService**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\MES\Services;
+
+use Carbon\CarbonInterface;
+use Illuminate\Support\Collection;
+use Modules\MES\Models\Bom;
+use Modules\MES\Models\ProductionOrder;
+
+final class BomExplosionService
+{
+    /**
+     * @return list<array{item_id: int, quantity: float, uom: string, consumption_method: string, level: int}>
+     */
+    public function explode(int $item_id, float $quantity, CarbonInterface $on_date, int $level = 0): array
+    {
+        $bom = $this->getActiveBom($item_id, $on_date);
+        if ($bom === null) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($bom->bomLines as $line) {
+            $line_qty = (float) $line->quantity * $quantity;
+            $child_bom = $this->getActiveBom($line->item_id, $on_date);
+            if ($child_bom !== null) {
+                array_push($result, ...$this->explode($line->item_id, $line_qty, $on_date, $level + 1));
+                continue;
+            }
+            $result[] = [
+                'item_id' => $line->item_id,
+                'quantity' => $line_qty,
+                'uom' => $line->uom,
+                'consumption_method' => $line->consumption_method->value,
+                'level' => $level,
+            ];
+        }
+
+        return $result;
+    }
+
+    public function getActiveBom(int $item_id, CarbonInterface $on_date): ?Bom
+    {
+        return Bom::query()
+            ->where('item_id', $item_id)
+            ->where('is_active', true)
+            ->whereDate('valid_from', '<=', $on_date)
+            ->where(function ($q) use ($on_date): void {
+                $q->whereNull('valid_to')->orWhereDate('valid_to', '>=', $on_date);
+            })
+            ->orderByDesc('valid_from')
+            ->first();
+    }
+
+    public function assertNotLocked(Bom $bom): void
+    {
+        $released = ProductionOrder::query()
+            ->where('status', '!=', 'draft')
+            ->where('bom_snapshot->id', $bom->id)
+            ->exists();
+
+        if ($released) {
+            throw new \Modules\MES\Exceptions\BomLockedException("BOM {$bom->id} is locked by a released production order.");
+        }
+    }
+}
+```
+
+Nota: `ProductionOrder` e campo snapshot arrivano in Task 6; fino ad allora stubbare test lock in Task 6.
+
+- [ ] **Step 6: Factory Bom/BomLine + run test PASS**
+
+- [ ] **Step 7: Commit**
+
+```bash
+cd Modules/MES && git add app/Models/Bom.php app/Models/BomLine.php app/Services/BomExplosionService.php app/Enums/ConsumptionMethod.php database/factories/BomFactory.php database/factories/BomLineFactory.php tests/Feature/BomExplosionServiceTest.php
+git commit -m "feat(mes): add BOM models and multi-level explosion service"
+```
+
+---
+
+### Task 5: Routing e operazioni — T5
+
+**Files:**
+- Create: `Modules/MES/database/migrations/2026_05_08_000006_create_mes_routing_operations_table.php`
+- Modify: `Modules/MES/app/Enums/MESTables.php` (add `RoutingOperations`)
+- Create: `Modules/MES/app/Models/Routing.php`
+- Create: `Modules/MES/app/Models/RoutingOperation.php`
+- Create: `Modules/MES/app/Services/RoutingResolverService.php`
+- Create: `Modules/MES/app/Exceptions/RoutingLockedException.php`
+- Create: factories + `Modules/MES/tests/Feature/RoutingResolverServiceTest.php`
+
+- [ ] **Step 1: Migration routing operations**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Modules\MES\Enums\MESTables;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $table_name = MESTables::RoutingOperations->value;
+        Schema::create($table_name, function (Blueprint $table) use ($table_name): void {
+            $table->id();
+            $table->foreignId('routing_id')->constrained(MESTables::Routings->value, 'id', "{$table_name}_routing_id_FK")->cascadeOnDelete();
+            $table->foreignId('work_center_id')->constrained(MESTables::WorkCenters->value, 'id', "{$table_name}_work_center_id_FK")->restrictOnDelete();
+            $table->integer('sequence');
+            $table->string('description', 255);
+            $table->integer('setup_time_minutes')->default(0);
+            $table->decimal('cycle_time_minutes', 10, 4)->default(0);
+            $table->boolean('is_parallel')->default(false);
+            $table->unique(['routing_id', 'sequence'], "{$table_name}_routing_sequence_UNIQUE");
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists(MESTables::RoutingOperations->value);
+    }
+};
+```
+
+- [ ] **Step 2: Test risoluzione versione attiva + operazioni parallele**
+
+```php
+it('resolves active routing by date', function (): void {
+    $company = MesTestHelpers::makeCompany();
+    $item = MesTestHelpers::makeItem($company->id);
+
+    $old = \Modules\MES\Models\Routing::factory()->create([
+        'company_id' => $company->id,
+        'item_id' => $item->id,
+        'version' => 'v1',
+        'valid_from' => now()->subYear()->toDateString(),
+        'valid_to' => now()->subMonth()->toDateString(),
+    ]);
+    $new = \Modules\MES\Models\Routing::factory()->create([
+        'company_id' => $company->id,
+        'item_id' => $item->id,
+        'version' => 'v2',
+        'valid_from' => now()->subMonth()->toDateString(),
+        'valid_to' => null,
+    ]);
+
+    $resolved = resolve(\Modules\MES\Services\RoutingResolverService::class)
+        ->getActiveRouting($item->id, now());
+
+    expect($resolved?->id)->toBe($new->id)->not->toBe($old->id);
+});
+```
+
+- [ ] **Step 3: Implementare modelli + RoutingResolverService** (stesso pattern BOM: `getActiveRouting()`, `assertNotLocked()`)
+
+- [ ] **Step 4: Run migrate + test**
+
+Run:
+
+```bash
+cd /srv/http/laraplate && php artisan migrate --path=Modules/MES/database/migrations --no-interaction
+php artisan test Modules/MES/tests/Feature/RoutingResolverServiceTest.php --compact
+```
+
+- [ ] **Step 5: Commit**
+
+---
+
+### Task 6: Ordini di produzione — T6
+
+**Files:**
+- Modify: `Modules/ERP/app/Casts/DocumentType.php` (add `ProductionOrder`)
+- Create: `Modules/MES/database/migrations/2026_05_10_000002_add_sales_order_line_id_to_mes_production_orders_table.php`
+- Create: `Modules/MES/app/Enums/ProductionOrderStatus.php`
+- Create: `Modules/MES/app/Models/ProductionOrder.php`
+- Create: `Modules/MES/app/Services/ProductionOrderService.php`
+- Create: `Modules/MES/app/Observers/ProductionOrderObserver.php`
+- Create: `Modules/ERP/app/Events/SalesOrderConfirmed.php`
+- Create: `Modules/MES/app/Listeners/HandleSalesOrderConfirmedListener.php`
+- Create: `Modules/MES/app/Jobs/CreateProductionOrderFromSalesOrderJob.php`
+- Modify: `Modules/MES/app/Providers/EventServiceProvider.php`
+- Create: `Modules/MES/tests/Feature/ProductionOrderServiceTest.php`
+
+- [ ] **Step 1: Aggiungere DocumentType ProductionOrder in ERP**
+
+```php
+// In Modules/ERP/app/Casts/DocumentType.php add case:
+case ProductionOrder = 'production_order';
+
+// In defaultGapAllowed():
+self::ProductionOrder => true,
+```
+
+- [ ] **Step 2: Test snapshot immutabile**
+
+```php
+it('freezes bom and routing snapshots on create', function (): void {
+    // setup item with bom+routing active
+    $order = resolve(\Modules\MES\Services\ProductionOrderService::class)->create([
+        'company_id' => $company->id,
+        'item_id' => $item->id,
+        'quantity_planned' => 5,
+        'uom' => 'pcs',
+        'planned_start_at' => now(),
+        'planned_end_at' => now()->addDay(),
+        'warehouse_id' => $warehouse->id,
+    ]);
+
+    expect($order->bom_snapshot)->toBeArray()->toHaveKey('lines')
+        ->and($order->routing_snapshot)->toBeArray()->toHaveKey('operations');
+
+    // mutate live bom after create
+    $bom->bomLines()->delete();
+
+    $order->refresh();
+    expect($order->bom_snapshot['lines'])->not->toBeEmpty();
+});
+```
+
+- [ ] **Step 3: Implementare ProductionOrderService**
+
+Metodi richiesti:
+
+```php
+public function create(array $payload): ProductionOrder;
+public function release(ProductionOrder $order): ProductionOrder;
+public function complete(ProductionOrder $order, float $quantity_produced, ?string $lot_code = null): ProductionOrder;
+public function cancel(ProductionOrder $order): ProductionOrder;
+```
+
+Regole implementative:
+
+- `create()`: alloca numero con `DocumentNumberAllocator::next($company, DocumentType::ProductionOrder, (int) now()->format('Y'))`, snapshot JSON da `BomExplosionService` + routing operations ordinate
+- `release()`: solo da `draft`; genera `ProductionOrderOperation` per ogni voce snapshot; status → `released`
+- `complete()`: verifica operazioni non `in_progress`; aggiorna qty; lot handling in Task 9
+- `cancel()`: solo da `draft|released`
+
+- [ ] **Step 4: Observer transizioni stato** — log/eventi dominio tipizzati (`ProductionOrderReleased`, ecc.)
+
+- [ ] **Step 5: SalesOrderConfirmed pipeline**
+
+```php
+// Modules/ERP/app/Events/SalesOrderConfirmed.php
+final class SalesOrderConfirmed
+{
+    public function __construct(public readonly \Modules\ERP\Models\SalesOrder $salesOrder) {}
+}
+
+// Listener dispatches CreateProductionOrderFromSalesOrderJob on config flag
+```
+
+- [ ] **Step 6: Test release genera operazioni + unicità numero**
+
+- [ ] **Step 7: Commit (MES + ERP DocumentType/event)**
+
+---
+
+### Task 7: Esecuzione operazioni — T7
+
+**Files:**
+- Create: migration `mes_production_order_operations`
+- Create: `ProductionOrderOperation` model + enum status
+- Create: `ProductionOrderOperationService` (start/complete/skip)
+- Create: `ProductionOrderOperationObserver`
+- Create: `Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php`
+
+- [ ] **Step 1: Migration** (schema design.md righe 235–251)
+
+- [ ] **Step 2: Test efficienza**
+
+```php
+it('calculates efficiency as actual over standard percent', function (): void {
+    // standard = setup 10 + cycle 2 * qty 5 = 20 min; actual 30 min => 66.67%
+});
+```
+
+Formula: `(standard_minutes / actual_minutes) * 100`, clamp 0–999.99.
+
+- [ ] **Step 3: Implementare start/complete con warning capacità non bloccante**
+
+- [ ] **Step 4: Observer on completed** — dispatch `BackflushMaterialsJob` (Task 8), crea QualityCheck pending se piano (Task 10)
+
+- [ ] **Step 5: Commit**
+
+---
+
+### Task 8: Consumo materiali — T8
+
+**Files:**
+- Create: migration `mes_material_consumptions`
+- Create: `MaterialConsumption` model
+- Create: `Modules/MES/app/Jobs/BackflushMaterialsJob.php`
+- Create: `Modules/MES/app/Http/Requests/MaterialConsumptionRequest.php`
+- Create: `Modules/MES/tests/Feature/BackflushMaterialsJobTest.php`
+
+- [ ] **Step 1: Test backflush crea consumption + invoca recorder**
+
+Mock `StockMovementRecorder` con `Mockery::mock` e assert `record()` chiamato con `direction=out`.
+
+- [ ] **Step 2: Implementare job**
+
+```php
+final class BackflushMaterialsJob implements ShouldQueue
+{
+    public function __construct(public readonly int $production_order_operation_id) {}
+
+    public function handle(StockMovementRecorder $recorder): void
+    {
+        // load operation → order snapshot lines where consumption_method=backflush
+        // upsert MaterialConsumption, compute variance, set stock_shortage if ERP throws
+    }
+}
+```
+
+Queue: `config('mes.queue.connection')`, `config('mes.queue.name')`.
+
+- [ ] **Step 3: Consumo manuale via Form Request + service method**
+
+- [ ] **Step 4: Commit**
+
+---
+
+### Task 9: Tracciabilità lotti — T7/R7
+
+**Files:**
+- Create: migrations `mes_lot_numbers`, `mes_serial_numbers`, `mes_lot_lineages`
+- Create: models `LotNumber`, `SerialNumber`, `LotLineage`
+- Create: `LotTracingService`
+- Modify: `ProductionOrderService::complete()` per generazione lotto
+- Create: `Modules/MES/tests/Feature/LotTracingServiceTest.php`
+
+- [ ] **Step 1: Test forward/backward trace simmetrico**
+
+```php
+it('forward and backward traces are symmetric', function (): void {
+    // parent -> child lineage
+    $forward = $service->forwardTrace($parent->id);
+    $backward = $service->backwardTrace($child->id);
+    expect($forward)->toContain($child->id);
+    expect($backward)->toContain($parent->id);
+});
+```
+
+- [ ] **Step 2: `generateLotCode()` usando `config('mes.lot_number_format')`** — uncomment keys in `config/config.php`
+
+- [ ] **Step 3: Integrate complete() when Item.tracing_type = lot|serial**
+
+- [ ] **Step 4: Commit**
+
+---
+
+### Task 10: Qualità e non conformità — T8/R8
+
+**Files:**
+- Create: 5 migrations quality_*
+- Create: 5 models
+- Create: `QualityCheckService`
+- Create: `NonConformanceService` con creazione PO rilavorazione
+- Create: `Modules/MES/tests/Feature/QualityCheckFlowTest.php`
+
+- [ ] **Step 1: Test failed check → NonConformance**
+
+- [ ] **Step 2: Implementare execute check con measurements + limits**
+
+- [ ] **Step 3: Rework production order when disposition=rework**
+
+- [ ] **Step 4: Commit**
+
+---
+
+### Task 11: Scheduling e capacità — T9
+
+**Files:**
+- Create: `Modules/MES/app/Services/CapacityService.php`
+- Create: `Modules/MES/tests/Feature/CapacityServiceTest.php`
+
+- [ ] **Step 1: Test CapacityLoad >= 0**
+
+- [ ] **Step 2: Implementare metodi**
+
+```php
+public function getCapacityLoad(int $work_center_id, \DateTimeInterface $from, \DateTimeInterface $to): float;
+public function getSchedule(int $company_id, \DateTimeInterface $from, \DateTimeInterface $to): Collection;
+public function estimateCompletionDate(ProductionOrder $order): \DateTimeInterface;
+public function checkOverload(int $work_center_id, \DateTimeInterface $at): bool;
+public function rescheduleOperation(ProductionOrderOperation $operation, int $work_center_id, \DateTimeInterface $planned_start_at): ProductionOrderOperation;
+```
+
+- [ ] **Step 3: Commit**
+
+---
+
+### Task 12: Fermi macchina e OEE — T11
+
+**Files:**
+- Create: migration `mes_downtimes`, model, enum cause
+- Create: `OeeCalculatorService`
+- Create: `Modules/MES/tests/Feature/OeeCalculatorServiceTest.php`
+
+- [ ] **Step 1: Test OEE in [0,1] con dati noti**
+
+```php
+// Availability=0.9, Performance=0.8, Quality=0.95 => OEE=0.684
+expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
+```
+
+- [ ] **Step 2: Downtime close calcola duration_minutes**
+
+- [ ] **Step 3: Active downtime flag su WorkCenter per CapacityService**
+
+- [ ] **Step 4: Commit**
+
+---
+
+### Task 13: Turni e operatori — T10
+
+**Files:**
+- Create: 4 migrations shifts*
+- Create: models `Shift`, `ShiftInstance`, `OperatorLog`
+- Create: `ShiftVerificationService`
+- Modify: `ProductionOrderOperationService` per log automatico
+- Create: `Modules/MES/tests/Feature/ShiftOperatorTest.php`
+
+- [ ] **Step 1: Test OperatorLog on start/complete**
+
+- [ ] **Step 2: ShiftInstance warning (non blocking) se assente**
+
+- [ ] **Step 3: Efficienza media per operatore/turno**
+
+- [ ] **Step 4: Commit**
+
+---
+
+### Task 14: API REST — T13/R13
+
+**Files:**
+- Modify: `Modules/MES/routes/api.php`
+- Modify: `Modules/MES/app/Providers/RouteServiceProvider.php` (prefix `api/v1/mes`, middleware `auth:sanctum`, throttle)
+- Modify: `Modules/MES/config/config.php` (uncomment `rate_limit`)
+- Create: `Modules/MES/app/Http/Controllers/Api/V1/*.php` (11 controller)
+- Create: `Modules/MES/app/Http/Resources/*.php`
+- Create: `Modules/MES/app/Http/Requests/*Request.php` per write endpoints
+- Create: `Modules/MES/tests/Feature/Api/WorkCenterApiTest.php` (+ uno per controller principale)
+
+- [ ] **Step 1: Base JsonResource envelope**
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\MES\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/** @mixin \Modules\MES\Models\WorkCenter */
+final class WorkCenterResource extends JsonResource
+{
+    /** @return array<string, mixed> */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
+            'type' => $this->type->value,
+            'capacity_per_hour' => $this->capacity_per_hour,
+            'capacity_uom' => $this->capacity_uom,
+            'is_active' => $this->is_active,
+        ];
+    }
+}
+```
+
+- [ ] **Step 2: Routes (estratto)**
+
+```php
+Route::prefix('v1/mes')->middleware(['auth:sanctum', 'throttle:mes'])->group(function (): void {
+    Route::apiResource('work-centers', WorkCenterController::class);
+    Route::post('work-centers/{work_center}/deactivate', [WorkCenterController::class, 'deactivate']);
+    Route::apiResource('boms', BomController::class)->only(['index', 'store', 'show']);
+    Route::get('boms/{bom}/explode', [BomController::class, 'explode']);
+    // ... table design.md lines 787-823
+});
+```
+
+- [ ] **Step 3: Test 401/403/422/200 per WorkCenter**
+
+```php
+it('returns 401 without token', function (): void {
+    $this->getJson('/api/v1/mes/work-centers')->assertUnauthorized();
+});
+```
+
+- [ ] **Step 4: Replicare pattern per tutti i controller design.md**
+
+- [ ] **Step 5: Commit**
+
+---
+
+### Task 15: Pannello Filament — T14/R14
+
+**Files:**
+- Create: `Modules/MES/app/Filament/Resources/WorkCenters/WorkCenterResource.php` (+ Pages, Schemas, Tables)
+- Create: resources per Bom, Routing, ProductionOrder, QualityCheck, NonConformance, Downtime, Shift
+- Create: `Modules/MES/app/Filament/Widgets/ProductionDashboardWidget.php`
+- Modify: `Modules/MES/app/Providers/MESServiceProvider.php` (registra panel namespace se richiesto dal pattern moduli)
+- Create: `Modules/MES/tests/Feature/Filament/WorkCenterResourceTest.php`
+
+- [ ] **Step 1: WorkCenterResource** — CRUD + repeater calendario inline (relation `calendar`)
+
+Seguire struttura:
+
+```
+Modules/MES/app/Filament/Resources/WorkCenters/
+  WorkCenterResource.php
+  Pages/ListWorkCenters.php, CreateWorkCenter.php, EditWorkCenter.php
+  Schemas/WorkCenterForm.php
+  Tables/WorkCentersTable.php
+```
+
+- [ ] **Step 2: BomResource** — Select `item_id` da ERP Item, Repeater bom lines
+
+- [ ] **Step 3: ProductionOrderResource** — View page con tabs (RelationManagers: Operations, MaterialConsumptions, QualityChecks, LotNumbers); actions Release/Complete/Cancel che chiamano `ProductionOrderService`
+
+- [ ] **Step 4: ProductionDashboardWidget** — 4 stat cards da query aggregate
+
+- [ ] **Step 5: Policy Core** — usare permessi tabella `mes_*` generati da Core seeder; altrimenti creare `MESDatabaseSeeder` permissions block
+
+- [ ] **Step 6: Test render list page authenticated admin**
+
+- [ ] **Step 7: Commit**
+
+---
+
+### Task 16: Test suite e quality gates — T16
+
+**Files:**
+- Create: factories per ogni modello MES mancante
+- Create: `Modules/MES/tests/Integration/ProductionCycleEndToEndTest.php`
+- Create: `Modules/MES/tests/Feature/Invariants/ProductionOrderInvariantsTest.php`
+- Modify: `Modules/MES/composer.json` scripts se presenti
+
+- [ ] **Step 1: Factory coverage checklist**
+
+Ogni modello in `app/Models/` deve avere factory in `database/factories/`.
+
+- [ ] **Step 2: Invariant tests (Pest datasets)**
+
+```php
+it('keeps bom snapshot immutable after release', function (int $i): void {
+    // mutate bom $i times, assert snapshot unchanged
+})->with(range(1, 5));
+```
+
+Coprire invarianti design.md: snapshot, OEE bounds, order number uniqueness, state coherence, capacity >= 0, lot trace symmetry.
+
+- [ ] **Step 3: E2E ciclo produzione**
+
+Flusso: create PO → release → start/complete operations → backflush → complete PO → stock in.
+
+- [ ] **Step 4: Quality gates**
+
+Run:
+
+```bash
+cd Modules/MES && vendor/bin/pint --dirty
+cd /srv/http/laraplate && php artisan test Modules/MES/tests --compact
+cd Modules/MES && composer test:type-coverage 2>/dev/null || echo "run if script exists"
+cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
+```
+
+- [ ] **Step 5: Commit**
+
+---
+
+### Task 17: Documentazione — T17
+
+**Files:**
+- Verify: `Modules/MES/docs/GLOSSARY.md`, `Modules/MES/docs/rag/GLOSSARY.md`
+- Create: `Modules/MES/docs/MES_GUIDA_SEMPLICE.md`
+- Create: `Modules/MES/docs/rag/MODULE.md`
+- Modify: `Modules/MES/README.md` (roadmap → current status)
+
+- [ ] **Step 1: MES_GUIDA_SEMPLICE.md** — flussi utente: creare WC, BOM, routing, ordine, avanzamento, OEE (italiano, no tecnicismi)
+
+- [ ] **Step 2: rag/MODULE.md** — scopo, entità, flussi, integrazione ERP/ERPBridge (breve, RAG-friendly)
+
+- [ ] **Step 3: Allineare GLOSSARY con entità implementate**
+
+- [ ] **Step 4: Commit**
+
+---
+
+## Self-Review (spec coverage)
+
+| Requisito Kiro | Task |
+|----------------|------|
+| R1 Work Center | 3, 14, 15 |
+| R2 BOM | 4, 14, 15 |
+| R3 Routing | 5, 14, 15 |
+| R4 Production Order | 6, 7, 14, 15 |
+| R5 Operations | 7, 14 |
+| R6 Material consumption | 8, 14 |
+| R7 Lot traceability | 9, 14 |
+| R8 Quality | 10, 14, 15 |
+| R9 Scheduling | 11, 14 |
+| R10 Shifts | 13, 14, 15 |
+| R11 Downtime/OEE | 12, 14, 15 |
+| R12 ERP integration | 1, 2, 6, 8 |
+| R13 API | 14 |
+| R14 Filament | 15 |
+
+**Gap note:** Requirement 5 (operazioni parallele) — implementare in `ProductionOrderOperationService` che operazioni con `is_parallel=true` condividono sequence possono essere `in_progress` contemporaneamente.
+
+**Placeholder scan:** nessun TBD nel piano; ogni task ha file path, comandi e codice di riferimento.
+
+**Type consistency:** `ProductionOrderOperation` FK column in material consumption = `production_order_operation_id` (design.md); allineare modelli e migration a questo nome.
+
+---
+
+## Final checklist per ogni task
+
+1. `vendor/bin/pint --dirty` (root o `Modules/MES`)
+2. `php artisan test Modules/MES/tests --compact` (o subset file)
+3. Commit nel submodule MES (e ERP se toccato)
+4. Aggiornare `.kiro/specs/mes-module/tasks.md` checkbox quando completato
+
+---
+
+## Execution Handoff
+
+**Plan complete and saved to `docs/superpowers/plans/2026-06-19-mes-module-full-implementation.md`. Two execution options:**
+
+**1. Subagent-Driven (recommended)** — I dispatch a fresh subagent per task, review between tasks, fast iteration
+
+**2. Inline Execution** — Execute tasks in this session using executing-plans, batch execution with checkpoints
+
+**Which approach?**
