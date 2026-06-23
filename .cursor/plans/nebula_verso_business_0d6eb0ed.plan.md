@@ -1,6 +1,6 @@
 ---
 name: Laraplate ERP modulo
-overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry. **Slice Filament** completati (contabile + commerciale). **M3.1 completato** (CRM win). **M3.2 completato** (SO + lock-chain + evasion + amendment). **M3.3 completato** (magazzino + costing). **M3.4 completato** (DDT + COGS/journal + storno). **M3.5 completato (2026-05-07):** posting fattura + numerazione `DocumentNumberAllocator` + pivot Invoice↔DDT + `InvoiceCompactionService`. **M3.6 avanzato:** ciclo acquisti, parties, 3-way match e posting fattura acquisto risultano implementati; resta da mantenere solo cleanup/regressioni se emergono gap. **M4 parziale:** permessi domain e reporting contabile presenti; pipeline/stock reporting restano backlog. **M5 completato:** scadenzario/pagamenti, note credito/debito, registri IVA/liquidazione, bilancio/conto economico. **M6.1 completato:** bank reconciliation v1 CSV + match manuale/suggerimenti. **M6.2 completato:** resi cliente/fornitore con DDT fisico, tracking quantità, NC/ND manuali. **M6.3 pending:** e-invoice stub/submission workflow; FatturaPA completo backlog opzionale. **M7.1 completato:** listini avanzati e resolver prezzi."
+overview: "P0 e P1 completati (Place+Location; Taxonomy+Category). **MVP v1 (pre-contabilità)**: anagrafica + listino + preventivo/righe + progetto + task + time entry. **Slice Filament** completati (contabile + commerciale). **M3.1 completato** (CRM win). **M3.2 completato** (SO + lock-chain + evasion + amendment). **M3.3 completato** (magazzino + costing). **M3.4 completato** (DDT + COGS/journal + storno). **M3.5 completato (2026-05-07):** posting fattura + numerazione `DocumentNumberAllocator` + pivot Invoice↔DDT + `InvoiceCompactionService`. **M3.6 avanzato:** ciclo acquisti, parties, 3-way match e posting fattura acquisto risultano implementati; resta da mantenere solo cleanup/regressioni se emergono gap. **M4 parziale:** permessi domain e reporting contabile presenti; pipeline/stock reporting restano backlog. **M5 completato:** scadenzario/pagamenti, note credito/debito, registri IVA/liquidazione, bilancio/conto economico. **M6.1 completato:** bank reconciliation v1 CSV + match manuale/suggerimenti. **M6.2 completato:** resi cliente/fornitore con DDT fisico, tracking quantità, NC/ND manuali. **M6.3 completato:** e-invoice stub/submission workflow; FatturaPA completo backlog opzionale. **M7.1 completato:** listini avanzati e resolver prezzi."
 todos:
   - id: p0-core-place-location-refactor
     content: "P0 — Place + Location: Core `places` + Place; servizi/rotte geocoding in Core; Cms `locations.place_id` + migration; trait trasparente Location↔Place; test; poi ERP `sites.place_id` / ICS"
@@ -141,8 +141,8 @@ todos:
     content: "M6.2 — **Completato.** Flusso primario su documenti dedicati: `ReturnOrder` per reso cliente e `SupplierReturn` per reso a fornitore, con party, documento origine opzionale, status e righe proprie. Se il reso muove fisicamente merce, il servizio genera/collega un DDT: cliente inbound (`DeliveryNote.direction=inbound`), fornitore outbound (`direction=outbound`). Le bolle non contengono prezzi o costi; i costi restano in `StockMovement`/`StockCostLayer` e, per resi cliente senza movimento originario risolvibile, sulla riga reso come costo manuale esplicito. Completamento reso aggiorna qty rese su invoice/SO o PO/GR quando c'e' una riga sorgente. Le pagine reso espongono azioni manuali NC/ND v1 e collegano i documenti generati a `credit_note_invoice_id` / `debit_note_invoice_id`; automazione resta backlog dopo contratto esplicito per fattura origine e override righe. Test: approve/complete/cancel, DDT reso collegato, stock movement, tracking qty rese, NC/ND manuali."
     status: completed
   - id: einvoice-sdi-binding
-    content: "M6.3 — **E-invoice stub + struttura invio.** Scope core: bind di `EInvoiceProvider`, provider stub deterministico, persistenza `EInvoiceSubmission`, azioni Filament minime per invio/refresh su fatture vendita postate e test del workflow. Non promettere XML FatturaPA validabile, provider Aruba reale, polling/webhook SDI avanzato o conservazione sostitutiva in questo milestone. **Backlog opzionale finale FatturaPA:** XSD ufficiale, mapping completo party/company/trasmittente/cessionario, PEC/codice SDI, regime fiscale, `Natura`, provider reale e stati SDI avanzati."
-    status: pending
+    content: "M6.3 — **Completato.** Scope core: bind di `EInvoiceProvider`, provider stub deterministico, persistenza `EInvoiceSubmission`, azioni Filament minime per invio/refresh su fatture vendita postate e test del workflow. Non promette XML FatturaPA validabile, provider Aruba reale, polling/webhook SDI avanzato o conservazione sostitutiva. **Backlog opzionale finale FatturaPA:** XSD ufficiale, mapping completo party/company/trasmittente/cessionario, PEC/codice SDI, regime fiscale, `Natura`, provider reale e stati SDI avanzati."
+    status: completed
   - id: advanced-pricelists
     content: "M7.1 — **Listino Prezzi Avanzato.** Estensione `price_list_items` con `valid_from`/`valid_to` (validità temporale). Tabella `party_price_rules` (party_id, item_id nullable, taxonomy_id nullable, discount_type enum [percentage, fixed, cascade], discount_value, priority, valid_from, valid_to) per condizioni di prezzo personalizzate per party. Sconti a cascata: `discount_value` come JSON array `[10, 5, 3]` → -10%, poi -5% sul risultato, poi -3%. Servizio `PriceResolverService::resolve(item_id, party_id, qty, date)`: applica in ordine: listino base → regole per party → sconti volume opzionali → prezzo finale. Integrazione: `QuotationItem`/`SalesOrderLine`/`InvoiceLine` richiamano `PriceResolverService` come suggerimento (prezzo modificabile dall'utente). Filament: gestione regole prezzo per party, preview prezzo calcolato nel form riga. Test: risoluzione con priorità, scadenza temporale, cascade, override manuale."
     status: completed
@@ -290,10 +290,9 @@ Aggiunta validazione `saving()` su tutti i modelli sales-side (Quotation, SalesO
 | `advanced-pricelists` | M7.1 | Listino con validità temporale, sconti per party, sconti a cascata | MEDIO |
 
 **Ordine residuo di implementazione suggerito:**
-1. M6.3 e-invoice stub/submission workflow.
-2. M4 follow-up: reporting operativo residuo, policy/permessi mancanti e test dedicati.
-3. Accounting golden-master/concurrency test plan.
-4. Backlog opzionali: differenze bancarie con journal, FatturaPA completo, reporting operativo avanzato.
+1. M4 follow-up: reporting operativo residuo, policy/permessi mancanti e test dedicati.
+2. Accounting golden-master/concurrency test plan.
+3. Backlog opzionali: differenze bancarie con journal, FatturaPA completo, reporting operativo avanzato.
 
 **Nota:** `erp-reporting-stub` (ex M4) è stato sostituito da `financial-statements` (M5.4) per i report contabili. `VatLedgerService` migra dentro `vat-registers-settlement` (M5.3). `SalesPipelineService` e `StockValuationService` restano in `erp-reporting-stub` come backlog opzionale.
 
@@ -333,8 +332,9 @@ Aggiunta validazione `saving()` su tutti i modelli sales-side (Quotation, SalesO
 **Fatto — Documentazione:**
 - Aggiornati `README.md`, `docs/rag/MODULE.md`, `docs/GLOSSARY.md` con tutte le funzionalità M0–M5.
 
-**Prossimi step:** procedere con M6.3 come stub e submission workflow. M6.1, M6.2 e M7.1 sono
-chiusi come v1; FatturaPA completo resta backlog opzionale finale.
+**Prossimi step:** M6.1, M6.2, M6.3 e M7.1 sono chiusi come v1. Procedere con i follow-up M4,
+test contabili golden-master/concorrenza e backlog opzionali. FatturaPA completo resta backlog
+opzionale finale.
 
 # Modulo ERP in Laraplate (Nebula)
 

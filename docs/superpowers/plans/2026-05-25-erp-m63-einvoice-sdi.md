@@ -158,6 +158,9 @@ Test scenarios:
 
 ## Verification Status
 
+- Implemented as v1 stub/submission workflow: `EInvoiceProvider` resolves to
+  `StubEInvoiceProvider`, `EInvoiceSubmissionService` persists submissions and refreshes status,
+  and invoice edit pages expose submit/refresh actions for posted sale invoices.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/EInvoiceProviderTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php`
