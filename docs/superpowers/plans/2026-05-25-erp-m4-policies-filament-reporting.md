@@ -105,14 +105,14 @@ Filament resource/page structure.
 - Create: `Modules/ERP/app/Services/Reporting/StockValuationService.php`
 - Create or modify focused reporting tests.
 
-- [ ] `SalesPipelineService` must query `Opportunity` using actual fields:
+- [x] `SalesPipelineService` must query `Opportunity` using actual fields:
   `status`, `expected_value_doc`, `expected_value_local`, `won_at`, and `lost_at`.
   There are no `amount_doc` / `amount_local` columns on `Opportunity`.
-- [ ] `StockValuationService` must query `StockLevel` using `quantity` and
+- [x] `StockValuationService` must query `StockLevel` using `quantity` and
   `weighted_avg_cost`.
-- [ ] Avoid raw SQL date formatting unless necessary; prefer portable query builder or collection
+- [x] Avoid raw SQL date formatting unless necessary; prefer portable query builder or collection
   grouping for testability.
-- [ ] Tests must create required model rows manually unless ERP factories are introduced in a
+- [x] Tests must create required model rows manually unless ERP factories are introduced in a
   separate explicit task.
 
 ## Task 6: Reporting Pages
@@ -122,9 +122,9 @@ Filament resource/page structure.
 - Create: `Modules/ERP/app/Filament/Pages/StockValuationPage.php`
 - Create Blade views under `Modules/ERP/resources/views/filament/pages/`.
 
-- [ ] Resolve company context via `Modules\ERP\Helpers\current_company_id()` or explicit page
+- [x] Resolve company context via `Modules\ERP\Helpers\current_company_id()` or explicit page
   filters. Do not assume a user-level current-company accessor exists.
-- [ ] Pages are read-only and must not create new tables.
+- [x] Pages are read-only and must not create new tables.
 
 ## Verification
 
@@ -151,8 +151,12 @@ the reason.
 - Existing financial statement reporting services were aligned to `ERPTables::*` and the installed
   PHP runtime; `TrialBalancePage`, `IncomeStatementPage`, and `BalanceSheetPage` now use the
   Filament 5 non-static page view override.
-- Operational `SalesPipelineService` and `StockValuationService` remain a follow-up development
-  slice unless this milestone is expanded.
+- Operational `SalesPipelineService` and `StockValuationService` are implemented as read-only
+  service-layer summaries with read-only Filament pages.
+- Verified on 2026-06-23:
+  - `php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
+  - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`
+  - `php artisan test --compact Modules/ERP/tests/Feature/FinancialStatementsTest.php Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Integration/Services/Accounting/FiscalPeriodCloserTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/FinancialStatementsTest.php`
