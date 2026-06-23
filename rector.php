@@ -53,7 +53,7 @@ return RectorConfig::configure()
         '**/node_modules/**',
         '**/storage/**',
         // Esclude il file SortableTrait dalla regola di privatizzazione
-        __DIR__ . '/Modules/Core/app/Helpers/SortableTrait.php',
+        __DIR__ . '/Modules/Core/app/Models/Concerns/SortableTrait.php',
     ])
     ->withPreparedSets(
         deadCode: true,
