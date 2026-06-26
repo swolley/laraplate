@@ -655,8 +655,8 @@ assertions.
 
 ## Follow-Up After Golden Master
 
-- Add a second suite for inventory/accounting integration: DDT outbound COGS, inbound return DDT,
-  supplier return outbound DDT, and COGS reversal symmetry.
+- Completed 2026-06-26: added a second suite for inventory/accounting integration covering DDT
+  outbound COGS, inbound return DDT, supplier return outbound DDT, and COGS reversal symmetry.
 - Add a focused settlement-confirmation test proving confirmed settlements cannot be recomputed or
   mutated.
 - Add API/export work only after the golden-master accounting suite is green.
