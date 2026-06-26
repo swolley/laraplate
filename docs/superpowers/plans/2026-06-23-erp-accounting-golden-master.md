@@ -657,6 +657,7 @@ assertions.
 
 - Completed 2026-06-26: added a second suite for inventory/accounting integration covering DDT
   outbound COGS, inbound return DDT, supplier return outbound DDT, and COGS reversal symmetry.
-- Add a focused settlement-confirmation test proving confirmed settlements cannot be recomputed or
-  mutated.
+- Completed 2026-06-27: added focused settlement-confirmation tests proving confirmed settlements
+  cannot be recomputed, updated, or deleted, and that only confirmed previous VAT credits are
+  carried forward.
 - Add API/export work only after the golden-master accounting suite is green.
