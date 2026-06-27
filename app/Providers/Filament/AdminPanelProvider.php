@@ -54,8 +54,16 @@ final class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(static fn (): string => sprintf('%s %s', (string) (config('app.name')), (string) (__('Admin'))))
-            ->brandLogo(static fn (): ?string => config('app.logo'))
+            ->brandName(static function (): string {
+                $app_name = config('app.name');
+
+                return sprintf('%s %s', is_string($app_name) ? $app_name : 'Laravel', __('Admin'));
+            })
+            ->brandLogo(static function (): ?string {
+                $logo = config('app.logo');
+
+                return is_string($logo) ? $logo : null;
+            })
             ->spa(hasPrefetching: true)
             ->maxContentWidth(Width::Full)
             ->unsavedChangesAlerts()

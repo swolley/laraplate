@@ -12,7 +12,11 @@ final class DatabaseSeeder extends Seeder
     public function run(): void
     {
         foreach (modules(prioritySort: true) as $module) {
-            $seeders_path = module_path($module, config('modules.paths.generator.seeder.path'));
+            $seeder_relative_path = config('modules.paths.generator.seeder.path');
+            $seeders_path = module_path(
+                $module,
+                is_string($seeder_relative_path) ? $seeder_relative_path : 'database/seeders',
+            );
             $seeders = glob("{$seeders_path}/*.php") ?: [];
 
             foreach ($seeders as $seeder) {

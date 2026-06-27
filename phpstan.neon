@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Livello di analisi (0-9, max = 9)
-    level: 7
+    level: 9
 
     tmpDir: /tmp/phpstan
     
@@ -17,12 +17,15 @@ parameters:
         - database
         - public
         - routes
+        - Modules/
     
     # File da escludere
     excludePaths:
         # Escludo solo _ide_helper.php principale (generato da barryvdh/laravel-ide-helper)
         - _ide_helper.php
         - .phpstorm.meta.php
+        # MES module — out of scope for now
+        - Modules/MES/**
         # Escludi file vendor che possono causare problemi
         - vendor/**
         - storage/*
