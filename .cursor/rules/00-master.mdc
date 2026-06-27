@@ -5,9 +5,10 @@ alwaysApply: true
 
 # Master Rules (caveman)
 
-- This file = entrypoint.
-- `laravel-boost.mdc` = main law.
-- Other files = context law by file type.
+- Cursor entrypoint. Codex entrypoint is `AGENTS.md`.
+- `laravel-boost.mdc` = ecosystem law.
+- Other `.mdc` files = contextual law by frontmatter.
+- `README.md` files are navigation, not law.
 
 - Always:
   - Chat in Italian.

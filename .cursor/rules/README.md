@@ -4,6 +4,7 @@
 - `laravel-boost.mdc` is main law.
 - `00-master.mdc` is map.
 - Other files are context rules by glob.
+- This README is a human/navigation index, not an agent rule file.
 
 ## Apply Mode
 
@@ -29,3 +30,9 @@
 - No duplicate rules across files.
 - If rule already in `laravel-boost.mdc`, reference it.
 - Keep language policy: chat IT, code docs EN.
+
+## Codex Compatibility
+
+- Codex should start from `AGENTS.md`.
+- Load this folder through `00-master.mdc` and relevant `.mdc` files only.
+- Do not treat README content as additional law.

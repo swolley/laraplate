@@ -5,16 +5,28 @@
 - Use existing rules. Do not recreate unless missing.
 - Main rules:
   - `CLAUDE.md`
-  - `.cursor/rules/*.mdc`
-  - `.kiro/steering/*.md`
+  - `.cursor/rules/00-master.mdc`
+  - `.cursor/rules/laravel-boost.mdc`
+  - Relevant `.cursor/rules/*.mdc`
+  - `.kiro/steering/*.md` only for Kiro specs or when Cursor rules miss needed context.
 - Specs:
-  - `.kiro/specs/**`
-  - `docs/superpowers/specs/**`
-  - `.cursor/plans/**`
+  - Read `docs/superpowers/specs/INDEX.md` first when present.
+  - Read `docs/superpowers/plans/INDEX.md` first when present.
+  - Read `.cursor/plans/INDEX.md` first when present.
+  - Read `.kiro/specs/INDEX.md` first when present.
+  - Open only relevant specs/plans after using indexes or search.
 - Module context:
   - `Modules/*/README.md`
   - `Modules/*/.cursor/rules/module-context.mdc`
   - `Modules/*/.cursor/mcp.json`
+
+## Load Policy
+
+- Cursor uses `.cursor/rules/*.mdc` frontmatter to decide rule inclusion.
+- Codex starts from `AGENTS.md`, then loads only relevant rules/specs/plans.
+- `README.md` and `INDEX.md` files are navigation aids, not extra law.
+- Do not bulk-load all specs/plans. Use `rg` and indexes, then open the smallest relevant section/file.
+- If two rule files duplicate each other, keep the stricter or more local rule.
 
 ## MCP
 
