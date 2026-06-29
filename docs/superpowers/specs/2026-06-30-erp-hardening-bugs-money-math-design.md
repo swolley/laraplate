@@ -25,7 +25,7 @@ endpoints, and architectural expansions, which are owned by later specs:
 - Spec 3: domain action endpoints (internal CRUD-style actions + opt-in external API), and the full
   per-model API/CRUD exposure governance (settings-driven toggles extending `core.expose_crud_api`,
   model-property hard override, route/middleware-level gating that stays CMS-delegation-safe). Spec 1
-  ships only the minimal write-integrity guard (Fix 8) as a forerunner.
+  ships only the minimal write-integrity guard (Fix 6) as a forerunner.
 - Spec 4 / Spec 5: architectural expansions (analytic dimensions, real multi-currency, Money value
   object, integration outbox/events).
 
@@ -53,8 +53,11 @@ defect.
   `Brick\Math\BigDecimal`, scale 4, `RoundingMode::HALF_UP`) replaces the ad-hoc float helpers
   (`add`/`mul`/`neg`/`round4`) currently duplicated across services. `brick/math` is already
   present in the root lock file; no new dependency is added.
-- Tax single source of truth: invoice posting and VAT register must compute line tax through
-  `TaxLineCalculator` (already Brick-based) instead of duplicating float tax math.
+- Tax single source of truth: invoice posting and VAT register compute per-line tax through one
+  shared decimal method (a `lineTax(net, rate)` helper added to `TaxLineCalculator`, already
+  Brick-based) instead of duplicating float tax math. The formula is identical on both paths and
+  takes a net amount + rate, so it needs neither a `TaxKind` check nor an extra `TaxCode` lookup
+  (kept low-risk and behavior-preserving).
 - Golden master as guardrail: existing golden-master tests must stay green. If a golden value
   changes after the decimal refactor, that is a float defect being corrected, not a reason to relax
   assertions. A new fractional-quantity golden master is added to prove the refactor fixes a real
@@ -129,58 +132,33 @@ semantics must be pinned.
   `JournalPostingService` tests (`AccountingSequencesAndPostingTest`).
 
 **Target:** In `InvoicePostingService::post()`, resolve the company's `FiscalPeriod` covering the
-invoice `posted_at` date and pass it to `JournalPostingService::post()`, so a closed period blocks
-invoice posting through the existing guard. Define behavior when no fiscal period exists for the
-date (align with `VatRegisterService`, which already throws when the fiscal year is missing): fail
-with a clear validation error rather than posting unguarded.
+invoice `posted_at` date (join `FiscalYear` on `company_id` + `year`, then match
+`start_date <= posted_at <= end_date`) and pass it to `JournalPostingService::post()`, so a closed
+covering period blocks invoice posting through the existing guard. **Non-breaking behavior:** when no
+fiscal period covers the date, pass `null` (current behavior) — posting is not blocked. The guard
+fires only when a covering period exists **and** `is_closed === true`. This mirrors
+`JournalPostingService`, which already no-ops the guard when no period is provided, and avoids
+breaking the existing posting suite, whose fixtures create a `FiscalYear` but no `FiscalPeriod`
+rows.
 
-**Test:** posting a sale invoice with `posted_at` inside a closed period throws; posting inside an
-open period succeeds and links the journal to that period.
+**Test:** posting a sale invoice whose `posted_at` falls inside a **closed** covering period throws
+`PostingToClosedFiscalPeriodException`; posting inside an **open** covering period succeeds and links
+the journal to that period; posting with no covering period (existing fixtures) still succeeds.
 
-### Fix 4 — Bank suggestion/match amount tolerance mismatch (P0)
+### Considered and dropped (verified against current code/tests)
 
-**Current:** `Modules/ERP/app/Services/Banking/BankReconciliationService.php`:
-- `suggestPayments()` filters candidate payments within a EUR 1.00 window
-  (`whereBetween('amount_doc', [expected - 1, expected + 1])`, lines 84-87).
-- `assertCanMatch()` requires an exact amount within 0.0001
-  (`abs(abs($line_amount) - $payment_amount) > 0.0001` throws, lines 135-143).
+- **Bank suggestion/match tolerance** — the EUR ±1 fuzzy window in `suggestPayments()` is
+  intentional and pinned by `BankReconciliationServiceTest` ("suggests compatible payments…", which
+  asserts a `100.5000` near payment is suggested for a `100.0000` line). Suggestions are fuzzy
+  candidates for human review; `matchPayment()` stays strict (0.0001). This is by design, not a P0
+  bug; any UX refinement is deferred to Spec 2/3.
+- **Return completion idempotency** — the normal flow is already guarded and tested:
+  `ReturnOrderServiceTest` ("prevents completing the same customer return twice") asserts a second
+  `complete()` throws (`Approved → Processed → re-complete throws`). The only double-count path
+  requires a pre-set `delivery_note_id` while status is still `Approved`, which is not reachable in
+  the normal flow. No change needed in Spec 1.
 
-A payment suggested within the EUR 1.00 window but not exactly equal cannot actually be matched.
-
-**Target:** Introduce a single private predicate (e.g. `amountsMatch(BankStatementLine, Payment)`)
-used by both `suggestPayments()` and `assertCanMatch()` so suggestion and match always agree.
-Default rule stays exact (0.0001) to keep accounting safe. Near-but-not-equal amounts may still be
-surfaced as non-matchable "near" hints, but must never be presented as directly matchable.
-Difference journals remain out of scope (Spec 3).
-
-**Test:** a payment within EUR 1.00 but not exact is not returned as a matchable suggestion (or is
-clearly flagged non-matchable), and `matchPayment()` and `suggestPayments()` agree on the same
-payment set for exact amounts.
-
-### Fix 5 — Idempotency guard on return completion (P0 hardening)
-
-**Current:** `CustomerReturnReceiptService::receive()` and
-`SupplierReturnShipmentService::ship()` are guarded by `status === Approved` and set `Processed` at
-the end, so normal double-processing is blocked. However, if `delivery_note_id` is already set
-while the status is still `Approved`, `deliveryNoteFor()` reuses the existing delivery note
-(`CustomerReturnReceiptService.php:61-68`, `SupplierReturnShipmentService.php:61-68`) while
-`registerSourceReturnedQuantities()` (called at lines 50) increments `qty_returned` again. This can
-double-count returned quantities on the source lines.
-
-**Target:** Add an idempotency guard so a return that already has a generated/linked delivery note
-does not re-run source returned-quantity registration. Stock posting is already idempotent (the
-service only sets `posted_at` when it is null), so the fix targets quantity double-counting.
-
-**Note (out of scope, routed to Spec 3):** there is no path to reverse a return after it reaches
-`Processed` (cancel is blocked for `Processed`, and the generated DDT and `qty_returned` are not
-rolled back). A "revert processed return" workflow is a design gap to be handled in Spec 3, not
-here.
-
-**Test:** invoking completion twice on a return whose delivery note is already linked does not
-double-increment `qty_returned` on the source invoice/sales-order or purchase-order/goods-receipt
-lines, and does not double-post stock.
-
-### Fix 6 — Decimal-exact money math (P1)
+### Fix 4 — Decimal-exact money math (P1)
 
 **Current:** float-based money math, with duplicated tax logic:
 - `InvoicePostingService`: `round4`/`add`/`mul`/`neg`/`asFloat` (lines 375-403); per-line tax via
@@ -210,7 +188,7 @@ lines, and does not double-post stock.
   example repeated `0.1`-style quantities) asserts exact 4-decimal signed journal, VAT register,
   and settlement values that the current float pipeline gets wrong.
 
-### Fix 7 — Targeted test gaps (P1)
+### Fix 5 — Targeted test gaps (P1)
 
 **Three-way match coverage:**
 - `ThreeWayMatchService` is exercised today only on `PurchaseOrderLine` (matched/throw/forced, 3
@@ -224,7 +202,7 @@ lines, and does not double-post stock.
   validation that rejects rows missing date/description/amount with a `ValidationException`, and a
   test for malformed/empty rows.
 
-### Fix 8 — Block generic CRUD writes on immutable/derived models (P0 integrity)
+### Fix 6 — Block generic CRUD writes on immutable/derived models (P0 integrity)
 
 **Current:** the Core dynamic CRUD has no structural model-exposure control. `CrudRequest`
 resolves any model by name via `DynamicEntity::resolve()` →
@@ -284,12 +262,12 @@ at the route/middleware layer to remain CMS-safe.
 
 - The decimal refactor touches the accounting core. Mitigation: test-first, existing golden masters
   as the baseline, and incremental per-service replacement rather than a single sweep.
-- Fix 3 changes invoice posting to require a fiscal period for the posted date. Mitigation: define
-  and test the missing-period behavior explicitly (fail with a clear validation error), mirroring
-  the existing `VatRegisterService` fiscal-year guard.
+- Fix 3 resolves a covering fiscal period for the posted date. Mitigation: it is non-breaking — the
+  guard only fires when a covering period exists and is closed; with no covering period posting is
+  unchanged, so the existing posting suite (FiscalYear-only fixtures) stays green.
 - Fixes 1 and 2 alter who can run e-invoice actions. Mitigation: explicit authorization tests pin
   the new, intended behavior.
-- Fix 8 introduces a small Core contract and a write guard in `CrudService`, touching Core beyond
+- Fix 6 introduces a small Core contract and a write guard in `CrudService`, touching Core beyond
   ERP. Mitigation: keep the contract minimal (write-only), default to no restriction when the
   contract is absent (existing models behave unchanged), and cover with tests that non-restricted
   entities and CMS read delegation are unaffected.

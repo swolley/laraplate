@@ -8,4 +8,4 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-05-21-module-testing-strategy-design.md`: Module-owned test taxonomy and suite strategy.
 - `2026-05-21-settings-group-cache-invalidation-design.md`: Core settings cache invalidation by group.
 - `2026-05-25-erp-m36-m4-m6-m7-design.md`: ERP pending milestone alignment for M3.6, M4, M6, and M7.
-- `2026-06-30-erp-hardening-bugs-money-math-design.md`: ERP v1 hardening — P0 correctness bugs (e-invoice permissions, closed-period posting, bank match tolerance, return idempotency, generic-CRUD write guard on immutable/derived models) and P1 decimal-exact money math.
+- `2026-06-30-erp-hardening-bugs-money-math-design.md`: ERP v1 hardening — P0 correctness bugs (e-invoice permissions, authorization tests, closed-period posting, generic-CRUD write guard on immutable/derived models) and P1 decimal-exact money math + targeted test gaps.
