@@ -3,7 +3,8 @@
 **Status:** Approved design, ready for implementation planning
 **Date:** 2026-06-30
 **Module:** `Modules/ERP`
-**Scope:** P0 correctness bugs + P1 quality/money-math hardening of the existing v1.
+**Scope:** P0 correctness bugs + P1 quality/money-math hardening of the existing v1, plus a minimal
+Core integrity guard against generic CRUD writes on immutable/derived models.
 
 ---
 
@@ -21,7 +22,10 @@ endpoints, and architectural expansions, which are owned by later specs:
 
 - Spec 2: deferred follow-ups (Filament page actions, state-aware policies, Party price-rule UI,
   bank difference journals, automatic credit/debit notes).
-- Spec 3: domain action endpoints (internal CRUD-style actions + opt-in external API).
+- Spec 3: domain action endpoints (internal CRUD-style actions + opt-in external API), and the full
+  per-model API/CRUD exposure governance (settings-driven toggles extending `core.expose_crud_api`,
+  model-property hard override, route/middleware-level gating that stays CMS-delegation-safe). Spec 1
+  ships only the minimal write-integrity guard (Fix 8) as a forerunner.
 - Spec 4 / Spec 5: architectural expansions (analytic dimensions, real multi-currency, Money value
   object, integration outbox/events).
 
@@ -220,6 +224,50 @@ lines, and does not double-post stock.
   validation that rejects rows missing date/description/amount with a `ValidationException`, and a
   test for malformed/empty rows.
 
+### Fix 8 — Block generic CRUD writes on immutable/derived models (P0 integrity)
+
+**Current:** the Core dynamic CRUD has no structural model-exposure control. `CrudRequest`
+resolves any model by name via `DynamicEntity::resolve()` →
+`DynamicEntityService::resolve()`/`tryResolveModel()` (`Modules/Core/app/Models/DynamicEntity.php`),
+with no allow/deny list, and `CrudService::insert/update/delete`
+(`Modules/Core/app/Services/Crud/CrudService.php:338-410`) then operates on it. The only gate is the
+per-model permission check, which is fail-closed for normal users but bypassed by superadmin.
+
+`JournalEntry` blocks `update`/`delete` only once posted, via model events, but does **not** guard
+creation and even exposes CRUD `create`/`update` rule sets:
+
+- `Modules/ERP/app/Models/JournalEntry.php:143-168` (`booted()` blocks update/delete post-posting).
+- `Modules/ERP/app/Models/JournalEntry.php:115-141` (`getRules()` exposes `create`/`update`).
+
+So `POST insert/erp/journal-entries` (with the permission, or as superadmin) can create an
+unbalanced voucher, bypassing every `JournalPostingService` invariant (double-entry balance,
+sequencing, fiscal period). The same risk applies to derived/immutable tables produced only by
+services: `journal_entry_lines`, `vat_register_entries`, `stock_movements`, `stock_cost_layers`,
+`stock_levels`.
+
+**Target (minimal forerunner of the Spec 3 exposure system):**
+- Add a minimal Core contract `Modules\Core\Contracts\RestrictsCrudWrites` exposing the denied write
+  operations for a model (subset of `insert`/`update`/`delete`/`forceDelete`).
+- In `CrudService::insert/update/delete`, when the resolved model implements the contract and the
+  operation is denied, throw a dedicated exception mapped to HTTP 403 in
+  `CrudController::handleServiceCall()`. The guard applies to everyone, superadmin included.
+- The ERP immutable/derived models implement the contract to deny direct CRUD writes. Service paths
+  (`JournalPostingService`, inventory services, VAT services) do not go through `CrudService`, so
+  they are unaffected. Existing `JournalEntry` model-event guards stay as defense-in-depth.
+
+**Constraint (CMS delegation):** the exposure governance must not break specialized controllers that
+reuse the generic CRUD logic in-process. `Modules/Cms/app/Http/Controllers/ContentsController.php`
+extends `CrudController` and calls `$this->list()` for `contents`. Fix 8 only guards **write**
+operations (`insert`/`update`/`delete`), which CMS does not reuse, so it is safe. The broader
+read/write per-model exposure toggles are intentionally deferred to Spec 3, where they must be gated
+at the route/middleware layer to remain CMS-safe.
+
+**Test:**
+- `insert`/`update`/`delete` via the generic CRUD on each restricted model returns 403 and persists
+  no change, even as superadmin.
+- Service-layer creation still works: the accounting golden masters stay green.
+- A non-restricted ERP model (e.g. a draft invoice) still inserts/updates normally via CRUD.
+
 ---
 
 ## Testing Strategy
@@ -241,12 +289,18 @@ lines, and does not double-post stock.
   the existing `VatRegisterService` fiscal-year guard.
 - Fixes 1 and 2 alter who can run e-invoice actions. Mitigation: explicit authorization tests pin
   the new, intended behavior.
+- Fix 8 introduces a small Core contract and a write guard in `CrudService`, touching Core beyond
+  ERP. Mitigation: keep the contract minimal (write-only), default to no restriction when the
+  contract is absent (existing models behave unchanged), and cover with tests that non-restricted
+  entities and CMS read delegation are unaffected.
 
 ## Out of Scope (routed to later specs)
 
 - Filament page actions, state-aware policies, extra seeded abilities (`force_post`, `close`,
   `reopen`, `reverse`, `amend`, `unlock`), Party price-rule UI, bank difference journals, automatic
   NC/ND creation → Spec 2.
-- Revert/reverse of a processed return; internal action endpoints and opt-in external API → Spec 3.
+- Revert/reverse of a processed return; internal action endpoints and opt-in external API; deeper
+  order-safe ERP domain-action routes (`.../{id}/{action}`); full per-model API/CRUD exposure
+  governance (settings + model-property override + CMS-safe route/middleware gating) → Spec 3.
 - Analytic dimensions, real multi-currency and FX revaluation, full `Money` value object,
   integration outbox/events → Spec 4 / Spec 5.
