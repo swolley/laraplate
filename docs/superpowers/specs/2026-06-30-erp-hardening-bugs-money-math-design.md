@@ -1,6 +1,6 @@
 # ERP Hardening — Bugs, Correctness & Money Math (Spec 1)
 
-**Status:** Approved design, ready for implementation planning
+**Status:** Implemented (2026-06-30). Post-implementation code review completed same day.
 **Date:** 2026-06-30
 **Module:** `Modules/ERP`
 **Scope:** P0 correctness bugs + P1 quality/money-math hardening of the existing v1, plus a minimal
@@ -99,10 +99,19 @@ feature is unusable rather than insecure.
 - Remove the `flushEventListeners()` call or move it out of the permission-name builder with a
   documented reason; the seeder method should only build permission names.
 
-**Test:** `Modules/ERP/tests/Feature/...` (permissions seeder feature test) asserts that after
+**Test:** `Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php` asserts that after
 running the seeder the permissions `default.erp_invoices.submitEInvoice` and
 `default.erp_invoices.refreshEInvoice` exist, alongside the existing `post`/`unpost` permissions
 for the five seeded models.
+
+**Implemented:** `9297a7c` (ERP submodule). Seeder fixed; tests green.
+
+**Post-review note:** the `default` prefix is correct for current ERP models. Laravel's
+`Model::getConnectionName()` returns the model's explicit `$connection` property, not the resolved
+database connection used by the default connection. Because ERP models do not define `$connection`,
+both the seeder and runtime policy checks intentionally fall back to `default`. A shared
+permission-name helper may still be useful if ERP later introduces explicit model connections or
+DynamicEntity-driven paths, but this is not a current production bug.
 
 ### Fix 2 — Authorization semantics locked by tests (P0)
 
@@ -116,6 +125,10 @@ semantics must be pinned.
 - a user granted the specific permission is allowed;
 - a user without the permission is denied;
 - when the permission row is absent, access is denied (documents the fail-closed contract).
+
+**Implemented:** `084113b` (ERP submodule). `ErpModelPolicyTest.php` (4 tests). Tests derive the
+permission string through a `policyPermission()` helper mirroring `ERPModelPolicy`'s fallback logic.
+No production code changed.
 
 ### Fix 3 — Invoice posting does not enforce closed fiscal periods (P0 correctness)
 
@@ -144,6 +157,12 @@ rows.
 **Test:** posting a sale invoice whose `posted_at` falls inside a **closed** covering period throws
 `PostingToClosedFiscalPeriodException`; posting inside an **open** covering period succeeds and links
 the journal to that period; posting with no covering period (existing fixtures) still succeeds.
+
+**Implemented:** `72dcdb3` (ERP submodule). `resolveFiscalPeriod()` added to
+`InvoicePostingService`; two new cases in `InvoicePostingServiceTest.php`. Regression suites
+green. **Note:** the `year` filter on `FiscalYear` assumes a solar fiscal calendar; non-solar
+exercises (e.g. Jul–Jun) may silently skip the guard if no period is resolved — acceptable today,
+document as future hardening if fiscal calendars evolve.
 
 ### Considered and dropped (verified against current code/tests)
 
@@ -188,6 +207,16 @@ the journal to that period; posting with no covering period (existing fixtures) 
   example repeated `0.1`-style quantities) asserts exact 4-decimal signed journal, VAT register,
   and settlement values that the current float pipeline gets wrong.
 
+**Implemented:** `cac0fa3` (Decimal helper), `d882aaf` (`TaxLineCalculator::lineTax`),
+`51cba65` (refactor across `InvoicePostingService`, `VatRegisterService`,
+`VatSettlementService`, `PriceResolverService`). `MoneyMathDecimalPostingTest.php` added.
+Golden masters unchanged (45 regression tests green).
+
+**Deferred follow-up (post-review):** `Decimal::div()` has no explicit divide-by-zero guard; Brick
+Math throws on `$b === '0'`. Current sole call site (`PriceResolverService::applyRule`, divisor
+literal `'100'`) is safe, but the shared helper needs a guard, documented contract, and regression
+test before new call sites are added. See **Follow-Up Items** and plan deferred Task 9.
+
 ### Fix 5 — Targeted test gaps (P1)
 
 **Three-way match coverage:**
@@ -201,6 +230,12 @@ the journal to that period; posting with no covering period (existing fixtures) 
 - The CSV importer currently validates only duplicate headers, not per-row content. Add per-row
   validation that rejects rows missing date/description/amount with a `ValidationException`, and a
   test for malformed/empty rows.
+
+**Implemented:** `e332542` (ERP submodule). GR quantity discrepancy + unmatched cases in
+`ThreeWayMatchServiceTest.php`; `BankStatementCsvImporter::assertRowIsValid()` + bad-row test in
+`BankStatementImportServiceTest.php`. **Gap:** empty `booked_at` is rejected; malformed but
+non-empty dates (e.g. `not-a-date`) are not validated and may throw from `CarbonImmutable::parse`
+instead of `ValidationException` — follow-up test/fix recommended.
 
 ### Fix 6 — Block generic CRUD writes on immutable/derived models (P0 integrity)
 
@@ -245,6 +280,107 @@ at the route/middleware layer to remain CMS-safe.
   no change, even as superadmin.
 - Service-layer creation still works: the accounting golden masters stay green.
 - A non-restricted ERP model (e.g. a draft invoice) still inserts/updates normally via CRUD.
+
+**Implemented:** Core `354299c` (`RestrictsCrudWrites`, `DeniesGenericCrudWrites`,
+`CrudWriteNotAllowedException`, `CrudService` guard, `CrudController` 403 mapping). ERP `f6ed9fd`
+(six models + `CrudWriteGuardTest.php`). Guard runs before `ensurePermission()` (blocks
+superadmin too). HTTP test requires `module=ERP` (uppercase) for entity resolution; lowercase
+`erp` fails with "Dynamic tables mapping is not enabled" — route/resolution concern for Spec 3.
+**Gap:** guard covers `insert`/`update`/`delete` only; `restore`/`approve`/`lock` and other
+mutating CRUD operations are not guarded yet.
+
+---
+
+## Implementation Record
+
+| Fix | ERP commit | Core commit | Key files |
+|-----|------------|-------------|-----------|
+| 1 E-invoice seeder | `9297a7c` | — | `ERPDatabaseSeeder.php`, `ErpDomainPermissionsSeederTest.php` |
+| 2 Policy tests | `084113b` | — | `ErpModelPolicyTest.php` |
+| 3 Closed fiscal period | `72dcdb3` | — | `InvoicePostingService.php`, `InvoicePostingServiceTest.php` |
+| 4 Decimal money math | `cac0fa3`, `d882aaf`, `51cba65` | — | `Decimal.php`, `TaxLineCalculator.php`, 4 services |
+| 5 Test gaps | `e332542` | — | `ThreeWayMatchServiceTest.php`, `BankStatementCsvImporter.php` |
+| 6 CRUD write guard | `f6ed9fd` | `354299c` | Core contract + `CrudService`; 6 ERP models |
+
+**Final verification:** `php artisan test --compact Modules/ERP/tests` → **240 passed, 1 skipped**
+(1184 assertions). Core `CrudApiTest` green.
+
+**Version bumps:** not applied (awaiting user confirmation per `08-versioning.mdc`).
+
+---
+
+## Post-Implementation Review (2026-06-30)
+
+Code review after full implementation. Verdict: **approved with reserve** — technical goals met and
+the suite is green; remaining items are follow-up hardening, not blockers.
+
+### Permission prefix note — `default` is correct for current ERP models
+
+Seeders and `PermissionsRefreshCommand` build permission names with
+`newInstanceWithoutConstructor()` → `getConnectionName() ?? 'default'`. This is consistent with
+`ERPModelPolicy`, `CrudService`, and `AuthorizationService`: Laravel's
+`Model::getConnectionName()` returns the model's explicit `$connection` property and does not return
+the resolved default database connection name (`pgsql`, `sqlite`, etc.). For the current ERP models,
+which do not define `$connection`, `default.erp_*.*` is therefore the intended permission prefix.
+
+**Future note:** if ERP later supports explicit per-model connections, DynamicEntity-driven ERP
+models, or cross-connection module routing, centralize permission-name construction so seeders,
+policies, and CRUD authorization continue to agree.
+
+### Important — follow-up hardening (not blocking merge)
+
+1. **CRUD guard scope:** extend `assertCrudWriteAllowed()` to all mutating `CrudService`
+   operations (`restore`, `approve`, `lock`, …) or document explicit exclusions.
+2. **Bank CSV dates:** validate parseability of `booked_at` (and optionally `value_at`) before
+   `CarbonImmutable::parse()`; add test for malformed non-empty dates.
+3. **Fiscal period resolution:** consider dropping redundant `year` filter or documenting
+   non-solar fiscal calendar assumption; add explicit test for "period exists but does not cover
+   date → posting still succeeds".
+4. **CRUD HTTP test / API clients:** document or fix lowercase `module=erp` resolution failure
+   (Spec 3 routing/exposure item).
+5. **CRUD guard HTTP coverage:** contract tests cover six models; add update/delete HTTP cases
+   when entity resolution is stable.
+
+### Minor (accepted in Spec 1)
+
+- `ErpDomainPermissionsSeederTest` runs full `ERPDatabaseSeeder` (~30s+); slow but functional.
+- `lineTax()` and `computeVatFromNet()` share formula but separate formatting paths; keep aligned.
+
+---
+
+## Follow-Up Items (routed out of Spec 1)
+
+| Item | Severity | Owner |
+|------|----------|-------|
+| **`Decimal::div()` divide-by-zero guard + test** | Minor (hardening) | Spec 1 patch or next ERP hardening |
+| Centralize permission-name construction if explicit model connections are introduced | Future hardening | Spec 3 |
+| Per-model API/CRUD exposure governance + route resolution (`erp` vs `ERP`) | Important | Spec 3 |
+| Extend CRUD write guard to all mutating operations | Important | Spec 3 |
+| Bank CSV malformed-date validation + test | Important | Spec 2 or patch |
+| Module version bumps (`composer version:patch` ERP + Core) | Process | User decision |
+
+### Follow-up detail — `Decimal::div()` divide-by-zero (deferred)
+
+**Problem:** `Modules\ERP\Support\Decimal::div()` delegates to
+`BigDecimal::dividedBy()` with no pre-check. A zero divisor throws a Brick exception
+(`DivisionByZeroException`), which is correct but undocumented and untested on the public API.
+
+**Current risk:** low. The only production call site divides by the literal `'100'`
+(`PriceResolverService::applyRule`, percent discount). No runtime path passes a zero divisor today.
+
+**Target (when implemented):**
+1. **Guard** in `Decimal::div(string $a, string $b)`: reject a zero divisor before calling Brick
+   (e.g. early return via `Decimal::isZero($b)` → throw `InvalidArgumentException` or a small
+   ERP-specific exception with a clear message). Do not silently return a value.
+2. **PHPDoc** on `div()`: document that zero divisors are rejected and which exception is thrown.
+3. **Test** in `Modules/ERP/tests/Feature/Support/DecimalTest.php`:
+   - `Decimal::div('1', '0')` throws the expected exception;
+   - existing divide cases (`0.125/100`, `1/3`) remain green.
+4. **Call-site audit** (quick grep): confirm no caller passes a variable divisor that could be
+   zero without upstream validation; document any that do.
+
+**Non-goals:** changing Brick Math behavior; adding divide-by-zero handling to `TaxLineCalculator`
+(divides only by `'100'` today).
 
 ---
 

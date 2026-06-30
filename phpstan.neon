@@ -63,6 +63,9 @@ parameters:
         - '#Call to an undefined method.*::searchableAs\(\)#'
         # Cache::remember con array come TTL (probabilmente un bug, ma ignoriamo per ora)
         - '#Parameter.*\$ttl.*Cache::remember.*array given#'
+        -
+          message: '#Property Modules\\CMS\\Models\\Pivot\\Categorizable::\$primaryKey \(string\) does not accept default value#'
+          path: Modules/CMS/app/Models/Pivot/Categorizable.php
     # File stub per definizioni di tipo (trait methods e facade custom)
     stubFiles:
         - _ide_helper_traits.php

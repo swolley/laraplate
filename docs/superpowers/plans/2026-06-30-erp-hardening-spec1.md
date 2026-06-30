@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status:** Completed (2026-06-30). Post-implementation code review completed same day.
+
 **Goal:** Make the existing ERP accounting/operational flows correct and decimal-exact, with regression tests proving each fix, plus a minimal Core guard that blocks generic-CRUD writes on immutable/derived models.
 
 **Architecture:** Six independent fixes on `Modules/ERP` (plus a small Core contract for Fix 6). Each fix is test-first (Pest + `RefreshDatabase`, manual model setup, no factories). A shared `Modules\ERP\Support\Decimal` (Brick Math, scale 4, HALF_UP) replaces the duplicated float helpers, and per-line tax flows through a single `TaxLineCalculator::lineTax()` method.
@@ -16,6 +18,25 @@
 - Invoice posting is triggered by setting `posted_at` (`$invoice->update(['posted_at' => now()])`), which runs `InvoicePostingService::post()` via an observer.
 - Superadmin is granted via the role `config('permission.roles.superadmin')` and bypasses Gate-based policies through `Gate::before` in `CoreServiceProvider`.
 - Format at the end of every task: `vendor/bin/pint --dirty`.
+
+---
+
+## Implementation Status (completed 2026-06-30)
+
+| Task | Fix | Submodule | Commit | Result |
+|------|-----|-----------|--------|--------|
+| 1 E-invoice seeder | Fix 1 | ERP | `9297a7c` | 2 tests pass |
+| 2 Policy tests | Fix 2 | ERP | `084113b` | 4 tests pass; `policyPermission()` helper for connection-aware strings |
+| 3 Closed fiscal period | Fix 3 | ERP | `72dcdb3` | 13 tests in `InvoicePostingServiceTest`; regression 16 pass |
+| 4 Decimal helper | Fix 4a | ERP | `cac0fa3` | 4 tests pass |
+| 5 lineTax | Fix 4b | ERP | `d882aaf` | 2 tests pass |
+| 6 Money math refactor | Fix 4c | ERP | `51cba65` | 45 regression tests pass; golden values unchanged |
+| 7 Test gaps | Fix 5 | ERP | `e332542` | 7 tests (3WM + bank CSV) |
+| 8 CRUD write guard | Fix 6 | Core + ERP | `354299c` + `f6ed9fd` | 3 guard tests; full ERP suite 240 pass |
+
+**Base SHAs:** ERP `db841e1`, Core `cd4d5dc`.
+
+**Not done (by design):** module version bumps — awaiting user confirmation.
 
 ---
 
@@ -1428,20 +1449,20 @@ git commit -m "feat(core): guard generic-CRUD writes on immutable/derived ERP mo
 
 ## Final verification
 
-- [ ] **Run the full ERP suite**
+- [x] **Run the full ERP suite**
 
 Run: `php artisan test --compact Modules/ERP/tests`
-Expected: PASS (all tests, including the new ones).
+Result: **240 passed, 1 skipped** (1184 assertions), ~163s.
 
-- [ ] **Run the touched Core tests**
+- [x] **Run the touched Core tests**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Api/CrudApiTest.php`
-Expected: PASS.
+Result: PASS (included in Task 8 regression: 23 tests with golden masters).
 
-- [ ] **Format the whole change set**
+- [x] **Format the whole change set**
 
 Run: `vendor/bin/pint --dirty`
-Expected: no outstanding style issues.
+Result: clean on all touched files.
 
 ---
 
@@ -1461,3 +1482,102 @@ cd Modules/Core && composer version:patch
 - **Spec coverage:** Fix 1 → Task 1; Fix 2 → Task 2; Fix 3 → Task 3; Fix 4 (decimal money math) → Tasks 4-6; Fix 5 (test gaps) → Task 7; Fix 6 (CRUD write guard) → Task 8. The dropped bank-tolerance and return-idempotency items are intentionally absent (see spec "Considered and dropped").
 - **Type consistency:** `Decimal` exposes `add/sub/mul/div/negate/abs/isZero/isNegative/format`; every call site in Task 6 uses only those. `TaxLineCalculator::lineTax(string, string): string` is defined in Task 5 and consumed in Task 6. `RestrictsCrudWrites::deniedCrudWrites(): array`, the `DeniesGenericCrudWrites` trait, and `CrudWriteNotAllowedException::for()` are defined in Task 8 and used consistently by `CrudService` and the test.
 - **Non-breaking guarantees:** Fix 3 only blocks closed *covering* periods; Fix 6 only guards writes (CMS read delegation is untouched) and defaults to no restriction when the contract is absent.
+
+---
+
+## Post-Implementation Code Review (2026-06-30)
+
+Full review after all 8 tasks. Verdict: **approved with reserve**.
+
+### Permission prefix note — `default` is expected for current ERP models
+
+Fix 1 seeds `default.erp_*.*`, and that matches runtime checks for the current ERP models.
+Laravel's `Model::getConnectionName()` returns the model's explicit `$connection` property, not the
+resolved default database connection name. Since ERP models do not define `$connection`, both the
+seeder and `ERPModelPolicy` / `CrudService` fall back to `default`.
+
+`ErpModelPolicyTest::policyPermission()` mirrors the policy construction so the test remains correct
+if an explicit model connection is introduced later. This is future-proofing, not a workaround for a
+current production bug.
+
+### Important follow-ups (deferred)
+
+| # | Finding | Suggested owner |
+|---|---------|-----------------|
+| 1 | CRUD guard: only `insert`/`update`/`delete`; not `restore`/`approve`/`lock` | Spec 3 |
+| 2 | Bank CSV: malformed non-empty dates not validated | Spec 2 / patch |
+| 3 | `resolveFiscalPeriod()` `year` filter assumes solar calendar | Document / future |
+| 4 | HTTP CRUD test needs `module=ERP`; lowercase `erp` fails resolution | Spec 3 |
+| 5 | No HTTP tests for update/delete on restricted models | Spec 3 |
+| 6 | Centralize permission-name construction if explicit ERP model connections are introduced | Future |
+| 7 | **`Decimal::div()` divide-by-zero guard + PHPDoc + test** | Spec 1 patch (deferred) |
+
+### Task-specific notes
+
+- **Task 1:** Seeder test asserts `default.*`, which is also the current runtime policy prefix for
+  ERP models without an explicit `$connection`.
+- **Task 7:** Bad-row CSV test covers empty `booked_at`; not malformed date strings.
+- **Task 8:** Two commits (Core contract, ERP models); HTTP insert test passes with `module=ERP`.
+
+### What went well
+
+- TDD followed on all fixes; golden masters unchanged after decimal refactor.
+- CRUD guard before permission check — correct integrity-over-convenience placement.
+- Submodule commits on `master` (ERP 8 commits, Core 1 commit); working trees clean post-implementation.
+
+---
+
+## Deferred follow-up: Task 9 — `Decimal::div()` divide-by-zero hardening
+
+**Status:** Not implemented — documented for a follow-up session (decide guard strategy first).
+
+**Problem:** `Decimal::div()` has no explicit zero-divisor guard; Brick throws
+`DivisionByZeroException`. Only call site today: `PriceResolverService::applyRule()` with divisor
+`'100'` (safe). The shared helper should fail predictably before new call sites appear.
+
+**Files (when implemented):**
+- Modify: `Modules/ERP/app/Support/Decimal.php` (`div()` guard + PHPDoc)
+- Test: `Modules/ERP/tests/Feature/Support/DecimalTest.php` (append case)
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `DecimalTest.php`:
+
+```php
+it('rejects division by zero with a clear exception', function (): void {
+    expect(fn () => Decimal::div('1', '0'))
+        ->toThrow(InvalidArgumentException::class); // or chosen domain exception
+});
+```
+
+Run: `php artisan test --compact Modules/ERP/tests/Feature/Support/DecimalTest.php`
+Expected: FAIL (Brick exception type differs, or no guard yet).
+
+- [ ] **Step 2: Add the guard**
+
+In `Decimal::div()`, before `dividedBy()`:
+
+```php
+if (self::isZero($b)) {
+    throw new \InvalidArgumentException('Decimal division by zero is not allowed.');
+}
+```
+
+Add PHPDoc `@throws \InvalidArgumentException` when `$b` is zero at scale 4.
+
+- [ ] **Step 3: Run tests, confirm PASS**
+
+All existing divide tests plus the new zero-divisor case.
+
+- [ ] **Step 4: Call-site audit**
+
+Run: `rg "Decimal::div" Modules/ERP`
+Confirm each call site passes a non-zero divisor (or validate upstream).
+
+- [ ] **Step 5: Format and commit (ERP submodule)**
+
+```bash
+vendor/bin/pint Modules/ERP/app/Support/Decimal.php Modules/ERP/tests/Feature/Support/DecimalTest.php
+cd Modules/ERP && git add app/Support/Decimal.php tests/Feature/Support/DecimalTest.php
+git commit -m "fix(erp): guard Decimal::div against zero divisors"
+```
