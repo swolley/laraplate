@@ -1500,84 +1500,45 @@ seeder and `ERPModelPolicy` / `CrudService` fall back to `default`.
 if an explicit model connection is introduced later. This is future-proofing, not a workaround for a
 current production bug.
 
-### Important follow-ups (deferred)
+### Important follow-ups — patch applied (`971851d` ERP, `15b11c8` Core, 2026-07-01)
 
-| # | Finding | Suggested owner |
-|---|---------|-----------------|
-| 1 | CRUD guard: only `insert`/`update`/`delete`; not `restore`/`approve`/`lock` | Spec 3 |
-| 2 | Bank CSV: malformed non-empty dates not validated | Spec 2 / patch |
-| 3 | `resolveFiscalPeriod()` `year` filter assumes solar calendar | Document / future |
-| 4 | HTTP CRUD test needs `module=ERP`; lowercase `erp` fails resolution | Spec 3 |
-| 5 | No HTTP tests for update/delete on restricted models | Spec 3 |
-| 6 | Centralize permission-name construction if explicit ERP model connections are introduced | Future |
-| 7 | **`Decimal::div()` divide-by-zero guard + PHPDoc + test** | Spec 1 patch (deferred) |
+| # | Finding | Status |
+|---|---------|--------|
+| 1 | CRUD guard on restore/approve/lock | Done — guard + HTTP tests |
+| 2 | Bank CSV malformed non-empty dates | Done — `isParseableDate()` + test |
+| 3 | `resolveFiscalPeriod()` solar `year` filter | Done — filter removed + test |
+| 4 | Lowercase `module=erp` resolution | Done — Core `15b11c8` |
+| 5 | HTTP update/delete on restricted models | Done — `CrudWriteGuardTest` |
+| 6 | Centralize permission-name construction | Future (explicit connections) |
+| 7 | `Decimal::div()` divide-by-zero guard + test | Done — ERP `971851d` |
 
 ### Task-specific notes
 
 - **Task 1:** Seeder test asserts `default.*`, which is also the current runtime policy prefix for
   ERP models without an explicit `$connection`.
-- **Task 7:** Bad-row CSV test covers empty `booked_at`; not malformed date strings.
-- **Task 8:** Two commits (Core contract, ERP models); HTTP insert test passes with `module=ERP`.
+- **Task 7:** Bad-row CSV test covers empty `booked_at`; malformed non-empty dates covered in patch
+  `971851d`.
+- **Task 8:** Core `354299c` + ERP `1ede917`; HTTP coverage extended in `971851d`; module alias in
+  Core `15b11c8`.
 
 ### What went well
 
 - TDD followed on all fixes; golden masters unchanged after decimal refactor.
 - CRUD guard before permission check — correct integrity-over-convenience placement.
-- Submodule commits on `master` (ERP 8 commits, Core 1 commit); working trees clean post-implementation.
+- Submodule commits on `master` (ERP 8 tasks + patch `971851d`, Core `354299c` + `15b11c8`).
 
 ---
 
-## Deferred follow-up: Task 9 — `Decimal::div()` divide-by-zero hardening
+## Post-review patch — Task 9 and follow-ups (`971851d` / `15b11c8`)
 
-**Status:** Not implemented — documented for a follow-up session (decide guard strategy first).
+**Status:** Implemented 2026-07-01 in ERP commit `971851d` and Core commit `15b11c8`.
 
-**Problem:** `Decimal::div()` has no explicit zero-divisor guard; Brick throws
-`DivisionByZeroException`. Only call site today: `PriceResolverService::applyRule()` with divisor
-`'100'` (safe). The shared helper should fail predictably before new call sites appear.
+**Scope delivered:**
+- `Decimal::div()` zero-divisor guard + PHPDoc + test
+- Bank CSV malformed-date validation + test
+- `resolveFiscalPeriod()` — removed redundant `year` filter
+- CRUD HTTP tests: update/delete/activate/approve/lock + lowercase `module=erp`
+- Version bumps: ERP `v1.14.4`, Core `v1.55.4+`
 
-**Files (when implemented):**
-- Modify: `Modules/ERP/app/Support/Decimal.php` (`div()` guard + PHPDoc)
-- Test: `Modules/ERP/tests/Feature/Support/DecimalTest.php` (append case)
-
-- [ ] **Step 1: Write the failing test**
-
-Append to `DecimalTest.php`:
-
-```php
-it('rejects division by zero with a clear exception', function (): void {
-    expect(fn () => Decimal::div('1', '0'))
-        ->toThrow(InvalidArgumentException::class); // or chosen domain exception
-});
-```
-
-Run: `php artisan test --compact Modules/ERP/tests/Feature/Support/DecimalTest.php`
-Expected: FAIL (Brick exception type differs, or no guard yet).
-
-- [ ] **Step 2: Add the guard**
-
-In `Decimal::div()`, before `dividedBy()`:
-
-```php
-if (self::isZero($b)) {
-    throw new \InvalidArgumentException('Decimal division by zero is not allowed.');
-}
-```
-
-Add PHPDoc `@throws \InvalidArgumentException` when `$b` is zero at scale 4.
-
-- [ ] **Step 3: Run tests, confirm PASS**
-
-All existing divide tests plus the new zero-divisor case.
-
-- [ ] **Step 4: Call-site audit**
-
-Run: `rg "Decimal::div" Modules/ERP`
-Confirm each call site passes a non-zero divisor (or validate upstream).
-
-- [ ] **Step 5: Format and commit (ERP submodule)**
-
-```bash
-vendor/bin/pint Modules/ERP/app/Support/Decimal.php Modules/ERP/tests/Feature/Support/DecimalTest.php
-cd Modules/ERP && git add app/Support/Decimal.php tests/Feature/Support/DecimalTest.php
-git commit -m "fix(erp): guard Decimal::div against zero divisors"
-```
+**Remaining (Spec 3 / future):** per-model API exposure governance, permission-name helper if
+explicit model connections are introduced.

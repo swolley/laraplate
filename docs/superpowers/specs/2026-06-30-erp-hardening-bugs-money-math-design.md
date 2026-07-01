@@ -212,10 +212,8 @@ document as future hardening if fiscal calendars evolve.
 `VatSettlementService`, `PriceResolverService`). `MoneyMathDecimalPostingTest.php` added.
 Golden masters unchanged (45 regression tests green).
 
-**Deferred follow-up (post-review):** `Decimal::div()` has no explicit divide-by-zero guard; Brick
-Math throws on `$b === '0'`. Current sole call site (`PriceResolverService::applyRule`, divisor
-literal `'100'`) is safe, but the shared helper needs a guard, documented contract, and regression
-test before new call sites are added. See **Follow-Up Items** and plan deferred Task 9.
+**Post-review patch:** `Decimal::div()` zero-divisor guard + PHPDoc + test in ERP `971851d`.
+Only production call site remains `PriceResolverService::applyRule()` (divisor `'100'`).
 
 ### Fix 5 — Targeted test gaps (P1)
 
@@ -282,12 +280,11 @@ at the route/middleware layer to remain CMS-safe.
 - A non-restricted ERP model (e.g. a draft invoice) still inserts/updates normally via CRUD.
 
 **Implemented:** Core `354299c` (`RestrictsCrudWrites`, `DeniesGenericCrudWrites`,
-`CrudWriteNotAllowedException`, `CrudService` guard, `CrudController` 403 mapping). ERP `f6ed9fd`
+`CrudWriteNotAllowedException`, `CrudService` guard, `CrudController` 403 mapping). ERP `1ede917`
 (six models + `CrudWriteGuardTest.php`). Guard runs before `ensurePermission()` (blocks
-superadmin too). HTTP test requires `module=ERP` (uppercase) for entity resolution; lowercase
-`erp` fails with "Dynamic tables mapping is not enabled" — route/resolution concern for Spec 3.
-**Gap:** guard covers `insert`/`update`/`delete` only; `restore`/`approve`/`lock` and other
-mutating CRUD operations are not guarded yet.
+superadmin too). Post-review patch Core `15b11c8` resolves lowercase `module=erp`; ERP `971851d`
+extends HTTP coverage (update/delete/activate/approve/lock) and confirms guard on all denied
+operations listed in `deniedCrudWrites()`.
 
 ---
 
@@ -300,12 +297,14 @@ mutating CRUD operations are not guarded yet.
 | 3 Closed fiscal period | `72dcdb3` | — | `InvoicePostingService.php`, `InvoicePostingServiceTest.php` |
 | 4 Decimal money math | `cac0fa3`, `d882aaf`, `51cba65` | — | `Decimal.php`, `TaxLineCalculator.php`, 4 services |
 | 5 Test gaps | `e332542` | — | `ThreeWayMatchServiceTest.php`, `BankStatementCsvImporter.php` |
-| 6 CRUD write guard | `f6ed9fd` | `354299c` | Core contract + `CrudService`; 6 ERP models |
+| 6 CRUD write guard | `1ede917` | `354299c` | Core contract + `CrudService`; 6 ERP models |
+| Post-review patch | `971851d` | `15b11c8` | Decimal div guard, CSV dates, fiscal period, CRUD HTTP tests, module alias |
 
-**Final verification:** `php artisan test --compact Modules/ERP/tests` → **240 passed, 1 skipped**
-(1184 assertions). Core `CrudApiTest` green.
+**Final verification:** `php artisan test --compact Modules/ERP/tests` → **240+ passed** (suite
+green after patch). Core `CrudApiTest` green.
 
-**Version bumps:** not applied (awaiting user confirmation per `08-versioning.mdc`).
+**Version bumps:** ERP `v1.14.4` and Core `v1.55.4+` applied in patch commits (`971851d`,
+`15b11c8`).
 
 ---
 
@@ -327,19 +326,17 @@ which do not define `$connection`, `default.erp_*.*` is therefore the intended p
 models, or cross-connection module routing, centralize permission-name construction so seeders,
 policies, and CRUD authorization continue to agree.
 
-### Important — follow-up hardening (not blocking merge)
+### Important — follow-up hardening (patch `971851d` / `15b11c8`, 2026-07-01)
 
-1. **CRUD guard scope:** extend `assertCrudWriteAllowed()` to all mutating `CrudService`
-   operations (`restore`, `approve`, `lock`, …) or document explicit exclusions.
-2. **Bank CSV dates:** validate parseability of `booked_at` (and optionally `value_at`) before
-   `CarbonImmutable::parse()`; add test for malformed non-empty dates.
-3. **Fiscal period resolution:** consider dropping redundant `year` filter or documenting
-   non-solar fiscal calendar assumption; add explicit test for "period exists but does not cover
-   date → posting still succeeds".
-4. **CRUD HTTP test / API clients:** document or fix lowercase `module=erp` resolution failure
-   (Spec 3 routing/exposure item).
-5. **CRUD guard HTTP coverage:** contract tests cover six models; add update/delete HTTP cases
-   when entity resolution is stable.
+1. ~~**CRUD guard scope**~~ — `assertCrudWriteAllowed()` runs on approve/disapprove/lock/unlock
+   and activate/restore; ERP models deny all listed operations; HTTP tests in `CrudWriteGuardTest`.
+2. ~~**Bank CSV dates**~~ — `isParseableDate()` validates `booked_at`/`value_at` before parse;
+   test for malformed non-empty dates in `BankStatementImportServiceTest`.
+3. ~~**Fiscal period resolution**~~ — redundant `year` filter removed from `resolveFiscalPeriod()`;
+   date-range match only (supports non-solar calendars). Test added in `InvoicePostingServiceTest`.
+4. ~~**CRUD module alias**~~ — Core `15b11c8` resolves lowercase `module=erp`; test in
+   `CrudWriteGuardTest`.
+5. ~~**CRUD guard HTTP coverage**~~ — update/delete/activate/approve/lock HTTP cases added.
 
 ### Minor (accepted in Spec 1)
 
@@ -350,37 +347,14 @@ policies, and CRUD authorization continue to agree.
 
 ## Follow-Up Items (routed out of Spec 1)
 
-| Item | Severity | Owner |
-|------|----------|-------|
-| **`Decimal::div()` divide-by-zero guard + test** | Minor (hardening) | Spec 1 patch or next ERP hardening |
-| Centralize permission-name construction if explicit model connections are introduced | Future hardening | Spec 3 |
-| Per-model API/CRUD exposure governance + route resolution (`erp` vs `ERP`) | Important | Spec 3 |
-| Extend CRUD write guard to all mutating operations | Important | Spec 3 |
-| Bank CSV malformed-date validation + test | Important | Spec 2 or patch |
-| Module version bumps (`composer version:patch` ERP + Core) | Process | User decision |
-
-### Follow-up detail — `Decimal::div()` divide-by-zero (deferred)
-
-**Problem:** `Modules\ERP\Support\Decimal::div()` delegates to
-`BigDecimal::dividedBy()` with no pre-check. A zero divisor throws a Brick exception
-(`DivisionByZeroException`), which is correct but undocumented and untested on the public API.
-
-**Current risk:** low. The only production call site divides by the literal `'100'`
-(`PriceResolverService::applyRule`, percent discount). No runtime path passes a zero divisor today.
-
-**Target (when implemented):**
-1. **Guard** in `Decimal::div(string $a, string $b)`: reject a zero divisor before calling Brick
-   (e.g. early return via `Decimal::isZero($b)` → throw `InvalidArgumentException` or a small
-   ERP-specific exception with a clear message). Do not silently return a value.
-2. **PHPDoc** on `div()`: document that zero divisors are rejected and which exception is thrown.
-3. **Test** in `Modules/ERP/tests/Feature/Support/DecimalTest.php`:
-   - `Decimal::div('1', '0')` throws the expected exception;
-   - existing divide cases (`0.125/100`, `1/3`) remain green.
-4. **Call-site audit** (quick grep): confirm no caller passes a variable divisor that could be
-   zero without upstream validation; document any that do.
-
-**Non-goals:** changing Brick Math behavior; adding divide-by-zero handling to `TaxLineCalculator`
-(divides only by `'100'` today).
+| Item | Severity | Status |
+|------|----------|--------|
+| ~~`Decimal::div()` divide-by-zero guard + test~~ | Minor | Done — ERP `971851d` |
+| ~~Extend CRUD write guard + HTTP coverage~~ | Important | Done — ERP `971851d`, Core `15b11c8` |
+| ~~Bank CSV malformed-date validation + test~~ | Important | Done — ERP `971851d` |
+| ~~Module version bumps (ERP + Core)~~ | Process | Done — ERP `v1.14.4`, Core `v1.55.4+` |
+| Centralize permission-name construction if explicit model connections are introduced | Future | Spec 3 |
+| Per-model API/CRUD exposure governance (beyond write guard) | Important | Spec 3 |
 
 ---
 
