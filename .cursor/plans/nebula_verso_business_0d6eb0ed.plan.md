@@ -151,6 +151,10 @@ isProject: false
 
 > **Repo / cartella (2026-04):** il modulo si chiama **ERP** nel monorepo: cartella **`Modules/ERP`**, package Composer **`swolley/laraplate-erp`**, namespace PHP **`Modules\ERP`**, chiave config **`erp`**, remote git **`laraplate-erp`**. I todo YAML con prefisso `business-*` / `business-filament-*` sono **id storici** Cursor; il contenuto si riferisce al modulo ERP.
 
+> **ERP open work (2026-06-30):** Pending frontmatter todos and M4/M6/M7 follow-ups are consolidated in
+> [`docs/superpowers/specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../../docs/superpowers/specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+> **Next implementation target:** Phase 2A (Filament domain actions + state-aware policies). Completed milestones below remain historical record.
+
 ### Sync piano ↔ repo (2026-04-30, sera)
 
 Commit submodule ERP: **`0655deb`** (`feat(erp): complete CRM/SO baseline and add M3 foundation resources`). Bump monorepo: **`6fbe51d`**.
@@ -332,9 +336,9 @@ Aggiunta validazione `saving()` su tutti i modelli sales-side (Quotation, SalesO
 **Fatto — Documentazione:**
 - Aggiornati `README.md`, `docs/rag/MODULE.md`, `docs/GLOSSARY.md` con tutte le funzionalità M0–M5.
 
-**Prossimi step:** M6.1, M6.2, M6.3 e M7.1 sono chiusi come v1. Procedere con i follow-up M4,
-test contabili golden-master/concorrenza e backlog opzionali. FatturaPA completo resta backlog
-opzionale finale.
+**Prossimi step (2026-06-30):** M0–M7 v1 e golden master sono chiusi. Tutto il lavoro ERP aperto è in
+**Spec 2 master backlog** (`docs/superpowers/specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`).
+Priorità: **Phase 2A** (azioni Filament + policy state-aware + permessi M4), poi 2B (Party UI, journal differenze banca, NC/ND auto), 2C (FatturaPA), Phase 3+ (API azioni dominio, architettura).
 
 # Modulo ERP in Laraplate (Nebula)
 

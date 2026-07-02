@@ -1,5 +1,9 @@
 # ERP M4 - Policies, Filament Actions, Reporting Alignment Plan
 
+> **Navigation:** Open items from this plan are consolidated in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md)
+> (ERP Spec 2 master backlog, Phase 2A). This file is kept for historical context.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
 
@@ -143,6 +147,7 @@ the reason.
 - Still deferred from the original expanded M4 idea: explicit Delivery Note post/unpost page
   actions, Fiscal Period close/reopen page actions, Journal Entry reversal page action, and the
   matching extra custom abilities/state-aware policy checks.
+  **→ Tracked as Phase 2A in Spec 2 master backlog** (`2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`).
 - Verified on 2026-06-23:
   - `php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`

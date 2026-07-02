@@ -1,5 +1,9 @@
 # ERP M6.2 - Returns Management Implementation Plan
 
+> **Navigation:** M6.2 v1 is **implemented** (manual NC/ND). Open follow-ups (auto NC/ND) →
+> Spec 2 Phase 2B in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
 

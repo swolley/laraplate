@@ -1,5 +1,8 @@
 # ERP Hardening (Spec 1) Implementation Plan
 
+> **Navigation:** **Completed.** Open follow-ups →
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Status:** Completed (2026-06-30). Post-implementation code review completed same day.
@@ -1541,4 +1544,4 @@ current production bug.
 - Version bumps: ERP `v1.14.4`, Core `v1.55.4+`
 
 **Remaining (Spec 3 / future):** per-model API exposure governance, permission-name helper if
-explicit model connections are introduced.
+explicit model connections are introduced. **→ Spec 2 Phase 3 master backlog.**

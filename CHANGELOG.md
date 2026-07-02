@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚀 Features
+
+- *(cms)* Add content provenance, references and ai assistance metadata
+
+### 📚 Documentation
+
+- *(erp)* Add Spec 1 design for v1 hardening (bugs + money math)
+- *(erp)* Add Fix 8 (CRUD write guard) to Spec 1 hardening
+- *(erp)* Refine Spec 1 hardening scope after code/test verification
+- *(erp)* Add Spec 1 hardening implementation plan
+- *(erp)* Update plans and specs for ERP hardening progress
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump Core/CMS/AI/ERP for trait Concerns refactor
+- Bump module references and align app bootstrap config
+- Sync module releases and ERP hardening progress
+- Update submodule references for AI, CMS, and Core modules
+- Sync submodule references after PHPDoc formatting cleanup
+
+## [2.0.3] - 2026-06-18
+
 ### 🐛 Bug Fixes
 
 - *(core)* Bump submodule for MySQL taxonomies migration trigger fix

@@ -1,5 +1,9 @@
 # ERP Accounting Golden Master Test Suite Implementation Plan
 
+> **Navigation:** Golden master suite is **implemented**. API/export after green suite →
+> Spec 2 Phase 3 in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
 > (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use
 > checkbox (`- [ ]`) syntax for tracking.

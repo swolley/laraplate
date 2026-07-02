@@ -14,6 +14,6 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-05-25-erp-m71-advanced-pricelists.md`: ERP advanced pricelists and discount rules.
 - `2026-06-19-mes-module-full-implementation.md`: Full MES module implementation plan.
 - `2026-06-23-erp-accounting-golden-master.md`: ERP accounting golden-master regression tests.
-- `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + post-review patch `971851d` ERP / `15b11c8` Core).
+- `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + patch `971851d` ERP / `15b11c8` Core). Open follow-ups → Spec 2 master backlog.
 - `2026-06-30-cms-graph-layer.md`: CMS graph layer — 6 tasks + deferred materialized edges; extends `CrudController`, reuses CRUD request/response pipeline.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.

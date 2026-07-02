@@ -1,5 +1,9 @@
 # ERP M6.1 - Bank Reconciliation Implementation Plan
 
+> **Navigation:** M6.1 v1 is **implemented**. Open follow-up (difference journals, CAMT) →
+> Spec 2 Phase 2B in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
 

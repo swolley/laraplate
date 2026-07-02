@@ -1,6 +1,7 @@
 # ERP Hardening — Bugs, Correctness & Money Math (Spec 1)
 
-**Status:** Implemented (2026-06-30). Post-implementation code review completed same day.
+**Status:** Implemented (2026-06-30). Post-implementation code review completed same day.  
+**Open work routed out of Spec 1:** [`2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md)  
 **Date:** 2026-06-30
 **Module:** `Modules/ERP`
 **Scope:** P0 correctness bugs + P1 quality/money-math hardening of the existing v1, plus a minimal
@@ -21,7 +22,8 @@ precision hardening. It explicitly excludes new features, deferred follow-ups, d
 endpoints, and architectural expansions, which are owned by later specs:
 
 - Spec 2: deferred follow-ups (Filament page actions, state-aware policies, Party price-rule UI,
-  bank difference journals, automatic credit/debit notes).
+  bank difference journals, automatic credit/debit notes) → **see Spec 2 master backlog** (same file;
+  phases 2A–2C).
 - Spec 3: domain action endpoints (internal CRUD-style actions + opt-in external API), and the full
   per-model API/CRUD exposure governance (settings-driven toggles extending `core.expose_crud_api`,
   model-property hard override, route/middleware-level gating that stays CMS-delegation-safe). Spec 1
@@ -386,7 +388,7 @@ policies, and CRUD authorization continue to agree.
 
 - Filament page actions, state-aware policies, extra seeded abilities (`force_post`, `close`,
   `reopen`, `reverse`, `amend`, `unlock`), Party price-rule UI, bank difference journals, automatic
-  NC/ND creation → Spec 2.
+  NC/ND creation → **Spec 2 master backlog** (`2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`).
 - Revert/reverse of a processed return; internal action endpoints and opt-in external API; deeper
   order-safe ERP domain-action routes (`.../{id}/{action}`); full per-model API/CRUD exposure
   governance (settings + model-property override + CMS-safe route/middleware gating) → Spec 3.

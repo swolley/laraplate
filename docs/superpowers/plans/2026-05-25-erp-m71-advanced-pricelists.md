@@ -1,5 +1,9 @@
 # ERP M7.1 - Advanced Pricelists Implementation Plan
 
+> **Navigation:** M7.1 resolver/integration is **implemented**. Party price-rule UI →
+> Spec 2 Phase 2B in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
 

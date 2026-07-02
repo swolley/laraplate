@@ -1,5 +1,8 @@
 # ERP M6.3 - E-Invoice Stub And Submission Structure Plan
 
+> **Navigation:** M6.3 stub workflow is **implemented**. Full FatturaPA → Spec 2 Phase 2C in
+> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
 

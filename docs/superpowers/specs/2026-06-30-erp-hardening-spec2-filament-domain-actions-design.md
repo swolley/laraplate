@@ -1,260 +1,273 @@
-# ERP Hardening — Filament Domain Actions & State-Aware Policies (Spec 2, Phase 2A)
+# ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design, ready for implementation planning  
-**Date:** 2026-06-30  
+**Status:** Approved design; **Phase 2A** ready for implementation planning  
+**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit 2026-06-30)  
 **Module:** `Modules/ERP`  
-**Depends on:** Spec 1 (implemented + patch `971851d` / Core `15b11c8`)
+**Depends on:** Spec 1 implemented + patch (`971851d` ERP, `15b11c8` Core)
+
+> **Single source of truth** for ERP work tracking. Completed items are listed in **§ Completed**
+> below; only **§ Open** requires implementation. Verified against codebase + `299` ERP tests pass.
 
 ---
 
-## Context
+## Completion summary (2026-06-30 audit)
 
-Spec 1 hardened correctness, decimal money math, and generic-CRUD write integrity. Spec 2
-Phase 2A completes the **M4 follow-up** deferred in
-`docs/superpowers/plans/2026-05-25-erp-m4-policies-filament-reporting.md` (Tasks 1–2, 4) and the
-“Out of Scope → Spec 2” Filament/policy items from Spec 1.
+| Bucket | Count | Notes |
+|--------|------:|-------|
+| **Done** | **62** | Core M0–M7 v1 + Spec 1 + M4 reporting slice |
+| **Partial** | **5** | Backend or skeleton exists; Phase 2A completes the gap |
+| **Open** | **38** | Phases 2A–5 — see § Open |
 
-Backend services for most domain actions already exist and are covered by integration/feature tests.
-The gap is **Filament page actions**, **seeded domain permissions**, and **state-aware policy
-guards** so UI authorization matches business state — not just DB permission rows.
-
-**Phase 2A scope (this spec):**
-
-| Area | In scope |
-|------|----------|
-| Filament domain actions | Fiscal period close/reopen, fiscal year close, journal reverse, DDT post/unpost, sales order amend |
-| Seeded abilities | `close`, `reopen`, `reverse`, `amend`, `force_post` |
-| State-aware policies | Guards on the abilities above + existing `post`/`unpost` |
-| Form hardening | Remove direct `is_closed` toggles that bypass services |
-
-**Explicitly deferred to Spec 2 Phase 2B / later specs:**
-
-- Party price-rule UI, bank difference journals, automatic NC/ND creation
-- Quotation `unlock`, document sequence `reset`
-- Spec 3 domain HTTP action endpoints and exposure governance
+**Next target:** Phase 2A (9 open items) — Filament wiring + state-aware policy + missing permissions.
 
 ---
 
-## Goals
+## Document map
 
-1. Expose existing domain services through Filament header actions with the same patterns as
-   `InvoicePostingActions`.
-2. Seed permissions only for abilities that have a wired UI action (M4 rule).
-3. Make `ERPModelPolicy` the single authorization source: **state guard first**, then permission
-   check (superadmin still bypasses permission, never state).
-4. Replace CRUD form workarounds (`is_closed` toggle) with read-only display + service-driven
-   actions.
+| Source | Role today |
+|--------|------------|
+| `.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md` | Historical M0–M7 roadmap; open items → § Open |
+| `specs/2026-06-30-erp-hardening-bugs-money-math-design.md` | Spec 1 — **done** |
+| `plans/2026-06-30-erp-hardening-spec1.md` | Spec 1 plan — **done** |
+| Milestone plans M3.6–M7.1 | v1 **done**; follow-ups → § Open |
 
-## Non-goals
+### Roadmap phases
 
-- New accounting business rules (services stay as-is unless a wiring bug is found).
-- Browser click-through / Livewire Filament tests (follow M4 smoke + policy/service tests).
-- Automatic credit/debit notes, bank difference journals, pricing UI.
-- Core or Spec 3 API routes.
+| Phase | Scope | Status |
+|-------|--------|--------|
+| Spec 1 | Bug + money math + CRUD guard | **Done** |
+| Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Open (next)** |
+| Spec 2 Phase 2B–2C | Party UI, bank journals, auto NC/ND, FatturaPA | Open |
+| Phase 3 | Domain HTTP actions + API exposure | Open |
+| Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
 
 ---
 
-## Approach
+## Completed (done — do not re-open without new finding)
 
-### 1. Action class pattern (reuse invoice precedent)
+Status verified in `Modules/ERP` unless noted.
 
-Create focused action factories under
-`Modules/ERP/app/Filament/Resources/{Entity}/Actions/` mirroring
-`InvoicePostingActions.php`:
+### Spec 1 & Core
 
-| Class | Page(s) | Service path |
-|-------|---------|--------------|
-| `FiscalPeriodActions` | `EditFiscalPeriod` | `FiscalPeriodCloser::closePeriod()` / `reopenPeriod()` |
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-S1 | Spec 1 P0/P1 fixes (seeder, policy tests, fiscal period guard, decimal money math, test gaps, CRUD guard) | ERP `9297a7c…971851d`, Core `354299c`, `15b11c8` |
+| DONE-S1P | Post-review patch: CSV dates, `Decimal::div` guard, CRUD HTTP tests, `module=erp` alias | `971851d`, `15b11c8` |
+
+### Nebula / M0 — Foundations
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M0-01 | Multi-company + `BelongsToCompany` + dual-currency columns | `Company` model, migrations |
+| DONE-M0-02 | `VersionStrategy::DIFF` on accounting models | Model properties + tests |
+| DONE-M0-03 | P0 Place + P1 Taxonomy (Core/CMS) | nebula todos completed |
+
+### M1 — Accounting core
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M1-01 | Chart of accounts + `ItalianCoaProvider` | `ChartOfAccountsInstaller`, `Account` |
+| DONE-M1-02 | `JournalPostingService` post/reverse + immutability | Service + golden master |
+| DONE-M1-03 | Fiscal years/periods + `FiscalPeriodCloser` service | Service + integration tests |
+| DONE-M1-04 | Document sequences + `DocumentNumberAllocator` | Service + tests |
+
+### M2 — Tax
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M2-01 | `TaxCode`, `TaxLineCalculator`, supersession | Models + services |
+| DONE-M2-02 | Invoice/invoice_line stub + posting integration | M3.5 |
+
+### M3 — Commercial & inventory
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M3-01 | CRM leads/opportunities + lifecycle | Resources + services |
+| DONE-M3-02 | Sales orders + lock-chain + evasion + `SalesOrderAmendmentService` | Service exists (UI amend → 2A) |
+| DONE-M3-03 | Inventory: movements, cost layers, `StockMovementService` | M3.3 |
+| DONE-M3-04 | DDT outbound/inbound + COGS journal + unpost | `DeliveryNoteInventoryService`, observer |
+| DONE-M3-05 | Invoice posting/unposting (sale + purchase) | `InvoicePostingService` |
+| DONE-M3-06 | Purchase cycle: PO/GR/parties/3-way match | `ThreeWayMatchService`, tests |
+| DONE-M3-07 | MVP pre-contabilità (quotations, projects, tasks, time entries) | nebula todo completed |
+| DONE-M3-08 | Party type validation (customer/supplier) on models + Filament | D6 |
+
+### M4 — Policies & reporting (v1 slice)
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M4-01 | `ERPModelPolicy` + Gate registration (permission-only) | Policy + `ERPServiceProvider` |
+| DONE-M4-02 | Seed domain permissions: `post`, `unpost`, `submitEInvoice`, `refreshEInvoice` | `ERPDatabaseSeeder` |
+| DONE-M4-03 | Invoice Filament post/unpost + e-invoice actions | `InvoicePostingActions`, `EditInvoice` |
+| DONE-M4-04 | `SalesPipelineService` + `StockValuationService` + Filament pages | M4 Task 5–6 |
+| DONE-M4-05 | Financial statements: trial balance, balance sheet, income statement | M5.4 services + pages |
+| DONE-M4-06 | `FiscalPeriodCloser::reopenPeriod()` service | Integration test |
+
+### M5 — Payments & fiscal reporting
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M5-01 | Payment terms, schedule, allocations, aging | M5.1 services + resources |
+| DONE-M5-02 | Credit/debit notes + `CreditNoteService` | M5.2 + Filament manual actions |
+| DONE-M5-03 | VAT register + settlement | `VatRegisterService`, `VatSettlementService` |
+| DONE-M5-04 | Financial statement pages + tests | `FinancialStatementsTest` |
+
+### M6 — Banking, returns, e-invoice (v1)
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M6-01 | Bank CSV import + manual match + suggestions + reco page | M6.1 |
+| DONE-M6-02 | Returns approve/complete/cancel + DDT linking + qty tracking | M6.2 |
+| DONE-M6-03 | Manual NC/ND Filament actions on returns/invoices | `EditReturnOrder`, `EditSupplierReturn`, `EditInvoice` |
+| DONE-M6-04 | E-invoice stub provider + submission + Filament submit/refresh | `StubEInvoiceProvider`, `EInvoiceSubmissionService` |
+
+### M7 — Pricing (backend)
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-M7-01 | `PartyPriceRule` model + migrations | M7.1 |
+| DONE-M7-02 | `PriceResolverService` + cascade/temporal rules | Tests |
+| DONE-M7-03 | Line pricing on quotation/SO/invoice | `InvoiceLinePricingService` |
+
+### Testing & hardening
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-T-01 | Accounting golden master suite | `AccountingGoldenMasterTest` |
+| DONE-T-02 | Inventory/accounting integration golden cases | Plan follow-up done |
+| DONE-T-03 | VAT settlement confirmation guards | Golden master extension |
+| DONE-T-04 | ERP feature suite green | `299 passed, 1 skipped` |
+
+---
+
+## Partially complete (Phase 2A finishes these)
+
+| ID | Done today | Still open (→ Phase 2A ID) |
+|----|------------|----------------------------|
+| PART-01 | `ERPModelPolicy` + `close`/`reopen`/`post`/`unpost` methods | State guards + `reverse`/`amend`/`forcePost` → **2A-02** |
+| PART-02 | Seeded `post`/`unpost`/e-invoice permissions | Seed `close`/`reopen`/`reverse`/`amend`/`force_post` → **2A-01** |
+| PART-03 | Force 3-way match checkbox on invoice post | Dedicated `force_post` permission gate → **2A-03** |
+| PART-04 | `FiscalPeriodCloser`, `JournalPostingService::reverse`, `SalesOrderAmendmentService`, DDT observer | Filament actions + form hardening → **2A-04…2A-08** |
+| PART-05 | `FinancialReportCsvExporter` service + tests | Filament export buttons / PDF → **2B-11** |
+
+---
+
+## Open (remaining work)
+
+Status: `open` · `next` = current sprint target
+
+### Phase 2A — Filament domain actions & state-aware policies (**next**)
+
+| ID | Status | Item |
+|----|--------|------|
+| 2A-01 | open | Seed abilities: `close`, `reopen`, `reverse`, `amend`, `force_post` |
+| 2A-02 | open | State-aware `ERPModelPolicy` (state before permission; superadmin bypasses permission only) |
+| 2A-03 | open | `force_post` gate on purchase invoice post checkbox |
+| 2A-04 | open | DDT post/unpost Filament actions (`posted_at` + observer) |
+| 2A-05 | open | Fiscal period close/reopen → `FiscalPeriodCloser`; read-only `is_closed` on form |
+| 2A-06 | open | Fiscal year close → `closeYear()`; register `FiscalYear` on policy map |
+| 2A-07 | open | Journal reverse → `JournalPostingService::reverse()` on `ViewJournalEntry` |
+| 2A-08 | open | Sales order amend → `SalesOrderAmendmentService` + redirect |
+| 2A-09 | open | Policy + seeder + action wiring tests (TDD) |
+
+**Deferred to 2B:** quotation `unlock`, document sequence `reset`.
+
+### Phase 2B — Commercial & banking UX
+
+| ID | Status | Item |
+|----|--------|------|
+| 2B-01 | open | Party price-rule UI |
+| 2B-02 | open | `Party::price_rules()` relation if missing |
+| 2B-03 | open | Optional `PriceList` / `PriceListItem` Filament resources |
+| 2B-04 | open | Bank difference journals (fees, rounding) |
+| 2B-05 | open | Match-with-difference on reco page |
+| 2B-06 | open | Automatic NC/ND on return `complete()` |
+| 2B-07 | open | Return line override contract for auto NC/ND |
+| 2B-08 | open | Quotation `unlock` action + policy + seed |
+| 2B-09 | open | Document sequence `reset` action + policy + seed |
+| 2B-10 | open | CAMT.053 / MT940 import |
+| 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
+| 2B-12 | open | BI / operational dashboard polish |
+
+### Phase 2C — E-invoice & extended permissions
+
+| ID | Status | Item |
+|----|--------|------|
+| 2C-01 | open | Full FatturaPA XML + XSD validation |
+| 2C-02 | open | Complete SDI party/company mapping |
+| 2C-03 | open | Production provider (e.g. Aruba) |
+| 2C-04 | open | Extended admin policies (tax codes, company switch, sequences) |
+| 2C-05 | open | FatturaPA schema columns if needed |
+
+### Phase 3 — Domain HTTP actions & API exposure
+
+| ID | Status | Item |
+|----|--------|------|
+| 3-01 | open | Internal domain-action routes `.../{id}/{action}` |
+| 3-02 | open | Opt-in external API + versioning |
+| 3-03 | open | Per-model CRUD/API exposure governance |
+| 3-04 | open | Centralize permission-name construction (explicit `$connection`) |
+| 3-05 | open | Revert/reverse processed return |
+| 3-06 | open | HTTP tests for domain actions |
+
+### Phase 4 — Cash / Tricount & commercial depth
+
+| ID | Status | Item |
+|----|--------|------|
+| 4-01 | open | `Movement` → `JournalEntry` refactor |
+| 4-02 | open | Tricount UX on journal-only writes |
+| 4-03 | open | Quote revisions + project bind locks |
+| 4-04 | open | DB lock-chain triggers (D5) |
+| 4-05 | open | Settlements / pool / settle-up |
+| 4-06 | open | PaymentRequest stub + providers |
+| 4-07 | open | Calendar ICS export |
+| 4-08 | open | Gantt planning entity (optional) |
+| 4-09 | open | ETL Symfony legacy |
+| 4-10 | open | ERP `sites.place_id` + ICS |
+| 4-11 | open | Hide version-strategy settings for DIFF models |
+| 4-12 | open | Concurrency stress tests (50 workers) |
+| 4-13 | open | API mobile (optional) |
+
+### Phase 5 — Architecture
+
+| ID | Status | Item |
+|----|--------|------|
+| 5-01 | open | Real multi-currency + FX + revaluation |
+| 5-02 | open | Full `Money` value object |
+| 5-03 | open | Analytic dimensions on journal lines |
+| 5-04 | open | Integration outbox / domain events |
+| 5-05 | open | Direct item-specific price lists |
+| 5-06 | open | ERP vision meta / pluggable narrative |
+
+---
+
+## Phase 2A — detailed design (implementation target)
+
+Backend services exist; gap = **Filament actions**, **permissions**, **state-aware policy**, **form hardening**.
+
+### Action classes to create
+
+| Class | Page | Service |
+|-------|------|---------|
+| `FiscalPeriodActions` | `EditFiscalPeriod` | `FiscalPeriodCloser` |
 | `FiscalYearActions` | `EditFiscalYear` | `FiscalPeriodCloser::closeYear()` |
-| `JournalEntryActions` | `ViewJournalEntry` (primary), optionally `EditJournalEntry` | `JournalPostingService::reverse()` |
-| `DeliveryNotePostingActions` | `EditDeliveryNote` | Observer path via `posted_at` update (same as invoice) |
-| `SalesOrderAmendmentActions` | `EditSalesOrder` | `SalesOrderAmendmentService::amend()` |
+| `JournalEntryActions` | `ViewJournalEntry` | `JournalPostingService::reverse()` |
+| `DeliveryNotePostingActions` | `EditDeliveryNote` | `posted_at` + observer |
+| `SalesOrderAmendmentActions` | `EditSalesOrder` | `SalesOrderAmendmentService` |
 
-Each action:
+### Implementation order
 
-- `->authorize(fn ($record) => auth()->user()?->can('<ability>', $record) ?? false)`
-- `->visible(fn ($record) => …)` may duplicate state hints for UX, but **policy is authoritative**
-- `->requiresConfirmation()` for mutating operations
-- Success/error `Notification` + `$this->refreshFormData()` / redirect where needed
-
-**Delivery note post/unpost:** call a small static helper (like `InvoicePostingActions::postInvoice`)
-that sets `posted_at` to `now()` or `null`. Do **not** call non-existent
-`DeliveryNoteInventoryService::post()` / `::unpost()` — inventory runs in
-`DeliveryNoteObserver::saving()` when `posted_at` changes.
-
-**Journal reverse:** modal with required `reversal_reason` text field; resolve company from record;
-call `JournalPostingService::reverse($entry, $company, $reason, auth()->id())`; redirect to new
-reversal entry view on success.
-
-**Sales order amend:** on success redirect to the new draft amendment’s edit page.
-
-### 2. Permissions (seeder)
-
-Extend `ERPDatabaseSeeder::domainPermissions()`:
-
-| Model | New abilities |
-|-------|----------------|
-| `FiscalPeriod` | `.close`, `.reopen` |
-| `FiscalYear` | `.close` |
-| `JournalEntry` | `.reverse` |
-| `SalesOrder` | `.amend` |
-| `Invoice` | `.force_post` |
-
-Keep using `newInstanceWithoutConstructor()` + `getConnectionName() ?? 'default'` + `getTable()`
-(Spec 1 permission-prefix note).
-
-Update `ErpDomainPermissionsSeederTest` for new permission names.
-
-### 3. State-aware `ERPModelPolicy`
-
-Add methods: `reverse()`, `amend()`, `forcePost()`.
-
-Refactor shared flow:
-
-```php
-private function allowsDomainAction(User $user, Model $record, string $operation, bool $state_ok): bool
-{
-    if (! $state_ok) {
-        return false;
-    }
-
-    if ($user->isSuperAdmin()) {
-        return true;
-    }
-
-    return $this->allows($user, $record, $operation);
-}
-```
-
-**State rules (Phase 2A):**
-
-| Ability | Model | State OK when |
-|---------|-------|----------------|
-| `post` | `Invoice` | `journal_entry_id === null` |
-| `unpost` | `Invoice` | `journal_entry_id !== null` |
-| `forcePost` | `Invoice` | same as `post` **and** `direction === purchase` |
-| `post` | `DeliveryNote` | `posted_at === null` |
-| `unpost` | `DeliveryNote` | `posted_at !== null` |
-| `close` | `FiscalPeriod` | `is_closed === false` |
-| `reopen` | `FiscalPeriod` | `is_closed === true` |
-| `close` | `FiscalYear` | `is_closed === false` |
-| `reverse` | `JournalEntry` | `posted_at !== null` and no row with `reverses_journal_entry_id = id` |
-| `amend` | `SalesOrder` | `status` in `Confirmed`, `PartiallyEvased` (mirror service) |
-
-Apply state guards to existing `post()` / `unpost()` / `close()` / `reopen()` — **breaking change
-for superadmin** who could previously post already-posted records via policy alone (UI already hid
-actions).
-
-**Invoice force checkbox:** show only when `auth()->user()?->can('forcePost', $record)`. If user has
-`post` but not `forcePost`, modal posts without checkbox (strict match enforced). Update both
-`InvoicePostingActions` and any duplicate in `EditInvoice.php`.
-
-Register `FiscalYear` in `ERPServiceProvider::policyModels()` for `close` authorization.
-
-### 4. Form hardening
-
-- `FiscalPeriodForm`: replace editable `Toggle::make('is_closed')` with read-only display
-  (`Placeholder` / disabled toggle / `TextEntry` in infolist) — closure state changes only via
-  actions calling `FiscalPeriodCloser`.
-- `FiscalYearForm`: same for `is_closed` if present.
-
-### 5. Error handling
-
-- Service exceptions (`FiscalPeriodAlreadyClosedException`, `ValidationException`,
-  `CannotReverseUnpostedJournalException`, etc.) → Filament `Notification::danger()` with message;
-  do not swallow.
-- No silent success on no-op reopen (service no-ops when already open — action should be hidden via
-  policy/state).
+1. Permissions seeder + test  
+2. Policy state guards + tests  
+3. `force_post` on invoice actions  
+4. Fiscal period/year + form hardening  
+5. DDT post/unpost  
+6. Journal reverse  
+7. Sales order amend  
+8. Filament smoke + ERP test subset  
 
 ---
 
-## Testing Strategy
+## Maintenance rule
 
-TDD per ability cluster:
-
-1. **Policy tests** — extend `ErpModelPolicyTest.php` (or add focused files per model) for:
-   - state denies even superadmin when record in wrong state
-   - permission granted + correct state → allow (non-superadmin)
-   - fail-closed when permission row missing
-
-2. **Seeder test** — `ErpDomainPermissionsSeederTest` asserts new permission names exist.
-
-3. **Action wiring tests** — lightweight feature tests invoking static action helpers or page logic
-   (without browser):
-   - e.g. `DeliveryNotePostingActions::postNote()` sets `posted_at` and triggers inventory side
-     effect (assert `inventory_posted_at` set) using existing service test patterns.
-
-4. **Regression** — run existing integration tests:
-   - `tests/Integration/Services/Accounting/FiscalPeriodCloserTest.php`
-   - journal reverse coverage in accounting golden-master / posting tests
-   - `SalesOrderAmendmentService` tests
-
-5. **Filament smoke** — extend `ERPFilamentResourcesTest` / route smoke if new routes unchanged
-   (pages already registered).
-
-Run `vendor/bin/pint --dirty` before completion.
-
----
-
-## File Map (expected touch set)
-
-```
-Modules/ERP/database/seeders/ERPDatabaseSeeder.php
-Modules/ERP/app/Policies/ERPModelPolicy.php
-Modules/ERP/app/Providers/ERPServiceProvider.php
-
-Modules/ERP/app/Filament/Resources/FiscalPeriods/Actions/FiscalPeriodActions.php
-Modules/ERP/app/Filament/Resources/FiscalPeriods/Pages/EditFiscalPeriod.php
-Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
-
-Modules/ERP/app/Filament/Resources/FiscalYears/Actions/FiscalYearActions.php
-Modules/ERP/app/Filament/Resources/FiscalYears/Pages/EditFiscalYear.php
-Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php  (if is_closed toggle exists)
-
-Modules/ERP/app/Filament/Resources/JournalEntries/Actions/JournalEntryActions.php
-Modules/ERP/app/Filament/Resources/JournalEntries/Pages/ViewJournalEntry.php
-
-Modules/ERP/app/Filament/Resources/DeliveryNotes/Actions/DeliveryNotePostingActions.php
-Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php
-
-Modules/ERP/app/Filament/Resources/SalesOrders/Actions/SalesOrderAmendmentActions.php
-Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php
-
-Modules/ERP/app/Filament/Resources/Invoices/Actions/InvoicePostingActions.php
-Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php  (force_post gate)
-
-Modules/ERP/tests/Feature/ErpModelPolicyTest.php
-Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php
-Modules/ERP/tests/Feature/Filament/…  (new action wiring tests as needed)
-```
-
----
-
-## Risks and Mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Duplicate post actions on `EditInvoice` vs `InvoicePostingActions` | Consolidate force_post gate in both or extract shared form builder |
-| DDT post via `posted_at` without lines | Keep existing model validation; action visible only when draft |
-| Fiscal period CRUD bypass | Disable `is_closed` on form |
-| Superadmin state bypass expectation | Document: superadmin bypasses permissions only, not state |
-| Journal reverse from Edit page on draft | Prefer `ViewJournalEntry`; hide reverse when unposted |
-
----
-
-## Implementation Order (recommended)
-
-1. Permissions seeder + seeder test  
-2. Policy state guards + policy tests (all abilities)  
-3. `force_post` gate on invoice actions  
-4. Fiscal period/year actions + form hardening  
-5. Delivery note post/unpost actions  
-6. Journal reverse action  
-7. Sales order amend action  
-8. Filament smoke + full ERP test subset  
-
----
-
-## Out of Scope (Phase 2B+)
-
-See Context section. Track in Spec 2 umbrella index when Phase 2B spec is written.
+When closing an item: move it from § Open to § Completed with evidence (commit/test). Partial items
+move to § Partial or split into done + remaining open IDs.
