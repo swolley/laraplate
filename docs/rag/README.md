@@ -1,6 +1,20 @@
 # Laraplate RAG corpus (application level)
 
-This folder holds **global** documentation you want available to the documentation assistant / RAG (`php artisan ai:laraplate-help`, FAQ chat when RAG is enabled).
+This folder holds **global** documentation you want available to the documentation assistant / RAG.
+
+## Who reads what
+
+| Audience | Typical questions | How they reach RAG |
+|----------|-------------------|-------------------|
+| **End user** (application operator) | “How do I approve a modification?”, “Where is the grid export?” | In-app **chat** (`ChatService`), when FAQ/RAG is enabled and the message is treated as a question (or `use_rag: true` in context) |
+| **Developer** (extends Laraplate) | “How does ACL inheritance work?”, “Which event triggers indexing?” | Terminal **`php artisan ai:laraplate-help`** (REPL or `--question=`) |
+
+Both paths use the **same indexed corpus** (`ai:index-docs`). Split content by **writing style and scope**, not by separate indexes (unless you later add filtered roots via `--path` or `AI_FAQ_DOCS_PATH`):
+
+- **User-oriented** docs: tasks, UI flows, permissions from an operator perspective, troubleshooting for daily use.
+- **Developer-oriented** docs: architecture, events, commands, config keys, extension points, module boundaries.
+
+Place files under `docs/rag/` or `Modules/<Module>/docs/rag/` according to which module/feature they describe.
 
 ## Not the same as Elasticsearch / Scout indexing
 
