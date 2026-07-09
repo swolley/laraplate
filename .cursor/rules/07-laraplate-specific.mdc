@@ -31,3 +31,8 @@ alwaysApply: false
   - Intelephense does not chain mixins: `IdeHelper*` alone hides inherited Eloquent instance methods (`hasManyThrough`, etc.).
   - Add `@property` on the trait only for host-specific fields the trait reads (not the full Model API).
   - Factory/command traits that are not used on models must not declare `require-extends Model`.
+
+- Pint `final_class`:
+  - Keep `final_class: false` in every `pint.json` (root + modules). Never enable it globally.
+  - Leaf Eloquent models should stay `final` manually; Pint cannot know which classes are extended by the host app.
+  - `Modules\Core\Models\User` must remain non-`final` because `App\Models\User` extends it.

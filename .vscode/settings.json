@@ -10,5 +10,6 @@
     },
     "laravel-pint.enable": true,
     "laravel-pint.configPath": "./pint.json",
+    "laravel-pint.executablePath": "./vendor/bin/pint",
     "postman.settings.dotenv-detection-notification-visibility": false
 }
