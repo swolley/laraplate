@@ -15,8 +15,11 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Modules\Core\Helpers\ValidationExceptionDescriber;
+use Modules\Core\Overrides\ContextualValidationException;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -89,7 +92,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->context(function (ValidationException $exception): array {
+            $context = [
+                'validation_summary' => ValidationExceptionDescriber::describe($exception),
+                'validation_errors' => $exception->errors(),
+            ];
+
+            if ($exception instanceof ContextualValidationException) {
+                $context['validation_context'] = $exception->context();
+            }
+
+            return $context;
+        });
     })
     ->create();
 

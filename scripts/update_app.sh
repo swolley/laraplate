@@ -1,6 +1,10 @@
 #!/bin/bash
 
-cd ..
+if [[ "$PWD" == *"scripts"* ]]; then
+   cd ..
+fi
+
+git submodule foreach 'git pull'
 
 before=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo "no tag")
 

@@ -20,7 +20,7 @@
         $overviewParams['seconds'] = $tableFetchDurationSeconds;
     }
     $overviewKey = isset($tableFetchDurationSeconds)
-        ? 'core::pagination.overview'
+        ? 'pagination.overview'
         : 'filament::components/pagination.overview';
 @endphp
 
