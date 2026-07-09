@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚀 Features
+
+- *(performance)* Enhance performance optimization strategies and add large dataset guidelines
+
+## [1.11.4] - 2026-07-09
+
 ### 🐛 Bug Fixes
 
 - *(app)* Guard validation exception context for all throwables
