@@ -1,0 +1,49 @@
+---
+description: Database migrations, queries, and index guidelines with multi-DB compatibility
+globs: ["**/database/migrations/**", "**/config/database.php", "**/Helpers/MigrateUtils.php", "**/Search/Engines/DatabaseEngine.php", "**/Search/Translators/DatabaseTranslator.php"]
+alwaysApply: false
+---
+
+# Database Guidelines (caveman)
+
+- Laraplate must stay compatible with **MySQL, MariaDB, PostgreSQL, Oracle, SQLite**.
+- **SQLite is mandatory for tests** — broken SQLite migrations/queries break CI.
+- Spec detail: `docs/superpowers/specs/2026-07-09-database-guidelines-design.md`.
+
+## Multi-DB law
+
+- Default test DB: SQLite (`config/database.php`).
+- Production targets: MySQL, MariaDB, PostgreSQL, Oracle (OCI8 when available).
+- Prefer Schema Builder; branch on `DB::getDriverName()` / `match` for dialect-specific SQL.
+- Every driver-specific migration needs a **SQLite-safe path** unless explicitly documented otherwise.
+- Reuse `MigrateUtils` for timestamps, soft deletes, locks, validity — do not reimplement.
+- Raw `DB::statement()` OK when Blueprint is insufficient — always guard non-portable SQL.
+
+## Indexes
+
+- Index for **query pattern**, not habit.
+- FK / `=` / unique keys → primary key, foreign key, `UNIQUE`, or `btree`.
+- Filters and sorts → `btree` (PG: `BRIN` for append-only timestamps only where already used).
+- Avoid redundant indexes when `UNIQUE` composite already covers access.
+
+## FULLTEXT (subsection — not default for text)
+
+- Do **not** put FULLTEXT / `to_tsvector` on every text column.
+- **Never** on: `slug`, codes, SKU, email, UUID, locale, enums, short prefix/equality fields.
+- **Yes** on: long prose searched multi-word **on DB** with `whereFullText` / `MATCH` / `to_tsvector`.
+- MySQL/MariaDB + PostgreSQL branches only in shared migrations; SQLite/Oracle need explicit tested branch or omit.
+- Scout default is `typesense`; DB FULLTEXT needs `SCOUT_DRIVER=database` + `SearchUsingFullText` on model.
+- Prefix fields → `SearchUsingPrefix`, not FULLTEXT.
+
+## Queries
+
+- Eloquent / query builder first.
+- Non-portable SQL → driver branch (e.g. `ILIKE` is PG-only).
+- Reference patterns: `MigrateUtils`, `create_permission_tables` migration.
+
+## Before merge
+
+1. Migration runs on SQLite?
+2. Driver branch has fallback for all five targets (or documented exception)?
+3. Index matches real queries?
+4. FULLTEXT only if DB text search is intentional?

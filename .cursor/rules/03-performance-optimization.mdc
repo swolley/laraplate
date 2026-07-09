@@ -10,6 +10,7 @@ alwaysApply: false
 - Use queue for heavy tasks.
 - Avoid N+1: eager load relations.
 - Use indexes when query pattern needs.
+- Multi-DB compatibility (MySQL, MariaDB, PostgreSQL, Oracle, SQLite): see `09-database-guidelines.mdc` and `docs/superpowers/specs/2026-07-09-database-guidelines-design.md`.
 - Use transactions for multi-step consistency.
 - Keep DB compatibility (MySQL/Postgres/SQLite/Oracle where possible or add comment if not).
 - Prefer Eloquent/query builder abstractions over vendor-specific SQL.

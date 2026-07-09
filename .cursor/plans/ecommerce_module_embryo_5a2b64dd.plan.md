@@ -17,7 +17,7 @@ isProject: false
 # Piano modulo Ecommerce (embrionale)
 
 ## Obiettivo
-Catturare le decisioni architetturali per non perderle. Nessun codice obbligatorio in questo file: documento di piano in `.cursor/plans/` allineato alla convenzione esistente ([nebula_verso_business_0d6eb0ed.plan.md](.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md), [mes_requirements_revision_8a9d6c58.plan.md](.cursor/plans/mes_requirements_revision_8a9d6c58.plan.md)).
+Catturare le decisioni architetturali per non perderle. Nessun codice obbligatorio in questo file: documento di piano in `.cursor/plans/` allineato alla convenzione esistente ([nebula_verso_business_0d6eb0ed.plan.md](.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md), [2026-06-19-mes-module-full-implementation.md](docs/superpowers/plans/2026-06-19-mes-module-full-implementation.md)).
 
 ## File di riferimento
 - Questo file: `.cursor/plans/ecommerce_module_embryo_5a2b64dd.plan.md` (unica fonte aggiornata per l'embrione Ecommerce).

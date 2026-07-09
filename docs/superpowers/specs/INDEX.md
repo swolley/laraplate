@@ -13,3 +13,4 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-06-30-cms-graph-layer-design.md`: Core Graph Framework for CRUD-aligned graph expand/search/stats; CMS is the first consumer/provider, not the owner of the graph engine.
 - `2026-07-02-cms-content-provenance-ai-assistance-design.md`: CMS content origin, references bibliography (`cms_contents_references`), and per-translation `ai_assistance` enum for EU AI Act Article 50 disclosure.
 - `2026-07-09-large-dataset-query-patterns-design.md`: Eloquent iteration rules (`get`/`lazy`/`chunk`/`cursor`), Core query/memory backlog, Filament table/widget performance checklist.
+- `2026-07-09-database-guidelines-design.md`: Multi-DB compatibility (MySQL, MariaDB, PostgreSQL, Oracle, SQLite), migrations, indexes, FULLTEXT/Scout rules, `MigrateUtils` patterns.

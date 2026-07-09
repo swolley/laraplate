@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Completare il modulo MES (Manufacturing Execution System) di Laraplate — da dominio produzione a API REST, Filament, test suite e documentazione — seguendo le spec Kiro (`.kiro/specs/mes-module/`) e i vincoli in `Modules/MES/.cursor/rules/module-context.mdc`.
+**Goal:** Completare il modulo MES (Manufacturing Execution System) di Laraplate — da dominio produzione a API REST, Filament, test suite e documentazione — seguendo i vincoli in `Modules/MES/.cursor/rules/module-context.mdc` e i pattern ERP/Core del monorepo.
 
 **Architecture:** Modulo Laravel (`Modules/MES`, submodule git) con dipendenza unidirezionale MES→ERP. Modelli MES con prefisso tabella `mes_`, trait `BelongsToCompany`, FK fisiche verso `items`, `warehouses`, `companies`, `sales_orders`. Movimenti magazzino via contratto `StockMovementRecorder` (adapter `ErpStockMovementRecorder`). Numerazione ordini produzione via `DocumentNumberAllocator` ERP (nuovo `DocumentType::ProductionOrder`). Servizi di dominio orchestrano snapshot BOM/Routing, backflush, tracciabilità lotti, qualità, capacità e OEE.
 
@@ -49,7 +49,6 @@ Queste decisioni non erano esplicite nella chat; il piano le adotta come default
 
 **Riferimenti obbligatori prima di ogni task:**
 
-- Spec: `.kiro/specs/mes-module/{requirements,design,tasks}.md`
 - Modello esistente: `Modules/MES/app/Models/WorkCenter.php`
 - Contratto stock: `Modules/MES/app/Contracts/StockMovementRecorder.php`
 - Numerazione ERP: `Modules/ERP/app/Services/Accounting/DocumentNumberAllocator.php`
@@ -1102,7 +1101,7 @@ cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 1. `vendor/bin/pint --dirty` (root o `Modules/MES`)
 2. `php artisan test Modules/MES/tests --compact` (o subset file)
 3. Commit nel submodule MES (e ERP se toccato)
-4. Aggiornare `.kiro/specs/mes-module/tasks.md` checkbox quando completato
+4. Aggiornare le checkbox di questo piano quando un task è completato
 
 ---
 

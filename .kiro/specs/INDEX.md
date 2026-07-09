@@ -2,7 +2,4 @@
 
 Navigation aid only. Use this file to find the relevant Kiro spec, then open only that spec or section.
 
-- `mes-module/requirements.md`: MES module requirements and acceptance criteria.
-- `mes-module/design.md`: MES module technical design.
-- `mes-module/tasks.md`: MES implementation task plan and progress.
-- `mes-module/tasks.meta.json`: MES task metadata.
+_No active Kiro specs. MES planning lives in `docs/superpowers/plans/2026-06-19-mes-module-full-implementation.md`._

@@ -22,6 +22,7 @@
 - `06-coding-principles.mdc` always-on coding principles.
 - `07-laraplate-specific.mdc` module architecture context.
 - `08-versioning.mdc` semantic module versioning workflow.
+- `09-database-guidelines.mdc` database migrations, queries, indexes, multi-DB compatibility (MySQL, MariaDB, PostgreSQL, Oracle, SQLite).
 - `laravel-boost.mdc` ecosystem source of truth.
 
 ## Maintenance

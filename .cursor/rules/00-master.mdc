@@ -25,3 +25,4 @@ alwaysApply: true
   - `06-coding-principles.mdc` always-on coding principles.
   - `07-laraplate-specific.mdc` module architecture rules.
   - `08-versioning.mdc` semantic module versioning workflow.
+  - `09-database-guidelines.mdc` migrations, queries, indexes, multi-DB compatibility.
