@@ -8,6 +8,21 @@ All notable changes to this project will be documented in this file.
 
 - *(performance)* Enhance performance optimization strategies and add large dataset guidelines
 
+### 📚 Documentation
+
+- Align RAG corpus guide with user vs developer audiences
+- Update MES module plans and decisions
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump CMS to v1.36.4 and sync project guidelines
+
+## [1.12.0] - 2026-07-09
+
+### 🚀 Features
+
+- *(performance)* Enhance performance optimization strategies and add large dataset guidelines
+
 ## [1.11.4] - 2026-07-09
 
 ### 🐛 Bug Fixes

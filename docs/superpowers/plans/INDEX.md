@@ -12,7 +12,8 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-05-25-erp-m62-returns-management.md`: ERP customer/supplier returns with inventory effects.
 - `2026-05-25-erp-m63-einvoice-sdi.md`: ERP e-invoice stub and submission structure.
 - `2026-05-25-erp-m71-advanced-pricelists.md`: ERP advanced pricelists and discount rules.
-- `2026-06-19-mes-module-full-implementation.md`: Full MES module implementation plan.
+- `docs/superpowers/plans/2026-06-19-mes-module-full-implementation.md`: Full MES module implementation plan.
+- `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`: MES locked decisions (confirmed 2026-07-09).
 - `2026-06-23-erp-accounting-golden-master.md`: ERP accounting golden-master regression tests.
 - `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + patch `971851d` ERP / `15b11c8` Core). Open follow-ups → Spec 2 master backlog.
 - `2026-06-30-erp-hardening-spec2-phase2a.md`: ERP Spec 2 Phase 2A — Filament domain actions + state-aware policies (**ready to implement**, 9 tasks).

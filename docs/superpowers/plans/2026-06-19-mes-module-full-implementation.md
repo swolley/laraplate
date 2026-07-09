@@ -8,47 +8,53 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, Filament 5, Livewire 4, Sanctum 4, Pest 4, nwidart/laravel-modules, Tailwind 4.
 
----
-
-## Assunzioni (conferma utente consigliata)
-
-Queste decisioni non erano esplicite nella chat; il piano le adotta come default coerenti con `module-context.mdc`. Modificare prima dell’implementazione se serve.
-
-| # | Decisione | Default adottato |
-|---|-----------|------------------|
-| A1 | Priorità consegna | Backend dominio + test prima; API e Filament dopo T6–T10 |
-| A2 | Numerazione ordini | `DocumentNumberAllocator` + nuovo `DocumentType::ProductionOrder` in ERP (non numerazione manuale company+anno) |
-| A3 | Auto-PO da SalesOrder | Creare evento ERP `SalesOrderConfirmed` + listener/job MES (non esiste oggi) |
-| A4 | `sales_order_line_id` | Aggiungere colonna nullable su `mes_production_orders` per coerenza header/linea |
-| A5 | Verifica turno operatore | Warning non bloccante (come capacità WC); log sempre creato |
-| A6 | Property-based testing | Pest con dataset ripetuti + invarianti esplicite; no nuova dipendenza PBT |
-| A7 | Git workflow | Commit nel repo `Modules/MES`; bump puntatore submodule nel monorepo Laraplate |
-| A8 | DIFF audit | Applicare trait/pattern Core DIFF solo su `ProductionOrder`, `Bom`, `Routing` (modelli ad alto valore) |
-
-**Domande aperte per l’utente:** confermare A1–A8; indicare se il backflush deve scattare a **fine operazione** (design Kiro) o solo a **fine ordine**; confermare se ERP Filament Resources esistono in un branch/submodule non presente in workspace (il pattern Filament segue `Modules/Core/app/Filament/Resources/Users/UserResource.php`).
+**Decisioni bloccate:** `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
 
 ---
 
-## Current Truth (stato reale vs `tasks.md` Kiro)
+## Decisioni confermate (2026-07-09)
 
-| Wave Kiro | Stato reale nel codice | Gap principale |
-|-----------|------------------------|----------------|
-| T1 Scaffolding | ✅ Fatto | TestCase/Pest ok; verificare binding |
-| T2 `tracing_type` | ✅ Migration + cast ERP | ❌ 4 test falliscono: import `TracingType` errato |
-| T3 Work Center | ✅ Modelli, migration, factory | ❌ Test slug >64 char; test unicità codice mancante |
-| T4 BOM | ⚠️ Solo migration | ❌ Modelli, enum, service, test, lock |
-| T5 Routing | ⚠️ Solo migration `mes_routings` | ❌ `mes_routing_operations`, modelli, service, test |
-| T6 ProductionOrder | ⚠️ Solo migration | ❌ Tutto il dominio ordini |
-| T7–T13 | ❌ Assente | Migration, modelli, servizi, job, observer |
-| T14 API | ❌ `routes/api.php` vuoto | Controller, resources, auth |
-| T15 Filament | ❌ Assente | 8 resources + widget |
-| T16 Test suite | ⚠️ Parziale | Factory mancanti, E2E, type coverage |
-| T17 Docs | ⚠️ Parziale | Mancano `MES_GUIDA_SEMPLICE.md`, `docs/rag/MODULE.md` |
+Dettaglio completo: `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
+
+| # | Decisione | Scelta |
+|---|-----------|--------|
+| D1 | Scope | Modulo **completo** (tutti i task del piano) |
+| D2 | Fonte requisiti | `module-context.mdc` + questo piano (Kiro rimosso) |
+| D3 | Numerazione PO | `DocumentNumberAllocator` + `DocumentType::ProductionOrder` |
+| D4 | Link SalesOrder | `sales_order_id` + `sales_order_line_id` (entrambi nullable, vincolo applicativo) |
+| D5 | Backflush | Per operazione collegata via `bom_lines.routing_operation_id`; fallback ultima operazione se FK null |
+| D6 | Turno operatore | Warning non bloccante; `OperatorLog` sempre |
+| D7 | Testing | Pest + invarianti esplicite; no lib PBT |
+| D8 | Git | Commit submodule `Modules/MES`; bump monorepo |
+| D9 | DIFF audit | `ProductionOrder`, `Bom`, `Routing` |
+| D10 | KPI | Materializzazione job + cache |
+
+Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (Task 14–15), coerente con D1.
+
+---
+
+## Current Truth (stato codice al 2026-07-09)
+
+| Task piano | Stato reale nel codice | Gap principale |
+|------------|------------------------|----------------|
+| 0 Baseline test | ⚠️ Parziale | Slug company >64 char in alcuni test; verificare suite |
+| 1 Scaffolding | ✅ Fatto | TestCase/Pest ok; binding ok |
+| 2 `tracing_type` | ✅ Migration + cast ERP | Test da stabilizzare |
+| 3 Work Center | ✅ Modelli, migration, factory | Test unicità codice mancante |
+| 4 BOM | ⚠️ Solo migration header/lines | Modelli, `routing_operation_id` su lines, service, test, lock |
+| 5 Routing | ⚠️ Solo migration `mes_routings` | `mes_routing_operations`, modelli, service, test |
+| 6 ProductionOrder | ⚠️ Solo migration | Dominio, `sales_order_line_id`, DocumentType ERP |
+| 7–13 | ❌ Assente | Migration, modelli, servizi, job, observer |
+| 14 API | ❌ `routes/api.php` vuoto | Controller, resources, auth |
+| 15 Filament | ❌ Assente | 8 resources + widget |
+| 16 Test suite | ⚠️ Parziale | Factory mancanti, E2E, type coverage |
+| 17 Docs | ⚠️ Parziale | Mancano `MES_GUIDA_SEMPLICE.md`, `docs/rag/MODULE.md` |
 
 **Test attuali:** `php artisan test Modules/MES/tests --compact` → 31 pass, 5 fail (baseline da sistemare in Task 0).
 
 **Riferimenti obbligatori prima di ogni task:**
 
+- Decisioni: `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
 - Modello esistente: `Modules/MES/app/Models/WorkCenter.php`
 - Contratto stock: `Modules/MES/app/Contracts/StockMovementRecorder.php`
 - Numerazione ERP: `Modules/ERP/app/Services/Accounting/DocumentNumberAllocator.php`
@@ -356,11 +362,12 @@ cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m 
 
 ---
 
-### Task 4: Distinta base (BOM) — T4
+### Task 4: Distinta base (BOM)
 
 **Files:**
 - Modify: `Modules/MES/app/Enums/MESTables.php`
 - Create: `Modules/MES/app/Enums/ConsumptionMethod.php`
+- Create: `Modules/MES/database/migrations/2026_05_08_000007_add_routing_operation_id_to_mes_bom_lines_table.php`
 - Create: `Modules/MES/app/Models/Bom.php`
 - Create: `Modules/MES/app/Models/BomLine.php`
 - Create: `Modules/MES/app/Services/BomExplosionService.php`
@@ -369,7 +376,23 @@ cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m 
 - Create: `Modules/MES/database/factories/BomLineFactory.php`
 - Create: `Modules/MES/tests/Feature/BomExplosionServiceTest.php`
 
-- [ ] **Step 1: Espandere MESTables e ConsumptionMethod**
+**Decision D5:** `mes_bom_lines.routing_operation_id` nullable FK → `mes_routing_operations` (migration in this task; FK enforced after Task 5 creates routing operations table — use deferred FK or add column in Task 5 if ordering requires).
+
+- [ ] **Step 1: Migration `routing_operation_id` on bom lines**
+
+```php
+Schema::table(MESTables::BomLines->value, function (Blueprint $table): void {
+    $table->foreignId('routing_operation_id')
+        ->nullable()
+        ->after('consumption_method')
+        ->constrained(MESTables::RoutingOperations->value)
+        ->nullOnDelete();
+});
+```
+
+> **Ordering note:** if `mes_routing_operations` does not exist yet, add this column in Task 5 instead, or create routing_operations migration before this ALTER.
+
+- [ ] **Step 2: Espandere MESTables e ConsumptionMethod**
 
 ```php
 // Modules/MES/app/Enums/ConsumptionMethod.php
@@ -393,7 +416,7 @@ enum ConsumptionMethod: string
 
 Aggiungere a `MESTables.php` i case già usati dalle migration (`Boms`, `BomLines` già presenti).
 
-- [ ] **Step 2: Scrivere test fallente esplosione multi-livello**
+- [ ] **Step 3: Scrivere test fallente esplosione multi-livello**
 
 ```php
 <?php
@@ -446,7 +469,7 @@ it('explodes multi-level bom quantities', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run test → FAIL**
+- [ ] **Step 4: Run test → FAIL**
 
 Run:
 
@@ -456,16 +479,16 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/BomExplosio
 
 Expected: FAIL (class not found).
 
-- [ ] **Step 4: Implementare modelli Bom e BomLine**
+- [ ] **Step 5: Implementare modelli Bom e BomLine**
 
 Seguire pattern `WorkCenter.php`:
 
 - `final class`, `BelongsToCompany`, `MESTables` per `$table`
 - Relazioni: `Bom` → `item()` BelongsTo ERP Item, `bomLines()` HasMany
-- `BomLine` → `bom()`, `item()`
+- `BomLine` → `bom()`, `item()`, `routingOperation()` BelongsTo nullable
 - `getRules()` con validazione version, date, quantity > 0
 
-- [ ] **Step 5: Implementare BomExplosionService**
+- [ ] **Step 6: Implementare BomExplosionService**
 
 ```php
 <?php
@@ -540,9 +563,9 @@ final class BomExplosionService
 
 Nota: `ProductionOrder` e campo snapshot arrivano in Task 6; fino ad allora stubbare test lock in Task 6.
 
-- [ ] **Step 6: Factory Bom/BomLine + run test PASS**
+- [ ] **Step 7: Factory Bom/BomLine + run test PASS**
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 cd Modules/MES && git add app/Models/Bom.php app/Models/BomLine.php app/Services/BomExplosionService.php app/Enums/ConsumptionMethod.php database/factories/BomFactory.php database/factories/BomLineFactory.php tests/Feature/BomExplosionServiceTest.php
@@ -783,13 +806,20 @@ final class BackflushMaterialsJob implements ShouldQueue
 
     public function handle(StockMovementRecorder $recorder): void
     {
-        // load operation → order snapshot lines where consumption_method=backflush
-        // upsert MaterialConsumption, compute variance, set stock_shortage if ERP throws
+        // 1. Load operation + order + sequence position
+        // 2. Select snapshot bom lines where consumption_method = backflush AND:
+        //    - routing_operation_id matches this operation's routing_operation_id, OR
+        //    - routing_operation_id is null AND this is the last operation in sequence
+        // 3. Skip lines already backflushed for this (operation_id, item_id) — idempotent
+        // 4. Create MaterialConsumption, invoke recorder (direction=out), compute variance
+        // 5. On insufficient stock: record consumption with stock_shortage=true, dispatch StockShortageDetected
     }
 }
 ```
 
 Queue: `config('mes.queue.connection')`, `config('mes.queue.name')`.
+
+See decision D5 in `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`.
 
 - [ ] **Step 3: Consumo manuale via Form Request + service method**
 
@@ -1069,30 +1099,30 @@ cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 
 ---
 
-## Self-Review (spec coverage)
+## Self-Review (coverage)
 
-| Requisito Kiro | Task |
-|----------------|------|
-| R1 Work Center | 3, 14, 15 |
-| R2 BOM | 4, 14, 15 |
-| R3 Routing | 5, 14, 15 |
-| R4 Production Order | 6, 7, 14, 15 |
-| R5 Operations | 7, 14 |
-| R6 Material consumption | 8, 14 |
-| R7 Lot traceability | 9, 14 |
-| R8 Quality | 10, 14, 15 |
-| R9 Scheduling | 11, 14 |
-| R10 Shifts | 13, 14, 15 |
-| R11 Downtime/OEE | 12, 14, 15 |
-| R12 ERP integration | 1, 2, 6, 8 |
-| R13 API | 14 |
-| R14 Filament | 15 |
+| Area funzionale | Task |
+|-----------------|------|
+| Work Center | 3, 14, 15 |
+| BOM | 4, 14, 15 |
+| Routing | 5, 14, 15 |
+| Production Order | 6, 7, 14, 15 |
+| Operations | 7, 14 |
+| Material consumption / backflush | 8, 14 |
+| Lot traceability | 9, 14 |
+| Quality | 10, 14, 15 |
+| Scheduling | 11, 14 |
+| Shifts | 13, 14, 15 |
+| Downtime/OEE | 12, 14, 15 |
+| ERP integration | 1, 2, 6, 8 |
+| API | 14 |
+| Filament | 15 |
 
-**Gap note:** Requirement 5 (operazioni parallele) — implementare in `ProductionOrderOperationService` che operazioni con `is_parallel=true` condividono sequence possono essere `in_progress` contemporaneamente.
+**Gap note:** operazioni parallele (`is_parallel=true`) — in `ProductionOrderOperationService`, stessa `sequence` può avere più operazioni `in_progress` contemporaneamente.
 
-**Placeholder scan:** nessun TBD nel piano; ogni task ha file path, comandi e codice di riferimento.
+**Backflush (D5):** `routing_operation_id` su `mes_bom_lines`; idempotenza job obbligatoria.
 
-**Type consistency:** `ProductionOrderOperation` FK column in material consumption = `production_order_operation_id` (design.md); allineare modelli e migration a questo nome.
+**Type consistency:** colonna FK consumi = `production_order_operation_id` (non `operation_id`).
 
 ---
 
