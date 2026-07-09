@@ -15,5 +15,8 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-19-mes-module-full-implementation.md`: Full MES module implementation plan.
 - `2026-06-23-erp-accounting-golden-master.md`: ERP accounting golden-master regression tests.
 - `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + patch `971851d` ERP / `15b11c8` Core). Open follow-ups → Spec 2 master backlog.
+- `2026-06-30-erp-hardening-spec2-phase2a.md`: ERP Spec 2 Phase 2A — Filament domain actions + state-aware policies (**ready to implement**, 9 tasks).
+- `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, reporting polish (**ready to implement**, 12 tasks + 1 optional).
+- `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Spec 2 Phases 2C–5 — e-invoice, domain HTTP/API, Tricount, architecture (**ready to implement**, 30 backlog items, 28 tasks).
 - `2026-06-30-cms-graph-layer.md`: Core Graph Phase 1 Expand — CRUD-aligned graph expansion in Core with CMS as first provider/consumer.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.

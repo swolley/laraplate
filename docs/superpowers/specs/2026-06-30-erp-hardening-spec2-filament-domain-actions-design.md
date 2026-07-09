@@ -14,11 +14,25 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **62** | Core M0–M7 v1 + Spec 1 + M4 reporting slice |
-| **Partial** | **5** | Backend or skeleton exists; Phase 2A completes the gap |
-| **Open** | **38** | Phases 2A–5 — see § Open |
+| **Done** | **62** | Core M0–M7 v1 + Spec 1 + M4 reporting slice — § Completed |
+| **Partial → closed by Phase 2A** | **4** | PART-01…PART-04 — backend/skeleton exists; 2A finishes wiring |
+| **Partial → Phase 2B** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
+| **Open backlog rows** | **51** | § Open — **9 in Phase 2A** (next) + **42 in Phases 2B–5** |
 
-**Next target:** Phase 2A (9 open items) — Filament wiring + state-aware policy + missing permissions.
+**How to read the backlog**
+
+- **51 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **4 partial** (PART-01…04) are **not** extra open rows; they explain what Phase 2A completes on top of existing code.
+- **Do not double-count:** PART-05 and 2B-11 are the same item.
+
+**Next target:** Phase 2A — 9 open items (`2A-01`…`2A-09`). Implementation plan:
+[`plans/2026-06-30-erp-hardening-spec2-phase2a.md`](../plans/2026-06-30-erp-hardening-spec2-phase2a.md).
+
+**Then:** Phase 2B — 12 items (`2B-01`…`2B-12`). Plan:
+[`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
+
+**Finally:** Phases 2C–5 — 30 items (`2C-01`…`5-06`). Plan:
+[`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
 
@@ -173,6 +187,8 @@ Status: `open` · `next` = current sprint target
 
 ### Phase 2B — Commercial & banking UX
 
+> Implementation plan: [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md) (5 waves, 12 tasks + optional PriceList resources).
+
 | ID | Status | Item |
 |----|--------|------|
 | 2B-01 | open | Party price-rule UI |
@@ -190,6 +206,8 @@ Status: `open` · `next` = current sprint target
 
 ### Phase 2C — E-invoice & extended permissions
 
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Wave 2 (Tasks 3–7).
+
 | ID | Status | Item |
 |----|--------|------|
 | 2C-01 | open | Full FatturaPA XML + XSD validation |
@@ -199,6 +217,8 @@ Status: `open` · `next` = current sprint target
 | 2C-05 | open | FatturaPA schema columns if needed |
 
 ### Phase 3 — Domain HTTP actions & API exposure
+
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Waves 1 + 3 (Tasks 1–2, 8–11). Spine of remaining work.
 
 | ID | Status | Item |
 |----|--------|------|
@@ -210,6 +230,8 @@ Status: `open` · `next` = current sprint target
 | 3-06 | open | HTTP tests for domain actions |
 
 ### Phase 4 — Cash / Tricount & commercial depth
+
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Wave 4 (Tasks 12–22).
 
 | ID | Status | Item |
 |----|--------|------|
@@ -228,6 +250,8 @@ Status: `open` · `next` = current sprint target
 | 4-13 | open | API mobile (optional) |
 
 ### Phase 5 — Architecture
+
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Wave 5 (Tasks 23–28).
 
 | ID | Status | Item |
 |----|--------|------|
