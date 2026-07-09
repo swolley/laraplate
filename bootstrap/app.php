@@ -92,17 +92,21 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->context(function (ValidationException $exception): array {
-            $context = [
+        $exceptions->context(function (Throwable $exception, array $context): array {
+            if (! $exception instanceof ValidationException) {
+                return $context;
+            }
+
+            $validation_context = [
                 'validation_summary' => ValidationExceptionDescriber::describe($exception),
                 'validation_errors' => $exception->errors(),
             ];
 
             if ($exception instanceof ContextualValidationException) {
-                $context['validation_context'] = $exception->context();
+                $validation_context['validation_context'] = $exception->context();
             }
 
-            return $context;
+            return array_merge($context, $validation_context);
         });
     })
     ->create();
