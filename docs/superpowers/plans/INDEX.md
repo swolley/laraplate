@@ -20,3 +20,4 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Spec 2 Phases 2C–5 — e-invoice, domain HTTP/API, Tricount, architecture (**ready to implement**, 30 backlog items, 28 tasks).
 - `2026-06-30-cms-graph-layer.md`: Core Graph Phase 1 Expand — CRUD-aligned graph expansion in Core with CMS as first provider/consumer.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
+- `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.

@@ -1,5 +1,7 @@
 # Filament Performance – Raccomandazioni
 
+> **Canonical spec:** `docs/superpowers/specs/2026-07-09-large-dataset-query-patterns-design.md` (Filament section). This file keeps extended notes and applied-resource history.
+
 ## Test vs Produzione: cosa aspettarsi
 
 - **Produzione sarà più veloce** rispetto al tuo ambiente di test, ma **non miracolosamente**.  

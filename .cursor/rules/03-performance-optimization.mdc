@@ -1,6 +1,6 @@
 ---
 description: Performance optimization strategies
-globs: ["**/Models/**", "**/Services/**", "**/Jobs/**", "**/database/migrations/**"]
+globs: ["**/Models/**", "**/Services/**", "**/Jobs/**", "**/Console/**", "**/Listeners/**", "**/Filament/**", "**/database/migrations/**"]
 alwaysApply: false
 ---
 
@@ -13,5 +13,27 @@ alwaysApply: false
 - Use transactions for multi-step consistency.
 - Keep DB compatibility (MySQL/Postgres/SQLite/Oracle where possible or add comment if not).
 - Prefer Eloquent/query builder abstractions over vendor-specific SQL.
+
+## Large datasets
+
+| Need | Use |
+|------|-----|
+| Small known set (< ~500), full Collection | `get()` |
+| Iterate all, may need `with()` | `lazy(n)` |
+| Per-batch side effects | `chunk(n)` |
+| Huge simple scan, no relations | `cursor()` — no `with()` |
+| API infinite scroll | `cursorPaginate()` + unique `orderBy` |
+| One row | `first()` / `limit(1)` |
+
+- `cursor()` never with `with()` — N+1 risk.
+- Spec backlog: `docs/superpowers/specs/2026-07-09-large-dataset-query-patterns-design.md`.
+
+## Filament tables
+
+- Eager load every relation used in columns, filters, or `formatStateUsing`.
+- Always `defaultSort()`; keep pagination (~25), no `paginated(false)` on growing tables.
+- Cache heavy filter option queries (short TTL) or use `relationship()->preload()`.
+- Widget stats: prefer `$isLazy = true` and/or short cache.
+- Checklist detail: same spec file, Filament section.
 
 - For deep Laravel perf patterns: see `laravel-boost.mdc`.
