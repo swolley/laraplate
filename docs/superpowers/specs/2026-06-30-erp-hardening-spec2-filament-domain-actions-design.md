@@ -1,12 +1,16 @@
 # ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design; **Phase 2A** ready for implementation planning  
-**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit 2026-06-30)  
-**Module:** `Modules/ERP`  
+**Status:** Approved design; **Phase 2A completed**; **Phase 2B** in progress
+
+**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-11)
+
+**Module:** `Modules/ERP`
+
 **Depends on:** Spec 1 implemented + patch (`971851d` ERP, `15b11c8` Core)
 
 > **Single source of truth** for ERP work tracking. Completed items are listed in **§ Completed**
-> below; only **§ Open** requires implementation. Verified against codebase + `299` ERP tests pass.
+> below; only **§ Open** requires implementation. The original audit was verified against the codebase,
+> with `299` ERP tests passing; Phase 2A closure evidence is listed in § Completed.
 
 ---
 
@@ -14,21 +18,17 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **62** | Core M0–M7 v1 + Spec 1 + M4 reporting slice — § Completed |
-| **Partial → closed by Phase 2A** | **4** | PART-01…PART-04 — backend/skeleton exists; 2A finishes wiring |
-| **Partial → Phase 2B** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **51** | § Open — **9 in Phase 2A** (next) + **42 in Phases 2B–5** |
+| **Done** | **76** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions — § Completed |
+| **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
+| **Open backlog rows** | **37** | § Open — **7 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **51 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
-- **4 partial** (PART-01…04) are **not** extra open rows; they explain what Phase 2A completes on top of existing code.
+- **37 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
-**Next target:** Phase 2A — 9 open items (`2A-01`…`2A-09`). Implementation plan:
-[`plans/2026-06-30-erp-hardening-spec2-phase2a.md`](../plans/2026-06-30-erp-hardening-spec2-phase2a.md).
-
-**Then:** Phase 2B — 12 items (`2B-01`…`2B-12`). Plan:
+**Current target:** Phase 2B — remaining items after Wave A. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
 **Finally:** Phases 2C–5 — 30 items (`2C-01`…`5-06`). Plan:
@@ -50,8 +50,9 @@
 | Phase | Scope | Status |
 |-------|--------|--------|
 | Spec 1 | Bug + money math + CRUD guard | **Done** |
-| Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Open (next)** |
-| Spec 2 Phase 2B–2C | Party UI, bank journals, auto NC/ND, FatturaPA | Open |
+| Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
+| Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, reporting polish | **In progress** |
+| Spec 2 Phase 2C | FatturaPA and extended permissions | Open |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
 
@@ -67,6 +68,16 @@ Status verified in `Modules/ERP` unless noted.
 |----|------|----------|
 | DONE-S1 | Spec 1 P0/P1 fixes (seeder, policy tests, fiscal period guard, decimal money math, test gaps, CRUD guard) | ERP `9297a7c…971851d`, Core `354299c`, `15b11c8` |
 | DONE-S1P | Post-review patch: CSV dates, `Decimal::div` guard, CRUD HTTP tests, `module=erp` alias | `971851d`, `15b11c8` |
+
+### Spec 2 Phase 2A — Filament domain actions
+
+| ID | Item | Evidence |
+|----|------|----------|
+| DONE-S2-2A | Seeded domain abilities, state-aware `ERPModelPolicy`, gated `force_post`, DDT/fiscal period/fiscal year/journal/sales order Filament actions, and focused regression tests | ERP `300f9ef`; targeted ERP subset: `38 passed, 86 assertions` |
+| DONE-S2-2B-A | Party `price_rules()` relation, concrete `PartyPriceRule::activity()` relation, and Party Filament price-rule relation manager | Working tree; `PartyPriceRuleTest`, `ERPFilamentCommercialResourcesTest`, `PriceResolverServiceTest` |
+| DONE-S2-2B-03 | Optional `PriceList` Filament resource with nested `PriceListItem` repeater | Working tree; `ERPFilamentCommercialResourcesTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-08 | Quotation `unlock` permission, state-aware policy, and Filament edit-page action | Working tree; `ErpQuotationUnlockTest`, `ErpDomainActionsSmokeTest` |
+| DONE-S2-2B-09 | Document sequence reset service, permission, policy, and Filament edit-page action | Working tree; `DocumentSequenceResetTest`, `ErpDomainActionsSmokeTest`, `ERPFilamentResourcesTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -153,14 +164,10 @@ Status verified in `Modules/ERP` unless noted.
 
 ---
 
-## Partially complete (Phase 2A finishes these)
+## Partially complete (remaining)
 
-| ID | Done today | Still open (→ Phase 2A ID) |
-|----|------------|----------------------------|
-| PART-01 | `ERPModelPolicy` + `close`/`reopen`/`post`/`unpost` methods | State guards + `reverse`/`amend`/`forcePost` → **2A-02** |
-| PART-02 | Seeded `post`/`unpost`/e-invoice permissions | Seed `close`/`reopen`/`reverse`/`amend`/`force_post` → **2A-01** |
-| PART-03 | Force 3-way match checkbox on invoice post | Dedicated `force_post` permission gate → **2A-03** |
-| PART-04 | `FiscalPeriodCloser`, `JournalPostingService::reverse`, `SalesOrderAmendmentService`, DDT observer | Filament actions + form hardening → **2A-04…2A-08** |
+| ID | Already implemented | Still open |
+|----|---------------------|------------|
 | PART-05 | `FinancialReportCsvExporter` service + tests | Filament export buttons / PDF → **2B-11** |
 
 ---
@@ -169,37 +176,16 @@ Status verified in `Modules/ERP` unless noted.
 
 Status: `open` · `next` = current sprint target
 
-### Phase 2A — Filament domain actions & state-aware policies (**next**)
-
-| ID | Status | Item |
-|----|--------|------|
-| 2A-01 | open | Seed abilities: `close`, `reopen`, `reverse`, `amend`, `force_post` |
-| 2A-02 | open | State-aware `ERPModelPolicy` (state before permission; superadmin bypasses permission only) |
-| 2A-03 | open | `force_post` gate on purchase invoice post checkbox |
-| 2A-04 | open | DDT post/unpost Filament actions (`posted_at` + observer) |
-| 2A-05 | open | Fiscal period close/reopen → `FiscalPeriodCloser`; read-only `is_closed` on form |
-| 2A-06 | open | Fiscal year close → `closeYear()`; register `FiscalYear` on policy map |
-| 2A-07 | open | Journal reverse → `JournalPostingService::reverse()` on `ViewJournalEntry` |
-| 2A-08 | open | Sales order amend → `SalesOrderAmendmentService` + redirect |
-| 2A-09 | open | Policy + seeder + action wiring tests (TDD) |
-
-**Deferred to 2B:** quotation `unlock`, document sequence `reset`.
-
-### Phase 2B — Commercial & banking UX
+### Phase 2B — Commercial & banking UX (**in progress**)
 
 > Implementation plan: [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md) (5 waves, 12 tasks + optional PriceList resources).
 
 | ID | Status | Item |
 |----|--------|------|
-| 2B-01 | open | Party price-rule UI |
-| 2B-02 | open | `Party::price_rules()` relation if missing |
-| 2B-03 | open | Optional `PriceList` / `PriceListItem` Filament resources |
 | 2B-04 | open | Bank difference journals (fees, rounding) |
 | 2B-05 | open | Match-with-difference on reco page |
 | 2B-06 | open | Automatic NC/ND on return `complete()` |
 | 2B-07 | open | Return line override contract for auto NC/ND |
-| 2B-08 | open | Quotation `unlock` action + policy + seed |
-| 2B-09 | open | Document sequence `reset` action + policy + seed |
 | 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
@@ -264,11 +250,11 @@ Status: `open` · `next` = current sprint target
 
 ---
 
-## Phase 2A — detailed design (implementation target)
+## Phase 2A — implementation summary
 
-Backend services exist; gap = **Filament actions**, **permissions**, **state-aware policy**, **form hardening**.
+Implemented in ERP `300f9ef`. Backend services already existed; Phase 2A closed the **Filament actions**, **permissions**, **state-aware policy**, and **form hardening** gap.
 
-### Action classes to create
+### Action classes implemented
 
 | Class | Page | Service |
 |-------|------|---------|
@@ -278,7 +264,7 @@ Backend services exist; gap = **Filament actions**, **permissions**, **state-awa
 | `DeliveryNotePostingActions` | `EditDeliveryNote` | `posted_at` + observer |
 | `SalesOrderAmendmentActions` | `EditSalesOrder` | `SalesOrderAmendmentService` |
 
-### Implementation order
+### Implemented order
 
 1. Permissions seeder + test  
 2. Policy state guards + tests  

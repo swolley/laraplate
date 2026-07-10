@@ -6,8 +6,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Ready for implementation  
-**Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) **recommended before Wave B** (2B-08/09 reuse state-aware policy + seeder pattern). Waves A, C, D, E can start in parallel if 2A is not yet merged.
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`)
+**Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
 
@@ -34,11 +34,11 @@
 
 | ID | Wave | Item | Depends on |
 |----|------|------|------------|
-| 2B-02 | A | `Party::price_rules()` relation | — |
-| 2B-01 | A | Party price-rule UI | 2B-02 |
-| 2B-03 | A (optional) | PriceList Filament resources | — |
-| 2B-08 | B | Quotation `unlock` + policy + seed | Phase 2A pattern |
-| 2B-09 | B | Document sequence `reset` + policy + seed | Phase 2A pattern |
+| 2B-02 | A | `Party::price_rules()` relation | Done |
+| 2B-01 | A | Party price-rule UI | Done |
+| 2B-03 | A (optional) | PriceList Filament resources | Done |
+| 2B-08 | B | Quotation `unlock` + policy + seed | Done |
+| 2B-09 | B | Document sequence `reset` + policy + seed | Done |
 | 2B-07 | C | Return line override contract | — |
 | 2B-06 | C | Auto NC/ND on `complete()` | 2B-07 |
 | 2B-04 | D | Bank difference journals | — |
@@ -63,7 +63,7 @@ flowchart LR
 
 | Area | Exists | Gap |
 |------|--------|-----|
-| Pricing backend | `PartyPriceRule`, `PriceResolverService`, tests | No `Party::price_rules()`, no Filament UI |
+| Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
 | Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
 | Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
 | Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions | `complete()` does not auto-create notes; no `unit_price` override on lines |
@@ -74,7 +74,7 @@ flowchart LR
 
 ---
 
-## Task 1: `Party::price_rules()` relation (2B-02)
+## Task 1: `Party::price_rules()` relation (2B-02) — completed 2026-07-11
 
 **Files:**
 - Modify: `Modules/ERP/app/Models/Party.php`
@@ -97,13 +97,19 @@ it('links party price rules through the party relation', function (): void {
         'name' => 'Customer A',
         'is_customer' => true,
     ]);
-    $taxonomy = Taxonomy::query()->create(['name' => 'Widgets', 'slug' => 'widgets-' . uniqid()]);
+    $item = Item::query()->create([
+        'company_id' => $company->id,
+        'name' => 'Widget',
+        'sku' => 'W-REL',
+        'uom' => 'ea',
+        'costing_method' => 'weighted_avg',
+    ]);
 
     $rule = PartyPriceRule::query()->create([
         'company_id' => $company->id,
         'party_id' => $party->id,
-        'taxonomy_id' => $taxonomy->id,
-        'discount_type' => DiscountType::Percentage,
+        'item_id' => $item->id,
+        'discount_type' => DiscountType::Percent,
         'discount_value' => '10.0000',
         'priority' => 1,
     ]);
@@ -113,7 +119,7 @@ it('links party price rules through the party relation', function (): void {
 });
 ```
 
-Add missing imports (`Party`, `Taxonomy`, `DiscountType`, `Company`) at file top.
+Add missing imports (`Party`, `Item`, `DiscountType`, `Company`) at file top.
 
 - [ ] **Step 2: Run test — expect FAIL** (`Call to undefined relationship price_rules`)
 
@@ -145,7 +151,7 @@ git commit -m "feat(erp): add Party price_rules relation"
 
 ---
 
-## Task 2: Party price-rule UI (2B-01)
+## Task 2: Party price-rule UI (2B-01) — completed 2026-07-11
 
 **Files:**
 - Create: `Modules/ERP/app/Filament/Resources/Parties/RelationManagers/PriceRulesRelationManager.php`
@@ -159,13 +165,13 @@ Follow Filament 5 `RelationManager` pattern (sibling: check other modules for re
 | Field | Component | Notes |
 |-------|-----------|-------|
 | `item_id` | Select, nullable | `relationship('item', 'name')` |
-| `taxonomy_id` | Select, nullable | Core taxonomy |
+| `taxonomy_id` | Select, nullable | ERP concrete `Activity` taxonomy via `activity()` relation |
 | `discount_type` | Select | `DiscountType::cases()` |
 | `discount_value` | TextInput numeric | min 0 |
 | `priority` | TextInput integer | default 0 |
 | `valid_from` / `valid_to` | DatePicker | from `HasValidity` on model |
 
-`mutateFormDataBeforeCreate`: set `company_id` from owner party. Validation: exactly one of `item_id` / `taxonomy_id` (model `saving` hook already enforces).
+`CreateAction::mutateDataUsing`: set `company_id` from owner party. Validation: exactly one of `item_id` / `taxonomy_id` (model `saving` hook already enforces).
 
 - [ ] **Step 2: Register on `PartyResource`**
 
@@ -204,7 +210,7 @@ git commit -m "feat(erp): party price rules Filament relation manager"
 
 ---
 
-## Task 3: Quotation unlock action (2B-08)
+## Task 3: Quotation unlock action (2B-08) — completed 2026-07-11
 
 **Requires:** Phase 2A policy pattern (`allowsDomainAction`) or inline equivalent.
 
@@ -349,7 +355,7 @@ cd Modules/ERP && git commit -m "feat(erp): quotation unlock action and permissi
 
 ---
 
-## Task 4: Document sequence reset (2B-09)
+## Task 4: Document sequence reset (2B-09) — completed 2026-07-11
 
 **Files:**
 - Create: `Modules/ERP/app/Services/Accounting/DocumentSequenceResetService.php`
@@ -835,9 +841,9 @@ cd Modules/ERP && git commit -m "feat(erp): operational dashboard filters KPIs a
 
 ---
 
-## Task 12 (optional): PriceList Filament resources (2B-03)
+## Task 12 (optional): PriceList Filament resources (2B-03) — completed 2026-07-11
 
-**Skip unless user explicitly requests during implementation.**
+Implemented because the user explicitly requested it during Phase 2B implementation.
 
 **Files:**
 - Create: `Modules/ERP/app/Filament/Resources/PriceLists/PriceListResource.php` (+ Pages, Form, Table)

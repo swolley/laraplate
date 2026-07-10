@@ -4,9 +4,11 @@
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 > Closes partial items PART-01…PART-04. PART-05 stays in Phase 2B (`2B-11`).
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** Historical execution plan. Phase 2A is complete; task checkboxes below are retained as the original implementation checklist, while authoritative status is tracked by the status/evidence block and the master backlog.
 
-**Status:** Ready for implementation  
+**Status:** Completed
+**Implementation evidence:** ERP `300f9ef` (`test(erp): expand Filament resources and domain action coverage`)
+**Verification recorded during implementation:** `rtk php artisan test --compact Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php Modules/ERP/tests/Feature/ErpModelPolicyTest.php Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php Modules/ERP/tests/Feature/Filament/InvoicePostingActionsTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php Modules/ERP/tests/Feature/Filament/ErpDomainActionsSmokeTest.php Modules/ERP/tests/Integration/Services/Accounting/FiscalPeriodCloserTest.php` → `38 passed, 86 assertions`
 **Goal:** Wire existing ERP domain services into Filament actions, seed missing domain permissions, and make `ERPModelPolicy` state-aware so invalid transitions are denied even for superadmin.
 
 **Architecture:** Nine independent workstreams on `Modules/ERP` only. Each task is test-first (Pest + `RefreshDatabase`, manual model setup). Action classes follow `InvoicePostingActions`: static factories returning Filament `Action`, authorize via `auth()->user()?->can(...)`, delegate to existing services/observers. Policy checks **state first**, then permission; superadmin skips permission only.
