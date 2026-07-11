@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`)
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave F completed (`2B-13`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation/payment-execution depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -48,7 +48,7 @@
 | 2B-10 | D | CAMT.053 / MT940 import | — |
 | 2B-11 | E | Financial report CSV export (PART-05) | — |
 | 2B-12 | E | BI / operational dashboard polish | 2B-11 (export pattern) |
-| 2B-13 | F | Supplier payment runs + SEPA `pain.001` export | Payment schedules, supplier bank coordinates, company bank account |
+| 2B-13 | F | Supplier payment runs + SEPA `pain.001` export | Done |
 
 ```mermaid
 flowchart LR
@@ -70,7 +70,7 @@ flowchart LR
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
 | Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
 | Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
-| Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount` | No supplier payment run, no supplier bank coordinates, no SEPA `pain.001` export |
+| Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount`, `PartyBankAccount`, `PaymentRun`, `PaymentRunLine`, `PaymentRunBuilderService`, `SepaPain001Exporter`, `PaymentRunResource` | Direct bank/API submission and CBI/Ri.Ba/SDD remain backlog |
 | Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Bank/reporting work remains open |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation | No unlock action/permission |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator` | No controlled reset action |
@@ -859,7 +859,7 @@ Mirror `TaxCodeResource` / `PaymentTermResource` structure. No new migrations.
 
 ---
 
-## Task 13: Supplier payment runs + SEPA `pain.001` export (2B-13)
+## Task 13: Supplier payment runs + SEPA `pain.001` export (2B-13) — completed 2026-07-11
 
 **Business rule:** payment execution is not bank reconciliation. This task creates an outbound supplier payment run from open AP schedule lines, exports an auditable SEPA Credit Transfer file, and leaves reconciliation to imported bank statements after the bank executes the payments.
 
@@ -889,7 +889,7 @@ Mirror `TaxCodeResource` / `PaymentTermResource` structure. No new migrations.
 - Create tests: `Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php`
 - Create tests: `Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php`
 
-- [ ] **Step 1: Add domain tables**
+- [x] **Step 1: Add domain tables**
 
 Tables:
 
@@ -960,7 +960,7 @@ Schema::create(ERPTables::PaymentRunLines->value, function (Blueprint $table): v
 
 Add portable non-negative check constraints for `amount_doc`, `amount_local`, `total_amount_doc`, and `total_amount_local` using the existing cross-DB migration helper pattern.
 
-- [ ] **Step 2: Add casts and models**
+- [x] **Step 2: Add casts and models**
 
 Enums:
 - `PaymentRunStatus`: `Draft`, `Approved`, `Exported`, `Cancelled`
@@ -984,7 +984,7 @@ Validation:
 - Payment run line amounts must be positive
 - Payment run line beneficiary snapshots are required even if the source supplier bank account is later edited
 
-- [ ] **Step 3: Failing builder tests**
+- [x] **Step 3: Failing builder tests**
 
 Create `PaymentRunBuilderServiceTest.php`:
 
@@ -1011,7 +1011,7 @@ it('does not include fully paid schedule lines', function (): void {
 });
 ```
 
-- [ ] **Step 4: Implement `PaymentRunBuilderService`**
+- [x] **Step 4: Implement `PaymentRunBuilderService`**
 
 Public API:
 
@@ -1037,7 +1037,7 @@ Rules:
 - create line snapshots for beneficiary name, IBAN, BIC, due date, currency, and remittance info
 - do not create `Payment` records yet; payment registration happens after bank execution/import or explicit confirmation
 
-- [ ] **Step 5: Failing SEPA exporter tests**
+- [x] **Step 5: Failing SEPA exporter tests**
 
 Create `SepaPain001ExporterTest.php`:
 
@@ -1060,7 +1060,7 @@ it('marks the payment run exported with checksum metadata', function (): void {
 });
 ```
 
-- [ ] **Step 6: Implement `SepaPain001Exporter`**
+- [x] **Step 6: Implement `SepaPain001Exporter`**
 
 Public API:
 
@@ -1085,7 +1085,7 @@ State transition:
 - set all included line statuses `Exported`
 - set `exported_at`, `export_file_name`, `export_checksum`
 
-- [ ] **Step 7: Add Filament resource**
+- [x] **Step 7: Add Filament resource**
 
 Resource behavior:
 - list payment runs by company, status, execution date, total amount
@@ -1100,7 +1100,7 @@ Smoke tests:
 - create page renders
 - export action is hidden for draft runs and visible for approved runs
 
-- [ ] **Step 8: Run tests + commit**
+- [x] **Step 8: Run tests + commit**
 
 ```bash
 php artisan test --compact \
@@ -1110,6 +1110,8 @@ php artisan test --compact \
 vendor/bin/pint --dirty
 cd Modules/ERP && git commit -m "feat(erp): supplier payment runs and SEPA export"
 ```
+
+Evidence: ERP `01678cc`; targeted subset `26 passed, 124 assertions`.
 
 ---
 
