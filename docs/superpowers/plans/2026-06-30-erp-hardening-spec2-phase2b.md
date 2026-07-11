@@ -1,6 +1,6 @@
 # ERP Spec 2 — Phase 2B Implementation Plan
 
-> **Navigation:** Implements backlog IDs `2B-01`…`2B-12` from
+> **Navigation:** Implements backlog IDs `2B-01`…`2B-13` from
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 > Closes partial item PART-05 (`2B-11`). Deferred from Phase 2A: quotation `unlock`, document sequence `reset`.
 
@@ -9,9 +9,9 @@
 **Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
-**Goal:** Complete commercial pricing UX, banking reconciliation depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
+**Goal:** Complete commercial pricing UX, banking reconciliation/payment-execution depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
 
-**Architecture:** Twelve backlog items grouped in **five waves** by dependency. Service-layer first (bank difference journals, return overrides, parsers), then Filament wiring. Reuse existing patterns: `InvoicePostingActions`, `BankReconciliationService`, `ReturnOrderService`, `FinancialReportCsvExporter`, `ErpCompanySettings`.
+**Architecture:** Thirteen backlog items grouped in **six waves** by dependency. Service-layer first (bank difference journals, return overrides, parsers, payment-run export), then Filament wiring. Reuse existing patterns: `InvoicePostingActions`, `BankReconciliationService`, `ReturnOrderService`, `FinancialReportCsvExporter`, `ErpCompanySettings`.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Filament 5, Spatie Permission, Pest, DOM/SimpleXML (native, no new Composer deps for CAMT/MT940).
 
@@ -24,6 +24,8 @@
 
 **Out of scope (Phase 2B):**
 - PDF export on financial reports (CSV only in 2B-11; PDF → backlog)
+- Direct bank/API submission of payment files; Phase 2B generates auditable files only
+- CBI, Ri.Ba, SEPA SDD, and non-SEPA bank formats beyond supplier SCT `pain.001`
 - Full FatturaPA (Phase 2C)
 - Direct item-specific price lists (Phase 5 / `5-05`)
 - Browser click-through E2E (server-side / Livewire smoke only)
@@ -46,6 +48,7 @@
 | 2B-10 | D | CAMT.053 / MT940 import | — |
 | 2B-11 | E | Financial report CSV export (PART-05) | — |
 | 2B-12 | E | BI / operational dashboard polish | 2B-11 (export pattern) |
+| 2B-13 | F | Supplier payment runs + SEPA `pain.001` export | Payment schedules, supplier bank coordinates, company bank account |
 
 ```mermaid
 flowchart LR
@@ -55,6 +58,7 @@ flowchart LR
   A2A[Phase 2A policy] --> B08[2B-08 unlock]
   A2A --> B09[2B-09 reset]
   B11[2B-11 CSV export] --> B12[2B-12 BI polish]
+  M51[M5.1 AP schedule] --> B13[2B-13 payment run export]
 ```
 
 ---
@@ -66,6 +70,7 @@ flowchart LR
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
 | Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
 | Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
+| Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount` | No supplier payment run, no supplier bank coordinates, no SEPA `pain.001` export |
 | Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Bank/reporting work remains open |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation | No unlock action/permission |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator` | No controlled reset action |
@@ -854,7 +859,261 @@ Mirror `TaxCodeResource` / `PaymentTermResource` structure. No new migrations.
 
 ---
 
-## Task 13: Phase 2B verification & backlog update
+## Task 13: Supplier payment runs + SEPA `pain.001` export (2B-13)
+
+**Business rule:** payment execution is not bank reconciliation. This task creates an outbound supplier payment run from open AP schedule lines, exports an auditable SEPA Credit Transfer file, and leaves reconciliation to imported bank statements after the bank executes the payments.
+
+**V1 scope:**
+- Supplier outbound payments only (`PaymentDirection::Outbound`)
+- SEPA SCT XML `pain.001` file generation only
+- No direct bank/API submission
+- No CBI, Ri.Ba, SDD, urgent transfers, salary payments, or multi-bank proprietary formats
+
+**Files:**
+- Create migration: `create_party_bank_accounts_table`
+- Create migration: `create_payment_runs_tables`
+- Modify: `Modules/ERP/app/Enums/ERPTables.php`
+- Create cast: `Modules/ERP/app/Casts/PaymentRunStatus.php`
+- Create cast: `Modules/ERP/app/Casts/PaymentRunLineStatus.php`
+- Create cast: `Modules/ERP/app/Casts/PaymentRunFormat.php`
+- Create model: `Modules/ERP/app/Models/PartyBankAccount.php`
+- Create model: `Modules/ERP/app/Models/PaymentRun.php`
+- Create model: `Modules/ERP/app/Models/PaymentRunLine.php`
+- Modify: `Modules/ERP/app/Models/Party.php`
+- Modify: `Modules/ERP/app/Models/PaymentScheduleLine.php`
+- Create service: `Modules/ERP/app/Services/Payments/PaymentRunBuilderService.php`
+- Create service: `Modules/ERP/app/Services/Payments/SepaPain001Exporter.php`
+- Create Filament resource: `Modules/ERP/app/Filament/Resources/PaymentRuns/PaymentRunResource.php` (+ Pages, Form, Table)
+- Create Filament relation manager or repeater for `PaymentRunLine`
+- Create tests: `Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php`
+- Create tests: `Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php`
+- Create tests: `Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php`
+
+- [ ] **Step 1: Add domain tables**
+
+Tables:
+
+```php
+Schema::create(ERPTables::PartyBankAccounts->value, function (Blueprint $table): void {
+    $table->id();
+    $table->foreignId('company_id')->constrained(ERPTables::Companies->value)->restrictOnDelete();
+    $table->foreignId('party_id')->constrained(ERPTables::Parties->value)->cascadeOnDelete();
+    $table->string('beneficiary_name');
+    $table->string('iban', 34);
+    $table->string('bic', 11)->nullable();
+    $table->string('currency', 3)->default('EUR');
+    $table->boolean('is_default')->default(false);
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+
+    $table->index(['company_id', 'party_id']);
+    $table->unique(['company_id', 'party_id', 'iban']);
+});
+```
+
+```php
+Schema::create(ERPTables::PaymentRuns->value, function (Blueprint $table): void {
+    $table->id();
+    $table->foreignId('company_id')->constrained(ERPTables::Companies->value)->restrictOnDelete();
+    $table->foreignId('bank_account_id')->constrained(ERPTables::BankAccounts->value)->restrictOnDelete();
+    $table->date('execution_date');
+    $table->string('currency', 3)->default('EUR');
+    $table->decimal('total_amount_doc', 15, 4)->default(0);
+    $table->decimal('total_amount_local', 15, 4)->default(0);
+    $table->string('status', 32)->default(PaymentRunStatus::Draft->value);
+    $table->string('format', 32)->default(PaymentRunFormat::SepaPain001->value);
+    $table->timestamp('approved_at')->nullable();
+    $table->timestamp('exported_at')->nullable();
+    $table->string('export_file_name')->nullable();
+    $table->string('export_checksum', 128)->nullable();
+    $table->timestamps();
+
+    $table->index(['company_id', 'status']);
+    $table->index(['company_id', 'execution_date']);
+});
+```
+
+```php
+Schema::create(ERPTables::PaymentRunLines->value, function (Blueprint $table): void {
+    $table->id();
+    $table->foreignId('company_id')->constrained(ERPTables::Companies->value)->restrictOnDelete();
+    $table->foreignId('payment_run_id')->constrained(ERPTables::PaymentRuns->value)->cascadeOnDelete();
+    $table->foreignId('payment_schedule_line_id')->constrained(ERPTables::PaymentScheduleLines->value)->restrictOnDelete();
+    $table->foreignId('party_id')->constrained(ERPTables::Parties->value)->restrictOnDelete();
+    $table->foreignId('party_bank_account_id')->nullable()->constrained(ERPTables::PartyBankAccounts->value)->nullOnDelete();
+    $table->decimal('amount_doc', 15, 4);
+    $table->string('currency_doc', 3);
+    $table->decimal('amount_local', 15, 4);
+    $table->string('currency_local', 3);
+    $table->date('due_date');
+    $table->string('beneficiary_name');
+    $table->string('beneficiary_iban', 34);
+    $table->string('beneficiary_bic', 11)->nullable();
+    $table->string('remittance_information', 140)->nullable();
+    $table->string('status', 32)->default(PaymentRunLineStatus::Included->value);
+    $table->timestamps();
+
+    $table->unique(['payment_run_id', 'payment_schedule_line_id']);
+    $table->index(['company_id', 'party_id']);
+});
+```
+
+Add portable non-negative check constraints for `amount_doc`, `amount_local`, `total_amount_doc`, and `total_amount_local` using the existing cross-DB migration helper pattern.
+
+- [ ] **Step 2: Add casts and models**
+
+Enums:
+- `PaymentRunStatus`: `Draft`, `Approved`, `Exported`, `Cancelled`
+- `PaymentRunLineStatus`: `Included`, `Exported`, `Cancelled`
+- `PaymentRunFormat`: `SepaPain001`
+
+Relationships:
+- `Party::bank_accounts(): HasMany`
+- `PaymentScheduleLine::payment_run_lines(): HasMany`
+- `PaymentRun::bank_account(): BelongsTo`
+- `PaymentRun::lines(): HasMany`
+- `PaymentRunLine::payment_run(): BelongsTo`
+- `PaymentRunLine::schedule_line(): BelongsTo`
+- `PaymentRunLine::party(): BelongsTo`
+- `PaymentRunLine::party_bank_account(): BelongsTo`
+
+Validation:
+- Party bank IBAN required, uppercase, max 34
+- Payment run execution date required
+- Payment run cannot be updated after `Exported`
+- Payment run line amounts must be positive
+- Payment run line beneficiary snapshots are required even if the source supplier bank account is later edited
+
+- [ ] **Step 3: Failing builder tests**
+
+Create `PaymentRunBuilderServiceTest.php`:
+
+```php
+it('creates a draft supplier payment run from open purchase schedule lines', function (): void {
+    // company + supplier + supplier bank + company bank + posted purchase invoice schedule line
+    // call build(company_id, bank_account_id, [schedule_line_id], execution_date)
+    // assert run status Draft, one line, totals equal unpaid amount, beneficiary snapshot equals supplier bank account
+});
+
+it('rejects receivable schedule lines for supplier payment runs', function (): void {
+    // create a sales invoice schedule line
+    // expect DomainException because only AP outbound lines are allowed
+});
+
+it('rejects suppliers without an active default bank account', function (): void {
+    // create open purchase schedule line without PartyBankAccount
+    // expect DomainException explaining missing supplier bank coordinates
+});
+
+it('does not include fully paid schedule lines', function (): void {
+    // create schedule line with status Paid
+    // expect DomainException because there is no residual amount to pay
+});
+```
+
+- [ ] **Step 4: Implement `PaymentRunBuilderService`**
+
+Public API:
+
+```php
+/**
+ * @param  list<int>  $payment_schedule_line_ids
+ */
+public function build(
+    int $company_id,
+    int $bank_account_id,
+    array $payment_schedule_line_ids,
+    CarbonInterface|string $execution_date,
+): PaymentRun
+```
+
+Rules:
+- lock selected `PaymentScheduleLine` rows for update
+- require `status` in `Open` or `Partial`
+- compute residual as `amount_doc - paid_amount_doc`
+- require source invoice to have `InvoiceDirection::Purchase` and `InvoiceType::Invoice`
+- require supplier party to have one active default `PartyBankAccount`
+- require company `BankAccount.iban`
+- create line snapshots for beneficiary name, IBAN, BIC, due date, currency, and remittance info
+- do not create `Payment` records yet; payment registration happens after bank execution/import or explicit confirmation
+
+- [ ] **Step 5: Failing SEPA exporter tests**
+
+Create `SepaPain001ExporterTest.php`:
+
+```php
+it('exports a payment run as SEPA pain001 XML', function (): void {
+    // build a run with one line
+    // approve the run
+    // call SepaPain001Exporter::export($run)
+    // assert XML contains CstmrCdtTrfInitn, company IBAN, supplier IBAN, EUR amount, execution date, and remittance info
+});
+
+it('refuses to export draft or cancelled payment runs', function (): void {
+    // draft run
+    // expect DomainException because only Approved runs can be exported
+});
+
+it('marks the payment run exported with checksum metadata', function (): void {
+    // export approved run
+    // assert status Exported, exported_at not null, export_checksum not null, line statuses Exported
+});
+```
+
+- [ ] **Step 6: Implement `SepaPain001Exporter`**
+
+Public API:
+
+```php
+public function export(PaymentRun $payment_run): string
+```
+
+Output:
+- XML declaration `UTF-8`
+- root `Document`
+- `CstmrCdtTrfInitn`
+- one payment information block per run
+- one credit transfer transaction per `PaymentRunLine`
+- debtor IBAN from company `BankAccount`
+- creditor name/IBAN/BIC from line snapshot
+- `InstdAmt` from `amount_doc`
+- `RmtInf/Ustrd` from `remittance_information`
+
+State transition:
+- allowed only from `Approved`
+- set run status `Exported`
+- set all included line statuses `Exported`
+- set `exported_at`, `export_file_name`, `export_checksum`
+
+- [ ] **Step 7: Add Filament resource**
+
+Resource behavior:
+- list payment runs by company, status, execution date, total amount
+- create draft from selected open AP schedule lines
+- edit allowed only while `Draft`
+- approve action moves `Draft` → `Approved`
+- export action streams XML and moves `Approved` → `Exported`
+- cancel action allowed for `Draft` / `Approved`, not after `Exported`
+
+Smoke tests:
+- resource routes register
+- create page renders
+- export action is hidden for draft runs and visible for approved runs
+
+- [ ] **Step 8: Run tests + commit**
+
+```bash
+php artisan test --compact \
+  Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php \
+  Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php \
+  Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php
+vendor/bin/pint --dirty
+cd Modules/ERP && git commit -m "feat(erp): supplier payment runs and SEPA export"
+```
+
+---
+
+## Task 14: Phase 2B verification & backlog update
 
 - [ ] **Run Phase 2B test subset**
 
@@ -867,6 +1126,8 @@ php artisan test --compact \
   Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php \
   Modules/ERP/tests/Feature/Services/BankDifferenceJournalTest.php \
   Modules/ERP/tests/Feature/Services/BankStatementParserTest.php \
+  Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php \
+  Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php \
   Modules/ERP/tests/Feature/FinancialStatementsTest.php \
   Modules/ERP/tests/Feature/OperationalReportingServicesTest.php
 ```
@@ -879,7 +1140,7 @@ php artisan test --compact Modules/ERP/tests/Feature
 
 Baseline: `299 passed, 1 skipped` — no regressions.
 
-- [ ] **Update spec backlog** — move `2B-01`…`2B-12` to § Completed; clear PART-05.
+- [ ] **Update spec backlog** — move `2B-01`…`2B-13` to § Completed; clear PART-05.
 
 - [ ] **Version bump** — ask user before `cd Modules/ERP && composer version:patch`
 
@@ -901,6 +1162,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 | 2B-10 | Task 9 | ✓ |
 | 2B-11 | Task 10 | ✓ |
 | 2B-12 | Task 11 | ✓ |
+| 2B-13 | Task 13 | ✓ |
 | PART-05 | Task 10 | ✓ |
 
 ---
@@ -909,7 +1171,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 
 Plan saved to `docs/superpowers/plans/2026-06-30-erp-hardening-spec2-phase2b.md`.
 
-**Recommended order:** Wave A → B (after 2A) → C → D → E. Task 12 only if needed.
+**Recommended order:** Wave A → B (after 2A) → C → D → E → F. Task 12 only if needed; Task 13 is independent from reconciliation and can run after M5.1 payment schedules are stable.
 
 **Two execution options:**
 

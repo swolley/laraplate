@@ -20,11 +20,11 @@
 |--------|------:|-------|
 | **Done** | **78** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation — § Completed |
 | **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **35** | § Open — **5 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **36** | § Open — **6 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **35 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **36 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
@@ -51,7 +51,7 @@
 |-------|--------|--------|
 | Spec 1 | Bug + money math + CRUD guard | **Done** |
 | Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
-| Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, reporting polish | **In progress** |
+| Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **In progress** |
 | Spec 2 Phase 2C | FatturaPA and extended permissions | Open |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
@@ -180,7 +180,7 @@ Status: `open` · `next` = current sprint target
 
 ### Phase 2B — Commercial & banking UX (**in progress**)
 
-> Implementation plan: [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md) (5 waves, 12 tasks + optional PriceList resources).
+> Implementation plan: [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md) (6 waves, 13 tasks + optional PriceList resources).
 
 | ID | Status | Item |
 |----|--------|------|
@@ -189,6 +189,7 @@ Status: `open` · `next` = current sprint target
 | 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
+| 2B-13 | open | Supplier payment runs and SEPA `pain.001` bank file export |
 
 ### Phase 2C — E-invoice & extended permissions
 
