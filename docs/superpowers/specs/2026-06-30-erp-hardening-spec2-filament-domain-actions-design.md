@@ -18,13 +18,13 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **76** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions — § Completed |
+| **Done** | **78** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation — § Completed |
 | **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **37** | § Open — **7 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **35** | § Open — **5 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **37 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **35 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
@@ -75,9 +75,11 @@ Status verified in `Modules/ERP` unless noted.
 |----|------|----------|
 | DONE-S2-2A | Seeded domain abilities, state-aware `ERPModelPolicy`, gated `force_post`, DDT/fiscal period/fiscal year/journal/sales order Filament actions, and focused regression tests | ERP `300f9ef`; targeted ERP subset: `38 passed, 86 assertions` |
 | DONE-S2-2B-A | Party `price_rules()` relation, concrete `PartyPriceRule::activity()` relation, and Party Filament price-rule relation manager | Working tree; `PartyPriceRuleTest`, `ERPFilamentCommercialResourcesTest`, `PriceResolverServiceTest` |
-| DONE-S2-2B-03 | Optional `PriceList` Filament resource with nested `PriceListItem` repeater | Working tree; `ERPFilamentCommercialResourcesTest`, `ERPFilamentResourcesTest` |
-| DONE-S2-2B-08 | Quotation `unlock` permission, state-aware policy, and Filament edit-page action | Working tree; `ErpQuotationUnlockTest`, `ErpDomainActionsSmokeTest` |
-| DONE-S2-2B-09 | Document sequence reset service, permission, policy, and Filament edit-page action | Working tree; `DocumentSequenceResetTest`, `ErpDomainActionsSmokeTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-03 | Optional `PriceList` Filament resource with nested `PriceListItem` repeater | ERP `169bdbd`; `ERPFilamentCommercialResourcesTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-08 | Quotation `unlock` permission, state-aware policy, and Filament edit-page action | ERP `169bdbd`; `ErpQuotationUnlockTest`, `ErpDomainActionsSmokeTest` |
+| DONE-S2-2B-09 | Document sequence reset service, permission, policy, and Filament edit-page action | ERP `169bdbd`; `DocumentSequenceResetTest`, `ErpDomainActionsSmokeTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-07 | Return line invoice-line fiscal override contract for customer credit notes and supplier debit notes | ERP `e53d594`; `ReturnLineOverrideTest` |
+| DONE-S2-2B-06 | Optional auto NC/ND draft creation on return `complete()` via `erp.returns.auto_create_notes_on_complete` | ERP `103e627`; `ReturnOrderServiceTest`, `SupplierReturnServiceTest`, `ErpCompanySettingsTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -184,8 +186,6 @@ Status: `open` · `next` = current sprint target
 |----|--------|------|
 | 2B-04 | open | Bank difference journals (fees, rounding) |
 | 2B-05 | open | Match-with-difference on reco page |
-| 2B-06 | open | Automatic NC/ND on return `complete()` |
-| 2B-07 | open | Return line override contract for auto NC/ND |
 | 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |

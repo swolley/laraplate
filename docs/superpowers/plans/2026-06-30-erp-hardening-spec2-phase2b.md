@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`)
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -39,8 +39,8 @@
 | 2B-03 | A (optional) | PriceList Filament resources | Done |
 | 2B-08 | B | Quotation `unlock` + policy + seed | Done |
 | 2B-09 | B | Document sequence `reset` + policy + seed | Done |
-| 2B-07 | C | Return line override contract | — |
-| 2B-06 | C | Auto NC/ND on `complete()` | 2B-07 |
+| 2B-07 | C | Return line override contract | Done |
+| 2B-06 | C | Auto NC/ND on `complete()` | Done |
 | 2B-04 | D | Bank difference journals | — |
 | 2B-05 | D | Match-with-difference reco UI | 2B-04 |
 | 2B-10 | D | CAMT.053 / MT940 import | — |
@@ -66,7 +66,7 @@ flowchart LR
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
 | Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
 | Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
-| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions | `complete()` does not auto-create notes; no `unit_price` override on lines |
+| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Bank/reporting work remains open |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation | No unlock action/permission |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator` | No controlled reset action |
 | Financial CSV | `FinancialReportCsvExporter` (`trialBalance`, `incomeStatement`) | No Filament download; no `balanceSheet()` |
@@ -80,7 +80,7 @@ flowchart LR
 - Modify: `Modules/ERP/app/Models/Party.php`
 - Modify: `Modules/ERP/tests/Feature/Models/PartyPriceRuleTest.php`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 Append to `PartyPriceRuleTest.php`:
 
@@ -121,11 +121,11 @@ it('links party price rules through the party relation', function (): void {
 
 Add missing imports (`Party`, `Item`, `DiscountType`, `Company`) at file top.
 
-- [ ] **Step 2: Run test — expect FAIL** (`Call to undefined relationship price_rules`)
+- [x] **Step 2: Run test — expect FAIL** (`Call to undefined relationship price_rules`)
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Models/PartyPriceRuleTest.php`
 
-- [ ] **Step 3: Add relation to `Party.php`**
+- [x] **Step 3: Add relation to `Party.php`**
 
 ```php
     /**
@@ -139,9 +139,9 @@ Run: `php artisan test --compact Modules/ERP/tests/Feature/Models/PartyPriceRule
 
 Import `PartyPriceRule`.
 
-- [ ] **Step 4: Run test — expect PASS**
+- [x] **Step 4: Run test — expect PASS**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -158,7 +158,7 @@ git commit -m "feat(erp): add Party price_rules relation"
 - Modify: `Modules/ERP/app/Filament/Resources/Parties/PartyResource.php` — register relation manager
 - Test: extend `Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php`
 
-- [ ] **Step 1: Create RelationManager**
+- [x] **Step 1: Create RelationManager**
 
 Follow Filament 5 `RelationManager` pattern (sibling: check other modules for reference). Schema:
 
@@ -173,7 +173,7 @@ Follow Filament 5 `RelationManager` pattern (sibling: check other modules for re
 
 `CreateAction::mutateDataUsing`: set `company_id` from owner party. Validation: exactly one of `item_id` / `taxonomy_id` (model `saving` hook already enforces).
 
-- [ ] **Step 2: Register on `PartyResource`**
+- [x] **Step 2: Register on `PartyResource`**
 
 ```php
 public static function getRelations(): array
@@ -184,7 +184,7 @@ public static function getRelations(): array
 }
 ```
 
-- [ ] **Step 3: Smoke test**
+- [x] **Step 3: Smoke test**
 
 Append to `ERPFilamentCommercialResourcesTest.php`:
 
@@ -196,11 +196,11 @@ it('registers party price rules relation manager', function (): void {
 });
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -221,7 +221,7 @@ git commit -m "feat(erp): party price rules Filament relation manager"
 - Modify: `Modules/ERP/app/Filament/Resources/Quotations/Pages/EditQuotation.php`
 - Create: `Modules/ERP/tests/Feature/ErpQuotationUnlockTest.php`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```php
 <?php
@@ -279,7 +279,7 @@ it('allows unlock when quotation is locked and user has permission', function ()
 });
 ```
 
-- [ ] **Step 2: Seed permission**
+- [x] **Step 2: Seed permission**
 
 In `domainPermissions()`, add `Quotation::class` to entities loop **or** append after loop:
 
@@ -292,7 +292,7 @@ $permissions[] = "{$q_conn}.{$q_table}.unlock";
 
 Import `Quotation`.
 
-- [ ] **Step 3: Policy method**
+- [x] **Step 3: Policy method**
 
 ```php
     public function unlock(User $user, Model $record): bool
@@ -309,7 +309,7 @@ Import `Quotation`.
 
 Ensure `Quotation` is in `ERPServiceProvider::policyModels()` (already is).
 
-- [ ] **Step 4: `QuotationActions::unlock()`**
+- [x] **Step 4: `QuotationActions::unlock()`**
 
 ```php
 <?php
@@ -345,7 +345,7 @@ final class QuotationActions
 
 Wire in `EditQuotation::getHeaderActions()`.
 
-- [ ] **Step 5: Run tests + commit**
+- [x] **Step 5: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/ErpQuotationUnlockTest.php
@@ -365,7 +365,7 @@ cd Modules/ERP && git commit -m "feat(erp): quotation unlock action and permissi
 - Modify: `Modules/ERP/app/Filament/Resources/DocumentSequences/Pages/EditDocumentSequence.php`
 - Create: `Modules/ERP/tests/Feature/DocumentSequenceResetTest.php`
 
-- [ ] **Step 1: Failing service test**
+- [x] **Step 1: Failing service test**
 
 ```php
 <?php
@@ -405,7 +405,7 @@ it('resets last_number and next allocation uses the new counter', function (): v
 });
 ```
 
-- [ ] **Step 2: Implement `DocumentSequenceResetService`**
+- [x] **Step 2: Implement `DocumentSequenceResetService`**
 
 ```php
 <?php
@@ -439,13 +439,13 @@ final class DocumentSequenceResetService
 
 Register singleton in `ERPServiceProvider` if other services are singletons.
 
-- [ ] **Step 3: Policy + seed + Filament action**
+- [x] **Step 3: Policy + seed + Filament action**
 
 - Seed `default.erp_document_sequences.reset`
 - `ERPModelPolicy::reset()` — always allow state-wise (or deny when `last_number` would break in-flight docs — keep simple: permission only for v1)
 - `DocumentSequenceActions::reset()` — modal with `TextInput::make('last_number')->numeric()->minValue(0)->required()->default(0)`, strong confirmation text
 
-- [ ] **Step 4: Run tests + commit**
+- [x] **Step 4: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/DocumentSequenceResetTest.php
@@ -455,7 +455,7 @@ cd Modules/ERP && git commit -m "feat(erp): document sequence reset service and 
 
 ---
 
-## Task 5: Return line override contract (2B-07)
+## Task 5: Return line override contract (2B-07) — completed 2026-07-11
 
 **Files:**
 - Create migration: `add_unit_price_to_return_lines_tables`
@@ -466,7 +466,7 @@ cd Modules/ERP && git commit -m "feat(erp): document sequence reset service and 
 - Modify: `Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php` (if exists)
 - Create: `Modules/ERP/tests/Feature/ReturnLineOverrideTest.php`
 
-- [ ] **Step 1: Migration**
+- [x] **Step 1: Migration**
 
 ```php
 Schema::table(ERPTables::ReturnOrderLines->value, function (Blueprint $table): void {
@@ -479,7 +479,7 @@ Schema::table(ERPTables::SupplierReturnLines->value, function (Blueprint $table)
 
 Add `unit_price` to model `$fillable` and casts `decimal:4`.
 
-- [ ] **Step 2: DTO + public builder**
+- [x] **Step 2: DTO + public builder**
 
 ```php
 <?php
@@ -507,17 +507,17 @@ final readonly class ReturnLineCreditOverride
 
 Expose `ReturnOrderService::buildCreditOverrides(ReturnOrder $return_order): array` (move logic from private `creditNoteLineOverrides`, use `$line->unit_price ?? $invoice_line->unit_price`).
 
-- [ ] **Step 3: Failing test — override price used in NC**
+- [x] **Step 3: Failing test — override price used in NC**
 
 Create return with `invoice_line_id`, `quantity`, `unit_price` override different from invoice line; call `createCreditNote()`; assert credit note line `unit_price` matches override.
 
-- [ ] **Step 4: Extend `ReturnOrderForm` repeater**
+- [x] **Step 4: Extend `ReturnOrderForm` repeater**
 
 Add fields:
 - `Select::make('invoice_line_id')` — filtered by parent `invoice_id` (live)
 - `TextInput::make('unit_price')` — optional, helper “defaults to invoice line price”
 
-- [ ] **Step 5: Run tests + commit**
+- [x] **Step 5: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/ReturnLineOverrideTest.php
@@ -527,7 +527,7 @@ cd Modules/ERP && git commit -m "feat(erp): return line unit_price override for 
 
 ---
 
-## Task 6: Automatic NC/ND on `complete()` (2B-06)
+## Task 6: Automatic NC/ND on `complete()` (2B-06) — completed 2026-07-11
 
 **Files:**
 - Modify: `Modules/ERP/app/Services/Company/ErpCompanySettings.php`
@@ -536,7 +536,7 @@ cd Modules/ERP && git commit -m "feat(erp): return line unit_price override for 
 - Modify: `Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php`
 - Modify: `Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php`
 
-- [ ] **Step 1: Company setting**
+- [x] **Step 1: Company setting**
 
 Add to `defaultSettings()` and `globalSettingDefinitions()`:
 
@@ -550,11 +550,11 @@ Constant: `AUTO_CREATE_NOTES_ON_COMPLETE = 'erp.returns.auto_create_notes_on_com
 
 Accessor: `autoCreateNotesOnComplete(Company $company): bool`
 
-- [ ] **Step 2: Failing test**
+- [x] **Step 2: Failing test**
 
 When setting `true`, `complete()` on processed return with `invoice_id` creates credit note and sets `credit_note_invoice_id`. When `false`, behavior unchanged (manual action only).
 
-- [ ] **Step 3: Hook in `complete()`**
+- [x] **Step 3: Hook in `complete()`**
 
 After `receipt_service->receive()` / `shipment_service->ship()`:
 
@@ -570,7 +570,7 @@ Mirror for supplier debit note when `purchase_order_id` or linked purchase invoi
 
 **Decision:** auto-create runs in **same transaction** as complete when possible; on validation failure, let `complete()` throw (fail-safe, no partial processed-without-note).
 
-- [ ] **Step 4: Run tests + commit**
+- [x] **Step 4: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php

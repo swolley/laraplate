@@ -26,3 +26,4 @@ alwaysApply: true
   - `07-laraplate-specific.mdc` module architecture rules.
   - `08-versioning.mdc` semantic module versioning workflow.
   - `09-database-guidelines.mdc` migrations, queries, indexes, multi-DB compatibility.
+  - `10-superpowers-documentation-lifecycle.mdc` superpowers planning docs lifecycle and module documentation handoff.

@@ -6,18 +6,15 @@ DG\BypassFinals::enable();
 
 /*
 | Module test configuration lives in each module's tests/Pest.php. The application
-| test bootstrap only loads tests/ by default; require those files here so
-| pest()->extend / uses() in modules apply when running from the repo root.
+| test bootstrap only loads tests/ by default; require installed module bootstrap
+| files dynamically so optional modules do not become root-level dependencies.
 */
-require_once __DIR__ . '/../Modules/Core/tests/Pest.php';
+$module_pest_files = glob(__DIR__ . '/../Modules/*/tests/Pest.php') ?: [];
+sort($module_pest_files);
 
-require_once __DIR__ . '/../Modules/CMS/tests/Pest.php';
-
-require_once __DIR__ . '/../Modules/AI/tests/Pest.php';
-
-require_once __DIR__ . '/../Modules/ERP/tests/Pest.php';
-
-require_once __DIR__ . '/../Modules/MES/tests/Pest.php';
+foreach ($module_pest_files as $module_pest_file) {
+    require_once $module_pest_file;
+}
 
 /*
 |--------------------------------------------------------------------------

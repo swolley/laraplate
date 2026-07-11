@@ -1,0 +1,27 @@
+---
+description: Superpowers planning document lifecycle and module documentation handoff
+alwaysApply: true
+---
+
+# Superpowers Documentation Lifecycle (caveman)
+
+- Keep `docs/superpowers/**` in the base repository. Superpowers specs and plans are planning/execution artifacts, even when they describe optional modules.
+- Do not move active superpowers specs or plans into module repositories during implementation.
+- Treat superpowers plans as temporary implementation trackers, not final product documentation.
+
+- During implementation:
+  - Keep every completed task reflected in the relevant superpowers plan/spec.
+  - Update the plan when decisions, scope, sequencing, or architecture changes.
+  - Do not leave completed behavior documented only in chat, commits, tests, or code.
+  - If a task changes module behavior, capture the final behavior while it is fresh.
+
+- At the end of all implementations for a plan/spec:
+  - Convert the completed plan/spec into stable module documentation.
+  - Update the affected module `README.md`.
+  - Update module developer RAG docs under `Modules/{ModuleName}/docs/rag/`.
+  - Update module user/operator RAG docs under `Modules/{ModuleName}/docs/rag/` or another existing module RAG split when present.
+  - Preserve important decisions, final workflows, permissions, extension points, limitations, and follow-up backlog in the module documentation.
+  - Then delete the completed superpowers plan/spec from `docs/superpowers/**`.
+
+- Never finish a superpowers-driven implementation while leaving useful completed-task knowledge only in `docs/superpowers/**`.
+- If only part of a plan is complete, keep the superpowers file in the base repository and clearly mark completed/open items.
