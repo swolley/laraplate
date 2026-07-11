@@ -32,6 +32,10 @@ needed.
 - `CreditNoteService` exposes `createFromInvoice()`, not `createFrom()`.
 - `Invoice` has a nullable `party_id`; return credit/debit note automation still needs explicit
   source-document and line override contracts before it becomes automatic.
+- Current return fiscal contract is now explicit in Spec 2 Phase 2B: customer credit notes default to
+  source sales `InvoiceLine` prices; supplier debit notes default to source purchase `InvoiceLine`
+  prices. Purchase orders, goods receipts, and DDTs remain logistics lineage, not fiscal price
+  sources.
 
 ## Task 1: Choose And Implement Return Schema
 
@@ -80,8 +84,8 @@ stock movements.
   - requires an explicit manual cost on the return line when no original outbound movement can be
     resolved and the business user chooses to receive the item anyway;
   - sets status to `Processed`;
-  - leaves credit-note creation as a manual follow-up action in v1, with optional automation only
-    after source invoice and line override contracts are explicit.
+  - leaves credit-note creation as a manual follow-up action in v1; source invoice and line
+    override contracts are now explicit in Spec 2 Phase 2B, so only automation remains open.
 
 **Important:** A return service may orchestrate the flow, but it must not silently post stock in a
 way that bypasses the DDT document when the physical movement is meant to be represented by a DDT.
@@ -103,8 +107,8 @@ way that bypasses the DDT document when the physical movement is meant to be rep
   - records outbound stock through the DDT inventory posting path or, if the DDT slice is not present
     yet, through an explicitly documented return-service fallback;
   - sets status to `Processed`;
-  - leaves debit-note creation as a manual follow-up action in v1, with optional automation only
-    after source invoice and line override contracts are explicit.
+  - leaves debit-note creation as a manual follow-up action in v1; source purchase invoice line and
+    override contracts are now explicit in Spec 2 Phase 2B, so only automation remains open.
 
 ## Task 4: Delivery Note Integration For Physical Returns
 

@@ -18,13 +18,13 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **76** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions — § Completed |
+| **Done** | **77** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + return line override contract — § Completed |
 | **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **37** | § Open — **7 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **36** | § Open — **6 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **37 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **36 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
@@ -44,6 +44,18 @@
 | `specs/2026-06-30-erp-hardening-bugs-money-math-design.md` | Spec 1 — **done** |
 | `plans/2026-06-30-erp-hardening-spec1.md` | Spec 1 plan — **done** |
 | Milestone plans M3.6–M7.1 | v1 **done**; follow-ups → § Open |
+| `Modules/ERP/README.md` | Developer/current module overview |
+| `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md` | User/operator guide |
+| `Modules/ERP/docs/rag/MODULE.md` | RAG-facing current behavior reference |
+
+## Current ERP design rules
+
+- ERP documents are split by responsibility: orders/DDTs/GRs explain logistics; invoices/invoice lines explain fiscal/accounting value.
+- Do not add prices to DDT/bolle lines. They remain quantity/source-link documents.
+- Customer return credit notes default to source sales `InvoiceLine.unit_price`.
+- Supplier return debit notes default to source purchase `InvoiceLine.unit_price`; `purchase_order_line_id` and `goods_receipt_line_id` remain logistics references only.
+- Return-line `unit_price` is a manual fiscal override, not the natural price source.
+- New schemas/tests must use `ERPTables::*`, portable migrations, decimal persisted numeric values, and service-layer mutations.
 
 ### Roadmap phases
 
@@ -78,6 +90,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-03 | Optional `PriceList` Filament resource with nested `PriceListItem` repeater | Working tree; `ERPFilamentCommercialResourcesTest`, `ERPFilamentResourcesTest` |
 | DONE-S2-2B-08 | Quotation `unlock` permission, state-aware policy, and Filament edit-page action | Working tree; `ErpQuotationUnlockTest`, `ErpDomainActionsSmokeTest` |
 | DONE-S2-2B-09 | Document sequence reset service, permission, policy, and Filament edit-page action | Working tree; `DocumentSequenceResetTest`, `ErpDomainActionsSmokeTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-07 | Return line `unit_price` override contract for credit/debit note generation; customer credits price from sales invoice lines, supplier debits price from purchase invoice lines | Working tree; `ReturnLineOverrideTest`, return service tests, model validation test, `ERPFilamentCommercialResourcesTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -185,7 +198,6 @@ Status: `open` · `next` = current sprint target
 | 2B-04 | open | Bank difference journals (fees, rounding) |
 | 2B-05 | open | Match-with-difference on reco page |
 | 2B-06 | open | Automatic NC/ND on return `complete()` |
-| 2B-07 | open | Return line override contract for auto NC/ND |
 | 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
