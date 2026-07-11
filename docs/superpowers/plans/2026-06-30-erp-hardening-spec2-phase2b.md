@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C prerequisite `2B-07` completed
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -39,7 +39,7 @@
 | 2B-03 | A (optional) | PriceList Filament resources | Done |
 | 2B-08 | B | Quotation `unlock` + policy + seed | Done |
 | 2B-09 | B | Document sequence `reset` + policy + seed | Done |
-| 2B-07 | C | Return line override contract | Done |
+| 2B-07 | C | Return line override contract | — |
 | 2B-06 | C | Auto NC/ND on `complete()` | 2B-07 |
 | 2B-04 | D | Bank difference journals | — |
 | 2B-05 | D | Match-with-difference reco UI | 2B-04 |
@@ -66,7 +66,7 @@ flowchart LR
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
 | Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
 | Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
-| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, customer return invoice-line pricing, supplier return purchase-invoice-line pricing, return line `unit_price` overrides | `complete()` does not auto-create notes |
+| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions | `complete()` does not auto-create notes; no `unit_price` override on lines |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation | No unlock action/permission |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator` | No controlled reset action |
 | Financial CSV | `FinancialReportCsvExporter` (`trialBalance`, `incomeStatement`) | No Filament download; no `balanceSheet()` |
@@ -455,32 +455,31 @@ cd Modules/ERP && git commit -m "feat(erp): document sequence reset service and 
 
 ---
 
-## Task 5: Return line override contract (2B-07) — completed 2026-07-11
+## Task 5: Return line override contract (2B-07)
 
 **Files:**
 - Create migration: `add_unit_price_to_return_lines_tables`
 - Create: `Modules/ERP/app/Data/Returns/ReturnLineCreditOverride.php` (readonly DTO)
 - Modify: `Modules/ERP/app/Services/Returns/ReturnOrderService.php`
-- Modify: `Modules/ERP/app/Services/Returns/SupplierReturnService.php` (debit notes use source purchase invoice lines, not purchase order prices)
+- Modify: `Modules/ERP/app/Services/Returns/SupplierReturnService.php` (mirror for debit notes)
 - Modify: `Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php`
-- Modify: `Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php`
+- Modify: `Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php` (if exists)
 - Create: `Modules/ERP/tests/Feature/ReturnLineOverrideTest.php`
 
-- [x] **Step 1: Migration**
+- [ ] **Step 1: Migration**
 
 ```php
 Schema::table(ERPTables::ReturnOrderLines->value, function (Blueprint $table): void {
     $table->decimal('unit_price', 16, 4)->nullable()->after('quantity');
 });
 Schema::table(ERPTables::SupplierReturnLines->value, function (Blueprint $table): void {
-    $table->foreignId('invoice_line_id')->nullable()->constrained(ERPTables::InvoiceLines->value)->nullOnDelete();
     $table->decimal('unit_price', 16, 4)->nullable()->after('quantity');
 });
 ```
 
-Add `invoice_line_id` and `unit_price` to model `$fillable`; cast `unit_price` as `decimal:4`.
+Add `unit_price` to model `$fillable` and casts `decimal:4`.
 
-- [x] **Step 2: DTO + public builder**
+- [ ] **Step 2: DTO + public builder**
 
 ```php
 <?php
@@ -508,23 +507,17 @@ final readonly class ReturnLineCreditOverride
 
 Expose `ReturnOrderService::buildCreditOverrides(ReturnOrder $return_order): array` (move logic from private `creditNoteLineOverrides`, use `$line->unit_price ?? $invoice_line->unit_price`).
 
-Expose/keep the supplier-side builder with `SupplierReturnLine.invoice_line_id` as the fiscal source. `purchase_order_line_id` remains the logistics reference; debit-note prices default to the purchase invoice line price, with `unit_price` only as a manual override.
-
-- [x] **Step 3: Failing test — override price used in NC**
+- [ ] **Step 3: Failing test — override price used in NC**
 
 Create return with `invoice_line_id`, `quantity`, `unit_price` override different from invoice line; call `createCreditNote()`; assert credit note line `unit_price` matches override.
 
-Create supplier return with purchase order line price different from purchase invoice line price; call `createDebitNote()`; assert debit note line `unit_price` matches the purchase invoice line price and the debit note references the source purchase invoice.
-
-- [x] **Step 4: Extend `ReturnOrderForm` repeater**
+- [ ] **Step 4: Extend `ReturnOrderForm` repeater**
 
 Add fields:
 - `Select::make('invoice_line_id')` — filtered by parent `invoice_id` (live)
 - `TextInput::make('unit_price')` — optional, helper “defaults to invoice line price”
 
-Supplier return form adds `Select::make('invoice_line_id')` filtered to purchase invoice lines for the selected purchase order line/order. Its `unit_price` helper must say it defaults to the source purchase invoice line price.
-
-- [x] **Step 5: Run tests**
+- [ ] **Step 5: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/ReturnLineOverrideTest.php
@@ -573,7 +566,7 @@ if ($this->erp_company_settings->autoCreateNotesOnComplete($company)
 }
 ```
 
-Mirror for supplier debit note only when supplier return lines have source purchase `invoice_line_id` values. `purchase_order_id` / `purchase_order_line_id` are logistics lineage and are not enough to generate fiscal debit notes.
+Mirror for supplier debit note when `purchase_order_id` or linked purchase invoice exists (follow `SupplierReturnService::createDebitNote()` preconditions).
 
 **Decision:** auto-create runs in **same transaction** as complete when possible; on validation failure, let `complete()` throw (fail-safe, no partial processed-without-note).
 

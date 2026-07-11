@@ -86,8 +86,3 @@ Use a consistent section model for each major feature:
 
 This structure improves chunk recall and keeps answers deterministic.
 
-## ERP module note
-
-For ERP answers, prefer `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/rag/GLOSSARY.md` as the current functional source. ERP plans under `docs/superpowers/plans/` are useful for implementation history, but they are not a substitute for current behavior docs.
-
-Important current ERP rule: logistics documents and fiscal documents are separate. DDT/order/goods-receipt links explain movement and fulfilment; invoice lines explain fiscal value. Customer return credit notes default to sales invoice-line prices. Supplier return debit notes default to purchase invoice-line prices.

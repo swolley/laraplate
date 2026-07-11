@@ -1,8 +1,7 @@
 # ERP M7.1 - Advanced Pricelists Implementation Plan
 
-> **Navigation:** M7.1 resolver/integration and Party price-rule UI are **implemented**. Remaining
-> commercial/pricing follow-ups →
-> Spec 2 Phase 2B / Phase 5 in
+> **Navigation:** M7.1 resolver/integration is **implemented**. Party price-rule UI →
+> Spec 2 Phase 2B in
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
@@ -25,8 +24,6 @@ then applies the highest-priority valid discount rule.
 - `PriceListItem` does not currently have `item_id`.
 - `Item` has nullable `taxonomy_id`.
 - `PriceListItem` table name is `ERPTables::PriceListItems->value` (`erp_price_list_items`).
-- `PriceList` / `PriceListItem` Filament resources and Party price-rule relation manager are
-  implemented in Spec 2 Phase 2B.
 - New models should use existing module namespaces and `Modules\ERP\Concerns\BelongsToCompany`
   where company-scoped.
 
