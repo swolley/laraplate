@@ -1,16 +1,18 @@
-# ERP Spec 2 — Phase 3+ Remaining Backlog Implementation Plan
+# ERP Spec 2 — Phase 2C + Phase 3+ Remaining Backlog Implementation Plan
 
 > **Navigation:** Implements **all backlog remaining after Phase 2A + 2B** — IDs `2C-01`…`2C-05`, `3-01`…`3-06`, `4-01`…`4-13`, `5-01`…`5-06` (30 items) from
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Ready for implementation  
+**Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
+
+**Current slice:** Phase 2C / Wave 2, starting from Task 3 (`2C-05`) because FatturaPA / SDI schema data unlocks mapping, XML generation, provider integration, and permission hardening.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
-**Architecture:** Six implementation waves. **Phase 3 is the spine** (Core contracts + routes + exposure toggles); Phases 2C, 4, 5 plug into that spine. Touch **Core + ERP** where noted; default submodule commits per module per task.
+**Architecture:** Six implementation waves. **Phase 3 is the spine** for domain HTTP/API exposure (Core contracts + routes + exposure toggles). Phase 2C can proceed independently for the e-invoice production path because it is driven by ERP invoice data, provider contracts, XML generation, and admin permissions. Touch **Core + ERP** where noted; default submodule commits per module per task.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Filament 5, Sanctum, Pest, Core CRUD (`CrudController` / `CrudService`), Spatie Permission.
 
@@ -68,7 +70,9 @@ flowchart TB
   P5 --> P4
 ```
 
-**Recommended execution order:** Wave 1 → Wave 3 → Wave 2 (parallel ok) → Wave 4 → Wave 5.
+**Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
+
+**Phase 2C task order:** Task 3 (`2C-05`) → Task 4 (`2C-02`) → Task 5 (`2C-01`) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
 
 ---
 
@@ -214,6 +218,8 @@ Default: if not implemented, all standard CRUD ops allowed when global `expose_c
 ## Wave 2 — E-invoice production (Phase 2C)
 
 ### Task 3: FatturaPA schema columns (2C-05)
+
+**Status:** Next
 
 **Prerequisite for 2C-01/02.**  
 **Modules:** ERP

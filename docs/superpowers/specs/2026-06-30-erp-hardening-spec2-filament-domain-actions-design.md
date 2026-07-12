@@ -1,6 +1,6 @@
 # ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design; **Phase 2A completed**; **Phase 2B completed**
+**Status:** Approved design; **Phase 2A completed**; **Phase 2B completed**; **Phase 2C active**
 
 **Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-11)
 
@@ -28,10 +28,10 @@
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Phases 2C–5 after Phase 2B completion. Completed Phase 2B plan:
+**Current target:** Phase 2C — FatturaPA / SDI production readiness. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Phases 2C–5 — 30 items (`2C-01`…`5-06`). Plan:
+**Next:** Phase 2C first, then Phases 3–5 — 30 items (`2C-01`…`5-06`). Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -52,7 +52,7 @@
 | Spec 1 | Bug + money math + CRUD guard | **Done** |
 | Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
 | Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **Done** |
-| Spec 2 Phase 2C | FatturaPA and extended permissions | Open |
+| Spec 2 Phase 2C | FatturaPA and extended permissions | **Active** |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
 
@@ -198,7 +198,7 @@ No open Phase 2B items remain.
 | 2C-02 | open | Complete SDI party/company mapping |
 | 2C-03 | open | Production provider (e.g. Aruba) |
 | 2C-04 | open | Extended admin policies (tax codes, company switch, sequences) |
-| 2C-05 | open | FatturaPA schema columns if needed |
+| 2C-05 | next | FatturaPA schema columns if needed |
 
 ### Phase 3 — Domain HTTP actions & API exposure
 

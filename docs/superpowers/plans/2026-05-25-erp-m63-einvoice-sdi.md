@@ -7,8 +7,8 @@
 > or `superpowers:executing-plans`.
 
 **Goal:** Wire the existing e-invoice contract into the ERP module with a deterministic stub
-provider, submission persistence, and minimal Filament actions. Full FatturaPA XML remains
-optional backlog.
+provider, submission persistence, and minimal Filament actions. Full FatturaPA XML is now promoted
+to Spec 2 Phase 2C, not part of the completed M6.3 stub milestone.
 
 **Architecture:** `EInvoiceProvider` already exists and is transport-agnostic. M6.3 binds a stub
 implementation, stores `EInvoiceSubmission` rows, and gives operators submit/refresh actions for
@@ -32,7 +32,7 @@ posted sale invoices.
 - `EInvoiceProvider::remoteStatus()` accepts `string $externalId`, not an `EInvoiceSubmission`.
 - Current invoices have a nullable `party_id`, but complete FatturaPA mapping still needs
   anagraphic, transmitter, recipient, PEC/SDI, fiscal-regime, address, and provider-specific fields
-  that are outside this stub milestone.
+  that are outside this stub milestone and are handled by Spec 2 Phase 2C.
 
 ## Task 1: Config And Binding
 
@@ -141,7 +141,7 @@ public function refresh(EInvoiceSubmission $submission): EInvoiceSubmission;
 ## Task 5: Optional Schema Additions
 
 Avoid adding `sdi_code`, `pec_email`, `fiscal_regime`, or `natura_code` in M6.3 stub mode unless
-another approved task needs them immediately. These columns belong to the optional FatturaPA work.
+another approved task needs them immediately. These columns now belong to Spec 2 Phase 2C.
 
 ## Test Plan
 
@@ -175,9 +175,9 @@ Test scenarios:
   - Confirms ERP Filament routes are registered and the invoice edit page renders server-side for
     a posted sale invoice. Full browser click-through remains optional if a browser runner is added.
 
-## Optional / Backlog: Full FatturaPA
+## Follow-up: Full FatturaPA / SDI
 
-Full FatturaPA remains a separate optional milestone:
+Full FatturaPA is handled by Spec 2 Phase 2C:
 
 - Add missing anagraphic/company/customer fields after completing the fiscal data model and provider
   package decision.
