@@ -35,7 +35,7 @@ The roadmap phases remain mandatory:
 - [x] Phase 2 hardening: search error propagation, expanded search aggregation, cross-result node dedupe, and graph/search metadata covered.
 - [x] Phase 3 MVP: Core Graph Stats and Analytics over authorized expand output.
 - [x] Phase 4 MVP: Provider Rules and Regulation Layer.
-- [x] Phase 5 MVP: Materialized Edges and Performance Layer.
+- [ ] Phase 5: Materialized Edges and Performance Layer, deferred until measured performance need and invalidation strategy exist.
 
 ## Recent Graph Commits
 
@@ -43,7 +43,6 @@ The roadmap phases remain mandatory:
 - `9d2608a test(core): cover graph search expansion aggregation`
 - `f8db53a feat(core): add graph stats endpoint`
 - `fea0e7d feat(core): add graph provider rules`
-- `e3040ef feat(core): add materialized graph edge store`
 
 ## Current Code Facts
 
@@ -155,35 +154,29 @@ Phase 4 MVP keeps Graph generic and adds optional provider-side restrictions. Pr
 
 ## Phase 5 Materialized Edges Plan
 
-Phase 5 MVP adds a materialized edge store and repository without changing public Graph route behavior. Runtime traversal remains the correctness baseline; the materialized store is an optional performance primitive for later route/query optimization.
+Phase 5 is intentionally deferred. Runtime traversal remains the correctness baseline for `expand`, `search`, and `stats`.
 
-### Phase 5 File Map
+Do not introduce a materialized edge migration or model until a concrete performance problem is measured and the invalidation/freshness strategy is specified. The next Phase 5 plan must first answer:
 
-| File | Responsibility |
-| --- | --- |
-| `Modules/Core/database/migrations/2026_07_12_214318_create_graph_edges_table.php` | Create `core_graph_edges` with source/target identity, relation, type, directed flag, metadata, stale marker, and indexes |
-| `Modules/Core/app/Enums/CoreTables.php` | Add `GraphEdges` table enum |
-| `Modules/Core/app/Models/GraphEdge.php` | Eloquent model for materialized edge rows |
-| `Modules/Core/app/Graph/MaterializedGraphEdgeRepository.php` | Upsert, query, and invalidate materialized edges |
-| `Modules/Core/tests/Feature/Graph/MaterializedGraphEdgeRepositoryTest.php` | Repository behavior tests |
+- which module/entity/relation paths are expensive enough to materialize;
+- which model events or module workflows create, update, or invalidate edges;
+- how provider rules and ACL filtering remain equivalent to runtime traversal;
+- how stale materialized data is detected and bypassed;
+- which benchmark proves the materialized path is needed.
 
-### Phase 5 Task 1: Migration And Model
+### Phase 5 Future Task 1: Performance Evidence And Invalidation Design
 
-- [x] Write a failing repository test that inserts a materialized edge and reads it by source node id.
-- [x] Add `CoreTables::GraphEdges`.
-- [x] Add migration for `core_graph_edges`.
-- [x] Add `Modules\Core\Models\GraphEdge`.
-- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph/MaterializedGraphEdgeRepositoryTest.php`.
+- [ ] Capture benchmark evidence for at least one graph workflow where runtime traversal is too expensive.
+- [ ] Define the exact relation paths to materialize.
+- [ ] Define invalidation rules per module/entity/relation.
+- [ ] Update this plan with concrete file paths only after the invalidation strategy is accepted.
 
-### Phase 5 Task 2: Repository Upsert And Invalidation
+### Phase 5 Future Task 2: Edge Store Implementation
 
-- [x] Add `MaterializedGraphEdgeRepository::upsertMany()`.
-- [x] Add `MaterializedGraphEdgeRepository::outgoingForSource()`.
-- [x] Add `MaterializedGraphEdgeRepository::markStaleForSource()`.
-- [x] Cover stale edges being excluded from outgoing queries.
-- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph`.
-- [x] Run `rtk vendor/bin/pint --dirty`.
-- [x] Commit Phase 5 MVP files as `e3040ef`.
+- [ ] Add storage only after Future Task 1 is complete.
+- [ ] Keep runtime traversal as fallback.
+- [ ] Prove response equivalence with tests comparing runtime traversal and materialized reads.
+- [ ] Prove stale edges are never served when invalidation cannot guarantee freshness.
 
 ## Shared Test Commands
 

@@ -50,7 +50,7 @@ The order is intentional. Later phases are not optional; they are deferred only 
 - Phase 2 is implemented for the Graph layer: graph search routes, `SearchGraphRequest extends SearchRequest`, `SearchGraphRequestData extends SearchRequestData`, `qs` kept as the search query parameter, CRUD search reused through `CrudService::search()`, and optional graph expansion through the same traversal pipeline.
 - Phase 3 MVP is implemented: stats are computed over an authorized graph expansion and do not introduce global graph scans or materialized edges.
 - Phase 4 MVP is implemented: optional provider rules can further restrict generic Graph behavior without making providers required.
-- Phase 5 MVP is implemented: Core has an optional materialized edge store and repository, while public graph routes still use runtime traversal as the correctness baseline.
+- Phase 5 is deferred: materialized edges require a measured performance need and an explicit invalidation/freshness strategy before any schema is introduced.
 
 ## CRUD Alignment Principles
 
@@ -792,44 +792,20 @@ Direction:
 - Preserve the same public response contract.
 - Ensure invalidation rules are explicit per module/entity/relation.
 
-### Phase 5 MVP: Optional Edge Store
+### Phase 5 Deferred: Optional Edge Store
 
-The first performance layer adds an optional materialized edge store without changing `expand`, `search`, or `stats` behavior.
+Runtime traversal remains the correctness baseline for `expand`, `search`, and `stats`.
 
-The runtime traversal remains the correctness baseline. Materialized edges are written and read through a dedicated Core service, but public Graph routes continue using traversal until a later step can prove freshness, invalidation, authorization, and provider-rule behavior are equivalent.
+Do not add graph edge storage until there is a measured performance need and the invalidation model is specified for the affected module/entity/relation set. When that need exists, the materialized layer must preserve the public response contract and fall back to runtime traversal whenever freshness cannot be proven.
 
-Storage table:
+Before introducing a migration, the implementation plan must define:
 
-```text
-core_graph_edges
-```
-
-Stored fields:
-
-- source module, entity, key, and node id;
-- target module, entity, key, and node id;
-- relation path and current relation segment;
-- edge type;
-- directed flag;
-- metadata JSON;
-- `stale_at` timestamp for invalidation without destructive deletes;
-- timestamps.
-
-Initial service behavior:
-
-- upsert one or more edges by stable edge key;
-- query non-stale outgoing edges by source node id;
-- mark edges stale by source node id;
-- preserve runtime traversal as fallback when no valid materialized edges exist.
-
-This phase intentionally does not add automatic synchronization hooks on model save/delete. Module-specific invalidation hooks belong to later provider/performance work once the first store is stable.
-
-Implemented behavior:
-
-- `core_graph_edges` stores stable source/target graph identity, relation path, edge type, metadata, stale marker, and timestamps.
-- `Modules\Core\Models\GraphEdge` represents materialized edges.
-- `MaterializedGraphEdgeRepository` can upsert edges, query non-stale outgoing edges by source node id, and mark source edges stale.
-- Public graph endpoints are unchanged and still use runtime traversal.
+- which relations are materialized;
+- when edges are written;
+- when edges are invalidated;
+- how provider rules and ACL filtering are preserved;
+- how stale materialized data is detected;
+- what metric proves runtime traversal is too expensive.
 
 ## Testing Strategy
 
