@@ -18,13 +18,13 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **81** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation — § Completed |
+| **Done** | **82** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import — § Completed |
 | **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **33** | § Open — **3 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **32** | § Open — **2 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **33 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **32 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
@@ -83,6 +83,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-13 | Supplier payment runs with supplier bank coordinates, approval/export lifecycle, SEPA `pain.001` XML, checksum metadata, and Filament resource | ERP `01678cc`; `PaymentRunBuilderServiceTest`, `SepaPain001ExporterTest`, `PaymentRunResourceTest`, `ERPFilamentResourcesTest` |
 | DONE-S2-2B-04 | Bank reconciliation difference journals with audit FK from bank statement line to journal entry | ERP `50ed21e`; `BankDifferenceJournalTest`, `BankReconciliationServiceTest` |
 | DONE-S2-2B-05 | Match-with-difference action on bank reconciliation page with expense-account selection | ERP `50ed21e`; `BankReconciliationDifferenceTest`, `ERPFilamentCommercialResourcesTest` |
+| DONE-S2-2B-10 | CAMT.053 XML and minimal MT940 statement import through shared bank statement import service | ERP `d800c18`; `BankStatementParserTest`, `BankStatementImportServiceTest`, `ERPFilamentCommercialResourcesTest`, `ERPFilamentRouteSmokeTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -145,7 +146,7 @@ Status verified in `Modules/ERP` unless noted.
 
 | ID | Item | Evidence |
 |----|------|----------|
-| DONE-M6-01 | Bank CSV import + manual match + suggestions + reco page | M6.1 |
+| DONE-M6-01 | Bank CSV/CAMT.053/minimal MT940 import + manual match + suggestions + reco page | M6.1 |
 | DONE-M6-02 | Returns approve/complete/cancel + DDT linking + qty tracking | M6.2 |
 | DONE-M6-03 | Manual NC/ND Filament actions on returns/invoices | `EditReturnOrder`, `EditSupplierReturn`, `EditInvoice` |
 | DONE-M6-04 | E-invoice stub provider + submission + Filament submit/refresh | `StubEInvoiceProvider`, `EInvoiceSubmissionService` |
@@ -187,7 +188,6 @@ Status: `open` · `next` = current sprint target
 
 | ID | Status | Item |
 |----|--------|------|
-| 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
 

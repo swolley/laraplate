@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave D banking differences completed (`2B-04`, `2B-05`); Wave F completed (`2B-13`)
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave D banking completed (`2B-04`, `2B-05`, `2B-10`); Wave F completed (`2B-13`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation/payment-execution depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -45,7 +45,7 @@
 | 2B-06 | C | Auto NC/ND on `complete()` | Done |
 | 2B-04 | D | Bank difference journals | Done |
 | 2B-05 | D | Match-with-difference reco UI | Done |
-| 2B-10 | D | CAMT.053 / MT940 import | — |
+| 2B-10 | D | CAMT.053 / MT940 import | Done |
 | 2B-11 | E | Financial report CSV export (PART-05) | — |
 | 2B-12 | E | BI / operational dashboard polish | 2B-11 (export pattern) |
 | 2B-13 | F | Supplier payment runs + SEPA `pain.001` export | Done |
@@ -69,7 +69,7 @@ flowchart LR
 |------|--------|-----|
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Direct item-specific price lists remain Phase 5 / `5-05` |
 | Price lists | `PriceList`, `PriceListItem`, migrations, Filament resource with nested items | No open Phase 2B gap |
-| Bank reco v1 | `BankReconciliationService` (exact match + match with difference), `BankDifferenceJournalService`, `BankReconciliationPage`, CSV import | No CAMT/MT940 import |
+| Bank reco v1 | `BankReconciliationService` (exact match + match with difference), `BankDifferenceJournalService`, `BankReconciliationPage`, CSV/CAMT.053/minimal MT940 import | CBI/Ri.Ba/SDD and direct bank APIs remain out of scope |
 | Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount`, `PartyBankAccount`, `PaymentRun`, `PaymentRunLine`, `PaymentRunBuilderService`, `SepaPain001Exporter`, `PaymentRunResource` | Direct bank/API submission and CBI/Ri.Ba/SDD remain backlog |
 | Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Revert/reverse processed return remains Phase 3 |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation; gated unlock action exists | No open Phase 2B gap |
@@ -702,7 +702,7 @@ Evidence: ERP `50ed21e`; targeted subset `36 passed, 137 assertions`.
 
 ---
 
-## Task 9: CAMT.053 / MT940 import (2B-10)
+## Task 9: CAMT.053 / MT940 import (2B-10) — completed 2026-07-12
 
 **Files:**
 - Create: `Modules/ERP/app/Contracts/BankStatementParser.php`
@@ -715,7 +715,7 @@ Evidence: ERP `50ed21e`; targeted subset `36 passed, 137 assertions`.
 - Create: `Modules/ERP/tests/Stubs/banking/minimal.camt.xml`, `minimal.mt940.sta`
 - Create: `Modules/ERP/tests/Feature/Services/BankStatementParserTest.php`
 
-- [ ] **Step 1: Contract**
+- [x] **Step 1: Contract**
 
 ```php
 <?php
@@ -735,15 +735,15 @@ interface BankStatementParser
 }
 ```
 
-- [ ] **Step 2: Failing parser tests** — minimal fixtures → expected line count, amounts, dates
+- [x] **Step 2: Failing parser tests** — minimal fixtures → expected line count, amounts, dates
 
-- [ ] **Step 3: Implement parsers** (native XML for CAMT, line regex for MT940 `:61:` / `:86:`)
+- [x] **Step 3: Implement parsers** (native XML for CAMT, line regex for MT940 `:61:` / `:86:`)
 
-- [ ] **Step 4: `BankStatementImportService::importFile(BankStatement $statement, string $path): int`**
+- [x] **Step 4: `BankStatementImportService::importFile(BankStatement $statement, string $path): int`**
 
 Auto-detect parser; persist lines like CSV importer (`raw_payload`, statuses).
 
-- [ ] **Step 5: Filament action on `EditBankStatement`**
+- [x] **Step 5: Filament action on `EditBankStatement`**
 
 ```php
 Action::make('import_file')
@@ -753,13 +753,15 @@ Action::make('import_file')
     ])
 ```
 
-- [ ] **Step 6: Run tests + commit**
+- [x] **Step 6: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementParserTest.php Modules/ERP/tests/Feature/Services/BankStatementImportServiceTest.php
 vendor/bin/pint --dirty
 cd Modules/ERP && git commit -m "feat(erp): CAMT.053 and MT940 bank statement import"
 ```
+
+Evidence: ERP `d800c18`; targeted subset `42 passed, 186 assertions`.
 
 ---
 
@@ -1166,7 +1168,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 | 2B-07 | Task 5 | ✓ |
 | 2B-08 | Task 3 | ✓ |
 | 2B-09 | Task 4 | ✓ |
-| 2B-10 | Task 9 | pending |
+| 2B-10 | Task 9 | ✓ |
 | 2B-11 | Task 10 | pending |
 | 2B-12 | Task 11 | pending |
 | 2B-13 | Task 13 | ✓ |
