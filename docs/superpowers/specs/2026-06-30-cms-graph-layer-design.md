@@ -1,9 +1,9 @@
-# Core Graph Framework - CRUD-Aligned Graph Expansion
+# Core Graph Framework - CRUD-Aligned Graph Operations
 
 ## Status
 
-- Date: 2026-07-08
-- Status: draft
+- Date: 2026-07-12
+- Status: in progress
 - Scope: Core framework, with CMS as the first consumer/provider
 - Supersedes: the previous CMS-only graph layer direction
 
@@ -43,6 +43,13 @@ The order is intentional. Later phases are not optional; they are deferred only 
 3. Core Graph Stats and Analytics
 4. Provider Rules and Regulation Layer
 5. Materialized Edges and Performance Layer
+
+## Implementation Status
+
+- Phase 1 is implemented in Core: generic expand routes, request/data classes, provider registry, CMS provider, relation traversal, ACL omission, cross-module traversal, MorphTo support, dedupe, cycles, and truncation metadata.
+- Phase 2 is implemented for the Graph layer: graph search routes, `SearchGraphRequest extends SearchRequest`, `SearchGraphRequestData extends SearchRequestData`, `qs` kept as the search query parameter, CRUD search reused through `CrudService::search()`, and optional graph expansion through the same traversal pipeline.
+- Phase 3 MVP is implemented: stats are computed over an authorized graph expansion and do not introduce global graph scans or materialized edges.
+- Phase 4 and Phase 5 are the next mandatory follow-up phases.
 
 ## CRUD Alignment Principles
 
@@ -505,6 +512,160 @@ Direction:
 - Request classes should extend CRUD list/search request classes where coherent.
 - Any additional graph parameters must be additive, not a replacement for CRUD query semantics.
 
+### Graph Search Routes
+
+API route:
+
+```http
+GET /api/v1/crud/graph/search/{module}/{entity}
+```
+
+Web route:
+
+```http
+GET /app/crud/graph/search/{module}/{entity}
+```
+
+`SearchGraphRequest` extends `SearchRequest`. It keeps all CRUD search semantics, including `qs`, `mode`, pagination, filters, and sorting. Graph-specific parameters are additive:
+
+- `relations[]`: optional graph relation paths to expand from each search result.
+- `depth`: maximum graph traversal depth for requested relation paths.
+- `relation_limit`: maximum target nodes per relation step.
+- `node_detail`: node serialization level.
+
+The `limit` parameter keeps its CRUD search meaning: maximum search results. It is not remapped to a graph node limit on search routes.
+
+If `relations[]` is absent, Graph Search returns graph-compatible nodes for search results and no edges. If `relations[]` is present, each search result becomes a seed for the same traversal pipeline used by `expand`; nodes and edges are deduplicated across seed expansions.
+
+Graph Search responses use `center: null` because the graph has multiple search-result seeds rather than a single detail center. The response includes both `graphMeta` and `searchMeta`.
+
+Example response shape:
+
+```json
+{
+  "data": {
+    "center": null,
+    "nodes": [],
+    "edges": [],
+    "graphMeta": {
+      "depth": 1,
+      "requestedRelations": ["roles"],
+      "defaultRelationsApplied": false,
+      "truncated": false,
+      "truncatedBy": [],
+      "filteredByAcl": false,
+      "hasCycles": false,
+      "deduplicatedNodeCount": 0
+    },
+    "searchMeta": {
+      "resultCount": 2
+    }
+  }
+}
+```
+
+### Core Search Route And Advanced Search
+
+The generic CRUD search route is shared infrastructure, not CMS-specific and not AI-specific.
+
+`SearchRequest` must expose a `mode` enum:
+
+- `auto`
+- `basic`
+- `orchestrated`
+
+Mode semantics:
+
+- `basic` uses Laravel Scout through the configured search driver.
+- `orchestrated` uses the advanced retrieval pipeline when the model resolves to a supported Core search engine.
+- `auto` chooses `orchestrated` when the model resolves to a supported Core search engine; otherwise it falls back to `basic`.
+
+The Core module must not depend on the AI module. AI may override Core contracts such as query intent parsing, planning, embedding, and reranking through service-provider bindings.
+
+### Existing Search Engine Layer
+
+Advanced search must be engine-aware and support both Elasticsearch and Typesense as first-class drivers through the existing Core search engine layer.
+
+Core must not create a parallel advanced adapter layer. Instead:
+
+- Laravel Scout resolves the model's configured engine through the existing `EngineManager` and `searchableUsing()` flow;
+- existing Core engines implementing `ISearchEngine` own driver-specific query construction;
+- Elasticsearch-specific request bodies stay in `ElasticsearchEngine`;
+- Typesense-specific search parameters stay in `TypesenseEngine`;
+- the ensemble/fusion layer composes Scout builders and normalizes results without knowing driver-specific response shapes.
+
+Supported initial drivers:
+
+- `elasticsearch`
+- `typesense`
+
+Unsupported engines, including database search, fall back to `basic` only when `mode=auto`; they must fail explicitly when `mode=orchestrated`.
+
+### Advanced Search Pagination
+
+Pagination behavior must be aligned for Elasticsearch and Typesense.
+
+The first advanced implementation should support page-based pagination for both drivers using a common request model:
+
+- `page`
+- `per_page`
+- `offset`
+- `limit`
+
+The advanced search result must include:
+
+- normalized result IDs;
+- normalized per-result scores;
+- `total`;
+- `page`;
+- `per_page`;
+- `total_pages`;
+- raw engine metadata for diagnostics.
+
+Core must not paginate, filter, or sort advanced-search results after the engine returns them except for Eloquent hydration by returned IDs. Any filtering that changes the result set must be pushed into the search engine before pagination.
+
+### Advanced Search Filters
+
+The first advanced implementation supports the same portable filter subset for both Elasticsearch and Typesense:
+
+- `=`
+- `in`
+- `!=`
+- nested `AND` groups
+
+Unsupported filters must be rejected before executing search:
+
+- `OR`
+- `like`
+- `not like`
+- range operators
+- relation-path filters
+- engine-specific filter syntax in public request input
+
+The rejection is intentional because applying unsupported filters after engine pagination breaks pagination semantics.
+
+### Searchable Schema Fields
+
+Full-text search fields must be read from the model searchable schema when available.
+
+The existing search engines should derive vector fields from `getVectorField()`, `getSearchMapping()`, or equivalent searchable schema metadata. Text/searchable fields should remain owned by the Scout driver and model mapping, with a conservative fallback only when schema metadata is unavailable.
+
+Fallback fields:
+
+- `title`
+- `name`
+- `body`
+- `content`
+- `description`
+
+Vector fields should also come from schema metadata. The default vector field is `embedding` only when no schema field can be inferred.
+
+### Advanced Search Error Policy
+
+`orchestrated` must fail explicitly when the advanced pipeline is unavailable or the search engine errors.
+
+`auto` may fall back to `basic` only when the model resolves to an unsupported engine. It should not silently hide runtime search engine failures once advanced search has been selected.
+
 ## Phase 3: Stats And Analytics
 
 Stats should be built after search and expand semantics are stable.
@@ -515,6 +676,64 @@ Direction:
 - Respect the same authorization and ACL rules.
 - Avoid leaking counts for entities the user cannot view.
 - Define clear behavior for truncated or sampled stats.
+
+### Phase 3 MVP: Expand Stats
+
+The first stats implementation is intentionally scoped to a single authorized expand operation.
+
+API route:
+
+```http
+GET /api/v1/crud/graph/stats/{module}/{entity}/{id}
+```
+
+Web route:
+
+```http
+GET /app/crud/graph/stats/{module}/{entity}/{id}
+```
+
+The request reuses `ExpandGraphRequest` semantics. Stats are computed from the same graph data that `expand` would return for the same user and parameters. This preserves:
+
+- center-node authorization;
+- related-node ACL omission;
+- provider default relations;
+- explicit `relations[]`;
+- depth, node, and relation limits;
+- truncation and cycle metadata.
+
+Stats response shape:
+
+```json
+{
+  "data": {
+    "center": "cms:contents:10",
+    "stats": {
+      "totalNodes": 3,
+      "totalEdges": 2,
+      "nodesByModule": {
+        "cms": 3
+      },
+      "nodesByEntity": {
+        "cms:contents": 1,
+        "cms:tags": 2
+      },
+      "edgesByRelation": {
+        "tags": 2
+      },
+      "edgesByType": {
+        "tagged_as": 2
+      }
+    },
+    "graphMeta": {
+      "truncated": false,
+      "filteredByAcl": false
+    }
+  }
+}
+```
+
+Phase 3 MVP does not provide global graph statistics for all records of an entity. Global, sampled, cached, or materialized statistics belong to the provider rules and materialized edge phases.
 
 ## Phase 4: Provider Rules And Regulation
 

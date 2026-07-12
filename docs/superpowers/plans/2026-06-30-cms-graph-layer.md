@@ -1,10 +1,10 @@
-# Core Graph Phase 1 Expand Implementation Plan
+# Core Graph Framework Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build Phase 1 of the Core Graph Framework: a CRUD-aligned `expand` endpoint that can expand any CRUD entity through explicitly requested Eloquent relation paths.
+**Goal:** Build the Core Graph Framework in ordered phases: CRUD-aligned expand, search + expand, stats, provider regulation, and materialized performance support.
 
-**Architecture:** Graph lives in `Modules/Core` and reuses the CRUD model: `ExpandGraphRequest extends DetailRequest`, entity resolution uses `DynamicEntity`, center-node authorization uses `AuthorizationService::ensurePermission()`, related-node visibility uses `AuthorizationService` plus ACL filters, and responses use `ResponseBuilder`. Providers are optional Core contracts registered by modules; CMS is only the first provider/consumer.
+**Architecture:** Graph lives in `Modules/Core` and reuses the CRUD model. `ExpandGraphRequest` extends `DetailRequest`, `SearchGraphRequest` extends `SearchRequest`, entity resolution uses `DynamicEntity`, authorization uses `AuthorizationService`, and responses use `ResponseBuilder`. Providers are optional Core contracts registered by modules; CMS is only the first provider/consumer.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Pest, Eloquent relations, Core CRUD stack, nwidart modules.
 
@@ -16,14 +16,32 @@
 
 ## Execution Scope
 
-This plan implements Phase 1 only: Core Graph Expand.
+This plan is the living implementation plan for the Core Graph framework. It must be updated whenever Graph architecture or implementation changes.
 
-The roadmap phases remain mandatory and get dedicated plans after this plan passes:
+The roadmap phases remain mandatory:
 
-1. Core Graph Search + Expand
-2. Core Graph Stats and Analytics
-3. Provider Rules and Regulation Layer
-4. Materialized Edges and Performance Layer
+1. Core Graph Expand
+2. Core Graph Search + Expand
+3. Core Graph Stats and Analytics
+4. Provider Rules and Regulation Layer
+5. Materialized Edges and Performance Layer
+
+## Current Status
+
+- [x] Phase 1: Core Graph Expand implemented in `Modules/Core`.
+- [x] Phase 1: CMS provider implemented as first consumer.
+- [x] Phase 1 hardening: ACL omission, dedupe, cycles, truncation metadata, MorphTo traversal, and cross-module traversal covered.
+- [x] Phase 2: Core Graph Search + Expand implemented.
+- [x] Phase 2 hardening: search error propagation, expanded search aggregation, cross-result node dedupe, and graph/search metadata covered.
+- [x] Phase 3 MVP: Core Graph Stats and Analytics over authorized expand output.
+- [ ] Phase 4: Provider Rules and Regulation Layer.
+- [ ] Phase 5: Materialized Edges and Performance Layer.
+
+## Recent Graph Commits
+
+- `bb92ee0 feat(core): add graph search endpoint`
+- `9d2608a test(core): cover graph search expansion aggregation`
+- `f8db53a feat(core): add graph stats endpoint`
 
 ## Current Code Facts
 
@@ -44,7 +62,9 @@ The roadmap phases remain mandatory and get dedicated plans after this plan pass
 | `Modules/Core/app/Graph/Contracts/GraphProviderRegistryInterface.php` | Provider registry contract |
 | `Modules/Core/app/Graph/GraphProviderRegistry.php` | Entity provider wins over module provider |
 | `Modules/Core/app/Casts/ExpandGraphRequestData.php` | Parsed graph expand request, extending `DetailRequestData` |
+| `Modules/Core/app/Casts/SearchGraphRequestData.php` | Parsed graph search request, extending `SearchRequestData` |
 | `Modules/Core/app/Http/Requests/ExpandGraphRequest.php` | CRUD-aligned graph request extending `DetailRequest` |
+| `Modules/Core/app/Http/Requests/SearchGraphRequest.php` | CRUD-aligned graph request extending `SearchRequest` |
 | `Modules/Core/app/Graph/DTOs/GraphNode.php` | Public graph node DTO |
 | `Modules/Core/app/Graph/DTOs/GraphEdge.php` | Public graph edge DTO |
 | `Modules/Core/app/Graph/DTOs/GraphMeta.php` | Graph metadata DTO |
@@ -63,6 +83,41 @@ The roadmap phases remain mandatory and get dedicated plans after this plan pass
 | `Modules/CMS/app/Providers/CMSServiceProvider.php` | Register CMS graph provider |
 | `Modules/Core/tests/Feature/Graph/*.php` | Core Graph feature tests |
 | `Modules/CMS/tests/Feature/Graph/*.php` | CMS provider integration tests |
+
+## Phase 3 Stats Plan
+
+Phase 3 MVP computes stats from the same graph data that `expand` would return for the same request and user. This keeps authorization, ACL filtering, provider defaults, requested relations, depth, truncation, and cycle semantics identical to expand.
+
+### Phase 3 File Map
+
+| File | Responsibility |
+| --- | --- |
+| `Modules/Core/app/Graph/DTOs/GraphStats.php` | Count totals and distributions for nodes and edges |
+| `Modules/Core/app/Graph/GraphStatsCalculator.php` | Build `GraphStats` from expanded graph arrays |
+| `Modules/Core/app/Graph/GraphService.php` | Add `stats(ExpandGraphRequestData $requestData)` by reusing expand |
+| `Modules/Core/app/Http/Controllers/GraphController.php` | Add `stats(ExpandGraphRequest $request)` endpoint |
+| `Modules/Core/routes/graph.php` | Add `/graph/stats/{module}/{entity}/{id}` route |
+| `Modules/Core/tests/Feature/Graph/GraphStatsTest.php` | Stats calculator and service tests |
+| `Modules/Core/tests/Feature/Graph/GraphExpandRouteTest.php` | Stats route registration tests |
+
+### Phase 3 Task 1: Stats DTO And Calculator
+
+- [x] Write a failing test that builds stats from a graph array with multiple modules, entities, relations, and edge types.
+- [x] Add `GraphStats` with `totalNodes`, `totalEdges`, `nodesByModule`, `nodesByEntity`, `edgesByRelation`, and `edgesByType`.
+- [x] Add `GraphStatsCalculator::fromGraph(array $graph): GraphStats`.
+- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphStatsTest.php`.
+- [x] Commit stats DTO/calculator/test files as part of `f8db53a`.
+
+### Phase 3 Task 2: Stats Service And Route
+
+- [x] Write a failing service test proving `GraphService::stats()` reuses expand output and returns `center`, `stats`, and `graphMeta`.
+- [x] Write failing API/web route registration tests for `/crud/graph/stats/{module}/{entity}/{id}`.
+- [x] Inject `GraphStatsCalculator` into `GraphService`.
+- [x] Add `GraphController::stats(ExpandGraphRequest $request)`.
+- [x] Add stats route to `Modules/Core/routes/graph.php`.
+- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph Modules/CMS/tests/Feature/Graph`.
+- [x] Run `rtk vendor/bin/pint --dirty`.
+- [x] Commit Phase 3 stats files as `f8db53a`.
 
 ## Shared Test Commands
 
@@ -2161,3 +2216,123 @@ Expected: no output.
 ## Follow-Up Plan Gate
 
 After this plan is implemented and verified, create the Phase 2 plan for Core Graph Search + Expand. The Phase 2 plan must start from the Phase 1 contracts in `Modules/Core/app/Graph` and must reuse CRUD list/search request semantics instead of introducing a separate graph query language.
+
+---
+
+# Phase 2 Search Infrastructure Plan
+
+**Goal:** make the Core CRUD search route support engine-aware advanced search for both Elasticsearch and Typesense through the existing Core/Scout engine layer, while keeping Core independent from the AI module.
+
+**Scope:** Core search infrastructure used by CRUD search and later Graph Search + Expand.
+
+**Decisions:**
+
+- `mode=auto` chooses `orchestrated` when the model resolves to a supported Core search engine; otherwise it uses `basic`.
+- `mode=basic` always uses Scout.
+- `mode=orchestrated` requires a supported Core search engine and fails explicitly when unavailable.
+- Elasticsearch and Typesense must have equivalent public behavior for pagination, filters, schema-driven fields, and normalized results.
+- Core contracts remain AI-extension points; Core must not depend on the AI module.
+- Do not create a parallel advanced adapter layer; reuse the existing `EngineManager`, model `searchableUsing()`, `ISearchEngine`, `ElasticsearchEngine`, and `TypesenseEngine`.
+
+## Phase 2 File Map
+
+| File | Responsibility |
+| --- | --- |
+| `Modules/Core/app/Search/DTOs/AdvancedSearchResult.php` | Normalized advanced search result and metadata |
+| `Modules/Core/app/Search/Services/EnsembleSearchService.php` | Composes Scout builders, runs keyword/vector/hybrid strategies, fuses normalized results |
+| `Modules/Core/app/Search/Services/AdvancedSearchService.php` | Orchestrates parser, planner, optional embedder, and ensemble |
+| `Modules/Core/app/Search/Traits/CommonEngineFunctions.php` | Shared engine helpers, including schema-driven vector field resolution |
+| `Modules/Core/app/Search/Engines/ElasticsearchEngine.php` | Elasticsearch query construction, vector search, filters, and response normalization through existing engine |
+| `Modules/Core/app/Search/Engines/TypesenseEngine.php` | Typesense search params, vector search, filters, and response normalization through existing engine |
+| `Modules/Core/app/Services/Crud/CrudService.php` | Chooses basic/orchestrated from `SearchMode` |
+| `Modules/Core/app/Providers/SearchServiceProvider.php` | Registers Core search contracts and fallback AI-extension services |
+
+## Task 1: Normalized Advanced Result DTO
+
+- [x] Create normalized result DTO with:
+  - result IDs
+  - normalized scores
+  - total
+  - page
+  - per page
+  - total pages
+  - executed strategies
+  - raw engine metadata
+
+## Task 2: Searchable Schema Field Resolution In Existing Engines
+
+- [x] Resolve vector field from `getVectorField()` when available.
+- [x] Resolve vector field from `getSearchMapping()` when available.
+- [x] Fall back to vector field `embedding`.
+- [x] Ensure Elasticsearch and Typesense vector searches use the resolved field.
+- [x] Ensure vector markers are not sent as normal filters.
+- [x] Cover mapping-driven vector field resolution in tests.
+
+## Task 3: Portable Filter Translation
+
+- [x] Support the same filter subset for Elasticsearch and Typesense:
+  - `=`
+  - `in`
+  - `!=`
+  - nested `AND`
+- [x] Reject:
+  - `OR`
+  - `like`
+  - `not like`
+  - range operators
+  - relation-path filters
+- [x] Add tests proving unsupported filters fail before engine execution.
+- [x] Apply accepted filters to Scout builders so the active engine owns pagination consistency.
+
+## Task 4: Existing Elasticsearch Engine
+
+- [x] Keep Elasticsearch request-body construction in `ElasticsearchEngine`.
+- [x] Build vector query with the resolved vector field.
+- [x] Exclude vector markers from filter clauses.
+- [x] Execute keyword/vector/hybrid searches through Scout builders.
+- [x] Propagate engine failures instead of converting them to empty results.
+
+## Task 5: Existing Typesense Engine
+
+- [x] Keep Typesense search parameter construction in `TypesenseEngine`.
+- [x] Build vector query with the resolved vector field.
+- [x] Exclude vector markers from `filter_by`.
+- [x] Execute keyword/vector/hybrid searches through Scout builders.
+- [x] Propagate engine failures instead of converting them to empty results.
+
+## Task 6: Ensemble Service Refactor
+
+- [x] Make `EnsembleSearchService` execute per-strategy Scout builders.
+- [x] Keep reciprocal-rank fusion and reranking driver-agnostic.
+- [x] Keep driver-specific query construction in existing engines only.
+- [x] Use a generic vector marker so field resolution remains engine-owned.
+
+## Task 7: Search Mode Selection
+
+- [x] `basic` uses Scout.
+- [x] `orchestrated` requires a supported Core search engine and fails explicitly if unavailable.
+- [x] `auto` uses `orchestrated` when the model resolves to Elasticsearch or Typesense, otherwise `basic`.
+- [x] Runtime engine errors in selected advanced search must not silently fall back to `basic`.
+
+## Task 8: CRUD Search Metadata
+
+- [x] Populate `CrudMeta::totalRecords` from advanced search total.
+- [x] Populate current page, total pages, and pagination from advanced search metadata.
+- [x] Hydrate Eloquent models by returned IDs without changing result membership.
+- [x] Preserve engine result order after hydration.
+
+## Task 9: Verification
+
+Run:
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Integration/Http/Requests/AuthAndSearchRequestsTest.php Modules/Core/tests/Integration/Services/CrudServiceRequestScenariosTest.php Modules/Core/tests/Integration/Search Modules/Core/tests/Integration/Providers/SearchServiceProviderTest.php
+```
+
+Run:
+
+```bash
+rtk vendor/bin/pint --dirty
+```
+
+Expected: all tests pass and formatting succeeds.
