@@ -8,7 +8,7 @@
 **Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 2C / Wave 2. Task 3 (`2C-05`) is complete; continue with Task 4 (`2C-02`) to map company, party, and invoice data into a FatturaPA-shaped payload.
+**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`) and 4 (`2C-02`) are complete; continue with Task 5 (`2C-01`) to build and validate FatturaPA XML from the mapped payload.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -72,7 +72,7 @@ flowchart TB
 
 **Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
 
-**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, next) → Task 5 (`2C-01`) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
+**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, next) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
 
 ---
 
@@ -232,17 +232,19 @@ Default: if not implemented, all standard CRUD ops allowed when global `expose_c
 
 ### Task 4: Complete SDI party/company mapping (2C-02)
 
-**Status:** Next
+**Status:** Done
 
 **Backlog:** `2C-02`
 
-- [ ] Create: `Modules/ERP/app/Services/EInvoice/FatturaPaAnagraphicMapper.php`
-- [ ] Map `Company` + `Party` + `Invoice` → neutral `EInvoicePayload` extended with FatturaPA-shaped arrays (no XML yet).
-- [ ] Tests with fixture company/party/invoice → expected array keys (codice fiscale, partita IVA, indirizzo, regime).
+- [x] Create: `Modules/ERP/app/Services/EInvoice/FatturaPaAnagraphicMapper.php`
+- [x] Map `Company` + `Party` + `Invoice` → neutral `EInvoicePayload` extended with FatturaPA-shaped arrays (no XML yet).
+- [x] Tests with fixture company/party/invoice → expected array keys (codice fiscale, partita IVA, indirizzo, regime).
 
 ---
 
 ### Task 5: Full FatturaPA XML + XSD validation (2C-01)
+
+**Status:** Next
 
 **Backlog:** `2C-01`
 
