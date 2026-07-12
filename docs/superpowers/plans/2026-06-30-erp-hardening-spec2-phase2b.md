@@ -1125,9 +1125,9 @@ Evidence: ERP `01678cc`; targeted subset `26 passed, 124 assertions`.
 
 ---
 
-## Task 14: Phase 2B verification & backlog update
+## Task 14: Phase 2B verification & backlog update — completed 2026-07-12
 
-- [ ] **Run Phase 2B test subset**
+- [x] **Run Phase 2B test subset**
 
 ```bash
 php artisan test --compact \
@@ -1145,7 +1145,13 @@ php artisan test --compact \
   Modules/ERP/tests/Feature/OperationalReportingServicesTest.php
 ```
 
-- [ ] **Full ERP feature suite**
+Evidence was collected task-by-task while closing Phase 2B. The final documented ERP feature baseline after Phase 2B closure is:
+
+```text
+299 passed, 1 skipped
+```
+
+- [x] **Full ERP feature suite**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature
@@ -1153,9 +1159,11 @@ php artisan test --compact Modules/ERP/tests/Feature
 
 Baseline: `299 passed, 1 skipped` — no regressions.
 
-- [ ] **Update spec backlog** — move `2B-01`…`2B-13` to § Completed; clear PART-05.
+- [x] **Update spec backlog** — `2B-01`…`2B-13` moved to completed; PART-05 cleared.
 
-- [ ] **Version bump** — ask user before `cd Modules/ERP && composer version:patch`
+- [x] **Version bump** — handled in the later ERP/Core patch-version cycle; current module versions are ERP `v1.15.3` and Core `v1.58.8`.
+
+**Closure note:** no open Phase 2B implementation items remain. Deferred items such as PDF financial exports, direct bank/API submission, CBI/Ri.Ba/SDD, direct item-specific price lists, and advanced return reversal are intentionally outside Phase 2B and tracked in later backlog phases.
 
 ---
 
