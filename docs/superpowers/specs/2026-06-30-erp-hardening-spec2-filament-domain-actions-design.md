@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **86** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish + FatturaPA readiness schema + FatturaPA mapper — § Completed |
+| **Done** | **87** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish + FatturaPA readiness schema + FatturaPA mapper + FatturaPA XML/XSD validation — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **28** | § Open — **0 in Phase 2B** + **28 in Phases 2C–5** |
+| **Open backlog rows** | **27** | § Open — **0 in Phase 2B** + **27 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **28 open** = every row in § Open with status `open` or `next`.
+- **27 open** = every row in § Open with status `open` or `next`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
 **Current target:** Phase 2C — FatturaPA / SDI production readiness. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue Phase 2C, then Phases 3–5 — 28 open items (`2C-01`…`5-06`, excluding completed `2C-05` and `2C-02`). Plan:
+**Next:** Continue Phase 2C, then Phases 3–5 — 27 open items (`2C-03`…`5-06`, excluding completed `2C-05`, `2C-02`, and `2C-01`). Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -88,6 +88,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-12 | Sales Pipeline and Stock Valuation filters, KPI rows, empty states, and CSV exports | ERP `b70ec97`; `OperationalReportingServicesTest`, `ERPFilamentRouteSmokeTest` |
 | DONE-S2-2C-05 | FatturaPA/SDI readiness fields on company, party, invoice; model rules/forms; submit validation for missing mandatory readiness data | ERP `d7f41cc`; `EInvoiceProviderTest`, `EInvoiceSubmissionSchemaTest`, `EInvoiceSubmissionTest`, `ERPFilamentResourcesTest` |
 | DONE-S2-2C-02 | `FatturaPaAnagraphicMapper` maps company, party, invoice, and lines into a FatturaPA-shaped neutral `EInvoicePayload` | ERP `dc0a9ab`; `FatturaPaAnagraphicMapperTest` |
+| DONE-S2-2C-01 | `FatturaPaXmlBuilder` builds schema-valid FPR12 XML with vendored official XSD; `fatturapa` provider path validates XML during submit | ERP `2cdcdb8`; `FatturaPaXmlBuilderTest`, `EInvoiceProviderTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -196,9 +197,9 @@ No open Phase 2B items remain.
 
 | ID | Status | Item |
 |----|--------|------|
-| 2C-01 | next | Full FatturaPA XML + XSD validation |
+| 2C-01 | done | Full FatturaPA XML + XSD validation |
 | 2C-02 | done | Complete SDI party/company mapping |
-| 2C-03 | open | Production provider (e.g. Aruba) |
+| 2C-03 | next | Production provider (e.g. Aruba) |
 | 2C-04 | open | Extended admin policies (tax codes, company switch, sequences) |
 | 2C-05 | done | FatturaPA schema columns and submit readiness validation |
 

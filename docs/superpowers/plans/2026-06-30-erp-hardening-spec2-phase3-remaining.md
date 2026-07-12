@@ -8,7 +8,7 @@
 **Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`) and 4 (`2C-02`) are complete; continue with Task 5 (`2C-01`) to build and validate FatturaPA XML from the mapped payload.
+**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`), 4 (`2C-02`), and 5 (`2C-01`) are complete; continue with Task 6 (`2C-03`) to add the production-oriented provider adapter/configuration.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -72,7 +72,7 @@ flowchart TB
 
 **Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
 
-**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, next) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
+**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, next) → Task 7 (`2C-04`).
 
 ---
 
@@ -244,23 +244,26 @@ Default: if not implemented, all standard CRUD ops allowed when global `expose_c
 
 ### Task 5: Full FatturaPA XML + XSD validation (2C-01)
 
-**Status:** Next
+**Status:** Done
 
 **Backlog:** `2C-01`
 
 **Files:**
-- Create: `Modules/ERP/app/Services/EInvoice/FatturaPaXmlBuilder.php`
-- Create: `Modules/ERP/resources/xsd/fatturapa/` — official XSD subset (vendored, no runtime download)
-- Modify: `Modules/ERP/app/Contracts/EInvoiceProvider.php` — optional `validateXml(string $xml): void`
-- Create: `Modules/ERP/tests/Feature/Services/EInvoice/FatturaPaXmlBuilderTest.php`
+- Created: `Modules/ERP/app/Services/EInvoice/FatturaPaXmlBuilder.php`
+- Created: `Modules/ERP/app/Services/EInvoice/FatturaPaEInvoiceProvider.php`
+- Created: `Modules/ERP/resources/xsd/fatturapa/` — official FPR12 v1.2.3 XSD vendored from `fatturapa.gov.it`, with local XMLDSIG dependency for offline validation
+- Modified: `Modules/ERP/app/Contracts/EInvoiceProvider.php` — `validateXml(string $xml): void`
+- Created: `Modules/ERP/tests/Feature/Services/FatturaPaXmlBuilderTest.php`
 - Fixture: `tests/Stubs/einvoice/golden-sale-invoice.xml`
 
-- [ ] **Step 1:** Test builds XML from posted sale invoice fixture; DOM load succeeds.
-- [ ] **Step 2:** `FatturaPaXmlBuilder::build(Invoice $invoice): string` using mapper from Task 4.
-- [ ] **Step 3:** XSD validate via `DOMDocument::schemaValidate()` in test; fail test on invalid fixture.
-- [ ] **Step 4:** Wire into `EInvoiceSubmissionService::submit()` when driver = `fatturapa`.
+- [x] **Step 1:** Test builds XML from posted sale invoice fixture; DOM load succeeds.
+- [x] **Step 2:** `FatturaPaXmlBuilder::build(Invoice $invoice): string` using mapper from Task 4.
+- [x] **Step 3:** XSD validate via `DOMDocument::schemaValidate()` in test; golden fixture added.
+- [x] **Step 4:** Wire into `EInvoiceSubmissionService::submit()` when driver = `fatturapa` through `FatturaPaEInvoiceProvider`.
 
 **No new Composer dependency** — native DOM/XSD.
+
+Evidence: ERP `2cdcdb8`; targeted subset `21 passed, 63 assertions`.
 
 ---
 
