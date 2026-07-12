@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
+**Status:** Active — Phase 2C completed; Phase 3 foundation is the current implementation slice  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`), 4 (`2C-02`), 5 (`2C-01`), and 6 (`2C-03`) are complete; continue with Task 7 (`2C-04`) for extended admin policies.
+**Current slice:** Phase 3 / Wave 1. Phase 2C / Wave 2 is complete; continue with Task 1 (`3-04`) for shared permission-name construction, then Task 2 (`3-03`) for CRUD/API exposure governance.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -70,9 +70,9 @@ flowchart TB
   P5 --> P4
 ```
 
-**Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
+**Current execution order:** Wave 1 / Phase 3 foundation now → Wave 3 → Wave 4 → Wave 5.
 
-**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, next).
+**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, done).
 
 ---
 
@@ -287,12 +287,16 @@ Evidence: ERP `8e0bd9e`; targeted subset `28 passed, 77 assertions`.
 
 ### Task 7: Extended admin policies (2C-04)
 
+**Status:** Done
+
 **Backlog:** `2C-04`
 
-- [ ] Seed domain permissions: `tax_codes.supersede`, `companies.switch_context` (if multi-company UI), document sequence admin ops beyond `reset`
-- [ ] Policies on `TaxCode`, `Company` (context switch), `DocumentSequence` — use `PermissionName` + state guards where applicable
-- [ ] Filament: gate company switcher / dangerous tax code actions on permissions
-- [ ] Tests: non-superadmin denied without explicit permission
+- [x] Seed domain permissions: `default.erp_tax_codes.supersede`, `default.erp_companies.switch_context`, and `default.erp_document_sequences.reserve`
+- [x] Policies on `TaxCode`, `Company` context switch, and `DocumentSequence` reservation with model state guards
+- [x] Filament audit: no company switcher or tax-code supersession action exists yet; existing document-sequence reset action was already gated by policy
+- [x] Tests: non-superadmin denied without explicit permission; granted users allowed; wrong model types denied
+
+Evidence: ERP `604c53c`; targeted test subset `14 passed, 41 assertions`.
 
 ---
 

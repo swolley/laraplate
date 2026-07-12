@@ -1,6 +1,6 @@
 # ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design; **Phase 2A completed**; **Phase 2B completed**; **Phase 2C active**
+**Status:** Approved design; **Phase 2A completed**; **Phase 2B completed**; **Phase 2C completed**
 
 **Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-11)
 
@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **88** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish + FatturaPA readiness schema + FatturaPA mapper + FatturaPA XML/XSD validation + configurable Aruba adapter — § Completed |
+| **Done** | **89** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish + FatturaPA readiness schema + FatturaPA mapper + FatturaPA XML/XSD validation + configurable Aruba adapter + extended admin domain permissions — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **26** | § Open — **0 in Phase 2B** + **26 in Phases 2C–5** |
+| **Open backlog rows** | **25** | § Open — **0 in Phase 2B/2C** + **25 in Phases 3–5** |
 
 **How to read the backlog**
 
-- **26 open** = every row in § Open with status `open` or `next`.
+- **25 open** = every row in § Open with status `open` or `next`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Phase 2C — FatturaPA / SDI production readiness. Completed Phase 2B plan:
+**Current target:** Phase 3 — Core foundation for domain HTTP actions and API exposure. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue Phase 2C, then Phases 3–5 — 26 open items (`2C-04`…`5-06`, excluding completed `2C-05`, `2C-03`, `2C-02`, and `2C-01`). Plan:
+**Next:** Continue Phases 3–5 — 25 open items (`3-01`…`5-06`). Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -52,7 +52,7 @@
 | Spec 1 | Bug + money math + CRUD guard | **Done** |
 | Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
 | Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **Done** |
-| Spec 2 Phase 2C | FatturaPA and extended permissions | **Active** |
+| Spec 2 Phase 2C | FatturaPA and extended permissions | **Done** |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
 
@@ -90,6 +90,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2C-02 | `FatturaPaAnagraphicMapper` maps company, party, invoice, and lines into a FatturaPA-shaped neutral `EInvoicePayload` | ERP `dc0a9ab`; `FatturaPaAnagraphicMapperTest` |
 | DONE-S2-2C-01 | `FatturaPaXmlBuilder` builds schema-valid FPR12 XML with vendored official XSD; `fatturapa` provider path validates XML during submit | ERP `2cdcdb8`; `FatturaPaXmlBuilderTest`, `EInvoiceProviderTest` |
 | DONE-S2-2C-03 | `ArubaEInvoiceProvider` configurable HTTP adapter submits validated XML and maps remote statuses through Laravel `Http` fake tests | ERP `8e0bd9e`; `ArubaEInvoiceProviderTest`, `EInvoiceProviderTest`, `ERPServiceProviderTest` |
+| DONE-S2-2C-04 | Extended admin domain permissions for tax-code supersession, company context switching, and document-sequence reservation | ERP `604c53c`; `ErpDomainPermissionsSeederTest`, `ErpModelPolicyTest`, `ERPServiceProviderTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -201,7 +202,7 @@ No open Phase 2B items remain.
 | 2C-01 | done | Full FatturaPA XML + XSD validation |
 | 2C-02 | done | Complete SDI party/company mapping |
 | 2C-03 | done | Production provider (e.g. Aruba) |
-| 2C-04 | next | Extended admin policies (tax codes, company switch, sequences) |
+| 2C-04 | done | Extended admin policies (tax codes, company switch, sequences) |
 | 2C-05 | done | FatturaPA schema columns and submit readiness validation |
 
 ### Phase 3 — Domain HTTP actions & API exposure
