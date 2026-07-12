@@ -46,6 +46,12 @@ aside:not(:where(.dark, .dark *)) {
     padding-block: calc(var(--spacing)*1.75);
 }
 
+.fi-sidebar-group .fi-dropdown-panel {
+    max-height: min(70dvh, 28rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
 /* #endregion */
 
 /* #region Main */

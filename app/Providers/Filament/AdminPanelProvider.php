@@ -8,6 +8,7 @@ use Coolsam\Modules\ModulesPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -16,6 +17,7 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -44,6 +46,7 @@ final class AdminPanelProvider extends PanelProvider
             Css::make('app-css', 'https://__vite__.invalid/app.css')->html(static fn (): string => Vite::asset('resources/css/app.css')),
             Css::make('admin-css', asset('css/admin.css')),
             Js::make('sidebar-scroll', asset('js/sidebar-scroll.js')),
+            Js::make('sidebar-accordion', asset('js/sidebar-accordion.js')),
         ], 'admin');
     }
 
@@ -76,6 +79,26 @@ final class AdminPanelProvider extends PanelProvider
                 Welcome::class,
                 Swagger::class,
                 PhpInfo::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Health')
+                    ->icon(Heroicon::OutlinedHeart),
+                NavigationGroup::make()
+                    ->label('Documentation')
+                    ->icon(Heroicon::OutlinedDocumentText),
+                NavigationGroup::make()
+                    ->label('Core')
+                    ->icon(Heroicon::OutlinedBolt),
+                NavigationGroup::make()
+                    ->label('CMS')
+                    ->icon(Heroicon::OutlinedNewspaper),
+                NavigationGroup::make()
+                    ->label('ERP')
+                    ->icon(Heroicon::OutlinedBuildingOffice),
+                NavigationGroup::make()
+                    ->label('AI')
+                    ->icon(Heroicon::OutlinedSparkles),
             ])
             ->widgets([
             ])
