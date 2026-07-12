@@ -18,15 +18,15 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **82** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import — § Completed |
-| **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **32** | § Open — **2 in Phase 2B** + **30 in Phases 2C–5** |
+| **Done** | **83** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI — § Completed |
+| **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
+| **Open backlog rows** | **31** | § Open — **1 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **32 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **31 open** = every row in § Open with status `open`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
-- **Do not double-count:** PART-05 and 2B-11 are the same item.
+- PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
 **Current target:** Phase 2B — remaining items after Wave A. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
@@ -84,6 +84,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-04 | Bank reconciliation difference journals with audit FK from bank statement line to journal entry | ERP `50ed21e`; `BankDifferenceJournalTest`, `BankReconciliationServiceTest` |
 | DONE-S2-2B-05 | Match-with-difference action on bank reconciliation page with expense-account selection | ERP `50ed21e`; `BankReconciliationDifferenceTest`, `ERPFilamentCommercialResourcesTest` |
 | DONE-S2-2B-10 | CAMT.053 XML and minimal MT940 statement import through shared bank statement import service | ERP `d800c18`; `BankStatementParserTest`, `BankStatementImportServiceTest`, `ERPFilamentCommercialResourcesTest`, `ERPFilamentRouteSmokeTest` |
+| DONE-S2-2B-11 | Financial report CSV export from Trial Balance, Balance Sheet, and Income Statement Filament pages | ERP `0b0c893`; `FinancialStatementsTest`, `ERPFilamentRouteSmokeTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -172,9 +173,7 @@ Status verified in `Modules/ERP` unless noted.
 
 ## Partially complete (remaining)
 
-| ID | Already implemented | Still open |
-|----|---------------------|------------|
-| PART-05 | `FinancialReportCsvExporter` service + tests | Filament export buttons / PDF → **2B-11** |
+None.
 
 ---
 
@@ -188,7 +187,6 @@ Status: `open` · `next` = current sprint target
 
 | ID | Status | Item |
 |----|--------|------|
-| 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
 
 ### Phase 2C — E-invoice & extended permissions
