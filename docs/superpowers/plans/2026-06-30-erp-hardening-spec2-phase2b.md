@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave F completed (`2B-13`)
+**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave D banking differences completed (`2B-04`, `2B-05`); Wave F completed (`2B-13`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation/payment-execution depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -43,8 +43,8 @@
 | 2B-09 | B | Document sequence `reset` + policy + seed | Done |
 | 2B-07 | C | Return line override contract | Done |
 | 2B-06 | C | Auto NC/ND on `complete()` | Done |
-| 2B-04 | D | Bank difference journals | — |
-| 2B-05 | D | Match-with-difference reco UI | 2B-04 |
+| 2B-04 | D | Bank difference journals | Done |
+| 2B-05 | D | Match-with-difference reco UI | Done |
 | 2B-10 | D | CAMT.053 / MT940 import | — |
 | 2B-11 | E | Financial report CSV export (PART-05) | — |
 | 2B-12 | E | BI / operational dashboard polish | 2B-11 (export pattern) |
@@ -67,13 +67,13 @@ flowchart LR
 
 | Area | Exists | Gap |
 |------|--------|-----|
-| Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Optional `PriceList` / `PriceListItem` resources only |
-| Price lists | `PriceList`, `PriceListItem`, migrations | No Filament resources |
-| Bank reco v1 | `BankReconciliationService` (exact match), `BankReconciliationPage`, CSV import | No difference journal, no CAMT/MT940 |
+| Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Direct item-specific price lists remain Phase 5 / `5-05` |
+| Price lists | `PriceList`, `PriceListItem`, migrations, Filament resource with nested items | No open Phase 2B gap |
+| Bank reco v1 | `BankReconciliationService` (exact match + match with difference), `BankDifferenceJournalService`, `BankReconciliationPage`, CSV import | No CAMT/MT940 import |
 | Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount`, `PartyBankAccount`, `PaymentRun`, `PaymentRunLine`, `PaymentRunBuilderService`, `SepaPain001Exporter`, `PaymentRunResource` | Direct bank/API submission and CBI/Ri.Ba/SDD remain backlog |
-| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Bank/reporting work remains open |
-| Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation | No unlock action/permission |
-| Document sequences | `DocumentSequence`, `DocumentNumberAllocator` | No controlled reset action |
+| Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Revert/reverse processed return remains Phase 3 |
+| Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation; gated unlock action exists | No open Phase 2B gap |
+| Document sequences | `DocumentSequence`, `DocumentNumberAllocator`, controlled reset action | No open Phase 2B gap |
 | Financial CSV | `FinancialReportCsvExporter` (`trialBalance`, `incomeStatement`) | No Filament download; no `balanceSheet()` |
 | BI pages | `SalesPipelinePage`, `StockValuationPage` — basic tables | No filters/KPI/export polish |
 
@@ -585,7 +585,7 @@ cd Modules/ERP && git commit -m "feat(erp): optional auto credit/debit notes on 
 
 ---
 
-## Task 7: Bank difference journals (2B-04)
+## Task 7: Bank difference journals (2B-04) — completed 2026-07-12
 
 **Files:**
 - Create migration: `add_difference_journal_entry_id_to_bank_statement_lines`
@@ -594,7 +594,7 @@ cd Modules/ERP && git commit -m "feat(erp): optional auto credit/debit notes on 
 - Modify: `Modules/ERP/app/Services/Company/ErpCompanySettings.php` (optional default expense account role)
 - Create: `Modules/ERP/tests/Feature/Services/BankDifferenceJournalTest.php`
 
-- [ ] **Step 1: Migration**
+- [x] **Step 1: Migration**
 
 ```php
 $table->foreignId('difference_journal_entry_id')
@@ -605,7 +605,7 @@ $table->foreignId('difference_journal_entry_id')
 
 Update `BankStatementLine` model (`fillable`, `BelongsTo` `difference_journal_entry`).
 
-- [ ] **Step 2: Failing test**
+- [x] **Step 2: Failing test**
 
 Line amount `100.50`, payment `100.00`, difference `0.50` → `matchPaymentWithDifference()`:
 - sets `matched_payment_id`
@@ -614,7 +614,7 @@ Line amount `100.50`, payment `100.00`, difference `0.50` → `matchPaymentWithD
 
 Use `findAccountByRole` pattern: roles `bank_cash` and `bank_reconciliation_difference` (seed in `ItalianCoaProvider` / chart installer if missing).
 
-- [ ] **Step 3: `BankDifferenceJournalService`**
+- [x] **Step 3: `BankDifferenceJournalService`**
 
 ```php
 public function postDifference(
@@ -633,7 +633,7 @@ Journal lines:
 
 Use `JournalPostingService::post()` with resolved fiscal period from `line->booked_at`.
 
-- [ ] **Step 4: `BankReconciliationService::matchPaymentWithDifference()`**
+- [x] **Step 4: `BankReconciliationService::matchPaymentWithDifference()`**
 
 ```php
 public function matchPaymentWithDifference(
@@ -645,7 +645,7 @@ public function matchPaymentWithDifference(
 
 Relax amount check: allow `abs(abs(line) - payment) > 0.0001` when difference journal is posted. Reject if difference is zero (delegate to `matchPayment()`).
 
-- [ ] **Step 5: Run tests + commit**
+- [x] **Step 5: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/BankDifferenceJournalTest.php
@@ -653,22 +653,24 @@ vendor/bin/pint --dirty
 cd Modules/ERP && git commit -m "feat(erp): bank reconciliation difference journals"
 ```
 
+Evidence: ERP `50ed21e`; targeted subset `36 passed, 137 assertions`.
+
 ---
 
-## Task 8: Match-with-difference reco UI (2B-05)
+## Task 8: Match-with-difference reco UI (2B-05) — completed 2026-07-12
 
 **Files:**
 - Modify: `Modules/ERP/app/Filament/Pages/BankReconciliationPage.php`
 - Modify: `Modules/ERP/resources/views/filament/pages/bank-reconciliation.blade.php`
 - Create: `Modules/ERP/tests/Feature/Filament/BankReconciliationDifferenceTest.php` (Livewire-level)
 
-- [ ] **Step 1: Extend form**
+- [x] **Step 1: Extend form**
 
 Add:
 - `TextInput::make('difference_amount')` — read-only, computed in `updatedPaymentId` / `updatedBankStatementLineId`
 - `Select::make('expense_account_id')` — company accounts (`Account::query()->where('company_id', ...)`)
 
-- [ ] **Step 2: New page action `matchWithDifference()`**
+- [x] **Step 2: New page action `matchWithDifference()`**
 
 ```php
 public function matchWithDifference(): void
@@ -685,16 +687,18 @@ public function matchWithDifference(): void
 }
 ```
 
-- [ ] **Step 3: Blade — show computed difference + button** (disabled when difference is 0 or accounts missing)
+- [x] **Step 3: Blade — show computed difference + button** (disabled when difference is 0 or accounts missing)
 
-- [ ] **Step 4: Test** — assert `matchPaymentWithDifference` called when difference non-zero (mock or integration with seeded COA)
+- [x] **Step 4: Test** — assert `matchPaymentWithDifference` called when difference non-zero (mock or integration with seeded COA)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
 cd Modules/ERP && git commit -m "feat(erp): bank reco match-with-difference UI"
 ```
+
+Evidence: ERP `50ed21e`; targeted subset `36 passed, 137 assertions`.
 
 ---
 
@@ -1127,6 +1131,7 @@ php artisan test --compact \
   Modules/ERP/tests/Feature/ReturnLineOverrideTest.php \
   Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php \
   Modules/ERP/tests/Feature/Services/BankDifferenceJournalTest.php \
+  Modules/ERP/tests/Feature/Filament/BankReconciliationDifferenceTest.php \
   Modules/ERP/tests/Feature/Services/BankStatementParserTest.php \
   Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php \
   Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php \
@@ -1161,11 +1166,11 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 | 2B-07 | Task 5 | ✓ |
 | 2B-08 | Task 3 | ✓ |
 | 2B-09 | Task 4 | ✓ |
-| 2B-10 | Task 9 | ✓ |
-| 2B-11 | Task 10 | ✓ |
-| 2B-12 | Task 11 | ✓ |
+| 2B-10 | Task 9 | pending |
+| 2B-11 | Task 10 | pending |
+| 2B-12 | Task 11 | pending |
 | 2B-13 | Task 13 | ✓ |
-| PART-05 | Task 10 | ✓ |
+| PART-05 | Task 10 | pending |
 
 ---
 

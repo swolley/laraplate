@@ -18,13 +18,13 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **79** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs — § Completed |
+| **Done** | **81** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation — § Completed |
 | **Partial remaining** | **1** | PART-05 / 2B-11 — `FinancialReportCsvExporter` exists; Filament export UI missing |
-| **Open backlog rows** | **35** | § Open — **5 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **33** | § Open — **3 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **35 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
+- **33 open** = every row in § Open with status `open` (or `partial` for 2B-11 only).
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - **Do not double-count:** PART-05 and 2B-11 are the same item.
 
@@ -81,6 +81,8 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-07 | Return line invoice-line fiscal override contract for customer credit notes and supplier debit notes | ERP `e53d594`; `ReturnLineOverrideTest` |
 | DONE-S2-2B-06 | Optional auto NC/ND draft creation on return `complete()` via `erp.returns.auto_create_notes_on_complete` | ERP `103e627`; `ReturnOrderServiceTest`, `SupplierReturnServiceTest`, `ErpCompanySettingsTest` |
 | DONE-S2-2B-13 | Supplier payment runs with supplier bank coordinates, approval/export lifecycle, SEPA `pain.001` XML, checksum metadata, and Filament resource | ERP `01678cc`; `PaymentRunBuilderServiceTest`, `SepaPain001ExporterTest`, `PaymentRunResourceTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2B-04 | Bank reconciliation difference journals with audit FK from bank statement line to journal entry | ERP `50ed21e`; `BankDifferenceJournalTest`, `BankReconciliationServiceTest` |
+| DONE-S2-2B-05 | Match-with-difference action on bank reconciliation page with expense-account selection | ERP `50ed21e`; `BankReconciliationDifferenceTest`, `ERPFilamentCommercialResourcesTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -185,8 +187,6 @@ Status: `open` · `next` = current sprint target
 
 | ID | Status | Item |
 |----|--------|------|
-| 2B-04 | open | Bank difference journals (fees, rounding) |
-| 2B-05 | open | Match-with-difference on reco page |
 | 2B-10 | open | CAMT.053 / MT940 import |
 | 2B-11 | partial | Financial report export CSV/PDF from Filament (service exists) |
 | 2B-12 | open | BI / operational dashboard polish |
