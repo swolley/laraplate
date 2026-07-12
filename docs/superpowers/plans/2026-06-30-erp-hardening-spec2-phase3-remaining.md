@@ -8,7 +8,7 @@
 **Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`), 4 (`2C-02`), and 5 (`2C-01`) are complete; continue with Task 6 (`2C-03`) to add the production-oriented provider adapter/configuration.
+**Current slice:** Phase 2C / Wave 2. Tasks 3 (`2C-05`), 4 (`2C-02`), 5 (`2C-01`), and 6 (`2C-03`) are complete; continue with Task 7 (`2C-04`) for extended admin policies.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -72,7 +72,7 @@ flowchart TB
 
 **Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
 
-**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, next) → Task 7 (`2C-04`).
+**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, next).
 
 ---
 
@@ -269,13 +269,19 @@ Evidence: ERP `2cdcdb8`; targeted subset `21 passed, 63 assertions`.
 
 ### Task 6: Production provider — Aruba stub (2C-03)
 
+**Status:** Done
+
 **Backlog:** `2C-03`
 
-- [ ] Create: `Modules/ERP/app/Services/EInvoice/ArubaEInvoiceProvider.php` implementing `EInvoiceProvider`
-- [ ] Config: `config/erp.php` — `einvoice.driver` = `stub|aruba|fatturapa`; credentials via `config()` only
-- [ ] HTTP client: Laravel `Http::` with sandbox base URL; map submit/remoteStatus to Aruba API shape (document from Aruba dev docs)
-- [ ] Test: `Http::fake()` — submit returns external id; refresh maps status
-- [ ] **Production secrets:** never in repo; env via config file only
+- [x] Create: `Modules/ERP/app/Services/EInvoice/ArubaEInvoiceProvider.php` implementing `EInvoiceProvider`
+- [x] Config: `config/erp.php` — `einvoice.driver` = `stub|aruba|fatturapa`; credentials via `config()` only
+- [x] HTTP client: Laravel `Http::` with configurable base URL / submit path / status path; maps submit and remoteStatus responses
+- [x] Test: `Http::fake()` — submit returns external id; refresh maps status
+- [x] **Production secrets:** never in repo; env via config file only
+
+Evidence: ERP `8e0bd9e`; targeted subset `28 passed, 77 assertions`.
+
+**Boundary:** public Aruba API docs were not available during implementation. This task delivers the configurable adapter and HTTP contract tests; endpoint paths/payload/status fields must be verified against the contracted Aruba environment before production go-live.
 
 ---
 
