@@ -634,6 +634,8 @@ The first advanced implementation supports the same portable filter subset for b
 - `!=`
 - nested `AND` groups
 
+The portable subset must be applied through a shared Core component used by both basic Scout search and orchestrated search, so filter and sort semantics cannot drift between `mode=basic`, `mode=auto`, and `mode=orchestrated`.
+
 Unsupported filters must be rejected before executing search:
 
 - `OR`
@@ -644,6 +646,8 @@ Unsupported filters must be rejected before executing search:
 - engine-specific filter syntax in public request input
 
 The rejection is intentional because applying unsupported filters after engine pagination breaks pagination semantics.
+
+Portable sort support is limited to scalar fields on the searched model. Relation-path sorts must be rejected before executing search for the same pagination-consistency reason.
 
 ### Searchable Schema Fields
 

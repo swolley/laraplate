@@ -207,7 +207,7 @@ rtk vendor/bin/pint --dirty
 - Modify: `Modules/Core/app/Providers/CoreServiceProvider.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphProviderRegistryTest.php`
 
-- [ ] **Step 1: Write the failing registry test**
+- [x] **Step 1: Write the failing registry test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphProviderRegistryTest.php`:
 
@@ -264,7 +264,7 @@ it('binds the registry contract in the container', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -274,7 +274,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphProviderReg
 
 Expected: FAIL because the graph contracts and registry do not exist.
 
-- [ ] **Step 3: Create provider contracts**
+- [x] **Step 3: Create provider contracts**
 
 Create `Modules/Core/app/Graph/Contracts/GraphProviderInterface.php`:
 
@@ -323,7 +323,7 @@ interface GraphProviderRegistryInterface
 }
 ```
 
-- [ ] **Step 4: Implement the registry**
+- [x] **Step 4: Implement the registry**
 
 Create `Modules/Core/app/Graph/GraphProviderRegistry.php`:
 
@@ -370,7 +370,7 @@ final class GraphProviderRegistry implements GraphProviderRegistryInterface
 }
 ```
 
-- [ ] **Step 5: Bind the registry in Core**
+- [x] **Step 5: Bind the registry in Core**
 
 Modify `Modules/Core/app/Providers/CoreServiceProvider.php`:
 
@@ -385,7 +385,7 @@ Inside `register()` after existing singleton registrations:
 $this->app->singleton(GraphProviderRegistryInterface::class, GraphProviderRegistry::class);
 ```
 
-- [ ] **Step 6: Run the test and verify it passes**
+- [x] **Step 6: Run the test and verify it passes**
 
 Run:
 
@@ -395,7 +395,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphProviderReg
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add Modules/Core/app/Graph/Contracts/GraphProviderInterface.php Modules/Core/app/Graph/Contracts/GraphProviderRegistryInterface.php Modules/Core/app/Graph/GraphProviderRegistry.php Modules/Core/app/Providers/CoreServiceProvider.php Modules/Core/tests/Feature/Graph/GraphProviderRegistryTest.php
@@ -410,7 +410,7 @@ rtk git commit -m "feat(core): add graph provider registry"
 - Create: `Modules/Core/app/Http/Requests/ExpandGraphRequest.php`
 - Test: `Modules/Core/tests/Feature/Graph/ExpandGraphRequestTest.php`
 
-- [ ] **Step 1: Write the failing request test**
+- [x] **Step 1: Write the failing request test**
 
 Create `Modules/Core/tests/Feature/Graph/ExpandGraphRequestTest.php`:
 
@@ -463,7 +463,7 @@ it('rejects relation paths deeper than depth', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -473,7 +473,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/ExpandGraphReque
 
 Expected: FAIL because the request classes do not exist.
 
-- [ ] **Step 3: Add graph config**
+- [x] **Step 3: Add graph config**
 
 Create `Modules/Core/config/graph.php`:
 
@@ -492,7 +492,7 @@ return [
 ];
 ```
 
-- [ ] **Step 4: Implement request data**
+- [x] **Step 4: Implement request data**
 
 Create `Modules/Core/app/Casts/ExpandGraphRequestData.php`:
 
@@ -553,7 +553,7 @@ final class ExpandGraphRequestData extends DetailRequestData
 }
 ```
 
-- [ ] **Step 5: Implement expand request**
+- [x] **Step 5: Implement expand request**
 
 Create `Modules/Core/app/Http/Requests/ExpandGraphRequest.php`:
 
@@ -659,7 +659,7 @@ final class ExpandGraphRequest extends DetailRequest
 }
 ```
 
-- [ ] **Step 6: Run the request test and verify it passes**
+- [x] **Step 6: Run the request test and verify it passes**
 
 Run:
 
@@ -669,7 +669,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/ExpandGraphReque
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add Modules/Core/config/graph.php Modules/Core/app/Casts/ExpandGraphRequestData.php Modules/Core/app/Http/Requests/ExpandGraphRequest.php Modules/Core/tests/Feature/Graph/ExpandGraphRequestTest.php
@@ -687,7 +687,7 @@ rtk git commit -m "feat(core): add graph expand request"
 - Create: `Modules/Core/app/Graph/GraphNodeSerializer.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphNodeSerializerTest.php`
 
-- [ ] **Step 1: Write the failing serializer test**
+- [x] **Step 1: Write the failing serializer test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphNodeSerializerTest.php`:
 
@@ -723,7 +723,7 @@ it('builds stable graph node ids from module entity and model key', function ():
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -733,7 +733,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphNodeSeriali
 
 Expected: FAIL because graph DTOs and serializer do not exist.
 
-- [ ] **Step 3: Create graph DTOs**
+- [x] **Step 3: Create graph DTOs**
 
 Create `Modules/Core/app/Graph/DTOs/GraphNode.php`:
 
@@ -894,7 +894,7 @@ readonly class GraphData
 }
 ```
 
-- [ ] **Step 4: Implement entity resolver**
+- [x] **Step 4: Implement entity resolver**
 
 Create `Modules/Core/app/Graph/GraphEntityResolver.php`:
 
@@ -940,7 +940,7 @@ final class GraphEntityResolver
 }
 ```
 
-- [ ] **Step 5: Implement node serializer**
+- [x] **Step 5: Implement node serializer**
 
 Create `Modules/Core/app/Graph/GraphNodeSerializer.php`:
 
@@ -1058,7 +1058,7 @@ final class GraphNodeSerializer
 }
 ```
 
-- [ ] **Step 6: Run the serializer test and verify it passes**
+- [x] **Step 6: Run the serializer test and verify it passes**
 
 Run:
 
@@ -1068,7 +1068,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphNodeSeriali
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add Modules/Core/app/Graph/DTOs Modules/Core/app/Graph/GraphEntityResolver.php Modules/Core/app/Graph/GraphNodeSerializer.php Modules/Core/tests/Feature/Graph/GraphNodeSerializerTest.php
@@ -1082,7 +1082,7 @@ rtk git commit -m "feat(core): add graph node serialization"
 - Create: `Modules/Core/app/Graph/GraphRelationInspector.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphRelationInspectorTest.php`
 
-- [ ] **Step 1: Write the failing inspector test**
+- [x] **Step 1: Write the failing inspector test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphRelationInspectorTest.php`:
 
@@ -1128,7 +1128,7 @@ it('rejects missing relations with validation errors', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1138,7 +1138,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphRelationIns
 
 Expected: FAIL because the inspector does not exist.
 
-- [ ] **Step 3: Create relation DTO**
+- [x] **Step 3: Create relation DTO**
 
 Create `Modules/Core/app/Graph/DTOs/GraphRelation.php`:
 
@@ -1165,7 +1165,7 @@ readonly class GraphRelation
 }
 ```
 
-- [ ] **Step 4: Implement relation inspector**
+- [x] **Step 4: Implement relation inspector**
 
 Create `Modules/Core/app/Graph/GraphRelationInspector.php`:
 
@@ -1237,7 +1237,7 @@ final class GraphRelationInspector
 }
 ```
 
-- [ ] **Step 5: Run the inspector test and verify it passes**
+- [x] **Step 5: Run the inspector test and verify it passes**
 
 Run:
 
@@ -1247,7 +1247,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphRelationIns
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add Modules/Core/app/Graph/DTOs/GraphRelation.php Modules/Core/app/Graph/GraphRelationInspector.php Modules/Core/tests/Feature/Graph/GraphRelationInspectorTest.php
@@ -1260,7 +1260,7 @@ rtk git commit -m "feat(core): add graph relation inspector"
 - Create: `Modules/Core/app/Graph/GraphTraversal.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphTraversalTest.php`
 
-- [ ] **Step 1: Write the failing traversal test**
+- [x] **Step 1: Write the failing traversal test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphTraversalTest.php`:
 
@@ -1373,7 +1373,7 @@ it('marks relation limit truncation', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1383,7 +1383,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphTraversalTe
 
 Expected: FAIL because traversal does not exist.
 
-- [ ] **Step 3: Implement traversal**
+- [x] **Step 3: Implement traversal**
 
 Create `Modules/Core/app/Graph/GraphTraversal.php`:
 
@@ -1600,7 +1600,7 @@ final class GraphTraversal
 }
 ```
 
-- [ ] **Step 4: Run traversal tests and verify they pass**
+- [x] **Step 4: Run traversal tests and verify they pass**
 
 Run:
 
@@ -1610,7 +1610,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphTraversalTe
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add Modules/Core/app/Graph/GraphTraversal.php Modules/Core/tests/Feature/Graph/GraphTraversalTest.php
@@ -1624,7 +1624,7 @@ rtk git commit -m "feat(core): add graph traversal"
 - Create: `Modules/Core/app/Http/Controllers/GraphController.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphServiceTest.php`
 
-- [ ] **Step 1: Write the failing service test**
+- [x] **Step 1: Write the failing service test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphServiceTest.php`:
 
@@ -1695,7 +1695,7 @@ it('loads the center record through detail semantics and returns a crud result',
 });
 ```
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -1705,7 +1705,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphServiceTest
 
 Expected: FAIL because service and controller do not exist.
 
-- [ ] **Step 3: Implement graph service**
+- [x] **Step 3: Implement graph service**
 
 Create `Modules/Core/app/Graph/GraphService.php`:
 
@@ -1797,7 +1797,7 @@ final class GraphService
 }
 ```
 
-- [ ] **Step 4: Implement graph controller**
+- [x] **Step 4: Implement graph controller**
 
 Create `Modules/Core/app/Http/Controllers/GraphController.php`:
 
@@ -1858,7 +1858,7 @@ final class GraphController extends Controller
 }
 ```
 
-- [ ] **Step 5: Run the service test and verify it passes**
+- [x] **Step 5: Run the service test and verify it passes**
 
 Run:
 
@@ -1868,7 +1868,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphServiceTest
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add Modules/Core/app/Graph/GraphService.php Modules/Core/app/Http/Controllers/GraphController.php Modules/Core/tests/Feature/Graph/GraphServiceTest.php
@@ -1883,7 +1883,7 @@ rtk git commit -m "feat(core): add graph expand service"
 - Modify: `Modules/Core/routes/web.php`
 - Test: `Modules/Core/tests/Feature/Graph/GraphExpandRouteTest.php`
 
-- [ ] **Step 1: Write the failing route test**
+- [x] **Step 1: Write the failing route test**
 
 Create `Modules/Core/tests/Feature/Graph/GraphExpandRouteTest.php`:
 
@@ -1918,7 +1918,7 @@ it('registers the web graph expand route under app crud', function (): void {
 
 The expected `401` means the route reached `GraphController` and failed through CRUD authorization because the test user has no permissions.
 
-- [ ] **Step 2: Run the route test and verify it fails**
+- [x] **Step 2: Run the route test and verify it fails**
 
 Run:
 
@@ -1928,7 +1928,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphExpandRoute
 
 Expected: FAIL because routes are not registered.
 
-- [ ] **Step 3: Create shared graph route file**
+- [x] **Step 3: Create shared graph route file**
 
 Create `Modules/Core/routes/graph.php`:
 
@@ -1945,7 +1945,7 @@ Route::controller(GraphController::class)->prefix('graph')->name('graph.')->grou
 });
 ```
 
-- [ ] **Step 4: Mount API graph routes under `/crud`**
+- [x] **Step 4: Mount API graph routes under `/crud`**
 
 Modify `Modules/Core/routes/api.php`:
 
@@ -1963,7 +1963,7 @@ Route::name('crud.')->prefix('/crud')->group(function (): void {
 require __DIR__ . '/crud.php';
 ```
 
-- [ ] **Step 5: Mount web graph routes under `/app/crud`**
+- [x] **Step 5: Mount web graph routes under `/app/crud`**
 
 Modify `Modules/Core/routes/web.php` inside the existing `Route::name('crud.')->prefix('/crud')->group(...)` block:
 
@@ -1972,7 +1972,7 @@ require __DIR__ . '/crud.php';
 require __DIR__ . '/graph.php';
 ```
 
-- [ ] **Step 6: Run the route test and verify it passes**
+- [x] **Step 6: Run the route test and verify it passes**
 
 Run:
 
@@ -1982,7 +1982,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphExpandRoute
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add Modules/Core/routes/graph.php Modules/Core/routes/api.php Modules/Core/routes/web.php Modules/Core/tests/Feature/Graph/GraphExpandRouteTest.php
@@ -1996,7 +1996,7 @@ rtk git commit -m "feat(core): expose graph expand routes"
 - Modify: `Modules/CMS/app/Providers/CMSServiceProvider.php`
 - Test: `Modules/CMS/tests/Feature/Graph/CmsGraphProviderTest.php`
 
-- [ ] **Step 1: Write the failing CMS provider test**
+- [x] **Step 1: Write the failing CMS provider test**
 
 Create `Modules/CMS/tests/Feature/Graph/CmsGraphProviderTest.php`:
 
@@ -2021,7 +2021,7 @@ it('registers cms graph defaults through the provider registry', function (): vo
 });
 ```
 
-- [ ] **Step 2: Run the CMS provider test and verify it fails**
+- [x] **Step 2: Run the CMS provider test and verify it fails**
 
 Run:
 
@@ -2031,7 +2031,7 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/Graph/CmsGraphProviderT
 
 Expected: FAIL because the CMS provider does not exist.
 
-- [ ] **Step 3: Implement CMS graph provider**
+- [x] **Step 3: Implement CMS graph provider**
 
 Create `Modules/CMS/app/Graph/CmsGraphProvider.php`:
 
@@ -2089,7 +2089,7 @@ final class CmsGraphProvider implements GraphProviderInterface
 }
 ```
 
-- [ ] **Step 4: Register the provider in CMS boot**
+- [x] **Step 4: Register the provider in CMS boot**
 
 Modify `Modules/CMS/app/Providers/CMSServiceProvider.php`:
 
@@ -2106,7 +2106,7 @@ $this->app
     ->register($this->app->make(CmsGraphProvider::class), 'cms');
 ```
 
-- [ ] **Step 5: Run the CMS provider test and verify it passes**
+- [x] **Step 5: Run the CMS provider test and verify it passes**
 
 Run:
 
@@ -2116,7 +2116,7 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/Graph/CmsGraphProviderT
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add Modules/CMS/app/Graph/CmsGraphProvider.php Modules/CMS/app/Providers/CMSServiceProvider.php Modules/CMS/tests/Feature/Graph/CmsGraphProviderTest.php
@@ -2128,7 +2128,7 @@ rtk git commit -m "feat(cms): register graph provider"
 **Files:**
 - Test: `Modules/CMS/tests/Feature/Graph/CmsGraphExpandTest.php`
 
-- [ ] **Step 1: Write the CMS expand smoke test**
+- [x] **Step 1: Write the CMS expand smoke test**
 
 Create `Modules/CMS/tests/Feature/Graph/CmsGraphExpandTest.php`:
 
@@ -2183,7 +2183,7 @@ it('uses provider defaults when relations are absent', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the smoke test and verify it passes**
+- [x] **Step 2: Run the smoke test and verify it passes**
 
 Run:
 
@@ -2193,7 +2193,7 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/Graph/CmsGraphExpandTes
 
 Expected: PASS.
 
-- [ ] **Step 3: Run the full graph-focused suite**
+- [x] **Step 3: Run the full graph-focused suite**
 
 Run:
 
@@ -2203,7 +2203,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph Modules/CMS/test
 
 Expected: PASS.
 
-- [ ] **Step 4: Format dirty files**
+- [x] **Step 4: Format dirty files**
 
 Run:
 
@@ -2213,7 +2213,7 @@ rtk vendor/bin/pint --dirty
 
 Expected: PASS with files formatted.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add Modules/Core Modules/CMS
@@ -2222,7 +2222,7 @@ rtk git commit -m "test(cms): cover graph expand smoke path"
 
 ## Final Verification
 
-- [ ] **Step 1: Run graph tests**
+- [x] **Step 1: Run graph tests**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/Graph Modules/CMS/tests/Feature/Graph
@@ -2230,7 +2230,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Graph Modules/CMS/test
 
 Expected: PASS.
 
-- [ ] **Step 2: Run affected CRUD request tests**
+- [x] **Step 2: Run affected CRUD request tests**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Integration/Http/Requests/AuthAndSearchRequestsTest.php Modules/Core/tests/Feature/Api/CrudApiTest.php
@@ -2238,7 +2238,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Http/Requests/Auth
 
 Expected: PASS.
 
-- [ ] **Step 3: Format dirty files**
+- [x] **Step 3: Format dirty files**
 
 ```bash
 rtk vendor/bin/pint --dirty
@@ -2246,7 +2246,7 @@ rtk vendor/bin/pint --dirty
 
 Expected: PASS.
 
-- [ ] **Step 4: Check git diff**
+- [x] **Step 4: Check git diff**
 
 ```bash
 rtk git diff --check
@@ -2256,21 +2256,21 @@ Expected: no output.
 
 ## Acceptance Checklist
 
-- [ ] `GET /api/v1/crud/graph/expand/{module}/{entity}/{id}` is registered.
-- [ ] `GET /app/crud/graph/expand/{module}/{entity}/{id}` is registered.
-- [ ] `ExpandGraphRequest` extends `DetailRequest`.
-- [ ] `relations[]` is graph traversal input under `/graph/expand`.
-- [ ] Missing `relations[]` uses provider defaults, or center-node-only output when no provider exists.
-- [ ] Depth validation rejects relation paths deeper than `depth`.
-- [ ] Invalid or excluded relations return `422`.
-- [ ] Center node authorization errors like CRUD detail.
-- [ ] Unauthorized neighbor nodes are omitted with `graphMeta.filteredByAcl=true`.
-- [ ] `limit` and `relation_limit` mark truncation in `graphMeta`.
-- [ ] Node IDs use `{module}:{entity}:{id}`.
-- [ ] Edge IDs are deterministic.
-- [ ] Deduplication and cycle guards are active.
-- [ ] CMS provider registers through `CMSServiceProvider`.
-- [ ] CMS does not own traversal logic.
+- [x] `GET /api/v1/crud/graph/expand/{module}/{entity}/{id}` is registered.
+- [x] `GET /app/crud/graph/expand/{module}/{entity}/{id}` is registered.
+- [x] `ExpandGraphRequest` extends `DetailRequest`.
+- [x] `relations[]` is graph traversal input under `/graph/expand`.
+- [x] Missing `relations[]` uses provider defaults, or center-node-only output when no provider exists.
+- [x] Depth validation rejects relation paths deeper than `depth`.
+- [x] Invalid or excluded relations return `422`.
+- [x] Center node authorization errors like CRUD detail.
+- [x] Unauthorized neighbor nodes are omitted with `graphMeta.filteredByAcl=true`.
+- [x] `limit` and `relation_limit` mark truncation in `graphMeta`.
+- [x] Node IDs use `{module}:{entity}:{id}`.
+- [x] Edge IDs are deterministic.
+- [x] Deduplication and cycle guards are active.
+- [x] CMS provider registers through `CMSServiceProvider`.
+- [x] CMS does not own traversal logic.
 
 ## Follow-Up Plan Gate
 
@@ -2300,6 +2300,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 | `Modules/Core/app/Search/DTOs/AdvancedSearchResult.php` | Normalized advanced search result and metadata |
 | `Modules/Core/app/Search/Services/EnsembleSearchService.php` | Composes Scout builders, runs keyword/vector/hybrid strategies, fuses normalized results |
 | `Modules/Core/app/Search/Services/AdvancedSearchService.php` | Orchestrates parser, planner, optional embedder, and ensemble |
+| `Modules/Core/app/Search/Services/ScoutSearchConstraintApplier.php` | Applies the portable Scout filter and sort subset shared by basic and orchestrated search |
 | `Modules/Core/app/Search/Traits/CommonEngineFunctions.php` | Shared engine helpers, including schema-driven vector field resolution |
 | `Modules/Core/app/Search/Engines/ElasticsearchEngine.php` | Elasticsearch query construction, vector search, filters, and response normalization through existing engine |
 | `Modules/Core/app/Search/Engines/TypesenseEngine.php` | Typesense search params, vector search, filters, and response normalization through existing engine |
@@ -2342,6 +2343,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
   - relation-path filters
 - [x] Add tests proving unsupported filters fail before engine execution.
 - [x] Apply accepted filters to Scout builders so the active engine owns pagination consistency.
+- [x] Centralize portable Scout filters and sorts in one shared applier used by both `CrudService` and `EnsembleSearchService`.
 
 ## Task 4: Existing Elasticsearch Engine
 
