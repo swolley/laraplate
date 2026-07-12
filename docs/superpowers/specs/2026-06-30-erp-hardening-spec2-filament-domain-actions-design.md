@@ -86,8 +86,8 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-10 | CAMT.053 XML and minimal MT940 statement import through shared bank statement import service | ERP `d800c18`; `BankStatementParserTest`, `BankStatementImportServiceTest`, `ERPFilamentCommercialResourcesTest`, `ERPFilamentRouteSmokeTest` |
 | DONE-S2-2B-11 | Financial report CSV export from Trial Balance, Balance Sheet, and Income Statement Filament pages | ERP `0b0c893`; `FinancialStatementsTest`, `ERPFilamentRouteSmokeTest` |
 | DONE-S2-2B-12 | Sales Pipeline and Stock Valuation filters, KPI rows, empty states, and CSV exports | ERP `b70ec97`; `OperationalReportingServicesTest`, `ERPFilamentRouteSmokeTest` |
-| DONE-S2-2C-05 | FatturaPA/SDI readiness fields on company, party, invoice; model rules/forms; submit validation for missing mandatory readiness data | Working tree; `EInvoiceProviderTest`, `EInvoiceSubmissionSchemaTest`, `EInvoiceSubmissionTest`, `ERPFilamentResourcesTest` |
-| DONE-S2-2C-02 | `FatturaPaAnagraphicMapper` maps company, party, invoice, and lines into a FatturaPA-shaped neutral `EInvoicePayload` | Working tree; `FatturaPaAnagraphicMapperTest` |
+| DONE-S2-2C-05 | FatturaPA/SDI readiness fields on company, party, invoice; model rules/forms; submit validation for missing mandatory readiness data | ERP `d7f41cc`; `EInvoiceProviderTest`, `EInvoiceSubmissionSchemaTest`, `EInvoiceSubmissionTest`, `ERPFilamentResourcesTest` |
+| DONE-S2-2C-02 | `FatturaPaAnagraphicMapper` maps company, party, invoice, and lines into a FatturaPA-shaped neutral `EInvoicePayload` | ERP `dc0a9ab`; `FatturaPaAnagraphicMapperTest` |
 
 ### Nebula / M0 — Foundations
 
