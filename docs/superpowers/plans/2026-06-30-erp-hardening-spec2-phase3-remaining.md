@@ -8,7 +8,7 @@
 **Status:** Active — Phase 2C selected as the current implementation slice after Phase 2B closure  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 2C / Wave 2, starting from Task 3 (`2C-05`) because FatturaPA / SDI schema data unlocks mapping, XML generation, provider integration, and permission hardening.
+**Current slice:** Phase 2C / Wave 2. Task 3 (`2C-05`) is complete; continue with Task 4 (`2C-02`) to map company, party, and invoice data into a FatturaPA-shaped payload.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -72,7 +72,7 @@ flowchart TB
 
 **Current execution order:** Wave 2 / Phase 2C now → Wave 1 → Wave 3 → Wave 4 → Wave 5.
 
-**Phase 2C task order:** Task 3 (`2C-05`) → Task 4 (`2C-02`) → Task 5 (`2C-01`) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
+**Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, next) → Task 5 (`2C-01`) → Task 6 (`2C-03`) → Task 7 (`2C-04`).
 
 ---
 
@@ -219,18 +219,20 @@ Default: if not implemented, all standard CRUD ops allowed when global `expose_c
 
 ### Task 3: FatturaPA schema columns (2C-05)
 
-**Status:** Next
+**Status:** Done
 
 **Prerequisite for 2C-01/02.**  
 **Modules:** ERP
 
-- [ ] Migration: extend `companies`, `parties`, `invoices` with SDI fields (PEC, codice destinatario, regime fiscale, REA, cap sociale, etc.) — inventory from FatturaPA v1.2.2 anagrafica minima.
-- [ ] Update model `$fillable`, `getRules()`, Filament forms (`PartyForm`, `Company` settings, `InvoiceForm` transmitter block).
-- [ ] Test: validation rejects sale e-invoice submit when mandatory SDI fields missing.
+- [x] Migration: extend `companies`, `parties`, `invoices` with SDI fields (PEC, codice destinatario, regime fiscale, REA, cap sociale, etc.) — inventory from FatturaPA v1.2.2 anagrafica minima.
+- [x] Update model `$fillable`, `getRules()`, Filament forms (`PartyForm`, `Company` settings, `InvoiceForm` transmitter block).
+- [x] Test: validation rejects sale e-invoice submit when mandatory SDI fields missing.
 
 ---
 
 ### Task 4: Complete SDI party/company mapping (2C-02)
+
+**Status:** Next
 
 **Backlog:** `2C-02`
 
