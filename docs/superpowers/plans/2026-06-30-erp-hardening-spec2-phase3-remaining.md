@@ -1,6 +1,6 @@
 # ERP Spec 2 — Phase 2C + Phase 3+ Remaining Backlog Implementation Plan
 
-> **Navigation:** Implements **all backlog remaining after Phase 2A + 2B** — IDs `2C-01`…`2C-05`, `3-01`…`3-06`, `4-01`…`4-13`, `5-01`…`5-06` (30 items) from
+> **Navigation:** Implements **all backlog remaining after Phase 2A + 2B** — IDs `2C-01`…`2C-05`, `3-01`…`3-06`, `4-01`…`4-13`, `5-01`…`5-06`, `6-01`…`6-06` (36 items) from
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
@@ -10,9 +10,9 @@
 
 **Current slice:** Phase 3 / Wave 1. Phase 2C / Wave 2 is complete; continue with Task 1 (`3-04`) for shared permission-name construction, then Task 2 (`3-03`) for CRUD/API exposure governance.
 
-**Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, and long-term architecture (FX, Money VO, dimensions, events).
+**Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
-**Architecture:** Six implementation waves. **Phase 3 is the spine** for domain HTTP/API exposure (Core contracts + routes + exposure toggles). Phase 2C can proceed independently for the e-invoice production path because it is driven by ERP invoice data, provider contracts, XML generation, and admin permissions. Touch **Core + ERP** where noted; default submodule commits per module per task.
+**Architecture:** Seven implementation waves. **Phase 3 is the spine** for domain HTTP/API exposure (Core contracts + routes + exposure toggles). Phase 6 adds operational console commands as thin wrappers over existing ERP services; commands are for batch, diagnostics, polling, and scheduled work, not for bypassing domain actions that require user confirmation. Touch **Core + ERP** where noted; default submodule commits per module per task.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Filament 5, Sanctum, Pest, Core CRUD (`CrudController` / `CrudService`), Spatie Permission.
 
@@ -32,7 +32,8 @@
 | 3 | `3-01`…`3-06` | 6 | Wave 1 (foundation) + Wave 3 (HTTP) |
 | 4 | `4-01`…`4-13` | 13 | Wave 4 |
 | 5 | `5-01`…`5-06` | 6 | Wave 5 |
-| **Total** | | **30** | |
+| 6 | `6-01`…`6-06` | 6 | Wave 6 |
+| **Total** | | **36** | |
 
 **Not in this plan:** Phase 2A (`2A-01`…`2A-09`) and Phase 2B (`2B-01`…`2B-12`) — separate plans.
 
@@ -61,6 +62,9 @@ flowchart TB
   subgraph W5["Wave 5 — Architecture 5"]
     P5[5-01…5-06]
   end
+  subgraph W6["Wave 6 — Operational commands"]
+    P6[6-01…6-06]
+  end
   P34 --> P33
   P33 --> P31
   P31 --> P36
@@ -68,11 +72,37 @@ flowchart TB
   P2C --> P32
   P31 --> P4
   P5 --> P4
+  P34 --> P6
+  P2C --> P6
 ```
 
-**Current execution order:** Wave 1 / Phase 3 foundation now → Wave 3 → Wave 4 → Wave 5.
+**Current execution order:** Wave 1 / Phase 3 foundation now → Wave 3 → Wave 4 → Wave 5. Wave 6 can be pulled forward after Task 1 when operational automation is prioritized; `6-03` depends on Phase 2C e-invoice services, already done.
 
 **Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, done).
+
+## ERP console command policy
+
+ERP commands are allowed when they solve an operational or batch problem. They must stay thin and call existing services rather than duplicating business logic.
+
+Use commands for:
+- diagnostics and installation readiness;
+- idempotent audits;
+- scheduled provider polling;
+- batch file imports/exports;
+- batch computation with dry-run support.
+
+Do not use commands for:
+- normal invoice posting/unposting;
+- document sequence reset/reservation;
+- period close/reopen when an operator must approve it in UI;
+- ad hoc mutations that bypass policies, model state guards, or domain-action services.
+
+Default command contract:
+- Mutating commands include `--dry-run` and write no data when it is present.
+- Batch commands include `--company=`, `--limit=`, and deterministic logging.
+- Commands return non-zero exit code for failed checks/imports.
+- Every command has a Feature test using `$this->artisan(...)`.
+- Command registration is explicit in `ERPServiceProvider` because the ERP provider currently extends Nwidart directly, not Core's auto-scanning provider.
 
 ---
 
@@ -644,6 +674,214 @@ public function revert(ReturnOrder $return_order): ReturnOrder
 
 ---
 
+## Wave 6 — Operational console commands (Phase 6)
+
+These commands are not a replacement for Filament/domain actions. They provide operator tooling for diagnostics, scheduled polling, imports, and controlled batch computations.
+
+### Task 29: ERP health-check command (6-01)
+
+**Backlog:** `6-01`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:health-check`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/HealthCheckCommand.php`
+- Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php` — register ERP console commands explicitly with `$this->commands([...])` when running in console
+- Create: `Modules/ERP/tests/Feature/Console/HealthCheckCommandTest.php`
+- Modify: `Modules/ERP/README.md`
+- Modify: `Modules/ERP/docs/rag/MODULE.md`
+
+**Checks:**
+- default company exists;
+- chart of accounts has rows for default company;
+- current fiscal year and periods exist;
+- required domain permissions exist (`post`, `unpost`, e-invoice, sequence/admin permissions);
+- at least one document sequence exists for the current year;
+- e-invoice driver config is internally valid (`stub`, `fatturapa`, `aruba`; Aruba requires base URL/token when selected);
+- command reports warning, failure, and success counts.
+
+- [ ] **Step 1: Failing command test** — assert `erp:health-check --format=json` returns non-zero and reports missing prerequisites on an empty ERP database.
+- [ ] **Step 2: Implement command** — use read-only Eloquent/service checks; do not create or repair data.
+- [ ] **Step 3: Add happy-path test** — seed `ERPDatabaseSeeder`, create minimal sequences, run command, assert exit code `0`.
+- [ ] **Step 4: Register command** — keep registration local to `ERPServiceProvider`.
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Console/HealthCheckCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add health check command"
+```
+
+---
+
+### Task 30: Document sequence audit command (6-02)
+
+**Backlog:** `6-02`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:sequences:audit --company=1 --year=2026`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/DocumentSequencesAuditCommand.php`
+- Create: `Modules/ERP/app/Services/Accounting/DocumentSequenceAuditService.php`
+- Create: `Modules/ERP/tests/Feature/Console/DocumentSequencesAuditCommandTest.php`
+- Create: `Modules/ERP/tests/Feature/Services/DocumentSequenceAuditServiceTest.php`
+
+**Audit scope:**
+- compare `DocumentSequence.last_number` against max posted document reference per document type where references are parseable;
+- warn when a required sequence is missing for a document type used in the selected year;
+- warn on duplicate formatted numbers;
+- report gaps only when `gap_allowed=false` and reliable posted-document data exists.
+
+**No mutation:** this command is read-only. Sequence repair remains a deliberate UI/domain action because it is operationally dangerous.
+
+- [ ] **Step 1: Service test** — create sequence and posted invoices with references; assert no issues.
+- [ ] **Step 2: Service test for mismatch** — set `last_number` below posted max; assert a failure issue.
+- [ ] **Step 3: Command test** — run with `--format=json`, assert issue count and non-zero exit when failures exist.
+- [ ] **Step 4: Implement service + command**
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Services/DocumentSequenceAuditServiceTest.php Modules/ERP/tests/Feature/Console/DocumentSequencesAuditCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add document sequence audit command"
+```
+
+---
+
+### Task 31: E-invoice status polling command (6-03)
+
+**Backlog:** `6-03`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:einvoice:refresh-statuses --company=1 --limit=50 --dry-run`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/EInvoiceRefreshStatusesCommand.php`
+- Create: `Modules/ERP/app/Services/EInvoice/EInvoiceStatusRefreshBatch.php`
+- Create: `Modules/ERP/tests/Feature/Console/EInvoiceRefreshStatusesCommandTest.php`
+- Create: `Modules/ERP/tests/Feature/Services/EInvoiceStatusRefreshBatchTest.php`
+
+**Batch behavior:**
+- process open submissions only (`submitted` / provider-pending states);
+- skip rows without external provider id where the provider requires it;
+- call `EInvoiceSubmissionService::refresh()` per row;
+- continue after a single-row provider failure and report failures at the end;
+- support `--dry-run` by listing candidates without contacting the provider;
+- intended scheduler cadence: every 15–60 minutes, configured by the host app, not hardcoded.
+
+- [ ] **Step 1: Batch service test** — create two open submissions; fake provider returns accepted/rejected; assert statuses update.
+- [ ] **Step 2: Dry-run test** — assert no provider call and no status mutation.
+- [ ] **Step 3: Command test** — assert JSON summary includes processed/skipped/failed.
+- [ ] **Step 4: Implement service + command**
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Services/EInvoiceStatusRefreshBatchTest.php Modules/ERP/tests/Feature/Console/EInvoiceRefreshStatusesCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add einvoice status polling command"
+```
+
+---
+
+### Task 32: Bank statement batch import command (6-04)
+
+**Backlog:** `6-04`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:bank-statements:import --bank-account=1 --format=camt053 --path=storage/app/erp-bank-imports --dry-run`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/BankStatementsImportCommand.php`
+- Create: `Modules/ERP/app/Services/Banking/BankStatementBatchImportService.php`
+- Create: `Modules/ERP/tests/Feature/Console/BankStatementsImportCommandTest.php`
+- Create: `Modules/ERP/tests/Feature/Services/BankStatementBatchImportServiceTest.php`
+
+**Batch behavior:**
+- import all supported files from a directory (`csv`, `camt053`, `mt940`) or one explicit file path;
+- create or reuse a `BankStatement` per file/import batch;
+- delegate parsing to `BankStatementImportService` / `BankStatementCsvImporter`;
+- support `--dry-run` by parsing and reporting counts without creating statements/lines;
+- move successfully imported files only if an explicit `--archive-path=` is supplied;
+- never auto-confirm reconciliation matches.
+
+- [ ] **Step 1: Dry-run test** — fixture CAMT file reports line count and creates no DB rows.
+- [ ] **Step 2: Import test** — fixture file creates statement and lines through existing import services.
+- [ ] **Step 3: Duplicate file test** — second run is idempotent by checksum or import metadata.
+- [ ] **Step 4: Implement service + command**
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementBatchImportServiceTest.php Modules/ERP/tests/Feature/Console/BankStatementsImportCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add bank statement import command"
+```
+
+---
+
+### Task 33: VAT settlement compute command (6-05)
+
+**Backlog:** `6-05`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:vat-settlements:compute --company=1 --year=2026 --period=2026-03 --dry-run`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/VatSettlementsComputeCommand.php`
+- Create: `Modules/ERP/app/Services/Accounting/VatSettlementBatchService.php`
+- Create: `Modules/ERP/tests/Feature/Console/VatSettlementsComputeCommandTest.php`
+- Create: `Modules/ERP/tests/Feature/Services/VatSettlementBatchServiceTest.php`
+
+**Batch behavior:**
+- compute one period or all open periods in a fiscal year;
+- delegate calculation to `VatSettlementService`;
+- never modify confirmed settlements;
+- support `--dry-run` by returning computed amounts without persisting;
+- no payment/F24 submission; this is accounting computation only.
+
+- [ ] **Step 1: Dry-run test** — posted VAT data returns expected amount and creates no settlement row.
+- [ ] **Step 2: Persist test** — without `--dry-run`, open settlement is created/updated.
+- [ ] **Step 3: Confirmed guard test** — confirmed settlement is skipped and reported.
+- [ ] **Step 4: Implement service + command**
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Services/VatSettlementBatchServiceTest.php Modules/ERP/tests/Feature/Console/VatSettlementsComputeCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add vat settlement compute command"
+```
+
+---
+
+### Task 34: Report snapshot/export command (6-06)
+
+**Backlog:** `6-06`  
+**Modules:** ERP
+
+**Command:** `php artisan erp:reports:snapshot --company=1 --report=trial-balance --date=2026-12-31 --disk=local --dry-run`
+
+**Files:**
+- Create: `Modules/ERP/app/Console/ReportsSnapshotCommand.php`
+- Create: `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
+- Create: `Modules/ERP/tests/Feature/Console/ReportsSnapshotCommandTest.php`
+- Create: `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
+
+**Snapshot scope:**
+- initial report set: `trial-balance`, `balance-sheet`, `income-statement`, `sales-pipeline`, `stock-valuation`;
+- use existing report services and CSV exporters;
+- write timestamped CSV files to a configured Laravel disk/path;
+- store only file artifacts and command output in v1; immutable report archive tables are a separate future feature;
+- support `--dry-run` by reporting target file names and row counts without writing files.
+
+- [ ] **Step 1: Dry-run test** — assert no file is written and summary includes planned path.
+- [ ] **Step 2: Export test** — use fake storage disk; assert CSV file exists and contains headers.
+- [ ] **Step 3: Invalid report test** — unknown report exits non-zero with supported report list.
+- [ ] **Step 4: Implement service + command**
+- [ ] **Step 5: Docs + commit**
+
+```bash
+php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/Console/ReportsSnapshotCommandTest.php
+git -C Modules/ERP commit -m "feat(erp): add report snapshot command"
+```
+
+---
+
 ## Final verification (all phases)
 
 - [ ] **Run targeted suites**
@@ -674,12 +912,14 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 | 4 | 4-01…07, 4-10…12 | 12–21 |
 | 4 opt | 4-08, 4-09, 4-13 | 22 |
 | 5 | 5-01…06 | 23–28 |
+| 6 | 6-01…06 | 29–34 |
 
 **Cross-cutting resolved:**
 - Spec 1 → Spec 3 exposure governance: Task 2
 - Permission prefix centralization: Task 1
 - Domain HTTP routes: Task 8
 - Return cancel/revert gap: Task 10
+- Operational console command gap: Tasks 29–34
 - PDF export (deferred from 2B): not in scope — add to backlog or 2C follow-up if needed
 
 ---
@@ -688,7 +928,7 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 
 Plan saved to `docs/superpowers/plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`.
 
-**Recommended:** Wave 1 → Wave 3 → Wave 2 ∥ Wave 4 (after 3-01) → Wave 5.
+**Recommended:** Wave 1 → Wave 3 → Wave 6 when operational automation is prioritized → Wave 4 (after 3-01) → Wave 5.
 
 **Two execution options:**
 

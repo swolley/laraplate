@@ -20,18 +20,18 @@
 |--------|------:|-------|
 | **Done** | **89** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish + FatturaPA readiness schema + FatturaPA mapper + FatturaPA XML/XSD validation + configurable Aruba adapter + extended admin domain permissions — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **25** | § Open — **0 in Phase 2B/2C** + **25 in Phases 3–5** |
+| **Open backlog rows** | **31** | § Open — **0 in Phase 2B/2C** + **31 in Phases 3–6** |
 
 **How to read the backlog**
 
-- **25 open** = every row in § Open with status `open` or `next`.
+- **31 open** = every row in § Open with status `open` or `next`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
 **Current target:** Phase 3 — Core foundation for domain HTTP actions and API exposure. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue Phases 3–5 — 25 open items (`3-01`…`5-06`). Plan:
+**Next:** Continue Phases 3–6 — 31 open items (`3-01`…`6-06`). Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -55,6 +55,7 @@
 | Spec 2 Phase 2C | FatturaPA and extended permissions | **Done** |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
+| Phase 6 | Operational console commands | Open |
 
 ---
 
@@ -250,6 +251,23 @@ No open Phase 2B items remain.
 | 5-04 | open | Integration outbox / domain events |
 | 5-05 | open | Direct item-specific price lists |
 | 5-06 | open | ERP vision meta / pluggable narrative |
+
+### Phase 6 — Operational console commands
+
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Wave 6 (Tasks 29–34).
+
+Command scope is operational and batch-oriented. Commands must wrap existing services, remain idempotent where possible, support `--dry-run` for data-changing workflows, and must not bypass policy/state rules that belong to domain actions.
+
+| ID | Status | Item |
+|----|--------|------|
+| 6-01 | open | `erp:health-check` diagnostics for install, settings, permissions, sequences, and provider config |
+| 6-02 | open | `erp:sequences:audit` gap/counter consistency audit |
+| 6-03 | open | `erp:einvoice:refresh-statuses` scheduled provider polling for open submissions |
+| 6-04 | open | `erp:bank-statements:import` batch import from local/integration directories |
+| 6-05 | open | `erp:vat-settlements:compute` dry-run and batch compute for open fiscal periods |
+| 6-06 | open | `erp:reports:snapshot` scheduled CSV snapshot/export for selected reports |
+
+Already covered elsewhere: `erp:migrate-movements-to-journal` belongs to `4-01`; FX daily-rate import belongs to `5-01`.
 
 ---
 
