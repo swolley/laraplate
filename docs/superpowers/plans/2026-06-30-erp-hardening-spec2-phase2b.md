@@ -6,7 +6,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** In progress — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave D banking completed (`2B-04`, `2B-05`, `2B-10`); Wave E financial CSV export completed (`2B-11`); Wave F completed (`2B-13`)
+**Status:** Completed — Wave A completed (`2B-02`, `2B-01`); optional `2B-03` completed; Wave B completed (`2B-08`, `2B-09`); Wave C completed (`2B-07`, `2B-06`); Wave D banking completed (`2B-04`, `2B-05`, `2B-10`); Wave E reporting completed (`2B-11`, `2B-12`); Wave F completed (`2B-13`)
 **Prerequisite:** Phase 2A (`plans/2026-06-30-erp-hardening-spec2-phase2a.md`) is complete in ERP `300f9ef`; Wave B can reuse the state-aware policy + seeder pattern.
 
 **Goal:** Complete commercial pricing UX, banking reconciliation/payment-execution depth, returns automation, admin domain actions, and reporting polish — all on `Modules/ERP` with TDD.
@@ -47,7 +47,7 @@
 | 2B-05 | D | Match-with-difference reco UI | Done |
 | 2B-10 | D | CAMT.053 / MT940 import | Done |
 | 2B-11 | E | Financial report CSV export (PART-05) | Done |
-| 2B-12 | E | BI / operational dashboard polish | 2B-11 (export pattern) |
+| 2B-12 | E | BI / operational dashboard polish | Done |
 | 2B-13 | F | Supplier payment runs + SEPA `pain.001` export | Done |
 
 ```mermaid
@@ -75,7 +75,7 @@ flowchart LR
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation; gated unlock action exists | No open Phase 2B gap |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator`, controlled reset action | No open Phase 2B gap |
 | Financial CSV | `FinancialReportCsvExporter` (`trialBalance`, `incomeStatement`, `balanceSheet`) and Filament CSV export actions on Trial Balance, Balance Sheet, and Income Statement | PDF export remains out of Phase 2B scope |
-| BI pages | `SalesPipelinePage`, `StockValuationPage` — basic tables | No filters/KPI/export polish |
+| BI pages | `SalesPipelinePage`, `StockValuationPage` with filters, KPI rows, empty states, and CSV exports | No open Phase 2B gap |
 
 ---
 
@@ -817,7 +817,7 @@ Evidence: ERP `0b0c893`; targeted subset `14 passed, 54 assertions`.
 
 ---
 
-## Task 11: BI / operational dashboard polish (2B-12)
+## Task 11: BI / operational dashboard polish (2B-12) — completed 2026-07-12
 
 **Files:**
 - Modify: `Modules/ERP/app/Services/Reporting/SalesPipelineService.php`
@@ -838,19 +838,21 @@ Evidence: ERP `0b0c893`; targeted subset `14 passed, 54 assertions`.
 | Both | Empty state when `report_data` empty; **Export CSV** button |
 | Both | Consistent header layout matching financial report pages |
 
-- [ ] **Step 1: Extend services** — add optional filter params without breaking existing `generate(int $company_id)` (add overload or optional array `$filters = []`).
+- [x] **Step 1: Extend services** — add optional filter params without breaking existing `generate(int $company_id)` (add overload or optional array `$filters = []`).
 
-- [ ] **Step 2: Failing tests** — warehouse filter reduces rows; date filter excludes old opportunities.
+- [x] **Step 2: Failing tests** — warehouse filter reduces rows; date filter excludes old opportunities.
 
-- [ ] **Step 3: Update pages + blades**
+- [x] **Step 3: Update pages + blades**
 
-- [ ] **Step 4: Run tests + commit**
+- [x] **Step 4: Run tests + commit**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingServicesTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php
 vendor/bin/pint --dirty
 cd Modules/ERP && git commit -m "feat(erp): operational dashboard filters KPIs and CSV export"
 ```
+
+Evidence: ERP `b70ec97`; targeted subset `8 passed, 55 assertions`.
 
 ---
 
@@ -1172,7 +1174,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 | 2B-09 | Task 4 | ✓ |
 | 2B-10 | Task 9 | ✓ |
 | 2B-11 | Task 10 | ✓ |
-| 2B-12 | Task 11 | pending |
+| 2B-12 | Task 11 | ✓ |
 | 2B-13 | Task 13 | ✓ |
 | PART-05 | Task 10 | ✓ |
 

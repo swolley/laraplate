@@ -1,6 +1,6 @@
 # ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design; **Phase 2A completed**; **Phase 2B** in progress
+**Status:** Approved design; **Phase 2A completed**; **Phase 2B completed**
 
 **Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-11)
 
@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **83** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI — § Completed |
+| **Done** | **84** | Core M0–M7 v1 + Spec 1 + M4 reporting slice + Spec 2 Phase 2A + Phase 2B Wave A + optional price-list resources + Wave B admin actions + Wave C return automation + supplier payment runs + bank difference reconciliation + CAMT/MT940 import + financial CSV export UI + operational dashboard polish — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **31** | § Open — **1 in Phase 2B** + **30 in Phases 2C–5** |
+| **Open backlog rows** | **30** | § Open — **0 in Phase 2B** + **30 in Phases 2C–5** |
 
 **How to read the backlog**
 
-- **31 open** = every row in § Open with status `open`.
+- **30 open** = every row in § Open with status `open`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Phase 2B — remaining items after Wave A. Plan:
+**Current target:** Phases 2C–5 after Phase 2B completion. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Finally:** Phases 2C–5 — 30 items (`2C-01`…`5-06`). Plan:
+**Next:** Phases 2C–5 — 30 items (`2C-01`…`5-06`). Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -51,7 +51,7 @@
 |-------|--------|--------|
 | Spec 1 | Bug + money math + CRUD guard | **Done** |
 | Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
-| Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **In progress** |
+| Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **Done** |
 | Spec 2 Phase 2C | FatturaPA and extended permissions | Open |
 | Phase 3 | Domain HTTP actions + API exposure | Open |
 | Phase 4–5 | Tricount refactor, FX, Money VO, dimensions | Open |
@@ -85,6 +85,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-S2-2B-05 | Match-with-difference action on bank reconciliation page with expense-account selection | ERP `50ed21e`; `BankReconciliationDifferenceTest`, `ERPFilamentCommercialResourcesTest` |
 | DONE-S2-2B-10 | CAMT.053 XML and minimal MT940 statement import through shared bank statement import service | ERP `d800c18`; `BankStatementParserTest`, `BankStatementImportServiceTest`, `ERPFilamentCommercialResourcesTest`, `ERPFilamentRouteSmokeTest` |
 | DONE-S2-2B-11 | Financial report CSV export from Trial Balance, Balance Sheet, and Income Statement Filament pages | ERP `0b0c893`; `FinancialStatementsTest`, `ERPFilamentRouteSmokeTest` |
+| DONE-S2-2B-12 | Sales Pipeline and Stock Valuation filters, KPI rows, empty states, and CSV exports | ERP `b70ec97`; `OperationalReportingServicesTest`, `ERPFilamentRouteSmokeTest` |
 
 ### Nebula / M0 — Foundations
 
@@ -181,13 +182,11 @@ None.
 
 Status: `open` · `next` = current sprint target
 
-### Phase 2B — Commercial & banking UX (**in progress**)
+### Phase 2B — Commercial & banking UX (**completed**)
 
 > Implementation plan: [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md) (6 waves, 13 tasks + optional PriceList resources).
 
-| ID | Status | Item |
-|----|--------|------|
-| 2B-12 | open | BI / operational dashboard polish |
+No open Phase 2B items remain.
 
 ### Phase 2C — E-invoice & extended permissions
 
