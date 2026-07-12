@@ -49,7 +49,8 @@ The order is intentional. Later phases are not optional; they are deferred only 
 - Phase 1 is implemented in Core: generic expand routes, request/data classes, provider registry, CMS provider, relation traversal, ACL omission, cross-module traversal, MorphTo support, dedupe, cycles, and truncation metadata.
 - Phase 2 is implemented for the Graph layer: graph search routes, `SearchGraphRequest extends SearchRequest`, `SearchGraphRequestData extends SearchRequestData`, `qs` kept as the search query parameter, CRUD search reused through `CrudService::search()`, and optional graph expansion through the same traversal pipeline.
 - Phase 3 MVP is implemented: stats are computed over an authorized graph expansion and do not introduce global graph scans or materialized edges.
-- Phase 4 and Phase 5 are the next mandatory follow-up phases.
+- Phase 4 MVP is implemented: optional provider rules can further restrict generic Graph behavior without making providers required.
+- Phase 5 remains the final mandatory performance follow-up.
 
 ## CRUD Alignment Principles
 
@@ -750,6 +751,35 @@ Examples:
 - business-specific graph constraints.
 
 This phase is mandatory, but it should build on the small Phase 1 provider contract instead of blocking the MVP.
+
+### Phase 4 MVP: Optional Provider Rules
+
+Core keeps Graph generic. Every CRUD-resolvable entity remains graph-capable unless normal CRUD resolution or authorization fails.
+
+Provider rules are optional refinements. A module can implement `GraphProviderRulesInterface` in addition to `GraphProviderInterface` to restrict the generic behavior. If a provider does not implement rules, Core uses the existing generic limits from `config/graph.php`.
+
+Initial rules:
+
+- `allowedRelationPaths(string $module, string $entity): array`
+  - Empty list means no provider allow-list is enforced.
+  - Non-empty list means requested relation paths for that entity must match exactly one allowed path.
+- `maxDepth(string $module, string $entity): ?int`
+  - `null` means use request/config depth only.
+  - A value lower than requested depth rejects the request before traversal.
+- `maxRelationLimit(string $module, string $entity, string $relation): ?int`
+  - `null` means use request/config relation limit.
+  - A value lower than requested `relation_limit` rejects traversal of that relation.
+
+Rule failures return validation errors (`422`) because the request is syntactically valid but violates module/entity graph policy.
+
+Provider exclusions from Phase 1 remain supported through `excludedRelations()`. Exclusions deny a relation segment on the source entity even if the user explicitly requested it. The rules interface adds stricter policy without replacing the existing exclusion behavior.
+
+Implemented behavior:
+
+- `GraphProviderRulesInterface` is optional and independent from base graph provider metadata.
+- `GraphProviderRuleEnforcer` applies request-level allow-list/depth/first-relation-limit checks before expand or search traversal.
+- `GraphTraversal` applies per-source `maxRelationLimit()` while walking relations, so nested traversal uses the provider for the current source entity.
+- Providers that do not implement `GraphProviderRulesInterface` keep the generic Core behavior unchanged.
 
 ## Phase 5: Materialized Edges And Performance
 

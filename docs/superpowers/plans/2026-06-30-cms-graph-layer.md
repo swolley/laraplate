@@ -34,7 +34,7 @@ The roadmap phases remain mandatory:
 - [x] Phase 2: Core Graph Search + Expand implemented.
 - [x] Phase 2 hardening: search error propagation, expanded search aggregation, cross-result node dedupe, and graph/search metadata covered.
 - [x] Phase 3 MVP: Core Graph Stats and Analytics over authorized expand output.
-- [ ] Phase 4: Provider Rules and Regulation Layer.
+- [x] Phase 4 MVP: Provider Rules and Regulation Layer.
 - [ ] Phase 5: Materialized Edges and Performance Layer.
 
 ## Recent Graph Commits
@@ -42,6 +42,7 @@ The roadmap phases remain mandatory:
 - `bb92ee0 feat(core): add graph search endpoint`
 - `9d2608a test(core): cover graph search expansion aggregation`
 - `f8db53a feat(core): add graph stats endpoint`
+- `fea0e7d feat(core): add graph provider rules`
 
 ## Current Code Facts
 
@@ -118,6 +119,38 @@ Phase 3 MVP computes stats from the same graph data that `expand` would return f
 - [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph Modules/CMS/tests/Feature/Graph`.
 - [x] Run `rtk vendor/bin/pint --dirty`.
 - [x] Commit Phase 3 stats files as `f8db53a`.
+
+## Phase 4 Provider Rules Plan
+
+Phase 4 MVP keeps Graph generic and adds optional provider-side restrictions. Providers are not required for Graph availability; a provider can opt into rules by implementing `GraphProviderRulesInterface`.
+
+### Phase 4 File Map
+
+| File | Responsibility |
+| --- | --- |
+| `Modules/Core/app/Graph/Contracts/GraphProviderRulesInterface.php` | Optional graph policy contract |
+| `Modules/Core/app/Graph/GraphProviderRuleEnforcer.php` | Applies provider allow-list, max depth, and relation-limit rules |
+| `Modules/Core/app/Graph/GraphService.php` | Applies request-level provider rules before traversal/search expansion |
+| `Modules/Core/app/Graph/GraphTraversal.php` | Applies per-source relation-limit provider rules while walking relations |
+| `Modules/Core/tests/Feature/Graph/GraphProviderRulesTest.php` | Provider rule behavior tests |
+| `Modules/CMS/app/Graph/CmsGraphProvider.php` | Can opt into rules later, but Phase 4 MVP does not require CMS rules |
+
+### Phase 4 Task 1: Optional Rules Contract And Enforcer
+
+- [x] Write failing tests proving provider rules reject disallowed relation paths and excessive depth.
+- [x] Add `GraphProviderRulesInterface` with `allowedRelationPaths()`, `maxDepth()`, and `maxRelationLimit()`.
+- [x] Add `GraphProviderRuleEnforcer::assertRequestAllowed()`.
+- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphProviderRulesTest.php`.
+- [x] Commit rules contract/enforcer/tests as part of `fea0e7d`.
+
+### Phase 4 Task 2: Relation Limit Enforcement During Traversal
+
+- [x] Write failing test proving a provider can reject a requested `relation_limit` for a specific source entity relation.
+- [x] Inject `GraphProviderRuleEnforcer` into `GraphTraversal`.
+- [x] Apply `maxRelationLimit()` before loading relation targets.
+- [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph`.
+- [x] Run `rtk vendor/bin/pint --dirty`.
+- [x] Commit Phase 4 MVP files as `fea0e7d`.
 
 ## Shared Test Commands
 
