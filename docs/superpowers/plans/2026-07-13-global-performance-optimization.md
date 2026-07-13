@@ -4,7 +4,7 @@
 
 **Goal:** Improve Laraplate performance across Core, ERP, CMS, AI, and Filament without changing business behavior or weakening module boundaries.
 
-**Architecture:** This plan is intentionally conservative: every optimization starts with a regression or guardrail test, changes one narrow behavior at a time, preserves public method return types, and commits each subsystem separately. The first execution pass closes known Core and Filament memory/query hotspots, then moves into ERP workflow/reporting and AI batch processing. Database changes are limited to portable Laravel migrations and only where a real query pattern requires them.
+**Architecture:** This plan is intentionally conservative: every optimization starts with a regression or guardrail test, records a before/after performance measurement, changes one narrow behavior at a time, preserves public method return types, and commits each subsystem separately. The first execution pass closes known Core and Filament memory/query hotspots, then moves into ERP workflow/reporting and AI batch processing. Database changes are limited to portable Laravel migrations and only where a real query pattern requires them.
 
 **Tech Stack:** PHP 8.5, Laravel 12, Eloquent, Filament 5, Livewire 4, Pest, SQLite test database, MySQL/MariaDB/PostgreSQL/Oracle-compatible query patterns.
 
@@ -24,8 +24,103 @@
 - Do not use `cursor()` with eager-loaded relationships.
 - Keep SQLite tests green.
 - Commit after each task that changes code.
+- A source-level assertion such as "contains `lazy()`" can only supplement behavior and measurement tests; it cannot be the only acceptance criterion for a code change.
+- Every code-changing task must produce both behavior evidence and performance evidence before commit.
 - If a task uncovers changed user work in the same files, stop that task and inspect the diff before editing.
 - If a performance optimization changes observable business output, revert the implementation and keep the test as a failing investigation artifact.
+
+## Acceptance Gates
+
+Every code-changing task must pass these gates before its commit step:
+
+1. **Behavior gate:** existing tests plus the task-specific regression test prove identical public behavior. For workflows, assert database state, emitted records, totals, statuses, and ordering. For reports, assert returned array shape, keys, numeric strings, sort order, and totals.
+2. **Performance gate:** capture a before and after measurement for the exact hotspot being changed. At least one relevant metric must improve: query count, duplicate query count, peak memory, rows loaded into PHP, or elapsed time on the seeded fixture.
+3. **Regression gate:** no meaningful metric may degrade without a written reason in the task summary. A small elapsed-time fluctuation is acceptable only when query count or memory clearly improves.
+4. **Rollback gate:** if behavior output changes or no measurable performance improvement appears, revert the implementation and keep only the added behavior test if it documents an existing risk.
+
+Use this evidence table in the task summary before committing:
+
+```text
+Task:
+Behavior invariant:
+Before queries:
+After queries:
+Before peak memory:
+After peak memory:
+Before elapsed ms:
+After elapsed ms:
+Rows loaded / streamed:
+Decision: keep | revise | revert
+```
+
+## Measurement Pattern
+
+Prefer assertions inside Pest tests for query count and output equality. Use wall-clock timing only as supporting evidence because local timing is noisy.
+
+For query-count and memory checks inside a test, use this local pattern in the test file that owns the behavior:
+
+```php
+use Illuminate\Support\Facades\DB;
+
+function measured_call(callable $callback): array
+{
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+
+    $memory_before = memory_get_usage(true);
+    $peak_before = memory_get_peak_usage(true);
+    $time_before = hrtime(true);
+
+    $result = $callback();
+
+    $elapsed_ms = (hrtime(true) - $time_before) / 1_000_000;
+    $peak_delta = memory_get_peak_usage(true) - $peak_before;
+    $memory_delta = memory_get_usage(true) - $memory_before;
+    $queries = DB::getQueryLog();
+
+    DB::disableQueryLog();
+
+    return [
+        'result' => $result,
+        'query_count' => count($queries),
+        'queries' => $queries,
+        'elapsed_ms' => $elapsed_ms,
+        'memory_delta' => $memory_delta,
+        'peak_delta' => $peak_delta,
+    ];
+}
+```
+
+Use the helper for task-local tests only. Do not create a shared test helper unless two executed tasks need the same code and the duplication becomes a real maintenance issue.
+
+For command-level timing, run the exact same command before and after the change:
+
+```bash
+rtk /usr/bin/time -v php artisan test --compact path/to/the/focused/test.php
+```
+
+Record `Maximum resident set size`, elapsed time, and whether the focused tests passed.
+
+## Task Evidence Matrix
+
+Each task must satisfy the row that applies to it before commit:
+
+| Task | Behavior invariant | Required performance evidence | Keep condition |
+|------|--------------------|-------------------------------|----------------|
+| 2 DatabaseEngine SQLite vector search | Same result shape, same top-N ordering by similarity, same similarity threshold | Peak memory or rows held in PHP is lower on a seeded embedding fixture; source no longer uses full `get()->map()` pipeline | Keep only if result ordering and limit are identical and memory/loaded-row evidence improves |
+| 3 HasClosureTable rebuild | Same closure rows, depths, ancestor/descendant checks, move behavior | No recursive eager-load query for children; large-tree rebuild completes with stable memory | Keep only if all existing closure tests pass and the larger-tree guard passes |
+| 4 DynamicContentsService cache scope | Same returned collection models for each type; cache invalidation still clears entities, presets, presettables | Query result set is scoped by type before caching; repeated calls hit memo/cache | Keep only if returned IDs match previous behavior for mixed-type fixtures |
+| 5 HandleLicensesCommand list | Same table output shape and max-session message | Query iteration is lazy; command still completes with many license rows | Keep only if prompt/output path tests pass and no full license collection remains |
+| 6 Filament widgets | Same stat labels, descriptions, colors, and counts | Second `getStats()` call uses cache and avoids duplicate count queries; widget is lazy | Keep only if widget stats are identical and duplicate dashboard queries drop |
+| 7 InvoicePostingService tax codes | Same invoice reference, journal lines, VAT snapshots, VAT register rows, payment schedules, sales-order progress | Tax-code queries do not scale with invoice line count | Keep only if invoice posting golden-master tests pass and repeated-tax query count is bounded |
+| 8 StockMovementService FIFO | Same stock movement unit cost, stock level quantity, layer consumption, validation errors | FIFO average calculation uses aggregate; fewer rows are loaded for display average | Keep only if stock and accounting golden-master tests pass |
+| 9 SalesPipelineService streaming | Same status buckets, totals, won/lost counts, legacy unknown-status behavior | Rows are streamed with `lazy(500)` instead of loaded as one full collection | Keep only if service tests and operational report tests return identical values |
+| 10 StockValuationService ordering/totals | Same row shape, row order, formatted totals, warehouse filter behavior | Sorting and totals move to SQL; PHP no longer sorts the full collection | Keep only if totals and ordering tests pass |
+| 11 TranslateContentCommand | Same number of dispatched jobs, same sync behavior, same locale options | Models are streamed with `lazyById(100)`; command no longer loads all selected models | Keep only if queue assertions still match existing tests |
+| 12 TranslateMissingCommand | Same per-model locale grouping and job dispatch behavior | Missing models are streamed per locale with `lazyById(100)` | Keep only if existing missing-translation tests still pass |
+| 13 DocumentationService RAG indexing | Same returned indexed chunk count and incremental/full rebuild behavior | Agent calls are bounded to batches of 100 documents | Keep only if documentation indexing tests pass and batch-call assertion proves the cap |
+
+If a task cannot produce the required performance evidence in an automated test, record the measurement from the focused command run and do not commit until the behavior gate still passes.
 
 ## Scope Split
 
@@ -85,6 +180,21 @@ rtk git diff -- composer.json composer.lock Modules/Core/composer.json Modules/E
 ```
 
 Expected: no dependency change is required for this plan.
+
+- [ ] **Step 4: Capture timing and memory baseline for focused suites**
+
+Run each command before any code edit and keep the output in the task execution notes:
+
+```bash
+rtk /usr/bin/time -v php artisan test --compact Modules/Core/tests/Integration/Search/SearchEngineContractTest.php
+rtk /usr/bin/time -v php artisan test --compact Modules/Core/tests/Integration/Helpers/HasClosureTableTest.php
+rtk /usr/bin/time -v php artisan test --compact Modules/Core/tests/Feature/Filament/WidgetsTest.php
+rtk /usr/bin/time -v php artisan test --compact Modules/ERP/tests/Feature/StockMovementServiceTest.php
+rtk /usr/bin/time -v php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingServicesTest.php
+rtk /usr/bin/time -v php artisan test --compact Modules/AI/tests/Integration/TranslateContentCommandTest.php
+```
+
+Expected: each command either passes or has a documented pre-existing failure. These numbers are not acceptance thresholds by themselves; they are the baseline used when reviewing each later task.
 
 ---
 
@@ -1342,7 +1452,26 @@ rtk php artisan test --compact Modules/AI/tests/Integration/DocumentationService
 
 Expected: PASS.
 
-- [ ] **Step 3: Inspect final diff**
+- [ ] **Step 3: Review the evidence matrix**
+
+Before inspecting the final diff, confirm every executed task has a completed evidence summary:
+
+```text
+Task:
+Behavior invariant:
+Before queries:
+After queries:
+Before peak memory:
+After peak memory:
+Before elapsed ms:
+After elapsed ms:
+Rows loaded / streamed:
+Decision: keep | revise | revert
+```
+
+Expected: every executed task has `Decision: keep`. If any task is missing behavior evidence or performance evidence, do not proceed to the final diff; return to that task and add the missing test or measurement.
+
+- [ ] **Step 4: Inspect final diff**
 
 Run:
 
@@ -1353,7 +1482,7 @@ rtk git diff -- Modules/Core Modules/ERP Modules/CMS Modules/AI
 
 Expected: only planned files changed. No dependency files changed.
 
-- [ ] **Step 4: Commit final formatting-only changes if Pint changed files after previous commits**
+- [ ] **Step 5: Commit final formatting-only changes if Pint changed files after previous commits**
 
 Run:
 
