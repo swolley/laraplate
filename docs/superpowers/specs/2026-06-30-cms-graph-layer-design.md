@@ -585,7 +585,7 @@ The Core module must not depend on the AI module. AI may override Core contracts
 
 ### Existing Search Engine Layer
 
-Advanced search must be engine-aware and support both Elasticsearch and Typesense as first-class drivers through the existing Core search engine layer.
+Advanced search must be engine-aware and support Elasticsearch, Typesense, and the database Scout driver as first-class drivers through the existing Core search engine layer.
 
 Core must not create a parallel advanced adapter layer. Instead:
 
@@ -593,20 +593,22 @@ Core must not create a parallel advanced adapter layer. Instead:
 - existing Core engines implementing `ISearchEngine` own driver-specific query construction;
 - Elasticsearch-specific request bodies stay in `ElasticsearchEngine`;
 - Typesense-specific search parameters stay in `TypesenseEngine`;
+- database-specific vector SQL and model-query candidate filtering stay in `DatabaseEngine`;
 - the ensemble/fusion layer composes Scout builders and normalizes results without knowing driver-specific response shapes.
 
-Supported initial drivers:
+Supported drivers:
 
 - `elasticsearch`
 - `typesense`
+- `database`
 
-Unsupported engines, including database search, fall back to `basic` only when `mode=auto`; they must fail explicitly when `mode=orchestrated`.
+Unsupported engines fall back to `basic` only when `mode=auto`; they must fail explicitly when `mode=orchestrated`.
 
 ### Advanced Search Pagination
 
-Pagination behavior must be aligned for Elasticsearch and Typesense.
+Pagination behavior must be aligned for Elasticsearch, Typesense, and the database Scout driver.
 
-The first advanced implementation should support page-based pagination for both drivers using a common request model:
+The advanced implementation should support page-based pagination for supported drivers using a common request model:
 
 - `page`
 - `per_page`
@@ -617,6 +619,8 @@ The advanced search result must include:
 
 - normalized result IDs;
 - normalized per-result scores;
+- raw per-result scores when the active engine exposes them;
+- score details for diagnostics and cross-driver explainability;
 - `total`;
 - `page`;
 - `per_page`;
@@ -624,6 +628,25 @@ The advanced search result must include:
 - raw engine metadata for diagnostics.
 
 Core must not paginate, filter, or sort advanced-search results after the engine returns them except for Eloquent hydration by returned IDs. Any filtering that changes the result set must be pushed into the search engine before pagination.
+
+### Advanced Search Score Contract
+
+Search scores are portable in shape, not in raw numeric meaning. Elasticsearch, Typesense, and database search use different scoring models, so Core must not promise that the same numeric value has the same semantic weight across drivers.
+
+Each result should expose:
+
+- `score`: Core-normalized score used for ordering and fusion in the current response.
+- `raw_score`: original engine score, distance, or similarity value when available.
+- `score_details`: diagnostic metadata including `driver`, `strategy`, `rank`, `raw_score`, `normalized_score`, and optional driver-specific fields such as `distance`, `similarity`, or text relevance metadata.
+
+Compatibility guarantees:
+
+- result shape is stable across drivers;
+- ordering is meaningful within the same query response;
+- ensemble fusion normalizes scores per strategy before combining them;
+- consumers must not compare raw score values across different drivers as if they shared a single scale.
+
+When a driver cannot provide a meaningful raw score for a strategy, Core may default the normalized score to `1.0` for membership and fusion purposes, but `score_details` must make that default explicit.
 
 ### Advanced Search Filters
 
@@ -638,18 +661,30 @@ The portable subset must be applied through a shared Core component used by both
 
 For database vector search, the model query layer must be applied before vector scoring whenever possible. Keyword constraints, portable `where`/`whereIn`/`whereNotIn` filters, Scout callbacks, query callbacks, and soft-delete constraints are used to derive candidate model IDs before querying `model_embeddings`. This keeps pagination totals exact and avoids filtering vector results after the page has already been selected.
 
+The next advanced-filter increment should add this portable subset:
+
+- `not in`;
+- `>`;
+- `>=`;
+- `<`;
+- `<=`;
+- `between`;
+- controlled `OR` groups over fields that are declared filterable by the searched model schema.
+
+Advanced filters remain valid only when the active engine can apply them before pagination. If any active driver cannot apply a requested operator before pagination, Core must reject the filter instead of applying it after hydration.
+
 Unsupported filters must be rejected before executing search:
 
-- `OR`
 - `like`
 - `not like`
-- range operators
 - relation-path filters
 - engine-specific filter syntax in public request input
 
 The rejection is intentional because applying unsupported filters after engine pagination breaks pagination semantics.
 
 Portable sort support is limited to scalar fields on the searched model. Relation-path sorts must be rejected before executing search for the same pagination-consistency reason.
+
+Relation filters may be added later only through explicit denormalized searchable fields or schema aliases. Generic Eloquent relation paths such as `author.name` or `tags.id` must not be translated implicitly because external search engines cannot see live Eloquent relations unless the data is indexed into the searchable document.
 
 ### Searchable Schema Fields
 

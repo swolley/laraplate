@@ -2337,14 +2337,39 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
   - `!=`
   - nested `AND`
 - [x] Reject:
-  - `OR`
   - `like`
   - `not like`
-  - range operators
   - relation-path filters
 - [x] Add tests proving unsupported filters fail before engine execution.
 - [x] Apply accepted filters to Scout builders so the active engine owns pagination consistency.
 - [x] Centralize portable Scout filters and sorts in one shared applier used by both `CrudService` and `EnsembleSearchService`.
+
+## Task 3A: Advanced Portable Filters
+
+- [ ] Add the next portable filter subset for Elasticsearch, Typesense, and database:
+  - `not in`
+  - `>`
+  - `>=`
+  - `<`
+  - `<=`
+  - `between`
+  - controlled `OR` groups over schema-declared filterable scalar fields
+- [ ] Reject advanced filters when the active engine cannot apply them before pagination.
+- [ ] Keep generic Eloquent relation-path filters rejected.
+- [ ] Add schema aliases or denormalized searchable fields before supporting relation-like filters.
+- [ ] Cover equivalent translation for Elasticsearch query DSL, Typesense `filter_by`, and database Scout/Eloquent constraints.
+
+## Task 3B: Cross-Driver Score Contract
+
+- [ ] Extend normalized hits with:
+  - `score`
+  - `raw_score`
+  - `score_details`
+- [ ] Include `driver`, `strategy`, `rank`, `raw_score`, and `normalized_score` in `score_details`.
+- [ ] Preserve optional driver-specific score diagnostics such as `distance`, `similarity`, or text relevance metadata.
+- [ ] Make default scores explicit when a driver cannot provide a meaningful raw score.
+- [ ] Normalize scores per strategy before ensemble fusion and document that raw score values are not comparable across drivers.
+- [ ] Add tests for Elasticsearch, Typesense, and database normalized hit shape.
 
 ## Task 4: Existing Elasticsearch Engine
 
