@@ -661,7 +661,7 @@ The portable subset must be applied through a shared Core component used by both
 
 For database vector search, the model query layer must be applied before vector scoring whenever possible. Keyword constraints, portable `where`/`whereIn`/`whereNotIn` filters, Scout callbacks, query callbacks, and soft-delete constraints are used to derive candidate model IDs before querying `model_embeddings`. This keeps pagination totals exact and avoids filtering vector results after the page has already been selected.
 
-The next advanced-filter increment should add this portable subset:
+Advanced search also supports this portable subset:
 
 - `not in`;
 - `>`;

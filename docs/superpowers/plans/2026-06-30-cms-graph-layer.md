@@ -2346,7 +2346,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 
 ## Task 3A: Advanced Portable Filters
 
-- [ ] Add the next portable filter subset for Elasticsearch, Typesense, and database:
+- [x] Add the next portable filter subset for Elasticsearch, Typesense, and database:
   - `not in`
   - `>`
   - `>=`
@@ -2354,22 +2354,22 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
   - `<=`
   - `between`
   - controlled `OR` groups over schema-declared filterable scalar fields
-- [ ] Reject advanced filters when the active engine cannot apply them before pagination.
-- [ ] Keep generic Eloquent relation-path filters rejected.
-- [ ] Add schema aliases or denormalized searchable fields before supporting relation-like filters.
-- [ ] Cover equivalent translation for Elasticsearch query DSL, Typesense `filter_by`, and database Scout/Eloquent constraints.
+- [x] Reject advanced filters when the active engine cannot apply them before pagination.
+- [x] Keep generic Eloquent relation-path filters rejected.
+- [x] Keep relation-like filters deferred until schema aliases or denormalized searchable fields exist.
+- [x] Cover equivalent translation for Elasticsearch query DSL, Typesense `filter_by`, and database Scout/Eloquent constraints.
 
 ## Task 3B: Cross-Driver Score Contract
 
-- [ ] Extend normalized hits with:
+- [x] Extend normalized hits with:
   - `score`
   - `raw_score`
   - `score_details`
-- [ ] Include `driver`, `strategy`, `rank`, `raw_score`, and `normalized_score` in `score_details`.
-- [ ] Preserve optional driver-specific score diagnostics such as `distance`, `similarity`, or text relevance metadata.
-- [ ] Make default scores explicit when a driver cannot provide a meaningful raw score.
-- [ ] Normalize scores per strategy before ensemble fusion and document that raw score values are not comparable across drivers.
-- [ ] Add tests for Elasticsearch, Typesense, and database normalized hit shape.
+- [x] Include `driver`, `strategy`, `rank`, `raw_score`, and `normalized_score` in `score_details`.
+- [x] Preserve optional driver-specific score diagnostics such as `distance`, `similarity`, or text relevance metadata.
+- [x] Make default scores explicit when a driver cannot provide a meaningful raw score.
+- [x] Normalize scores per strategy before ensemble fusion and document that raw score values are not comparable across drivers.
+- [x] Add tests for Elasticsearch, Typesense, and database normalized hit shape.
 
 ## Task 4: Existing Elasticsearch Engine
 
