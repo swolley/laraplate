@@ -2354,6 +2354,8 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
   - `<=`
   - `between`
   - controlled `OR` groups over schema-declared filterable scalar fields
+- [x] Enforce schema-declared filterability when searchable schema metadata exists, with backward-compatible scalar filters only when no schema metadata is available.
+- [x] Preserve filterability metadata in driver translations: Typesense `facet`, Elasticsearch `meta.filterable`, and database column `filterable`.
 - [x] Reject advanced filters when the active engine cannot apply them before pagination.
 - [x] Keep generic Eloquent relation-path filters rejected.
 - [x] Keep relation-like filters deferred until schema aliases or denormalized searchable fields exist.

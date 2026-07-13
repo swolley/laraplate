@@ -671,6 +671,8 @@ Advanced search also supports this portable subset:
 - `between`;
 - controlled `OR` groups over fields that are declared filterable by the searched model schema.
 
+When a model exposes searchable schema metadata, filters must be limited to fields declared filterable or facetable by that schema. The restriction is schema-driven: Core reads source schema metadata when available and otherwise reads driver-translated metadata such as Typesense `facet`, Elasticsearch `meta.filterable`, or database column `filterable`. If no searchable schema metadata is exposed, Core keeps the legacy scalar-field behavior for backward compatibility.
+
 Advanced filters remain valid only when the active engine can apply them before pagination. If any active driver cannot apply a requested operator before pagination, Core must reject the filter instead of applying it after hydration.
 
 Unsupported filters must be rejected before executing search:
@@ -691,6 +693,8 @@ Relation filters may be added later only through explicit denormalized searchabl
 Full-text search fields must be read from the model searchable schema when available.
 
 The existing search engines should derive vector fields from `getVectorField()`, `getSearchMapping()`, or equivalent searchable schema metadata. Text/searchable fields should remain owned by the Scout driver and model mapping, with a conservative fallback only when schema metadata is unavailable.
+
+Filterable fields are a separate schema concern from full-text searchable fields. A field being searchable does not automatically make it valid for public request filters. Translators must preserve enough filterability metadata for Core to validate filters consistently across Elasticsearch, Typesense, and database search.
 
 Fallback fields:
 
