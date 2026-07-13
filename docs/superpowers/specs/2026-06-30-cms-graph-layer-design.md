@@ -627,7 +627,7 @@ Core must not paginate, filter, or sort advanced-search results after the engine
 
 ### Advanced Search Filters
 
-The first advanced implementation supports the same portable filter subset for both Elasticsearch and Typesense:
+The first advanced implementation supports the same portable filter subset for Elasticsearch, Typesense, and the database Scout driver:
 
 - `=`
 - `in`
@@ -635,6 +635,8 @@ The first advanced implementation supports the same portable filter subset for b
 - nested `AND` groups
 
 The portable subset must be applied through a shared Core component used by both basic Scout search and orchestrated search, so filter and sort semantics cannot drift between `mode=basic`, `mode=auto`, and `mode=orchestrated`.
+
+For database vector search, the model query layer must be applied before vector scoring whenever possible. Keyword constraints, portable `where`/`whereIn`/`whereNotIn` filters, Scout callbacks, query callbacks, and soft-delete constraints are used to derive candidate model IDs before querying `model_embeddings`. This keeps pagination totals exact and avoids filtering vector results after the page has already been selected.
 
 Unsupported filters must be rejected before executing search:
 
@@ -670,6 +672,18 @@ Vector fields should also come from schema metadata. The default vector field is
 `orchestrated` must fail explicitly when the advanced pipeline is unavailable or the search engine errors.
 
 `auto` may fall back to `basic` only when the model resolves to an unsupported engine. It should not silently hide runtime search engine failures once advanced search has been selected.
+
+### Database Driver Advanced Search Semantics
+
+The database Scout driver is a supported orchestrated engine. It provides the same public advanced-search input and output shape as Elasticsearch and Typesense:
+
+- keyword, vector, and hybrid strategies are executed through Scout builders;
+- results are normalized to `{ id, score, source }`;
+- `total`, `page`, `per_page`, and `total_pages` are based on engine-level pagination;
+- vector field markers are internal and must not leak as public filters;
+- portable filters and sorts are applied before pagination.
+
+Database vector scoring is intentionally less performant than dedicated search engines. SQLite computes cosine similarity in PHP over a lazy `model_embeddings` stream. PostgreSQL uses `pgvector` distance syntax. MySQL/MariaDB use JSON vector scoring through `JSON_TABLE`. Scores are normalized for the advanced result contract, but they are not guaranteed to be numerically identical across drivers; ranking and pagination semantics are the compatibility target.
 
 ## Phase 3: Stats And Analytics
 

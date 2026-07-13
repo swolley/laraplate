@@ -2280,7 +2280,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 
 # Phase 2 Search Infrastructure Plan
 
-**Goal:** make the Core CRUD search route support engine-aware advanced search for both Elasticsearch and Typesense through the existing Core/Scout engine layer, while keeping Core independent from the AI module.
+**Goal:** make the Core CRUD search route support engine-aware advanced search for Elasticsearch, Typesense, and the database Scout driver through the existing Core/Scout engine layer, while keeping Core independent from the AI module.
 
 **Scope:** Core search infrastructure used by CRUD search and later Graph Search + Expand.
 
@@ -2289,9 +2289,9 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 - `mode=auto` chooses `orchestrated` when the model resolves to a supported Core search engine; otherwise it uses `basic`.
 - `mode=basic` always uses Scout.
 - `mode=orchestrated` requires a supported Core search engine and fails explicitly when unavailable.
-- Elasticsearch and Typesense must have equivalent public behavior for pagination, filters, schema-driven fields, and normalized results.
+- Elasticsearch, Typesense, and database must have equivalent public behavior for pagination, filters, schema-driven fields, and normalized results.
 - Core contracts remain AI-extension points; Core must not depend on the AI module.
-- Do not create a parallel advanced adapter layer; reuse the existing `EngineManager`, model `searchableUsing()`, `ISearchEngine`, `ElasticsearchEngine`, and `TypesenseEngine`.
+- Do not create a parallel advanced adapter layer; reuse the existing `EngineManager`, model `searchableUsing()`, `ISearchEngine`, `ElasticsearchEngine`, `TypesenseEngine`, and `DatabaseEngine`.
 
 ## Phase 2 File Map
 
@@ -2304,6 +2304,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 | `Modules/Core/app/Search/Traits/CommonEngineFunctions.php` | Shared engine helpers, including schema-driven vector field resolution |
 | `Modules/Core/app/Search/Engines/ElasticsearchEngine.php` | Elasticsearch query construction, vector search, filters, and response normalization through existing engine |
 | `Modules/Core/app/Search/Engines/TypesenseEngine.php` | Typesense search params, vector search, filters, and response normalization through existing engine |
+| `Modules/Core/app/Search/Engines/DatabaseEngine.php` | Database Scout keyword/vector/hybrid search, model-query candidate prefiltering, driver-specific vector scoring, and normalized pagination |
 | `Modules/Core/app/Services/Crud/CrudService.php` | Chooses basic/orchestrated from `SearchMode` |
 | `Modules/Core/app/Providers/SearchServiceProvider.php` | Registers Core search contracts and fallback AI-extension services |
 
@@ -2361,28 +2362,39 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 - [x] Execute keyword/vector/hybrid searches through Scout builders.
 - [x] Propagate engine failures instead of converting them to empty results.
 
-## Task 6: Ensemble Service Refactor
+## Task 6: Existing Database Engine
+
+- [x] Register the Core database Scout engine as an orchestrated-capable search engine.
+- [x] Support keyword, vector, and hybrid strategies through the same Scout builder path used by Elasticsearch and Typesense.
+- [x] Return normalized Eloquent models with `_score` for vector results and default score `1.0` for keyword-only database results.
+- [x] Apply keyword constraints, portable wheres, where-ins, where-not-ins, Scout callbacks, query callbacks, and soft-delete constraints to derive candidate model IDs before vector scoring.
+- [x] Keep vector pagination exact by filtering constrained matches before slicing and hydrating only the requested page of models.
+- [x] Isolate PostgreSQL `pgvector` and MySQL/MariaDB `JSON_TABLE` query construction behind testable query builders.
+- [x] Keep SQLite vector scoring lazy over `model_embeddings` and avoid full collection map pipelines.
+
+## Task 7: Ensemble Service Refactor
 
 - [x] Make `EnsembleSearchService` execute per-strategy Scout builders.
 - [x] Keep reciprocal-rank fusion and reranking driver-agnostic.
 - [x] Keep driver-specific query construction in existing engines only.
 - [x] Use a generic vector marker so field resolution remains engine-owned.
+- [x] Normalize model hits from loaded attributes so keyword-only database hits do not require a synthetic `_score` attribute.
 
-## Task 7: Search Mode Selection
+## Task 8: Search Mode Selection
 
 - [x] `basic` uses Scout.
 - [x] `orchestrated` requires a supported Core search engine and fails explicitly if unavailable.
-- [x] `auto` uses `orchestrated` when the model resolves to Elasticsearch or Typesense, otherwise `basic`.
+- [x] `auto` uses `orchestrated` when the model resolves to Elasticsearch, Typesense, or database, otherwise `basic`.
 - [x] Runtime engine errors in selected advanced search must not silently fall back to `basic`.
 
-## Task 8: CRUD Search Metadata
+## Task 9: CRUD Search Metadata
 
 - [x] Populate `CrudMeta::totalRecords` from advanced search total.
 - [x] Populate current page, total pages, and pagination from advanced search metadata.
 - [x] Hydrate Eloquent models by returned IDs without changing result membership.
 - [x] Preserve engine result order after hydration.
 
-## Task 9: Verification
+## Task 10: Verification
 
 Run:
 

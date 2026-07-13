@@ -146,7 +146,7 @@ Always provide a SQLite path for shared Core migrations.
 - Default test DB; requires `pdo_sqlite` (see `Modules/Core/README.md`).
 - No `regexp_replace` in generated columns — use triggers or application logic.
 - Some MySQL functions (`REGEXP_INSTR`, etc.) unavailable — branch required.
-- Vector search in `DatabaseEngine` has a SQLite-specific code path (in-memory similarity).
+- Vector search in `DatabaseEngine` has a SQLite-specific lazy code path, PostgreSQL `pgvector` SQL, and MySQL/MariaDB JSON-vector SQL. The database driver is orchestrated-search capable, but it is a compatibility fallback rather than a performance replacement for Typesense or Elasticsearch.
 
 ## Application queries
 
