@@ -2358,7 +2358,7 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 - [x] Preserve filterability metadata in driver translations: Typesense `facet`, Elasticsearch `meta.filterable`, and database column `filterable`.
 - [x] Reject advanced filters when the active engine cannot apply them before pagination.
 - [x] Keep generic Eloquent relation-path filters rejected.
-- [x] Keep relation-like filters deferred until schema aliases or denormalized searchable fields exist.
+- [x] Keep arbitrary relation-like filters deferred until schema aliases or denormalized searchable fields exist.
 - [x] Cover equivalent translation for Elasticsearch query DSL, Typesense `filter_by`, and database Scout/Eloquent constraints.
 
 ## Task 3B: Cross-Driver Score Contract
@@ -2372,6 +2372,30 @@ After this plan is implemented and verified, create the Phase 2 plan for Core Gr
 - [x] Make default scores explicit when a driver cannot provide a meaningful raw score.
 - [x] Normalize scores per strategy before ensemble fusion and document that raw score values are not comparable across drivers.
 - [x] Add tests for Elasticsearch, Typesense, and database normalized hit shape.
+
+## Task 3C: Indexed Relation-Field Filters
+
+- [x] Add schema support for relation-field filter metadata:
+  - parent field option `relation` for the Eloquent relation used by database search;
+  - nested `properties` entries that can declare `type` and `filterable`;
+  - backward-compatible support for existing `properties` entries expressed as `FieldType` values.
+- [x] Update CMS searchable schemas for indexed relation fields:
+  - `contributors.id`, `contributors.slug`, `contributors.path`;
+  - `categories.id`, `categories.slug`, `categories.path`;
+  - `tags.id`, `tags.slug`, `tags.path`;
+  - `locations.id`, `locations.slug`, `locations.city`, `locations.province`, `locations.country`, `locations.postcode`, `locations.zone`.
+- [x] Accept dot-path filters only when declared by searchable schema metadata.
+- [x] Reject arbitrary relation paths that are not declared in the searchable schema.
+- [x] Translate positive relation filters to:
+  - Elasticsearch nested queries when the field mapping is `nested`;
+  - Typesense nested-field dot notation;
+  - database `whereHas`.
+- [x] Translate relation `!=` and `not in` as anti-exists:
+  - Elasticsearch outer `must_not` nested query;
+  - Typesense negative nested-field filter when supported by `filter_by`;
+  - database `whereDoesntHave`.
+- [x] Keep relation-path sorts rejected.
+- [x] Cover equivalent behavior for Elasticsearch, Typesense, and database search tests.
 
 ## Task 4: Existing Elasticsearch Engine
 

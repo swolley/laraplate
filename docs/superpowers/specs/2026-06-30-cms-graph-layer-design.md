@@ -679,14 +679,30 @@ Unsupported filters must be rejected before executing search:
 
 - `like`
 - `not like`
-- relation-path filters
 - engine-specific filter syntax in public request input
 
 The rejection is intentional because applying unsupported filters after engine pagination breaks pagination semantics.
 
 Portable sort support is limited to scalar fields on the searched model. Relation-path sorts must be rejected before executing search for the same pagination-consistency reason.
 
-Relation filters may be added later only through explicit denormalized searchable fields or schema aliases. Generic Eloquent relation paths such as `author.name` or `tags.id` must not be translated implicitly because external search engines cannot see live Eloquent relations unless the data is indexed into the searchable document.
+Relation-field filters are allowed only when they target relation data already present in the searchable document and declared by the searchable schema. Core must not interpret arbitrary public dot paths as live Eloquent traversal. A request filter such as `tags.id = 10` means "filter by indexed search document relation field `tags.id`", not "discover any Eloquent relation named `tags` at runtime".
+
+The relation-field contract is:
+
+- the top-level field, such as `tags`, must be declared in the searchable schema as filterable or facetable;
+- the nested property, such as `id`, must be declared in the field `properties` as filterable or facetable;
+- database search additionally requires the field option `relation` to name the Eloquent relation that backs the indexed field;
+- Elasticsearch uses a `nested` query when the translated mapping marks the relation field as `nested`;
+- Typesense uses nested-field dot notation when the collection schema enables nested fields;
+- database search translates positive relation filters to `whereHas`;
+- database search translates `!=` and `not in` relation filters to `whereDoesntHave`, so they mean "no related record matches this value/list", not "there exists a different related record".
+
+Examples:
+
+- `tags.id = 10` means at least one indexed tag has `id = 10`.
+- `tags.id in [10, 20]` means at least one indexed tag has an ID in the list.
+- `tags.id != 10` means no indexed tag has `id = 10`.
+- `tags.id not in [10, 20]` means no indexed tag has an ID in the list.
 
 ### Searchable Schema Fields
 
