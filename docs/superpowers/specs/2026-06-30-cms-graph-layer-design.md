@@ -2,7 +2,7 @@
 
 ## Status
 
-- Date: 2026-07-12
+- Date: 2026-07-14
 - Status: in progress
 - Scope: Core framework, with CMS as the first consumer/provider
 - Supersedes: the previous CMS-only graph layer direction
@@ -51,6 +51,7 @@ The order is intentional. Later phases are not optional; they are deferred only 
 - Phase 3 MVP is implemented: stats are computed over an authorized graph expansion and do not introduce global graph scans or materialized edges.
 - Phase 4 MVP is implemented: optional provider rules can further restrict generic Graph behavior without making providers required.
 - Phase 5 is deferred: materialized edges require a measured performance need and an explicit invalidation/freshness strategy before any schema is introduced.
+- Point 0 documentation checkpoint is complete: stable Core/CMS module docs and RAG docs now describe the implemented generic Graph contract and the Phase 5 gate.
 
 ## CRUD Alignment Principles
 
@@ -879,6 +880,15 @@ Before introducing a migration, the implementation plan must define:
 - how provider rules and ACL filtering are preserved;
 - how stale materialized data is detected;
 - what metric proves runtime traversal is too expensive.
+
+## Documentation Handoff
+
+The implemented Graph contract must not live only in this spec or in the execution plan. Stable module documentation is part of the delivered behavior:
+
+- Core owns the developer and API/operator documentation for generic graph routes, request semantics, authorization, providers, stats, and the materialization boundary.
+- CMS documents only its provider contribution: default content relations, summary fields, edge labels, and excluded implementation relations.
+- Cross-module changes must update the RAG documentation for each affected module.
+- Phase 5 remains a documented gate, not a hidden backlog item: materialized edges require benchmark evidence and a relation-specific invalidation/freshness design before any schema exists.
 
 ## Testing Strategy
 

@@ -36,6 +36,7 @@ The roadmap phases remain mandatory:
 - [x] Phase 3 MVP: Core Graph Stats and Analytics over authorized expand output.
 - [x] Phase 4 MVP: Provider Rules and Regulation Layer.
 - [ ] Phase 5: Materialized Edges and Performance Layer, deferred until measured performance need and invalidation strategy exist.
+- [x] Point 0 documentation checkpoint: stable Core/CMS README and module RAG docs describe the implemented generic Graph behavior and the Phase 5 gate.
 
 ## Recent Graph Commits
 
@@ -151,6 +152,19 @@ Phase 4 MVP keeps Graph generic and adds optional provider-side restrictions. Pr
 - [x] Run `rtk php artisan test --compact Modules/Core/tests/Feature/Graph`.
 - [x] Run `rtk vendor/bin/pint --dirty`.
 - [x] Commit Phase 4 MVP files as `fea0e7d`.
+
+
+## Point 0 Documentation Checkpoint
+
+Point 0 is the stabilization handoff after the runtime MVP phases. It does not add graph behavior. It makes the implemented contract discoverable in stable module documentation before any further implementation work.
+
+- [x] Document Core Graph as a generic Core capability in `Modules/Core/docs/GRAPH_SYSTEM.md`.
+- [x] Link Graph from `Modules/Core/README.md`.
+- [x] Update Core RAG documentation with developer and API/operator semantics for graph expand/search/stats.
+- [x] Update CMS README and RAG documentation to describe CMS as a provider/consumer, not the owner of graph traversal.
+- [x] Keep Phase 5 open and explicitly blocked by real benchmark evidence plus invalidation/freshness design.
+
+Next implementation work must start from measured runtime traversal behavior on real module data. Do not introduce graph edge storage, migrations, or cache persistence until the benchmark and invalidation strategy are accepted.
 
 ## Phase 5 Materialized Edges Plan
 
