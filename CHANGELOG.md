@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [1.13.2] - 2026-07-12
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -35,12 +35,6 @@ All notable changes to this project will be documented in this file.
 
 - Bump CMS to v1.36.4 and sync project guidelines
 
-## [1.12.0] - 2026-07-09
-
-### 🚀 Features
-
-- *(performance)* Enhance performance optimization strategies and add large dataset guidelines
-
 ## [1.11.4] - 2026-07-09
 
 ### 🐛 Bug Fixes
@@ -58,43 +52,22 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
-- *(cms,core)* Wire record origins registry and generic cms:import
-
-### ⚙️ Miscellaneous Tasks
-
-- Update dependencies and submodule references
-- Update submodule references for AI and CMS modules
-
-## [2.1.0] - 2026-07-02
-
-### 🚀 Features
-
+- Add master rule file and enhance existing rules with descriptions
+- Implement app structure with authentication and module management
+- Add initial Business module plan and structure
+- [**breaking**] Point monorepo to ERP submodule (laraplate-erp)
 - *(cms)* Add content provenance, references and ai assistance metadata
-
-### 📚 Documentation
-
-- *(erp)* Add Spec 1 design for v1 hardening (bugs + money math)
-- *(erp)* Add Fix 8 (CRUD write guard) to Spec 1 hardening
-- *(erp)* Refine Spec 1 hardening scope after code/test verification
-- *(erp)* Add Spec 1 hardening implementation plan
-- *(erp)* Update plans and specs for ERP hardening progress
-
-### ⚙️ Miscellaneous Tasks
-
-- Bump Core/CMS/AI/ERP for trait Concerns refactor
-- Bump module references and align app bootstrap config
-- Sync module releases and ERP hardening progress
-- Update submodule references for AI, CMS, and Core modules
-- Sync submodule references after PHPDoc formatting cleanup
-
-## [2.0.3] - 2026-06-18
+- *(cms,core)* Wire record origins registry and generic cms:import
 
 ### 🐛 Bug Fixes
 
+- Standardize module naming and update dependencies
 - *(core)* Bump submodule for MySQL taxonomies migration trigger fix
 
 ### 📚 Documentation
 
+- *(plan)* Mark Filament ERP core slice in Nebula roadmap
+- *(plan)* Align Nebula plan with ERP module paths and naming
 - Add CMS comments with AI moderation design spec
 - Revise CMS comments spec per review feedback
 - Add preliminary AI disapproval and implementation plan
@@ -102,58 +75,11 @@ All notable changes to this project will be documented in this file.
 - Use HasTranslations for comments with locale overrides
 - Add approval_mode config for comment moderation A/B
 - Add RTK documentation and update AGENTS.md
-
-### ⚙️ Miscellaneous Tasks
-
-- Update submodule references and composer.lock for module dependencies
-- Update module versions and Swagger documentation for testing environment
-- Add .cursorignore and AGENTS.md, update package-lock.json, and clean up project structure
-- Reorganize testing structure and update module configurations
-- *(core)* Bump Core module for GELF logging improvements
-- Update .env.example and composer.lock for module dependencies
-- Update composer.lock and package-lock.json for new dependencies
-- Update submodule references and API documentation
-
-## [2.0.2] - 2026-05-15
-
-### ⚙️ Miscellaneous Tasks
-
-- Update submodule references and Swagger documentation for AI, CMS, Core, ERP, and MES modules
-
-## [2.0.1] - 2026-05-15
-
-### ⚙️ Miscellaneous Tasks
-
-- Update submodule references and clean up package-lock.json
-- Add MES requirements revision document
-- Update ERP submodule and development plan for M3.5-M5
-- Add cache duration registry to configuration
-- Update dependencies and refine documentation
-- *(plans)* Add initial ecommerce module development plan
-- *(plans)* Mark ecommerce module development plan as completed
-- Update dependencies and add bugfix for HasValidations trait
-- Complete performance optimization tasks in documentation
-- *(plans)* Update ecommerce module embryo plan with architectural decisions and todos
-- Update dependencies and enhance rich editor functionality
-- Update environment and configuration files for MES module integration
-
-## [2.0.0] - 2026-05-05
-
-### 🚀 Features
-
-- Add master rule file and enhance existing rules with descriptions
-- Implement app structure with authentication and module management
-- Add initial Business module plan and structure
-- [**breaking**] Point monorepo to ERP submodule (laraplate-erp)
-
-### 🐛 Bug Fixes
-
-- Standardize module naming and update dependencies
-
-### 📚 Documentation
-
-- *(plan)* Mark Filament ERP core slice in Nebula roadmap
-- *(plan)* Align Nebula plan with ERP module paths and naming
+- *(erp)* Add Spec 1 design for v1 hardening (bugs + money math)
+- *(erp)* Add Fix 8 (CRUD write guard) to Spec 1 hardening
+- *(erp)* Refine Spec 1 hardening scope after code/test verification
+- *(erp)* Add Spec 1 hardening implementation plan
+- *(erp)* Update plans and specs for ERP hardening progress
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -191,6 +117,32 @@ All notable changes to this project will be documented in this file.
 - *(business)* Bump submodule for Filament accounting domain
 - Update dependencies and enhance test configurations
 - Add MES module and update configurations
+- Update submodule references and clean up package-lock.json
+- Add MES requirements revision document
+- Update ERP submodule and development plan for M3.5-M5
+- Add cache duration registry to configuration
+- Update dependencies and refine documentation
+- *(plans)* Add initial ecommerce module development plan
+- *(plans)* Mark ecommerce module development plan as completed
+- Update dependencies and add bugfix for HasValidations trait
+- Complete performance optimization tasks in documentation
+- *(plans)* Update ecommerce module embryo plan with architectural decisions and todos
+- Update dependencies and enhance rich editor functionality
+- Update environment and configuration files for MES module integration
+- Update submodule references and Swagger documentation for AI, CMS, Core, ERP, and MES modules
+- Update submodule references and composer.lock for module dependencies
+- Update module versions and Swagger documentation for testing environment
+- Add .cursorignore and AGENTS.md, update package-lock.json, and clean up project structure
+- Reorganize testing structure and update module configurations
+- *(core)* Bump Core module for GELF logging improvements
+- Update .env.example and composer.lock for module dependencies
+- Update composer.lock and package-lock.json for new dependencies
+- Update submodule references and API documentation
+- Bump Core/CMS/AI/ERP for trait Concerns refactor
+- Bump module references and align app bootstrap config
+- Sync module releases and ERP hardening progress
+- Sync submodule references after PHPDoc formatting cleanup
+- Update submodule references for AI and CMS modules
 
 ## [1.11.2] - 2026-01-22
 

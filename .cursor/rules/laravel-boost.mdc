@@ -48,6 +48,7 @@ alwaysApply: true
 - Run minimal relevant tests (`php artisan test --compact` with file/filter).
 - Prefer feature tests.
 - Use factories/states for test data.
+- Never declare classes inside test files; use each module's own `tests/Stubs/` with PSR-4 autoloading.
 
 ## Livewire law
 - Single root element per component.

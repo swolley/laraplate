@@ -16,3 +16,12 @@ alwaysApply: false
 - Use factories/states for setup.
 - Module tests stay inside module `tests/`.
 - Tooling details in `laravel-boost.mdc`.
+
+## Test doubles and PSR-4
+
+- Never declare classes, traits, interfaces, or enums inside test files.
+- Inline declarations break PSR-4 autoloading and are not allowed.
+- Each module owns its stubs under `Modules/{Module}/tests/Stubs/` (or that module's existing equivalent, e.g. `Modules/ERP/tests/Support/`).
+- Never put module test doubles in another module's stub folder or in the app root `tests/` tree.
+- One class per file; namespace must match that module's `autoload-dev` PSR-4 mapping (e.g. `Modules\Core\Tests\Stubs\...`, `Modules\ERP\Tests\Stubs\...`).
+- When adding a new stub namespace for a module, register it in that module's `composer.json` `autoload-dev` section.

@@ -94,6 +94,7 @@
 - Prefer Pest and feature tests unless unit test fits better.
 - Keep tests inside module `tests/` for module work.
 - Use factories/states for setup.
+- Never declare classes, traits, interfaces, or enums inside test files; put them in that module's `Modules/{Module}/tests/Stubs/` (or module equivalent like `tests/Support/`) with PSR-4 namespaces registered in that module's `composer.json` `autoload-dev`.
 - Run minimal relevant tests:
   - `php artisan test --compact path/or/filter`
 - Before done after code changes:
