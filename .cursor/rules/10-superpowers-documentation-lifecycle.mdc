@@ -14,6 +14,12 @@ alwaysApply: true
   - Update the plan when decisions, scope, sequencing, or architecture changes.
   - Do not leave completed behavior documented only in chat, commits, tests, or code.
   - If a task changes module behavior, capture the final behavior while it is fresh.
+  - For every implementation that adds or changes a feature, workflow, public API, permission model, extension point, operational behavior, or architectural contract, update the affected user/operator RAG documentation and developer RAG documentation in the same change set.
+  - Use the documentation that belongs to the module where the change was made. For cross-module changes, update each affected module's own RAG documentation instead of documenting everything in one central module.
+  - Every added, removed, renamed, or behavior-changing environment variable must be documented in the affected module's `README.md`, following the existing module README environment variable style.
+  - Recognize patch-only work: typo fixes, formatting-only changes, narrow test-only corrections, local bug fixes with no observable behavior change, and purely internal refactors normally do not need RAG documentation updates.
+  - When skipping RAG documentation for a patch-only change, make that judgment explicit in the final response or plan note.
+  - If the relevant RAG split does not exist yet, update the closest existing RAG document under that same module's `Modules/{ModuleName}/docs/rag/` directory and note whether a future split between user/operator and developer docs is warranted.
 
 - At the end of all implementations for a plan/spec:
   - Convert the completed plan/spec into stable module documentation.

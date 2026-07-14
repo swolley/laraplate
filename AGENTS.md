@@ -50,6 +50,7 @@
 - No new dependencies without user approval.
 - No new base folders without user approval.
 - Create docs only when user asks.
+- Feature implementations must update affected user/operator and developer RAG docs when the behavior is worth documenting. Use the docs of the module where the change was made; cross-module work updates each affected module's own docs. Added, removed, renamed, or behavior-changing env vars must be documented in the affected module README using the existing style. Patch-only fixes, formatting, narrow tests, and internal refactors can skip RAG docs, but state that judgment when finishing.
 
 ## Project
 
