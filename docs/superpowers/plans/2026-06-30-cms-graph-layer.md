@@ -163,6 +163,7 @@ Point 0 is the stabilization handoff after the runtime MVP phases. It does not a
 - [x] Update Core RAG documentation with developer and API/operator semantics for graph expand/search/stats.
 - [x] Update CMS README and RAG documentation to describe CMS as a provider/consumer, not the owner of graph traversal.
 - [x] Keep Phase 5 open and explicitly blocked by real benchmark evidence plus invalidation/freshness design.
+- [x] Add a CMS opt-in runtime benchmark harness for realistic content graph datasets without adding it to the normal test suite.
 
 Next implementation work must start from measured runtime traversal behavior on real module data. Do not introduce graph edge storage, migrations, or cache persistence until the benchmark and invalidation strategy are accepted.
 
@@ -177,6 +178,15 @@ Do not introduce a materialized edge migration or model until a concrete perform
 - how provider rules and ACL filtering remain equivalent to runtime traversal;
 - how stale materialized data is detected and bypassed;
 - which benchmark proves the materialized path is needed.
+
+### Phase 5 Future Task 0: Runtime Benchmark Harness
+
+- [x] Add `Modules/CMS/tests/Benchmark/CmsGraphRuntimeBenchmarkTest.php` as an opt-in benchmark outside the normal module test suites.
+- [x] Gate execution behind `CMS_GRAPH_BENCHMARK_ENABLED=true`.
+- [x] Make dataset size and iterations configurable through documented `CMS_GRAPH_BENCHMARK_*` environment variables.
+- [x] Report duration, SQL query count, peak memory, node count, edge count, truncation, and ACL filtering per scenario.
+
+The harness creates evidence; it does not by itself justify materialized storage. Future Task 1 still must be completed with benchmark results from real module workflows before any Phase 5 implementation.
 
 ### Phase 5 Future Task 1: Performance Evidence And Invalidation Design
 

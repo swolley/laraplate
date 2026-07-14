@@ -52,6 +52,7 @@ The order is intentional. Later phases are not optional; they are deferred only 
 - Phase 4 MVP is implemented: optional provider rules can further restrict generic Graph behavior without making providers required.
 - Phase 5 is deferred: materialized edges require a measured performance need and an explicit invalidation/freshness strategy before any schema is introduced.
 - Point 0 documentation checkpoint is complete: stable Core/CMS module docs and RAG docs now describe the implemented generic Graph contract and the Phase 5 gate.
+- A CMS opt-in runtime benchmark harness exists to collect performance evidence without running large datasets in the normal test suite.
 
 ## CRUD Alignment Principles
 
@@ -865,6 +866,12 @@ Direction:
 - Add materialized edge storage only where measurable performance requires it.
 - Preserve the same public response contract.
 - Ensure invalidation rules are explicit per module/entity/relation.
+
+### Runtime Benchmark Harness
+
+CMS provides the first opt-in benchmark harness for Graph runtime traversal: `Modules/CMS/tests/Benchmark/CmsGraphRuntimeBenchmarkTest.php`. It is not part of the normal test suites, requires `CMS_GRAPH_BENCHMARK_ENABLED=true`, and exposes documented `CMS_GRAPH_BENCHMARK_*` variables for dataset size and iterations. The benchmark must report at least duration, SQL query count, peak memory, node/edge counts, truncation, and ACL filtering for expand, search, expanded search, and stats scenarios.
+
+Benchmark output is evidence for Phase 5 planning only. It does not change the correctness baseline: runtime traversal remains authoritative until a materialized edge design proves equivalent responses and safe invalidation.
 
 ### Phase 5 Deferred: Optional Edge Store
 
