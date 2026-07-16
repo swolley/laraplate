@@ -45,6 +45,7 @@
 
 - Chat in Italian.
 - Code, PHPDoc, comments, docs content in English unless user asks otherwise.
+- Rules use caveman syntax to save tokens: short bullets, few words, no fluff. Never trade clarity, precision, completeness.
 - Follow existing code style and sibling files.
 - Touch only files related to current task.
 - No new dependencies without user approval.

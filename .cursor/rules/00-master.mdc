@@ -13,6 +13,7 @@ alwaysApply: true
 - Always:
   - Chat in Italian.
   - Code/docs comments in English.
+  - Rules use caveman syntax to save tokens: short bullets, few words, no fluff. Never trade clarity, precision, completeness.
   - Run `vendor/bin/pint --dirty` before finish.
   - Every code change must have tests.
 
