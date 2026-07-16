@@ -12,11 +12,12 @@ Graphify, Microsoft GraphRAG, a graph database, and graph traversal are **not ba
 
 The adoption order is locked:
 
-1. establish a repeatable RAG evaluation dataset and baseline;
-2. improve corpus metadata and retrieval scoping;
-3. evaluate hybrid lexical + vector retrieval;
-4. evaluate cross-encoder reranking;
-5. run a graph-retrieval spike only if measured residual failures are genuinely relational or multi-hop.
+1. implement the approved assistant-profile, corpus-isolation, guardrail, and read-only Graph tool boundary in `2026-07-16-in-app-ai-assistance-security-design.md`;
+2. establish a repeatable RAG evaluation dataset and baseline;
+3. improve corpus metadata and retrieval scoping;
+4. evaluate hybrid lexical + vector retrieval;
+5. evaluate cross-encoder reranking;
+6. run a graph-retrieval spike only if measured residual documentation failures are genuinely relational or multi-hop.
 
 ## Context
 
@@ -49,7 +50,8 @@ The architecture therefore needs a stable vector baseline, measurable quality ga
 4. Permit an optional graph retriever without changing chat or CLI public contracts.
 5. Route graph retrieval only for questions whose structure benefits from relationship traversal.
 6. Keep citations traceable to canonical source documents, including when a graph contributes context.
-7. Keep end-user documentation and developer documentation distinguishable through metadata even while they share physical infrastructure.
+7. Keep end-user documentation and developer documentation in physically separate indexes with server-owned profile selection.
+8. Use the existing Core Graph API as a read-only, ACL-preserving live-data tool for in-app assistance; this is separate from documentation GraphRAG.
 
 ## Non-goals
 
@@ -60,6 +62,7 @@ The architecture therefore needs a stable vector baseline, measurable quality ga
 - Automatically learning graph facts from user conversations.
 - Adding database/API/PDF ingestion in this strategy; each new source type requires its own ingestion spec.
 - Treating model search in Core and documentation RAG as the same index or service.
+- Treating the read-only Core Graph tool as a documentation graph retriever or as permission to implement graph mutations.
 
 ## Terminology and boundaries
 
@@ -79,6 +82,10 @@ The product UI for exploring application relations. It is not a RAG retriever an
 
 Graphify is an external knowledge-graph tool. GraphRAG is a family of retrieval approaches that extracts or uses entities and relationships. Neither is selected as a Laraplate production dependency by this decision.
 
+### Core Graph tools for in-app assistance
+
+Core Graph tools query live application records through the existing authorized Graph framework. They are an approved read-only capability for the in-app assistant and are not gated by the future GraphRAG experiment. They use `search`, `expand`, and `stats`, inherit the authenticated user's tenant, permissions, ACL, provider rules, and graph limits, and never write live records into the documentation index.
+
 ## Target architecture
 
 ```mermaid
@@ -96,12 +103,14 @@ flowchart LR
 
 The solid path is the committed architecture. The dotted graph path is a future extension point, not an implementation commitment.
 
-The public entry points remain unchanged:
+The public entry points retain their purpose but no longer share one trust profile:
 
 - `DocumentationService::answerQuestion()`;
 - in-app `ChatService` RAG routing;
 - `php artisan ai:laraplate-help`;
 - `php artisan ai:index-docs`.
+
+Developer CLI and in-app assistance must use the separate profiles and physical indexes defined in `2026-07-16-in-app-ai-assistance-security-design.md`. The in-app profile is non-streaming in v1 and requires mandatory fail-closed input, retrieval, tool, and output guardrails.
 
 NeuronAI's `RetrievalInterface` is the internal extension seam. The current default remains similarity retrieval. Hybrid, reranked, or future graph-aware implementations must remain replaceable behind this interface.
 
@@ -135,7 +144,7 @@ Every indexed chunk should carry stable metadata sufficient to filter or analyze
 - heading breadcrumb;
 - source type.
 
-Missing metadata must degrade to an explicit neutral value rather than silently excluding legacy documents.
+Missing metadata may use an explicit neutral value in the developer index. It must exclude the source from the user index; user visibility is deny-by-default.
 
 ### Phase 2 — hybrid retrieval
 
@@ -209,6 +218,8 @@ The answer API continues returning document-oriented citations so current consum
 
 Retrieval filtering must happen before context reaches the LLM. Future tenant-specific corpora or graph facts must not rely on prompt instructions for isolation.
 
+The in-app assistant security boundary is normative and defined by `2026-07-16-in-app-ai-assistance-security-design.md`: developer and user indexes are physically separate; profile, identity, tenant, permissions, and tools are server-owned; Graph tools are read-only; guardrail failures fail closed; and unvalidated output cannot be streamed or persisted.
+
 Any graph experiment must document:
 
 - tenant partitioning;
@@ -244,8 +255,8 @@ Live-provider or live-Elasticsearch benchmarks may be opt-in, but deterministic 
 ## Related documents
 
 - `docs/superpowers/specs/2026-05-13-rag-multi-instance-design.md`
+- `docs/superpowers/specs/2026-07-16-in-app-ai-assistance-security-design.md`
 - `docs/superpowers/plans/2026-05-13-rag-multi-instance-elasticsearch.md`
 - `Modules/AI/docs/rag/MODULE.md`
 - `Modules/AI/docs/rag/DEPLOYMENT.md`
 - `docs/rag/README.md`
-
