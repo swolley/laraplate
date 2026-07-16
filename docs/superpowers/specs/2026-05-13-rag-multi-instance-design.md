@@ -49,3 +49,7 @@ The FAQ/documentation RAG path (`DocumentationService` + `DocumentationAgent`) p
 ## Implementation plan
 
 See `docs/superpowers/plans/2026-05-13-rag-multi-instance-elasticsearch.md`.
+
+## Retrieval strategy boundary (2026-07-16)
+
+This spec decides **where vector data is shared**, not whether Laraplate adopts GraphRAG. The authoritative retrieval decision is `docs/superpowers/specs/2026-07-16-rag-retrieval-strategy-design.md`: vector documentation RAG remains the baseline; hybrid retrieval and reranking require evaluation; graph retrieval is an optional future experiment authorized only by measured multi-hop failures.

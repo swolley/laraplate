@@ -15,3 +15,4 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-09-mes-module-decisions-design.md`: MES locked product/architecture decisions (scope, numbering, backflush, ERP linkage).
 - `2026-07-09-large-dataset-query-patterns-design.md`: Eloquent iteration rules (`get`/`lazy`/`chunk`/`cursor`), Core query/memory backlog, Filament table/widget performance checklist.
 - `2026-07-09-database-guidelines-design.md`: Multi-DB compatibility (MySQL, MariaDB, PostgreSQL, Oracle, SQLite), migrations, indexes, FULLTEXT/Scout rules, `MigrateUtils` patterns.
+- `2026-07-16-rag-retrieval-strategy-design.md`: Locked documentation RAG direction — vector baseline, evaluation-first hybrid/reranking roadmap, and evidence-gated optional graph retrieval.

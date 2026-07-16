@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-13-rag-multi-instance-design.md`
 
+**Retrieval boundary:** This plan implements shared vector persistence only. It does not authorize Graphify, GraphRAG, or a graph database. Future retrieval evolution follows `docs/superpowers/plans/2026-07-16-rag-retrieval-strategy.md`.
+
 ---
 
 ### Task 1: Deployment documentation (filesystem interim)

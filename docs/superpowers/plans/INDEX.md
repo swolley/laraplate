@@ -22,3 +22,4 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-30-cms-graph-layer.md`: Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider, Phase 5 materialized edges gated by benchmarks and invalidation design.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.
+- `2026-07-16-rag-retrieval-strategy.md`: Evaluation-first documentation RAG evolution from vector baseline to optional hybrid/reranking, with a separate authorization gate for any graph spike.
