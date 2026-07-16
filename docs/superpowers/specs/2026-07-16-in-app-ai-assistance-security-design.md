@@ -90,6 +90,26 @@ The in-app profile is selected only by authenticated in-app message endpoints. I
 
 An `AssistantProfile` enum or equivalent typed value must be passed explicitly through application services. There is no public `profile` request parameter.
 
+## Authorization is not prompt policy
+
+Authentication establishes who is making the request; it does not by itself establish which information the assistant may receive. Before any live data reaches the LLM, Core must apply the authenticated user, active tenant, effective permissions, row-level ACL, Graph provider rules, relation limits, and an explicit safe-field projection. The same principle applies to user-document retrieval: index selection, tenant scope, and required permissions are enforced in Elasticsearch before chunks are returned.
+
+Roles remain an authorization-management mechanism. They contribute to the effective permissions and ACL resolved by Core, but role names, ACL expressions, and permission internals are not appended to prompts and are not exposed to the model. The assistant consumes only the resulting authorized capability set and already-filtered data.
+
+Prompt policy has a different purpose: it constrains model behavior after deterministic authorization has already reduced the available context. Laraplate uses a versioned, server-owned policy catalog with at least:
+
+1. a global assistant safety policy;
+2. one fixed policy for each `AssistantProfile`;
+3. optional predefined capability or module restrictions;
+4. optional organization or user restrictions that may only narrow the result;
+5. non-security preferences such as locale, accessibility needs, response format, and verbosity.
+
+Policy composition uses intersection semantics: a more specific layer may remove capabilities but cannot grant data or tools denied by a broader layer, and deny always wins. Free-form system-prompt fragments are not stored on roles, permissions, ACL, organizations, or users. The browser and ordinary administrators cannot submit executable prompt text. The server compiles approved policy identifiers into the system instructions and registers only the tools permitted by the effective capability set.
+
+User preferences never change authorization. Locale, tone, verbosity, and accessible formatting may change presentation; they cannot select another corpus, reveal additional fields, enable a tool, or weaken a guardrail. If future product requirements need delegated policy administration, that requires a separate specification with typed rules, validation, audit history, versioning, and deny-only composition.
+
+The in-app model is explicitly instructed to answer only from authorized RAG context and tool results and to abstain when that evidence is insufficient. This instruction is defense in depth: pre-LLM authorization and post-generation output validation remain mandatory because prompts cannot provide a security guarantee.
+
 ## Physically separate corpora
 
 Two Elasticsearch indexes are required:
@@ -187,6 +207,7 @@ Graph tools are read-only by contract and implementation. They are not registere
 - Server selects the profile.
 - In-app routes require an authenticated conversation owner.
 - Client `system_message`, assistant profile, tenant, user, permissions, and tool lists are rejected or ignored according to a documented request contract.
+- The server compiles only versioned policy identifiers; it never concatenates role-, organization-, or user-authored prompt fragments.
 
 ### 2. Input policy
 
@@ -207,6 +228,7 @@ Graph tools are read-only by contract and implementation. They are not registere
 - Register only the read-only Graph tools for the in-app profile.
 - Derive identity and tenant from the server context.
 - Reuse Core authorization and ACL before serialization.
+- Apply an explicit safe-field projection after authorization so readable records cannot leak sensitive internal attributes.
 - Enforce stricter in-app depth, node, relation, and detail limits than the general Graph API where appropriate.
 
 ### 5. Context policy

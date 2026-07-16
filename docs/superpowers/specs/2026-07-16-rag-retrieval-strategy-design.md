@@ -220,6 +220,8 @@ Retrieval filtering must happen before context reaches the LLM. Future tenant-sp
 
 The in-app assistant security boundary is normative and defined by `2026-07-16-in-app-ai-assistance-security-design.md`: developer and user indexes are physically separate; profile, identity, tenant, permissions, and tools are server-owned; Graph tools are read-only; guardrail failures fail closed; and unvalidated output cannot be streamed or persisted.
 
+Roles, permissions, and ACL are deterministic authorization inputs, not prompt fragments. They filter documents, records, relations, fields, and tools before LLM invocation. Profile instructions come only from a versioned server-owned policy catalog; role/user preferences cannot grant access or append free-form system instructions.
+
 Any graph experiment must document:
 
 - tenant partitioning;
