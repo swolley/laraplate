@@ -30,7 +30,7 @@ The current documentation RAG already provides:
 - incremental reindexing by source;
 - vector similarity top-K retrieval;
 - LLM answers with structured citations;
-- in-app chat for operators and `ai:laraplate-help` for developers.
+- in-app chat for operators and `ai:help` for developers.
 
 Elasticsearch is the production and multi-instance store. Filesystem remains suitable for simple single-instance deployments, and memory remains test-only.
 
@@ -107,8 +107,8 @@ The public entry points retain their purpose but no longer share one trust profi
 
 - `DocumentationService::answerQuestion()`;
 - in-app `ChatService` RAG routing;
-- `php artisan ai:laraplate-help`;
-- `php artisan ai:index-docs`.
+- `php artisan ai:help`;
+- `php artisan ai:index-rag-docs`.
 
 Developer CLI and in-app assistance must use the separate profiles and physical indexes defined in `2026-07-16-in-app-ai-assistance-security-design.md`. The in-app profile is non-streaming in v1 and requires mandatory fail-closed input, retrieval, tool, and output guardrails.
 

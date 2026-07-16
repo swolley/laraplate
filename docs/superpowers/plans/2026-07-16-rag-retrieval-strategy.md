@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-07-16-rag-retrieval-strategy-design.md`
 
+**Security prerequisite:** `docs/superpowers/plans/2026-07-16-in-app-ai-assistance-security.md` owns the separate user corpus, permissions/ACL enforcement, mandatory guardrails, and read-only Core Graph tools. Complete that plan before exposing RAG through the in-app assistant.
+
 ---
 
 **Workspace rule:** Run Artisan and tests from the Laraplate application root. `Modules/AI` is a nested Git repository, so commit AI module files with `rtk git -C Modules/AI ...`; commit application-level specs and plans with `rtk git ...` from the Laraplate root.
@@ -19,6 +21,8 @@
 Tasks 1–3 establish measurement and a replaceable vector baseline. Tasks 4 and 5 are independently feature-flagged experiments. Task 6 is a decision checkpoint, not permission to implement GraphRAG.
 
 Do not start Task 4 until Tasks 1–3 have produced a committed baseline report. Do not start Task 5 until hybrid results are recorded. Do not authorize a graph implementation from this plan.
+
+This plan evaluates documentation retrieval quality. It does not authorize sharing a corpus between assistant profiles or exposing Core Graph data. Evaluation reports must slice results by server-owned profile, and user-profile cases must use only the physically separate user index defined by the security prerequisite.
 
 ### Task 1: Versioned RAG evaluation dataset and loader
 
@@ -180,11 +184,11 @@ rtk git -C Modules/AI commit -m "feat(ai): measure documentation RAG retrieval q
 
 - [ ] **Step 1: Write failing metadata tests**
 
-Assert that every chunk has `audience`, `module`, `locale`, `canonical_source`, `heading_breadcrumb`, and `source_type`. Legacy documents without front matter must receive `shared`, `app`, `und`, the normalized source path, an empty breadcrumb where none exists, and `file` respectively.
+Assert that every chunk has `audience`, `module`, `locale`, `canonical_source`, `heading_breadcrumb`, and `source_type`. Legacy documents without front matter may receive `shared`, `app`, `und`, the normalized source path, an empty breadcrumb, and `file` only in the developer corpus. They remain ineligible for the user corpus until explicitly classified `user` or `shared` and approved by its policy.
 
 - [ ] **Step 2: Implement metadata normalization**
 
-Read optional front matter keys without changing document content semantics. Propagate normalized metadata from the source document to every split chunk. Reject unknown audience values during indexing with a source-specific exception.
+Read optional front matter keys without changing document content semantics. Propagate normalized metadata from the source document to every split chunk. Reject unknown audience values during indexing with a source-specific exception. Never let developer-compatible defaults weaken the user-index deny-by-default rule.
 
 - [ ] **Step 3: Write the failing retrieval factory test**
 
@@ -377,6 +381,7 @@ rtk git commit -m "docs(ai): record graph retrieval gate"
 | Canonical citations survive retrieval changes | Tasks 3–5 tests |
 | Safe fallback behavior | Tasks 4–5 |
 | Tenant/permission graph requirements | Task 6 spike-spec gate |
+| In-app corpus isolation, ACL, guardrails, and Core Graph tools | Separate mandatory security prerequisite plan |
 
 **Placeholder scan:** No placeholders remain. The concrete graph-spike filenames are reserved but must not be created unless Task 6 passes and a separate brainstorming cycle approves the spike. No graph implementation task is authorized here.
 
