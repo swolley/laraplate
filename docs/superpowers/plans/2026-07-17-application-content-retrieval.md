@@ -4,7 +4,7 @@
 
 **Goal:** Let the authenticated in-app assistant retrieve bounded, cited evidence from module-owned searchable data through a general Core provider contract, with CMS as the first provider.
 
-**Architecture:** Core owns neutral contracts, DTOs, registry, and the authorization gateway so optional modules never depend on AI. Provider modules own search and safe projection; AI owns one contextual read-only tool, evidence prompt projection, abstention, and evaluation. Phase 1 is authenticated-only and reuses existing Core search; public assistance and new passage indexes remain separately gated.
+**Architecture:** Core owns neutral contracts, typed source descriptors, the explicit registry, and the authorization gateway so optional modules never depend on AI. Provider modules own search and safe projection; AI builds a request-local source allowlist and routes one contextual read-only tool to a single authorized provider. Verified page context supplies the default source; requests without context use generic single-source routing and ask for clarification when ambiguous. Phase 1 is authenticated-only and reuses existing Core search; public assistance, automatic cross-provider fan-out, and new passage indexes remain separately gated.
 
 **Tech Stack:** Laravel 12, PHP 8.4, Core authorization/ACL and orchestrated search, Laravel Scout, Elasticsearch/Typesense/database search drivers, NeuronAI v3, Pest 4.
 
@@ -29,6 +29,7 @@ Do not create a second CMS index in this plan. Do not add `/api/v1` or anonymous
 - Create: `Modules/Core/app/ApplicationContent/Contracts/ApplicationContentRetrievalProviderInterface.php`
 - Create: `Modules/Core/app/ApplicationContent/Contracts/ApplicationContentRetrievalProviderRegistryInterface.php`
 - Create: `Modules/Core/app/ApplicationContent/Data/ApplicationContentQuery.php`
+- Create: `Modules/Core/app/ApplicationContent/Data/ApplicationContentSourceDescriptor.php`
 - Create: `Modules/Core/app/ApplicationContent/Data/ApplicationContentAuthorization.php`
 - Create: `Modules/Core/app/ApplicationContent/Data/ApplicationContentHit.php`
 - Create: `Modules/Core/app/ApplicationContent/Data/ApplicationContentResult.php`
@@ -40,7 +41,7 @@ Do not create a second CMS index in this plan. Do not add `/api/v1` or anonymous
 
 - [ ] **Step 1: Write the failing registry and DTO tests**
 
-Cover normalized source-key lookup, deterministic source listing, unknown source, duplicate registration failure, immutable DTOs, limit validation, and rejection of unsafe/oversized hit fields. Define an inline fake implementing `ApplicationContentRetrievalProviderInterface` in the test file; it receives its source key through the constructor and returns an empty typed result.
+Cover normalized source-key lookup, deterministic source listing, unknown source, duplicate registration failure, immutable DTOs, descriptor validation, limit validation, and rejection of unsafe/oversized hit fields. Assert registration is explicit and no event, reflection, or container scan discovers providers. Define an inline fake implementing `ApplicationContentRetrievalProviderInterface` in the test file; it receives its typed descriptor through the constructor and returns an empty typed result.
 
 ```php
 it('rejects duplicate source keys instead of silently replacing providers', function (): void {
@@ -67,9 +68,7 @@ Use this public provider shape:
 ```php
 interface ApplicationContentRetrievalProviderInterface
 {
-    public function sourceKey(): string;
-    public function module(): string;
-    public function entity(): string;
+    public function descriptor(): ApplicationContentSourceDescriptor;
 
     public function retrieve(
         ApplicationContentQuery $query,
@@ -77,6 +76,8 @@ interface ApplicationContentRetrievalProviderInterface
     ): ApplicationContentResult;
 }
 ```
+
+`ApplicationContentSourceDescriptor` contains exactly a normalized source key, module key, Core entity key, supported locales, retrieval capabilities, and bounded intent categories. Reject free-form prompt instructions, class/index/connection names, callbacks, authorization data, and user- or tenant-specific values.
 
 `ApplicationContentQuery` contains exactly `source`, `query`, `locale`, and `limit`. Clamp `limit` to the Core configuration maximum and reject blank queries. `ApplicationContentAuthorization` contains only the resolved permission name and optional `FiltersGroup`; it is internal control-plane data and must not implement `JsonSerializable`.
 
@@ -86,7 +87,7 @@ Create `application-content.php` with conservative server-owned defaults: `max_r
 
 - [ ] **Step 4: Implement and bind the registry**
 
-Use normalized lowercase source keys. `register()` throws on collision. `providerFor()` returns `null` for unknown keys; it never resolves a class name dynamically. `sources()` returns sorted keys. Bind the interface as a singleton in `CoreServiceProvider`, following `GraphProviderRegistryInterface`.
+Use normalized lowercase source keys from the descriptor. `register()` throws on collision. `providerFor()` returns `null` for unknown keys; it never resolves a class name dynamically. `descriptors()` returns a source-key-sorted list. Bind the interface as a singleton in `CoreServiceProvider`, following `GraphProviderRegistryInterface`. Providers are registered explicitly by module service providers during boot; do not introduce discovery events. Events remain available only for post-registration indexing, invalidation, deletion, and freshness notifications.
 
 - [ ] **Step 5: Run tests and commit Core**
 
@@ -215,13 +216,19 @@ rtk git -C Modules/CMS commit -m "feat(cms): provide authorized content evidence
 **Files:**
 
 - Create: `Modules/AI/app/Services/ApplicationContent/ApplicationContentToolProvider.php`
+- Create: `Modules/AI/app/Services/ApplicationContent/ApplicationContentSourceRouter.php`
+- Create: `Modules/AI/app/Services/ApplicationContent/Data/ApplicationContentRequestContext.php`
+- Create: `Modules/AI/app/Services/ApplicationContent/Data/ApplicationContentRoutingDecision.php`
+- Create: `Modules/AI/app/Services/ApplicationContent/Enums/ApplicationContentRoutingStatus.php`
 - Create: `Modules/AI/app/Services/ApplicationContent/ApplicationContentPromptProjector.php`
 - Create: `Modules/AI/tests/Unit/Services/ApplicationContent/ApplicationContentToolProviderTest.php`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
 - [ ] **Step 1: Write failing tool schema and context tests**
 
-Assert one tool named `application_content_search` with only `source`, `query`, `locale`, and `limit`. Assert absence of user/tenant/role/permission/ACL/index/class/field/filter/system-prompt arguments. Cover developer profile exclusion, unauthenticated context, unapproved source, limit clamping, timeout, provider denial, and safe evidence projection.
+Assert one tool named `application_content_search` with only `source`, `query`, `locale`, and `limit`. Assert `source` is a runtime enum constrained to the request-local authorized allowlist, never a free-form string, and the schema contains no unavailable provider. Assert absence of user/tenant/role/permission/ACL/index/class/field/filter/system-prompt arguments. Cover developer profile exclusion, unauthenticated context, unapproved source, limit clamping, timeout, provider denial, and safe evidence projection.
+
+Add router cases for: verified CMS context selects `cms.contents` for a compatible request; forged, stale, or unverified context is ignored; contextual mode does not broaden to another source without an explicit user request; absent context uses generic descriptor routing; a sole authorized candidate is selected deterministically; no suitable source returns no selection; ambiguous generic routing requests clarification; registry order never resolves ambiguity; permissions or disabled modules remove a source before routing.
 
 ```php
 it('registers content retrieval only for approved authenticated sources', function (): void {
@@ -243,7 +250,15 @@ Expected: FAIL because the contextual tool provider does not exist.
 
 - [ ] **Step 3: Implement contextual tool creation**
 
-Build the tool per authenticated `AssistantAccessContext`. Intersect the requested source with the server-owned capability policy and the registry. Call `ApplicationContentRetrievalService` directly with the authenticated request; never issue an HTTP request to Laraplate.
+Build the tool per authenticated `AssistantAccessContext`. Construct the source allowlist as registered providers intersected with enabled modules, profile capabilities, tenant configuration, and effective authorization eligibility. Do not store request identity, tenant, permissions, ACL, or page context in the singleton registry or provider instances.
+
+`ApplicationContentRequestContext` is created only from server-verified route/module/entity metadata and contains `module`, optional `entity`, and optional opaque `recordKey`. Absence of verified context is represented by `null`, not by accepting an unverified DTO.
+
+`ApplicationContentSourceRouter::route()` receives the natural-language query, authorized descriptors, optional verified context, and optional explicit source intent. It returns an immutable `ApplicationContentRoutingDecision` with status `selected`, `no_match`, or `clarification_required` and an optional selected source. In contextual mode, it selects the matching authorized source as the default for compatible requests and permits another source only for an explicit user request. Without context, use descriptor intent categories to select exactly one authorized source. Do not use registry order as a fallback and do not fan out in Phase 1. Keep selection diagnostics payload-free and internal.
+
+Build the tool schema per request. Contextual mode narrows the runtime `source` enum to the compatible default unless explicit source intent was verified from the user's request. Generic mode exposes the request allowlist as the enum and validates any model proposal through the router. The model never makes the authoritative routing decision.
+
+Call `ApplicationContentRetrievalService` directly with the authenticated request; never issue an HTTP request to Laraplate.
 
 Keep the tool outside `ActionRequestService` and mutation replay. Provider errors return a generic unavailable tool result and payload-free reason code.
 
@@ -271,7 +286,7 @@ rtk git -C Modules/AI commit -m "feat(ai): add authenticated application content
 
 - [ ] **Step 1: Write end-to-end failing assistance tests**
 
-Cover a successful CMS question, combined content evidence plus Graph expansion, no-evidence abstention, unsupported source, permission denial, hidden-record equivalence, malicious instructions inside evidence, unsafe citation, provider timeout, and output-policy rejection.
+Cover a successful contextual CMS question, a generic request without page context, ambiguous generic routing, explicit cross-module intent, combined content evidence plus Graph expansion, no-evidence abstention, unsupported source, permission denial, hidden-record equivalence, malicious instructions inside evidence, unsafe citation, provider timeout, and output-policy rejection.
 
 Assert application content is never added to either documentation index and the developer CLI receives no application content tool.
 
@@ -285,7 +300,7 @@ Expected: FAIL because the in-app orchestrator does not register or map applicat
 
 - [ ] **Step 3: Integrate evidence under the existing security pipeline**
 
-Register the tool only after profile/access-context creation and input policy success. Add its evidence to `AssistantPromptContext` under the existing total token/chunk/node budget. The orchestration order remains authorization → retrieval → prompt projection → complete generation → output validation → persistence.
+Register the tool only after profile/access-context creation, input policy success, request-local source allowlist construction, and routing. Add its evidence to `AssistantPromptContext` under the existing total token/chunk/node budget. The orchestration order remains authentication → verified application context → provider capability eligibility → source allowlist → routing → record permission and ACL authorization → retrieval → prompt projection → complete generation → output validation → persistence.
 
 - [ ] **Step 4: Map citations and enforce abstention**
 
@@ -362,7 +377,7 @@ Describe documentation RAG, Core Graph, and application content retrieval as ind
 
 - [ ] **Step 2: Document provider implementation rules**
 
-Record Core ownership, source-key registration, duplicate failure, authenticated gateway use, pre-query ACL, rehydration, safe projection, evidence DTO shape, no raw `_source`, and no module dependency on AI.
+Record Core ownership, typed descriptors, explicit service-provider registration without discovery events, duplicate failure, request-local allowlists, contextual and generic single-source routing, ambiguity clarification, authenticated gateway use, pre-query ACL, rehydration, safe projection, evidence DTO shape, no raw `_source`, and no module dependency on AI.
 
 - [ ] **Step 3: Record Phase 2 without implementing it**
 
@@ -389,7 +404,7 @@ rtk git -C Modules/CMS commit -m "docs(cms): document content retrieval provider
 
 - [ ] **Step 1: Add adversarial cross-module cases**
 
-Cover forged source keys, identity/tenant/permission arguments, raw filter/query DSL, source collision, disabled module, stale index hit, cross-tenant record, hidden field, malicious retrieved instructions, oversized excerpt, provider timeout, partial diagnostics, citation path injection, anonymous request, and attempted `/api/v1` use.
+Cover forged source keys, forged module/entity/page context, stale context, identity/tenant/permission arguments, raw filter/query DSL, source collision, disabled module, registry-order manipulation, ambiguous routing, attempted source selection outside the request allowlist, stale index hit, cross-tenant record, hidden field, malicious retrieved instructions, oversized excerpt, provider timeout, partial diagnostics, citation path injection, anonymous request, and attempted `/api/v1` use.
 
 - [ ] **Step 2: Run the full deterministic release suite**
 
@@ -416,7 +431,11 @@ rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval se
 
 - [ ] Core owns neutral contracts and no AI/Neuron dependency.
 - [ ] Optional modules register providers without depending on AI.
+- [ ] Providers are registered explicitly during module boot; events are reserved for lifecycle notifications, not discovery.
 - [ ] Duplicate source registration fails deterministically.
+- [ ] Every request receives an allowlist intersecting registry, enabled modules, profile, tenant configuration, and effective authorization.
+- [ ] Verified application context selects the default source; absent context uses generic single-source routing.
+- [ ] Ambiguous generic requests ask for clarification and Phase 1 never fans out automatically.
 - [ ] Phase 1 requires an authenticated application user.
 - [ ] Permission, ACL, tenant, validity, and deletion constraints apply before evidence reaches AI.
 - [ ] Search hits are rehydrated and reauthorized before safe projection.

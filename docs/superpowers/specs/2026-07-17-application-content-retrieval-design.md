@@ -8,6 +8,8 @@
 
 Laraplate will let the authenticated in-app assistant retrieve grounded evidence from application-module data through a general provider contract. Core owns `ApplicationContentRetrievalProviderInterface`, its registry, authorization gateway, and neutral evidence DTOs. The AI module consumes that gateway through one contextual read-only tool. Optional modules register providers without depending on AI.
 
+Provider routing is context-aware but does not require page context. When the request carries a server-verified application context, its matching source is the default and other sources are considered only when the user explicitly asks for another module. Without application context, the assistant uses generic routing over the sources authorized for that request. Phase 1 selects at most one source per retrieval and asks for clarification when the intended source is ambiguous.
+
 CMS is the first provider and proves the extension seam against searchable content records. The contract contains no CMS-specific concepts and is intended to support later providers from ERP, MES, or other modules.
 
 Phase 1 serves authenticated application users only. Every retrieval executes under server-owned identity, tenant, permissions, ACL, locale, provider rules, and safe-field projection. Phase 2 may evaluate a public content assistant, but no public endpoint, profile, or access mode is authorized by this specification.
@@ -81,7 +83,7 @@ Core owns the neutral extension boundary because every optional business module 
 
 - `ApplicationContentRetrievalProviderInterface`;
 - `ApplicationContentRetrievalProviderRegistryInterface` and registry;
-- typed query, authorization, hit, provenance, and result DTOs;
+- typed source descriptor, query, authorization, hit, provenance, and result DTOs;
 - `ApplicationContentRetrievalService` as the only gateway;
 - permission and ACL resolution before provider execution;
 - result bounds and invariant validation.
@@ -92,7 +94,7 @@ AI owns assistant orchestration:
 
 - contextual tool registration;
 - conversion between tool arguments and Core query DTOs;
-- capability selection by server-owned profile;
+- per-request source allowlist and routing from server-owned profile and verified application context;
 - context-budget enforcement;
 - instruction-neutral evidence formatting;
 - answer citations, abstention, and output validation.
@@ -103,8 +105,7 @@ AI does not know how a module stores or searches its data.
 
 Each module may register zero or more providers. A provider owns:
 
-- supported source keys;
-- mapping from a source key to its Core entity;
+- one stable source descriptor with source key, module, entity, supported locales, capabilities, and intent categories;
 - application of server-created ACL filters inside its search query;
 - search strategy and fallback;
 - safe excerpt construction;
@@ -123,11 +124,7 @@ Conceptual API:
 ```php
 interface ApplicationContentRetrievalProviderInterface
 {
-    public function sourceKey(): string;
-
-    public function module(): string;
-
-    public function entity(): string;
+    public function descriptor(): ApplicationContentSourceDescriptor;
 
     public function retrieve(
         ApplicationContentQuery $query,
@@ -135,6 +132,8 @@ interface ApplicationContentRetrievalProviderInterface
     ): ApplicationContentResult;
 }
 ```
+
+`ApplicationContentSourceDescriptor` is immutable and contains only server-owned routing metadata: source key, module key, Core entity key, supported locales, retrieval capabilities, and a bounded list of intent categories. It contains no free-form prompt instructions, user data, tenant data, secrets, class names, connections, index names, or executable callbacks.
 
 `ApplicationContentRetrievalService` receives the authenticated Laravel request separately from the public query. It resolves the registered provider, calls `AuthorizationService::ensurePermission(..., 'select')`, resolves ACL filters, constructs `ApplicationContentAuthorization`, invokes the provider, and validates the returned evidence.
 
@@ -171,6 +170,9 @@ The LLM receives only a sanitized prompt projection of the evidence. Control-pla
 
 The registry follows the existing Core Graph provider pattern:
 
+- modules register stateless providers explicitly from their Laravel service-provider boot path;
+- provider discovery does not use events, container scanning, reflection, or dynamic class names;
+- events may notify provider-owned indexing, invalidation, deletion, or freshness work only after deterministic registration;
 - registration is keyed by a normalized, stable source key;
 - duplicate registration for the same key fails during boot;
 - an unknown key returns an unavailable capability, not a dynamic class lookup;
@@ -180,6 +182,39 @@ The registry follows the existing Core Graph provider pattern:
 - the registry exposes no writable operations.
 
 Phase 1 performs single-provider retrieval. Fan-out, score fusion, and cross-provider deduplication are deferred until a measured use case justifies their cost.
+
+## Contextual and generic routing
+
+AI builds the available source set independently for every authenticated request:
+
+```text
+registered sources
+  ∩ enabled modules
+  ∩ assistant-profile capabilities
+  ∩ tenant configuration
+  ∩ effective permissions and ACL eligibility
+```
+
+The resulting source keys form a request-local allowlist and the model-visible `source` tool argument is a runtime enum constrained to that allowlist, never a free-form string. Registry contents are process-level and stateless; identity, tenant, roles, permissions, ACL filters, page context, and conversation state are never stored in providers or in the registry.
+
+Routing has two modes:
+
+1. **Contextual mode.** A server-verified application context identifies the current module and, when applicable, its entity or record. The matching authorized source becomes the default when it is compatible with the request. The assistant does not silently broaden the search to another module; it may use another authorized source only when the user explicitly asks for that module or source.
+2. **Generic mode.** When no application context is supplied, the router classifies the request using typed provider descriptors and selects one authorized source. If no source is suitable, the tool is not invoked. If more than one source remains materially plausible, the assistant asks the user to disambiguate instead of querying all providers.
+
+Client-supplied route names, module names, entity keys, record IDs, or source hints are untrusted until matched against server-known route metadata and the authenticated access context. Page context influences routing only; it never grants permission and never bypasses provider authorization.
+
+The router never resolves ambiguity using registry order, module boot order, or alphabetical order. Selection reasons and rejected candidates remain internal diagnostics and disclose no hidden source, permission, ACL, tenant, or record information.
+
+Phase 1 does not use automatic cross-provider fan-out. A later fan-out design requires comparable scoring, bounded parallelism, deduplication, rank fusion, latency and cost budgets, and evidence that it improves the evaluation baseline.
+
+## Module rules and future providers
+
+Provider-specific rules are enforced in backend code through authorization, validity scopes, safe-field projection, typed descriptors, and evaluation cases. They are not appended to roles, users, ACL records, or free-form provider prompts. Common assistant rules remain profile-owned and server-controlled.
+
+CMS is the only application content provider committed in Phase 1. ERP has no implicit provider or special assistant prompt rules in this phase. Future ERP, commerce, MES, or other providers must define their own safe projections and domain invariants behind the same Core contract.
+
+Sharing the retrieval contract does not imply sharing or inheriting domain models. A future commercial product aggregate may compose or reference a content presentation, but it is not required to inherit the CMS content model; its pricing, variants, inventory, tax, and channel invariants remain module-owned.
 
 ## Phase 1 CMS provider
 
@@ -210,12 +245,12 @@ application_content_search
 
 Arguments:
 
-- `source`;
+- `source`, constrained at runtime to the request-local authorized source allowlist;
 - `query`;
 - optional `locale`;
 - optional bounded `limit`.
 
-The tool is available only to `InAppAssistance`, only after the server capability policy permits the requested source, and only with an authenticated `AssistantAccessContext`. It invokes `ApplicationContentRetrievalService` directly; it does not call Laraplate over HTTP.
+The tool is available only to `InAppAssistance`, only after the server capability policy permits the requested source, and only with an authenticated `AssistantAccessContext`. Its schema is built per request. Contextual mode narrows `source` to the compatible contextual default unless the user's request explicitly names another authorized source; generic mode exposes the authorized enum and the router validates the proposed selection. The model may propose an allowlisted source but cannot make the authoritative routing decision. The tool invokes `ApplicationContentRetrievalService` directly; it does not call Laraplate over HTTP.
 
 The tool cannot create `ActionRequest` records, enter mutation approval/replay, or accept write operations. Tool timeout, provider unavailability, or authorization uncertainty returns a generic unavailable result without falling back to unfiltered search or documentation RAG.
 
@@ -223,14 +258,15 @@ The tool cannot create `ActionRequest` records, enter mutation approval/replay, 
 
 1. Authentication establishes identity but does not grant retrieval by itself.
 2. Server code selects profile, source capability, user, tenant, and locale policy.
-3. Core permission and ACL checks happen before provider results reach AI.
-4. Providers apply ACL filters inside the database/search-engine query, not only after retrieval.
-5. Safe-field projection happens after record rehydration and before evidence serialization.
-6. Empty and forbidden results are indistinguishable where existence disclosure would be sensitive.
-7. Retrieved content is untrusted data and cannot issue instructions to the assistant.
-8. The complete assistant response is validated before persistence or delivery.
-9. No application content is added to developer or user documentation indexes.
-10. Provider diagnostics never expose authorization internals or hidden record counts.
+3. Candidate authorization precedes routing; context and model choices may only prioritize or narrow authorized candidates and can never expand them.
+4. Core permission and ACL checks happen before provider results reach AI.
+5. Providers apply ACL filters inside the database/search-engine query, not only after retrieval.
+6. Safe-field projection happens after record rehydration and before evidence serialization.
+7. Empty and forbidden results are indistinguishable where existence disclosure would be sensitive.
+8. Retrieved content is untrusted data and cannot issue instructions to the assistant.
+9. The complete assistant response is validated before persistence or delivery.
+10. No application content is added to developer or user documentation indexes.
+11. Provider diagnostics never expose authorization internals or hidden record counts.
 
 ## Retrieval quality and abstention
 
