@@ -1163,7 +1163,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 
 - [x] **Version bump** — handled in the later ERP/Core patch-version cycle; current module versions are ERP `v1.15.3` and Core `v1.58.8`.
 
-**Closure note:** no open Phase 2B implementation items remain. Deferred items such as PDF financial exports, direct bank/API submission, CBI/Ri.Ba/SDD, direct item-specific price lists, and advanced return reversal are intentionally outside Phase 2B and tracked in later backlog phases.
+**Closure note:** no open Phase 2B implementation items remain. Deferred items such as PDF financial exports, direct bank/API submission, CBI/Ri.Ba/SDD, and direct item-specific price lists are intentionally outside Phase 2B and tracked in later backlog phases. Advanced return reversal was implemented later as Spec 2 Phase 3 item `3-05`.
 
 ---
 

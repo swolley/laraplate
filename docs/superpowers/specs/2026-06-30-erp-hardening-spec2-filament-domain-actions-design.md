@@ -202,7 +202,7 @@ No open Phase 2B items remain.
 |----|--------|------|
 | 2C-01 | done | Full FatturaPA XML + XSD validation |
 | 2C-02 | done | Complete SDI party/company mapping |
-| 2C-03 | done | Production provider (e.g. Aruba) |
+| 2C-03 | done | Production provider (Aruba upload/polling/callback adapter) |
 | 2C-04 | done | Extended admin policies (tax codes, company switch, sequences) |
 | 2C-05 | done | FatturaPA schema columns and submit readiness validation |
 
@@ -216,7 +216,7 @@ No open Phase 2B items remain.
 | 3-02 | open | Opt-in external API + versioning |
 | 3-03 | open | Per-model CRUD/API exposure governance |
 | 3-04 | open | Centralize permission-name construction (explicit `$connection`) |
-| 3-05 | open | Revert/reverse processed return |
+| 3-05 | done | Revert/reverse processed return |
 | 3-06 | open | HTTP tests for domain actions |
 
 ### Phase 4 — Cash / Tricount & commercial depth
@@ -262,10 +262,11 @@ Command scope is operational and batch-oriented. Commands must wrap existing ser
 |----|--------|------|
 | 6-01 | open | `erp:health-check` diagnostics for install, settings, permissions, sequences, and provider config |
 | 6-02 | open | `erp:sequences:audit` gap/counter consistency audit |
-| 6-03 | open | `erp:einvoice:refresh-statuses` scheduled provider polling for open submissions |
+| 6-03 | done | `erp:einvoice:refresh-statuses` scheduled provider polling for open submissions |
 | 6-04 | open | `erp:bank-statements:import` batch import from local/integration directories |
+| BANK-IT-01 | done | CBI bonifici supplier export plus Ri.Ba/SDD CORE receivable file generators |
 | 6-05 | open | `erp:vat-settlements:compute` dry-run and batch compute for open fiscal periods |
-| 6-06 | open | `erp:reports:snapshot` scheduled CSV snapshot/export for selected reports |
+| 6-06 | done | `erp:reports:snapshot` immutable CSV/PDF snapshot archive for financial reports |
 
 Already covered elsewhere: `erp:migrate-movements-to-journal` belongs to `4-01`; FX daily-rate import belongs to `5-01`.
 

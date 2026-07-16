@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Active — Phase 2C completed; Phase 3 foundation is the current implementation slice  
+**Status:** Backlog ready — Phase 2C completed; Phase 3+ remains open enterprise/future work. Task `3-05` processed-return reverse is implemented.  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 3 / Wave 1. Phase 2C / Wave 2 is complete; continue with Task 1 (`3-04`) for shared permission-name construction, then Task 2 (`3-03`) for CRUD/API exposure governance.
+**Next candidate slice:** Phase 3 / Wave 1. Phase 2C / Wave 2 is complete; if Phase 3 is approved, start with Task 1 (`3-04`) for shared permission-name construction, then Task 2 (`3-03`) for CRUD/API exposure governance.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -305,13 +305,16 @@ Evidence: ERP `2cdcdb8`; targeted subset `21 passed, 63 assertions`.
 
 - [x] Create: `Modules/ERP/app/Services/EInvoice/ArubaEInvoiceProvider.php` implementing `EInvoiceProvider`
 - [x] Config: `config/erp.php` — `einvoice.driver` = `stub|aruba|fatturapa`; credentials via `config()` only
-- [x] HTTP client: Laravel `Http::` with configurable base URL / submit path / status path; maps submit and remoteStatus responses
-- [x] Test: `Http::fake()` — submit returns external id; refresh maps status
+- [x] HTTP client: Laravel `Http::` with configurable base URL, auth base URL, upload path, notifications path, token or username/password auth; maps upload result and SDI notification outcomes
+- [x] Callback route: `POST /api/v1/erp/einvoice/aruba/callbacks` with optional static API key header validation
+- [x] Polling command: `erp:einvoice:refresh-statuses --company=1 --limit=50 --dry-run`
+- [x] Persistence: polling payloads, callbacks, Aruba SDI identifiers, and conservation availability metadata in `EInvoiceSubmission.response_payload`
+- [x] Test: `Http::fake()` — upload returns external id; refresh maps notifications; callback and command tests cover operational flow
 - [x] **Production secrets:** never in repo; env via config file only
 
-Evidence: ERP `8e0bd9e`; targeted subset `28 passed, 77 assertions`.
+Evidence: ERP `8e0bd9e` for initial adapter; hardened 2026-07-16 with `ArubaEInvoiceProviderTest` callback/command coverage. Targeted subset after hardening: `30 passed, 71 assertions`.
 
-**Boundary:** public Aruba API docs were not available during implementation. This task delivers the configurable adapter and HTTP contract tests; endpoint paths/payload/status fields must be verified against the contracted Aruba environment before production go-live.
+**Boundary:** implementation follows Aruba v2-style upload/auth/notifications/callback concepts. Before production go-live, verify the actual contracted Aruba tenant, callback accreditation/IP allowlist, retention contract, credentials, and sandbox/prod endpoint selection.
 
 ---
 
@@ -430,42 +433,25 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 10: Revert/reverse processed return (3-05)
+### Task 10: Revert/reverse processed return (3-05) — completed 2026-07-16
 
 **Backlog:** `3-05`  
 **Modules:** ERP
 
-**Current gap:** `ReturnOrderService::cancel()` only allows Draft/Approved; processed returns with DDT cannot be reverted.
+**Implemented truth:** processed customer/supplier returns can be reversed before any linked fiscal note exists. The implementation is intentionally conservative: linked credit/debit notes block reverse rather than being deleted or unlinked automatically.
 
 **Files:**
-- Create: `Modules/ERP/app/Services/Returns/ReturnOrderRevertService.php`
-- Create: `Modules/ERP/app/Services/Returns/SupplierReturnRevertService.php`
-- Modify: `ReturnOrderService` / `SupplierReturnService` — delegate or expose `revert()`
-- Register domain action `revert` in Task 8 registrar
-- Filament: optional `ReturnOrderActions::revert()` on `EditReturnOrder` (visible when `Processed` and no posted credit note)
-- Test: `ReturnOrderRevertTest.php`
+- Modified: `Modules/ERP/app/Services/Returns/ReturnOrderService.php` — `reverseProcessed()`
+- Modified: `Modules/ERP/app/Services/Returns/SupplierReturnService.php` — `reverseProcessed()`
+- Modified: `Modules/ERP/app/Filament/Resources/ReturnOrders/Pages/EditReturnOrder.php`
+- Modified: `Modules/ERP/app/Filament/Resources/SupplierReturns/Pages/EditSupplierReturn.php`
+- Modified: `Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php`
+- Modified: `Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php`
 
-- [ ] **Step 1: Failing test** — processed return with inbound DDT → `revert()` unposts DDT (via `posted_at = null`), restores `qty_returned` on source lines, sets status `Cancelled` or new `Reverted` status (prefer `Cancelled` + audit fields).
-
-- [ ] **Step 2: Implement transaction**
-
-```php
-public function revert(ReturnOrder $return_order): ReturnOrder
-{
-    return DB::transaction(function () use ($return_order): void {
-        $locked = ReturnOrder::query()->with(['lines', 'delivery_note'])->lockForUpdate()->findOrFail(...);
-        // deny if credit_note_invoice_id posted
-        // unpost delivery note if posted
-        // reverse qty_returned on invoice/SO lines
-        // clear delivery_note_id, processed_at
-        // status -> Cancelled
-    });
-}
-```
-
-- [ ] **Step 3:** Policy `revert` — state: `Processed` only; permission `default.erp_return_orders.revert` (seed).
-
-- [ ] **Step 4: Commit**
+- [x] **Step 1: Failing tests** — customer and supplier processed-return reverse restores stock/returned quantities; linked NC/ND blocks reverse.
+- [x] **Step 2: Implement transaction** — lock return, block linked fiscal note, unpost generated DDT through existing inventory observer/service, restore source `qty_returned`, clear `processed_at`, set status back to `Approved`.
+- [x] **Step 3: Filament actions** — `reverse_processed` header actions on customer/supplier return edit pages, visible only for processed returns without linked NC/ND.
+- [x] **Step 4: Verification** — `php artisan test --compact Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php` passes.
 
 ---
 
@@ -750,35 +736,126 @@ git -C Modules/ERP commit -m "feat(erp): add document sequence audit command"
 
 ### Task 31: E-invoice status polling command (6-03)
 
+**Status:** Done 2026-07-16  
 **Backlog:** `6-03`  
 **Modules:** ERP
 
 **Command:** `php artisan erp:einvoice:refresh-statuses --company=1 --limit=50 --dry-run`
 
 **Files:**
-- Create: `Modules/ERP/app/Console/EInvoiceRefreshStatusesCommand.php`
-- Create: `Modules/ERP/app/Services/EInvoice/EInvoiceStatusRefreshBatch.php`
-- Create: `Modules/ERP/tests/Feature/Console/EInvoiceRefreshStatusesCommandTest.php`
-- Create: `Modules/ERP/tests/Feature/Services/EInvoiceStatusRefreshBatchTest.php`
+- Created: `Modules/ERP/app/Console/EInvoiceRefreshStatusesCommand.php`
+- Modified: `Modules/ERP/app/Services/EInvoice/EInvoiceSubmissionService.php`
+- Covered by: `Modules/ERP/tests/Feature/Services/ArubaEInvoiceProviderTest.php`
 
-**Batch behavior:**
-- process open submissions only (`submitted` / provider-pending states);
-- skip rows without external provider id where the provider requires it;
-- call `EInvoiceSubmissionService::refresh()` per row;
-- continue after a single-row provider failure and report failures at the end;
-- support `--dry-run` by listing candidates without contacting the provider;
-- intended scheduler cadence: every 15–60 minutes, configured by the host app, not hardcoded.
+**Implemented behavior:**
+- processes open submissions only (`queued` / `submitted`);
+- filters by company, provider code, and limit;
+- calls `EInvoiceSubmissionService::refresh()` per row;
+- continues after a single-row provider failure and reports failures at the end;
+- supports `--dry-run` by listing candidates without contacting the provider;
+- intended scheduler cadence remains host-app policy, not hardcoded in ERP.
 
-- [ ] **Step 1: Batch service test** — create two open submissions; fake provider returns accepted/rejected; assert statuses update.
-- [ ] **Step 2: Dry-run test** — assert no provider call and no status mutation.
-- [ ] **Step 3: Command test** — assert JSON summary includes processed/skipped/failed.
-- [ ] **Step 4: Implement service + command**
-- [ ] **Step 5: Docs + commit**
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/ArubaEInvoiceProviderTest.php` -> `9 passed, 26 assertions`; e-invoice/provider subset -> `30 passed, 71 assertions`.
 
-```bash
-php artisan test --compact Modules/ERP/tests/Feature/Services/EInvoiceStatusRefreshBatchTest.php Modules/ERP/tests/Feature/Console/EInvoiceRefreshStatusesCommandTest.php
-git -C Modules/ERP commit -m "feat(erp): add einvoice status polling command"
-```
+
+---
+
+### Task 33: Italian bank file exports beyond SEPA SCT
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/app/Services/Payments/CbiBonificiExporter.php`
+- `Modules/ERP/app/Services/Payments/ItalianReceivableBankFileExporter.php`
+- `Modules/ERP/app/Casts/PaymentRunFormat.php`
+- `Modules/ERP/app/Models/PartyBankAccount.php`
+- `Modules/ERP/database/migrations/2026_07_11_150000_create_party_bank_accounts_table.php`
+- `Modules/ERP/app/Filament/Resources/PaymentRuns/Actions/PaymentRunActions.php`
+
+**Scope:**
+- CBI bonifici is integrated with approved supplier `PaymentRun` export and stores export file name/checksum like SEPA.
+- Ri.Ba and SDD CORE are generated from customer receivable `PaymentScheduleLine` rows; SDD requires mandate reference/date on the customer `PartyBankAccount`.
+- No direct bank submission is performed.
+- Bank-specific certification/proprietary profile variants remain go-live tasks.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php Modules/ERP/tests/Feature/Services/ItalianReceivableBankFileExporterTest.php Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php` -> `14 passed, 55 assertions`.
+
+
+---
+
+### Task 34: Immutable financial report snapshots and PDF archives
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/database/migrations/2026_07_16_120000_create_report_snapshots_table.php`
+- `Modules/ERP/app/Models/ReportSnapshot.php`
+- `Modules/ERP/app/Services/Reporting/ReportPdfExporter.php`
+- `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
+- `Modules/ERP/app/Console/ReportSnapshotCommand.php`
+- `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
+
+**Scope:**
+- Immutable archive table stores report key, parameters, JSON payload, CSV content, base64 PDF content, generated timestamp, and content hash.
+- Model blocks updates/deletes for immutable rows.
+- `erp:reports:snapshot` supports `trial_balance`, `income_statement`, and `balance_sheet`, with `--company`, `--from`, `--to`, and `--dry-run`.
+- PDF renderer is dependency-free and intentionally simple; richer paginated/report-design PDF rendering remains an enhancement.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php` -> `16 passed, 48 assertions`.
+
+
+---
+
+### Task 35: Multi-currency FX rates and unrealized revaluation
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/database/migrations/2026_07_16_130000_create_exchange_rates_table.php`
+- `Modules/ERP/app/Models/ExchangeRate.php`
+- `Modules/ERP/app/Services/Currency/DatabaseCurrencyConverter.php`
+- `Modules/ERP/app/Services/Currency/FxRevaluationService.php`
+- `Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php`
+
+**Scope:**
+- Historical FX rates with source and date.
+- Converter resolves identity, latest direct rates, and inverse rates.
+- ERP service binding now uses `DatabaseCurrencyConverter`.
+- Unrealized FX revaluation posts balanced journal entries for open foreign-currency payment schedules using caller-supplied balance/gain/loss accounts.
+
+**Still future:** external provider feed imports, realized FX differences during settlement, and full close automation.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php Modules/ERP/tests/Feature/Providers/ERPServiceProviderTest.php` -> `6 passed, 16 assertions`.
+
+
+---
+
+### Task 36: Money value object and analytic dimensions
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/app/ValueObjects/Money.php`
+- `Modules/ERP/database/migrations/2026_07_16_140000_create_analytic_dimensions_tables.php`
+- `Modules/ERP/app/Models/AnalyticDimension.php`
+- `Modules/ERP/app/Models/AnalyticDimensionValue.php`
+- `Modules/ERP/app/Models/Pivot/JournalEntryLineHasAnalyticDimensionValue.php`
+- `Modules/ERP/app/Models/JournalEntryLine.php`
+- `Modules/ERP/tests/Feature/Support/MoneyTest.php`
+- `Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php`
+
+**Scope:**
+- `Money` is immutable and supports normalized amount/currency, same-currency arithmetic, negate/abs, equality, and allocation with rounding remainder.
+- Analytic dimensions are modeled as company dimensions and values.
+- Journal entry lines can attach analytic values through a first-class pivot with `allocation_percent` and timestamps.
+
+**Still future:** refactor every legacy float helper to `Money`, analytic reporting cubes, allocation engines, and automatic propagation from operational documents.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/MoneyTest.php Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php Modules/ERP/tests/Feature/Support/DecimalTest.php` -> `9 passed, 31 assertions`.
 
 ---
 
