@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-07-16-in-app-ai-assistance-security-design.md`
 
+**Application content follow-up:** After Tasks 1–7 establish the protected profile and contextual tool boundary, execute `docs/superpowers/plans/2026-07-17-application-content-retrieval.md` to add the general Core provider contract and authenticated module evidence tool.
+
 ---
 
 **Workspace rule:** Run Artisan and tests from the Laraplate application root. `Modules/AI` and `Modules/Core` are nested Git repositories. Commit AI files with `rtk git -C Modules/AI ...`, Core files with `rtk git -C Modules/Core ...`, and application-level docs with `rtk git ...` from the Laraplate root. Stage only paths named by each task because these repositories may contain unrelated work.
@@ -339,6 +341,7 @@ rtk git -C Modules/Core commit -m "docs(core): document graph tool security boun
 - [ ] Permissions and tenant filters apply before retrieved chunks reach the LLM.
 - [ ] Graph `search`, `expand`, and `stats` preserve Core permissions, ACL, provider rules, safe-field projections, and limits.
 - [ ] Graph tools have no mutation or action-replay path.
+- [ ] Application content providers, when enabled by the follow-up plan, use the same server-owned access context and remain read-only.
 - [ ] Restricted inputs and unsafe outputs fail closed without existence disclosure.
 - [ ] No rejected raw output is streamed, stored, or logged.
 - [ ] In-app streaming remains unavailable in v1.

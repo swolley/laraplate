@@ -12,6 +12,8 @@
 
 **Security prerequisite:** `docs/superpowers/plans/2026-07-16-in-app-ai-assistance-security.md` owns the separate user corpus, permissions/ACL enforcement, mandatory guardrails, and read-only Core Graph tools. Complete that plan before exposing RAG through the in-app assistant.
 
+**Application data extension:** `docs/superpowers/plans/2026-07-17-application-content-retrieval.md` owns the general Core provider contract, authenticated module evidence tool, CMS reference provider, and separately gated public phase. It does not change the documentation retrieval experiments in this plan.
+
 ---
 
 **Workspace rule:** Run Artisan and tests from the Laraplate application root. `Modules/AI` is a nested Git repository, so commit AI module files with `rtk git -C Modules/AI ...`; commit application-level specs and plans with `rtk git ...` from the Laraplate root.
@@ -23,6 +25,8 @@ Tasks 1–3 establish measurement and a replaceable vector baseline. Tasks 4 and
 Do not start Task 4 until Tasks 1–3 have produced a committed baseline report. Do not start Task 5 until hybrid results are recorded. Do not authorize a graph implementation from this plan.
 
 This plan evaluates documentation retrieval quality. It does not authorize sharing a corpus between assistant profiles or exposing Core Graph data. Evaluation reports must slice results by server-owned profile, and user-profile cases must use only the physically separate user index defined by the security prerequisite.
+
+Application-module data must not be added to this evaluation corpus. Its search indexes, provider results, citations, and metrics belong to the application content retrieval plan.
 
 ### Task 1: Versioned RAG evaluation dataset and loader
 
@@ -382,6 +386,7 @@ rtk git commit -m "docs(ai): record graph retrieval gate"
 | Safe fallback behavior | Tasks 4–5 |
 | Tenant/permission graph requirements | Task 6 spike-spec gate |
 | In-app corpus isolation, ACL, guardrails, and Core Graph tools | Separate mandatory security prerequisite plan |
+| Module-owned searchable evidence | Separate application content retrieval plan |
 
 **Placeholder scan:** No placeholders remain. The concrete graph-spike filenames are reserved but must not be created unless Task 6 passes and a separate brainstorming cycle approves the spike. No graph implementation task is authorized here.
 

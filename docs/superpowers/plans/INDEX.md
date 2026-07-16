@@ -24,3 +24,4 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.
 - `2026-07-16-rag-retrieval-strategy.md`: Evaluation-first documentation RAG evolution from vector baseline to optional hybrid/reranking, with a separate authorization gate for any graph spike.
 - `2026-07-16-in-app-ai-assistance-security.md`: Mandatory server-owned profiles, isolated user RAG, fail-closed guardrails, and ACL-preserving read-only Core Graph tools for in-app assistance.
+- `2026-07-17-application-content-retrieval.md`: General Core provider registry, authenticated module evidence retrieval, CMS record-level baseline, AI tool integration, and separately gated public assistance.
