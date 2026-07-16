@@ -15,6 +15,8 @@ The profiles are selected by server-owned entry points. The browser, request pay
 
 The in-app profile uses a physically separate RAG index containing only explicitly approved user-assistance documents. It may call a read-only Core Graph tool family for `search`, `expand`, and `stats`. Graph calls execute under the authenticated user's tenant, permissions, ACL, provider rules, and graph limits.
 
+It may also call registered application content retrieval providers through the read-only `application_content_search` tool. Providers return bounded evidence from module-owned searchable data and inherit the same server-owned profile, identity, tenant, permissions, ACL, locale, and safe-field requirements. They never add application records to a documentation index.
+
 In-app assistance is fail-closed. Mandatory input, retrieval, tool, and output guardrails run before any answer is delivered. Streaming is disabled for this profile in v1 so the complete output can be validated first.
 
 ## Existing state
@@ -56,8 +58,10 @@ The existing implementation is not yet a safe in-app assistant because:
 
 - Giving the in-app assistant access to source code or the developer corpus.
 - Allowing Graph tools to create, update, delete, approve, or execute business actions.
+- Allowing application content providers or their tool to mutate records.
 - Using Graphify, Microsoft GraphRAG, or a graph database for live application data.
 - Copying live application records into the documentation vector store.
+- Exposing an authenticated application content provider to anonymous/public callers in v1.
 - Letting prompts, tool arguments, or client context choose a tenant or user.
 - Replacing Core Graph authorization with LLM policy instructions.
 - Supporting token-by-token streaming for in-app assistance in v1.
@@ -199,6 +203,8 @@ The handler binds a server-created `AssistantAccessContext` containing the conve
 The AI module calls a typed Core Graph gateway/service directly. It must not issue HTTP requests back into Laraplate. Core remains responsible for entity resolution, permission checks, ACL query filters, provider rules, cycle handling, truncation, and relation limits.
 
 Graph tools are read-only by contract and implementation. They are not registered in the action approval/replay path and cannot be transformed into mutation tools by changing a prompt or risk level.
+
+Application content retrieval uses the separate contract and phase boundary defined in `2026-07-17-application-content-retrieval-design.md`. It complements Graph when the answer needs ranked evidence from searchable module data. Phase 1 is limited to authenticated application users; any public assistant requires a later dedicated design.
 
 ## Guardrail layers
 

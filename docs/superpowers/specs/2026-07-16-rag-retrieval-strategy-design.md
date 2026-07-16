@@ -63,6 +63,8 @@ The architecture therefore needs a stable vector baseline, measurable quality ga
 - Adding database/API/PDF ingestion in this strategy; each new source type requires its own ingestion spec.
 - Treating model search in Core and documentation RAG as the same index or service.
 - Treating the read-only Core Graph tool as a documentation graph retriever or as permission to implement graph mutations.
+- Copying application-module records into either documentation index.
+- Making application content retrieval depend on CMS-specific concepts.
 
 ## Terminology and boundaries
 
@@ -86,6 +88,10 @@ Graphify is an external knowledge-graph tool. GraphRAG is a family of retrieval 
 
 Core Graph tools query live application records through the existing authorized Graph framework. They are an approved read-only capability for the in-app assistant and are not gated by the future GraphRAG experiment. They use `search`, `expand`, and `stats`, inherit the authenticated user's tenant, permissions, ACL, provider rules, and graph limits, and never write live records into the documentation index.
 
+### Application content retrieval providers
+
+Application content retrieval is a third, separate capability for ranked evidence inside module-owned searchable data. Core owns the neutral provider contract and authorization gateway; AI exposes one contextual read-only tool; optional modules own their retrieval implementations. CMS is the first provider, but the contract contains no CMS-specific concepts. The authoritative design is `2026-07-17-application-content-retrieval-design.md`.
+
 ## Target architecture
 
 ```mermaid
@@ -102,6 +108,8 @@ flowchart LR
 ```
 
 The solid path is the committed architecture. The dotted graph path is a future extension point, not an implementation commitment.
+
+This diagram describes documentation retrieval only. The authenticated in-app assistant may additionally call Core Graph tools and registered application content retrieval providers; those capabilities keep separate data stores, authorization, evidence DTOs, and evaluation suites.
 
 The public entry points retain their purpose but no longer share one trust profile:
 

@@ -17,3 +17,4 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-09-database-guidelines-design.md`: Multi-DB compatibility (MySQL, MariaDB, PostgreSQL, Oracle, SQLite), migrations, indexes, FULLTEXT/Scout rules, `MigrateUtils` patterns.
 - `2026-07-16-rag-retrieval-strategy-design.md`: Locked documentation RAG direction — vector baseline, evaluation-first hybrid/reranking roadmap, and evidence-gated optional graph retrieval.
 - `2026-07-16-in-app-ai-assistance-security-design.md`: Mandatory developer/in-app profile isolation, separate corpora, fail-closed guardrails, and read-only ACL-preserving Core Graph tools.
+- `2026-07-17-application-content-retrieval-design.md`: General Core provider contract for ACL-preserving module evidence retrieval, AI tool orchestration, CMS reference provider, and a separately gated public phase.
