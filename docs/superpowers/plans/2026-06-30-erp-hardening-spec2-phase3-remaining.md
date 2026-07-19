@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Backlog ready — Phase 2C completed; Phase 3+ remains open enterprise/future work. Task `3-05` processed-return reverse is implemented.  
+**Status:** Active non-API backlog — Phase 2C and enterprise tasks `3-05`, `5-01`, `5-02`, `5-03`, `6-01`, `6-02`, `6-03`, `6-04`, `6-06` are completed. Phase 3/API is deliberately deferred.  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Next candidate slice:** Phase 3 / Wave 1. Phase 2C / Wave 2 is complete; if Phase 3 is approved, start with Task 1 (`3-04`) for shared permission-name construction, then Task 2 (`3-03`) for CRUD/API exposure governance.
+**Current slice:** Phase 6 operational commands. Tasks `6-01`, `6-02`, `6-03`, `6-04`, and `6-06` are complete; Task `6-05` VAT settlement batch computation is next. Phase 3 is retained for later review because Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -102,7 +102,7 @@ Default command contract:
 - Batch commands include `--company=`, `--limit=`, and deterministic logging.
 - Commands return non-zero exit code for failed checks/imports.
 - Every command has a Feature test using `$this->artisan(...)`.
-- Command registration is explicit in `ERPServiceProvider` because the ERP provider currently extends Nwidart directly, not Core's auto-scanning provider.
+- Command discovery follows `Modules\Core\Overrides\ModuleServiceProvider`, which `ERPServiceProvider` now extends.
 
 ---
 
@@ -596,37 +596,41 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ## Wave 5 — Architecture (Phase 5)
 
-### Task 23: Full Money value object (5-02)
+### Task 23: Money value object (5-02) — completed 2026-07-16
 
 **Backlog:** `5-02` — **do before 5-01**
 
-- [ ] Create: `Modules/ERP/app/Support/Money.php` (amount minor units + currency, immutable)
-- [ ] Bridge: `Money::fromDecimal(string $amount, string $currency): self`
-- [ ] Refactor `Decimal` monetary paths incrementally (invoice line totals first)
-- [ ] Test: rounding HALF_UP matches current golden master
+- [x] Created immutable `Modules/ERP/app/ValueObjects/Money.php` on top of normalized `Decimal` arithmetic.
+- [x] Added construction from decimal amount/currency, same-currency arithmetic, multiplication, sign operations, equality, zero checks, and allocation with deterministic rounding remainder.
+- [x] Added focused `MoneyTest` coverage and retained existing decimal/golden-master behavior.
+
+**Boundary:** replacing every legacy decimal/float call site is an incremental refactor, not a prerequisite for using the value object in new domain code.
 
 ---
 
-### Task 24: Real multi-currency + FX + revaluation (5-01)
+### Task 24: Multi-currency + FX + revaluation (5-01) — completed 2026-07-16
 
 **Backlog:** `5-01`  
 **Depends:** Task 23
 
-- [ ] Replace `NoopCurrencyConverter` with `EcbCurrencyConverter` or configurable provider
-- [ ] `FxRate` model + daily rate import command
-- [ ] `RevaluationService` — period-end unrealized gain/loss journal
-- [ ] Test: invoice in USD → balanced `amount_local` at posting date rate
+- [x] Replaced `NoopCurrencyConverter` binding with database-backed `DatabaseCurrencyConverter`.
+- [x] Added dated `ExchangeRate` rows with source, direct lookup, and inverse conversion.
+- [x] Added `FxRevaluationService` for balanced period-end unrealized gain/loss journals on open foreign-currency schedules.
+- [x] Added focused conversion/revaluation tests.
+
+**Boundary:** external FX feed import and realized FX differences during settlement remain separate enhancements.
 
 ---
 
-### Task 25: Analytic dimensions on journal lines (5-03)
+### Task 25: Analytic dimensions on journal lines (5-03) — completed 2026-07-16
 
 **Backlog:** `5-03`
 
-- [ ] Migration: `journal_entry_lines.project_id`, `cost_center_id` (nullable FKs)
-- [ ] `JournalPostingService` accepts optional dimension on each line
-- [ ] Reporting: trial balance by project filter
-- [ ] Test: post with dimension → persisted on lines
+- [x] Added company-owned analytic dimensions and dimension values instead of fixed project/cost-center columns.
+- [x] Added first-class journal-line pivot with allocation percentage, timestamps, and soft-delete support.
+- [x] Added model relations and persistence tests.
+
+**Boundary:** automatic propagation/allocation engines and analytic reporting cubes remain future enhancements.
 
 ---
 
@@ -664,19 +668,20 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 These commands are not a replacement for Filament/domain actions. They provide operator tooling for diagnostics, scheduled polling, imports, and controlled batch computations.
 
-### Task 29: ERP health-check command (6-01)
+### Task 29: ERP health-check command (6-01) — completed 2026-07-19
 
+**Status:** Done  
 **Backlog:** `6-01`  
 **Modules:** ERP
 
 **Command:** `php artisan erp:health-check`
 
 **Files:**
-- Create: `Modules/ERP/app/Console/HealthCheckCommand.php`
-- Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php` — register ERP console commands explicitly with `$this->commands([...])` when running in console
-- Create: `Modules/ERP/tests/Feature/Console/HealthCheckCommandTest.php`
-- Modify: `Modules/ERP/README.md`
-- Modify: `Modules/ERP/docs/rag/MODULE.md`
+- Created: `Modules/ERP/app/Console/HealthCheckCommand.php`
+- Created: `Modules/ERP/app/Services/Diagnostics/ErpHealthCheckService.php`
+- Command discovery is provided by the Core module service-provider override already used by ERP; no duplicate manual command registry is required.
+- Created: `Modules/ERP/tests/Feature/Console/HealthCheckCommandTest.php`
+- Updated: module README, user/developer RAG, glossary, plan, and master specification.
 
 **Checks:**
 - default company exists;
@@ -687,11 +692,11 @@ These commands are not a replacement for Filament/domain actions. They provide o
 - e-invoice driver config is internally valid (`stub`, `fatturapa`, `aruba`; Aruba requires base URL/token when selected);
 - command reports warning, failure, and success counts.
 
-- [ ] **Step 1: Failing command test** — assert `erp:health-check --format=json` returns non-zero and reports missing prerequisites on an empty ERP database.
-- [ ] **Step 2: Implement command** — use read-only Eloquent/service checks; do not create or repair data.
-- [ ] **Step 3: Add happy-path test** — seed `ERPDatabaseSeeder`, create minimal sequences, run command, assert exit code `0`.
-- [ ] **Step 4: Register command** — keep registration local to `ERPServiceProvider`.
-- [ ] **Step 5: Docs + commit**
+- [x] **Step 1: Failure test** — `--format=json` returns non-zero and reports missing prerequisites.
+- [x] **Step 2: Implement command/service** — all checks are read-only and missing tables/configuration become diagnostic failures rather than uncaught exceptions.
+- [x] **Step 3: Happy-path test** — seeded company/accounting/permissions plus current sequence returns success.
+- [x] **Step 4: Verify discovery** — command is auto-discovered through the Core module provider override.
+- [x] **Step 5: Docs + verification** — `4 passed (12 assertions)`; Pint passes.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Console/HealthCheckCommandTest.php
@@ -700,18 +705,19 @@ git -C Modules/ERP commit -m "feat(erp): add health check command"
 
 ---
 
-### Task 30: Document sequence audit command (6-02)
+### Task 30: Document sequence audit command (6-02) — completed 2026-07-19
 
+**Status:** Done  
 **Backlog:** `6-02`  
 **Modules:** ERP
 
 **Command:** `php artisan erp:sequences:audit --company=1 --year=2026`
 
 **Files:**
-- Create: `Modules/ERP/app/Console/DocumentSequencesAuditCommand.php`
-- Create: `Modules/ERP/app/Services/Accounting/DocumentSequenceAuditService.php`
-- Create: `Modules/ERP/tests/Feature/Console/DocumentSequencesAuditCommandTest.php`
-- Create: `Modules/ERP/tests/Feature/Services/DocumentSequenceAuditServiceTest.php`
+- Created: `Modules/ERP/app/Console/DocumentSequencesAuditCommand.php`
+- Created: `Modules/ERP/app/Services/Accounting/DocumentSequenceAuditService.php`
+- Created: `Modules/ERP/tests/Feature/Console/DocumentSequencesAuditCommandTest.php`
+- Created: `Modules/ERP/tests/Feature/Services/DocumentSequenceAuditServiceTest.php`
 
 **Audit scope:**
 - compare `DocumentSequence.last_number` against max posted document reference per document type where references are parseable;
@@ -721,11 +727,13 @@ git -C Modules/ERP commit -m "feat(erp): add health check command"
 
 **No mutation:** this command is read-only. Sequence repair remains a deliberate UI/domain action because it is operationally dangerous.
 
-- [ ] **Step 1: Service test** — create sequence and posted invoices with references; assert no issues.
-- [ ] **Step 2: Service test for mismatch** — set `last_number` below posted max; assert a failure issue.
-- [ ] **Step 3: Command test** — run with `--format=json`, assert issue count and non-zero exit when failures exist.
-- [ ] **Step 4: Implement service + command**
-- [ ] **Step 5: Docs + commit**
+- [x] **Step 1: Service test** — aligned invoice references produce a consistent result.
+- [x] **Step 2: Mismatch/duplicate/gap tests** — counter behind documents and duplicate references fail; gap-free stream holes warn; audit does not mutate sequence state.
+- [x] **Step 3: Command test** — JSON output and non-zero exit code cover hard inconsistencies.
+- [x] **Step 4: Implement service + command** — supports default/explicit company, current/explicit year, table/JSON output, and clean database error handling.
+- [x] **Step 5: Docs + verification** — combined command diagnostics subset: `9 passed (22 assertions)`; Pint passes.
+
+**Audit boundary:** invoices and sales/purchase orders have reliable persisted references. `Quotation` and `InternalJournal` sequence rows are reported as non-auditable because those models do not persist an equivalent generated reference; no fragile inference is attempted.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/DocumentSequenceAuditServiceTest.php Modules/ERP/tests/Feature/Console/DocumentSequencesAuditCommandTest.php
@@ -859,18 +867,21 @@ Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/Mone
 
 ---
 
-### Task 32: Bank statement batch import command (6-04)
+### Task 32: Bank statement batch import command (6-04) — completed 2026-07-19
 
+**Status:** Done  
 **Backlog:** `6-04`  
 **Modules:** ERP
 
 **Command:** `php artisan erp:bank-statements:import --bank-account=1 --format=camt053 --path=storage/app/erp-bank-imports --dry-run`
 
 **Files:**
-- Create: `Modules/ERP/app/Console/BankStatementsImportCommand.php`
-- Create: `Modules/ERP/app/Services/Banking/BankStatementBatchImportService.php`
-- Create: `Modules/ERP/tests/Feature/Console/BankStatementsImportCommandTest.php`
-- Create: `Modules/ERP/tests/Feature/Services/BankStatementBatchImportServiceTest.php`
+- Created: `Modules/ERP/app/Console/BankStatementsImportCommand.php`
+- Created: `Modules/ERP/app/Services/Banking/BankStatementBatchImportService.php`
+- Created: `Modules/ERP/tests/Feature/Console/BankStatementsImportCommandTest.php`
+- Created: `Modules/ERP/tests/Feature/Services/BankStatementBatchImportServiceTest.php`
+- Modified: original bank-statement migration/model with per-account SHA-256 source checksum.
+- Modified: existing CSV and structured import services to expose side-effect-free parsing.
 
 **Batch behavior:**
 - import all supported files from a directory (`csv`, `camt053`, `mt940`) or one explicit file path;
@@ -880,11 +891,13 @@ Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/Mone
 - move successfully imported files only if an explicit `--archive-path=` is supplied;
 - never auto-confirm reconciliation matches.
 
-- [ ] **Step 1: Dry-run test** — fixture CAMT file reports line count and creates no DB rows.
-- [ ] **Step 2: Import test** — fixture file creates statement and lines through existing import services.
-- [ ] **Step 3: Duplicate file test** — second run is idempotent by checksum or import metadata.
-- [ ] **Step 4: Implement service + command**
-- [ ] **Step 5: Docs + commit**
+- [x] **Step 1: Dry-run test** — CAMT fixture reports two lines and creates no statement/line rows.
+- [x] **Step 2: Import test** — CAMT/MT940/CSV delegate to existing parsers/import service and derive statement period boundaries.
+- [x] **Step 3: Duplicate file test** — per-bank-account SHA-256 checksum skips repeated imports independent of file name/path.
+- [x] **Step 4: Implement service + command** — file/directory input, auto/explicit format, per-file continuation, table/JSON output, and explicit optional archive path.
+- [x] **Step 5: Docs + verification** — batch and existing importer/parser suites: `16 passed (78 assertions)`; Pint passes.
+
+**Safety boundary:** the command never auto-confirms reconciliation matches. `--dry-run` never writes or moves files. Source files move only when `--archive-path` is explicitly supplied after successful persistence; retries remain checksum-idempotent.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementBatchImportServiceTest.php Modules/ERP/tests/Feature/Console/BankStatementsImportCommandTest.php
