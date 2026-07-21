@@ -1,6 +1,6 @@
 ---
 description: Database migrations, queries, and index guidelines with multi-DB compatibility
-globs: ["**/database/migrations/**", "**/config/database.php", "**/Helpers/MigrateUtils.php", "**/Search/Engines/DatabaseEngine.php", "**/Search/Translators/DatabaseTranslator.php"]
+globs: ["app/**/*.php", "Modules/*/app/**/*.php", "**/database/migrations/**", "**/config/database.php", "**/Helpers/MigrateUtils.php", "**/Search/Engines/DatabaseEngine.php", "**/Search/Translators/DatabaseTranslator.php"]
 alwaysApply: false
 ---
 
@@ -40,6 +40,16 @@ alwaysApply: false
 - Eloquent / query builder first.
 - Non-portable SQL → driver branch (e.g. `ILIKE` is PG-only).
 - Reference patterns: `MigrateUtils`, `create_permission_tables` migration.
+
+## Connection affinity
+
+- Start with an Eloquent instance so its `setConnection()` is preserved.
+- Direct queries over model-owned data must derive both the connection and table from that same model.
+- Transactions and locks must use the aggregate root connection.
+- Models participating in one transaction must share a connection; cross-connection work is not atomic.
+- Dynamic or infrastructure tables must receive a trusted, explicit connection.
+- Migration SQL must reuse the migrator or `Schema` connection.
+- `DB::raw()` is connection-neutral and inherits the connection of the builder that consumes it.
 
 ## Before merge
 
