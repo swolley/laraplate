@@ -502,14 +502,19 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 14: Quote revisions + project bind locks (4-03)
+### Task 14: Quote revisions + project bind locks (4-03) — completed 2026-07-21
 
 **Backlog:** `4-03`
 
-- [ ] `QuotationRevisionService` — snapshot + new version with parent `revises_quotation_id`
-- [ ] Lock `Project` when bound to confirmed SO (model events or DB trigger companion to 4-04)
-- [ ] Filament actions: "Create revision"
-- [ ] Tests: revision chain; project edit blocked when locked
+- [x] Added unique nullable self-FK `revises_quotation_id` in the original quotation migration and predecessor/successor relations.
+- [x] Added transactional `QuotationRevisionService`: source lock, linear-chain guard, draft successor, incremented version, validity/header snapshot, and copied lines.
+- [x] Added Filament **Create revision** action for locked/non-draft latest quotations.
+- [x] Added project lock columns in the original migration, `HasLocks`, ORM update/delete guards, and Filament edit/delete gates.
+- [x] Operational sales-order states now lock both linked quotation and project.
+- [x] Corrected pre-existing nullable-FK declaration order for optional project quotation and quotation-item price-list references, preserving SQLite and cross-driver intent.
+- [x] Added revision-chain, copied-line, project-lock, model-guard, resource-gate, action smoke, and commercial regression tests.
+
+**Boundary:** this task provides portable application enforcement. Database trigger defense for raw SQL lock-chain violations remains `4-04`.
 
 ---
 
