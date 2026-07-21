@@ -579,13 +579,18 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 19: ERP sites.place_id + ICS (4-10)
+### Task 19: ERP sites.place_id + ICS (4-10) — completed 2026-07-22
 
 **Backlog:** `4-10`
 
-- [ ] Migration: `erp_sites.place_id` FK → `core.places`
-- [ ] `Site` model relation; Filament Select
-- [ ] Test: site with place → ICS location populated
+- [x] Verified the original `erp_sites.place_id` required FK to canonical Core `places` and existing `Site::place()` relation/validation.
+- [x] Added `HasValidity` to align Site with its original validity columns.
+- [x] Added Site Filament resource with company, canonical Place selector, validity fields, and address/city list columns.
+- [x] Added database relation and Filament configuration tests.
+
+**Verification:** `SitePlaceTest` and `ERPFilamentResourcesTest` pass (`22 passed`, `122 assertions`); `vendor/bin/pint --dirty` passes.
+
+**Boundary:** Core owns postal/geographic fields. ERP stores only `place_id`; task ICS `LOCATION` formatting is completed by `4-07`.
 
 ---
 
