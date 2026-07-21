@@ -488,14 +488,17 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 13: Tricount UX on journal-only writes (4-02)
+### Task 13: Tricount UX on journal-only writes (4-02) — completed 2026-07-21
 
 **Backlog:** `4-02`  
 **Depends:** Task 12
 
-- [ ] Filament/Livewire pages for pool/split (reuse nebula `settlements-quotes-lines` intent)
-- [ ] UI writes only through `MovementPostingService` — no parallel balance table updates
-- [ ] Test: Filament smoke + service integration
+- [x] Added `MovementResource` with list, transactional create, and read-only detail pages; no edit route exists for posted movements.
+- [x] Added company/type-aware Revenue/Expense account selection and displayed frozen document/local amounts plus linked journal.
+- [x] UI creation writes only through `MovementPostingService` in the same transaction; no parallel balance table update exists.
+- [x] Added Filament form/table/page smoke coverage and retained `MovementPostingService` integration tests.
+
+**Plan correction:** pool/split UI cannot precede the `PartnerPool`/allocation model planned in `4-05`. This task closes the journal-only cash movement UX; pool allocation and settle-up UI remain explicitly owned by `4-05` rather than inventing premature persistence here.
 
 ---
 
