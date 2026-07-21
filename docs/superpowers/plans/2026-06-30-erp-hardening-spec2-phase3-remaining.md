@@ -599,13 +599,19 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 20: Hide version-strategy settings for DIFF models (4-11)
+### Task 20: Hide version-strategy settings for DIFF models (4-11) — completed 2026-07-22
 
 **Backlog:** `4-11`  
 **Modules:** Core + ERP
 
-- [ ] `SchemaInspector` or Filament settings UI: hide `version_strategy_{table}` when model has hardcoded `VersionStrategy::DIFF`
-- [ ] Test: accounting model setting row not exposed in generated settings form
+- [x] Added Core `ForcedVersionStrategySettings` discovery for concrete models declaring class-level `VersionStrategy::DIFF` across active/inactive modules.
+- [x] Filtered matching historical rows from `SettingResource`, tab counts, and group options; form validation rejects recreating those names.
+- [x] Kept stale database rows intact for audit/manual cleanup while removing misleading administrative controls.
+- [x] Added coverage proving ERP `Account` is discovered and a historical setting is hidden while normal settings remain visible.
+
+**Verification:** `ForcedVersionStrategySettingsTest`, `SettingResourceTest`, `ResourceConfigurationTest`, and `ForcedModelConfigurationTest` pass; focused resolver coverage is `1 passed`, `4 assertions`; `vendor/bin/pint --dirty` passes.
+
+**Boundary:** this hides only class-forced DIFF version settings. It does not delete stale rows or generalize UI hiding to unrelated forced soft-delete/locking/translation flags.
 
 ---
 

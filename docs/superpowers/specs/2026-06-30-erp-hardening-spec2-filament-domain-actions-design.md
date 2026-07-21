@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **110** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, and the completed operational command suite — § Completed |
+| **Done** | **111** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, forced-DIFF setting governance, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **10** | § Open — **0 in Phase 2B/2C/5/6** + **10 in Phases 3–4**; Phase 3/API is deliberately deferred |
+| **Open backlog rows** | **9** | § Open — **0 in Phase 2B/2C/5/6** + **9 in Phases 3–4**; Phase 3/API is deliberately deferred |
 
 **How to read the backlog**
 
-- **10 open** = every row in § Open with status `open` or `next` after completion of Task ICS export on 2026-07-22.
+- **9 open** = every row in § Open with status `open` or `next` after completion of forced-DIFF setting governance on 2026-07-22.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Implement `4-11` hiding configurable version-strategy settings for models with hardcoded DIFF strategy. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Optional `4-08`, `4-09`, and `4-13` remain unapproved. Completed Phase 2B plan:
+**Current target:** Implement `4-12` opt-in document-number concurrency stress coverage. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Optional `4-08`, `4-09`, and `4-13` remain unapproved. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue approved non-API Phase 4 work first; retain the 10 open rows as explicit backlog. Plan:
+**Next:** Continue approved non-API Phase 4 work first; retain the 9 open rows as explicit backlog. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -178,6 +178,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-P4-06 | Provider-neutral PaymentRequest lifecycle, deterministic stub checkout, secure external callbacks, terminal-state idempotency, and Filament workflow | `PaymentRequestService`, provider contract/stub, callback and resource tests |
 | DONE-P4-10 | ERP Site linkage to canonical Core Place with validity-aware Filament management and relation coverage | original FK/relation, `SiteResource`, `SitePlaceTest` |
 | DONE-P4-07 | RFC 5545 Task ICS export with canonical Site/Place location and streamed Filament download | `TaskIcsExporter`, `TaskResource`, integrated ICS tests |
+| DONE-P4-11 | Core Settings governance for ERP accounting models with class-forced DIFF strategy | `ForcedVersionStrategySettings`, filtered Setting resource, focused Core tests |
 
 ### Testing & hardening
 
@@ -247,8 +248,8 @@ No open Phase 2B items remain.
 | 4-08 | open | Gantt planning entity (optional) |
 | 4-09 | open | ETL Symfony legacy |
 | 4-10 | done | ERP `sites.place_id` + ICS location prerequisite |
-| 4-11 | next | Hide version-strategy settings for DIFF models |
-| 4-12 | open | Concurrency stress tests (50 workers) |
+| 4-11 | done | Hide version-strategy settings for DIFF models |
+| 4-12 | next | Concurrency stress tests (50 workers) |
 | 4-13 | open | API mobile (optional) |
 
 ### Phase 5 — Architecture
