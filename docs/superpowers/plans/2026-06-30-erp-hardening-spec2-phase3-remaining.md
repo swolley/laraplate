@@ -514,18 +514,24 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 - [x] Corrected pre-existing nullable-FK declaration order for optional project quotation and quotation-item price-list references, preserving SQLite and cross-driver intent.
 - [x] Added revision-chain, copied-line, project-lock, model-guard, resource-gate, action smoke, and commercial regression tests.
 
-**Boundary:** this task provides portable application enforcement. Database trigger defense for raw SQL lock-chain violations remains `4-04`.
+**Boundary:** this task introduced portable application enforcement. Raw-SQL defense was subsequently completed by `4-04` for MySQL/MariaDB and PostgreSQL.
 
 ---
 
-### Task 15: DB lock-chain triggers (4-04)
+### Task 15: DB lock-chain triggers (4-04) — completed 2026-07-21
 
 **Backlog:** `4-04` — **D5 nebula**
 
-- [ ] PostgreSQL triggers (or portable equivalent if SQLite tests require PHP fallback):
-  - SO confirm → quotation locked (defense in depth beyond app layer)
-  - DDT line qty → SO line lock
-- [ ] Integration test: attempt violating update → DB exception or app guard
+- [x] MySQL/MariaDB and PostgreSQL triggers guard locked quotation, sales-order and project headers against raw update/delete.
+- [x] Operational sales-order states lock linked quotation/project at DB level as defense in depth.
+- [x] Creating or relinking a DDT line locks the referenced sales-order line.
+- [x] Locked sales-order lines reject commercial-field changes and deletion while allowing delivery/invoice/return counters and operational status.
+- [x] SQLite and Oracle use equivalent model guards for the same business contract.
+- [x] Focused integration coverage proves DDT linkage, rejected commercial updates/deletion, and permitted operational progression.
+
+**Verification:** `LockChainGuardTest`, `SalesOrderLineTest`, `SalesOrderSchemaTest`, `DeliveryNoteInventoryServiceTest`, and `InvoicePostingServiceTest` pass; `vendor/bin/pint --dirty` passes.
+
+**Boundary:** native raw-SQL trigger enforcement is installed on MySQL/MariaDB and PostgreSQL. SQLite and Oracle rely on Eloquent guards for this specific rule; direct SQL on those engines is outside this defense.
 
 ---
 
