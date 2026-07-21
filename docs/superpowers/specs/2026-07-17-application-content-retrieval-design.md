@@ -197,6 +197,8 @@ registered sources
 
 The resulting source keys form a request-local allowlist and the model-visible `source` tool argument is a runtime enum constrained to that allowlist, never a free-form string. Registry contents are process-level and stateless; identity, tenant, roles, permissions, ACL filters, page context, and conversation state are never stored in providers or in the registry.
 
+Phase 1 currently resolves only `Global` tenant scope. A request resolved as `Tenant` receives no application content tool until a server-owned per-tenant source policy exists; the system does not treat a missing tenant policy as unrestricted access.
+
 Routing has two modes:
 
 1. **Contextual mode.** A server-verified application context identifies the current module and, when applicable, its entity or record. The matching authorized source becomes the default when it is compatible with the request. The assistant does not silently broaden the search to another module; it may use another authorized source only when the user explicitly asks for that module or source.
@@ -233,7 +235,7 @@ The provider:
 - degrades from vector/hybrid to the supported Core search path with explicit internal diagnostics;
 - returns an empty authorized result when no evidence is available.
 
-The initial provider is a record-level evidence baseline. A separate chunk or passage index is not authorized until evaluation shows that long records materially reduce hit rate, citation precision, or groundedness.
+The initial provider is a record-level evidence baseline. The synthetic baseline shows a material residual failure for semantic/paraphrase and passage-candidate cases, so a bounded comparison is specified in `2026-07-21-application-content-passage-index-gate.md`. A separate chunk or passage index remains unauthorized until that gate is passed.
 
 ## AI tool contract
 

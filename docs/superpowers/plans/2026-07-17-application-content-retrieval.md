@@ -39,7 +39,7 @@ Do not create a second CMS index in this plan. Do not add `/api/v1` or anonymous
 - Create: `Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalProviderRegistryTest.php`
 - Modify: `Modules/Core/app/Providers/CoreServiceProvider.php`
 
-- [ ] **Step 1: Write the failing registry and DTO tests**
+- [x] **Step 1: Write the failing registry and DTO tests**
 
 Cover normalized source-key lookup, deterministic source listing, unknown source, duplicate registration failure, immutable DTOs, descriptor validation, limit validation, and rejection of unsafe/oversized hit fields. Assert registration is explicit and no event, reflection, or container scan discovers providers. Define an inline fake implementing `ApplicationContentRetrievalProviderInterface` in the test file; it receives its typed descriptor through the constructor and returns an empty typed result.
 
@@ -53,7 +53,7 @@ it('rejects duplicate source keys instead of silently replacing providers', func
 });
 ```
 
-- [ ] **Step 2: Run the registry test and verify failure**
+- [x] **Step 2: Run the registry test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalProviderRegistryTest.php
@@ -61,7 +61,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/App
 
 Expected: FAIL because the contracts and registry do not exist.
 
-- [ ] **Step 3: Implement the typed contract**
+- [x] **Step 3: Implement the typed contract**
 
 Use this public provider shape:
 
@@ -85,11 +85,11 @@ interface ApplicationContentRetrievalProviderInterface
 
 Create `application-content.php` with conservative server-owned defaults: `max_results=8`, `max_query_chars=2000`, `max_excerpt_chars=2000`, `max_label_chars=200`, and `max_reference_chars=500`. Environment configuration may lower or raise deployment limits within hard code-level ceilings; request/tool arguments can only lower them.
 
-- [ ] **Step 4: Implement and bind the registry**
+- [x] **Step 4: Implement and bind the registry**
 
 Use normalized lowercase source keys from the descriptor. `register()` throws on collision. `providerFor()` returns `null` for unknown keys; it never resolves a class name dynamically. `descriptors()` returns a source-key-sorted list. Bind the interface as a singleton in `CoreServiceProvider`, following `GraphProviderRegistryInterface`. Providers are registered explicitly by module service providers during boot; do not introduce discovery events. Events remain available only for post-registration indexing, invalidation, deletion, and freshness notifications.
 
-- [ ] **Step 5: Run tests and commit Core**
+- [x] **Step 5: Run tests and commit Core**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalProviderRegistryTest.php
@@ -105,7 +105,7 @@ rtk git -C Modules/Core commit -m "feat(core): add application content provider 
 - Create: `Modules/Core/app/ApplicationContent/Exceptions/ApplicationContentUnavailableException.php`
 - Create: `Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php`
 
-- [ ] **Step 1: Write failing gateway authorization tests**
+- [x] **Step 1: Write failing gateway authorization tests**
 
 Use a capturing fake provider. Cover missing authentication, unknown source, disabled provider module, select permission denial, row ACL propagation, provider exception, invalid returned source/entity, oversized result, and successful bounded retrieval. Assert the provider is never called before authorization succeeds.
 
@@ -124,7 +124,7 @@ it('passes server-resolved ACL filters to the provider', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the gateway test and verify failure**
+- [x] **Step 2: Run the gateway test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php
@@ -132,7 +132,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/App
 
 Expected: FAIL because the gateway does not exist.
 
-- [ ] **Step 3: Implement the single authorized gateway**
+- [x] **Step 3: Implement the single authorized gateway**
 
 `retrieve(Request $request, ApplicationContentQuery $query)` must:
 
@@ -147,11 +147,11 @@ Expected: FAIL because the gateway does not exist.
 
 Keep request identity, role names, tenant internals, permission name, and ACL expressions out of `ApplicationContentResult`.
 
-- [ ] **Step 4: Test Auth guard consistency**
+- [x] **Step 4: Test Auth guard consistency**
 
 Add a regression case where the request resolver and global guard disagree. The service must fail closed until both authorization paths refer to the same authenticated user. Do not allow queued/background provider execution to inherit a missing request identity.
 
-- [ ] **Step 5: Run Core authorization regressions and commit**
+- [x] **Step 5: Run Core authorization regressions and commit**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Modules/Core/tests/Integration/Services/Authorization/AuthorizationServiceTest.php
@@ -168,7 +168,7 @@ rtk git -C Modules/Core commit -m "feat(core): authorize application content ret
 - Create: `Modules/CMS/tests/Feature/ApplicationContent/CmsApplicationContentRetrievalProviderTest.php`
 - Modify: `Modules/CMS/app/Providers/CMSServiceProvider.php`
 
-- [ ] **Step 1: Write failing provider tests**
+- [x] **Step 1: Write failing provider tests**
 
 Cover registration only when CMS is enabled, source key `cms.contents`, exact lexical search, vector/hybrid result adaptation, locale selection, translation fallback policy, validity, soft deletion, row ACL, cross-tenant exclusion, deterministic ordering, excerpt truncation, safe canonical references, and degraded lexical fallback.
 
@@ -183,7 +183,7 @@ it('rehydrates authorized records before creating safe evidence', function (): v
 });
 ```
 
-- [ ] **Step 2: Run the provider test and verify failure**
+- [x] **Step 2: Run the provider test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/CMS/tests/Feature/ApplicationContent/CmsApplicationContentRetrievalProviderTest.php
@@ -191,19 +191,19 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/ApplicationContent/CmsA
 
 Expected: FAIL because the provider and projector do not exist.
 
-- [ ] **Step 3: Implement authorized search adaptation**
+- [x] **Step 3: Implement authorized search adaptation**
 
 Inject `AdvancedSearchService` and `AuthorizationService`. Search `Content` with the natural query, bounded result count, locale, and the ACL `FiltersGroup` supplied by Core. Do not call `Model::search()` without the Core constraint path and do not return `AdvancedSearchResult::source` directly.
 
 Collect ranked record IDs, then rehydrate them through an Eloquent query that reapplies `AuthorizationService::applyAclFiltersToQuery()` and CMS validity/deletion rules. Preserve the ranked ID order after rehydration. A stale search hit that no longer passes the database query disappears without confirming its existence.
 
-- [ ] **Step 4: Implement the safe evidence projector**
+- [x] **Step 4: Implement the safe evidence projector**
 
 Build evidence from provider-approved title, textual fields, locale, canonical path, update/revision marker, and normalized rank information. Strip markup, normalize whitespace, and truncate by Unicode character count. Never serialize `Content::toArray()` or `toSearchableArray()` into a hit.
 
 Register the provider in `CMSServiceProvider::boot()` through `ApplicationContentRetrievalProviderRegistryInterface`, following the existing Graph provider registration pattern.
 
-- [ ] **Step 5: Run CMS search/ACL regressions and commit**
+- [x] **Step 5: Run CMS search/ACL regressions and commit**
 
 ```bash
 rtk php artisan test --compact Modules/CMS/tests/Feature/ApplicationContent/CmsApplicationContentRetrievalProviderTest.php Modules/CMS/tests/Integration/Models/ContentTest.php Modules/CMS/tests/Feature/Graph
@@ -224,7 +224,7 @@ rtk git -C Modules/CMS commit -m "feat(cms): provide authorized content evidence
 - Create: `Modules/AI/tests/Unit/Services/ApplicationContent/ApplicationContentToolProviderTest.php`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
-- [ ] **Step 1: Write failing tool schema and context tests**
+- [x] **Step 1: Write failing tool schema and context tests**
 
 Assert one tool named `application_content_search` with only `source`, `query`, `locale`, and `limit`. Assert `source` is a runtime enum constrained to the request-local authorized allowlist, never a free-form string, and the schema contains no unavailable provider. Assert absence of user/tenant/role/permission/ACL/index/class/field/filter/system-prompt arguments. Cover developer profile exclusion, unauthenticated context, unapproved source, limit clamping, timeout, provider denial, and safe evidence projection.
 
@@ -240,7 +240,7 @@ it('registers content retrieval only for approved authenticated sources', functi
 });
 ```
 
-- [ ] **Step 2: Run the tool test and verify failure**
+- [x] **Step 2: Run the tool test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationContent/ApplicationContentToolProviderTest.php
@@ -248,7 +248,7 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationContent
 
 Expected: FAIL because the contextual tool provider does not exist.
 
-- [ ] **Step 3: Implement contextual tool creation**
+- [x] **Step 3: Implement contextual tool creation**
 
 Build the tool per authenticated `AssistantAccessContext`. Construct the source allowlist as registered providers intersected with enabled modules, profile capabilities, tenant configuration, and effective authorization eligibility. Do not store request identity, tenant, permissions, ACL, or page context in the singleton registry or provider instances.
 
@@ -262,11 +262,11 @@ Call `ApplicationContentRetrievalService` directly with the authenticated reques
 
 Keep the tool outside `ActionRequestService` and mutation replay. Provider errors return a generic unavailable tool result and payload-free reason code.
 
-- [ ] **Step 4: Implement the prompt projector**
+- [x] **Step 4: Implement the prompt projector**
 
 Convert hits to bounded instruction-neutral evidence blocks containing excerpt, safe label, canonical reference, locale, revision, and rank. Escape or delimit retrieved text as untrusted data. Exclude internal diagnostics, raw scores not comparable across engines, authorization context, and unknown fields.
 
-- [ ] **Step 5: Run AI tool regressions and commit**
+- [x] **Step 5: Run AI tool regressions and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationContent/ApplicationContentToolProviderTest.php Modules/AI/tests/Integration/ToolRegistryTest.php
@@ -284,13 +284,13 @@ rtk git -C Modules/AI commit -m "feat(ai): add authenticated application content
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistanceContextPolicy.php`
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistanceOutputPolicy.php`
 
-- [ ] **Step 1: Write end-to-end failing assistance tests**
+- [x] **Step 1: Write end-to-end failing assistance tests**
 
 Cover a successful contextual CMS question, a generic request without page context, ambiguous generic routing, explicit cross-module intent, combined content evidence plus Graph expansion, no-evidence abstention, unsupported source, permission denial, hidden-record equivalence, malicious instructions inside evidence, unsafe citation, provider timeout, and output-policy rejection.
 
 Assert application content is never added to either documentation index and the developer CLI receives no application content tool.
 
-- [ ] **Step 2: Run the feature test and verify failure**
+- [x] **Step 2: Run the feature test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php
@@ -298,15 +298,15 @@ rtk php artisan test --compact Modules/AI/tests/Feature/InAppApplicationContentA
 
 Expected: FAIL because the in-app orchestrator does not register or map application content evidence.
 
-- [ ] **Step 3: Integrate evidence under the existing security pipeline**
+- [x] **Step 3: Integrate evidence under the existing security pipeline**
 
 Register the tool only after profile/access-context creation, input policy success, request-local source allowlist construction, and routing. Add its evidence to `AssistantPromptContext` under the existing total token/chunk/node budget. The orchestration order remains authentication → verified application context → provider capability eligibility → source allowlist → routing → record permission and ACL authorization → retrieval → prompt projection → complete generation → output validation → persistence.
 
-- [ ] **Step 4: Map citations and enforce abstention**
+- [x] **Step 4: Map citations and enforce abstention**
 
 Map each used hit to a user-safe citation label and canonical application reference. Do not present raw similarity as confidence. When no sufficient evidence is returned, respond with the localized insufficient-evidence message and do not let the model substitute assumed application data.
 
-- [ ] **Step 5: Run security regressions and commit**
+- [x] **Step 5: Run security regressions and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/AI/tests/Feature/InAppAssistanceAdversarialTest.php
@@ -327,19 +327,19 @@ rtk git -C Modules/AI commit -m "feat(ai): ground in-app answers in module evide
 - Create after running baseline: `Modules/CMS/docs/evaluations/application-content/2026-07-record-baseline.json`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
-- [ ] **Step 1: Write failing deterministic metric tests**
+- [x] **Step 1: Write failing deterministic metric tests**
 
 Use a fake Core retrieval service and assert hit@K, reciprocal rank, citation precision, authorized-empty accuracy, supported-answer rate, abstention accuracy, latency slices, and locale/source slices. Ensure raw engine scores are retained only as internal diagnostics.
 
-- [ ] **Step 2: Implement the evaluation service and command**
+- [x] **Step 2: Implement the evaluation service and command**
 
 Add `ai:evaluate-application-content` with required `--dataset`, `--source`, and `--output` options plus `--force`. The command runs provider-level retrieval evaluation without calling the chat provider and refuses sources not registered by enabled modules. The dataset loader builds typed, evaluation-only `FiltersGroup` access cases; this path is unavailable to HTTP/tools and does not bypass the authenticated gateway in production.
 
-- [ ] **Step 3: Create the CMS fixture**
+- [x] **Step 3: Create the CMS fixture**
 
 Create at least 30 versioned cases: exact lookup, paraphrase, locale/translation, validity, ACL exclusion, cross-tenant exclusion, unsupported questions, long records, and citation mapping. Use generated test records and no production/customer data.
 
-- [ ] **Step 4: Run tests and the opt-in baseline**
+- [x] **Step 4: Run tests and the opt-in baseline**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/ApplicationContent/Evaluation/ApplicationContentEvaluationServiceTest.php
@@ -348,11 +348,11 @@ rtk php artisan ai:evaluate-application-content --dataset=Modules/CMS/tests/Fixt
 
 The report records driver, corpus revision, provider version, aggregate/sliced metrics, and latency. It contains no prompts, full content, user identifiers, ACL expressions, or secrets.
 
-- [ ] **Step 5: Apply the passage-index gate**
+- [x] **Step 5: Apply the passage-index gate**
 
 Keep record-level retrieval when hit@5, citation precision, and supported-answer metrics meet the approved baseline. If long-record cases remain a material failure class, write a separate passage-index spec with ingestion, update, deletion, tenant isolation, storage, and cost analysis; do not add that index from this plan.
 
-- [ ] **Step 6: Commit evaluation code and artifacts in their owners**
+- [x] **Step 6: Commit evaluation code and artifacts in their owners**
 
 ```bash
 rtk git -C Modules/AI add app/Services/ApplicationContent/Evaluation app/Console/EvaluateApplicationContentCommand.php app/Providers/AIServiceProvider.php tests/Unit/Services/ApplicationContent/Evaluation
@@ -371,19 +371,19 @@ rtk git -C Modules/CMS commit -m "test(cms): add application content retrieval b
 - Modify: `Modules/Core/docs/GRAPH_SYSTEM.md`
 - Modify: `Modules/AI/README.md`
 
-- [ ] **Step 1: Document the three separate retrieval surfaces**
+- [x] **Step 1: Document the three separate retrieval surfaces**
 
 Describe documentation RAG, Core Graph, and application content retrieval as independent capabilities with separate authorization, stores, DTOs, citations, evaluation, and failure behavior.
 
-- [ ] **Step 2: Document provider implementation rules**
+- [x] **Step 2: Document provider implementation rules**
 
 Record Core ownership, typed descriptors, explicit service-provider registration without discovery events, duplicate failure, request-local allowlists, contextual and generic single-source routing, ambiguity clarification, authenticated gateway use, pre-query ACL, rehydration, safe projection, evidence DTO shape, no raw `_source`, and no module dependency on AI.
 
-- [ ] **Step 3: Record Phase 2 without implementing it**
+- [x] **Step 3: Record Phase 2 without implementing it**
 
 Add a clearly non-authorized future section requiring a dedicated public profile, public-visibility policy, rate limits, privacy/retention, abuse controls, prompt-injection treatment, safe fields, citations, cost budgets, and separate approval. State that missing authentication never falls back to public mode.
 
-- [ ] **Step 4: Run module documentation tests and commit by owner**
+- [x] **Step 4: Run module documentation tests and commit by owner**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Integration/CoreRagModuleDocumentationTest.php Modules/AI/tests/Integration/AiRagModuleDocumentationTest.php Modules/CMS/tests/Unit/CmsRagModuleDocumentationTest.php
@@ -402,11 +402,11 @@ rtk git -C Modules/CMS commit -m "docs(cms): document content retrieval provider
 - Create: `Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php`
 - Modify: `Modules/AI/docs/rag/evaluations/2026-07-in-app-security.json`
 
-- [ ] **Step 1: Add adversarial cross-module cases**
+- [x] **Step 1: Add adversarial cross-module cases**
 
 Cover forged source keys, forged module/entity/page context, stale context, identity/tenant/permission arguments, raw filter/query DSL, source collision, disabled module, registry-order manipulation, ambiguous routing, attempted source selection outside the request allowlist, stale index hit, cross-tenant record, hidden field, malicious retrieved instructions, oversized excerpt, provider timeout, partial diagnostics, citation path injection, anonymous request, and attempted `/api/v1` use.
 
-- [ ] **Step 2: Run the full deterministic release suite**
+- [x] **Step 2: Run the full deterministic release suite**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Modules/CMS/tests/Feature/ApplicationContent Modules/AI/tests/Unit/Services/ApplicationContent Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/Core/tests/Feature/Graph
@@ -414,11 +414,11 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Mod
 
 Expected: PASS without a live LLM or external search cluster.
 
-- [ ] **Step 3: Verify public access is absent**
+- [x] **Step 3: Verify public access is absent**
 
 Assert no application content route is registered under `/api/v1`, anonymous requests cannot invoke the gateway/tool, and no configuration flag converts authenticated retrieval into public retrieval.
 
-- [ ] **Step 4: Update the security report and commit**
+- [x] **Step 4: Update the security report and commit**
 
 Record aggregate pass/fail counts, policy/provider versions, and timings only. Release requires zero unauthorized-context, hidden-field, identity-spoofing, source-collision, public-fallback, or unsafe-output successes.
 
@@ -429,19 +429,19 @@ rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval se
 
 ## Completion checklist
 
-- [ ] Core owns neutral contracts and no AI/Neuron dependency.
-- [ ] Optional modules register providers without depending on AI.
-- [ ] Providers are registered explicitly during module boot; events are reserved for lifecycle notifications, not discovery.
-- [ ] Duplicate source registration fails deterministically.
-- [ ] Every request receives an allowlist intersecting registry, enabled modules, profile, tenant configuration, and effective authorization.
-- [ ] Verified application context selects the default source; absent context uses generic single-source routing.
-- [ ] Ambiguous generic requests ask for clarification and Phase 1 never fans out automatically.
-- [ ] Phase 1 requires an authenticated application user.
-- [ ] Permission, ACL, tenant, validity, and deletion constraints apply before evidence reaches AI.
-- [ ] Search hits are rehydrated and reauthorized before safe projection.
-- [ ] Tool arguments cannot supply identity, authorization, fields, indexes, or raw query DSL.
-- [ ] Evidence contains only bounded allowlisted fields and canonical citations.
-- [ ] Documentation RAG, Graph tools, and application content retrieval remain distinct.
-- [ ] Empty/insufficient evidence causes abstention.
-- [ ] Record-level CMS retrieval has a committed evaluation baseline.
-- [ ] No passage index, multimodal processing, entity linking, or public endpoint is added without a separate approved design.
+- [x] Core owns neutral contracts and no AI/Neuron dependency.
+- [x] Optional modules register providers without depending on AI.
+- [x] Providers are registered explicitly during module boot; events are reserved for lifecycle notifications, not discovery.
+- [x] Duplicate source registration fails deterministically.
+- [x] Every request receives an allowlist intersecting registry, enabled modules, profile, tenant configuration, and effective authorization.
+- [x] Verified application context selects the default source; absent context uses generic single-source routing.
+- [x] Ambiguous generic requests ask for clarification and Phase 1 never fans out automatically.
+- [x] Phase 1 requires an authenticated application user.
+- [x] Permission, ACL, tenant, validity, and deletion constraints apply before evidence reaches AI.
+- [x] Search hits are rehydrated and reauthorized before safe projection.
+- [x] Tool arguments cannot supply identity, authorization, fields, indexes, or raw query DSL.
+- [x] Evidence contains only bounded allowlisted fields and canonical citations.
+- [x] Documentation RAG, Graph tools, and application content retrieval remain distinct.
+- [x] Empty/insufficient evidence causes abstention.
+- [x] Record-level CMS retrieval has a committed evaluation baseline.
+- [x] No passage index, multimodal processing, entity linking, or public endpoint is added without a separate approved design.
