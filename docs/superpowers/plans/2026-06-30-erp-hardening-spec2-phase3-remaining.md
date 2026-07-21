@@ -645,13 +645,16 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 27: Direct item-specific price lists (5-05)
+### Task 27: Direct item-specific price lists (5-05) — completed 2026-07-21
 
 **Backlog:** `5-05`
 
-- [ ] Migration: `price_list_items.item_id` nullable FK (alongside `taxonomy_id`)
-- [ ] Update `PriceResolverService` cascade: item → taxonomy → party rules
-- [ ] Tests: item-specific price beats taxonomy
+- [x] Added nullable `price_list_items.item_id` and made `taxonomy_id` optional in the original price-list migration; the original item migration adds the portable FK after `erp_items` exists.
+- [x] Enforced exactly one item or taxonomy target in the model and Filament form.
+- [x] Updated `PriceResolverService` cascade: direct item price → taxonomy fallback → party rules.
+- [x] Added focused resolver/model/resource coverage, including direct precedence, items without taxonomy, and invalid ambiguous/untargeted rows.
+
+**Boundary:** the cross-field XOR is enforced by model and UI validation. A portable corrective `ALTER TABLE ... CHECK` was intentionally avoided because supported database engines differ, especially SQLite; fresh installs still receive the item FK through the original migrations.
 
 ---
 
