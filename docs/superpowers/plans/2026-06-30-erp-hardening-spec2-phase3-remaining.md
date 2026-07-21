@@ -472,17 +472,19 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ## Wave 4 — Tricount & commercial depth (Phase 4)
 
-### Task 12: Movement → JournalEntry refactor (4-01)
+### Task 12: Movement → JournalEntry refactor (4-01) — completed 2026-07-21
 
 **Backlog:** `4-01`  
 **Nebula:** M2 accounting refactor
 
-- [ ] Migration: `movements.posted_journal_entry_id` nullable FK
-- [ ] Define `MovementType` income/expense posting rules → COA roles (`bank_cash`, expense/income accounts)
-- [ ] Create: `Modules/ERP/app/Services/Cash/MovementPostingService.php` — posts via `JournalPostingService`
-- [ ] Tricount balance = derived from journal lines (view or `CashBalanceService`)
-- [ ] Data migration command: `erp:migrate-movements-to-journal` (idempotent)
-- [ ] Test: movement create → journal balanced; balance query matches
+- [x] Expanded the original `erp_movements` migration with positive document amount, date/type, document/local currency snapshots, explicit counterparty account, and unique nullable `posted_journal_entry_id` FK.
+- [x] Defined professional posting rules: income requires an active Revenue counterparty and posts bank debit/revenue credit; expense requires Expense and posts expense debit/bank credit.
+- [x] Added locked/idempotent `MovementPostingService` through `JournalPostingService`, with dated FX conversion and frozen local amount/rate.
+- [x] Added `CashBalanceService`, deriving balance only from posted `bank_cash` journal lines.
+- [x] Added idempotent `erp:migrate-movements-to-journal` with company filter, dry-run, and per-row failure reporting.
+- [x] Added focused tests for balanced signs, account-kind validation, idempotency, derived balance, dry-run, and command reruns; retained accounting golden-master regressions.
+
+**Boundary:** the historical movement table was an empty structural stub and never stored amount/type/account data. The command therefore migrates complete unlinked rows created with the finalized schema; it cannot infer financial data that never existed. Partner allocations and settle-up remain `4-05`.
 
 ---
 

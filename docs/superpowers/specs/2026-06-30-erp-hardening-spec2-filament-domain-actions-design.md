@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **102** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, and the completed operational command suite — § Completed |
+| **Done** | **103** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **18** | § Open — **0 in Phase 2B/2C/5/6** + **18 in Phases 3–4**; Phase 3/API is deliberately deferred |
+| **Open backlog rows** | **17** | § Open — **0 in Phase 2B/2C/5/6** + **17 in Phases 3–4**; Phase 3/API is deliberately deferred |
 
 **How to read the backlog**
 
-- **18 open** = every row in § Open with status `open` or `next` after completion of Phase 5 architecture on 2026-07-21.
+- **17 open** = every row in § Open with status `open` or `next` after completion of journal-backed cash movements on 2026-07-21.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Continue non-API Phase 4 in backlog order. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
+**Current target:** Implement `4-02` Tricount UX on journal-only writes. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue approved non-API Phase 4 work first; retain the 18 open rows as explicit backlog. Plan:
+**Next:** Continue approved non-API Phase 4 work first; retain the 17 open rows as explicit backlog. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -170,6 +170,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-M7-04 | Direct item-specific list prices with taxonomy fallback and subsequent party-rule application | `PriceListItem`, `PriceResolverService`, focused feature tests |
 | DONE-ARCH-04 | Core transactional outbox with replaceable publisher and ERP invoice/payment/return integration events | `OutboxRecorder`, `PublishOutboxEventJob`, focused Core/ERP tests |
 | DONE-ARCH-06 | ERP architecture vision, module boundaries, real extension bindings, integration event contracts, and explicit absence of tagged plugin discovery | `Modules/ERP/docs/VISION.md`, README and RAG |
+| DONE-P4-01 | Journal-backed cash movements with explicit Revenue/Expense counterparty, dated FX snapshot, derived cash balance, and idempotent migration command | `MovementPostingService`, `CashBalanceService`, focused tests |
 
 ### Testing & hardening
 
@@ -229,7 +230,7 @@ No open Phase 2B items remain.
 
 | ID | Status | Item |
 |----|--------|------|
-| 4-01 | open | `Movement` → `JournalEntry` refactor |
+| 4-01 | done | `Movement` → `JournalEntry` refactor |
 | 4-02 | open | Tricount UX on journal-only writes |
 | 4-03 | open | Quote revisions + project bind locks |
 | 4-04 | open | DB lock-chain triggers (D5) |
