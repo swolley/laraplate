@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **98** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, ERP health diagnostics, document-sequence audit, and idempotent bank-statement batch import — § Completed |
+| **Done** | **99** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **22** | § Open — **0 in Phase 2B/2C** + **22 in Phases 3–6**; Phase 3/API is deliberately deferred |
+| **Open backlog rows** | **21** | § Open — **0 in Phase 2B/2C/6** + **21 in Phases 3–5**; Phase 3/API is deliberately deferred |
 
 **How to read the backlog**
 
-- **22 open** = every row in § Open with status `open` or `next` after the 2026-07-19 implementation audit.
+- **21 open** = every row in § Open with status `open` or `next` after the 2026-07-21 implementation audit.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Phase 6 non-API operational commands; `6-01`, `6-02`, and `6-04` are complete, with `6-05` VAT settlement batch computation next. Phase 3 is deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
+**Current target:** Phase 6 operational commands is complete. Select the next non-API Phase 4/5 item before implementation. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue approved non-API work first; retain the 22 open rows as explicit backlog. Plan:
+**Next:** Continue approved non-API Phase 4/5 work first; retain the 21 open rows as explicit backlog. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -56,7 +56,7 @@
 | Phase 3 | Domain HTTP actions + API exposure | Deferred pending governance review of the existing dynamic Core CRUD/API |
 | Phase 4 | Cash/Tricount and commercial depth | Open |
 | Phase 5 | Architecture | Partially done: `5-01`, `5-02`, `5-03` completed |
-| Phase 6 | Operational console commands | Partially done: `6-03`, `6-06` completed; current target |
+| Phase 6 | Operational console commands | **Done** |
 
 ---
 
@@ -266,7 +266,7 @@ Command scope is operational and batch-oriented. Commands must wrap existing ser
 | 6-03 | done | `erp:einvoice:refresh-statuses` scheduled provider polling for open submissions |
 | 6-04 | done | `erp:bank-statements:import` idempotent CSV/CAMT.053/MT940 batch import with dry-run and optional archive |
 | BANK-IT-01 | done | CBI bonifici supplier export plus Ri.Ba/SDD CORE receivable file generators |
-| 6-05 | open | `erp:vat-settlements:compute` dry-run and batch compute for open fiscal periods |
+| 6-05 | done | `erp:vat-settlements:compute` dry-run and draft batch compute for open fiscal periods |
 | 6-06 | done | `erp:reports:snapshot` immutable CSV/PDF snapshot archive for financial reports |
 
 Already covered elsewhere: `erp:migrate-movements-to-journal` belongs to `4-01`; FX daily-rate import belongs to `5-01`.

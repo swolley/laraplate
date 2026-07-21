@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Active non-API backlog — Phase 2C and enterprise tasks `3-05`, `5-01`, `5-02`, `5-03`, `6-01`, `6-02`, `6-03`, `6-04`, `6-06` are completed. Phase 3/API is deliberately deferred.  
+**Status:** Active non-API backlog — Phase 2C, enterprise tasks `3-05`, `5-01`, `5-02`, `5-03`, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred.  
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 6 operational commands. Tasks `6-01`, `6-02`, `6-03`, `6-04`, and `6-06` are complete; Task `6-05` VAT settlement batch computation is next. Phase 3 is retained for later review because Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
+**Current slice:** Phase 6 operational commands is complete. The next implementation slice must be selected from non-API Phase 4/5 backlog. Phase 3 is retained for later review because Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -906,18 +906,20 @@ git -C Modules/ERP commit -m "feat(erp): add bank statement import command"
 
 ---
 
-### Task 33: VAT settlement compute command (6-05)
+### Task 33: VAT settlement compute command (6-05) — completed 2026-07-21
 
+**Status:** Done  
 **Backlog:** `6-05`  
 **Modules:** ERP
 
 **Command:** `php artisan erp:vat-settlements:compute --company=1 --year=2026 --period=2026-03 --dry-run`
 
 **Files:**
-- Create: `Modules/ERP/app/Console/VatSettlementsComputeCommand.php`
-- Create: `Modules/ERP/app/Services/Accounting/VatSettlementBatchService.php`
-- Create: `Modules/ERP/tests/Feature/Console/VatSettlementsComputeCommandTest.php`
-- Create: `Modules/ERP/tests/Feature/Services/VatSettlementBatchServiceTest.php`
+- Created: `Modules/ERP/app/Console/VatSettlementsComputeCommand.php`
+- Created: `Modules/ERP/app/Services/Accounting/VatSettlementBatchService.php`
+- Created: `Modules/ERP/tests/Feature/Console/VatSettlementsComputeCommandTest.php`
+- Created: `Modules/ERP/tests/Feature/Services/VatSettlementBatchServiceTest.php`
+- Modified: `VatSettlementService` with shared side-effect-free `preview()` calculation and company/period ownership validation.
 
 **Batch behavior:**
 - compute one period or all open periods in a fiscal year;
@@ -926,11 +928,13 @@ git -C Modules/ERP commit -m "feat(erp): add bank statement import command"
 - support `--dry-run` by returning computed amounts without persisting;
 - no payment/F24 submission; this is accounting computation only.
 
-- [ ] **Step 1: Dry-run test** — posted VAT data returns expected amount and creates no settlement row.
-- [ ] **Step 2: Persist test** — without `--dry-run`, open settlement is created/updated.
-- [ ] **Step 3: Confirmed guard test** — confirmed settlement is skipped and reported.
-- [ ] **Step 4: Implement service + command**
-- [ ] **Step 5: Docs + commit**
+- [x] **Step 1: Dry-run test** — open periods return calculated previews and create no settlement rows.
+- [x] **Step 2: Persist test** — non-dry runs create/update draft settlements only.
+- [x] **Step 3: Confirmed/closed guard** — confirmed settlements and closed periods are skipped and never modified.
+- [x] **Step 4: Implement service + command** — default/explicit company, fiscal year, optional `YYYY-N` period, table/JSON output, and per-period continuation.
+- [x] **Step 5: Docs + verification** — batch, command, service, VAT register, and accounting golden-master subset: `24 passed (99 assertions)`; Pint passes.
+
+**Safety boundary:** this command computes drafts only. It never confirms settlements and never performs payment or F24 submission.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Services/VatSettlementBatchServiceTest.php Modules/ERP/tests/Feature/Console/VatSettlementsComputeCommandTest.php
