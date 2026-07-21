@@ -535,14 +535,19 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 16: Settlements / pool / settle-up (4-05)
+### Task 16: Settlements / pool / settle-up (4-05) — completed 2026-07-21
 
 **Backlog:** `4-05`
 
-- [ ] Models: `PartnerPool`, `PoolTransaction` (if not present) or extend `Movement` allocations
-- [ ] `SettlementService::suggestSettleUp(partner_pool)` + `settle()`
-- [ ] Filament page under ERP Cash group
-- [ ] Tests: split lines sum to movement amount
+- [x] Added company/currency-scoped `PartnerPool`, first-class `PartnerPoolHasUser` pivot, `MovementAllocation`, and `PoolTransaction`.
+- [x] Expense allocations store exact owed and paid amounts; both aggregate totals must equal the source `Movement` amount.
+- [x] `PartnerPoolSettlementService` uses transactions and pessimistic locks, derives balances without mutable balance persistence, suggests debtor-to-creditor transfers, and records bounded settle-up transfers.
+- [x] Added Partner Pools Filament resource with membership, expense split, and settle-up actions.
+- [x] Added model/database non-negative validation, currency/company/member checks, and focused rollback/over-settlement tests.
+
+**Verification:** `PartnerPoolSettlementServiceTest`, `ERPFilamentResourcesTest`, and `MovementPostingServiceTest` pass (`25 passed`, `130 assertions`); `vendor/bin/pint --dirty` passes.
+
+**Boundary:** pool balances are an internal memorandum subledger derived from allocations/transfers. They do not replace journal-derived company cash, and settle-up records an internal confirmed reimbursement rather than submitting an external bank payment. External provider requests belong to `4-06`.
 
 ---
 
