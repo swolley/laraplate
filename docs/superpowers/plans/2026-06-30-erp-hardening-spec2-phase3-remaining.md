@@ -634,14 +634,16 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 26: Integration outbox / domain events (5-04)
+### Task 26: Integration outbox / domain events (5-04) — completed 2026-07-21
 
 **Backlog:** `5-04`
 
-- [ ] Create: `Modules/Core/app/Models/OutboxEvent.php` + migration
-- [ ] Dispatch on: invoice posted, payment matched, return completed
-- [ ] Job: `PublishOutboxEventJob` (stub publisher)
-- [ ] Test: posting invoice creates outbox row
+- [x] Added generic Core `OutboxEvent`, `core_outbox_events` migration, and transactional `OutboxRecorder`.
+- [x] Added ERP events for invoice posting, exact/difference payment matching, and customer/supplier return completion.
+- [x] Added unique queued `PublishOutboxEventJob`, replaceable `OutboxPublisher`, and default no-I/O `StubOutboxPublisher`.
+- [x] Added Core persistence/publication/rollback tests and ERP integration assertions for all three business-flow families.
+
+**Boundary:** the default stub marks rows published without external I/O. Broker/webhook delivery, transport retries beyond the queue policy, replay tooling, and dead-letter operations require an application-specific publisher/operations slice.
 
 ---
 

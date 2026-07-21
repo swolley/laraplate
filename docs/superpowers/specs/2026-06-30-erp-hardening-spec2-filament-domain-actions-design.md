@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **100** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, direct item-specific prices, and the completed operational command suite — § Completed |
+| **Done** | **101** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **20** | § Open — **0 in Phase 2B/2C/6** + **20 in Phases 3–5**; Phase 3/API is deliberately deferred |
+| **Open backlog rows** | **19** | § Open — **0 in Phase 2B/2C/6** + **19 in Phases 3–5**; Phase 3/API is deliberately deferred |
 
 **How to read the backlog**
 
-- **20 open** = every row in § Open with status `open` or `next` after completion of direct item-specific pricing on 2026-07-21.
+- **19 open** = every row in § Open with status `open` or `next` after completion of the integration outbox on 2026-07-21.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Implement `5-04` integration outbox/domain events next. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
+**Current target:** Complete the optional `5-06` ERP architecture/extension narrative, then continue non-API Phase 4. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue approved non-API Phase 4/5 work first; retain the 20 open rows as explicit backlog. Plan:
+**Next:** Continue approved non-API Phase 4/5 work first; retain the 19 open rows as explicit backlog. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -168,6 +168,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-M7-02 | `PriceResolverService` + cascade/temporal rules | Tests |
 | DONE-M7-03 | Line pricing on quotation/SO/invoice | `InvoiceLinePricingService` |
 | DONE-M7-04 | Direct item-specific list prices with taxonomy fallback and subsequent party-rule application | `PriceListItem`, `PriceResolverService`, focused feature tests |
+| DONE-ARCH-04 | Core transactional outbox with replaceable publisher and ERP invoice/payment/return integration events | `OutboxRecorder`, `PublishOutboxEventJob`, focused Core/ERP tests |
 
 ### Testing & hardening
 
@@ -250,7 +251,7 @@ No open Phase 2B items remain.
 | 5-01 | done | Database multi-currency rates + direct/inverse conversion + unrealized FX revaluation |
 | 5-02 | done | Immutable decimal-safe `Money` value object |
 | 5-03 | done | Analytic dimensions and allocations on journal lines |
-| 5-04 | open | Integration outbox / domain events |
+| 5-04 | done | Integration outbox / domain events |
 | 5-05 | done | Direct item-specific price lists |
 | 5-06 | open | ERP vision meta / pluggable narrative |
 
