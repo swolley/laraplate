@@ -568,14 +568,19 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 18: Calendar ICS export (4-07)
+### Task 18: Calendar ICS export (4-07) — completed 2026-07-22
 
 **Backlog:** `4-07`
 
-- [ ] `Modules/ERP/app/Services/Calendar/TaskIcsExporter.php`
-- [ ] Filament action on `Task` resource / project page — download `.ics`
-- [ ] LOCATION from `Site` → Core `Place` when `sites.place_id` exists (coordinate with 4-10)
-- [ ] Test: ICS contains DTSTART, SUMMARY, LOCATION
+- [x] Added dependency-free RFC 5545 `TaskIcsExporter` with stable UID, UTC dates, text escaping, CRLF, and 75-byte folding.
+- [x] Added Task Filament resource and streamed **Export calendar** action.
+- [x] `SUMMARY` resolves from Activity/project fallback and `LOCATION` from canonical `Site -> Core Place` postal fields.
+- [x] Added explicit immutable Task validity casts and corrected original nullable project/site FK declaration order for cross-driver behavior.
+- [x] Added integrated ICS and Filament tests covering DTSTART/DTEND, SUMMARY, LOCATION, UID, line endings/folding, and Site/Place regression.
+
+**Verification:** `TaskIcsExporterTest`, `ERPFilamentResourcesTest`, and `SitePlaceTest` pass; focused ICS coverage is `1 passed`, `7 assertions`; `vendor/bin/pint --dirty` passes.
+
+**Boundary:** this produces an importable single-event file. Calendar subscriptions, attendees, alarms, recurrence, provider APIs, and bidirectional synchronization are outside `4-07`.
 
 ---
 

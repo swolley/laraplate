@@ -18,20 +18,20 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **109** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, and the completed operational command suite — § Completed |
+| **Done** | **110** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **11** | § Open — **0 in Phase 2B/2C/5/6** + **11 in Phases 3–4**; Phase 3/API is deliberately deferred |
+| **Open backlog rows** | **10** | § Open — **0 in Phase 2B/2C/5/6** + **10 in Phases 3–4**; Phase 3/API is deliberately deferred |
 
 **How to read the backlog**
 
-- **11 open** = every row in § Open with status `open` or `next` after completion of canonical Site/Place integration on 2026-07-22.
+- **10 open** = every row in § Open with status `open` or `next` after completion of Task ICS export on 2026-07-22.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Implement `4-07` calendar ICS export, coordinated with `4-10` site/place location support. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Completed Phase 2B plan:
+**Current target:** Implement `4-11` hiding configurable version-strategy settings for models with hardcoded DIFF strategy. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Optional `4-08`, `4-09`, and `4-13` remain unapproved. Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Continue approved non-API Phase 4 work first; retain the 11 open rows as explicit backlog. Plan:
+**Next:** Continue approved non-API Phase 4 work first; retain the 10 open rows as explicit backlog. Plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -177,6 +177,7 @@ Status verified in `Modules/ERP` unless noted.
 | DONE-P4-05 | Company/currency partner pools, exact owed/paid expense allocations, derived balances, settlement suggestions, confirmed settle-up, and Filament operations | `PartnerPoolSettlementService`, models/migration, focused service and resource tests |
 | DONE-P4-06 | Provider-neutral PaymentRequest lifecycle, deterministic stub checkout, secure external callbacks, terminal-state idempotency, and Filament workflow | `PaymentRequestService`, provider contract/stub, callback and resource tests |
 | DONE-P4-10 | ERP Site linkage to canonical Core Place with validity-aware Filament management and relation coverage | original FK/relation, `SiteResource`, `SitePlaceTest` |
+| DONE-P4-07 | RFC 5545 Task ICS export with canonical Site/Place location and streamed Filament download | `TaskIcsExporter`, `TaskResource`, integrated ICS tests |
 
 ### Testing & hardening
 
@@ -242,11 +243,11 @@ No open Phase 2B items remain.
 | 4-04 | done | DB lock-chain triggers (D5) |
 | 4-05 | done | Settlements / pool / settle-up |
 | 4-06 | done | PaymentRequest stub + providers |
-| 4-07 | next | Calendar ICS export |
+| 4-07 | done | Calendar ICS export |
 | 4-08 | open | Gantt planning entity (optional) |
 | 4-09 | open | ETL Symfony legacy |
 | 4-10 | done | ERP `sites.place_id` + ICS location prerequisite |
-| 4-11 | open | Hide version-strategy settings for DIFF models |
+| 4-11 | next | Hide version-strategy settings for DIFF models |
 | 4-12 | open | Concurrency stress tests (50 workers) |
 | 4-13 | open | API mobile (optional) |
 
