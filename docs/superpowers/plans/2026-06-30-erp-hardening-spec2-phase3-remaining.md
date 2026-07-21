@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Active non-API backlog — Phase 2C, enterprise tasks `3-05`, `5-01`, `5-02`, `5-03`, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred.  
+**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred; `4-08`, `4-09`, and `4-13` remain optional and unapproved.
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Phase 6 operational commands is complete. The next implementation slice must be selected from non-API Phase 4/5 backlog. Phase 3 is retained for later review because Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
+**Current slice:** No mandatory non-API task remains. The next slice requires either a Phase 3/API governance decision or explicit approval of optional Gantt (`4-08`), legacy ETL (`4-09`), or mobile API (`4-13`) work. Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -615,13 +615,18 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 21: Concurrency stress tests (4-12)
+### Task 21: Concurrency stress tests (4-12) — completed 2026-07-22
 
 **Backlog:** `4-12`
 
-- [ ] Create: `Modules/ERP/tests/Stress/DocumentNumberConcurrencyStressTest.php` (group `stress`, skipped in CI by default)
-- [ ] 50 parallel `DocumentNumberAllocator::next()` → 50 unique numbers
-- [ ] Document run command in plan README comment: `php artisan test --group=stress`
+- [x] Added `Modules/ERP/tests/Stress/DocumentNumberConcurrencyStressTest.php` in group `stress`, skipped by default unless `RUN_ERP_STRESS_TESTS=1` is set.
+- [x] Added a reusable process harness that synchronizes 50 `pcntl` workers on an isolated temporary SQLite WAL database without touching the configured application database.
+- [x] Verified 50 parallel `DocumentNumberAllocator::next()` calls produce exactly 50 unique contiguous numbers, one sequence row, and `last_number = 50`.
+- [x] Documented the explicit run command in ERP developer, user, and RAG documentation: `RUN_ERP_STRESS_TESTS=1 php artisan test --group=stress`.
+
+**Verification:** default invocation is `1 skipped`; opt-in invocation is `1 passed`, `7 assertions`; the existing 8-worker `DocumentNumberConcurrencyTest` remains `1 passed`, `7 assertions`; `vendor/bin/pint --dirty` passes.
+
+**Boundary:** this is an application-level stress regression on isolated SQLite WAL. Production database engine load, latency, failover, and infrastructure capacity remain deployment-specific performance tests.
 
 ---
 
