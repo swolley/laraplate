@@ -551,14 +551,20 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 17: PaymentRequest stub + providers (4-06)
+### Task 17: PaymentRequest stub + providers (4-06) — completed 2026-07-22
 
 **Backlog:** `4-06`
 
-- [ ] Contract `PaymentRequestProvider` (Stripe/PayPal stub)
-- [ ] Model `PaymentRequest` + status enum
-- [ ] Filament create/list; webhook route placeholder
-- [ ] Test: stub provider returns checkout URL
+- [x] Added `PaymentRequestProvider`, checkout result DTO, and deterministic no-I/O stub provider.
+- [x] Added `PaymentRequest` model/schema/status lifecycle with exactly one Party or Core-user recipient and optional pool/settlement linkage.
+- [x] Added transactional `PaymentRequestService` for draft send and authenticated callback application with terminal-state idempotency.
+- [x] Added external `POST /api/v1/erp/payment-requests/{provider}/callbacks`; it is disabled without a provider callback key and requires Bearer authentication.
+- [x] Added Filament create/list/edit plus **Send** action and checkout URL visibility.
+- [x] Added provider binding, callback, recipient-invariant, terminal-state, migration, and Filament smoke tests.
+
+**Verification:** `PaymentRequestServiceTest`, `ERPFilamentResourcesTest`, and `PartnerPoolSettlementServiceTest` pass; focused PaymentRequest coverage is `3 passed`, `13 assertions`; `vendor/bin/pint --dirty` passes.
+
+**Boundary:** the stub URL cannot move money. A callback updates only `PaymentRequest`; it does not create `Payment`, `JournalEntry`, or `PoolTransaction`. Real provider adapters, signature/IP validation, refunds, disputes, and accounting reconciliation remain provider/go-live work.
 
 ---
 
