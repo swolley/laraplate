@@ -660,12 +660,15 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 28: ERP vision meta / pluggable narrative (5-06)
+### Task 28: ERP vision meta / pluggable narrative (5-06) — completed 2026-07-21
 
 **Backlog:** `5-06` — **optional / documentation**
 
-- [ ] `Modules/ERP/docs/VISION.md` — module boundaries, extension points (domain actions, e-invoice providers, payment providers)
-- [ ] `ERPServiceProvider` tagged hooks document in README
+- [x] Added `Modules/ERP/docs/VISION.md` with module boundaries, invariants, supported bindings, stable integration events, deferred work, and implementation checklist.
+- [x] Documented the actual `ERPServiceProvider` extension surface in README/user/developer RAG: chart-of-accounts, currency, e-invoice, and Core outbox contracts.
+- [x] Audited tagged hooks: none exist today. Parser/export services are workflow-selected and must not be described as auto-discovered plugins.
+
+**Boundary:** payment provider discovery and generic tagged registries are not implemented. Introduce them only with a concrete independently installed provider requirement and focused lifecycle/configuration tests.
 
 ---
 
