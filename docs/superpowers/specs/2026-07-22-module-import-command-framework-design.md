@@ -1,6 +1,6 @@
 # Module-owned import commands on Core infrastructure
 
-**Status:** Approved design; implementation pending
+**Status:** Core/CMS implemented; ERP entry point and source integration pending
 
 **Date:** 2026-07-22
 
@@ -87,7 +87,7 @@ Do not add `--entity`, `--resume`, or other speculative options in this extracti
 - parsing and validation of common options;
 - bootstrap loading;
 - common console messages and exit codes;
-- default-connection transactional dry-run orchestration;
+- importer-selected-or-default single-connection transactional dry-run orchestration;
 - temporary Scout suppression requested by `--no-search` or `--dry-run`.
 
 Core must contain no CMS/ERP entity names, DTOs, model references, table names, source mappings, or module-specific configuration.
@@ -202,18 +202,18 @@ The destination module validates every write through its own pipeline and domain
 
 ## Dry-run boundary
 
-The current runner wraps execution in a transaction on the default connection. This guarantees rollback only for database writes made on that connection.
+The runner wraps execution in a transaction on the connection returned by an optional `ConnectionAwareBulkImporterInterface`. Legacy importers fall back to the current default connection. This guarantees rollback only for database writes made on that selected connection.
 
 It does not automatically roll back:
 
-- writes on another connection;
+- writes on any other connection;
 - files or object storage;
 - queues already dispatched;
 - HTTP calls;
 - search indexing outside the disabled Scout driver;
 - provider-specific external side effects.
 
-Therefore documentation and console output must say `default database transaction rolled back`, not claim that every possible side effect was reverted. Importers executed with `--dry-run` must inspect the injected `dryRun` constructor parameter and suppress non-transactional side effects. Multi-connection ERP dry-run support requires an explicit importer design and tests; it is not implied by the Core runner.
+Therefore documentation and console output must refer to the selected database transaction, not claim that every possible side effect was reverted. Importers executed with `--dry-run` must inspect the injected `dryRun` constructor parameter and suppress non-transactional side effects. Multi-connection dry-run support requires explicit importer orchestration and tests; it is not implied by the Core runner.
 
 ## Error and result contract
 

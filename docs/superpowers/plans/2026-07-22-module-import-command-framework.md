@@ -2,7 +2,7 @@
 
 > **For agentic workers:** execute one task and one owning repository at a time. Do not stage unrelated dirty files. Use module test stubs under `tests/Stubs` or `tests/Support`; do not declare test-only classes inside test files.
 
-**Status:** Ready for implementation; Symfony source adapter gated by source evidence
+**Status:** Core framework and CMS migration completed; ERP entry point and source integration pending
 
 **Goal:** Extract common import command mechanics from CMS into Core without exposing a runnable Core command, preserve `cms:import`, add the equivalent `erp:import` entry point, and prepare ERP `4-09` for a source-specific Symfony adapter.
 
@@ -22,13 +22,13 @@
 - Keep CMS DTOs, pipeline, upserters, and post-processing in CMS.
 - ERP importers write through ERP services, never raw accounting/inventory mutations.
 - Preserve the old CMS importer contract namespace as a compatibility marker.
-- Treat default-connection rollback as the exact dry-run guarantee.
+- Treat importer-selected-or-default single-connection rollback as the exact dry-run guarantee.
 - Update user/developer/RAG docs in every affected module.
 - Commit each task in its owning repository before advancing the root submodule pointer.
 
 ---
 
-## Task 1: Freeze the current CMS command contract
+## Task 1: Freeze the current CMS command contract — completed 2026-07-22
 
 **Module:** CMS
 
@@ -37,18 +37,18 @@
 - Modify: `Modules/CMS/tests/Feature/Import/ImportCommandTest.php`
 - Create or modify: `Modules/CMS/tests/Feature/Import/ImportCommandDefinitionTest.php`
 
-- [ ] Assert the command name is exactly `cms:import`.
-- [ ] Assert the definition contains exactly the current module options: `importer`, `bootstrap`, repeatable `arg`, `dry-run`, `limit`, and `no-search`, in addition to framework options.
-- [ ] Assert there are no positional import arguments.
-- [ ] Assert the command listing description contains the CMS colored suffix.
-- [ ] Preserve existing execution tests for FQCN resolution, bootstrap loading, args, limit, rollback, Scout suppression, sibling discovery, invalid importer, and exit codes.
-- [ ] Run:
+- [x] Asserted the command name is exactly `cms:import`.
+- [x] Asserted the inherited definition contains `importer`, `bootstrap`, repeatable `arg`, `dry-run`, `limit`, and `no-search`.
+- [x] Asserted there are no positional import arguments.
+- [x] Asserted the command listing description contains the CMS colored suffix.
+- [x] Preserved execution coverage for FQCN resolution, bootstrap loading, args, limit, rollback, Scout suppression, sibling discovery, invalid importer, and exit codes.
+- [x] Ran:
 
 ```bash
 php artisan test --compact Modules/CMS/tests/Feature/Import/ImportCommandTest.php Modules/CMS/tests/Feature/Import/ImportCommandDefinitionTest.php
 ```
 
-**Expected:** existing behavior passes; the new suffix/definition assertion may fail until Task 3 and must remain an explicit red test only if Tasks 1–3 are executed in one implementation branch.
+**Verification:** CMS command and definition coverage passes with `15 passed`, `49 assertions`.
 
 **Commit:** `test(cms): freeze bulk import command contract`
 
@@ -72,7 +72,7 @@ php artisan test --compact Modules/CMS/tests/Feature/Import/ImportCommandTest.ph
 - Modify: `Modules/Core/composer.json` only if the existing test PSR-4 mapping does not cover the new stubs.
 
 - [x] Defined the neutral `import(): int` contract without module references.
-- [x] Moved default-connection transaction behavior to Core, including `limitReached()` compatibility and restoration of the previous nesting level.
+- [x] Moved transactional behavior to Core, including optional importer connection affinity, default-connection fallback, `limitReached()` compatibility, and restoration of the previous nesting level.
 - [x] Implemented the abstract command as non-registerable infrastructure.
 - [x] Defined all current options through inherited `getOptions()` using Symfony `InputOption` modes.
 - [x] Preserved common parsing semantics: malformed `--arg` entries are ignored, later duplicate keys win, blank keys are ignored, and limit is normalized to a non-negative integer or `null`.
@@ -83,7 +83,7 @@ php artisan test --compact Modules/CMS/tests/Feature/Import/ImportCommandTest.ph
 - [x] Tested that a minimal concrete command needs only `$name`, `$description`, and injected collaborators.
 - [x] Updated automatic module command discovery to ignore every non-instantiable command class, including the abstract parent.
 - [x] Tested that Core registers no `core:import` command.
-- [x] Covered dry-run rollback behavior and documented that only the default connection is covered.
+- [x] Covered dry-run rollback on both the default and importer-declared connection; only the selected connection is covered.
 - [x] Ran:
 
 ```bash
@@ -91,13 +91,13 @@ php artisan test --compact Modules/Core/tests/Feature/Import/AbstractImportComma
 vendor/bin/pint --dirty
 ```
 
-**Verification:** focused Core import and `ModuleServiceProvider` coverage passes with `21 passed`, `49 assertions`; `vendor/bin/pint --dirty` passes. Focused PHPStan was attempted but is blocked before analysis by the unrelated required `excludePaths` entry for missing root `.phpstorm.meta.php`.
+**Verification:** focused Core import and `ModuleServiceProvider` coverage passes with `22 passed`, `51 assertions`; the command-definition test passes with `6 passed`, `26 assertions`. Focused PHPStan was attempted but is blocked before analysis by the unrelated required `excludePaths` entry for missing root `.phpstorm.meta.php`.
 
 **Commit:** `feat(core): add abstract module import command`
 
 ---
 
-## Task 3: Migrate CMS onto the Core parent without breaking plugins
+## Task 3: Migrate CMS onto the Core parent without breaking plugins — completed 2026-07-22
 
 **Modules:** CMS; Core only if a defect is found in the new neutral API
 
@@ -113,16 +113,16 @@ vendor/bin/pint --dirty
 - Modify: `Modules/CMS/tests/Feature/Import/SiblingImportersDiscoveryTest.php`
 - Modify: `Modules/CMS/tests/Feature/Import/Stubs/FakeBulkImporter.php`
 
-- [ ] Make the existing CMS contract extend the Core contract so current external classes remain valid.
-- [ ] Make CMS `ImportCommand` extend Core `AbstractImportCommand`.
-- [ ] Remove `$signature`; set `$name = 'cms:import'`.
-- [ ] Add the established CMS colored suffix to the description.
-- [ ] Inject CMS-specific resolver/discovery implementations in the constructor and pass them to the parent.
-- [ ] Require the CMS marker interface before execution; a Core-only or ERP importer must fail.
-- [ ] Preserve interactive sibling project discovery and external autoloader behavior.
-- [ ] Remove the CMS runner only after all references use Core; do not leave duplicate implementations.
-- [ ] Keep `AbstractBulkImporter`, mapper contracts, DTOs, pipeline, upserters, and post-processing in CMS.
-- [ ] Run all focused import coverage:
+- [x] Made the existing CMS contract extend the Core contract so current external classes remain valid.
+- [x] Made CMS `ImportCommand` extend Core `AbstractImportCommand`.
+- [x] Removed `$signature`; set `$name = 'cms:import'`.
+- [x] Added the established CMS colored suffix to the description.
+- [x] Injected CMS-specific resolver/discovery implementations in the constructor and passed them to the parent.
+- [x] Required the CMS marker interface before execution.
+- [x] Preserved interactive sibling project discovery and external autoloader behavior.
+- [x] Retained the CMS runner only as a compatibility adapter for external importers using `limitReached()`; execution delegates to Core.
+- [x] Kept `AbstractBulkImporter`, mapper contracts, DTOs, pipeline, upserters, and post-processing in CMS.
+- [x] Ran focused import coverage successfully.
 
 ```bash
 php artisan test --compact Modules/CMS/tests/Feature/Import
@@ -133,17 +133,17 @@ vendor/bin/pint --dirty
 
 ---
 
-## Task 4: Verify external Acme importer compatibility
+## Task 4: Verify external Acme importer compatibility — completed 2026-07-22
 
 **Repository:** sibling `laraplate-importers`
 
 **Files:** source importer classes, tests, Composer/static-analysis configuration, and README only where required by the actual compatibility change.
 
-- [ ] Load the external Composer bootstrap through the refactored `cms:import` command.
-- [ ] Verify both `AcmeApiImporter` and `AcmeSqlImporter` satisfy the retained CMS marker contract.
-- [ ] Update imports only if the compatibility marker cannot preserve the old namespace.
-- [ ] Do not add a reverse Laraplate dependency to the CMS module.
-- [ ] Run the external package test suite and formatting.
+- [x] Loaded the external Composer bootstrap alongside Laraplate's autoloader.
+- [x] Verified both `AcmeApiImporter` and `AcmeSqlImporter` satisfy the retained CMS marker contract.
+- [x] Preserved existing imports through the compatibility marker; no external source change was required.
+- [x] Added no reverse Laraplate dependency to the CMS module.
+- [x] Ran the external package test suite: `124 passed`, `298 assertions`.
 - [ ] Run one Laraplate dry-run smoke import against an anonymized fixture, not a production source.
 
 ```bash
@@ -191,7 +191,7 @@ vendor/bin/pint --dirty
 
 ---
 
-## Task 6: Document Core, CMS, and ERP behavior
+## Task 6: Document Core, CMS, and ERP behavior — Core/CMS completed; ERP pending
 
 **Modules:** Core, CMS, ERP
 
@@ -202,12 +202,12 @@ vendor/bin/pint --dirty
 - Modify CMS and ERP user/operator guides.
 - Modify relevant normal and RAG glossaries.
 
-- [ ] Core docs explain the abstract framework, absence of `core:import`, common option contract, and extension rules.
-- [ ] CMS docs preserve Acme examples and explain the compatibility marker.
+- [x] Core docs explain the abstract framework, absence of `core:import`, common option contract, and extension rules.
+- [x] CMS docs preserve Acme examples and explain the compatibility marker.
 - [ ] ERP docs explain that `erp:import` is infrastructure and does not by itself provide a Symfony mapping.
-- [ ] All docs state the exact dry-run boundary.
-- [ ] All command examples use absolute bootstrap paths and quote importer FQCNs safely.
-- [ ] Document the colored command suffix convention.
+- [x] Core and CMS docs state the exact dry-run boundary.
+- [x] CMS command examples use absolute bootstrap paths and quote importer FQCNs safely.
+- [x] Core and CMS document the colored command suffix convention.
 
 **Commits:** one documentation commit per owning module.
 
