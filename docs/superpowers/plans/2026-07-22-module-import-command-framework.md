@@ -2,25 +2,23 @@
 
 > **For agentic workers:** execute one task and one owning repository at a time. Do not stage unrelated dirty files. Use module test stubs under `tests/Stubs` or `tests/Support`; do not declare test-only classes inside test files.
 
-**Status:** Core framework and CMS migration completed; ERP entry point and source integration pending
+**Status:** Completed for Core/CMS; ERP work transferred to the dedicated ERP external-source importer plan
 
-**Goal:** Extract common import command mechanics from CMS into Core without exposing a runnable Core command, preserve `cms:import`, add the equivalent `erp:import` entry point, and prepare ERP `4-09` for a source-specific Symfony adapter.
+**Goal:** Extract common import command mechanics from CMS into Core without exposing a runnable Core command, then preserve `cms:import` on the shared infrastructure.
 
-**Architecture:** Core owns `AbstractImportCommand`, the neutral executable importer contract, runner, and resolver/discovery abstractions. CMS and ERP each own a namespaced `ImportCommand`, marker importer interface, colored command description, module resolver, destination pipeline, and documentation. Common CLI options are declared once by Core through `getOptions()`; concrete commands declare `$name` and must not declare `$signature`.
+**Architecture:** Core owns `AbstractImportCommand`, the neutral executable importer contract, runner, and resolver/discovery abstractions. CMS owns its namespaced `ImportCommand`, marker importer interface, colored command description, module resolver, destination pipeline, and documentation. Common CLI options are declared once by Core through `getOptions()`; concrete commands declare `$name` and must not declare `$signature`.
 
 **Spec:** `docs/superpowers/specs/2026-07-22-module-import-command-framework-design.md`
 
-**Repositories:** root documentation, `Modules/Core`, `Modules/CMS`, `Modules/ERP`, and optionally the sibling `laraplate-importers` repository.
+**Repositories:** root documentation, `Modules/Core`, `Modules/CMS`, and the sibling `laraplate-importers` repository for compatibility verification only.
 
 ## Locked implementation rules
 
 - No runnable `core:import` command.
 - Keep `cms:import` and its current options/behavior.
-- Add `erp:import` with the same common options.
 - Do not add `--entity`, `--resume`, or new dependencies.
 - Use `$name` in concrete commands; common parameters come from parent `getOptions()`.
 - Keep CMS DTOs, pipeline, upserters, and post-processing in CMS.
-- ERP importers write through ERP services, never raw accounting/inventory mutations.
 - Preserve the old CMS importer contract namespace as a compatibility marker.
 - Treat importer-selected-or-default single-connection rollback as the exact dry-run guarantee.
 - Update user/developer/RAG docs in every affected module.
@@ -157,117 +155,10 @@ vendor/bin/pint
 
 ---
 
-## Task 5: Add the ERP module import entry point
+## Transferred ERP scope
 
-**Module:** ERP
-
-**Files:**
-
-- Create: `Modules/ERP/app/Console/ImportCommand.php`
-- Create: `Modules/ERP/app/Import/Contracts/BulkImporterInterface.php`
-- Create: `Modules/ERP/app/Import/Support/ErpBulkImporterResolver.php`
-- Create if needed: `Modules/ERP/app/Import/Support/ErpImportPluginDiscovery.php`
-- Create: `Modules/ERP/tests/Stubs/Import/FakeErpBulkImporter.php`
-- Create: `Modules/ERP/tests/Stubs/Import/FakeCmsBulkImporter.php`
-- Create: `Modules/ERP/tests/Feature/Import/ImportCommandTest.php`
-- Modify: ERP service-provider command registration only if automatic module command discovery does not already load the command.
-
-- [ ] Add `$name = 'erp:import'`; do not declare `$signature`.
-- [ ] Add the established colored ERP suffix to the command description.
-- [ ] Inject ERP-specific resolver/discovery collaborators into the Core parent.
-- [ ] Accept only the ERP marker interface.
-- [ ] Prove inherited options have the same names and modes as CMS.
-- [ ] Cover FQCN resolution, bootstrap, constructor args, limit, dry-run, Scout suppression, missing importer, invalid class, and imported count.
-- [ ] Prove `erp:import` rejects a CMS importer before `import()` is called.
-- [ ] Do not implement source mappings or direct model writes in this task.
-- [ ] Run:
-
-```bash
-php artisan test --compact Modules/ERP/tests/Feature/Import/ImportCommandTest.php
-vendor/bin/pint --dirty
-```
-
-**Commit:** `feat(erp): add module import entry point`
-
----
-
-## Task 6: Document Core, CMS, and ERP behavior — Core/CMS completed; ERP pending
-
-**Modules:** Core, CMS, ERP
-
-**Files:**
-
-- Modify each affected module README.
-- Modify each affected module developer RAG document.
-- Modify CMS and ERP user/operator guides.
-- Modify relevant normal and RAG glossaries.
-
-- [x] Core docs explain the abstract framework, absence of `core:import`, common option contract, and extension rules.
-- [x] CMS docs preserve Acme examples and explain the compatibility marker.
-- [ ] ERP docs explain that `erp:import` is infrastructure and does not by itself provide a Symfony mapping.
-- [x] Core and CMS docs state the exact dry-run boundary.
-- [x] CMS command examples use absolute bootstrap paths and quote importer FQCNs safely.
-- [x] Core and CMS document the colored command suffix convention.
-
-**Commits:** one documentation commit per owning module.
-
----
-
-## Task 7: Audit and specify the Symfony ERP source
-
-**Backlog:** ERP `4-09`, concrete adapter gate
-
-- [ ] Identify database engine, version, charset, and timezone.
-- [ ] Obtain schema/schema dump and anonymized representative rows.
-- [ ] Inventory source tables, foreign keys, soft deletion, polymorphism, and historical state.
-- [ ] Define stable source keys and an idempotent source-to-ERP ID map.
-- [ ] Decide one-shot migration versus repeatable synchronization.
-- [ ] Establish row counts and monetary, inventory, quotation, time, and settlement control totals.
-- [ ] Write a field-level mapping document against current ERP models/services.
-- [ ] Define ordering, chunk size, restart, failure, and duplicate policies.
-- [ ] Determine whether default-connection transactional dry-run is sufficient; otherwise design importer-owned multi-connection side-effect suppression.
-- [ ] Obtain explicit approval of the mapping before writing the adapter.
-
-**Stop condition:** if source evidence is unavailable, leave the concrete adapter pending. Do not invent source fields from the historical conceptual mapping.
-
----
-
-## Task 8: Implement the external Symfony ERP importer after the gate
-
-**Repository:** external importer package, not Core and not ERP domain internals
-
-**Prerequisite:** Task 7 approved.
-
-- [ ] Implement the ERP marker interface.
-- [ ] Read the source through a named read-only connection or dump reader.
-- [ ] Map source data into ERP-owned typed inputs.
-- [ ] Import master data before dependent operational/fiscal data.
-- [ ] Use ERP services for journal, inventory, numbering, posting, lock, return, and settlement behavior.
-- [ ] Add idempotent external identity tracking and deterministic rerun behavior.
-- [ ] Add chunking, progress, rejected-row reporting, and restart checkpoints inside the importer; do not extend the common CLI until semantics are shared by CMS.
-- [ ] Reconcile every approved control total.
-- [ ] Test with anonymized fixtures and a disposable full-size database copy.
-- [ ] Run `erp:import --dry-run` first, then an approved disposable persistent run.
-
-**Commit:** repository-specific, isolated from Laraplate module commits.
-
----
-
-## Task 9: Final regression and backlog closure
-
-- [ ] Run focused Core import tests.
-- [ ] Run all CMS import tests.
-- [ ] Run ERP import command tests.
-- [ ] Run external importer tests when Task 8 exists.
-- [ ] Run `vendor/bin/pint --dirty` after every code-owning module change.
-- [ ] Confirm `php artisan list` shows `cms:import` and `erp:import` with distinct colored module suffixes and no `core:import`.
-- [ ] Confirm no Core class imports `Modules\CMS` or `Modules\ERP`.
-- [ ] Confirm `cms:import` examples remain executable.
-- [ ] Update the ERP master backlog:
-  - framework/ERP entry point complete after Tasks 1–6;
-  - concrete `4-09` complete only after Tasks 7–8 and reconciliation evidence.
-- [ ] Commit root Superpowers updates separately from submodule pointers.
+The ERP command, ERP documentation, Symfony SQL adapter, SPLID adapter, Tricount adapter, and their final regression are no longer tasks in this completed Core/CMS plan. They are owned by [`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md).
 
 ## Completion definition
 
-The shared framework is complete when Core, CMS, and ERP Tasks 1–6 pass even if no Symfony database is available. ERP `4-09` as a legacy migration is complete only when the approved source adapter has run against representative data and reconciliation totals pass. These are deliberately separate completion claims.
+The shared framework is complete when Core import tests, CMS import tests, and external Acme compatibility checks pass; no runnable `core:import` command exists, and Core imports no CMS class. The optional Acme fixture smoke run remains operational evidence, not a blocker for the completed extraction.
