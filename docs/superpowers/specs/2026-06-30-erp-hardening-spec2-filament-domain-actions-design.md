@@ -20,18 +20,21 @@
 |--------|------:|-------|
 | **Done** | **112** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, forced-DIFF setting governance, 50-worker numbering stress coverage, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **8** | § Open — **0 in Phase 2B/2C/5/6** + **8 in Phases 3–4**; Phase 3/API is deliberately deferred and the remaining Phase 4 rows are optional |
+| **Open backlog rows** | **8** | § Open — **0 in Phase 2B/2C/5/6** + **8 in Phases 3–4**; Phase 3/API is deliberately deferred, `4-09` is planned, and `4-08`/`4-13` remain optional |
 
 **How to read the backlog**
 
-- **8 open** = every row in § Open after completion of numbering stress coverage on 2026-07-22: five deferred Phase 3/API governance rows and optional `4-08`, `4-09`, `4-13`.
+- **8 open** = every row in § Open after completion of numbering stress coverage on 2026-07-22: five deferred Phase 3/API governance rows, planned `4-09`, and optional `4-08`/`4-13`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** No further non-API mandatory row is approved. Phase 3 remains deferred: Core already provides dynamic CRUD routes and optional external exposure, so ERP-specific API overrides require a separate governance decision. Optional `4-08`, `4-09`, and `4-13` remain unapproved. Completed Phase 2B plan:
+**Current target:** Plan `4-09` as a Core abstract import-command framework with module-owned `cms:import` and `erp:import` commands. The concrete Symfony adapter remains gated by source schema and reconciliation evidence. Phase 3 remains deferred; optional `4-08` and `4-13` remain unapproved. Framework plan:
+[`plans/2026-07-22-module-import-command-framework.md`](../plans/2026-07-22-module-import-command-framework.md).
+
+Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Select either the Phase 3/API governance review or explicitly approve an optional Phase 4 row; retain the 8 open rows as explicit backlog. Plan:
+**Next:** Implement the approved `4-09` framework plan, then decide whether source evidence is sufficient for the Symfony adapter. Retain the other open rows explicitly. Master plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -246,7 +249,7 @@ No open Phase 2B items remain.
 | 4-06 | done | PaymentRequest stub + providers |
 | 4-07 | done | Calendar ICS export |
 | 4-08 | open | Gantt planning entity (optional) |
-| 4-09 | open | ETL Symfony legacy |
+| 4-09 | planned | Core abstract import framework + module-owned commands; Symfony ERP adapter gated by source evidence |
 | 4-10 | done | ERP `sites.place_id` + ICS location prerequisite |
 | 4-11 | done | Hide version-strategy settings for DIFF models |
 | 4-12 | done | Opt-in concurrency stress test: 50 workers, 50 unique contiguous numbers, isolated temporary SQLite WAL database |

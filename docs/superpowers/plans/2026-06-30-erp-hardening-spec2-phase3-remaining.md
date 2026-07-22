@@ -5,10 +5,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred; `4-08`, `4-09`, and `4-13` remain optional and unapproved.
+**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred; `4-09` has an approved implementation plan; `4-08` and `4-13` remain optional and unapproved.
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** No mandatory non-API task remains. The next slice requires either a Phase 3/API governance decision or explicit approval of optional Gantt (`4-08`), legacy ETL (`4-09`), or mobile API (`4-13`) work. Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
+**Current slice:** Implement the shared import-command framework and ERP entry point in [`2026-07-22-module-import-command-framework.md`](2026-07-22-module-import-command-framework.md). The concrete Symfony adapter remains gated by source evidence. Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -630,14 +630,14 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 22: Optional — Gantt, ETL, API mobile (4-08, 4-09, 4-13)
+### Task 22: Optional Gantt/API mobile; planned import framework (4-08, 4-09, 4-13)
 
-**Skip unless user approves.**
+**Skip `4-08` and `4-13` unless user approves. Implement `4-09` through its dedicated plan; do not implement the Symfony adapter before its source-evidence gate.**
 
 | ID | Deliverable if approved |
 |----|-------------------------|
 | 4-08 | `PlanningActivity` model + Filament read-only Gantt view |
-| 4-09 | `Modules/ERP/app/Console/ImportLegacySymfonyCommand.php` + mapping doc |
+| 4-09 | Core `AbstractImportCommand` + module-owned `cms:import`/`erp:import`; external Symfony ERP adapter after schema and reconciliation approval |
 | 4-13 | Sanctum mobile routes subset on Task 11 API |
 
 ---
