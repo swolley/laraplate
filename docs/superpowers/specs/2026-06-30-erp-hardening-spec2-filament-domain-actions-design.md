@@ -28,13 +28,13 @@
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Plan `4-09` as a Core abstract import-command framework with module-owned `cms:import` and `erp:import` commands. The concrete Symfony adapter remains gated by source schema and reconciliation evidence. Phase 3 remains deferred; optional `4-08` and `4-13` remain unapproved. Framework plan:
-[`plans/2026-07-22-module-import-command-framework.md`](../plans/2026-07-22-module-import-command-framework.md).
+**Current target:** Complete ERP `4-09` through the module-owned `erp:import` command and three external adapters: legacy Symfony SQL, SPLID Excel, and a supported Tricount export. The Core/CMS framework extraction is complete. Each adapter remains gated by real source fixtures, approved mappings, and reconciliation evidence. Phase 3 remains deferred; optional `4-08` and `4-13` remain unapproved. ERP importer plan:
+[`plans/2026-07-22-erp-external-source-importers.md`](../plans/2026-07-22-erp-external-source-importers.md).
 
 Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Implement the approved `4-09` framework plan, then decide whether source evidence is sufficient for the Symfony adapter. Retain the other open rows explicitly. Master plan:
+**Next:** Implement the ERP import host, approve destination contracts, then execute the independent Symfony, SPLID, and Tricount source gates. Retain the other open rows explicitly. Master plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
