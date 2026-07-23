@@ -1,3 +1,10 @@
+# Laraplate Backend — Claude Code
+
+Canonical agent rules for this repo are in `AGENTS.md` and `.cursor/rules/`.
+The Laravel Boost guidelines below are auto-generated; read `AGENTS.md` for the full project law.
+
+@AGENTS.md
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

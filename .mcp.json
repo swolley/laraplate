@@ -6,6 +6,10 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "neuron-ai-doc": {
+            "type": "http",
+            "url": "https://docs.neuron-ai.dev/~gitbook/mcp"
         }
     }
 }
