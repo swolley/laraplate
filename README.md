@@ -42,6 +42,8 @@ php artisan module:seed --all
 -   ⚡ **Core**: main common boilerplate functionalities. About [Core Module](https://github.com/swolley/laraplate-core).
 -   ✎ **CMS**: common content management functionalities. About [CMS module](https://github.com/swolley/laraplate-cms).
 -   ✨ **AI**: artificial intelligence capabilities (embeddings, vector search, automatic translation). About [AI Module](https://github.com/swolley/laraplate-ai).
+-   📊 **ERP**: accounting and operations (multi-company, journal entries, tax codes, commercial scaffolding). About [ERP Module](https://github.com/swolley/laraplate-erp).
+-   🏭 **MES**: manufacturing execution foundation (work orders, shop-floor events, traceability, KPIs). About [MES Module](https://github.com/swolley/laraplate-mes).
 
 ### Environment (principali variabili)
 
@@ -99,3 +101,4 @@ For a complete and detailed list of TODOs, read:
 - [Core Module TODO](Modules/Core/README.md#todo-and-fixme)
 - [CMS Module TODO](Modules/CMS/README.md#todo-and-fixme)
 - [AI Module TODO](Modules/AI/README.md#todo-and-fixme)
+- [ERP Module TODO](Modules/ERP/README.md#todo)
