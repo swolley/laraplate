@@ -30,3 +30,5 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-07-22-module-import-command-framework.md`: Completed Core abstract import mechanics and CMS command migration; ERP scope transferred to its dedicated plan.
 - `2026-07-22-erp-external-source-importers.md`: Add `erp:import` and three ERP adapters in `laraplate-importers` for legacy Symfony SQL, SPLID Excel, and supported Tricount exports.
 - `2026-07-29-filament-environment-indicator.md`: Replace pxlrbt env indicator with Core plugin + module version dropdown.
+- `2026-07-29-filament-make-resources.md`: `filament:make-resources` + ownership helper + permanent Filament ClassGenerator rebind.
+- `2026-07-29-hasform-entity-preset.md`: Core `HasForm` Entity → Preset cascade; persist `presettable_id` only.
