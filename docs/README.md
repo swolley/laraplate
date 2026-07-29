@@ -25,3 +25,7 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 - Write human-readable docs in `docs/` or `Modules/*/docs/`.
 - Copy or move into `*/docs/rag/` only what you want the assistant to see.
 - Run `php artisan ai:index-docs` (or `--full` when you need a full rebuild of the vector store).
+
+## Engineering audits
+
+- [Database connection affinity audit](database-connection-affinity-audit.md)
