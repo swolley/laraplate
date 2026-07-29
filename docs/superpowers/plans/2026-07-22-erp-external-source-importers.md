@@ -14,6 +14,17 @@
 
 **Framework:** Core import infrastructure from [`2026-07-22-module-import-command-framework.md`](2026-07-22-module-import-command-framework.md).
 
+**Approved first vertical slice:**
+
+- [`2026-07-29-erp-external-cash-import-foundation.md`](2026-07-29-erp-external-cash-import-foundation.md)
+  implements the generic Core/ERP host, provenance, cash types, and destination
+  services.
+- [`2026-07-29-nebula-cash-importer.md`](2026-07-29-nebula-cash-importer.md)
+  implements the proprietary Nebula financial adapter after the foundation.
+
+Nebula is the authoritative initial baseline. SPLID and Tricount remain later
+source-reconciliation phases.
+
 ## Locked boundaries
 
 - Every importer targets ERP and implements the ERP marker contract.
