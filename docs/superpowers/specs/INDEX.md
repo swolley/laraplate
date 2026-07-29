@@ -19,6 +19,7 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-16-in-app-ai-assistance-security-design.md`: Mandatory developer/in-app profile isolation, separate corpora, fail-closed guardrails, and read-only ACL-preserving Core Graph tools.
 - `2026-07-17-application-content-retrieval-design.md`: General Core provider contract for ACL-preserving module evidence retrieval, AI tool orchestration, CMS reference provider, and a separately gated public phase.
 - `2026-07-21-aggregate-version-sets-design.md`: Generic Core version sets, synchronous single-connection history, composite pivot identity, aggregate restore, and the mandatory multi-connection recovery milestone.
+- `2026-07-29-revision-centric-aggregate-history-design.md`: **Draft for adversarial review** — revision-first aggregate state snapshots with relation version vectors and optional atomic version sets; implementation remains paused.
 - `2026-07-29-filament-environment-indicator-design.md`: Custom Filament env badge + App/module version dropdown (replaces pxlrbt).
 - `2026-07-29-filament-make-resources-design.md`: Batch `filament:make-resources` + permanent Filament ClassGenerator rebind with Laraplate HasTable/HasRecords/HasForm trait resolution and `laraplate_owned` module gate.
 - `2026-07-29-hasform-entity-preset-design.md`: Core `HasForm` Entity → Preset cascade for `HasDynamicContents` models; persist only `presettable_id`.

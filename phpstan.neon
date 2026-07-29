@@ -66,10 +66,6 @@ parameters:
         -
           message: '#Property Modules\\CMS\\Models\\Pivot\\Categorizable::\$primaryKey \(string\) does not accept default value#'
           path: Modules/CMS/app/Models/Pivot/Categorizable.php
-    # File stub per definizioni di tipo (trait methods e facade custom)
-    stubFiles:
-        - _ide_helper_traits.php
-    
     # Non segnalare pattern non corrispondenti (per evitare warning sui file IDE helper)
     reportUnmatchedIgnoredErrors: false
 
