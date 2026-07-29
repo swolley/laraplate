@@ -75,6 +75,13 @@ aside:not(:where(.dark, .dark *)) {
 
 /* #region Tables */
 
+@layer components {
+    .fi-ta-image img {
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+    }
+}
+
 .fi-ta-row {
     position: relative;
 }
