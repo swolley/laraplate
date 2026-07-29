@@ -4,7 +4,7 @@
   "vendor": "swolley",
   "type": "project",
   "description": "The skeleton application for the Laravel framework.",
-  "version": "v1.13.3",
+  "version": "v1.13.4",
   "keywords": [
     "laravel",
     "laraplate",
@@ -52,7 +52,6 @@
     "typesense/typesense-php": "^5.2",
     "laravel/scout": "^10.25",
     "matanyadaev/laravel-eloquent-spatial": "^4.7",
-    "pxlrbt/filament-environment-indicator": "^3.5.1",
     "livewire/livewire": "^4.3",
     "filament/spatie-laravel-media-library-plugin": "^5.6.3",
     "spatie/fork": "^1.2.7",

@@ -29,8 +29,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Core\Filament\Pages\PhpInfo;
 use Modules\Core\Filament\Pages\Swagger;
 use Modules\Core\Filament\Pages\Welcome;
+use Modules\Core\Filament\Plugins\EnvironmentIndicatorPlugin;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
-use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -74,6 +74,8 @@ final class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
             ])
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
                 Welcome::class,
@@ -104,11 +106,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 ModulesPlugin::make(),
-                EnvironmentIndicatorPlugin::make()
-                    ->visible(true)
-                    ->showBorder(false)
-                    ->showGitBranch()
-                    ->showDebugModeWarningInProduction(),
+                EnvironmentIndicatorPlugin::make(),
             ])
             // AUTHENTICATION
             ->login()
