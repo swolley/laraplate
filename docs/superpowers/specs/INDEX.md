@@ -20,4 +20,5 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-17-application-content-retrieval-design.md`: General Core provider contract for ACL-preserving module evidence retrieval, AI tool orchestration, CMS reference provider, and a separately gated public phase.
 - `2026-07-21-aggregate-version-sets-design.md`: Generic Core version sets, synchronous single-connection history, composite pivot identity, aggregate restore, and the mandatory multi-connection recovery milestone.
 - `2026-07-29-filament-environment-indicator-design.md`: Custom Filament env badge + App/module version dropdown (replaces pxlrbt).
+- `2026-07-29-filament-toggle-inline-default-design.md`: Global Filament `Toggle::inline(false)` default (label above switch); form `inlineLabel()` unchanged.
 - `2026-07-22-module-import-command-framework-design.md`: Core abstract import command infrastructure with module-owned CMS/ERP commands and gated Symfony ERP adapter.
