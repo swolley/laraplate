@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### 🚀 Features
+
+- *(filament)* Default Toggle fields to stacked label layout
+- *(filament)* Ship make-resources docs and App panel discovery
+
+### 🐛 Bug Fixes
+
+- *(filament)* Render stacked locale flags as circles
+
+### 🚜 Refactor
+
+- Replace pxlrbt/filament-environment-indicator with Core plugin and module version dropdown
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Core and AI submodule pointers for PSR-4 test stubs
+
 ## [1.13.2] - 2026-07-12
 
 ### ⚙️ Miscellaneous Tasks
