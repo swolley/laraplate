@@ -134,7 +134,8 @@ filament:make-resources {module?}
 4. For each model, invoke existing makers with non-interactive options where possible:
    - `App` → `make:filament-resource`
    - else → `module:make:filament-resource` with `module` argument  
-   Rebound generators supply Laraplate traits automatically.
+   Always pass Filament `--generate`. Form fields come from DB inspect (with HasForm-owned columns excluded). Table domain columns are passed into `HasTable`’s `$columns` callback; trait-owned grezzi (`created_at`/`updated_at`/`deleted_at`, `valid_from`/`valid_to`) are stripped at generate + runtime. Rebound generators supply Laraplate traits automatically.
+   See also `2026-07-30-filament-generate-trait-merge-design.md`.
 5. Existing files: rely on Filament `checkForCollision` prompt (overwrite yes/no).  
    Under `--no-interaction`: **skip** existing files (do not abort the whole batch if one file exists — batch orchestration should continue to next model; per-resource Filament abort on decline must be handled so one skip does not stop the loop).
 6. Summary: created / skipped / failed counts.
@@ -177,7 +178,7 @@ Rebind is the supported injection point for Laraplate behaviour without forking 
 - Runtime / generator rules: build columns and form fields from fillable ∪ casts ∪ attributes − hidden, excluding trait-managed system fields (timestamps, soft deletes, validity, locks, activation, translations, order).
 - Finish `HasForm` implementation.
 - CMS-specific form trait if needed.
-- Whether manual `make:filament-resource` should default `--generate` on/off for Laraplate DX.
+- Whether manual `make:filament-resource` (outside this batch command) should also default `--generate` on for Laraplate DX.
 
 ## Implementation sketch (for planning)
 

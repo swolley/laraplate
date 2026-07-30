@@ -25,7 +25,7 @@ Finish `Modules\Core\Filament\Utils\HasForm` so Filament create/edit forms for m
 | Preset select | UI filter (`live`); options scoped to selected entity |
 | Resolve | On preset change (and on hydrate for edit), set `presettable_id` from `Preset::activePresettable()` |
 | Missing active | Fail validation / clear error — do not create a snapshot |
-| Generated form fields | Resource Form schemas must not keep Filament-generated `entity_id` / broken `relationship('entity')` selects for dynamic models; trait owns that UX |
+| Generated form fields | Resource Form schemas must not keep Filament-generated `entity_id` / broken `relationship('entity')` selects for dynamic models; trait owns that UX. `LaraplateResourceFormSchemaClassGenerator` passes `entity_id` + `presettable_id` as Filament `exceptColumns` when the model uses `HasDynamicContents`, and `configureForm` also strips those component names at runtime if present. |
 | Preset model forms | Unchanged: `Preset` itself still uses real `entity()` BelongsTo |
 
 ## Domain facts (why C)
