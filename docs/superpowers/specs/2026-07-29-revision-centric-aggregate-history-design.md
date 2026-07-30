@@ -2,13 +2,15 @@
 
 ## Status
 
-- Date: 2026-07-29
-- Status: draft for adversarial review
+- Date: 2026-07-29, revised 2026-07-30
+- Status: draft, partially decided
 - Scope: generic Core versioning architecture; no module pilot is authorized by this draft
 - Relationship to the current design: proposed successor to `2026-07-21-aggregate-version-sets-design.md`
-- Implementation gate: paused until this document has completed cross-agent review and explicit user approval
+- Implementation gate: paused until the open decisions are settled and the user approves
 
 This document exists so multiple reviewers can challenge the same concrete proposal. It does not supersede the approved operation-centric design yet, and it must not be used as authorization to continue the CMS pilot or relation implementation.
+
+The 2026-07-30 revision does three things: it replaces the description of the existing code with what the code was verified to do, records the decisions already taken, and separates them from what is still open. Four defects surfaced while checking the draft's own premises — the optimistic locking that had never run, the per-model settings that were never read, the model observers dropped at boot, and the locking column leaking into snapshots. All four are fixed, and the sections below reflect the repaired system, not the one the first draft assumed.
 
 ## Review instructions
 
@@ -42,16 +44,40 @@ The proposed design therefore makes the aggregate revision the primary restore c
 
 ## Evidence already present in Laraplate
 
-Core already provides optimistic record revisions through `HasOptimisticLocking`:
+This section records what the code does, verified on 2026-07-30. The first revision of this document described intent rather than behaviour, and several of its claims were false.
 
-- the configured `lock_version` starts at `1`;
-- an update includes the expected current version in its `WHERE` predicate;
+Core provides optimistic record revisions through `HasOptimisticLocking`:
+
+- the configured `lock_version` column starts at `1`;
+- an update carries the expected current version in its `WHERE` predicate;
 - a successful update increments it by exactly one;
-- a stale update throws `StaleModelLockingException`.
+- a stale update throws `StaleModelLockingException`;
+- an update on a row whose version is `NULL` throws `MissingLockVersionException` instead of writing without the guard.
 
-CMS `Content` already uses `HasOptimisticLocking` and has a `lock_version` column.
+**None of this worked until 2026-07-30.** The trait declared `bootOptimisticLocking()` where Laravel looks for `bootHasOptimisticLocking()`, so the hook never ran: `lock_version` stayed `NULL` and the first update raised a `TypeError`. No test covered the trait, and the `Content` tests are skipped as requiring a full Core runtime, so it went unnoticed. Coverage now lives in `Modules/Core/tests/Integration/Locking/HasOptimisticLockingTest.php`.
+
+CMS `Content` is still the only model carrying the trait. `cms_contents.lock_version` is now non-nullable with default `1`.
+
+The mechanism protects a caller holding a stale in-memory instance. It does **not** yet protect a Filament form: Livewire re-hydrates the model from the database on the request that submits the form, so the value read when the form opened never reaches the update. `HasForm` injects the hidden column, but mass assignment discards it because the column is guarded. A page-level guard is missing, and `StaleModelLockingException` has no renderable, so a conflict would surface as a 500.
 
 `HasLocks` is a separate advisory application lock based on `locked_at` and `locked_by`. A database `lockForUpdate()` is the pessimistic database lock. These three mechanisms must not be described as interchangeable.
+
+`HasLocks` also assigns `lock_version` from `request('lock_version')` on every save, for every model carrying the trait — nine of which have no such column. No form sends that parameter today, so the code is inert, but it is a trap for the Vue frontend under construction.
+
+## What the first review assumed, and what was true
+
+The adversarial review of this draft rests on assumptions that did not hold. They are recorded here so its findings can be re-read correctly.
+
+| The review assumed | Actually true until 2026-07-30 |
+|---|---|
+| Versioning active on 88 tables | Active on the 9 ERP models with a hardcoded `$versionStrategy`. Everywhere else `getVersionStrategy()` returned `false`: the seeder wrote `version_strategy__cms_contents` while the readers looked up `version_strategy_cms_contents`, so no per-model setting was ever found. |
+| Per-model settings govern behaviour | Every reader fell back to its hardcoded default. Six capabilities went unnoticed because the default matched the configured value. |
+| Saving a setting takes effect | `Setting` ran with **no observers at all** — they were dropped because the model is booted while providers are still registering, before Eloquent has an event dispatcher. The group cache was never invalidated, and the approval capture never ran. |
+| `HasOptimisticLocking` works | It had never run. See above. |
+
+All four are fixed. The consequence worth stating plainly: **versioning is now genuinely active on every table whose setting says so**, and every write on those tables produces history. That is what the settings always asked for, but it began on 2026-07-30, not before.
+
+Two findings of the review are closed by those fixes. `C2` — a SNAPSHOT restore writing back a stale lock token — no longer applies: `getDontVersionable()` excludes the revision column for models carrying the trait. The claim that DIFF rows cannot be mapped to a revision still stands.
 
 ## Goals
 
@@ -61,7 +87,7 @@ CMS `Content` already uses `HasOptimisticLocking` and has a `lock_version` colum
 - Preserve a version set when a managed atomic operation exists without requiring one for every history row.
 - State honestly whether a captured revision is atomic or best-effort.
 - Refuse complete restore when relation coverage is partial or capture is inconsistent.
-- Reuse `lock_version` as the root revision where the aggregate already supports optimistic locking.
+- Keep the root revision distinct from the optimistic locking token, so a relation change never invalidates an open editing form.
 - Keep Core generic while modules explicitly declare relation ownership, identity, and capture coverage.
 
 ## Non-goals
@@ -142,11 +168,15 @@ Decision: recommended.
 
 Core should depend on an `AggregateRevisionProviderInterface`, not directly on a hard-coded column.
 
-For models using `HasOptimisticLocking`, the provider uses `lock_version`. A relation-only mutation must perform a compare-and-swap revision advance on the root even when no scalar root attribute changes.
+The provider reads and advances a dedicated `aggregate_revision` column, **not** `lock_version` (decision 1). The column is non-nullable with default `1`, is never fillable, is never assignable from request state, and is excluded from the versionable image exactly as the locking column now is.
 
-For the first revised milestone, an aggregate that cannot provide a monotonic revision may keep scalar history but cannot advertise aggregate restore. This avoids introducing an unreviewed generic revision-head table merely to support models that have not opted into aggregate semantics.
+A relation-only mutation performs a compare-and-swap revision advance on the root even when no scalar root attribute changes, inside the same transaction that writes the pivot rows.
 
-The CMS pilot may use `Content.lock_version`, but Core contracts must not mention CMS classes or tables.
+The provider is the only component allowed to advance the revision. This is a deliberate move away from the current arrangement, where `HasOptimisticLocking::performUpdate()` increments its column as a side effect of any dirty save: that coupling is what produces revisions with no history behind them (a `touch()`, a non-versionable column, a `saveQuietly()`).
+
+An aggregate without the column keeps scalar history but cannot advertise aggregate restore, and Core must fail closed rather than assume a revision of `1`. Adding the column to a root is an explicit opt-in, following the pattern already used by `model:optimistic-lock-add`.
+
+The CMS pilot may use `Content`, but Core contracts must not mention CMS classes or tables.
 
 ## Proposed history representation
 
@@ -351,26 +381,47 @@ No existing migration or commit should be reverted until this draft is approved 
 - local IDs from different connections cannot collide in a version vector;
 - cycles remain bounded to registered one-hop paths.
 
-## Decisions requiring adversarial review
+## Decisions taken
 
-1. Is `lock_version` safe as both optimistic concurrency token and aggregate revision?
-2. Should a relation-only mutation advance the root before or after its business write in best-effort mode?
-3. Is JSON acceptable for `relation_versions`, or is a normalized child table required?
-4. What globally stable reference identifies a version across connections?
-5. How should root checkpoints interact with DIFF and SNAPSHOT scalar strategies?
-6. Can a best-effort snapshot ever qualify for complete restore after stable-read validation?
-7. Which bypasses must automatically downgrade aggregate coverage?
-8. Is requiring a revision provider for aggregate restore acceptable for models without `HasOptimisticLocking`?
-9. How does retention prove reachability efficiently when relation vectors reference other versions?
-10. Which CMS category semantics are `reference` and which pivot attributes are authoritative?
+Settled on 2026-07-29/30. They are no longer open for review; the rest of the document must be read as constrained by them.
+
+**1. `lock_version` is not the aggregate revision.** Two separate columns. `lock_version` keeps its current job — the user-facing conflict token — and a new `aggregate_revision`, owned solely by the revision provider, becomes the restore coordinate.
+
+Reusing one column would make any relation change invalidate an open editing form: attaching a tag would fail Anna's save on a field Marco never touched. It would also leave the restore coordinate reachable from `request('lock_version')`.
+
+**2. The revision advances only when Core writes history**, in the same transaction. A scalar change carries the increment in the same `UPDATE` as the data, exactly as `performUpdate()` does today for `lock_version`. A relation-only change performs a dedicated compare-and-swap on the root inside the transaction that writes the pivot. A `touch()`, a non-versionable column, or a disabled strategy must not advance it: no revision may exist without a row describing it.
+
+**3. Cascades and soft deletes stay exactly as they are.** The database enforces referential integrity faster and more reliably than application code, and it only destroys rows on `forceDelete()` — reachable from two centralised call sites. The relation vector records the subject's natural identity alongside its ID, so a recycled ID is detectable, and restore reconciles against reality instead of trusting the vector: subjects that no longer exist are skipped and reported, never recreated.
+
+**4. Before a `forceDelete` destroys registered links, Core records them.** Links are drained in transactional batches — each batch writes its checkpoints and deletes those pivot rows together — and the subject is removed once no links remain. The cascade stays in the schema as the guarantee that orphan rows cannot exist; in the normal path it finds nothing to do. Ordering the work this way keeps the job restartable, without a transaction that holds locks over thousands of rows.
+
+## Decisions still open
+
+1. Is JSON acceptable for `relation_versions`, or is a normalized child table required? The reverse lookup demanded by decision 4 — *which aggregates reference this subject* — is a full scan of the history table with JSON, and an indexed read with a child table. No foreign key can protect a reference living inside a JSON column.
+2. What globally stable reference identifies a version across connections? None exists today: `versionable.uuid` is `false` and version rows carry local auto-increment ids only.
+3. How should root checkpoints interact with DIFF and SNAPSHOT scalar strategies?
+4. Can a best-effort snapshot ever qualify for complete restore after stable-read validation?
+5. Which bypasses must automatically downgrade aggregate coverage?
+6. Is requiring a revision provider for aggregate restore acceptable for models without `HasOptimisticLocking`? Related: the optimistic locking policy agreed alongside this draft is that advisory locking is a strict subset of optimistic locking, never the reverse.
+7. How does retention prove reachability efficiently when relation vectors reference other versions?
+8. Which CMS category semantics are `reference` and which pivot attributes are authoritative?
 
 ## Review and approval gate
 
+Done so far:
+
+1. the draft has been challenged and the findings written up;
+2. its description of the existing code has been replaced with verified behaviour;
+3. four defects found while checking those premises have been fixed and covered by tests;
+4. four decisions have been taken and recorded above.
+
 Before implementation resumes:
 
-1. at least one independent reviewer must challenge this draft;
-2. all Critical and Important findings must be resolved in the document;
-3. the user must approve the revised semantics;
-4. the previous Core and CMS plans must be replaced or explicitly amended;
-5. a new implementation plan must identify which existing commits remain, change, or revert;
-6. no CMS pilot work may start before the new Core plan passes review.
+5. the eight open decisions must be settled, starting with JSON versus a normalized child table, since decision 4 depends on the reverse lookup;
+6. the remaining Critical and Important findings must be resolved in this document;
+7. the user must approve the revised semantics;
+8. the previous Core and CMS plans must be replaced or explicitly amended — note that the Core plan's checkboxes no longer match the repository, which is further ahead;
+9. a new implementation plan must identify which existing commits remain, change, or revert;
+10. no CMS pilot work may start before the new Core plan passes review.
+
+Outside this document, two gaps block the locking work the decisions rely on: a Filament page guard that carries the expected version into the update, and a renderable for `StaleModelLockingException` so a conflict is not served as a 500.
