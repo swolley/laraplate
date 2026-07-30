@@ -23,5 +23,6 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-29-filament-environment-indicator-design.md`: Custom Filament env badge + App/module version dropdown (replaces pxlrbt).
 - `2026-07-29-filament-make-resources-design.md`: Batch `filament:make-resources` + permanent Filament ClassGenerator rebind with Laraplate HasTable/HasRecords/HasForm trait resolution and `laraplate_owned` module gate.
 - `2026-07-29-hasform-entity-preset-design.md`: Core `HasForm` Entity → Preset cascade for `HasDynamicContents` models; persist only `presettable_id`.
+- `2026-07-30-filament-generate-trait-merge-design.md`: Pass Filament `--generate` columns/fields into HasTable/HasForm; strip trait-owned duplicates at generate + runtime (timestamps/validity composites).
 - `2026-07-29-filament-toggle-inline-default-design.md`: Global Filament `Toggle::inline(false)` default (label above switch); form `inlineLabel()` unchanged.
 - `2026-07-22-module-import-command-framework-design.md`: Core abstract import command infrastructure with module-owned CMS/ERP commands and gated Symfony ERP adapter.
