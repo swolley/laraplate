@@ -46,7 +46,9 @@ Paths are relative to `Modules/SAO/` unless stated otherwise.
 | `rector.php` | Automated refactoring sets |
 | `scripts/version.sh`, `scripts/setup-hooks.sh`, `scripts/hooks/post-commit` | Release versioning and git hooks |
 | `.cursor/rules/module-context.mdc` | Module-scoped agent rules |
-| `docs/.gitkeep` | Module documentation home |
+| `docs/GLOSSARY.md` | Canonical domain vocabulary, fixed before any domain code exists |
+| `docs/rag/GLOSSARY.md` | RAG-indexed copy of the glossary |
+| `docs/rag/MODULE.md` | RAG-indexed copy of the README |
 | `tests/TestCase.php` | Base test case delegating to the application `Tests\TestCase` |
 | `tests/Pest.php` | Binds `TestCase` to the Feature and Integration suites |
 | `tests/Unit/ScaffoldingComplianceTest.php` | Asserts every required scaffolding file exists |
@@ -548,7 +550,7 @@ cd ../..
 
 **Interfaces:**
 - Consumes: nothing. This test reads the filesystem only.
-- Produces: `ScaffoldingComplianceTest`, extended in Task 4 with the tooling files. Task 4 edits its dataset rather than adding a second test file.
+- Produces: `ScaffoldingComplianceTest`, extended by Tasks 3b, 4 and 5. Those tasks edit its dataset rather than adding parallel test files. The `docs/.gitkeep` placeholder created here is replaced by real documentation in Task 3b.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -784,6 +786,201 @@ cd ../..
 
 ---
 
+## Task 3b: Module documentation and RAG corpus
+
+Every sibling module ships a documentation tree that the AI module indexes: `docs/rag/` is
+discovered by `Modules\AI\Services\DocumentationService`, which matches the path pattern
+`/Modules/{Name}/docs/rag/`. There is no generator — the RAG copies are maintained by hand.
+
+Numbered `3b` rather than renumbering the tasks that follow: Tasks 4 and 7 refer to "Task 3" by
+name, and this plan is written to be read by workers who see one task at a time.
+
+Writing the glossary before any domain code exists is the point, not a formality. It fixes the
+vocabulary — `Signal` vs "error", `Connection` vs "integration", `ChangeRef` vs "commit link" — at
+the moment when changing it is free.
+
+**Files:**
+- Modify: `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`
+- Delete: `Modules/SAO/docs/.gitkeep`
+- Create: `Modules/SAO/docs/GLOSSARY.md`
+- Create: `Modules/SAO/docs/rag/GLOSSARY.md`
+- Create: `Modules/SAO/docs/rag/MODULE.md`
+
+**Interfaces:**
+- Consumes: `ScaffoldingComplianceTest` from Task 3, and the README written in Task 3 Step 5.
+- Produces: the canonical domain vocabulary used by every later phase.
+
+- [ ] **Step 1: Extend the failing test**
+
+In `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`, replace `'docs/.gitkeep'` in the first
+test's dataset with the three documentation files:
+
+```php
+    'docs/GLOSSARY.md',
+    'docs/rag/GLOSSARY.md',
+    'docs/rag/MODULE.md',
+```
+
+Then append to the same file:
+
+```php
+test('the RAG glossary mirrors the human glossary', function (): void {
+    $module_root = dirname(__DIR__, 2);
+
+    $human = file_get_contents($module_root . '/docs/GLOSSARY.md');
+    $rag = file_get_contents($module_root . '/docs/rag/GLOSSARY.md');
+
+    expect($human)->toBeString();
+    expect($rag)->toBeString();
+
+    foreach (['Connection', 'Signal', 'Ticket', 'ChangeRef', 'ClosurePolicy'] as $term) {
+        expect((string) $human)->toContain($term);
+        expect((string) $rag)->toContain($term);
+    }
+});
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+```bash
+php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
+```
+
+Expected: FAIL on the three documentation paths and on the glossary mirror assertion.
+
+- [ ] **Step 3: Write the module glossary**
+
+Create `Modules/SAO/docs/GLOSSARY.md`:
+
+```markdown
+# SAO module glossary
+
+Canonical English names for SAO concepts. Use these terms in code, APIs, tests and cross-module
+documentation. The vocabulary is fixed here before the domain exists, so that later phases inherit
+it rather than invent parallel names.
+
+## Module scope
+
+| Term | Meaning |
+|------|---------|
+| **SAO** | Simply Another Orchestrator: a correlation engine between code, errors and work. Not a log aggregator, not an APM, not a CI runner. |
+| **`sao_` prefix** | All SAO tables use this prefix. Names like `connections`, `projects` and `tickets` are too generic to sit unprefixed beside Core/CMS/ERP. |
+| **Core dependency** | SAO depends on Core for fingerprint normalization, ACL, CRUD and Filament foundations. The dependency is unidirectional: SAO → Core. |
+| **Standalone use** | An installation with zero connections configured. SAO is then a complete ticketing system. This is the default, not a degraded mode. |
+
+## Integration
+
+| Term | Meaning |
+|------|---------|
+| **Driver** | Registered code that knows how to talk to one external system. Registered in an open registry: a third-party package can add one without modifying SAO. |
+| **Connection** | A configured instance of a driver: base URL, encrypted credentials, health state, declared capabilities. |
+| **Capability** | What a connection can do: `issues`, `vcs`, `logs`, `releases`. One connection may expose several — a GitHub connection exposes all but `logs`. |
+| **Ingest mode** | How events reach SAO from a driver: `push` (webhook), `pull` (polling), `in_process` (no transport). Each driver declares which it supports. |
+| **Conformance suite** | The shared test battery every driver of a given capability must pass. A driver is done when it passes conformance, not when it works. |
+
+## Projects and deployment
+
+| Term | Meaning |
+|------|---------|
+| **Project** | The correlation anchor: a tracked software project. Holds no URLs or credentials of its own — only bindings. |
+| **ProjectBinding** | A link from a project to a connection for one capability, plus binding-scoped configuration: sync direction, status map, priority map. |
+| **Sync direction** | Who owns a ticket. `mirror`: SAO owns it, the external system receives writes. `shadow`: the external system owns it, SAO reads and correlates. A project with no `issues` binding is local. |
+| **Status map** | The translation between canonical statuses and one specific remote installation's statuses. Lives on the binding, never on the driver: Redmine statuses are per-installation and Jira workflows per-project. |
+| **Environment** | A deployed instance of a project (`production`, `staging`, customer X) with the version currently running on it. |
+| **Environment liveness** | The last time an environment was observed sending anything. Absence of errors is evidence only when the source was demonstrably alive. |
+| **Release** | A version of a project (tag, commit, date) and the map of where it is deployed. |
+
+## Ingest
+
+| Term | Meaning |
+|------|---------|
+| **IngestEvent** | One raw received event: connection, delivery id, payload, status, outcome. The record of what came in. |
+| **Delivery id** | The identifier a source assigns to one delivery. Unique per connection; the basis of retry idempotency. |
+| **SourceProfile** | A normalization profile stored in the database: matchers plus JSONPath field bindings. Lets a new source be supported by configuration, without code. |
+| **Matcher** | The rule that selects which profile applies to an incoming payload. |
+| **Field binding** | A JSONPath expression mapping one payload location to one canonical field. |
+| **Canonical field** | A normalized field name shared by all sources, independent of any source's payload shape. |
+| **Dry-run replay** | Replaying a retained sample payload against a modified profile to see what would have happened, without acting. |
+| **Correlation ruleset** | The ordered, inspectable rules that attach an event to a project. Every event records which rule won. |
+| **Pipeline origin marker** | The runtime marker set while an ingest, normalization or synchronization job runs. The internal log source discards records carrying it, which is what makes a self-feeding loop impossible. |
+
+## Error grouping
+
+| Term | Meaning |
+|------|---------|
+| **Fingerprint** | The hash computed from a normalized error: kind, module, class, normalized file, function, normalized message. The line number is metadata, deliberately not an ingredient. |
+| **Group key** | The identity of an error group. Either native or computed. |
+| **Native group key** | A grouping key the source already provides — Core's own fingerprint, a Sentry issue id. Namespaced per source (`core:…`, `sentry:…`) so keys from different systems cannot collide. SAO computes its own only in their absence. |
+| **`algo_version`** | The version of the fingerprint algorithm that produced a group key. Stored from the first migration; adding it later would mean backfilling unknown values. |
+| **Signal** | An error group: group key, algorithm version, project, counters, first and last seen, state, affected versions. |
+| **SignalOccurrence** | One individual occurrence of a signal, with configurable retention. |
+| **SignalAlias** | A superseded group key pointing at its signal. What lets the fingerprint algorithm evolve without splitting history. |
+
+## Work
+
+| Term | Meaning |
+|------|---------|
+| **Ticket** | The canonical unit of work: title, body, canonical status, priority, assignee, comments. Exists with or without an external counterpart. |
+| **TicketLink** | The link between a ticket and its counterpart in an external tracker. No link means an internal ticket. |
+| **Internal ticket** | A ticket with no `TicketLink`. The default, and the reason standalone use needs no special code path. |
+| **ChangeRef** | The link between a code artefact (commit, pull request, tag) and a ticket, with the source that produced it. |
+| **Idempotency key** | The persisted key carried by every outbound write, so a retry can never produce a second comment or a second ticket. Trackers rarely offer idempotent write APIs; the guarantee lives on our side. |
+
+## Automation
+
+| Term | Meaning |
+|------|---------|
+| **ClosurePolicy** | A per-project set of closure conditions combined with AND, plus the action taken when they hold: close, propose closure, or notify only. |
+| **Closure condition** | One independently testable predicate over verifiable facts: `pull_request_merged`, `no_recurrence_for`, `fix_released`, `fix_deployed_there`, `resolved_for`, `internal_tickets_only`. |
+| **Premature closure** | An automatic closure invalidated by the signal reappearing. Recorded as such, and the data that says whether configured durations are tuned correctly. |
+| **Fix propagation** | The deterministic check for whether a fix already exists upstream and only a deployment is missing. |
+```
+
+- [ ] **Step 4: Create the RAG copies**
+
+The RAG corpus is a maintained copy, not a build artefact — there is no generator, and
+`DocumentationService` reads whatever is in `docs/rag/`.
+
+```bash
+mkdir -p Modules/SAO/docs/rag
+cp Modules/SAO/docs/GLOSSARY.md Modules/SAO/docs/rag/GLOSSARY.md
+cp Modules/SAO/README.md         Modules/SAO/docs/rag/MODULE.md
+rm Modules/SAO/docs/.gitkeep
+```
+
+`docs/rag/MODULE.md` is the README copy, matching `Modules/ERP/docs/rag/MODULE.md` and
+`Modules/CMS/docs/rag/MODULE.md`. The `.gitkeep` placeholder from Task 3 is removed: the directory
+now holds real files.
+
+- [ ] **Step 5: Run the test to verify it passes**
+
+```bash
+php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
+```
+
+Expected: PASS, zero failures.
+
+- [ ] **Step 6: Verify the RAG indexer sees the module**
+
+```bash
+php artisan ai:index-rag-docs --help
+```
+
+Expected: the command exists and its help text renders. Do **not** run an actual index in this
+phase — indexing requires an embeddings provider and an Elasticsearch instance, neither of which
+phase 0 depends on. This step only confirms the corpus is in a location the indexer knows about.
+
+- [ ] **Step 7: Commit — module repository**
+
+```bash
+cd Modules/SAO
+git add docs tests/Unit/ScaffoldingComplianceTest.php
+git commit -m "docs(sao): add the module glossary and RAG corpus"
+cd ../..
+```
+
+---
+
 ## Task 4: Quality tooling configuration
 
 **Files:**
@@ -811,7 +1008,9 @@ In `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`, replace the `->with([
     '.gitignore',
     'module.json',
     'composer.json',
-    'docs/.gitkeep',
+    'docs/GLOSSARY.md',
+    'docs/rag/GLOSSARY.md',
+    'docs/rag/MODULE.md',
     'phpunit.xml',
     'phpstan.neon',
     'pint.json',
@@ -916,7 +1115,7 @@ parameters:
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 ```
 
-Expected: PASS, 17 tests — 13 dataset cases plus the 4 named assertions (licence and readme from Task 3, Pint and PHPUnit from Task 4).
+Expected: PASS, 20 tests — 15 dataset cases plus 5 named assertions (licence and readme from Task 3, the glossary mirror from Task 3b, Pint and PHPUnit from Task 4).
 
 - [ ] **Step 6: Verify static analysis runs against the module**
 
