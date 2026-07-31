@@ -25,6 +25,32 @@
 - Avoid `DB::`; prefer `Model::query()`. Derive queries from the model's own connection.
 - **This plan does not touch `Dev*` seeders or `BatchSeeder`.**
 
+## Commit protocol — `Modules/*` are git submodules
+
+`Modules/Core` is a **separate git repository**. A commit touching it is two commits: one inside
+the submodule, one in `laraplate` bumping the recorded pointer. Every command below runs from the
+`laraplate` root:
+
+```bash
+vendor/bin/pint --dirty
+git -C Modules/Core add <paths relative to Modules/Core>
+git -C Modules/Core commit -m "<type>(core): <subject>"
+git add Modules/Core
+git commit -m "chore: bump Core for <subject>"
+```
+
+Paths passed to `git -C Modules/Core add` are relative to the **submodule root** —
+`app/Seeding`, not `Modules/Core/app/Seeding`.
+
+**Other sessions may be committing to these repositories concurrently.** Never run `git add -A`,
+`git add .`, or `git commit -a`. Stage only the exact paths this task creates or modifies. At the
+time of writing, `Modules/Core` carries unrelated uncommitted work in
+`app/Providers/RouteServiceProvider.php` plus two untracked files under `app/Console/` and
+`tests/Feature/Console/` — leave them alone.
+
+Task 9 also modifies `database/seeders/DatabaseSeeder.php`, which lives in the `laraplate`
+repository itself, not in a submodule. Its commit block reflects that.
+
 ## File Structure
 
 **Created:**
@@ -308,8 +334,10 @@ Expected: PASS — 5 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding Modules/Core/tests/Unit/Seeding
-git commit -m "feat(core): deterministic seeder dependency graph"
+git -C Modules/Core add app/Seeding tests/Unit/Seeding
+git -C Modules/Core commit -m "feat(core): deterministic seeder dependency graph"
+git add Modules/Core
+git commit -m "chore: bump Core for the seeder dependency graph"
 ```
 
 ---
@@ -527,8 +555,10 @@ Note: `Core` is required implicitly by AI, CMS and ERP via their `module.json` `
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding Modules/Core/tests/Feature/Seeding
-git commit -m "feat(core): seeder discovery with implicit module.json requires edges"
+git -C Modules/Core add app/Seeding tests/Feature/Seeding
+git -C Modules/Core commit -m "feat(core): seeder discovery with implicit module.json requires edges"
+git add Modules/Core
+git commit -m "chore: bump Core for seeder discovery"
 ```
 
 ---
@@ -652,8 +682,10 @@ Expected: PASS — 2 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/database/migrations Modules/Core/app/Models/Setting.php Modules/Core/tests/Integration/Seeding
-git commit -m "feat(core): settings module ownership and seeded baseline columns"
+git -C Modules/Core add database/migrations app/Models/Setting.php tests/Integration/Seeding
+git -C Modules/Core commit -m "feat(core): settings module ownership and seeded baseline columns"
+git add Modules/Core
+git commit -m "chore: bump Core for settings seeding columns"
 ```
 
 ---
@@ -861,8 +893,10 @@ Expected: PASS — 3 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding/SeedDefinition.php Modules/Core/tests/Unit/Seeding/SeedDefinitionTest.php
-git commit -m "feat(core): SeedDefinition declaring structural vs initial fields"
+git -C Modules/Core add app/Seeding/SeedDefinition.php tests/Unit/Seeding/SeedDefinitionTest.php
+git -C Modules/Core commit -m "feat(core): SeedDefinition declaring structural vs initial fields"
+git add Modules/Core
+git commit -m "chore: bump Core for SeedDefinition"
 ```
 
 ---
@@ -1284,8 +1318,10 @@ If the query-count test reports a mismatch, check that `whereIn` is not being sp
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding Modules/Core/tests/Integration/Seeding/SeedReconcilerTest.php
-git commit -m "feat(core): SeedReconciler with fixed query budget and drift-safe realignment"
+git -C Modules/Core add app/Seeding tests/Integration/Seeding/SeedReconcilerTest.php
+git -C Modules/Core commit -m "feat(core): SeedReconciler with fixed query budget and drift-safe realignment"
+git add Modules/Core
+git commit -m "chore: bump Core for SeedReconciler"
 ```
 
 ---
@@ -1422,8 +1458,10 @@ Expected: PASS — 2 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding Modules/Core/tests/Integration/Seeding/ModelCapabilityScannerTest.php
-git commit -m "perf(core): single-pass model capability scan"
+git -C Modules/Core add app/Seeding tests/Integration/Seeding/ModelCapabilityScannerTest.php
+git -C Modules/Core commit -m "perf(core): single-pass model capability scan"
+git add Modules/Core
+git commit -m "chore: bump Core for the single-pass capability scan"
 ```
 
 ---
@@ -1540,8 +1578,10 @@ Expected: PASS
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/database/seeders/CoreDatabaseSeeder.php Modules/Core/tests/Feature/Seeding
-git commit -m "perf(core): reconcile Core settings in one pass, drop duplicate model scan"
+git -C Modules/Core add database/seeders/CoreDatabaseSeeder.php tests/Feature/Seeding
+git -C Modules/Core commit -m "perf(core): reconcile Core settings in one pass, drop duplicate model scan"
+git add Modules/Core
+git commit -m "chore: bump Core for single-pass settings reconciliation"
 ```
 
 ---
@@ -1780,8 +1820,10 @@ Expected: PASS — 4 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Enums/CoreTables.php Modules/Core/app/Models/SeedRun.php Modules/Core/app/Seeding/SeedLedger.php Modules/Core/database/migrations Modules/Core/tests/Integration/Seeding/SeedLedgerTest.php
-git commit -m "feat(core): seed run ledger"
+git -C Modules/Core add app/Enums/CoreTables.php app/Models/SeedRun.php app/Seeding/SeedLedger.php database/migrations tests/Integration/Seeding/SeedLedgerTest.php
+git -C Modules/Core commit -m "feat(core): seed run ledger"
+git add Modules/Core
+git commit -m "chore: bump Core for the seed run ledger"
 ```
 
 ---
@@ -2007,8 +2049,10 @@ Expected: PASS — 3 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding/SeedOrchestrator.php Modules/Core/app/Console/SeedCommand.php database/seeders/DatabaseSeeder.php Modules/Core/tests/Stubs/Seeding Modules/Core/tests/Feature/Seeding/SeedOrchestratorTest.php
-git commit -m "feat(core): seed orchestrator with per-node atomicity and in-run resume"
+git -C Modules/Core add app/Seeding/SeedOrchestrator.php app/Console/SeedCommand.php tests/Stubs/Seeding tests/Feature/Seeding/SeedOrchestratorTest.php
+git -C Modules/Core commit -m "feat(core): seed orchestrator with per-node atomicity and in-run resume"
+git add Modules/Core database/seeders/DatabaseSeeder.php
+git commit -m "feat: delegate root DatabaseSeeder to the Core orchestrator"
 ```
 
 ---
@@ -2297,13 +2341,23 @@ Expected: PASS — 5 tests
 
 ```bash
 vendor/bin/pint --dirty
-git add Modules/Core/app/Seeding Modules/Core/tests/Integration/Seeding/SettingsCleanerTest.php
-git commit -m "feat(core): settings cleanup keyed on module state and drift"
+git -C Modules/Core add app/Seeding tests/Integration/Seeding/SettingsCleanerTest.php
+git -C Modules/Core commit -m "feat(core): settings cleanup keyed on module state and drift"
+git add Modules/Core
+git commit -m "chore: bump Core for settings cleanup"
 ```
 
 ---
 
-### Task 11: Migrate AI, CMS, ERP and MES seeders
+### Task 11: Migrate AI, CMS, ERP and MES seeders — DEFERRED
+
+> **Do not execute this task in the current sequence.** It is the only task touching submodules
+> other than Core, and `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` — which this task
+> rewrites — carries uncommitted work from a concurrent session. Executing it would risk that work.
+>
+> Resume it once ERP's in-flight changes are committed and the file is clean. Until then Tasks 1–10
+> stand on their own: the graph, reconciler, ledger and cleaner all work, and the module seeders keep
+> their current behaviour because the orchestrator runs them unchanged.
 
 **Files:**
 - Modify: `Modules/AI/database/seeders/AIDatabaseSeeder.php`
@@ -2395,9 +2449,14 @@ Append a one-line entry to `docs/superpowers/plans/INDEX.md` following the exist
 - [ ] **Step 3: Commit**
 
 ```bash
-git add Modules/Core/README.md docs/superpowers/plans/INDEX.md
-git commit -m "docs(core): seeding orchestration and reconciliation"
+git -C Modules/Core add README.md
+git -C Modules/Core commit -m "docs(core): seeding orchestration and reconciliation"
+git add Modules/Core docs/superpowers/plans/INDEX.md
+git commit -m "docs: index the seeder orchestration plan"
 ```
+
+`docs/superpowers/plans/INDEX.md` may carry unrelated pending entries from other sessions. Stage the
+file only if your line is the sole change; otherwise leave it and say so in the report.
 
 ---
 
