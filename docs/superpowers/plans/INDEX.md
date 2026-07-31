@@ -18,7 +18,7 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + patch `971851d` ERP / `15b11c8` Core). Open follow-ups → Spec 2 master backlog.
 - `2026-06-30-erp-hardening-spec2-phase2a.md`: ERP Spec 2 Phase 2A — Filament domain actions + state-aware policies (**completed**, ERP `300f9ef`).
 - `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, reporting polish (**in progress**, Wave A + optional `2B-03` + Wave B completed, 7 backlog rows remain).
-- `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Spec 2 remaining backlog — mandatory non-API work complete; API governance deferred; `4-09` import framework planned.
+- `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Spec 2 remaining backlog — mandatory non-API work complete; Phase 3 `/app` half (`3-04`, `3-01`, `3-06`) ready to implement, `/api/v1` half deferred; `4-09` import framework planned.
 - `2026-06-30-cms-graph-layer.md`: Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider, Phase 5 materialized edges gated by benchmarks and invalidation design.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.

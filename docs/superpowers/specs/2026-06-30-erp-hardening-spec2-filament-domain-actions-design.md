@@ -1,8 +1,8 @@
 # ERP Remaining Work — Spec 2 (Master Backlog)
 
-**Status:** Approved design; **Phases 2A/2B/2C completed**; enterprise follow-ups partially completed; API work deliberately deferred
+**Status:** Approved design; **Phases 2A/2B/2C completed**; enterprise follow-ups partially completed; Phase 3 split by surface — `/app` designed 2026-07-31, `/api/v1` deferred
 
-**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-22)
+**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-22; Phase 3 surface split 2026-07-31)
 
 **Module:** `Modules/ERP`
 
@@ -20,21 +20,21 @@
 |--------|------:|-------|
 | **Done** | **112** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, forced-DIFF setting governance, 50-worker numbering stress coverage, and the completed operational command suite — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **8** | § Open — **0 in Phase 2B/2C/5/6** + **8 in Phases 3–4**; Phase 3/API is deliberately deferred, `4-09` is planned, and `4-08`/`4-13` remain optional |
+| **Open backlog rows** | **8** | § Open — **0 in Phase 2B/2C/5/6** + **8 in Phases 3–4**; `3-01`/`3-04`/`3-06` are designed and ready, `3-02`/`3-03` deferred with the external API, `4-09` planned, `4-08`/`4-13` optional |
 
 **How to read the backlog**
 
-- **8 open** = every row in § Open after completion of numbering stress coverage on 2026-07-22: five deferred Phase 3/API governance rows, planned `4-09`, and optional `4-08`/`4-13`.
+- **8 open** = every row in § Open after completion of numbering stress coverage on 2026-07-22: five Phase 3 rows (three designed on the `/app` surface, two deferred with the external API), planned `4-09`, and optional `4-08`/`4-13`.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** Complete ERP `4-09` through the module-owned `erp:import` command and three external adapters: legacy Symfony SQL, SPLID Excel, and a supported Tricount export. The Core/CMS framework extraction is complete. Each adapter remains gated by real source fixtures, approved mappings, and reconciliation evidence. Phase 3 remains deferred; optional `4-08` and `4-13` remain unapproved. ERP importer plan:
+**Current target:** Implement the `/app` half of Phase 3 — `3-04` then `3-01` then `3-06` — per [`2026-07-31-domain-action-http-routes-design.md`](2026-07-31-domain-action-http-routes-design.md). ERP `4-09` proceeds independently through the module-owned `erp:import` command and its three external adapters (legacy Symfony SQL, SPLID Excel, supported Tricount export); the Core/CMS framework extraction is complete and each adapter stays gated by real source fixtures, approved mappings, and reconciliation evidence. The external API (`3-02`, `3-03`) stays deferred; optional `4-08` and `4-13` remain unapproved. ERP importer plan:
 [`plans/2026-07-22-erp-external-source-importers.md`](../plans/2026-07-22-erp-external-source-importers.md).
 
 Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** Implement the ERP import host, approve destination contracts, then execute the independent Symfony, SPLID, and Tricount source gates. Retain the other open rows explicitly. Master plan:
+**Next:** Implement the Phase 3 `/app` half, then the ERP import host and its source gates. Retain the other open rows explicitly. Master plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -56,7 +56,7 @@ Completed Phase 2B plan:
 | Spec 2 Phase 2A | Filament domain actions + state-aware policies | **Done** |
 | Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **Done** |
 | Spec 2 Phase 2C | FatturaPA and extended permissions | **Done** |
-| Phase 3 | Domain HTTP actions + API exposure | Deferred pending governance review of the existing dynamic Core CRUD/API |
+| Phase 3 | Domain HTTP actions + API exposure | Split: `/app` half (`3-01`, `3-04`, `3-06`) designed 2026-07-31; `/api/v1` half (`3-02`, `3-03`) deferred |
 | Phase 4 | Cash/Tricount and commercial depth | Open |
 | Phase 5 | Architecture | Partially done: `5-01`, `5-02`, `5-03` completed |
 | Phase 6 | Operational console commands | **Done** |
@@ -226,14 +226,25 @@ No open Phase 2B items remain.
 
 > Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Waves 1 + 3 (Tasks 1–2, 8–11). Spine of remaining work.
 
-| ID | Status | Item |
-|----|--------|------|
-| 3-01 | open | Internal domain-action routes `.../{id}/{action}` |
-| 3-02 | open | Opt-in external API + versioning |
-| 3-03 | open | Per-model CRUD/API exposure governance |
-| 3-04 | open | Centralize permission-name construction (explicit `$connection`) |
-| 3-05 | done | Revert/reverse processed return |
-| 3-06 | open | HTTP tests for domain actions |
+**Split by surface (2026-07-31).** Phase 3 is not one block. `/app` is session-based and is the
+surface Laraplate UI consumes; `/api/v1` is the opt-in headless API. Domain actions belong to
+`/app` and do not depend on the API decision, so `3-01`/`3-04`/`3-06` are unblocked while
+`3-02`/`3-03` stay deferred. Design:
+[`2026-07-31-domain-action-http-routes-design.md`](2026-07-31-domain-action-http-routes-design.md).
+
+| ID | Surface | Status | Item |
+|----|---------|--------|------|
+| 3-01 | `/app` | designed | Domain-action route `POST /app/crud/{action}/{module}/{entity}` + registry |
+| 3-02 | `/api/v1` | deferred | Opt-in external API + versioning |
+| 3-03 | `/api/v1` | deferred | Per-model CRUD/API exposure governance |
+| 3-04 | both | designed | Centralize permission-name construction (explicit `$connection`) |
+| 3-05 | — | done | Revert/reverse processed return |
+| 3-06 | `/app` | designed | HTTP tests for domain actions |
+
+Two Core defects found while designing this and fixed on the way (Core `b609e60`, `055b685`):
+`CrudService::doLockOperation()` threw on every single-record `lock` and never called `unlock()`;
+the `handle_test_overrides.php` fixture shadowed `config()` for the whole `Modules\Core\Console`
+namespace, crashing console commands depending on test order.
 
 ### Phase 4 — Cash / Tricount & commercial depth
 

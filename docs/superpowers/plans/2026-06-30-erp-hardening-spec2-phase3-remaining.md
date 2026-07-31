@@ -5,10 +5,25 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. Phase 3/API is deliberately deferred; `4-09` has an approved implementation plan; `4-08` and `4-13` remain optional and unapproved.
+**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. `4-09` has an approved implementation plan; `4-08` and `4-13` remain optional and unapproved.
+
+**Phase 3 is split by surface, not deferred as a whole:**
+
+| Half | IDs | State |
+|------|-----|-------|
+| Internal `/app` | `3-01`, `3-04`, `3-06` | designed 2026-07-31, ready to implement |
+| External `/api/v1` | `3-02`, `3-03` | deferred — no consumer yet, and `3-03` governs external exposure |
+
+The split exists because the two surfaces have different consumers. `/app` is session-based and is
+what Laraplate UI talks to; `/api/v1` is the opt-in headless API. Domain actions belong to `/app`
+and are not blocked by the API decision. Design:
+[`specs/2026-07-31-domain-action-http-routes-design.md`](../specs/2026-07-31-domain-action-http-routes-design.md).
+
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** The shared Core/CMS import-command framework is complete. Implement the ERP entry point and the independently gated Symfony SQL, SPLID Excel, and Tricount export adapters through [`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md). Core already exposes dynamic CRUD routes when external API exposure is enabled; ERP-specific overrides must not duplicate that mechanism.
+**Current slice:** Wave 1 Task 1 (`3-04`) → Wave 3 Task 8 (`3-01`) → Task 9 (`3-06`). The ERP
+external-source importers (`4-09`) proceed independently through
+[`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md).
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -45,12 +60,14 @@
 flowchart TB
   subgraph W1["Wave 1 — Core foundation"]
     P34[3-04 Permission helper]
-    P33[3-03 Exposure governance]
   end
-  subgraph W3["Wave 3 — Domain HTTP"]
+  subgraph W3["Wave 3 — Domain HTTP on /app"]
     P31[3-01 Domain routes]
     P36[3-06 HTTP tests]
-    P35[3-05 Return revert]
+    P35[3-05 Return revert — done]
+  end
+  subgraph DEF["Deferred — external /api/v1"]
+    P33[3-03 Exposure governance]
     P32[3-02 External API]
   end
   subgraph W2["Wave 2 — E-invoice 2C"]
@@ -65,18 +82,18 @@ flowchart TB
   subgraph W6["Wave 6 — Operational commands"]
     P6[6-01…6-06]
   end
-  P34 --> P33
-  P33 --> P31
+  P34 --> P31
   P31 --> P36
+  P34 --> P33
+  P33 --> P32
   P31 --> P32
   P2C --> P32
-  P31 --> P4
   P5 --> P4
   P34 --> P6
   P2C --> P6
 ```
 
-**Current execution order:** Wave 1 / Phase 3 foundation now → Wave 3 → Wave 4 → Wave 5. Wave 6 can be pulled forward after Task 1 when operational automation is prioritized; `6-03` depends on Phase 2C e-invoice services, already done.
+**Current execution order:** Task 1 (`3-04`) → Task 8 (`3-01`) → Task 9 (`3-06`). Waves 2, 4, 5 and 6 are complete. `3-03` is no longer a prerequisite of `3-01`: it governs exposure on `/api/v1`, and domain actions live on `/app`, which `routes/web.php` never exposes externally.
 
 **Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, done).
 
@@ -338,81 +355,108 @@ Evidence: ERP `604c53c`; targeted test subset `14 passed, 41 assertions`.
 ### Task 8: Domain action registry + internal routes (3-01)
 
 **Modules:** Core + ERP  
-**Backlog:** `3-01`
+**Backlog:** `3-01`  
+**Design:** [`specs/2026-07-31-domain-action-http-routes-design.md`](../specs/2026-07-31-domain-action-http-routes-design.md) — read before starting; it supersedes the sketch previously held in this task.
 
-**Design:** Mirror existing CRUD routes (`Modules/Core/routes/crud.php`) — add:
+**Route:**
 
 ```
-POST /crud/action/{module}/{entity}/{id}/{action}
+POST /app/crud/{action}/{module}/{entity}      id + action payload in body
 ```
+
+Declared at the **end** of Core's `crud` group in `routes/web.php`, after every literal verb, so
+the literals keep winning. Internal-only by construction: `routes/web.php` is not required by
+`mapApiRoutes()`, so nothing reaches `/api/v1`.
+
+**Prerequisite already in place:** Core defers its web/API route registration to
+`$this->app->booted()`, so Core registers after every module and module-declared overrides win.
+Verify with `php artisan route:check <url> --method=POST`.
 
 **Files:**
 - Create: `Modules/Core/app/Contracts/ExposesDomainActions.php`
+- Create: `Modules/Core/app/Contracts/OverridesGenericCrudActions.php`
+- Create: `Modules/Core/app/Services/Crud/DomainActionRegistry.php`
 - Create: `Modules/Core/app/Services/Crud/DomainActionDispatcher.php`
 - Create: `Modules/Core/app/Http/Requests/DomainActionRequest.php`
 - Modify: `Modules/Core/app/Http/Controllers/CrudController.php` — `domainAction()`
-- Modify: `Modules/Core/routes/web.php`
+- Modify: `Modules/Core/routes/web.php` — catch-all last in the group
 - Create: `Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php`
-- Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php` — register ERP actions at boot
+- Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php` — register at boot
+- Modify: `Modules/ERP/app/Models/ReturnOrder.php`, `SupplierReturn.php` — declare `['approve']`
 - Create: `Modules/Core/tests/Feature/Http/DomainActionRouteTest.php`
 - Create: `Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php`
 
-- [ ] **Step 1: Core contract**
+- [ ] **Step 1: Registry + contracts** — `{module}/{entity}/{action}` → handler. The registry, not
+  the route table, decides what exists.
+
+- [ ] **Step 2: Boot-time collision guard** — registration fails when a model both declares an
+  overridden verb and uses the trait giving that verb its generic meaning (`approve`/`disapprove`
+  vs `HasApprovals`). Fails at application start, not on record instantiation. Write the failing
+  case first.
+
+- [ ] **Step 3: Dispatcher** — authorize through `Gate`, not `ensurePermission`: the state guard is
+  intrinsic to the action and `ERPModelPolicy::allowsDomainAction()` already implements it.
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace Modules\Core\Contracts;
-
-use Illuminate\Database\Eloquent\Model;
-use Modules\Core\Models\User;
-
-interface ExposesDomainActions
+public function dispatch(Model $record, string $action, User $user, array $payload = []): mixed
 {
-    /**
-     * @return list<string>
-     */
-    public static function exposedDomainActions(): array;
-}
-```
-
-- [ ] **Step 2: Dispatcher**
-
-```php
-public function dispatch(
-    Model $record,
-    string $action,
-    User $user,
-    array $payload = [],
-): mixed {
-    $policy_method = $this->policyMethodFor($action); // force_post -> forcePost
-    if (! $user->can($policy_method, $record)) {
+    if (! $user->can($this->policyMethodFor($action), $record)) {   // force_post -> forcePost
         throw new AuthorizationException();
     }
-    $handler = $this->registry->resolve($record::class, $action);
-    return $handler($record, $payload, $user);
+
+    return ($this->registry->resolve($record::class, $action))($record, $payload, $user);
 }
 ```
 
-- [ ] **Step 3: ERP registrar** — map actions to existing services (post-2A):
+- [ ] **Step 4: ERP registrar** — map actions to the existing services:
 
 | Entity | Actions | Handler |
 |--------|---------|---------|
-| `Invoice` | `post`, `unpost`, `submitEInvoice`, `refreshEInvoice` | `InvoicePostingService` / `EInvoiceSubmissionService` |
+| `Invoice` | `post`, `unpost`, `force_post`, `submitEInvoice`, `refreshEInvoice` | `InvoicePostingService` / `EInvoiceSubmissionService` |
 | `DeliveryNote` | `post`, `unpost` | `posted_at` update |
 | `FiscalPeriod` | `close`, `reopen` | `FiscalPeriodCloser` |
 | `FiscalYear` | `close` | `FiscalPeriodCloser::closeYear` |
 | `JournalEntry` | `reverse` | `JournalPostingService::reverse` |
 | `SalesOrder` | `amend` | `SalesOrderAmendmentService` |
-| `Quotation` | `unlock` | `$record->unlock()` |
-| `DocumentSequence` | `reset` | `DocumentSequenceResetService` |
-| `ReturnOrder` | `revert` | Task 10 service |
+| `DocumentSequence` | `reset`, `reserve` | `DocumentSequenceResetService` |
+| `TaxCode` | `supersede` | tax code supersession |
+| `Company` | `switch_context` | company context switch |
+| `ReturnOrder` | `approve`\*, `cancel`, `complete`, `reverse_processed`, `create_credit_note` | `ReturnOrderService` |
+| `SupplierReturn` | `approve`\*, `cancel`, `complete`, `reverse_processed`, `create_debit_note` | `SupplierReturnService` |
+| `Quotation` | `create_revision` | `QuotationRevisionService` |
+| `PartnerPool` | `allocate_expense`, `settle_up` | `PartnerPoolSettlementService` |
+| `PaymentRequest` | `send` | `PaymentRequestService` |
+| `VatSettlement` | `compute_settlement` | `VatSettlementService` |
 
-- [ ] **Step 4: Failing HTTP test** — authenticated user with `post` permission POSTs action → 200 + side effect.
+\* overridden generic verb — declared via `OverridesGenericCrudActions`.
 
-- [ ] **Step 5: Commit** Core + ERP
+**Not registered:** `unlock` on `Quotation`. It is behaviourally identical to Core's generic
+`unlock` (both call `HasLocks::unlock()`), so the generic route serves it and lock/unlock stay
+uniform across all classes. See the design's D6 for the permission divergence this leaves open.
+
+**File actions are in scope on `/app`** — the UIs need them:
+
+| Entity | Actions | Handler |
+|--------|---------|---------|
+| `PaymentRun` | `export_sepa`, `export_cbi_bonifici` | `SepaPain001Exporter` / `CbiBonificiExporter` |
+| `Task` | `export_ics` | `TaskIcsExporter` |
+| `BankStatement` | `import_file` | `BankStatementImportService` |
+
+- [ ] **Step 5: Response + error mapping** — return through `CrudResult`/`ResponseBuilder`. Add
+  mappings for `ValidationException` and `DomainException`, which domain services raise and
+  `handleServiceCall()` would otherwise turn into 500.
+
+- [ ] **Step 6: Binary response kind** — if a handler returns a
+  `Symfony\Component\HttpFoundation\Response`, return it unchanged; otherwise wrap in a
+  `CrudResult`. One rule covers streamed exports and the `multipart/form-data` import.
+  Authorization and state guards must run **before** the first byte is streamed: once streaming
+  starts the JSON error envelope is gone. Test both — a refused export returns a normal JSON 403,
+  a permitted one returns the stream.
+
+- [ ] **Step 7: Failing HTTP test** — authenticated user with `post` permission POSTs the action →
+  200 + side effect.
+
+- [ ] **Step 8: Commit** Core + ERP
 
 ---
 
@@ -824,105 +868,6 @@ Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/Aru
 
 ---
 
-### Task 33: Italian bank file exports beyond SEPA SCT
-
-**Status:** Done 2026-07-16  
-**Modules:** ERP
-
-**Implemented files:**
-- `Modules/ERP/app/Services/Payments/CbiBonificiExporter.php`
-- `Modules/ERP/app/Services/Payments/ItalianReceivableBankFileExporter.php`
-- `Modules/ERP/app/Casts/PaymentRunFormat.php`
-- `Modules/ERP/app/Models/PartyBankAccount.php`
-- `Modules/ERP/database/migrations/2026_07_11_150000_create_party_bank_accounts_table.php`
-- `Modules/ERP/app/Filament/Resources/PaymentRuns/Actions/PaymentRunActions.php`
-
-**Scope:**
-- CBI bonifici is integrated with approved supplier `PaymentRun` export and stores export file name/checksum like SEPA.
-- Ri.Ba and SDD CORE are generated from customer receivable `PaymentScheduleLine` rows; SDD requires mandate reference/date on the customer `PartyBankAccount`.
-- No direct bank submission is performed.
-- Bank-specific certification/proprietary profile variants remain go-live tasks.
-
-Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php Modules/ERP/tests/Feature/Services/ItalianReceivableBankFileExporterTest.php Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php` -> `14 passed, 55 assertions`.
-
-
----
-
-### Task 34: Immutable financial report snapshots and PDF archives
-
-**Status:** Done 2026-07-16  
-**Modules:** ERP
-
-**Implemented files:**
-- `Modules/ERP/database/migrations/2026_07_16_120000_create_report_snapshots_table.php`
-- `Modules/ERP/app/Models/ReportSnapshot.php`
-- `Modules/ERP/app/Services/Reporting/ReportPdfExporter.php`
-- `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
-- `Modules/ERP/app/Console/ReportSnapshotCommand.php`
-- `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
-
-**Scope:**
-- Immutable archive table stores report key, parameters, JSON payload, CSV content, base64 PDF content, generated timestamp, and content hash.
-- Model blocks updates/deletes for immutable rows.
-- `erp:reports:snapshot` supports `trial_balance`, `income_statement`, and `balance_sheet`, with `--company`, `--from`, `--to`, and `--dry-run`.
-- PDF renderer is dependency-free and intentionally simple; richer paginated/report-design PDF rendering remains an enhancement.
-
-Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php` -> `16 passed, 48 assertions`.
-
-
----
-
-### Task 35: Multi-currency FX rates and unrealized revaluation
-
-**Status:** Done 2026-07-16  
-**Modules:** ERP
-
-**Implemented files:**
-- `Modules/ERP/database/migrations/2026_07_16_130000_create_exchange_rates_table.php`
-- `Modules/ERP/app/Models/ExchangeRate.php`
-- `Modules/ERP/app/Services/Currency/DatabaseCurrencyConverter.php`
-- `Modules/ERP/app/Services/Currency/FxRevaluationService.php`
-- `Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php`
-
-**Scope:**
-- Historical FX rates with source and date.
-- Converter resolves identity, latest direct rates, and inverse rates.
-- ERP service binding now uses `DatabaseCurrencyConverter`.
-- Unrealized FX revaluation posts balanced journal entries for open foreign-currency payment schedules using caller-supplied balance/gain/loss accounts.
-
-**Still future:** external provider feed imports, realized FX differences during settlement, and full close automation.
-
-Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php Modules/ERP/tests/Feature/Providers/ERPServiceProviderTest.php` -> `6 passed, 16 assertions`.
-
-
----
-
-### Task 36: Money value object and analytic dimensions
-
-**Status:** Done 2026-07-16  
-**Modules:** ERP
-
-**Implemented files:**
-- `Modules/ERP/app/ValueObjects/Money.php`
-- `Modules/ERP/database/migrations/2026_07_16_140000_create_analytic_dimensions_tables.php`
-- `Modules/ERP/app/Models/AnalyticDimension.php`
-- `Modules/ERP/app/Models/AnalyticDimensionValue.php`
-- `Modules/ERP/app/Models/Pivot/JournalEntryLineHasAnalyticDimensionValue.php`
-- `Modules/ERP/app/Models/JournalEntryLine.php`
-- `Modules/ERP/tests/Feature/Support/MoneyTest.php`
-- `Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php`
-
-**Scope:**
-- `Money` is immutable and supports normalized amount/currency, same-currency arithmetic, negate/abs, equality, and allocation with rounding remainder.
-- Analytic dimensions are modeled as company dimensions and values.
-- Journal entry lines can attach analytic values through a first-class pivot with `allocation_percent` and timestamps.
-
-**Still future:** refactor every legacy float helper to `Money`, analytic reporting cubes, allocation engines, and automatic propagation from operational documents.
-
-Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/MoneyTest.php Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php Modules/ERP/tests/Feature/Support/DecimalTest.php` -> `9 passed, 31 assertions`.
-
----
-
 ### Task 32: Bank statement batch import command (6-04) — completed 2026-07-19
 
 **Status:** Done  
@@ -999,36 +944,138 @@ git -C Modules/ERP commit -m "feat(erp): add vat settlement compute command"
 
 ---
 
-### Task 34: Report snapshot/export command (6-06)
+### Task 34: Report snapshot/export command (6-06) — completed 2026-07-16
 
+**Status:** Done  
 **Backlog:** `6-06`  
 **Modules:** ERP
 
-**Command:** `php artisan erp:reports:snapshot --company=1 --report=trial-balance --date=2026-12-31 --disk=local --dry-run`
+**Command:** `php artisan erp:reports:snapshot --company=1 --from=… --to=… --dry-run`
 
-**Files:**
-- Create: `Modules/ERP/app/Console/ReportsSnapshotCommand.php`
-- Create: `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
-- Create: `Modules/ERP/tests/Feature/Console/ReportsSnapshotCommandTest.php`
-- Create: `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
+**Delivered instead of the sketch below.** The work was implemented as Task 36 with a wider
+scope: rather than writing timestamped CSV files to a disk, it persists an immutable archive
+row per snapshot (report key, parameters, JSON payload, CSV content, base64 PDF, content hash).
+The immutable archive table, listed here as "a separate future feature", was built as part of it.
 
-**Snapshot scope:**
-- initial report set: `trial-balance`, `balance-sheet`, `income-statement`, `sales-pipeline`, `stock-valuation`;
-- use existing report services and CSV exporters;
-- write timestamped CSV files to a configured Laravel disk/path;
-- store only file artifacts and command output in v1; immutable report archive tables are a separate future feature;
-- support `--dry-run` by reporting target file names and row counts without writing files.
+- [x] Created: `Modules/ERP/app/Console/ReportSnapshotCommand.php`
+- [x] Created: `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
+- [x] Created: `Modules/ERP/app/Services/Reporting/ReportPdfExporter.php`
+- [x] Created: `Modules/ERP/app/Models/ReportSnapshot.php` + migration
+- [x] Created: `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
+- [x] Supports `trial_balance`, `income_statement`, `balance_sheet` with `--company`, `--from`, `--to`, `--dry-run`
 
-- [ ] **Step 1: Dry-run test** — assert no file is written and summary includes planned path.
-- [ ] **Step 2: Export test** — use fake storage disk; assert CSV file exists and contains headers.
-- [ ] **Step 3: Invalid report test** — unknown report exits non-zero with supported report list.
-- [ ] **Step 4: Implement service + command**
-- [ ] **Step 5: Docs + commit**
+**Deviation from the original sketch:** `sales-pipeline` and `stock-valuation` are not covered by
+the command; they remain available as Filament CSV exports from `2B-12`. Report keys use
+underscores (`trial_balance`), not hyphens. The class is `ReportSnapshotCommand`, not
+`ReportsSnapshotCommand`.
 
-```bash
-php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/Console/ReportsSnapshotCommandTest.php
-git -C Modules/ERP commit -m "feat(erp): add report snapshot command"
-```
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php` -> `16 passed, 48 assertions`.
+
+---
+
+> **Tasks 35–38 are enterprise follow-ups recorded outside the `2C`/`3`/`4`/`5`/`6` numbering.**
+> They were originally numbered 33–36, colliding with the Wave 6 tasks below. Tasks 37 and 38
+> duplicate work already tracked as Tasks 24, 23 and 25; they are kept for their evidence and
+> cross-referenced rather than deleted.
+
+### Task 35: Italian bank file exports beyond SEPA SCT
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/app/Services/Payments/CbiBonificiExporter.php`
+- `Modules/ERP/app/Services/Payments/ItalianReceivableBankFileExporter.php`
+- `Modules/ERP/app/Casts/PaymentRunFormat.php`
+- `Modules/ERP/app/Models/PartyBankAccount.php`
+- `Modules/ERP/database/migrations/2026_07_11_150000_create_party_bank_accounts_table.php`
+- `Modules/ERP/app/Filament/Resources/PaymentRuns/Actions/PaymentRunActions.php`
+
+**Scope:**
+- CBI bonifici is integrated with approved supplier `PaymentRun` export and stores export file name/checksum like SEPA.
+- Ri.Ba and SDD CORE are generated from customer receivable `PaymentScheduleLine` rows; SDD requires mandate reference/date on the customer `PartyBankAccount`.
+- No direct bank submission is performed.
+- Bank-specific certification/proprietary profile variants remain go-live tasks.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/SepaPain001ExporterTest.php Modules/ERP/tests/Feature/Services/ItalianReceivableBankFileExporterTest.php Modules/ERP/tests/Feature/Services/PaymentRunBuilderServiceTest.php Modules/ERP/tests/Feature/Filament/PaymentRunResourceTest.php` -> `14 passed, 55 assertions`.
+
+
+---
+
+### Task 36: Immutable financial report snapshots and PDF archives
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/database/migrations/2026_07_16_120000_create_report_snapshots_table.php`
+- `Modules/ERP/app/Models/ReportSnapshot.php`
+- `Modules/ERP/app/Services/Reporting/ReportPdfExporter.php`
+- `Modules/ERP/app/Services/Reporting/ReportSnapshotService.php`
+- `Modules/ERP/app/Console/ReportSnapshotCommand.php`
+- `Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php`
+
+**Scope:**
+- Immutable archive table stores report key, parameters, JSON payload, CSV content, base64 PDF content, generated timestamp, and content hash.
+- Model blocks updates/deletes for immutable rows.
+- `erp:reports:snapshot` supports `trial_balance`, `income_statement`, and `balance_sheet`, with `--company`, `--from`, `--to`, and `--dry-run`.
+- PDF renderer is dependency-free and intentionally simple; richer paginated/report-design PDF rendering remains an enhancement.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/ReportSnapshotServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php` -> `16 passed, 48 assertions`.
+
+
+---
+
+### Task 37: Multi-currency FX rates and unrealized revaluation (same work as Task 24 / `5-01`)
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/database/migrations/2026_07_16_130000_create_exchange_rates_table.php`
+- `Modules/ERP/app/Models/ExchangeRate.php`
+- `Modules/ERP/app/Services/Currency/DatabaseCurrencyConverter.php`
+- `Modules/ERP/app/Services/Currency/FxRevaluationService.php`
+- `Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php`
+
+**Scope:**
+- Historical FX rates with source and date.
+- Converter resolves identity, latest direct rates, and inverse rates.
+- ERP service binding now uses `DatabaseCurrencyConverter`.
+- Unrealized FX revaluation posts balanced journal entries for open foreign-currency payment schedules using caller-supplied balance/gain/loss accounts.
+
+**Still future:** external provider feed imports, realized FX differences during settlement, and full close automation.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Services/FxRevaluationServiceTest.php Modules/ERP/tests/Feature/Providers/ERPServiceProviderTest.php` -> `6 passed, 16 assertions`.
+
+
+---
+
+### Task 38: Money value object and analytic dimensions (same work as Tasks 23 + 25 / `5-02`, `5-03`)
+
+**Status:** Done 2026-07-16  
+**Modules:** ERP
+
+**Implemented files:**
+- `Modules/ERP/app/ValueObjects/Money.php`
+- `Modules/ERP/database/migrations/2026_07_16_140000_create_analytic_dimensions_tables.php`
+- `Modules/ERP/app/Models/AnalyticDimension.php`
+- `Modules/ERP/app/Models/AnalyticDimensionValue.php`
+- `Modules/ERP/app/Models/Pivot/JournalEntryLineHasAnalyticDimensionValue.php`
+- `Modules/ERP/app/Models/JournalEntryLine.php`
+- `Modules/ERP/tests/Feature/Support/MoneyTest.php`
+- `Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php`
+
+**Scope:**
+- `Money` is immutable and supports normalized amount/currency, same-currency arithmetic, negate/abs, equality, and allocation with rounding remainder.
+- Analytic dimensions are modeled as company dimensions and values.
+- Journal entry lines can attach analytic values through a first-class pivot with `allocation_percent` and timestamps.
+
+**Still future:** refactor every legacy float helper to `Money`, analytic reporting cubes, allocation engines, and automatic propagation from operational documents.
+
+Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/MoneyTest.php Modules/ERP/tests/Feature/Models/AnalyticDimensionTest.php Modules/ERP/tests/Feature/Support/DecimalTest.php` -> `9 passed, 31 assertions`.
+
+---
 
 ---
 

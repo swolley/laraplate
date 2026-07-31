@@ -9,7 +9,7 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-05-21-settings-group-cache-invalidation-design.md`: Core settings cache invalidation by group.
 - `2026-05-25-erp-m36-m4-m6-m7-design.md`: ERP pending milestone alignment for M3.6, M4, M6, and M7.
 - `2026-06-30-erp-hardening-bugs-money-math-design.md`: ERP v1 hardening — **implemented** P0/P1 fixes + post-review patch (`971851d` ERP, `15b11c8` Core).
-- `2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`: ERP Spec 2 master backlog — mandatory non-API work completed; API governance deferred; module import framework planned for `4-09`.
+- `2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`: ERP Spec 2 master backlog — mandatory non-API work completed; Phase 3 split by surface (`/app` designed, `/api/v1` deferred); module import framework planned for `4-09`.
 - `2026-06-30-cms-graph-layer-design.md`: Core Graph Framework for CRUD-aligned graph expand/search/stats; CMS is the first consumer/provider, not the owner of the graph engine.
 - `2026-07-02-cms-content-provenance-ai-assistance-design.md`: CMS content origin, references bibliography (`cms_contents_references`), and per-translation `ai_assistance` enum for EU AI Act Article 50 disclosure.
 - `2026-07-09-mes-module-decisions-design.md`: MES locked product/architecture decisions (scope, numbering, backflush, ERP linkage).
@@ -26,3 +26,4 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-30-filament-generate-trait-merge-design.md`: Pass Filament `--generate` columns/fields into HasTable/HasForm; strip trait-owned duplicates at generate + runtime (timestamps/validity composites).
 - `2026-07-29-filament-toggle-inline-default-design.md`: Global Filament `Toggle::inline(false)` default (label above switch); form `inlineLabel()` unchanged.
 - `2026-07-22-module-import-command-framework-design.md`: Core abstract import command infrastructure with module-owned CMS/ERP commands and gated Symfony ERP adapter.
+- `2026-07-31-domain-action-http-routes-design.md`: Domain actions over HTTP on the internal `/app` surface — `POST /app/crud/{action}/{module}/{entity}`, per-entity registry, module-declared overrides of generic verbs with a boot-time collision guard, and the ERP `HasApprovals` candidate map.
