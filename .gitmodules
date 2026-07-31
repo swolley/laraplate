@@ -18,3 +18,7 @@
 	path = Modules/MES
 	url = https://github.com/swolley/laraplate-mes.git
 	pushurl = git@github.com:swolley/laraplate-mes.git
+[submodule "Modules/SAO"]
+	path = Modules/SAO
+	url = https://github.com/swolley/laraplate-sao.git
+	pushurl = git@github.com:swolley/laraplate-sao.git
