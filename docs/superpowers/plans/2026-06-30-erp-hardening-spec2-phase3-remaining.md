@@ -11,7 +11,7 @@
 
 | Half | IDs | State |
 |------|-----|-------|
-| Internal `/app` | `3-01`, `3-04`, `3-06` | designed 2026-07-31, ready to implement |
+| Internal `/app` | `3-01`, `3-04`, `3-06` | **implemented 2026-08-01** — see [`plans/2026-07-31-domain-action-http-routes.md`](2026-07-31-domain-action-http-routes.md) |
 | External `/api/v1` | `3-02`, `3-03` | deferred — no consumer yet, and `3-03` governs external exposure |
 
 The split exists because the two surfaces have different consumers. `/app` is session-based and is
@@ -21,8 +21,8 @@ and are not blocked by the API decision. Design:
 
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** Wave 1 Task 1 (`3-04`) → Wave 3 Task 8 (`3-01`) → Task 9 (`3-06`). The ERP
-external-source importers (`4-09`) proceed independently through
+**Current slice:** The `/app` half of Phase 3 is done. The ERP external-source importers
+(`4-09`) proceed independently through
 [`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md).
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
