@@ -211,13 +211,20 @@ fraud vector in the system — validating the workflow end to end before widenin
 
 29 distinct actions, none requiring a route declaration except the two overrides.
 
-`post`, `unpost`, `force_post`, `close`, `reopen`, `reverse`, `reverse_processed`, `amend`,
-`reset`, `reserve`, `supersede`, `switch_context`, `unlock`, `submitEInvoice`, `refreshEInvoice`,
-`approve`\*, `cancel`, `complete`, `create_credit_note`, `create_debit_note`, `create_revision`,
+`post`, `unpost`, `close`, `reopen`, `reverse`, `reverse_processed`, `amend`, `reset`, `reserve`,
+`supersede`, `switch_context`, `unlock`, `submitEInvoice`, `refreshEInvoice`, `approve`\*,
+`cancel`, `complete`, `create_credit_note`, `create_debit_note`, `create_revision`,
 `allocate_expense`, `settle_up`, `compute_settlement`, `send`, `import_file`, `export_sepa`,
 `export_cbi_bonifici`, `export_ics`.
 
 \* overridden on `ReturnOrder` and `SupplierReturn` per D3.
+
+**`force_post` is not an action.** It was listed as one while auditing the policy, which has a
+`forcePost` method. Reading `InvoicePostingActions` shows the UI has no separate force action:
+`post` carries a `force_three_way_match` checkbox, shown only for a purchase invoice when the user
+holds `forcePost`. The HTTP surface mirrors that — a payload flag on `post` with its own
+permission check — because a second route would be a way to post that bypasses the normal path.
+The seeded `…erp_invoices.force_post` permission stays and keeps governing the flag.
 
 The four file operations (`import_file`, `export_sepa`, `export_cbi_bonifici`, `export_ics`) are
 exposed on `/app` — the UIs need them — and use the binary response kind described in D5. They do

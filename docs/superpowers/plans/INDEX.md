@@ -32,3 +32,4 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-07-29-filament-environment-indicator.md`: Replace pxlrbt env indicator with Core plugin + module version dropdown.
 - `2026-07-29-filament-make-resources.md`: `filament:make-resources` + ownership helper + permanent Filament ClassGenerator rebind.
 - `2026-07-29-hasform-entity-preset.md`: Core `HasForm` Entity → Preset cascade; persist `presettable_id` only.
+- `2026-07-31-domain-action-http-routes.md`: Implements `3-04`, `3-01`, `3-06` — PermissionName helper, domain action registry with the generic-verb collision guard, dispatcher, `POST /app/crud/{action}/{module}/{entity}`, ERP registrar and the HTTP behaviour matrix.
