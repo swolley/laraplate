@@ -1227,9 +1227,19 @@ cd ../..
 
 Expected: six new commits pushed to `git@github.com:swolley/laraplate-sao.git` on top of the existing `initial commit`. The submodule entry in the next step records a commit that must exist on the remote, or a fresh clone of the application cannot resolve it.
 
-- [ ] **Step 2: Add the submodule entry**
+- [x] **Step 2: Add the submodule entry — already done on 2026-07-31**
 
-`Modules/SAO` already exists as a working git repository, so `git submodule add` would refuse. Register it by hand, mirroring the five existing entries. Append to `.gitmodules`:
+`Modules/SAO` was left in a half-created state by an earlier `git submodule add` that failed
+partway: its git directory had already been absorbed into
+`.git/modules/laraplate/modules/Modules/SAO` (its `.git` is a pointer file, exactly like the five
+siblings), but neither `.gitmodules`, nor `.git/config`, nor the index knew about it. Consequently
+editors that enumerate submodules from `.gitmodules` — VS Code, Cursor — did not list SAO among the
+workspace repositories.
+
+This has been completed ahead of the rest of the plan. Recorded here for the audit trail; verify
+rather than repeat.
+
+The `.gitmodules` entry, mirroring the five existing ones:
 
 ```ini
 [submodule "Modules/SAO"]
@@ -1238,17 +1248,21 @@ Expected: six new commits pushed to `git@github.com:swolley/laraplate-sao.git` o
 	pushurl = git@github.com:swolley/laraplate-sao.git
 ```
 
-Then record the gitlink:
+The command sequence that was run — **the order matters**: `git submodule init` resolves its
+argument as a pathspec against the index, so it fails with "did not match any file known to git"
+unless the gitlink is staged first. `absorbgitdirs` is not needed; the git directory was already in
+place.
 
 ```bash
 git add .gitmodules
-git rm -r --cached Modules/SAO --quiet 2>/dev/null || true
-git submodule init Modules/SAO
-git submodule absorbgitdirs Modules/SAO
-git add Modules/SAO
+git add Modules/SAO                 # stages the gitlink, mode 160000
+git submodule init Modules/SAO      # writes submodule.Modules/SAO.{url,active} into .git/config
+git config submodule.Modules/SAO.url git@github.com:swolley/laraplate-sao.git
 ```
 
-`git submodule init` copies the `.gitmodules` entry into `.git/config`; without it `absorbgitdirs` has no registered URL to work from. `absorbgitdirs` then moves `Modules/SAO/.git` into `.git/modules/laraplate/modules/SAO`, matching how the five existing submodules are stored.
+The final `git config` call aligns the stored URL with the SSH form the five sibling submodules use
+in `.git/config`, even though `.gitmodules` records the HTTPS form. `git submodule init` copies the
+HTTPS URL verbatim, so without this the entry would be the odd one out.
 
 - [ ] **Step 3: Verify the submodule resolves**
 
