@@ -3,5 +3,6 @@
     "CMS": true,
     "ERP": true,
     "AI": true,
-    "MES": true
+    "MES": true,
+    "SAO": true
 }
