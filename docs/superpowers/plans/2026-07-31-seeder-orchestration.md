@@ -2064,8 +2064,36 @@ The only task that deletes data. It goes last, behind everything that makes dele
 **Files:**
 - Create: `Modules/Core/app/Seeding/ModuleState.php`
 - Create: `Modules/Core/app/Seeding/ModuleStateResolver.php`
+- Create: `Modules/Core/app/Seeding/CleanupReport.php`
 - Create: `Modules/Core/app/Seeding/SettingsCleaner.php`
+- Create: `Modules/Core/tests/Stubs/Seeding/FixedModuleStateResolver.php`
 - Test: `Modules/Core/tests/Integration/Seeding/SettingsCleanerTest.php`
+
+The stub exists because the Global Constraints forbid declaring classes inside test files — an
+anonymous `new class … extends ModuleStateResolver` in the test would violate it:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\Core\Tests\Stubs\Seeding;
+
+use Modules\Core\Seeding\ModuleState;
+use Modules\Core\Seeding\ModuleStateResolver;
+use Override;
+
+final class FixedModuleStateResolver extends ModuleStateResolver
+{
+    public function __construct(private readonly ModuleState $state) {}
+
+    #[Override]
+    public function for(?string $module): ModuleState
+    {
+        return $this->state;
+    }
+}
+```
 
 **Interfaces:**
 - Consumes: `core_settings.module` / `seeded_value` from Task 3
@@ -2085,6 +2113,7 @@ use Modules\Core\Models\Setting;
 use Modules\Core\Seeding\ModuleState;
 use Modules\Core\Seeding\ModuleStateResolver;
 use Modules\Core\Seeding\SettingsCleaner;
+use Modules\Core\Tests\Stubs\Seeding\FixedModuleStateResolver;
 
 function seededSetting(string $name, mixed $value, mixed $baseline, ?string $module): Setting
 {
@@ -2102,15 +2131,7 @@ function seededSetting(string $name, mixed $value, mixed $baseline, ?string $mod
 
 function resolverReturning(ModuleState $state): void
 {
-    app()->instance(ModuleStateResolver::class, new class($state) extends ModuleStateResolver
-    {
-        public function __construct(private readonly ModuleState $state) {}
-
-        public function for(?string $module): ModuleState
-        {
-            return $this->state;
-        }
-    });
+    app()->instance(ModuleStateResolver::class, new FixedModuleStateResolver($state));
 }
 
 it('hard deletes an untouched setting of a disabled module', function (): void {
@@ -2341,7 +2362,7 @@ Expected: PASS — 5 tests
 
 ```bash
 vendor/bin/pint --dirty
-git -C Modules/Core add app/Seeding tests/Integration/Seeding/SettingsCleanerTest.php
+git -C Modules/Core add app/Seeding tests/Stubs/Seeding tests/Integration/Seeding/SettingsCleanerTest.php
 git -C Modules/Core commit -m "feat(core): settings cleanup keyed on module state and drift"
 git add Modules/Core
 git commit -m "chore: bump Core for settings cleanup"
