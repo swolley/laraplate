@@ -1549,6 +1549,13 @@ git commit -m "docs(sao): mark phase 0 complete"
 All must hold simultaneously:
 
 1. `php artisan test` is green for the whole application, with SAO's tests included.
+   **Status as of 2026-08-01: deliberately open.** Criteria 2–7 are verified; this one is not.
+   The application suite takes over an hour, which is a known problem being addressed separately,
+   and it was left unresolved rather than lowered or quietly dropped. It is not a formality: SAO's
+   own 32 tests pass, but activating a module changes the global boot — `SAOServiceProvider` is now
+   registered on every request and every test, and it throws when `Core` is absent. This criterion
+   is the only thing that can reveal breakage *outside* SAO. Do not declare phase 0 complete until
+   it has an answer, and do not re-run the suite unprompted.
 2. `vendor/bin/pint --test Modules/SAO` reports no style issues.
 3. `vendor/bin/phpstan analyse --configuration=Modules/SAO/phpstan.neon` reports no errors.
 4. `composer validate --no-check-all --no-check-lock --no-check-publish` exits 0 inside `Modules/SAO`.
