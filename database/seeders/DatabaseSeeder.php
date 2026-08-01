@@ -5,35 +5,37 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Modules\Core\Seeding\SeedLedger;
+use Modules\Core\Seeding\SeedOrchestrator;
+use RuntimeException;
 
 final class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (modules(prioritySort: true) as $module) {
-            $seeder_relative_path = config('modules.paths.generator.seeder.path');
-            $seeders_path = module_path(
-                $module,
-                is_string($seeder_relative_path) ? $seeder_relative_path : 'database/seeders',
-            );
-            $seeders = glob("{$seeders_path}/*.php") ?: [];
+        $exit_code = app(SeedOrchestrator::class)
+            ->withCommand($this->command)
+            ->run($this->resumeRunId());
 
-            foreach ($seeders as $seeder) {
-                $basename = basename($seeder, '.php');
-
-                if (Str::startsWith($basename, 'Dev')) {
-                    continue;
-                }
-
-                $seeder_class = "Modules\\{$module}\\Database\\Seeders\\{$basename}";
-
-                if (! class_exists($seeder_class)) {
-                    continue;
-                }
-
-                $this->call($seeder_class);
-            }
+        if ($exit_code !== 0) {
+            throw new RuntimeException('Seeding failed; see the run ledger for the failing node.');
         }
+    }
+
+    /**
+     * Resolve --resume, guarding hasOption() first: DatabaseSeeder can be
+     * invoked through db:seed (Modules\Core\Console\SeedCommand, which
+     * declares --resume), but also directly without any command at all
+     * (e.g. app(DatabaseSeeder::class)->run() in a script or test). Calling
+     * option() on an undefined option throws, so this must not assume the
+     * option exists just because a command instance is present.
+     */
+    private function resumeRunId(): ?string
+    {
+        $wants_resume = $this->command !== null
+            && $this->command->hasOption('resume')
+            && $this->command->option('resume') === true;
+
+        return $wants_resume ? app(SeedLedger::class)->lastFailedRunId() : null;
     }
 }
