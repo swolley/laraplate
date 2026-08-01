@@ -16,6 +16,9 @@
 - Table names come from a `SAOTables` enum using `Modules\Core\Enums\Concerns\HasModuleTablesUtils`; models set `#[Override] protected $table = SAOTables::X->value;`. Follow CMS/ERP, not MES — MES hardcodes table-name strings.
 - Migrations use `Modules\Core\Helpers\MigrateUtils::timestamps(...)` rather than `$table->timestamps()`.
 - Validation lives on the model in `#[Override] public function getRules(): array`, merging into `parent::getRules()` under the `create` and `update` keys.
+- **Core models validate on save.** A `unique:` rule therefore raises `Modules\Core\Overrides\ContextualValidationException`, not `Illuminate\Database\QueryException` — the model rejects the duplicate before the database constraint is reached. Unique indexes stay as the last line of defence for writes that bypass the model. Discovered while executing Task 2; every later uniqueness test expects the validation exception when the model declares the rule, and `QueryException` only when it does not.
+- **Mass assignment is strict.** Filling a guarded attribute raises `Illuminate\Database\Eloquent\MassAssignmentException` rather than being silently discarded. Assert the exception, not a silently unchanged value.
+- **Database defaults are not visible on a freshly created model.** A column with `->default(x)` reads as null in memory until the model is refreshed. Where later code reads the value straight after creation, declare it in the model's `$attributes` as well.
 - Enums expose `validationRule(): string` and `values(): array`, following `Modules\MES\Enums\WorkCenterType`.
 - Permission names come **only** from `Modules\Core\Support\PermissionName::forModel()` / `::forClass()`. Never build the string by hand.
 - **No integration code of any kind** (E12). No `Connection`, no driver, no external HTTP. No reference to `Modules\AI`.
@@ -354,21 +357,22 @@ test('a project is created with an uppercase key prefix', function (): void {
     expect($project->is_active)->toBeTrue();
 });
 
-test('the ticket counter starts at zero and is not mass assignable', function (): void {
+test('the ticket counter starts at zero and refuses mass assignment', function (): void {
     $project = Project::factory()->create();
 
     expect($project->next_ticket_number)->toBe(0);
 
-    $project->fill(['next_ticket_number' => 99]);
+    expect(fn (): Project => $project->fill(['next_ticket_number' => 99]))
+        ->toThrow(Illuminate\Database\Eloquent\MassAssignmentException::class);
 
-    expect($project->next_ticket_number)->toBe(0);
+    expect($project->fresh()->next_ticket_number)->toBe(0);
 });
 
 test('two projects cannot share a key prefix', function (): void {
     Project::factory()->create(['key_prefix' => 'SAO']);
 
     expect(fn (): Project => Project::factory()->create(['key_prefix' => 'SAO']))
-        ->toThrow(Illuminate\Database\QueryException::class);
+        ->toThrow(Modules\Core\Overrides\ContextualValidationException::class);
 });
 
 test('the create rules require a name and a prefix of two to ten uppercase characters', function (): void {
@@ -648,7 +652,7 @@ test('statuses are global, so two of them may not share a name', function (): vo
     TicketStatus::factory()->create(['name' => 'In review']);
 
     expect(fn (): TicketStatus => TicketStatus::factory()->create(['name' => 'In review']))
-        ->toThrow(Illuminate\Database\QueryException::class);
+        ->toThrow(Modules\Core\Overrides\ContextualValidationException::class);
 });
 
 test('a terminal category answers the question phase 6 will ask', function (): void {
@@ -886,6 +890,7 @@ cd ../..
 **Files:**
 - Create: `Modules/SAO/database/migrations/2026_08_01_100200_create_sao_workflow_schemes_table.php`
 - Create: `Modules/SAO/database/migrations/2026_08_01_100300_create_sao_workflow_transitions_table.php`
+- Create: `Modules/SAO/app/Exceptions/DuplicateCreationTransitionException.php`
 - Create: `Modules/SAO/app/Models/WorkflowScheme.php`
 - Create: `Modules/SAO/app/Models/WorkflowTransition.php`
 - Create: `Modules/SAO/database/factories/WorkflowSchemeFactory.php`
@@ -954,7 +959,7 @@ test('a scheme may declare only one creation transition', function (): void {
     expect(fn (): WorkflowTransition => WorkflowTransition::factory()->for($scheme)->create([
         'from_status_id' => null,
         'to_status_id' => $other->id,
-    ]))->toThrow(Illuminate\Database\QueryException::class);
+    ]))->toThrow(Modules\SAO\Exceptions\DuplicateCreationTransitionException::class);
 });
 
 test('exactly one scheme is the default', function (): void {
@@ -1071,7 +1076,34 @@ return new class extends Migration
 
 The unique index over `(scheme, from, to)` is what makes a second creation transition impossible: with `from_status_id` null, MySQL and PostgreSQL both treat two rows differing only in `to_status_id` as distinct, so the guard needs help — Step 5 adds it in the model.
 
-- [ ] **Step 4: Create the transition model**
+- [ ] **Step 4: Create the domain exception**
+
+Create `Modules/SAO/app/Exceptions/DuplicateCreationTransitionException.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\SAO\Exceptions;
+
+use RuntimeException;
+
+/**
+ * A scheme with two creation transitions cannot answer "where does a new ticket
+ * start". The composite unique index cannot express this, because SQL treats
+ * rows with a null from_status_id as distinct.
+ */
+final class DuplicateCreationTransitionException extends RuntimeException
+{
+    public static function make(): self
+    {
+        return new self('A workflow scheme may declare only one creation transition.');
+    }
+}
+```
+
+- [ ] **Step 5: Create the transition model**
 
 Create `Modules/SAO/app/Models/WorkflowTransition.php`:
 
@@ -1161,7 +1193,7 @@ final class WorkflowTransition extends Model
 }
 ```
 
-- [ ] **Step 5: Create the scheme model with its two invariants**
+- [ ] **Step 6: Create the scheme model with its two invariants**
 
 Create `Modules/SAO/app/Models/WorkflowScheme.php`:
 
@@ -1174,10 +1206,10 @@ namespace Modules\SAO\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\QueryException;
 use Modules\Core\Overrides\Model;
 use Modules\SAO\Database\Factories\WorkflowSchemeFactory;
 use Modules\SAO\Enums\SAOTables;
+use Modules\SAO\Exceptions\DuplicateCreationTransitionException;
 use Override;
 
 /**
@@ -1243,12 +1275,7 @@ final class WorkflowScheme extends Model
                 ->exists();
 
             if ($exists) {
-                throw new QueryException(
-                    'sao',
-                    'insert into sao_workflow_transitions',
-                    [],
-                    new \RuntimeException('A workflow scheme may declare only one creation transition.'),
-                );
+                throw DuplicateCreationTransitionException::make();
             }
         });
 
@@ -1286,7 +1313,7 @@ final class WorkflowScheme extends Model
 }
 ```
 
-- [ ] **Step 6: Create both factories**
+- [ ] **Step 7: Create both factories**
 
 Create `Modules/SAO/database/factories/WorkflowSchemeFactory.php`:
 
@@ -1364,7 +1391,7 @@ final class WorkflowTransitionFactory extends Factory
 }
 ```
 
-- [ ] **Step 7: Run the test to verify it passes**
+- [ ] **Step 8: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=WorkflowSchemeTest
@@ -1372,7 +1399,7 @@ php artisan test --filter=WorkflowSchemeTest
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 8: Format, analyse and commit**
+- [ ] **Step 9: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
