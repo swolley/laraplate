@@ -41,7 +41,7 @@ D3 of the parent spec.
 | E8 | One comment entity, with a nullable author and a `human`/`system` origin | Phase 2 posts automated comments. A bot user would be assignable, appear in filters, and be impersonable. |
 | E9 | History is a **read model** over Core versions plus comments. No activity table in 1a | Core's `HasVersions` in diff strategy already records which attributes changed and by whom. |
 | E10 | Every ticket mutation accepts a **change context** from day one | Phase 3 brings remote actors, which Core versioning cannot attribute. The seam costs one parameter now and avoids touching every call site later. |
-| E11 | Authorization is **exactly Laraplate's**: `Core\Support\PermissionName` plus spatie. **No visibility scope in 1a** | Core already designs row-level visibility (`ACL` + filters), but its scope is an unimplemented TODO. A SAO-owned membership pivot would be a second authorization system to reconcile later. |
+| E11 | Authorization is **exactly Laraplate's**: `Core\Support\PermissionName` plus spatie for permissions, and Core's `ACL` filters for row-level visibility. SAO adds no mechanism of its own | The ACL chain is implemented and wired into Core's CRUD, grid and graph layers. Per-project visibility is therefore an ACL to configure, not code to write. |
 | E12 | No integration of any kind | Connections, bindings and drivers are phase 3. 1a must not contain a single line that anticipates them. |
 
 ---
@@ -57,7 +57,8 @@ Deferred to later phases: everything involving an external system, error signals
 
 Explicitly **not** built at all in 1a:
 
-- A project membership pivot or any per-record visibility scope (E11).
+- A project membership pivot, or any visibility mechanism of SAO's own. Row-level visibility is
+  Core's ACL chain, configured rather than coded (E11, §8).
 - An activity/audit table parallel to Core versions (E9).
 - A bot user for automation (E8).
 
@@ -159,9 +160,22 @@ Permission names come from `Core\Support\PermissionName` — the `{connection}.{
 convention — with operations beyond CRUD where the domain needs them: `transition`, `assign`,
 `transition_override`.
 
-There is no visibility scope in 1a (E11). Whoever holds the permission sees every project. When
-per-project visibility becomes a real requirement, the correct place to solve it is Core's `ACL`
-scope, which benefits every module, not a mechanism private to SAO.
+Row-level visibility uses Core's existing ACL chain, unchanged. `AclResolverService` resolves the
+effective ACLs for a (user, permission) pair — inheriting along the role hierarchy, combining
+non-hierarchical roles with OR, treating `unrestricted` ACLs as transparent, and honouring priority
+— and `AuthorizationService` applies the resulting `FiltersGroup` through `applyAclFiltersToQuery()`
+and `injectAclFilters()`. That chain is already wired into `Crud\CrudService`, `Crud\QueryBuilder`,
+the grid actions and `GraphService`.
+
+**Per-project visibility is therefore configuration, not code**: an ACL carrying a filter on the
+ticket's project, attached to the relevant permission. SAO ships no membership table and no scope of
+its own.
+
+**The rule this imposes on SAO.** `HasACL`'s model-level global scope is an unimplemented TODO, so
+ACL filtering is *not* automatic at the Eloquent level. Every SAO read path must go through Core's
+CRUD/grid layer, or call `applyAclFiltersToQuery()` explicitly. A domain service that queries
+tickets with raw Eloquent silently bypasses visibility — which is exactly the kind of hole that is
+invisible until it matters. A test asserts that the ticket read paths honour a restricting ACL.
 
 ---
 
@@ -187,6 +201,9 @@ must leave a fully functional module.
   keys. This is the one test in 1a that must exercise real concurrency.
 - **Feature:** permission enforcement per operation; Filament pages render; the domain service
   refuses a transition the UI would not have offered.
+- **Visibility:** with an ACL restricting the relevant permission to one project, every ticket read
+  path returns only that project's tickets. This is the test that catches a read path built on raw
+  Eloquent, which would bypass the filters silently (§8).
 - **Standalone scenario:** the complete work flow — create, assign, transition, comment, close —
   with no connection configured, because in 1a that is the only mode there is.
 
