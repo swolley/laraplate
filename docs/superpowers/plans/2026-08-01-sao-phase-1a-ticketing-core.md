@@ -13,6 +13,10 @@
 - **Spec:** `docs/superpowers/specs/2026-08-01-sao-phase-1a-ticketing-core-design.md`. Decisions are numbered E1–E12 there; tasks reference them.
 - Every PHP file starts with `declare(strict_types=1);`. Models and services are `final` unless a sibling proves otherwise.
 - Models extend `Modules\Core\Overrides\Model`, which already provides `HasFactory`, `HasPrefixedTableName`, `HasValidations`, `HasVersions` and `SoftDeletes`.
+- **Reuse Core's model concerns rather than hand-rolling their behaviour.** `Modules\Core\Models\Concerns\` holds `HasActivation` (an `is_active` column with default, cast, hidden flag, `active`/`inactive` scopes and `activate()`/`deactivate()`), `SortableTrait`, `HasSlug`, `HasValidity`, `HasApprovals` and more; `Modules\Core\Locking\Traits\` holds `HasOptimisticLocking` and `HasLocks`. Check for an existing concern before writing a cast plus a scope by hand.
+- **A trait's `casts()` must be aliased and merged, never overridden.** A class-level `casts()` silently replaces the trait's, dropping its casts. Follow `Modules\Core\Models\Taxonomy`: `use HasActivation { HasActivation::casts as private activationCasts; }` then `array_merge($this->activationCasts(), [...])`.
+- **Fill `$fillable`, `$casts` and `$attributes` deliberately on every model.** `$attributes` mirrors the migration defaults so a freshly created model reports what it will hold once refreshed. Omit the columns a trait already initializes — `HasActivation` adds `is_active` to fillable and defaults it itself. The defaults each model owes, beyond what traits supply: `TicketStatus` → `colour` `'gray'`, `sort_order` `0`; `WorkflowScheme` → `is_default` `false`; `TicketType` → `colour` `'gray'`, `is_defect` `false`; `ProjectTicketType` → `is_default` `false`; `Ticket` → `priority` `TicketPriority::Normal`; `TicketComment` → `origin` `CommentOrigin::Human`. The model snippets below predate this rule; add the property when writing each file.
+- **The two locking mechanisms are different things.** `MigrateUtils::timestamps(hasLocks: true)` adds `locked_at`, `locked_by` and `is_locked` — the explicit "this record is checked out" lock backing `HasLocks`. Optimistic locking is a separate `config('core.locking.lock_version_column')` column, `->integer()->unsigned()->nullable(false)->default(1)`, backing `HasOptimisticLocking`. `Modules\CMS\Models\Content` uses both; they coexist rather than replace one another.
 - Table names come from a `SAOTables` enum using `Modules\Core\Enums\Concerns\HasModuleTablesUtils`; models set `#[Override] protected $table = SAOTables::X->value;`. Follow CMS/ERP, not MES — MES hardcodes table-name strings.
 - Migrations use `Modules\Core\Helpers\MigrateUtils::timestamps(...)` rather than `$table->timestamps()`.
 - Validation lives on the model in `#[Override] public function getRules(): array`, merging into `parent::getRules()` under the `create` and `update` keys.
@@ -818,6 +822,13 @@ final class TicketStatus extends Model
     }
 }
 ```
+
+Before writing this file, check whether Core's `SortableTrait` fits the `sort_order` column — it
+wraps `spatie/eloquent-sortable` and supplies an `ordered` scope. If its expected column name
+differs from `sort_order`, either follow the trait's name in the migration or configure the trait,
+rather than keeping a parallel hand-rolled ordering. Also add
+`protected $attributes = ['colour' => 'gray', 'sort_order' => 0];` so a freshly created status
+reports the same values the migration defaults give it.
 
 - [ ] **Step 5: Create the factory**
 
@@ -2042,8 +2053,9 @@ return new class extends Migration
     {
         $table_name = SAOTables::Tickets->value;
         $users = CoreTables::Users->value;
+        $lock_version_column = config('core.locking.lock_version_column');
 
-        Schema::create($table_name, static function (Blueprint $table) use ($table_name, $users): void {
+        Schema::create($table_name, static function (Blueprint $table) use ($table_name, $users, $lock_version_column): void {
             $table->id();
             $table->foreignId('project_id')
                 ->constrained(SAOTables::Projects->value, 'id', "{$table_name}_project_FK")
@@ -2066,7 +2078,9 @@ return new class extends Migration
                 ->constrained($users, 'id', "{$table_name}_assignee_FK")
                 ->nullOnDelete();
 
-            MigrateUtils::timestamps($table, hasCreateUpdate: true, hasSoftDelete: true, hasLocks: true);
+            $table->integer($lock_version_column)->unsigned()->nullable(false)->default(1)->comment('The optimistic lock version of the ticket');
+
+            MigrateUtils::timestamps($table, hasCreateUpdate: true, hasSoftDelete: true);
 
             $table->unique('key', "{$table_name}_key_UN");
             $table->unique(['project_id', 'number'], "{$table_name}_project_number_UN");
@@ -2082,7 +2096,13 @@ return new class extends Migration
 };
 ```
 
-`hasLocks: true` adds the optimistic-locking column Core expects. Tickets are the most concurrently edited object in the system, so this is not optional.
+The ticket model must then `use Modules\Core\Locking\Traits\HasOptimisticLocking;`. Tickets are the
+most concurrently edited object in the system, so this is not optional.
+
+**Not** `hasLocks: true`: that flag adds `locked_at`, `locked_by` and `is_locked`, which back the
+*explicit* checkout lock (`HasLocks`) — a different feature. A tracker plausibly wants it, so that a
+person can claim a ticket while editing, but it was not specified for 1a and is a candidate for 1b.
+Adding it here would ship an unrequested feature and three unused columns.
 
 - [ ] **Step 6: Create the ticket model and factory**
 
