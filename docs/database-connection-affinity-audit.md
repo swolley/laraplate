@@ -147,10 +147,17 @@ unrelated `Schema` class is excluded by resolved class identity. Detector
 self-tests cover both rejected and accepted forms. The committed baseline is an
 empty array, so new runtime exceptions fail the architecture test immediately.
 
-## `CurrencyConverter` compatibility note
+## ERP public API compatibility notes
 
-Connection affinity required a deliberate external API break in ERP's
-`CurrencyConverter` contract. The signatures changed from:
+Connection affinity required deliberate API breaks in ERP. Consumers must pass
+trusted aggregate models instead of scalar identifiers wherever the service has
+to select a database connection. The model supplies the connection and, when
+the service uses it as the aggregate, its identifier; callers must not create a
+new default-connection model merely to satisfy the signature.
+
+### Currency conversion
+
+ERP commit `54bc1e7` changed the `CurrencyConverter` contract from:
 
 ```php
 convert(string $from, string $to, float|string|int $amount, ?DateTimeInterface $at = null)
@@ -164,9 +171,8 @@ convert(Model $owner, string $from, string $to, float|string|int $amount, ?DateT
 getRate(Model $owner, string $from, string $to, ?DateTimeInterface $at = null)
 ```
 
-This was introduced in ERP commit `54bc1e7`. The trusted aggregate supplies the
-connection that owns exchange-rate data; current callers pass the relevant
-company/aggregate model.
+The trusted aggregate supplies the connection that owns exchange-rate data;
+current callers pass the relevant company/aggregate model.
 
 External implementations and decorators must add the leading `Model $owner`
 parameter to both methods and use its connection for exchange-rate queries.
@@ -175,3 +181,119 @@ compatibility adapter because silently falling back to the default connection
 would reintroduce the inconsistency this rule prevents. This change therefore
 requires an explicit upgrade note for consumers of the ERP contract.
 
+### Payments
+
+ERP commit `19851f4` changed two public service methods:
+
+```php
+// Before
+PaymentRequestService::applyCallback(string $provider, array $payload)
+PaymentRunBuilderService::build(
+    int $company_id,
+    int $bank_account_id,
+    array $payment_schedule_line_ids,
+    CarbonInterface|string $execution_date,
+)
+
+// After
+PaymentRequestService::applyCallback(
+    string $provider,
+    array $payload,
+    PaymentRequest $source,
+)
+PaymentRunBuilderService::build(
+    int $company_id,
+    int $bank_account_id,
+    array $payment_schedule_line_ids,
+    CarbonInterface|string $execution_date,
+    BankAccount $source,
+)
+```
+
+For provider callbacks, resolve the trusted `PaymentRequest` prototype on the
+configured ERP connection and pass it as `$source`; the service then locates the
+persisted request on that connection. For payment runs, pass the owning
+`BankAccount` (or a trusted `BankAccount` prototype) as `$source`. The source
+selects the connection; the persisted bank account identified by
+`$bank_account_id` must still belong to `$company_id`.
+
+### Accounting audits and VAT settlements
+
+ERP commit `32d85de` replaced scalar owners with connected models:
+
+```php
+// Before
+DocumentSequenceAuditService::audit(int $company_id, int $year)
+VatSettlementBatchService::compute(
+    int $company_id,
+    int $year,
+    ?string $period = null,
+    bool $dry_run = false,
+)
+VatSettlementService::preview(int $company_id, int $fiscal_period_id)
+VatSettlementService::compute(int $company_id, int $fiscal_period_id)
+
+// After
+DocumentSequenceAuditService::audit(Company $company, int $year)
+VatSettlementBatchService::compute(
+    Company $company,
+    int $year,
+    ?string $period = null,
+    bool $dry_run = false,
+)
+VatSettlementService::preview(Company $company, FiscalPeriod $fiscal_period)
+VatSettlementService::compute(Company $company, FiscalPeriod $fiscal_period)
+```
+
+Callers must load `Company` and `FiscalPeriod` from the same connection. VAT
+settlement methods validate that the period belongs to the supplied company and
+reject mixed-connection participants before querying.
+
+### Pricing
+
+The same ERP commit, `32d85de`, changed the public pricing APIs:
+
+```php
+// Before
+InvoiceLinePricingService::defaultsFromSalesOrderLine(
+    int $company_id,
+    int $sales_order_line_id,
+    ?int $party_id = null,
+    string $currency = 'EUR',
+)
+PriceResolverService::resolve(
+    int $company_id,
+    int $item_id,
+    ?int $party_id = null,
+    string $currency = 'EUR',
+    ?CarbonInterface $date = null,
+)
+
+// After
+InvoiceLinePricingService::defaultsFromSalesOrderLine(
+    Company $company,
+    int $sales_order_line_id,
+    ?int $party_id = null,
+    string $currency = 'EUR',
+)
+PriceResolverService::resolve(
+    Company $company,
+    Item $item,
+    ?int $party_id = null,
+    string $currency = 'EUR',
+    ?CarbonInterface $date = null,
+)
+```
+
+Pass the connected company that owns the price lists. `PriceResolverService`
+also requires the connected item and validates that both models share a
+connection and that the item belongs to the company.
+
+### Compatible additions
+
+The affinity work also added an optional `Company` argument to
+`ErpHealthCheckService::run()` and an optional `ConnectionScopedModels` argument
+to `CreditNoteService::validateCreditNoteTotal()`. Existing calls remain valid;
+passing the owner explicitly is recommended when checking a non-default ERP
+connection. Framework-managed constructors gained connection-context
+dependencies and should continue to be resolved through Laravel's container.
