@@ -52,15 +52,14 @@ These calls only construct SQL expressions; the surrounding query determines
 the connection:
 
 - Core:
-  `HandleLicensesCommand` (2), `CoreStatsWidget` (3), `Entity` (1), and
-  `DynamicContentsService` (1).
+  `HandleLicensesCommand` (2), `Entity` (1), and `DynamicContentsService` (1).
 - CMS:
-  `Preset` (1) and `Content` (2).
+  `Preset` (1) and `Content` (1).
 - ERP:
   `Preset` (1), `TrialBalanceService` (1), and
   `IncomeStatementService` (1).
 
-Total: 13 `DB::raw()` calls.
+Total: 9 `DB::raw()` calls.
 
 ### Explicit lifecycle and diagnostic operations
 
@@ -92,6 +91,23 @@ from that model's connection. Settings-table work obtains both the schema
 builder and query builder from a `Setting` model. The model-less
 `ModelMakeCommand` explicitly selects `config('database.default')`.
 
+### Configured runtime fallbacks
+
+Entrypoints that do not receive a connected owner may resolve a trusted model
+prototype from module configuration. `StockMovementService` uses an explicit
+`$source` model when one is supplied; otherwise it resolves `Company` through
+`erp.model_connections` and runs all inventory participants on that connection.
+Deployments that move ERP inventory models must configure the `Company` class
+(or its table) in that map rather than relying on the application default.
+
+Core exposes the equivalent `core.model_connections` map for dashboard models.
+`CoreStatsWidget` queries `User` and `License` independently, then counts the
+intersection of distinct user `license_id` values with scoped `License` rows.
+This avoids a cross-database join and excludes orphaned license identifiers.
+Its cache key hashes each model class, table, resolved connection name, and
+database identity configuration, so reusing a connection name for another
+database cannot return statistics cached for the previous database.
+
 ## Migration and seeder context
 
 Migration schema operations intentionally run through the migration
@@ -106,6 +122,13 @@ connection/context:
 Seeders use model-owned queries or transactions. Core's `BatchSeeder` is the
 exceptional connection-lifecycle coordinator documented above; CMS and ERP
 seeders remain model-bound.
+
+Core also runs approval-vote deduplication and unique-index migrations through
+the migrator's active connection. The forward fix keeps the newest historical
+vote for each modification and actor before enforcing one vote per actor. The
+constraint migration repeats the idempotent cleanup immediately before adding
+the indexes so a retry remains safe if an old application node writes between
+the separately recorded migrations.
 
 ## Test inventory
 
