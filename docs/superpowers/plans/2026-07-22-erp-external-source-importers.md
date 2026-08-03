@@ -2,7 +2,7 @@
 
 > **For agentic workers:** execute one task and one owning repository at a time. Do not infer source fields. Every parser starts from a versioned, anonymized fixture and an approved mapping. Commit ERP, Core, importer-package, and root-documentation changes separately.
 
-**Status:** Separate planned workstream; excluded from the ERP Point 0 baseline. Source fixtures and mappings are required before parser implementation.
+**Status:** Core/ERP import foundation complete; source fixtures and mappings required before parser implementation
 
 **Goal:** Add the module-owned `erp:import` entry point and implement three ERP importers in the sibling `laraplate-importers` repository:
 
@@ -55,13 +55,13 @@ source-reconciliation phases.
 - Create: ERP import test stubs under `Modules/ERP/tests/Stubs/Import/`
 - Create: `Modules/ERP/tests/Feature/Import/ImportCommandTest.php`
 
-- [ ] Extend Core `AbstractImportCommand`; declare `$name = 'erp:import'`, not `$signature`.
-- [ ] Add the established green ERP command suffix.
-- [ ] Accept only the ERP marker interface and reject CMS/Core-only importers before execution.
-- [ ] Inherit the common `importer`, `bootstrap`, repeatable `arg`, `dry-run`, `limit`, and `no-search` options unchanged.
-- [ ] Discover compatible classes from the sibling `laraplate-importers` checkout without depending on that package from ERP.
-- [ ] Cover bootstrap, resolution, arguments, limit, dry-run connection affinity, output, failures, and command registration.
-- [ ] Update ERP README, operator guide, developer RAG, RAG glossary, and normal glossary.
+- [x] Extend Core `AbstractImportCommand`; declare `$name = 'erp:import'`, not `$signature`.
+- [x] Add the established green ERP command suffix.
+- [x] Accept only the ERP marker interface and reject CMS/Core-only importers before execution.
+- [x] Inherit the common `importer`, `bootstrap`, repeatable `arg`, `dry-run`, `limit`, and `no-search` options unchanged.
+- [x] Discover compatible classes from the sibling `laraplate-importers` checkout without depending on that package from ERP.
+- [x] Cover bootstrap, resolution, arguments, limit, dry-run connection affinity, output, failures, and command registration.
+- [x] Update ERP README, developer RAG, RAG glossary, and normal glossary for the public runtime boundary.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Import/ImportCommandTest.php
@@ -76,14 +76,14 @@ vendor/bin/pint --dirty
 
 **Module:** ERP; Core only if a neutral `RecordOrigin` service is demonstrably reusable
 
-- [ ] Inventory existing ERP services for parties, contacts, projects, tasks, time entries, quotations, price lists, movements, partner pools, settlements, journals, inventory, and fiscal documents.
-- [ ] Define small typed ERP import inputs by destination workflow; do not create one unbounded `ErpImportDto`.
-- [ ] Add an ERP application service for shared-expense ingestion that atomically creates a draft `Movement`, applies participant shares through `PartnerPoolSettlementService`, and posts only when explicitly configured and preflight checks pass.
-- [ ] Define source identity keys: `legacy_symfony`, `splid`, and `tricount`, qualified by source instance/group where needed.
-- [ ] Wrap `core_record_origins` lookup/register behavior so duplicate source records resolve to the same local aggregate.
-- [ ] Define changed-source policy before code: unchanged rerun skips; changed unposted records may update; changed posted/accounted records reject and require an explicit correction workflow.
-- [ ] Require explicit maps for company, Core users, chart-of-account roles/accounts, currency, tax codes, and any source category/taxonomy.
-- [ ] Return structured rejected-row evidence without changing Core's current `import(): int` compatibility contract.
+- [x] Inventory existing ERP services for parties, contacts, projects, tasks, time entries, quotations, price lists, movements, partner pools, settlements, journals, inventory, and fiscal documents.
+- [x] Define small typed ERP import inputs by destination workflow; do not create one unbounded `ErpImportDto`.
+- [x] Add composable ERP application services that ingest a draft cash `Movement`, optionally post it, and apply participant shares through `PartnerPoolSettlementService` without conflating dated cash events with allocations.
+- [x] Define source identity keys qualified by source instance/group where needed; adapters supply the concrete `legacy_symfony`, `splid`, or `tricount` key.
+- [x] Wrap `core_record_origins` lookup/register behavior so duplicate source records resolve to the same local aggregate.
+- [x] Define changed-source policy before code: unchanged rerun skips; changed unposted records may update; changed posted/accounted records reject and require an explicit correction workflow.
+- [x] Require explicit maps for company, Core users, chart-of-account roles/accounts, currency, tax codes, and any source category/taxonomy.
+- [x] Return structured conflict evidence without changing Core's current `import(): int` compatibility contract.
 
 **Stop condition:** do not implement external parsers until these destination contracts and correction rules have focused tests.
 

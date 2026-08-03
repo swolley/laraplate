@@ -2,7 +2,7 @@
 
 > **For Codex:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement this plan task-by-task.
 
-**Status:** Ready for implementation
+**Status:** Complete (2026-08-03)
 
 **Goal:** Give ERP a generic, idempotent import entry point and a source-neutral
 cash-movement ingestion service that can represent income, expenses, partner
