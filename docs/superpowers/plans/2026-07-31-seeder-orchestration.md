@@ -2370,15 +2370,26 @@ git commit -m "chore: bump Core for settings cleanup"
 
 ---
 
-### Task 11: Migrate AI, CMS, ERP and MES seeders — DEFERRED
+### Task 11: Migrate AI, CMS, ERP and MES seeders
 
-> **Do not execute this task in the current sequence.** It is the only task touching submodules
-> other than Core, and `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` — which this task
-> rewrites — carries uncommitted work from a concurrent session. Executing it would risk that work.
+> **Unblocked 2026-08-01.** This task was deferred while
+> `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` carried uncommitted work from a concurrent
+> session. All four submodules are now clean.
 >
-> Resume it once ERP's in-flight changes are committed and the file is clean. Until then Tasks 1–10
-> stand on their own: the graph, reconciler, ledger and cleaner all work, and the module seeders keep
-> their current behaviour because the orchestrator runs them unchanged.
+> It is the only task touching submodules other than Core, so its commit protocol differs: **four
+> submodule commits plus one pointer bump**, not one commit.
+
+**Findings from the final whole-branch review that this task must also close:**
+
+- `permission:refresh` is still an `Artisan::call()` inside `CoreDatabaseSeeder::defaultPermissions()`
+  rather than a declared graph node. Make it a node so seeders that need permissions can depend on it.
+- `Modules/CMS/database/seeders/CMSDatabaseSeeder.php` still calls `Artisan::call('cache:clear')`,
+  so the spec's "removes the blanket cache wipe" is only half true. Replace it with the targeted
+  `SettingsCacheCoordinator::flushAll()`, or delete it — the orchestrator already flushes once at
+  the end of a successful run.
+- `MESDatabaseSeeder::runtimeSettingDefinitions()` omits `encrypted` and `choices`. A batch `upsert`
+  needs a **uniform column set** across every row of a definition; `SeedDefinition` does not validate
+  this, so a mismatch surfaces as a binding-count SQL error. Give every row the full column set.
 
 **Files:**
 - Modify: `Modules/AI/database/seeders/AIDatabaseSeeder.php`
@@ -2445,11 +2456,26 @@ Expected: PASS
 
 - [ ] **Step 5: Commit**
 
+Four separate repositories plus the superproject. Run from the laraplate root:
+
 ```bash
 vendor/bin/pint --dirty
-git add Modules/AI Modules/CMS Modules/ERP Modules/MES Modules/Core/tests/Feature/Seeding/FullSeedRunTest.php
-git commit -m "refactor(modules): seed definitions and declared dependencies per module"
+
+for m in AI CMS ERP MES; do
+  git -C "Modules/$m" add database/seeders
+  git -C "Modules/$m" commit -m "refactor(${m,,}): seed definitions and declared dependencies"
+done
+
+git -C Modules/Core add tests/Feature/Seeding/FullSeedRunTest.php
+git -C Modules/Core commit -m "test(core): full seed run is idempotent and attributes every setting"
+
+git add Modules/AI Modules/CMS Modules/ERP Modules/MES Modules/Core
+git commit -m "chore: bump modules for seed definition migration"
 ```
+
+Skip any module whose seeder needed no change rather than creating an empty commit. **Other
+sessions commit to these repositories** — stage only `database/seeders` paths you actually edited,
+never `git add -A`.
 
 ---
 
