@@ -41,7 +41,7 @@ Before implementation approval, the experiment design must define:
 
 ## Explicit non-goals
 
-This gate does not introduce Graphify, GraphRAG, a graph database, automatic multi-provider fan-out, a public assistant, or a new HTTP API. Core Graph remains the relation API and is independent of both record and passage retrieval.
+This gate does not introduce Graphify, GraphRAG, a graph database, automatic multi-provider fan-out, session-based guest assistance, or a new HTTP API. Core Graph remains the relation API and is independent of both record and passage retrieval.
 
 ## Decision states
 

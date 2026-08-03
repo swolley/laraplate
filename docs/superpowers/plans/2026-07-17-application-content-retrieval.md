@@ -444,7 +444,7 @@ rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval se
 - Modify: `Modules/CMS/docs/rag/MODULE.md`
 - Modify: `docs/superpowers/specs/2026-07-21-application-content-passage-index-gate.md`
 
-- [ ] **Step 1: Write the failing Core guest-classification tests**
+- [x] **Step 1: Write the failing Core guest-classification tests**
 
 Keep the existing no-email compatibility case and add configured-name, configured-username, normal-user, and invalid-configuration cases to `UserTest.php`:
 
@@ -491,7 +491,7 @@ it('fails guest classification when the configured account is invalid', function
 });
 ```
 
-- [ ] **Step 2: Run the focused model tests and verify RED**
+- [x] **Step 2: Run the focused model tests and verify RED**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php --filter='recognizes the configured guest|does not classify a normal account|fails guest classification'
@@ -499,7 +499,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php --
 
 Expected: both configured guest cases fail because `isGuest()` currently checks only whether email is absent, and the invalid-configuration case fails because no classification error is raised.
 
-- [ ] **Step 3: Implement the minimal central classifier**
+- [x] **Step 3: Implement the minimal central classifier**
 
 Replace `User::isGuest()` with:
 
@@ -523,7 +523,7 @@ public function isGuest(): bool
 }
 ```
 
-- [ ] **Step 4: Run the complete focused model file and verify GREEN**
+- [x] **Step 4: Run the complete focused model file and verify GREEN**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php
@@ -531,7 +531,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php
 
 Expected: PASS, including legacy no-email compatibility, both configured-account shapes, normal-account exclusion, and invalid-configuration failure.
 
-- [ ] **Step 5: Write the failing Core gateway test**
+- [x] **Step 5: Write the failing Core gateway test**
 
 Add to `ApplicationContentRetrievalServiceTest.php`:
 
@@ -565,7 +565,7 @@ it('fails closed before provider execution when guest classification fails', fun
 });
 ```
 
-- [ ] **Step 6: Run the gateway test and verify RED**
+- [x] **Step 6: Run the gateway test and verify RED**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php --filter='rejects the configured guest'
@@ -573,7 +573,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/App
 
 Expected: FAIL because the permitted configured guest reaches the provider.
 
-- [ ] **Step 7: Add the guest check to the Core identity invariant**
+- [x] **Step 7: Add the guest check to the Core identity invariant**
 
 Extend `ApplicationContentRetrievalService::assertConsistentIdentity()` so its rejection condition ends with:
 
@@ -584,7 +584,7 @@ Extend `ApplicationContentRetrievalService::assertConsistentIdentity()` so its r
 
 The provider registry and permission resolver must not run for a guest.
 
-- [ ] **Step 8: Run the Core gateway file and verify GREEN**
+- [x] **Step 8: Run the Core gateway file and verify GREEN**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php
@@ -592,7 +592,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/App
 
 Expected: PASS and the guest test observes zero provider calls.
 
-- [ ] **Step 9: Write the failing AI access-context test**
+- [x] **Step 9: Write the failing AI access-context test**
 
 Add a `bool $guest = false` argument to `assistanceUserMock()`, make it return that value from `isGuest()`, and add:
 
@@ -623,7 +623,7 @@ it('fails closed when guest classification fails', function (): void {
 });
 ```
 
-- [ ] **Step 10: Run the AI context test and verify RED**
+- [x] **Step 10: Run the AI context test and verify RED**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php --filter='rejects the configured guest'
@@ -631,7 +631,7 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Assista
 
 Expected: FAIL because `forInApp()` currently creates an in-app context for a guest-shaped user.
 
-- [ ] **Step 11: Reject guests before AI context resolution**
+- [x] **Step 11: Reject guests before AI context resolution**
 
 After ownership identifiers have been validated, move guest classification inside the existing normalized `try` block and before tenant or permission resolution:
 
@@ -651,7 +651,7 @@ try {
 }
 ```
 
-- [ ] **Step 12: Run the complete AI context file and verify GREEN**
+- [x] **Step 12: Run the complete AI context file and verify GREEN**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
@@ -659,7 +659,7 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Assista
 
 Expected: PASS; guest rejection occurs before tenant and permission resolution.
 
-- [ ] **Step 13: Synchronize module documentation**
+- [x] **Step 13: Synchronize module documentation**
 
 Document these exact boundaries:
 
@@ -670,7 +670,7 @@ Document these exact boundaries:
 
 Replace the stale public/anonymous Phase 2 wording in the named files; do not rename public DTO/API terminology that describes PHP visibility or a separately approved headless API.
 
-- [ ] **Step 14: Run documentation and focused security tests**
+- [x] **Step 14: Run documentation and focused security tests**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Integration/CoreRagModuleDocumentationTest.php Modules/AI/tests/Integration/AiRagModuleDocumentationTest.php Modules/CMS/tests/Unit/CmsRagModuleDocumentationTest.php Modules/Core/tests/Feature/Models/UserTest.php Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php
@@ -678,7 +678,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/CoreRagModuleDocum
 
 Expected: PASS without a live LLM or external search cluster.
 
-- [ ] **Step 15: Run the deterministic release suite**
+- [x] **Step 15: Run the deterministic release suite**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Modules/CMS/tests/Feature/ApplicationContent Modules/AI/tests/Unit/Services/ApplicationContent Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/Core/tests/Feature/Graph
@@ -686,7 +686,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Mod
 
 Expected: PASS with zero failures. Record the emitted test, assertion, and duration totals in `Modules/AI/docs/rag/evaluations/2026-07-in-app-security.json`, set `evaluated_at` to `2026-08-03`, and retain only aggregate counts and existing policy/provider version identifiers.
 
-- [ ] **Step 16: Format changed PHP and repeat affected tests**
+- [x] **Step 16: Format changed PHP and repeat affected tests**
 
 ```bash
 rtk vendor/bin/pint Modules/Core/app/Models/User.php Modules/Core/app/ApplicationContent/ApplicationContentRetrievalService.php Modules/Core/tests/Feature/Models/UserTest.php Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php Modules/AI/app/Services/Assistance/AssistantAccessContextFactory.php Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
@@ -695,7 +695,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php Mo
 
 Expected: Pint exits zero and the affected tests pass.
 
-- [ ] **Step 17: Commit exact owner paths without staging unrelated work**
+- [x] **Step 17: Commit exact owner paths without staging unrelated work**
 
 Because `Modules/Core/app/Models/User.php` already contains unrelated worktree changes, stage only the guest-classifier hunk for the Core commit. Then commit by owner:
 
@@ -723,7 +723,7 @@ For the interactive Core staging, accept only the `isGuest()` hunk and reject th
 - [x] Verified application context selects the default source; absent context uses generic single-source routing.
 - [x] Ambiguous generic requests ask for clarification and Phase 1 never fans out automatically.
 - [x] Phase 1 requires an authenticated application user.
-- [ ] Phase 1 explicitly rejects the configured guest even when it is attached to the session guard.
+- [x] Phase 1 explicitly rejects the configured guest even when it is attached to the session guard.
 - [x] Permission, ACL, tenant, validity, and deletion constraints apply before evidence reaches AI.
 - [x] Search hits are rehydrated and reauthorized before safe projection.
 - [x] Tool arguments cannot supply identity, authorization, fields, indexes, or raw query DSL.

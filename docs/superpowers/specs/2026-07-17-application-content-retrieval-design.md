@@ -1,6 +1,6 @@
 # Application content retrieval providers
 
-**Status:** Implemented Phase 1; guest-boundary closure approved
+**Status:** Implemented Phase 1
 
 **Date:** 2026-07-17
 
