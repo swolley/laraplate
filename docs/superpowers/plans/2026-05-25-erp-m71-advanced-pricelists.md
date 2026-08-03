@@ -1,8 +1,6 @@
 # ERP M7.1 - Advanced Pricelists Implementation Plan
 
-> **Navigation:** M7.1 resolver/integration is **implemented**. Party price-rule UI →
-> Spec 2 Phase 2B in
-> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+> **Point 0 status:** M7.1, Party price-rule UI, and direct item-specific prices are implemented. This plan preserves the original taxonomy-first design history; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
@@ -124,8 +122,7 @@ public function resolve(
 - Modify: `Modules/ERP/app/Models/Party.php`
 - Modify existing Party resource files under `Modules/ERP/app/Filament/Resources/Parties/`
 
-**Status:** Deferred from v1. `PartyPriceRule` exists and is consumed by `PriceResolverService`,
-but the Party Filament resource does not yet expose a price-rule management section.
+**Historical status:** deferred from v1 and implemented later in Phase 2B. `PartyPriceRule` is consumed by `PriceResolverService` and can be maintained through the Party Filament resource.
 
 **Behavior:**
 - Add `Party::price_rules()` relation.
@@ -190,9 +187,8 @@ Test scenarios:
 - Sale invoice line integration is implemented through the existing `sales_order_line_id` source;
   selecting a sales order line fills description, remaining quantity, and resolved unit price when
   the current line has not been customized.
-- Deferred from v1: Party resource price-rule management UI and `Party::price_rules()` relation.
-  Price rules can be managed at model/service level and are applied by the resolver, but the Party
-  edit screen does not yet expose a dedicated "Price Rules" section.
+- Implemented later in Phase 2B: Party resource price-rule management UI and the
+  `Party::price_rules()` relation.
 - Verified on 2026-05-29:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/PriceResolverServiceTest.php`
   - included in the combined ERP focused command documented in the final verification note

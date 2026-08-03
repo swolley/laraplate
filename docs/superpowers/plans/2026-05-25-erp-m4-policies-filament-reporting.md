@@ -1,8 +1,6 @@
 # ERP M4 - Policies, Filament Actions, Reporting Alignment Plan
 
-> **Navigation:** Open items from this plan are consolidated in
-> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md)
-> (ERP Spec 2 master backlog, Phase 2A). This file is kept for historical context.
+> **Point 0 status:** M4 and its approved reporting/action follow-ups are implemented. This plan is kept for historical context; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.

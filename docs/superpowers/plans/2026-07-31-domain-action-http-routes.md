@@ -1,5 +1,7 @@
 # Domain Action HTTP Routes Implementation Plan
 
+**Status:** Completed 2026-08-01. All task checkboxes describe executed implementation history; external `/api/v1` exposure remains outside this plan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Expose ERP domain actions over HTTP on the internal `/app` surface through one generic Core route backed by a per-entity registry.
@@ -63,7 +65,7 @@ Expected: resolves to `ai.crud.conversations.detail`, not `core.crud.detail`.
 
 `forClass` exists because `ERPDatabaseSeeder` builds names from class strings without instantiating models.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/Core/tests/Feature/Support/PermissionNameTest.php`:
 
@@ -93,7 +95,7 @@ it('builds a name from a class string without instantiating the model', function
 });
 ```
 
-- [ ] **Step 2: Run the test and watch it fail**
+- [x] **Step 2: Run the test and watch it fail**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Support/PermissionNameTest.php
@@ -101,7 +103,7 @@ php artisan test --compact Modules/Core/tests/Feature/Support/PermissionNameTest
 
 Expected: `Class "Modules\Core\Support\PermissionName" not found`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `Modules/Core/app/Support/PermissionName.php`:
 
@@ -151,7 +153,7 @@ final class PermissionName
 }
 ```
 
-- [ ] **Step 4: Run the test and watch it pass**
+- [x] **Step 4: Run the test and watch it pass**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Support/PermissionNameTest.php
@@ -159,7 +161,7 @@ php artisan test --compact Modules/Core/tests/Feature/Support/PermissionNameTest
 
 Expected: `3 passed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -182,7 +184,7 @@ git -C Modules/Core commit -m "feat(core): centralize permission name constructi
 
 This task changes no behaviour. The existing tests are the proof: if a name changes, `ErpModelPolicyTest` and `ErpDomainPermissionsSeederTest` fail.
 
-- [ ] **Step 1: Record the current baseline**
+- [x] **Step 1: Record the current baseline**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php
@@ -190,7 +192,7 @@ php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php Modu
 
 Write the passing counts down. They must be identical at Step 5.
 
-- [ ] **Step 2: Replace the Core copy**
+- [x] **Step 2: Replace the Core copy**
 
 In `AuthorizationService::buildPermissionName()`, replace the body:
 
@@ -206,7 +208,7 @@ In `AuthorizationService::buildPermissionName()`, replace the body:
 
 Add `use Modules\Core\Support\PermissionName;`.
 
-- [ ] **Step 3: Replace the ERP policy copy**
+- [x] **Step 3: Replace the ERP policy copy**
 
 In `ERPModelPolicy::hasPermission()`, replace the `sprintf(...)` block:
 
@@ -216,7 +218,7 @@ In `ERPModelPolicy::hasPermission()`, replace the `sprintf(...)` block:
 
 Add `use Modules\Core\Support\PermissionName;`. Leave the rest of the method untouched.
 
-- [ ] **Step 4: Replace the ERP seeder copy**
+- [x] **Step 4: Replace the ERP seeder copy**
 
 In `ERPDatabaseSeeder::domainPermissions()`, replace every hand-built string. The per-model loop becomes:
 
@@ -263,7 +265,7 @@ In `ERPDatabaseSeeder::domainPermissions()`, replace every hand-built string. Th
 
 Add `use Modules\Core\Support\PermissionName;` and drop the now-unused `ReflectionClass` import **only if** nothing else in the file uses it.
 
-- [ ] **Step 5: Run the same tests and compare**
+- [x] **Step 5: Run the same tests and compare**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php
@@ -272,7 +274,7 @@ php artisan test --compact Modules/Core/tests/Feature/Api/CrudApiTest.php Module
 
 Expected: identical counts to Step 1, everything green. Any change means a permission name moved — fix the code, not the test.
 
-- [ ] **Step 6: Commit both modules**
+- [x] **Step 6: Commit both modules**
 
 ```bash
 vendor/bin/pint --dirty
@@ -300,7 +302,7 @@ Handler signature, relied on by Tasks 5 and 7–9:
 fn (Model $record, array $payload, User $user): mixed
 ```
 
-- [ ] **Step 1: Add the test stub model**
+- [x] **Step 1: Add the test stub model**
 
 Create `Modules/Core/tests/Stubs/DomainActions/PlainActionModel.php`:
 
@@ -325,7 +327,7 @@ final class PlainActionModel extends Model
 
 Confirm `Modules\Core\Tests\Stubs\` is already mapped in `Modules/Core/composer.json` `autoload-dev`; the module already ships `tests/Stubs/Locking/…`, so it is.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Create `Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php`:
 
@@ -372,7 +374,7 @@ it('rejects registering the same action twice for one model', function (): void 
 })->throws(LogicException::class, 'already registered');
 ```
 
-- [ ] **Step 3: Run the test and watch it fail**
+- [x] **Step 3: Run the test and watch it fail**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php
@@ -380,7 +382,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegis
 
 Expected: `Class "Modules\Core\Services\Crud\DomainActionRegistry" not found`.
 
-- [ ] **Step 4: Write the contracts**
+- [x] **Step 4: Write the contracts**
 
 Create `Modules/Core/app/Contracts/ExposesDomainActions.php`:
 
@@ -431,7 +433,7 @@ interface OverridesGenericCrudActions
 }
 ```
 
-- [ ] **Step 5: Write the registry**
+- [x] **Step 5: Write the registry**
 
 Create `Modules/Core/app/Services/Crud/DomainActionRegistry.php`:
 
@@ -487,7 +489,7 @@ final class DomainActionRegistry
 }
 ```
 
-- [ ] **Step 6: Run the test and watch it pass**
+- [x] **Step 6: Run the test and watch it pass**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php
@@ -495,7 +497,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegis
 
 Expected: `4 passed`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -518,7 +520,7 @@ git -C Modules/Core commit -m "feat(core): add domain action registry and contra
 
 The rule: registering a **generic** verb requires the model to declare it in `overriddenCrudActions()`, and forbids the model from also using the trait that gives that verb its generic meaning. Registration happens at application boot, so a contradiction stops the app immediately in every environment rather than surfacing when one record is first touched.
 
-- [ ] **Step 1: Add the two stub models**
+- [x] **Step 1: Add the two stub models**
 
 Create `Modules/Core/tests/Stubs/DomainActions/OverridingActionModel.php`:
 
@@ -587,7 +589,7 @@ final class ApprovableActionModel extends Model implements OverridesGenericCrudA
 }
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Append to `Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php`:
 
@@ -615,7 +617,7 @@ it('rejects overriding approve on a model that also uses HasApprovals', function
 
 Add the two stub imports at the top of the file.
 
-- [ ] **Step 3: Run the tests and watch them fail**
+- [x] **Step 3: Run the tests and watch them fail**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php
@@ -623,7 +625,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegis
 
 Expected: the two rejection tests fail because no exception is thrown; the permissive one passes.
 
-- [ ] **Step 4: Implement the guard**
+- [x] **Step 4: Implement the guard**
 
 In `DomainActionRegistry`, add the verb map and the guard, and call it at the top of `register()`:
 
@@ -692,7 +694,7 @@ Call it first in `register()`:
         throw_if(
 ```
 
-- [ ] **Step 5: Run the tests and watch them pass**
+- [x] **Step 5: Run the tests and watch them pass**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegistryTest.php
@@ -700,7 +702,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionRegis
 
 Expected: `7 passed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -722,7 +724,7 @@ git -C Modules/Core commit -m "feat(core): reject domain actions colliding with 
 
 Resolution happens **before** authorization: an unknown action is a 404, not a 403. Leaking "this action exists but you may not use it" for actions that do not exist would be wrong and noisier.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/Core/tests/Feature/Services/DomainActionDispatcherTest.php`:
 
@@ -789,7 +791,7 @@ it('maps a snake_case action onto its camelCase policy method', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run the test and watch it fail**
+- [x] **Step 2: Run the test and watch it fail**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionDispatcherTest.php
@@ -797,7 +799,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionDispa
 
 Expected: `Class "Modules\Core\Services\Crud\DomainActionDispatcher" not found`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `Modules/Core/app/Services/Crud/DomainActionDispatcher.php`:
 
@@ -859,7 +861,7 @@ final class DomainActionDispatcher
 }
 ```
 
-- [ ] **Step 4: Run the test and watch it pass**
+- [x] **Step 4: Run the test and watch it pass**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionDispatcherTest.php
@@ -867,7 +869,7 @@ php artisan test --compact Modules/Core/tests/Feature/Services/DomainActionDispa
 
 Expected: `4 passed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -891,7 +893,7 @@ git -C Modules/Core commit -m "feat(core): add domain action dispatcher"
 
 `CrudController::__construct()` is **not** changed: `Modules/CMS/app/Http/Controllers/ContentsController.php:18` calls `parent::__construct($crudService)`, so an extra constructor parameter would break CMS. The dispatcher arrives through method injection instead.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/Core/tests/Feature/Http/DomainActionRouteTest.php`:
 
@@ -959,7 +961,7 @@ it('passes a streamed response through untouched', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and watch it fail**
+- [x] **Step 2: Run the test and watch it fail**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest.php
@@ -967,7 +969,7 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 Expected: `Route [core.crud.domain-action] not defined`.
 
-- [ ] **Step 3: Write the request**
+- [x] **Step 3: Write the request**
 
 Create `Modules/Core/app/Http/Requests/DomainActionRequest.php`:
 
@@ -1031,7 +1033,7 @@ final class DomainActionRequest extends CrudRequest implements IParsableRequest
 }
 ```
 
-- [ ] **Step 4: Add the controller action**
+- [x] **Step 4: Add the controller action**
 
 In `Modules/Core/app/Http/Controllers/CrudController.php`, add these imports:
 
@@ -1076,7 +1078,7 @@ and this method, after `clearModelCache()`:
     }
 ```
 
-- [ ] **Step 5: Extend the error mapping**
+- [x] **Step 5: Extend the error mapping**
 
 Domain services raise `ValidationException` and `DomainException`; without mappings both become 500. In `handleServiceCall()`, insert these two catches **before** the final `catch (Throwable $ex)`:
 
@@ -1103,7 +1105,7 @@ Domain services raise `ValidationException` and `DomainException`; without mappi
 
 `LogicException` is already caught and mapped to 304. `DomainException` extends `LogicException`, so its catch **must** come first or it will never be reached.
 
-- [ ] **Step 6: Add the route**
+- [x] **Step 6: Add the route**
 
 In `Modules/Core/routes/web.php`, inside the `Route::name('crud.')->prefix('/crud')` group, **after** the `GridsController` group so every literal verb wins the match:
 
@@ -1116,7 +1118,7 @@ In `Modules/Core/routes/web.php`, inside the `Route::name('crud.')->prefix('/cru
         ->name('domain-action');
 ```
 
-- [ ] **Step 7: Run the test and watch it pass**
+- [x] **Step 7: Run the test and watch it pass**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest.php
@@ -1124,7 +1126,7 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 Expected: `3 passed`.
 
-- [ ] **Step 8: Prove the literal verbs still win**
+- [x] **Step 8: Prove the literal verbs still win**
 
 ```bash
 php artisan route:check app/crud/select/erp/invoices --method=GET
@@ -1134,7 +1136,7 @@ php artisan test --compact Modules/Core/tests/Feature/Api/CrudApiTest.php Module
 
 Expected: `core.crud.list`, then `ai.crud.conversations.detail`, then all green.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1155,7 +1157,7 @@ git -C Modules/Core commit -m "feat(core): expose domain actions on the /app sur
 - Consumes: `DomainActionRegistry::register()` from Task 3
 - Produces: `ErpDomainActionRegistrar::register(DomainActionRegistry $registry): void`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php`:
 
@@ -1187,7 +1189,7 @@ it('does not register force_post as an action of its own', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test and watch it fail**
+- [x] **Step 2: Run the test and watch it fail**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php
@@ -1195,7 +1197,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: fails on the first `toBeTrue()`.
 
-- [ ] **Step 3: Write the registrar with the accounting slice**
+- [x] **Step 3: Write the registrar with the accounting slice**
 
 Create `Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php`:
 
@@ -1345,7 +1347,7 @@ Add the imports these handlers need: `Illuminate\Auth\Access\AuthorizationExcept
 `Illuminate\Validation\ValidationException`,
 `Modules\ERP\Services\EInvoice\EInvoiceSubmissionService`.
 
-- [ ] **Step 4: Call the registrar at boot**
+- [x] **Step 4: Call the registrar at boot**
 
 In `ERPServiceProvider::boot()`, after the policy loop:
 
@@ -1359,7 +1361,7 @@ Add the imports for `ErpDomainActionRegistrar` and `DomainActionRegistry`. Bind 
         $this->app->singleton(DomainActionRegistry::class);
 ```
 
-- [ ] **Step 5: Run the test and watch it pass**
+- [x] **Step 5: Run the test and watch it pass**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php
@@ -1367,7 +1369,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: `1 passed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1392,7 +1394,7 @@ git -C Modules/ERP commit -m "feat(erp): register accounting domain actions"
 
 `approve` on a return transitions `Draft → Approved`; Core's `approve` votes on a pending `Modification`. Neither return uses `HasApprovals`, so the guard from Task 4 lets the override through — and will stop the app if either ever takes the trait.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php`:
 
@@ -1413,7 +1415,7 @@ it('registers the return lifecycle actions', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the tests and watch them fail**
+- [x] **Step 2: Run the tests and watch them fail**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php
@@ -1421,7 +1423,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: `Call to undefined method … overriddenCrudActions()`.
 
-- [ ] **Step 3: Declare the override on both models**
+- [x] **Step 3: Declare the override on both models**
 
 In `Modules/ERP/app/Models/ReturnOrder.php`, add `implements OverridesGenericCrudActions` to the class declaration and:
 
@@ -1443,7 +1445,7 @@ In `Modules/ERP/app/Models/ReturnOrder.php`, add `implements OverridesGenericCru
 
 Repeat verbatim in `Modules/ERP/app/Models/SupplierReturn.php`. Add the `Modules\Core\Contracts\OverridesGenericCrudActions` and `Override` imports to both.
 
-- [ ] **Step 4: Register the return actions**
+- [x] **Step 4: Register the return actions**
 
 Add to `ErpDomainActionRegistrar::register()` a `$this->registerReturns($registry);` call and the method:
 
@@ -1466,7 +1468,7 @@ Add to `ErpDomainActionRegistrar::register()` a `$this->registerReturns($registr
 
 Verify each method name against `ReturnOrderService` and `SupplierReturnService` before writing; correct the registrar to match the services, never the reverse.
 
-- [ ] **Step 5: Add both returns to `policyModels()`**
+- [x] **Step 5: Add both returns to `policyModels()`**
 
 `ERPModelPolicy` needs to govern them, otherwise `Gate` finds no policy and every action is denied. Add `ReturnOrder::class` and `SupplierReturn::class` to `ERPServiceProvider::policyModels()`.
 
@@ -1487,7 +1489,7 @@ Verify each method name against `ReturnOrderService` and `SupplierReturnService`
 
 Seed the matching permissions in `ERPDatabaseSeeder::domainPermissions()` using `PermissionName::forClass()` from Task 1.
 
-- [ ] **Step 6: Run the tests and watch them pass**
+- [x] **Step 6: Run the tests and watch them pass**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php Modules/ERP/tests/Feature/Services/ReturnOrderServiceTest.php Modules/ERP/tests/Feature/Services/SupplierReturnServiceTest.php
@@ -1495,7 +1497,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: all green.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1515,7 +1517,7 @@ git -C Modules/ERP commit -am "feat(erp): register return lifecycle actions and 
 
 File actions return a `Symfony\Component\HttpFoundation\Response`, which Task 6's controller returns unchanged. Authorization and state guards run before the first byte, so a refusal is still a JSON error.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php`:
 
@@ -1546,7 +1548,7 @@ it('registers the file actions', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the tests and watch them fail**
+- [x] **Step 2: Run the tests and watch them fail**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php
@@ -1554,7 +1556,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: fails on the first `toBeTrue()` of each new test.
 
-- [ ] **Step 3: Register the remaining non-file actions**
+- [x] **Step 3: Register the remaining non-file actions**
 
 Add `$this->registerAdministration($registry);` and `$this->registerCommercial($registry);` to `register()`:
 
@@ -1588,7 +1590,7 @@ and would deny every action. Add them, give each policy method the state predica
 its Filament action uses in `->visible()`, and seed the permissions with
 `PermissionName::forClass()`.
 
-- [ ] **Step 4: Register the file actions**
+- [x] **Step 4: Register the file actions**
 
 ```php
     private function registerFileActions(DomainActionRegistry $registry): void
@@ -1619,7 +1621,7 @@ Follow the same shape for `export_cbi_bonifici` (`CbiBonificiExporter`) and `exp
 
 Verify `BankStatementImportService::importFile()`'s real signature before writing this.
 
-- [ ] **Step 5: Run the tests and watch them pass**
+- [x] **Step 5: Run the tests and watch them pass**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php
@@ -1627,7 +1629,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTe
 
 Expected: all green.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1646,7 +1648,7 @@ git -C Modules/ERP commit -am "feat(erp): register administration, commercial an
 
 Tasks 7–9 proved actions are *registered*. This one proves they *behave*: the same action must answer differently to an authorized user, an unauthorized one, and a record in the wrong state.
 
-- [ ] **Step 1: Write the matrix test**
+- [x] **Step 1: Write the matrix test**
 
 Create `Modules/ERP/tests/Feature/Http/ErpDomainActionsHttpTest.php`:
 
@@ -1720,7 +1722,7 @@ it('returns 404 for a record that does not exist', function (): void {
 
 `policyInvoice()` is the existing helper in `Modules/ERP/tests/Feature/ErpModelPolicyTest.php`. Pest helpers are file-scoped: copy it into this file rather than importing it, and rename it `httpDomainActionInvoice()` to avoid a redeclaration clash when both files load in one process.
 
-- [ ] **Step 2: Run the tests**
+- [x] **Step 2: Run the tests**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/
@@ -1728,7 +1730,7 @@ php artisan test --compact Modules/ERP/tests/Feature/Http/
 
 Fix the implementation, not the tests, until green. An invalid-state refusal arriving as 500 rather than 401 means Task 6 Step 5's exception mapping is wrong or ordered wrong.
 
-- [ ] **Step 3: Run the full regression**
+- [x] **Step 3: Run the full regression**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature
@@ -1740,11 +1742,11 @@ The accounting golden master must stay green: domain actions now reach posting s
 
 **Known baseline:** the full Core feature suite is not green and was not before this work — `handle_test_overrides.php` shadows helpers for the whole `Modules\Core\Console` namespace once loaded, so results vary with test ordering. Compare against a baseline run on `HEAD~`, not against zero.
 
-- [ ] **Step 4: Update module docs**
+- [x] **Step 4: Update module docs**
 
 Document the new surface in `Modules/Core/docs/CRUD_SYSTEM.md` next to the "Internal-only Operations" table: the route, the registry, the override contract and the boot-time guard. Add the ERP action inventory to the ERP developer RAG docs.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1757,12 +1759,12 @@ git -C Modules/ERP commit -m "test(erp): cover the domain action HTTP matrix"
 
 ## Final verification
 
-- [ ] `php artisan route:check app/crud/select/erp/invoices --method=GET` → `core.crud.list`
-- [ ] `php artisan route:check app/crud/post/erp/invoices --method=POST` → `core.crud.domain-action`
-- [ ] `php artisan route:check app/crud/detail/ai/conversations/5 --method=GET` → `ai.crud.conversations.detail`
-- [ ] No domain-action route appears under `/api/v1`: `php artisan route:list --path=api/v1 | grep -c domain-action` returns `0`
-- [ ] Update the master spec: move `3-01`, `3-04`, `3-06` to § Completed with commit SHAs
-- [ ] Evaluate Core + ERP version bumps per `08-versioning.mdc`; ask before `composer version:*`
+- [x] `php artisan route:check app/crud/select/erp/invoices --method=GET` → `core.crud.list`
+- [x] `php artisan route:check app/crud/post/erp/invoices --method=POST` → `core.crud.domain-action`
+- [x] `php artisan route:check app/crud/detail/ai/conversations/5 --method=GET` → `ai.crud.conversations.detail`
+- [x] No domain-action route appears under `/api/v1`: `php artisan route:list --path=api/v1 | grep -c domain-action` returns `0`
+- [x] Update the master spec: move `3-01`, `3-04`, `3-06` to § Completed with commit SHAs
+- [x] Evaluate Core + ERP version bumps per `08-versioning.mdc`; ask before `composer version:*`
 
 ## Self-review notes
 

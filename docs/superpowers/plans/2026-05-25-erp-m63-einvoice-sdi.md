@@ -1,7 +1,6 @@
 # ERP M6.3 - E-Invoice Stub And Submission Structure Plan
 
-> **Navigation:** M6.3 stub workflow is **implemented**. Full FatturaPA → Spec 2 Phase 2C in
-> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+> **Point 0 status:** M6.3, FatturaPA FPR12/XSD, and the Aruba operational adapter are implemented. Contracted-tenant and legal-retention verification remain go-live obligations. Current ERP status: `Modules/ERP/docs/STATUS.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
@@ -175,9 +174,11 @@ Test scenarios:
   - Confirms ERP Filament routes are registered and the invoice edit page renders server-side for
     a posted sale invoice. Full browser click-through remains optional if a browser runner is added.
 
-## Follow-up: Full FatturaPA / SDI
+## Later implementation: FatturaPA / SDI
 
-Full FatturaPA is handled by Spec 2 Phase 2C:
+Spec 2 Phase 2C subsequently implemented the ordinary FPR12 mapping/XML/XSD and the configurable
+Aruba operations adapter described by this follow-up. Contracted-tenant verification, edge-case
+fiscal mappings, and full legal-retention governance remain deployment/future-depth obligations:
 
 - Add missing anagraphic/company/customer fields after completing the fiscal data model and provider
   package decision.

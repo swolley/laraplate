@@ -2,14 +2,14 @@
 
 **Status:** Approved design; **Phases 2A/2B/2C completed**; enterprise follow-ups partially completed; Phase 3 split by surface — `/app` half implemented 2026-08-01, `/api/v1` deferred
 
-**Date:** 2026-06-30 (backlog consolidated 2026-06-30; completion audit updated 2026-07-22; Phase 3 surface split 2026-07-31; `/app` half implemented 2026-08-01)
+**Date:** 2026-06-30 (Point 0 baseline reconciled 2026-08-03)
 
 **Module:** `Modules/ERP`
 
 **Depends on:** Spec 1 implemented + patch (`971851d` ERP, `15b11c8` Core)
 
 > **Single source of truth** for ERP work tracking. Completed items are listed in **§ Completed**
-> below; only **§ Open** requires implementation. The original audit was verified against the codebase,
+> below; **§ Tracked but inactive** contains deferred, optional, or separate work and does not authorize implementation. The original audit was verified against the codebase,
 > with `299` ERP tests passing; Phase 2A closure evidence is listed in § Completed.
 
 ---
@@ -18,23 +18,25 @@
 
 | Bucket | Count | Notes |
 |--------|------:|-------|
-| **Done** | **112** | Previous completed scope plus processed-return reverse, Aruba polling/callback operations, immutable report snapshots, database FX/revaluation, Money value object, analytic journal dimensions, integration outbox, direct item-specific prices, architecture vision, journal-backed cash movements/UI, quotation revisions/project locks, DB lock-chain defense, partner-pool settlements, provider-neutral payment requests, canonical Site/Place integration, Task ICS export, forced-DIFF setting governance, 50-worker numbering stress coverage, and the completed operational command suite — § Completed |
+| **Done** | **115** | Previous completed scope plus the internal `/app` domain-action surface (`3-01`), centralized permission names (`3-04`), and its HTTP behavior matrix (`3-06`) — § Completed |
 | **Partial remaining** | **0** | No partial ERP backlog rows remain in this master backlog |
-| **Open backlog rows** | **5** | § Open — **0 in Phase 2B/2C/5/6** + **5 in Phases 3–4**; `3-01`/`3-04`/`3-06` closed on 2026-08-01, `3-02`/`3-03` deferred with the external API, `4-09` planned, `4-08`/`4-13` optional |
+| **Tracked but not active** | **4** | Deferred external API governance (`3-02`, `3-03`) plus optional, unapproved Gantt/mobile work (`4-08`, `4-13`) |
+| **Separate workstream** | **1** | `4-09` external-source importers are tracked in their dedicated plan and excluded from this Point 0 count |
 
 **How to read the backlog**
 
-- **5 open** = the two deferred `/api/v1` rows (`3-02`, `3-03`), planned `4-09`, and optional `4-08`/`4-13`. The three `/app` Phase 3 rows closed on 2026-08-01.
+- **4 tracked but not active** = the two deferred `/api/v1` rows (`3-02`, `3-03`) and optional `4-08`/`4-13`.
+- **Importer exclusion:** `4-09` remains independently planned but is not part of this ERP Point 0 assessment.
 - PART-01…PART-04 were closed by Phase 2A and are tracked in § Completed.
 - PART-05 / 2B-11 is closed for CSV export UI. PDF export remains explicitly out of Phase 2B scope unless promoted by a new requirement.
 
-**Current target:** ERP `4-09` proceeds independently through the module-owned `erp:import` command and its three external adapters (legacy Symfony SQL, SPLID Excel, supported Tricount export); the Core/CMS framework extraction is complete and each adapter stays gated by real source fixtures, approved mappings, and reconciliation evidence. The external API (`3-02`, `3-03`) stays deferred; optional `4-08` and `4-13` remain unapproved. ERP importer plan:
+**Current target:** Point 0 documentation baseline. No mandatory non-API ERP implementation remains open. External API governance (`3-02`, `3-03`) stays deferred until a concrete consumer is approved; Gantt (`4-08`) and mobile API (`4-13`) remain optional and unapproved. Importers are a separate workstream:
 [`plans/2026-07-22-erp-external-source-importers.md`](../plans/2026-07-22-erp-external-source-importers.md).
 
 Completed Phase 2B plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase2b.md`](../plans/2026-06-30-erp-hardening-spec2-phase2b.md).
 
-**Next:** The ERP import host and its source gates. Retain the other open rows explicitly. Master plan:
+**Next:** choose and approve a new scope before implementation. The current module baseline is documented in `Modules/ERP/docs/STATUS.md`. Historical task detail remains in the master plan:
 [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md).
 
 ---
@@ -43,10 +45,10 @@ Completed Phase 2B plan:
 
 | Source | Role today |
 |--------|------------|
-| `.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md` | Historical M0–M7 roadmap; open items → § Open |
+| `.cursor/plans/nebula_verso_business_0d6eb0ed.plan.md` | Archived historical M0–M7 roadmap; its pending flags are superseded by this baseline |
 | `specs/2026-06-30-erp-hardening-bugs-money-math-design.md` | Spec 1 — **done** |
 | `plans/2026-06-30-erp-hardening-spec1.md` | Spec 1 plan — **done** |
-| Milestone plans M3.6–M7.1 | v1 **done**; follow-ups → § Open |
+| Milestone plans M3.6–M7.1 | v1 and approved follow-ups **done**; plans retained as implementation history |
 
 ### Roadmap phases
 
@@ -57,8 +59,8 @@ Completed Phase 2B plan:
 | Spec 2 Phase 2B | Party UI, bank journals, auto NC/ND, payment runs, reporting polish | **Done** |
 | Spec 2 Phase 2C | FatturaPA and extended permissions | **Done** |
 | Phase 3 | Domain HTTP actions + API exposure | Split: `/app` half (`3-01`, `3-04`, `3-06`) **done** 2026-08-01; `/api/v1` half (`3-02`, `3-03`) deferred |
-| Phase 4 | Cash/Tricount and commercial depth | Open |
-| Phase 5 | Architecture | Partially done: `5-01`, `5-02`, `5-03` completed |
+| Phase 4 | Cash/Tricount and commercial depth | Required scope done; `4-08`/`4-13` optional, `4-09` separate |
+| Phase 5 | Architecture | **Done** (`5-01`…`5-06`) |
 | Phase 6 | Operational console commands | **Done** |
 
 ---
@@ -200,9 +202,9 @@ None.
 
 ---
 
-## Open (remaining work)
+## Tracked but inactive
 
-Status: `open` · `next` = current sprint target
+No row in this section is an active sprint target. `deferred` requires an approved external consumer and governance contract; `optional` requires explicit product approval; `separate` belongs to another workstream.
 
 ### Phase 2B — Commercial & banking UX (**completed**)
 
@@ -224,7 +226,7 @@ No open Phase 2B items remain.
 
 ### Phase 3 — Domain HTTP actions & API exposure
 
-> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — Waves 1 + 3 (Tasks 1–2, 8–11). Spine of remaining work.
+> Plan: [`plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`](../plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md) — internal `/app` work is complete; Tasks 2 and 11 remain deferred external-API decisions.
 
 **Split by surface (2026-07-31).** Phase 3 is not one block. `/app` is session-based and is the
 surface Laraplate UI consumes; `/api/v1` is the opt-in headless API. Domain actions belong to
@@ -268,12 +270,12 @@ namespace, crashing console commands depending on test order.
 | 4-05 | done | Settlements / pool / settle-up |
 | 4-06 | done | PaymentRequest stub + providers |
 | 4-07 | done | Calendar ICS export |
-| 4-08 | open | Gantt planning entity (optional) |
-| 4-09 | planned | Core abstract import framework + module-owned commands; Symfony ERP adapter gated by source evidence |
+| 4-08 | optional | Gantt planning entity; not approved |
+| 4-09 | separate | External-source importer workstream; excluded from Point 0 |
 | 4-10 | done | ERP `sites.place_id` + ICS location prerequisite |
 | 4-11 | done | Hide version-strategy settings for DIFF models |
 | 4-12 | done | Opt-in concurrency stress test: 50 workers, 50 unique contiguous numbers, isolated temporary SQLite WAL database |
-| 4-13 | open | API mobile (optional) |
+| 4-13 | optional | Mobile API; not approved |
 
 ### Phase 5 — Architecture
 
@@ -337,5 +339,5 @@ Implemented in ERP `300f9ef`. Backend services already existed; Phase 2A closed 
 
 ## Maintenance rule
 
-When closing an item: move it from § Open to § Completed with evidence (commit/test). Partial items
-move to § Partial or split into done + remaining open IDs.
+When closing an item: move it to § Completed with evidence (commit/test). Deferred and optional items
+stay under § Tracked but inactive until explicitly approved; separate workstreams retain their own plan.

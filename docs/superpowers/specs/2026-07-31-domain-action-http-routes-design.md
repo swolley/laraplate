@@ -1,6 +1,6 @@
 # Domain Action HTTP Routes on the `/app` Surface — Design
 
-**Status:** Approved design, not implemented
+**Status:** Implemented 2026-08-01 (Core mechanism + ERP registrations and HTTP matrix)
 
 **Date:** 2026-07-31
 

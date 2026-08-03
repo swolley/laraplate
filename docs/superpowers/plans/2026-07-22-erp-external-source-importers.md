@@ -2,7 +2,7 @@
 
 > **For agentic workers:** execute one task and one owning repository at a time. Do not infer source fields. Every parser starts from a versioned, anonymized fixture and an approved mapping. Commit ERP, Core, importer-package, and root-documentation changes separately.
 
-**Status:** Planned; source fixtures and mappings required before parser implementation
+**Status:** Separate planned workstream; excluded from the ERP Point 0 baseline. Source fixtures and mappings are required before parser implementation.
 
 **Goal:** Add the module-owned `erp:import` entry point and implement three ERP importers in the sibling `laraplate-importers` repository:
 

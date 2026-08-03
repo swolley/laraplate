@@ -17,8 +17,8 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-23-erp-accounting-golden-master.md`: ERP accounting golden-master regression tests.
 - `2026-06-30-erp-hardening-spec1.md`: ERP Spec 1 hardening — **completed** (8 tasks + patch `971851d` ERP / `15b11c8` Core). Open follow-ups → Spec 2 master backlog.
 - `2026-06-30-erp-hardening-spec2-phase2a.md`: ERP Spec 2 Phase 2A — Filament domain actions + state-aware policies (**completed**, ERP `300f9ef`).
-- `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, reporting polish (**in progress**, Wave A + optional `2B-03` + Wave B completed, 7 backlog rows remain).
-- `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Spec 2 remaining backlog — mandatory non-API work complete; Phase 3 `/app` half (`3-04`, `3-01`, `3-06`) ready to implement, `/api/v1` half deferred; `4-09` import framework planned.
+- `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, and reporting polish (**completed**; deferred ideas moved to the master backlog).
+- `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Point 0 history — mandatory non-API work and internal `/app` domain actions complete; external `/api/v1` deferred, Gantt/mobile optional, importers tracked separately.
 - `2026-06-30-cms-graph-layer.md`: Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider, Phase 5 materialized edges gated by benchmarks and invalidation design.
 - `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.
@@ -28,9 +28,9 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-07-21-core-version-set-foundation.md`: Implement the generic Core sole writer, synchronous single-connection version sets, pivot descriptors, forward restore, approval integration, and set-level retention.
 - `2026-07-21-cms-versioned-categories-pilot.md`: Prove versioned composite pivots on `Content::categories()` with one set per root and explicitly partial Content coverage.
 - `2026-07-22-module-import-command-framework.md`: Completed Core abstract import mechanics and CMS command migration; ERP scope transferred to its dedicated plan.
-- `2026-07-22-erp-external-source-importers.md`: Add `erp:import` and three ERP adapters in `laraplate-importers` for legacy Symfony SQL, SPLID Excel, and supported Tricount exports.
+- `2026-07-22-erp-external-source-importers.md`: Separate ERP importer workstream, excluded from ERP Point 0; planned adapters cover legacy Symfony SQL, SPLID Excel, and supported Tricount exports.
 - `2026-07-29-filament-environment-indicator.md`: Replace pxlrbt env indicator with Core plugin + module version dropdown.
 - `2026-07-29-filament-make-resources.md`: `filament:make-resources` + ownership helper + permanent Filament ClassGenerator rebind.
 - `2026-07-29-hasform-entity-preset.md`: Core `HasForm` Entity → Preset cascade; persist `presettable_id` only.
-- `2026-07-31-domain-action-http-routes.md`: Implements `3-04`, `3-01`, `3-06` — PermissionName helper, domain action registry with the generic-verb collision guard, dispatcher, `POST /app/crud/{action}/{module}/{entity}`, ERP registrar and the HTTP behaviour matrix.
+- `2026-07-31-domain-action-http-routes.md`: **Completed** `3-04`, `3-01`, `3-06` — PermissionName, internal domain-action registry/route, ERP handlers, and HTTP behavior matrix.
 - `2026-07-31-seeder-orchestration.md`: Core `Modules\Core\Seeding` — dependency-graph seeder ordering, `SeedDefinition`/`SeedReconciler` field-level reconciliation, per-node resume ledger, and module-state-aware settings cleanup (**completed**, 11 of 12 tasks — Task 11 AI/CMS/ERP/MES seeder migration DEFERRED).

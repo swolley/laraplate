@@ -9,7 +9,7 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-05-21-settings-group-cache-invalidation-design.md`: Core settings cache invalidation by group.
 - `2026-05-25-erp-m36-m4-m6-m7-design.md`: ERP pending milestone alignment for M3.6, M4, M6, and M7.
 - `2026-06-30-erp-hardening-bugs-money-math-design.md`: ERP v1 hardening — **implemented** P0/P1 fixes + post-review patch (`971851d` ERP, `15b11c8` Core).
-- `2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`: ERP Spec 2 master backlog — mandatory non-API work completed; Phase 3 split by surface (`/app` designed, `/api/v1` deferred); module import framework planned for `4-09`.
+- `2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`: ERP Point 0 master — mandatory non-API work and internal `/app` actions complete; external `/api/v1` deferred, Gantt/mobile optional, importers excluded and tracked separately.
 - `2026-06-30-cms-graph-layer-design.md`: Core Graph Framework for CRUD-aligned graph expand/search/stats; CMS is the first consumer/provider, not the owner of the graph engine.
 - `2026-07-02-cms-content-provenance-ai-assistance-design.md`: CMS content origin, references bibliography (`cms_contents_references`), and per-translation `ai_assistance` enum for EU AI Act Article 50 disclosure.
 - `2026-07-09-mes-module-decisions-design.md`: MES locked product/architecture decisions (scope, numbering, backflush, ERP linkage).
@@ -26,7 +26,7 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-07-30-filament-generate-trait-merge-design.md`: Pass Filament `--generate` columns/fields into HasTable/HasForm; strip trait-owned duplicates at generate + runtime (timestamps/validity composites).
 - `2026-07-29-filament-toggle-inline-default-design.md`: Global Filament `Toggle::inline(false)` default (label above switch); form `inlineLabel()` unchanged.
 - `2026-07-22-module-import-command-framework-design.md`: Core abstract import command infrastructure with module-owned CMS/ERP commands and gated Symfony ERP adapter.
-- `2026-07-31-domain-action-http-routes-design.md`: Domain actions over HTTP on the internal `/app` surface — `POST /app/crud/{action}/{module}/{entity}`, per-entity registry, module-declared overrides of generic verbs with a boot-time collision guard, and the ERP `HasApprovals` candidate map.
+- `2026-07-31-domain-action-http-routes-design.md`: **Implemented** internal `/app` domain actions — generic POST route, per-entity registry, generic-verb override guard, and ERP handlers.
 - `2026-07-31-sao-module-design.md`: SAO (Simply Another Orchestrator) module architecture — pluggable VCS/log/issue drivers, internal-first ticketing with per-binding sync direction, shared versioned fingerprinting in Core, evidence-based auto-closure, 10-phase roadmap.
 - `2026-07-31-seeder-orchestration-design.md`: Production seeding — explicit dependency graph replacing `module.json` priority (fixes MES-before-ERP), single `SeedReconciler` with field-level drift semantics, computed `seeded_value` baseline, per-node atomicity with in-run resume, and cleanup keyed on module state. No process-level parallelism.
 - `2026-08-01-sao-phase-1a-ticketing-core-design.md`: SAO phase 1a — internal ticketing core: projects, per-project ticket keys, shareable per-type workflow schemes with enforced transitions, global statuses with canonical categories, comments with human/system origin, history as a read model over Core versions, Laraplate-only authorization.

@@ -1,8 +1,6 @@
 # ERP M6.2 - Returns Management Implementation Plan
 
-> **Navigation:** M6.2 v1 is **implemented** (manual NC/ND). Open follow-ups (auto NC/ND) →
-> Spec 2 Phase 2B in
-> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+> **Point 0 status:** M6.2, optional automatic NC/ND, invoice-based fiscal pricing, and safe processed-return reversal are implemented. This plan is historical; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`.
@@ -120,8 +118,8 @@ header workflow:
   unposted.
 - Return headers still own approval, reason, cancellation, and credit/debit follow-up decisions.
 
-If the code does not yet link returns to DDTs, keep that as the next required M6.2 development slice
-instead of treating M6.2 as complete.
+**Implemented outcome:** returns link to directional DDTs and follow the physical workflow above;
+this historical completion condition is satisfied.
 
 ## Task 5: Filament Resources
 

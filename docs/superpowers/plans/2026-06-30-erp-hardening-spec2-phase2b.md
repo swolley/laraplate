@@ -70,7 +70,7 @@ flowchart LR
 | Pricing backend | `PartyPriceRule`, `PriceResolverService`, `Party::price_rules()`, Party Filament relation manager, tests | Direct item-specific price lists remain Phase 5 / `5-05` |
 | Price lists | `PriceList`, `PriceListItem`, migrations, Filament resource with nested items | No open Phase 2B gap |
 | Bank reco v1 | `BankReconciliationService` (exact match + match with difference), `BankDifferenceJournalService`, `BankReconciliationPage`, CSV/CAMT.053/minimal MT940 import | CBI/Ri.Ba/SDD and direct bank APIs remain out of scope |
-| Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount`, `PartyBankAccount`, `PaymentRun`, `PaymentRunLine`, `PaymentRunBuilderService`, `SepaPain001Exporter`, `PaymentRunResource` | Direct bank/API submission and CBI/Ri.Ba/SDD remain backlog |
+| Payment execution | `Payment`, `PaymentScheduleLine`, `PaymentAllocationService`, `BankAccount`, `PartyBankAccount`, `PaymentRun`, `PaymentRunLine`, `PaymentRunBuilderService`, `SepaPain001Exporter`, `PaymentRunResource` | Direct bank/API submission remains separate; CBI/Ri.Ba/SDD were implemented later |
 | Returns v1 | `ReturnOrderService`, manual NC/ND Filament actions, return line invoice-line fiscal override contract, optional auto NC/ND setting | Revert/reverse processed return remains Phase 3 |
 | Quotation locks | `Quotation` uses `HasLocks`; SO confirms lock quotation; gated unlock action exists | No open Phase 2B gap |
 | Document sequences | `DocumentSequence`, `DocumentNumberAllocator`, controlled reset action | No open Phase 2B gap |
@@ -1163,7 +1163,7 @@ Baseline: `299 passed, 1 skipped` — no regressions.
 
 - [x] **Version bump** — handled in the later ERP/Core patch-version cycle; current module versions are ERP `v1.15.3` and Core `v1.58.8`.
 
-**Closure note:** no open Phase 2B implementation items remain. Deferred items such as PDF financial exports, direct bank/API submission, CBI/Ri.Ba/SDD, and direct item-specific price lists are intentionally outside Phase 2B and tracked in later backlog phases. Advanced return reversal was implemented later as Spec 2 Phase 3 item `3-05`.
+**Closure note:** no open Phase 2B implementation items remain. PDF snapshots, CBI/Ri.Ba/SDD, direct item-specific prices, and advanced return reversal were implemented in later phases. Direct bank/API submission remains a separate transport concern.
 
 ---
 

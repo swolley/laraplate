@@ -5,7 +5,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax.
 
-**Status:** Mandatory non-API backlog completed — Phase 2C, enterprise tasks `3-05`, `4-01`…`4-07`, `4-10`…`4-12`, Phase 5, and all Phase 6 operational commands are completed. `4-09` has an approved implementation plan; `4-08` and `4-13` remain optional and unapproved.
+**Status:** Point 0 reconciled 2026-08-03. Mandatory non-API ERP work and the internal `/app` action surface are complete. External `/api/v1` governance is deferred; `4-08` and `4-13` are optional and unapproved; `4-09` importers are tracked separately and excluded from this baseline.
 
 **Phase 3 is split by surface, not deferred as a whole:**
 
@@ -21,9 +21,7 @@ and are not blocked by the API decision. Design:
 
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
-**Current slice:** The `/app` half of Phase 3 is done. The ERP external-source importers
-(`4-09`) proceed independently through
-[`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md).
+**Current slice:** no active implementation slice. This plan is retained as completed implementation history. A new scope requires explicit approval. ERP external-source importers (`4-09`) remain independent in [`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md) and are outside Point 0.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
 
@@ -93,7 +91,7 @@ flowchart TB
   P2C --> P6
 ```
 
-**Current execution order:** Task 1 (`3-04`) → Task 8 (`3-01`) → Task 9 (`3-06`). Waves 2, 4, 5 and 6 are complete. `3-03` is no longer a prerequisite of `3-01`: it governs exposure on `/api/v1`, and domain actions live on `/app`, which `routes/web.php` never exposes externally.
+**Current execution order:** none. Task 1 (`3-04`), Task 8 (`3-01`), and Task 9 (`3-06`) completed on 2026-08-01. `3-03` governs only external `/api/v1` exposure and remains deferred with `3-02`.
 
 **Phase 2C task order:** Task 3 (`2C-05`, done) → Task 4 (`2C-02`, done) → Task 5 (`2C-01`, done) → Task 6 (`2C-03`, done) → Task 7 (`2C-04`, done).
 
@@ -125,7 +123,7 @@ Default command contract:
 
 ## Wave 1 — Core foundation (Phase 3 prep)
 
-### Task 1: Centralize permission-name construction (3-04)
+### Task 1: Centralize permission-name construction (3-04) — completed 2026-08-01
 
 **Modules:** Core (+ ERP consumer updates)  
 **Backlog:** `3-04`
@@ -138,7 +136,7 @@ Default command contract:
 - Create: `Modules/Core/tests/Feature/Support/PermissionNameTest.php`
 - Modify: `Modules/ERP/tests/Feature/ErpModelPolicyTest.php` — use shared helper
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 ```php
 <?php
@@ -162,7 +160,7 @@ it('accepts explicit connection override', function (): void {
 });
 ```
 
-- [ ] **Step 2: Implement**
+- [x] **Step 2: Implement**
 
 ```php
 <?php
@@ -191,9 +189,9 @@ final class PermissionName
 }
 ```
 
-- [ ] **Step 3:** Replace duplicated `sprintf('%s.%s.%s', ...)` in `ERPModelPolicy`, seeders, and `AuthorizationService` permission resolution.
+- [x] **Step 3:** Replaced duplicated permission-name construction in Core and ERP consumers.
 
-- [ ] **Step 4: Run tests + commit** (Core then ERP)
+- [x] **Step 4: Run tests + commit** (Core then ERP)
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature/Support/PermissionNameTest.php
@@ -202,7 +200,9 @@ php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php
 
 ---
 
-### Task 2: Per-model CRUD/API exposure governance (3-03)
+### Task 2: Per-model CRUD/API exposure governance (3-03) — deferred
+
+**Point 0 decision:** do not implement until an external `/api/v1` consumer and its permitted entity/operation matrix are approved. The unchecked steps below describe the candidate implementation, not active work.
 
 **Modules:** Core  
 **Backlog:** `3-03`  
@@ -352,7 +352,7 @@ Evidence: ERP `604c53c`; targeted test subset `14 passed, 41 assertions`.
 
 ## Wave 3 — Domain HTTP actions & API (Phase 3)
 
-### Task 8: Domain action registry + internal routes (3-01)
+### Task 8: Domain action registry + internal routes (3-01) — completed 2026-08-01
 
 **Modules:** Core + ERP  
 **Backlog:** `3-01`  
@@ -386,15 +386,15 @@ Verify with `php artisan route:check <url> --method=POST`.
 - Create: `Modules/Core/tests/Feature/Http/DomainActionRouteTest.php`
 - Create: `Modules/ERP/tests/Feature/Http/ErpDomainActionRouteTest.php`
 
-- [ ] **Step 1: Registry + contracts** — `{module}/{entity}/{action}` → handler. The registry, not
+- [x] **Step 1: Registry + contracts** — `{module}/{entity}/{action}` → handler. The registry, not
   the route table, decides what exists.
 
-- [ ] **Step 2: Boot-time collision guard** — registration fails when a model both declares an
+- [x] **Step 2: Boot-time collision guard** — registration fails when a model both declares an
   overridden verb and uses the trait giving that verb its generic meaning (`approve`/`disapprove`
   vs `HasApprovals`). Fails at application start, not on record instantiation. Write the failing
   case first.
 
-- [ ] **Step 3: Dispatcher** — authorize through `Gate`, not `ensurePermission`: the state guard is
+- [x] **Step 3: Dispatcher** — authorize through `Gate`, not `ensurePermission`: the state guard is
   intrinsic to the action and `ERPModelPolicy::allowsDomainAction()` already implements it.
 
 ```php
@@ -408,7 +408,7 @@ public function dispatch(Model $record, string $action, User $user, array $paylo
 }
 ```
 
-- [ ] **Step 4: ERP registrar** — map actions to the existing services:
+- [x] **Step 4: ERP registrar** — mapped supported actions to existing services:
 
 | Entity | Actions | Handler |
 |--------|---------|---------|
@@ -442,33 +442,33 @@ uniform across all classes. See the design's D6 for the permission divergence th
 | `Task` | `export_ics` | `TaskIcsExporter` |
 | `BankStatement` | `import_file` | `BankStatementImportService` |
 
-- [ ] **Step 5: Response + error mapping** — return through `CrudResult`/`ResponseBuilder`. Add
+- [x] **Step 5: Response + error mapping** — return through `CrudResult`/`ResponseBuilder`. Added
   mappings for `ValidationException` and `DomainException`, which domain services raise and
   `handleServiceCall()` would otherwise turn into 500.
 
-- [ ] **Step 6: Binary response kind** — if a handler returns a
+- [x] **Step 6: Binary response kind** — if a handler returns a
   `Symfony\Component\HttpFoundation\Response`, return it unchanged; otherwise wrap in a
   `CrudResult`. One rule covers streamed exports and the `multipart/form-data` import.
   Authorization and state guards must run **before** the first byte is streamed: once streaming
   starts the JSON error envelope is gone. Test both — a refused export returns a normal JSON 403,
   a permitted one returns the stream.
 
-- [ ] **Step 7: Failing HTTP test** — authenticated user with `post` permission POSTs the action →
+- [x] **Step 7: HTTP test** — authenticated user with `post` permission POSTs the action →
   200 + side effect.
 
-- [ ] **Step 8: Commit** Core + ERP
+- [x] **Step 8: Commit** Core + ERP
 
 ---
 
-### Task 9: HTTP tests for domain actions (3-06)
+### Task 9: HTTP tests for domain actions (3-06) — completed 2026-08-01
 
 **Backlog:** `3-06`  
 **Depends:** Task 8
 
-- [ ] Create: `Modules/ERP/tests/Feature/Http/ErpDomainActionsHttpTest.php`
-- [ ] Cover matrix: authorized → 200, missing permission → 403, invalid state → 403, unknown action → 404
-- [ ] Cover: `force_post` payload on purchase invoice post action
-- [ ] Run full ERP HTTP + policy subset
+- [x] Created `Modules/ERP/tests/Feature/Http/ErpDomainActionsHttpTest.php`.
+- [x] Covered authorized, missing-permission, invalid-state, unknown-action, and missing-record behavior.
+- [x] Covered `force_three_way_match` as a guarded `post` payload rather than a second action.
+- [x] Ran focused ERP HTTP and policy coverage during implementation.
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/Http/
@@ -499,7 +499,9 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 11: Opt-in external API + versioning (3-02)
+### Task 11: Opt-in external API + versioning (3-02) — deferred
+
+**Point 0 decision:** do not implement until a concrete external client contract defines authentication, versioning, rate limits, idempotency, and the required domain actions. The unchecked items below are retained design notes.
 
 **Backlog:** `3-02`  
 **Modules:** Core (+ ERP route group)
@@ -674,9 +676,9 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ---
 
-### Task 22: Optional Gantt/API mobile; planned ERP external importers (4-08, 4-09, 4-13)
+### Task 22: Optional Gantt/API mobile; separate ERP importers (4-08, 4-09, 4-13)
 
-**Skip `4-08` and `4-13` unless user approves. Implement `4-09` through its dedicated ERP importer plan; do not implement any source adapter before its fixture, mapping, and reconciliation gate.**
+**Point 0:** skip `4-08` and `4-13` unless explicitly approved. `4-09` is excluded from this plan's active backlog and remains in its dedicated importer plan.
 
 | ID | Deliverable if approved |
 |----|-------------------------|
@@ -1079,7 +1081,9 @@ Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/Mone
 
 ---
 
-## Final verification (all phases)
+## Future release verification
+
+These commands are release gates, not open ERP feature tasks. Run them after any newly approved implementation slice.
 
 - [ ] **Run targeted suites**
 
@@ -1121,15 +1125,8 @@ php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.
 
 ---
 
-## Execution handoff
+## Point 0 handoff
 
 Plan saved to `docs/superpowers/plans/2026-06-30-erp-hardening-spec2-phase3-remaining.md`.
 
-**Recommended:** Wave 1 → Wave 3 → Wave 6 when operational automation is prioritized → Wave 4 (after 3-01) → Wave 5.
-
-**Two execution options:**
-
-1. **Subagent-Driven** — one subagent per task, review between tasks  
-2. **Inline Execution** — wave-by-wave with checkpoints
-
-Which approach?
+No implementation wave is active. Select one of the four tracked but inactive rows (`3-02`, `3-03`, `4-08`, `4-13`) only after approving its consumer and scope. Importers remain outside this Point 0 handoff.

@@ -1,7 +1,6 @@
 # ERP M3.6 - Purchase Invoice Posting Cleanup Plan
 
-> **Navigation:** M3.6 is **verification-only** (implemented). Open ERP work →
-> [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
+> **Point 0 status:** M3.6 is implemented and this verification plan is historical. Current ERP status: `Modules/ERP/docs/STATUS.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`
 > or `superpowers:executing-plans`. This is a cleanup/verification plan, not a greenfield
