@@ -1,18 +1,18 @@
 # Application content retrieval providers
 
-**Status:** Approved direction
+**Status:** Implemented Phase 1; guest-boundary closure approved
 
 **Date:** 2026-07-17
 
 ## Decision summary
 
-Laraplate will let the authenticated in-app assistant retrieve grounded evidence from application-module data through a general provider contract. Core owns `ApplicationContentRetrievalProviderInterface`, its registry, authorization gateway, and neutral evidence DTOs. The AI module consumes that gateway through one contextual read-only tool. Optional modules register providers without depending on AI.
+Laraplate lets the authenticated, non-guest in-app assistant retrieve grounded evidence from application-module data through a general provider contract. Core owns `ApplicationContentRetrievalProviderInterface`, its registry, authorization gateway, and neutral evidence DTOs. The AI module consumes that gateway through one contextual read-only tool. Optional modules register providers without depending on AI.
 
 Provider routing is context-aware but does not require page context. When the request carries a server-verified application context, its matching source is the default and other sources are considered only when the user explicitly asks for another module. Without application context, the assistant uses generic routing over the sources authorized for that request. Phase 1 selects at most one source per retrieval and asks for clarification when the intended source is ambiguous.
 
 CMS is the first provider and proves the extension seam against searchable content records. The contract contains no CMS-specific concepts and is intended to support later providers from ERP, MES, or other modules.
 
-Phase 1 serves authenticated application users only. Every retrieval executes under server-owned identity, tenant, permissions, ACL, locale, provider rules, and safe-field projection. Phase 2 may evaluate a public content assistant, but no public endpoint, profile, or access mode is authorized by this specification.
+Phase 1 serves authenticated, non-guest application users only. Laraplate resolves the configured guest account when no real user session is available, so guard authentication alone is not sufficient to enter this profile. Every retrieval executes under server-owned identity, principal classification, tenant, permissions, ACL, locale, provider rules, and safe-field projection. Phase 2 may evaluate session-based guest assistance, but no guest assistant profile or access mode is authorized by this specification.
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ The following are not part of this phase:
 - automatic entity resolution across time;
 - direct image, audio, or video understanding;
 - autonomous report or content generation;
-- public anonymous assistance;
+- session-based guest assistance;
 - copying application records into the documentation RAG index;
 - introducing a mandatory new search backend.
 
@@ -185,7 +185,7 @@ Phase 1 performs single-provider retrieval. Fan-out, score fusion, and cross-pro
 
 ## Contextual and generic routing
 
-AI builds the available source set independently for every authenticated request:
+AI builds the available source set independently for every authenticated, non-guest request:
 
 ```text
 registered sources
@@ -204,7 +204,7 @@ Routing has two modes:
 1. **Contextual mode.** A server-verified application context identifies the current module and, when applicable, its entity or record. The matching authorized source becomes the default when it is compatible with the request. The assistant does not silently broaden the search to another module; it may use another authorized source only when the user explicitly asks for that module or source.
 2. **Generic mode.** When no application context is supplied, the router classifies the request using typed provider descriptors and selects one authorized source. If no source is suitable, the tool is not invoked. If more than one source remains materially plausible, the assistant asks the user to disambiguate instead of querying all providers.
 
-Client-supplied route names, module names, entity keys, record IDs, or source hints are untrusted until matched against server-known route metadata and the authenticated access context. Page context influences routing only; it never grants permission and never bypasses provider authorization.
+Client-supplied route names, module names, entity keys, record IDs, or source hints are untrusted until matched against server-known route metadata and the authenticated, non-guest access context. Page context influences routing only; it never grants permission and never bypasses provider authorization.
 
 The router never resolves ambiguity using registry order, module boot order, or alphabetical order. Selection reasons and rejected candidates remain internal diagnostics and disclose no hidden source, permission, ACL, tenant, or record information.
 
@@ -252,13 +252,15 @@ Arguments:
 - optional `locale`;
 - optional bounded `limit`.
 
-The tool is available only to `InAppAssistance`, only after the server capability policy permits the requested source, and only with an authenticated `AssistantAccessContext`. Its schema is built per request. Contextual mode narrows `source` to the compatible contextual default unless the user's request explicitly names another authorized source; generic mode exposes the authorized enum and the router validates the proposed selection. The model may propose an allowlisted source but cannot make the authoritative routing decision. The tool invokes `ApplicationContentRetrievalService` directly; it does not call Laraplate over HTTP.
+The tool is available only to `InAppAssistance`, only after the server capability policy permits the requested source, and only with an authenticated, non-guest `AssistantAccessContext`. Guest classification is enforced both when AI creates the access context and when Core executes application-content retrieval, so bypassing one boundary does not expose the provider. Its schema is built per request. Contextual mode narrows `source` to the compatible contextual default unless the user's request explicitly names another authorized source; generic mode exposes the authorized enum and the router validates the proposed selection. The model may propose an allowlisted source but cannot make the authoritative routing decision. The tool invokes `ApplicationContentRetrievalService` directly; it does not call Laraplate over HTTP.
 
 The tool cannot create `ActionRequest` records, enter mutation approval/replay, or accept write operations. Tool timeout, provider unavailability, or authorization uncertainty returns a generic unavailable result without falling back to unfiltered search or documentation RAG.
 
 ## Authorization and information-flow invariants
 
-1. Authentication establishes identity but does not grant retrieval by itself.
+`User::isGuest()` is the single principal classifier used by this boundary. It returns true for the account identified by `permission.users.guest` through its configured name or username, and preserves the legacy classification of accounts without an email address. A classification failure must deny Phase 1 assistance; callers must not infer a real user only from `Auth::check()`.
+
+1. Authentication establishes identity but does not grant retrieval by itself; the configured guest principal is excluded from Phase 1 even when it is attached to the session guard.
 2. Server code selects profile, source capability, user, tenant, and locale policy.
 3. Candidate authorization precedes routing; context and model choices may only prioritize or narrow authorized candidates and can never expand them.
 4. Core permission and ACL checks happen before provider results reach AI.
@@ -290,7 +292,7 @@ Metrics include hit rate at K, reciprocal rank, citation precision, authorized-e
 ## Failure behavior
 
 - Unknown or disabled provider: generic capability unavailable response.
-- Missing authentication: reject before registry or provider execution.
+- Missing or inconsistent identity, or a guest principal: reject before registry or provider execution.
 - Permission or ACL resolution failure: fail closed.
 - Unsupported search driver: return an explicit unavailable/degraded result; never run an unbounded database scan.
 - Vector branch failure with supported lexical fallback: return bounded lexical evidence and internal diagnostics.
@@ -298,24 +300,25 @@ Metrics include hit rate at K, reciprocal rank, citation precision, authorized-e
 - Invalid evidence DTO or unsafe field: discard the provider result and record a payload-free policy reason.
 - Insufficient evidence: abstain with a user-safe response.
 
-## Phase 2 — possible public content assistance
+## Phase 2 — possible session-based guest assistance
 
-Phase 2 is a preserved extension point, not an implementation commitment. It requires a separate design, threat model, evaluation dataset, and approval before any route or profile is created.
+Phase 2 is a preserved extension point, not an implementation commitment. Laraplate already resolves a configured guest user into the session guard when a real user is unavailable; Phase 2 therefore concerns a restricted guest assistance profile, not an identity-free anonymous API. It requires a separate design, threat model, evaluation dataset, and approval before any guest profile is created.
 
 That design must decide:
 
-- a dedicated public assistant profile and fixed capability allowlist;
-- explicit public-visibility rules independent of authenticated ACL assumptions;
-- provider sources and fields safe for anonymous use;
-- separate rate limits, quotas, abuse controls, and cost budgets;
+- a dedicated `GuestAssistance` profile and fixed capability allowlist;
+- explicit guest-visible rules enforced through the guest role, permissions, ACL, and provider safe projection;
+- provider sources and fields safe for guest use;
+- conversation ownership isolated by a server-owned session subject in addition to the shared guest user ID;
+- separate rate limits, quotas, abuse controls, and cost budgets keyed by safe session and network dimensions rather than only guest user ID;
 - privacy, retention, consent, and logging constraints;
-- prompt-injection handling for publicly managed content;
+- prompt-injection handling for guest-visible managed content;
 - caching and freshness behavior;
 - citations and non-disclosure behavior;
-- whether public retrieval needs a separate index or projection;
+- whether guest retrieval needs a separate index or projection;
 - whether streaming can satisfy equivalent output validation.
 
-Phase 1 must not expose an internal provider through `/api/v1`, reuse an authenticated profile anonymously, or treat absence of authentication as public authorization.
+Phase 1 must not expose an internal provider through `/api/v1`, assign `InAppAssistance` to the configured guest, or treat the presence of a guest in the session guard as non-guest authorization. Phase 2 remains session-based under `/app` unless a separate public headless API design is explicitly approved.
 
 ## Deferred capability gates
 
@@ -327,7 +330,7 @@ The following capabilities require measured evidence and separate specifications
 - derived text from images, audio, or video;
 - graph-aware evidence fusion;
 - provider-specific generation workflows;
-- public content assistance.
+- session-based guest content assistance.
 
 Each gate requires a representative evaluation subset, a baseline without the capability, measurable improvement, bounded cost, provenance, incremental update/deletion behavior, and the same authorization guarantees.
 
@@ -335,11 +338,11 @@ Each gate requires a representative evaluation subset, a baseline without the ca
 
 - Optional modules implement a Core contract without depending on AI.
 - AI discovers only installed, registered, server-authorized providers.
-- The CMS reference provider returns bounded, cited evidence from records visible to the authenticated user.
+- The CMS reference provider returns bounded, cited evidence from records visible to the authenticated, non-guest user.
 - ACL, tenant, locale, validity, deletion, and safe-field rules apply before evidence reaches the LLM.
 - Documentation RAG, Core Graph, and application content retrieval remain separate capabilities.
 - Provider failure or insufficient evidence produces abstention rather than unsupported answers.
-- Phase 1 creates no public or anonymous access surface.
+- Phase 1 grants no assistant access to the configured guest principal.
 - The contract can accept a future non-CMS provider without changing AI tool schemas.
 
 ## Related documents
