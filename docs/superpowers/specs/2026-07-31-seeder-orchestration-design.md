@@ -1,6 +1,6 @@
 # Seeder Orchestration and Reconciliation — Design
 
-**Status:** Approved design, not implemented
+**Status:** Implemented (Core mechanism); Task 11 (AI/CMS/ERP/MES seeder migration) deferred
 
 **Date:** 2026-07-31
 

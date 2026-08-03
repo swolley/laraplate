@@ -91,7 +91,7 @@ like `connections`, `projects`, `tickets` are too generic to sit unprefixed besi
 | `Ticket` | Canonical unit of work: title, body, canonical status, priority, assignee, comments. Exists with or without any external counterpart. |
 | `TicketLink` | `Ticket` ↔ external tracker (connection, remote id, URL, last sync state). Absent link = internal ticket. |
 | `ChangeRef` | Link between a code artefact (commit, pull request, tag) and a ticket, with the source that produced it. Backs code-to-work deduplication. |
-| `Release` | Version registry per project (tag, commit, date) and the map of what is deployed where. Fed actively from VCS APIs, not only inferred from alerts. |
+| `Release` | A **product version** of a project, with a status: *announced* (a release candidate exists, so the version will ship) or *shipped* (a stable tag exists). Distinct from the **tags that realize it**, since one version is usually preceded by several candidates. Plus the map of what is deployed where. Fed actively from VCS APIs, not only inferred from alerts. See §9.1. |
 | `ClosurePolicy` | Per-project set of composable closure conditions and the action taken when they hold. |
 
 ### Environment liveness
@@ -131,6 +131,23 @@ the UI. Ignoring this is the fastest way to make the module unusable outside one
 **Every outbound write is idempotent by construction.** Queued jobs carry a persisted idempotency
 key: a retry must never be able to produce a second comment or a second ticket. Trackers rarely
 offer idempotent write APIs, so the guarantee has to live on our side of the wire.
+
+**Every list endpoint paginates.** Tags, branches, commits and issues all arrive a page at a time,
+with a provider-specific and often silently capped page size. A driver that reads the first page and
+stops looks correct on a small project and loses data on a real one. The capability conformance
+suite includes a fixture with more items than one page holds.
+
+### Where configuration lives
+
+Secrets and infrastructure — credentials, endpoints, queue and cache wiring — stay in the
+environment and are never written to the database. Product behaviour — thresholds, durations, policy
+toggles, which suffixes mark a release candidate — has its default in config and is editable in the
+UI, with the stored value overriding the environment.
+
+The line matters because the two have opposite requirements: a secret must be rotatable without a UI
+and must never be readable from one, while a threshold that requires a deployment to change will
+simply never be tuned. SAO stores the editable half through Core's existing settings, not a
+mechanism of its own.
 
 ### Planned driver waves
 
@@ -293,7 +310,8 @@ testable class:
 
 - `pull_request_merged` — the linked PR is approved and merged into the target branch
 - `no_recurrence_for(duration)` — scoped to the **reporting environment**
-- `fix_released` — a release containing the fix commit exists
+- `fix_released` — a **shipped** release containing the fix commit exists. Not an announced one: a
+  fix present only in a release candidate is on staging, not in anyone's production (§9.1)
 - `fix_deployed_there` — that release is the version currently running on the reporting environment
 - `resolved_for(duration)` — ticket marked resolved with no counter-evidence since
 - `internal_tickets_only` — restricts the policy to tickets with no `TicketLink`
@@ -305,6 +323,26 @@ owns the ticket — the default action is *propose*, never *close*.
 Every automatic change records **which conditions held and with what evidence**, and is reversible:
 if the signal reappears, the ticket reopens and the event is marked a premature closure. That record
 is also the data that says whether configured durations are tuned correctly.
+
+### 9.1 Release candidates are not releases
+
+A project's tags come in two shapes: **stable** (`v1.2.3`) and **release candidate**
+(`v1.2.3-rc.7`). Treating them alike breaks the closure policy in both directions, so `Release`
+separates the *product version* from the *tags that realize it*.
+
+A candidate is worth recording rather than ignoring, for a reason that is operational rather than
+semantic. The first candidate announces that the version **will** exist, which lets SAO attribute a
+fix version to a ticket immediately. Waiting for the stable tag instead means scanning the entire
+commit range accumulated since the previous release in one go — slow, and increasingly likely to
+straddle unrelated work. Processing each candidate keeps every scan to the range since the last tag
+processed, whichever kind it was.
+
+But a candidate must never satisfy `fix_released`. A fix present only in a candidate is on staging;
+nobody's production is running it. Announced means *coming*; shipped means *out*. Conflating them
+would close tickets for bugs that are still live for every user.
+
+Which suffixes count as candidates is configuration, not a hardcoded pattern: `-rc.N` is common,
+`-beta`, `-alpha` and others exist, and a project that uses none of them must not be forced to.
 
 ### Silence is not evidence
 
