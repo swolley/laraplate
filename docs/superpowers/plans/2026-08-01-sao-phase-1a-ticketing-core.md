@@ -19,6 +19,8 @@
 - **The two locking mechanisms are different things.** `MigrateUtils::timestamps(hasLocks: true)` adds `locked_at`, `locked_by` and `is_locked` — the explicit "this record is checked out" lock backing `HasLocks`. Optimistic locking is a separate `config('core.locking.lock_version_column')` column, `->integer()->unsigned()->nullable(false)->default(1)`, backing `HasOptimisticLocking`. `Modules\CMS\Models\Content` uses both; they coexist rather than replace one another.
 - Table names come from a `SAOTables` enum using `Modules\Core\Enums\Concerns\HasModuleTablesUtils`; models set `#[Override] protected $table = SAOTables::X->value;`. Follow CMS/ERP, not MES — MES hardcodes table-name strings.
 - Migrations use `Modules\Core\Helpers\MigrateUtils::timestamps(...)` rather than `$table->timestamps()`.
+- **Every SAO table needs `hasSoftDelete: true`.** Core's base `Model` applies its soft-delete trait unconditionally, and Core's implementation scopes on an **`is_deleted`** column as well as `deleted_at`. A table created without them fails every query against it with "no such column: …is_deleted" — including tables like workflow transitions where soft deletes feel unnecessary.
+- **`comment()` belongs to the column, not the foreign key.** `constrained()` returns a `ForeignKeyDefinition`, which has no `comment()`. Chain the comment after `nullable()` and before `constrained()`, or the migration fatals on first run. PHPStan catches this; do not skip the analysis step.
 - Validation lives on the model in `#[Override] public function getRules(): array`, merging into `parent::getRules()` under the `create` and `update` keys.
 - **Core models validate on save.** A `unique:` rule therefore raises `Modules\Core\Overrides\ContextualValidationException`, not `Illuminate\Database\QueryException` — the model rejects the duplicate before the database constraint is reached. Unique indexes stay as the last line of defence for writes that bypass the model. Discovered while executing Task 2; every later uniqueness test expects the validation exception when the model declares the rule, and `QueryException` only when it does not.
 - **Mass assignment is strict.** Filling a guarded attribute raises `Illuminate\Database\Eloquent\MassAssignmentException` rather than being silently discarded. Assert the exception, not a silently unchanged value.
@@ -1060,16 +1062,16 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->foreignId('from_status_id')
                 ->nullable()
+                ->comment('Null means the creation transition: it declares the scheme initial status')
                 ->constrained($statuses, 'id', "{$table_name}_from_status_FK")
-                ->restrictOnDelete()
-                ->comment('Null means the creation transition: it declares the scheme initial status');
+                ->restrictOnDelete();
             $table->foreignId('to_status_id')
                 ->constrained($statuses, 'id', "{$table_name}_to_status_FK")
                 ->restrictOnDelete();
             $table->string('label');
             $table->string('required_permission')->nullable();
 
-            MigrateUtils::timestamps($table, hasCreateUpdate: true);
+            MigrateUtils::timestamps($table, hasCreateUpdate: true, hasSoftDelete: true);
 
             $table->unique(
                 ['workflow_scheme_id', 'from_status_id', 'to_status_id'],
@@ -1588,11 +1590,11 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->foreignId('workflow_scheme_id')
                 ->nullable()
+                ->comment('Optional per-project override; null means the type own scheme applies')
                 ->constrained(SAOTables::WorkflowSchemes->value, 'id', "{$table_name}_scheme_FK")
-                ->restrictOnDelete()
-                ->comment('Optional per-project override; null means the type own scheme applies');
+                ->restrictOnDelete();
 
-            MigrateUtils::timestamps($table, hasCreateUpdate: true);
+            MigrateUtils::timestamps($table, hasCreateUpdate: true, hasSoftDelete: true);
 
             $table->unique(['project_id', 'ticket_type_id'], "{$table_name}_pair_UN");
         });
@@ -2880,9 +2882,9 @@ return new class extends Migration
                 ->constrained(SAOTables::Tickets->value, 'id', "{$table_name}_ticket_FK")
                 ->cascadeOnDelete();
             $table->foreignId('author_id')->nullable()
+                ->comment('Null for system comments')
                 ->constrained(CoreTables::Users->value, 'id', "{$table_name}_author_FK")
-                ->nullOnDelete()
-                ->comment('Null for system comments');
+                ->nullOnDelete();
             $table->enum('origin', CommentOrigin::values())->default(CommentOrigin::Human->value);
             $table->string('source_key')->nullable()->comment('Which automation wrote it, for system comments');
             $table->text('body');
