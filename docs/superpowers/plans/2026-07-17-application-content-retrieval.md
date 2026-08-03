@@ -4,7 +4,7 @@
 
 **Goal:** Let the authenticated in-app assistant retrieve bounded, cited evidence from module-owned searchable data through a general Core provider contract, with CMS as the first provider.
 
-**Architecture:** Core owns neutral contracts, typed source descriptors, the explicit registry, and the authorization gateway so optional modules never depend on AI. Provider modules own search and safe projection; AI builds a request-local source allowlist and routes one contextual read-only tool to a single authorized provider. Verified page context supplies the default source; requests without context use generic single-source routing and ask for clarification when ambiguous. Phase 1 is authenticated-only and reuses existing Core search; public assistance, automatic cross-provider fan-out, and new passage indexes remain separately gated.
+**Architecture:** Core owns neutral contracts, typed source descriptors, the explicit registry, and the authorization gateway so optional modules never depend on AI. Provider modules own search and safe projection; AI builds a request-local source allowlist and routes one contextual read-only tool to a single authorized provider. Verified page context supplies the default source; requests without context use generic single-source routing and ask for clarification when ambiguous. Phase 1 is authenticated and non-guest only and reuses existing Core search; session-based guest assistance, automatic cross-provider fan-out, and new passage indexes remain separately gated.
 
 **Tech Stack:** Laravel 12, PHP 8.4, Core authorization/ACL and orchestrated search, Laravel Scout, Elasticsearch/Typesense/database search drivers, NeuronAI v3, Pest 4.
 
@@ -20,7 +20,7 @@
 
 Tasks 1–2 establish the Core extension boundary and authorization gateway. Task 3 implements the CMS record-level baseline. Tasks 4–5 expose it safely to the authenticated assistant. Task 6 adds evaluation. Task 7 synchronizes documentation and records the Phase 2 gate. Task 8 is the release gate.
 
-Do not create a second CMS index in this plan. Do not add `/api/v1` or anonymous access. Do not add module-specific fields to Core DTOs. Do not pass raw search `_source`, Eloquent arrays, permission names, or ACL expressions to AI.
+Do not create a second CMS index in this plan. Do not add `/api/v1` or guest assistance. Do not add module-specific fields to Core DTOs. Do not pass raw search `_source`, Eloquent arrays, permission names, or ACL expressions to AI.
 
 ### Task 1: Core provider contracts, DTOs, and deterministic registry
 
@@ -381,7 +381,7 @@ Record Core ownership, typed descriptors, explicit service-provider registration
 
 - [x] **Step 3: Record Phase 2 without implementing it**
 
-Add a clearly non-authorized future section requiring a dedicated public profile, public-visibility policy, rate limits, privacy/retention, abuse controls, prompt-injection treatment, safe fields, citations, cost budgets, and separate approval. State that missing authentication never falls back to public mode.
+Add a clearly non-authorized future section requiring a dedicated guest profile, session-level conversation isolation, guest permissions and ACL, rate limits, privacy/retention, abuse controls, prompt-injection treatment, safe fields, citations, cost budgets, and separate approval. State that a guest attached to the guard never receives `InAppAssistance`.
 
 - [x] **Step 4: Run module documentation tests and commit by owner**
 
@@ -404,7 +404,7 @@ rtk git -C Modules/CMS commit -m "docs(cms): document content retrieval provider
 
 - [x] **Step 1: Add adversarial cross-module cases**
 
-Cover forged source keys, forged module/entity/page context, stale context, identity/tenant/permission arguments, raw filter/query DSL, source collision, disabled module, registry-order manipulation, ambiguous routing, attempted source selection outside the request allowlist, stale index hit, cross-tenant record, hidden field, malicious retrieved instructions, oversized excerpt, provider timeout, partial diagnostics, citation path injection, anonymous request, and attempted `/api/v1` use.
+Cover forged source keys, forged module/entity/page context, stale context, identity/tenant/permission arguments, raw filter/query DSL, source collision, disabled module, registry-order manipulation, ambiguous routing, attempted source selection outside the request allowlist, stale index hit, cross-tenant record, hidden field, malicious retrieved instructions, oversized excerpt, provider timeout, partial diagnostics, citation path injection, missing identity, guest principal, and attempted `/api/v1` use.
 
 - [x] **Step 2: Run the full deterministic release suite**
 
@@ -416,7 +416,7 @@ Expected: PASS without a live LLM or external search cluster.
 
 - [x] **Step 3: Verify public access is absent**
 
-Assert no application content route is registered under `/api/v1`, anonymous requests cannot invoke the gateway/tool, and no configuration flag converts authenticated retrieval into public retrieval.
+Assert no application content route is registered under `/api/v1`, missing identities and guest principals cannot invoke the gateway/tool, and no configuration flag converts non-guest retrieval into guest retrieval.
 
 - [x] **Step 4: Update the security report and commit**
 
@@ -426,6 +426,292 @@ Record aggregate pass/fail counts, policy/provider versions, and timings only. R
 rtk git -C Modules/AI add tests/Feature/ApplicationContentRetrievalAdversarialTest.php docs/rag/evaluations/2026-07-in-app-security.json
 rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval security"
 ```
+
+### Task 9: Close the configured guest boundary
+
+**Files:**
+
+- Modify: `Modules/Core/app/Models/User.php`
+- Modify: `Modules/Core/tests/Feature/Models/UserTest.php`
+- Modify: `Modules/Core/app/ApplicationContent/ApplicationContentRetrievalService.php`
+- Modify: `Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php`
+- Modify: `Modules/Core/docs/rag/MODULE.md`
+- Modify: `Modules/AI/app/Services/Assistance/AssistantAccessContextFactory.php`
+- Modify: `Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php`
+- Modify: `Modules/AI/docs/rag/MODULE.md`
+- Modify: `Modules/AI/README.md`
+- Modify: `Modules/AI/docs/rag/evaluations/2026-07-in-app-security.json`
+- Modify: `Modules/CMS/docs/rag/MODULE.md`
+- Modify: `docs/superpowers/specs/2026-07-21-application-content-passage-index-gate.md`
+
+- [ ] **Step 1: Write the failing Core guest-classification tests**
+
+Keep the existing no-email compatibility case and add configured-name, configured-username, normal-user, and invalid-configuration cases to `UserTest.php`:
+
+```php
+it('recognizes the configured guest account even when it has an email', function (): void {
+    config()->set('permission.users.guest', 'visitor');
+    $user = User::factory()->create([
+        'name' => 'visitor',
+        'username' => 'visitor',
+        'email' => 'visitor@example.test',
+    ]);
+
+    expect($user->isGuest())->toBeTrue();
+});
+
+it('recognizes the configured guest account by username', function (): void {
+    config()->set('permission.users.guest', 'visitor');
+    $user = User::factory()->create([
+        'name' => 'Public visitor',
+        'username' => 'visitor',
+        'email' => 'visitor@example.test',
+    ]);
+
+    expect($user->isGuest())->toBeTrue();
+});
+
+it('does not classify a normal account as guest', function (): void {
+    config()->set('permission.users.guest', 'visitor');
+    $user = User::factory()->create([
+        'name' => 'member',
+        'username' => 'member',
+        'email' => 'member@example.test',
+    ]);
+
+    expect($user->isGuest())->toBeFalse();
+});
+
+it('fails guest classification when the configured account is invalid', function (): void {
+    config()->set('permission.users.guest', '');
+    $user = User::factory()->create(['email' => 'member@example.test']);
+
+    expect(fn (): bool => $user->isGuest())
+        ->toThrow(UnexpectedValueException::class);
+});
+```
+
+- [ ] **Step 2: Run the focused model tests and verify RED**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php --filter='recognizes the configured guest|does not classify a normal account|fails guest classification'
+```
+
+Expected: both configured guest cases fail because `isGuest()` currently checks only whether email is absent, and the invalid-configuration case fails because no classification error is raised.
+
+- [ ] **Step 3: Implement the minimal central classifier**
+
+Replace `User::isGuest()` with:
+
+```php
+public function isGuest(): bool
+{
+    $guest = config('permission.users.guest');
+
+    if ($this->getAttribute('email') === null) {
+        return true;
+    }
+
+    if (! is_string($guest) || $guest === '') {
+        throw new \UnexpectedValueException('Configured guest account is invalid.');
+    }
+
+    return in_array($guest, [
+        $this->getAttribute('name'),
+        $this->getAttribute('username'),
+    ], true);
+}
+```
+
+- [ ] **Step 4: Run the complete focused model file and verify GREEN**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php
+```
+
+Expected: PASS, including legacy no-email compatibility, both configured-account shapes, normal-account exclusion, and invalid-configuration failure.
+
+- [ ] **Step 5: Write the failing Core gateway test**
+
+Add to `ApplicationContentRetrievalServiceTest.php`:
+
+```php
+it('rejects the configured guest before provider execution', function (): void {
+    config()->set('permission.users.guest', 'visitor');
+    $guest = User::factory()->create([
+        'name' => 'visitor',
+        'username' => 'visitor',
+        'email' => 'visitor@example.test',
+    ]);
+    $guest->givePermissionTo($this->permission);
+    Auth::login($guest);
+    $this->request->setUserResolver(static fn (): User => $guest);
+
+    expect(fn () => $this->service->retrieve(
+        $this->request,
+        new ApplicationContentQuery('core.users', 'visible record', 'en', 5),
+    ))->toThrow(ApplicationContentUnavailableException::class)
+        ->and($this->provider->calls)->toBe(0);
+});
+
+it('fails closed before provider execution when guest classification fails', function (): void {
+    config()->set('permission.users.guest', '');
+
+    expect(fn () => $this->service->retrieve(
+        $this->request,
+        new ApplicationContentQuery('core.users', 'visible record', 'en', 5),
+    ))->toThrow(ApplicationContentUnavailableException::class)
+        ->and($this->provider->calls)->toBe(0);
+});
+```
+
+- [ ] **Step 6: Run the gateway test and verify RED**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php --filter='rejects the configured guest'
+```
+
+Expected: FAIL because the permitted configured guest reaches the provider.
+
+- [ ] **Step 7: Add the guest check to the Core identity invariant**
+
+Extend `ApplicationContentRetrievalService::assertConsistentIdentity()` so its rejection condition ends with:
+
+```php
+|| $request_user->getAuthIdentifier() === null
+|| $request_user->isGuest()
+```
+
+The provider registry and permission resolver must not run for a guest.
+
+- [ ] **Step 8: Run the Core gateway file and verify GREEN**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php
+```
+
+Expected: PASS and the guest test observes zero provider calls.
+
+- [ ] **Step 9: Write the failing AI access-context test**
+
+Add a `bool $guest = false` argument to `assistanceUserMock()`, make it return that value from `isGuest()`, and add:
+
+```php
+it('rejects the configured guest before resolving tenant or permissions', function (): void {
+    $user = assistanceUserMock(guest: true);
+    $resolver = Mockery::mock(AssistantTenantResolverInterface::class);
+    $resolver->shouldNotReceive('resolveFor');
+
+    expect(fn () => (new AssistantAccessContextFactory($resolver))->forInApp(
+        assistanceConversation(),
+        $user,
+    ))->toThrow(AuthorizationException::class);
+});
+
+it('fails closed when guest classification fails', function (): void {
+    $user = Mockery::mock(User::class)->makePartial();
+    $user->shouldReceive('getKey')->andReturn(7);
+    $user->shouldReceive('isGuest')->once()
+        ->andThrow(new UnexpectedValueException('invalid guest configuration'));
+    $resolver = Mockery::mock(AssistantTenantResolverInterface::class);
+    $resolver->shouldNotReceive('resolveFor');
+
+    expect(fn () => (new AssistantAccessContextFactory($resolver))->forInApp(
+        assistanceConversation(),
+        $user,
+    ))->toThrow(AuthorizationException::class, 'Assistant access context is unavailable.');
+});
+```
+
+- [ ] **Step 10: Run the AI context test and verify RED**
+
+```bash
+rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php --filter='rejects the configured guest'
+```
+
+Expected: FAIL because `forInApp()` currently creates an in-app context for a guest-shaped user.
+
+- [ ] **Step 11: Reject guests before AI context resolution**
+
+After ownership identifiers have been validated, move guest classification inside the existing normalized `try` block and before tenant or permission resolution:
+
+```php
+try {
+    if ($authenticated_user->isGuest()) {
+        throw new AuthorizationException('Assistant access context is unavailable.');
+    }
+
+    $tenant = $this->tenant_resolver->resolveFor($authenticated_user);
+    $permissions = $this->effectivePermissions($authenticated_user);
+} catch (Throwable $exception) {
+    throw new AuthorizationException(
+        'Assistant access context is unavailable.',
+        previous: $exception,
+    );
+}
+```
+
+- [ ] **Step 12: Run the complete AI context file and verify GREEN**
+
+```bash
+rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
+```
+
+Expected: PASS; guest rejection occurs before tenant and permission resolution.
+
+- [ ] **Step 13: Synchronize module documentation**
+
+Document these exact boundaries:
+
+- Core: `User::isGuest()` recognizes the configured guest account and the legacy missing-email shape; `ApplicationContentRetrievalService` rejects it before provider lookup.
+- AI: Phase 1 is non-guest only even when the guest is attached to the session guard; Phase 2 is a separate session-based `GuestAssistance` design with session-subject conversation isolation.
+- CMS: `cms.contents` is available only to authenticated non-guest `InAppAssistance`.
+- Passage gate: it neither introduces nor authorizes session-based guest assistance.
+
+Replace the stale public/anonymous Phase 2 wording in the named files; do not rename public DTO/API terminology that describes PHP visibility or a separately approved headless API.
+
+- [ ] **Step 14: Run documentation and focused security tests**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Integration/CoreRagModuleDocumentationTest.php Modules/AI/tests/Integration/AiRagModuleDocumentationTest.php Modules/CMS/tests/Unit/CmsRagModuleDocumentationTest.php Modules/Core/tests/Feature/Models/UserTest.php Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php
+```
+
+Expected: PASS without a live LLM or external search cluster.
+
+- [ ] **Step 15: Run the deterministic release suite**
+
+```bash
+rtk php artisan test --compact Modules/Core/tests/Feature/ApplicationContent Modules/CMS/tests/Feature/ApplicationContent Modules/AI/tests/Unit/Services/ApplicationContent Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php Modules/AI/tests/Feature/ApplicationContentRetrievalAdversarialTest.php Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/Core/tests/Feature/Graph
+```
+
+Expected: PASS with zero failures. Record the emitted test, assertion, and duration totals in `Modules/AI/docs/rag/evaluations/2026-07-in-app-security.json`, set `evaluated_at` to `2026-08-03`, and retain only aggregate counts and existing policy/provider version identifiers.
+
+- [ ] **Step 16: Format changed PHP and repeat affected tests**
+
+```bash
+rtk vendor/bin/pint Modules/Core/app/Models/User.php Modules/Core/app/ApplicationContent/ApplicationContentRetrievalService.php Modules/Core/tests/Feature/Models/UserTest.php Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php Modules/AI/app/Services/Assistance/AssistantAccessContextFactory.php Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
+rtk php artisan test --compact Modules/Core/tests/Feature/Models/UserTest.php Modules/Core/tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
+```
+
+Expected: Pint exits zero and the affected tests pass.
+
+- [ ] **Step 17: Commit exact owner paths without staging unrelated work**
+
+Because `Modules/Core/app/Models/User.php` already contains unrelated worktree changes, stage only the guest-classifier hunk for the Core commit. Then commit by owner:
+
+```bash
+rtk git -C Modules/Core add -p app/Models/User.php
+rtk git -C Modules/Core add app/ApplicationContent/ApplicationContentRetrievalService.php tests/Feature/Models/UserTest.php tests/Feature/ApplicationContent/ApplicationContentRetrievalServiceTest.php docs/rag/MODULE.md
+rtk git -C Modules/Core commit -m "fix(core): reject guest content retrieval"
+rtk git -C Modules/AI add app/Services/Assistance/AssistantAccessContextFactory.php tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php docs/rag/MODULE.md README.md docs/rag/evaluations/2026-07-in-app-security.json
+rtk git -C Modules/AI commit -m "fix(ai): exclude guest from in-app assistance"
+rtk git -C Modules/CMS add docs/rag/MODULE.md
+rtk git -C Modules/CMS commit -m "docs(cms): clarify non-guest retrieval boundary"
+rtk git add Modules/Core Modules/AI Modules/CMS docs/superpowers/plans/2026-07-17-application-content-retrieval.md docs/superpowers/specs/2026-07-21-application-content-passage-index-gate.md
+rtk git commit -m "docs(rag): close phase one guest boundary"
+```
+
+For the interactive Core staging, accept only the `isGuest()` hunk and reject the unrelated connection-affinity hunk already present in `User.php`. Before each commit, inspect `git diff --cached --stat` and ensure it contains only the paths owned by that commit.
 
 ## Completion checklist
 
@@ -437,6 +723,7 @@ rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval se
 - [x] Verified application context selects the default source; absent context uses generic single-source routing.
 - [x] Ambiguous generic requests ask for clarification and Phase 1 never fans out automatically.
 - [x] Phase 1 requires an authenticated application user.
+- [ ] Phase 1 explicitly rejects the configured guest even when it is attached to the session guard.
 - [x] Permission, ACL, tenant, validity, and deletion constraints apply before evidence reaches AI.
 - [x] Search hits are rehydrated and reauthorized before safe projection.
 - [x] Tool arguments cannot supply identity, authorization, fields, indexes, or raw query DSL.
@@ -444,4 +731,4 @@ rtk git -C Modules/AI commit -m "test(ai): gate application content retrieval se
 - [x] Documentation RAG, Graph tools, and application content retrieval remain distinct.
 - [x] Empty/insufficient evidence causes abstention.
 - [x] Record-level CMS retrieval has a committed evaluation baseline.
-- [x] No passage index, multimodal processing, entity linking, or public endpoint is added without a separate approved design.
+- [x] No passage index, multimodal processing, entity linking, guest assistant profile, or public endpoint is added without a separate approved design.
