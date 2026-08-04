@@ -6,82 +6,30 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
-- *(filament)* Default Toggle fields to stacked label layout
-- *(filament)* Ship make-resources docs and App panel discovery
-
-### 🐛 Bug Fixes
-
-- *(filament)* Render stacked locale flags as circles
-
-### 🚜 Refactor
-
-- Replace pxlrbt/filament-environment-indicator with Core plugin and module version dropdown
-
-### ⚙️ Miscellaneous Tasks
-
-- Update Core and AI submodule pointers for PSR-4 test stubs
-
-## [1.13.2] - 2026-07-12
-
-### ⚙️ Miscellaneous Tasks
-
-- *(modules)* Update ERP submodule reference and document progress on Phase 2A and 2B
-
-## [1.13.1] - 2026-07-10
-
-### 🐛 Bug Fixes
-
-- *(tests)* Stabilize suite bootstrap and bump module refs
-
-### ⚙️ Miscellaneous Tasks
-
-- *(modules)* Bump AI, CMS, Core, and ERP submodules
-- *(modules)* Update submodule references for AI, CMS, Core, and ERP
-- *(modules)* Update CMS submodule reference to latest commit
-
-## [1.13.0] - 2026-07-09
-
-### 🚀 Features
-
-- *(performance)* Enhance performance optimization strategies and add large dataset guidelines
-
-### 📚 Documentation
-
-- Align RAG corpus guide with user vs developer audiences
-- Update MES module plans and decisions
-
-### ⚙️ Miscellaneous Tasks
-
-- Bump CMS to v1.36.4 and sync project guidelines
-
-## [1.11.4] - 2026-07-09
-
-### 🐛 Bug Fixes
-
-- *(app)* Guard validation exception context for all throwables
-
-### ⚙️ Miscellaneous Tasks
-
-- Update submodule references for CMS and Core modules
-- *(app)* Wire core validation context and translation updates
-- Update Pint configuration and enhance laraplate-specific rules
-- Update dependencies and submodule references
-
-## [1.11.3] - 2026-07-07
-
-### 🚀 Features
-
 - Add master rule file and enhance existing rules with descriptions
 - Implement app structure with authentication and module management
 - Add initial Business module plan and structure
 - [**breaking**] Point monorepo to ERP submodule (laraplate-erp)
 - *(cms)* Add content provenance, references and ai assistance metadata
 - *(cms,core)* Wire record origins registry and generic cms:import
+- *(performance)* Enhance performance optimization strategies and add large dataset guidelines
+- *(filament)* Default Toggle fields to stacked label layout
+- *(filament)* Ship make-resources docs and App panel discovery
+- *(filament)* Bump modules for generate→trait merge
+- Delegate root DatabaseSeeder to the Core orchestrator
 
 ### 🐛 Bug Fixes
 
 - Standardize module naming and update dependencies
 - *(core)* Bump submodule for MySQL taxonomies migration trigger fix
+- *(app)* Guard validation exception context for all throwables
+- *(tests)* Stabilize suite bootstrap and bump module refs
+- *(filament)* Render stacked locale flags as circles
+- Bump Core submodule for the seed orchestrator review fixes
+
+### 🚜 Refactor
+
+- Replace pxlrbt/filament-environment-indicator with Core plugin and module version dropdown
 
 ### 📚 Documentation
 
@@ -99,15 +47,86 @@ All notable changes to this project will be documented in this file.
 - *(erp)* Refine Spec 1 hardening scope after code/test verification
 - *(erp)* Add Spec 1 hardening implementation plan
 - *(erp)* Update plans and specs for ERP hardening progress
+- Align RAG corpus guide with user vs developer audiences
+- Update MES module plans and decisions
+- *(filament)* Specify generate→trait merge for tables and forms
+- *(specs)* Align revision-centric draft with verified behaviour
+- *(erp)* Design domain actions over HTTP on the /app surface
+- *(erp)* Implementation plan for domain action HTTP routes
+- *(core)* Seeder orchestration implementation plan
+- *(sao)* Design the SAO orchestrator module
+- *(sao)* Implementation plan for phase 0 scaffolding
+- *(specs)* Index the SAO and seeder orchestration designs
+- *(sao)* Record the completed submodule registration
+- *(sao)* Add the documentation and RAG task to the phase 0 plan
+- *(core)* Fix seeder plan commit protocol for submodules
+- *(core)* Extract test stub instead of an inline anonymous class
+- *(erp)* Close 3-01, 3-04 and 3-06 in the master backlog
+- *(sao)* Design the phase 1a internal ticketing core
+- *(sao)* Correct the 1a authorization section — ACL is implemented
+- *(sao)* Mark phase 0 criterion 1 as deliberately open
+- *(sao)* Implementation plan for slice 1a
+- *(sao)* Correct the 1a plan from what Task 2 revealed
+- *(sao)* Fold the Laraplate model standard into the 1a plan
+- *(sao)* Distinguish release candidates from shipped releases
+- *(sao)* Record two migration constraints the plan got wrong
+- *(core)* Unblock Task 11 and fix its multi-submodule commit protocol
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update dependencies and enhance functionality
+- Update package-lock.json and enhance CSS styles
+- Update IDE helper models and improve documentation
+- Update .vscode settings and submodule commits
+- Update composer.json and submodule commits
+- Update submodule commits and improve version script
+- Update submodule commits and enhance version script validation
+- Update versioning method in composer.json
+- Update submodule commits and enhance version script logic
+- Update submodule commits and refine version script logic
+- Update submodule commits and enhance version script functionality
+- Update submodule commits and enhance version script debugging
+- Update submodule commits for Cms and Core modules
+- Clean up post-commit hook script
+- Update dependencies and remove unused package
+- Update dependencies and submodule commits
+- Update project configuration and dependencies
+- Update coding principles and module structure
+- Update submodule URLs to use HTTPS
+- Update module links in README
+- Update IDE helper and module configurations
+- Update IDE helper models and package dependencies
+- Update environment configurations and dependencies
+- Update dependencies and improve package configurations
+- Update IDE helper files and improve cache functionality
+- Enhance IDE helper files and add new traits
+- Update Cms submodule and add pushurl synchronization script
+- Update submodule commits and improve type hinting
+- Enhance IDE helper files and update submodule references
+- Enhance IDE helper traits and update PHPStan configuration
+- Update Laravel standards and enhance test case structure
+- Update environment and configuration files for PHP 8.5 compatibility
+- Update Laravel standards and enhance performance optimization guidelines
+- Enhance IDE helper models and update workspace configuration
+- Update dependencies and enhance configuration files
+- Enhance IDE helper models and update submodule references
+- Update commit parsing rules and enhance version update script
+- Update submodule references for Cms and Core modules
+- Update commit parsing rules and submodule references
+- Update IDE helper models and configuration files
+- Update environment variable names and package versions
+- Update package versions in composer.lock and submodule reference for Core module
+- Update IDE helper models, environment variables, and package versions
+- Add filament/spatie-laravel-media-library-plugin and update package versions
+- Add AI module and update submodule references
+- Update composer.json and submodule references for AI, Cms, and Core modules
+- Update submodule references and enhance Swagger documentation
+- Enhance README and update submodule references
 - Update package versions and submodule references
 - Update composer.lock with new package versions and dependencies
 - Remove CLAUDE.md and update dependencies
 - Update submodule references and composer.lock content-hash
 - Add Laravel Boost guidelines and update dependencies
-- Update submodule references for Cms and Core modules
 - Update dependencies and improve component functionality
 - Update Core submodule and add pagination component
 - Remove IDE helper files and update .gitignore
@@ -162,65 +181,17 @@ All notable changes to this project will be documented in this file.
 - Sync module releases and ERP hardening progress
 - Sync submodule references after PHPDoc formatting cleanup
 - Update submodule references for AI and CMS modules
-
-## [1.11.2] - 2026-01-22
-
-### ⚙️ Miscellaneous Tasks
-
-- Update submodule references and enhance Swagger documentation
-- Enhance README and update submodule references
-- Update package versions and submodule references
-
-## [1.11.1] - 2026-01-15
-
-### ⚙️ Miscellaneous Tasks
-
-- Update dependencies and enhance functionality
-- Update package-lock.json and enhance CSS styles
-- Update IDE helper models and improve documentation
-- Update .vscode settings and submodule commits
-- Update composer.json and submodule commits
-- Update submodule commits and improve version script
-- Update submodule commits and enhance version script validation
-- Update versioning method in composer.json
-- Update submodule commits and enhance version script logic
-- Update submodule commits and refine version script logic
-- Update submodule commits and enhance version script functionality
-- Update submodule commits and enhance version script debugging
-- Update submodule commits for Cms and Core modules
-- Clean up post-commit hook script
-- Update dependencies and remove unused package
-- Update dependencies and submodule commits
-- Update project configuration and dependencies
-- Update coding principles and module structure
-- Update submodule URLs to use HTTPS
-- Update module links in README
-- Update IDE helper and module configurations
-- Update IDE helper models and package dependencies
-- Update environment configurations and dependencies
-- Update dependencies and improve package configurations
-- Update IDE helper files and improve cache functionality
-- Enhance IDE helper files and add new traits
-- Update Cms submodule and add pushurl synchronization script
-- Update submodule commits and improve type hinting
-- Enhance IDE helper files and update submodule references
-- Enhance IDE helper traits and update PHPStan configuration
-- Update Laravel standards and enhance test case structure
-- Update environment and configuration files for PHP 8.5 compatibility
-- Update Laravel standards and enhance performance optimization guidelines
-- Enhance IDE helper models and update workspace configuration
-- Update dependencies and enhance configuration files
-- Enhance IDE helper models and update submodule references
-- Update commit parsing rules and enhance version update script
-- Update submodule references for Cms and Core modules
-- Update commit parsing rules and submodule references
-- Update IDE helper models and configuration files
-- Update environment variable names and package versions
-- Update package versions in composer.lock and submodule reference for Core module
-- Update IDE helper models, environment variables, and package versions
-- Add filament/spatie-laravel-media-library-plugin and update package versions
-- Add AI module and update submodule references
-- Update composer.json and submodule references for AI, Cms, and Core modules
+- *(app)* Wire core validation context and translation updates
+- Update Pint configuration and enhance laraplate-specific rules
+- Bump CMS to v1.36.4 and sync project guidelines
+- *(modules)* Bump AI, CMS, Core, and ERP submodules
+- *(modules)* Update submodule references for AI, CMS, Core, and ERP
+- *(modules)* Update CMS submodule reference to latest commit
+- *(modules)* Update ERP submodule reference and document progress on Phase 2A and 2B
+- Update Core and AI submodule pointers for PSR-4 test stubs
+- Bump Core for observer registration and versionable image fixes
+- *(sao)* Register SAO as a submodule
+- *(sao)* Bump SAO to the phase 0 scaffolding state
 
 ## [1.11.0] - 2025-09-19
 
