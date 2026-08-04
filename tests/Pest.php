@@ -2,7 +2,22 @@
 
 declare(strict_types=1);
 
+// Pest loads CallsTerminable only at Kernel::terminate(). Preload it before
+// BypassFinals wraps the file stream so a corrupted wrapper cannot break shutdown.
+class_exists(Pest\Plugins\Actions\CallsTerminable::class);
+
 DG\BypassFinals::enable();
+// BypassFinals is test-runtime only: it does not edit source. Our `final`
+// keywords stay in the codebase. allowPaths limits which loaded files can be
+// stripped so the full suite does not OOM on vendor/.
+// Prefer interfaces for doubles; add a path here only when mocking a final
+// class is unavoidable (app services today, Elastic Client as third-party).
+DG\BypassFinals::allowPaths([
+    '*/app/*',
+    '*/Modules/*/app/*',
+    '*/vendor/elasticsearch/elasticsearch/src/*',
+]);
+DG\BypassFinals::setCacheDirectory(dirname(__DIR__) . '/storage/framework/cache/bypass-finals');
 
 /*
 | Module test configuration lives in each module's tests/Pest.php. The application
