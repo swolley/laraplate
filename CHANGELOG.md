@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(tests)* Prevent Pest CallsTerminable shutdown failures
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump CMS, Core, and ERP for optional import console output
+
+## [1.13.5] - 2026-08-04
+
 ### 🚀 Features
 
 - Add master rule file and enhance existing rules with descriptions
