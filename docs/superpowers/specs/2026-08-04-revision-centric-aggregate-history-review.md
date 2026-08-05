@@ -24,17 +24,28 @@ Reviewers must not silently close a finding. A finding closes only when the desi
 |---|---|---|---|
 | C01 | Critical | proposed | Best-effort capture cannot satisfy the same-transaction invariant |
 | C02 | Critical | proposed | The concurrency section contradicts the separation of lock and aggregate revisions |
-| C03 | Critical | proposed | A root-local revision counter disappears on hard delete |
-| C04 | Critical | proposed | The revision allocation boundary and canonical checkpoint are undefined |
+| C03 | Critical | resolved (m1) | A root-local revision counter disappears on hard delete |
+| C04 | Critical | resolved (m1) | The revision allocation boundary and canonical checkpoint are undefined |
 | C05 | Critical | proposed | Disabling versioning or changing descriptors can leave a falsely complete history |
 | C06 | Critical | proposed | Multi-root relations do not fit the one-root revision model |
 | C07 | Critical | proposed | The force-delete design assumes central mutation paths that do not exist |
-| I01 | Important | open | Stable version, subject, root, and history-store identities are missing |
+| I01 | Important | proposed (partial) | Stable version, subject, root, and history-store identities are missing |
 | I02 | Important | open | Skipping a missing subject contradicts complete restore |
-| I03 | Important | proposed | JSON-only relation vectors cannot support integrity and retention safely |
+| I03 | Important | resolved (m1) | JSON-only relation vectors cannot support integrity and retention safely |
 | I04 | Important | proposed | Aggregate checkpoints need a scalar snapshot independent of DIFF audit rows |
 | I05 | Important | open | Authorization, approvals, side-effect control, and history visibility are absent |
 | I06 | Important | open | Review evidence and historical coverage epochs are not represented durably |
+
+## Milestone 1 dispositions (2026-08-05)
+
+The user confirmed a CMS-grade milestone-1 bundle (see the design spec, "Milestone 1 — confirmed scope"). Findings are resolved for the milestone by narrowing scope, which this log's closure gate explicitly permits.
+
+- **C03 → resolved (scope).** The revision coordinate is the version set; no durable head. Hard-deleted roots are non-restorable; the SNAPSHOT tombstone is audit-only.
+- **C04 → resolved (scope).** One supported operation = one version set = one revision. Membership is normalized version rows keyed by `relation_path` + `subject_key`.
+- **I03 → resolved.** Normalized relation items via existing `relation_path`/`subject_key` + a new nullable `subject_version_id` self-FK (owned only). No JSON blob.
+- **I01 → proposed (partial).** Local ids for the single-connection milestone; a stable `uuid` is added to shared reference subjects; version-row uuid and cross-connection identity are deferred.
+- **C06 → out of scope (m1).** Single-authoritative-root relations only.
+- **C01, C05, C07** remain deferred under the CMS-grade posture: honest best-effort/degradation and non-continuable hard delete instead of fail-closed atomic guarantees. **C02, I02, I04, I05, I06** are unchanged by this bundle.
 
 ## Critical findings
 

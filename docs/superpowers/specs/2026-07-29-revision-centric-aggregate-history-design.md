@@ -436,6 +436,19 @@ Reusing one column would make any relation change invalidate an open editing for
 9. How does retention prove reachability efficiently when relation items reference other versions?
 10. Which CMS category semantics are `reference`, which pivot attributes are authoritative, and which stable subject identity is used?
 
+## Milestone 1 — confirmed scope (2026-08-05)
+
+The user confirmed a CMS-grade, minimal, forward-compatible bundle. It resolves the blocking Critical findings for milestone 1 by narrowing scope rather than by building the full machinery, which the review log's closure gate explicitly permits.
+
+- **Restore coordinate and hard delete (C03).** The aggregate revision is the **version set** itself (each supported operation opens one set for the root; `vend_versions_sets` is already root-keyed, monotonic, and revert-aware via `reverted_from_set_id`). No durable aggregate head is introduced. **Hard-deleted roots are non-restorable** as a continuation; the SNAPSHOT tombstone remains for audit/export and manual re-creation as a new entity. This closes C03 for the milestone.
+- **Storage (C04 / I03).** Normalized, reusing the existing `vend_versions.relation_path` + `subject_key` columns: each membership entry is a version row (`versionable` = root, `relation_path`, `subject_key`, `contents` = pivot attributes). A new nullable **`subject_version_id`** (self-referential FK to `vend_versions`) references the child's version at the revision, populated **only for `owned` relations**; `reference` relations leave it null (live re-link). No JSON membership blob.
+- **Identity (I01).** Local ids for milestone 1 (single connection, per the multi-connection policy). A stable **`uuid` is added to shared `reference` subjects** (CMS categories/tags, which lack an immutable natural key) as cheap forward insurance for re-link survival. A stable uuid on every version row and cross-connection atomicity are deferred.
+- **Multi-root (C06)** remains out of scope for the milestone.
+
+Preceding delivery (already implemented and tested on 2026-08-05): revert marker (`revertToVersion()` opens a `Revert`-kind version set with `reverted_from_set_id`) and delete semantics (hard delete → SNAPSHOT tombstone; soft delete → `Updated` on `deleted_at`; `trashingVersions()` scope) in `Modules/Core/app/Models/Concerns/HasVersions.php`.
+
+Next: an implementation plan identifying the concrete slices, then TDD delivery.
+
 ## Review and approval gate
 
 Done so far:
