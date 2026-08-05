@@ -63,6 +63,17 @@ php artisan ai:laraplate-help
 php artisan ai:laraplate-help --question="How does ACL inheritance work?"
 ```
 
+### Evaluating documentation retrieval quality
+
+Run a per-module documentation retrieval baseline (retrieval-only, no chat model):
+
+    php artisan ai:evaluate-documentation --module=core --index=user \
+      --dataset=Modules/Core/docs/rag/evaluations/<file>.json \
+      --output=<report>.json
+
+Datasets live under each module's `docs/rag/evaluations/`. See
+`docs/superpowers/specs/2026-08-04-documentation-rag-evaluation-baseline-design.md`.
+
 ## Adding project-specific documentation
 
 You can:
