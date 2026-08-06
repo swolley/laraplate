@@ -61,15 +61,38 @@ facets: [
 
 Response, per facet: the **paginated slice** of `{value, total, count}` plus the distinct-value count (to paginate the facet itself). `total(v)` is only needed for the values on the current page, so it stays bounded.
 
+## Group key ≠ label ≠ display fields
+
+The value a facet is grouped/counted by is not necessarily what is shown. A facet may group by a key (e.g. `author_id`) but display a different field, or a set of fields the frontend composes into a string (e.g. `first_name` + `last_name`). The parked `Funnel` already separated these (`getValueField()` vs `getLabelField()` — possibly an array — vs `columns`, `Funnel.php:29,45-51`); we keep that separation, finished.
+
+A facet spec therefore carries:
+- `groupBy` — the **key** to aggregate and count on (e.g. `author_id`).
+- `fields` (a.k.a. `label`) — the **display fields** returned per grouped value; the frontend builds the shown string.
+
+Per-value result is structured, not a pre-baked label:
+
+```
+{ key: 42, count: 12, total: 130, attributes: { first_name: 'Anna', last_name: 'Rossi' } }
+```
+
+**Label resolution in two steps** (portable across MySQL/MariaDB/PostgreSQL/Oracle/SQLite):
+1. grouped-count on the **key only** → a page of `[key, count, total]`;
+2. a bounded `whereIn(key, [page keys])` select to resolve the requested `fields` — this is a **normal Crud read**, bounded to the page.
+
+This keeps `GROUP BY` on a single column (portable) and moves labelling into a cheap second round.
+
+**Deferred (later tier):** `search`/`sort` **by label** while grouping by key (type "ross" to find author Rossi, or order by surname). That forces the label into the aggregated query (join + GROUP BY functional-dependency care across DBs). If `search`/`sort` are by key or by count instead, the two-step stays clean. Not in v1.
+
 ## API shape (backend)
 
 A single `CrudService` method, reused by both HTTP entry points below:
 
 ```php
 /**
- * @param  list<FacetSpec>  $facets  each: field (column or single-hop relation path),
- *                                    plus optional page/perPage/search/sort
- * @return array<string, FacetResult>  per field: paginated [{value,total,count}] + distinctValues
+ * @param  list<FacetSpec>  $facets  each: groupBy (key column or single-hop relation path),
+ *                                    optional fields (display fields resolved per key),
+ *                                    optional page/perPage/search/sort
+ * @return array<string, FacetResult>  per facet: paginated [{key,total,count,attributes}] + distinctValues
  */
 public function facetCounts(ListRequestData $base, array $facets): array;
 ```
