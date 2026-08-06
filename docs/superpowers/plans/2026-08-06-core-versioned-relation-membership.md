@@ -528,7 +528,7 @@ These require their own plan once the foundation above lands and informs the det
 
 - **Owned children** — migration adding nullable `subject_version_id` self-FK to `vend_versions`; capture that references the child's version; snapshot so deleted children are recreatable.
 - **Restore / reconcile** — apply a target revision's membership: live re-link for `reference`; recreate/revert for `owned`; append-only, transactional, with shared-subject impact preview.
-- **`syncVersioned`** — set the whole membership to a target list as a single revision (one version set wrapping the attach/detach diff). Deferred because correct single-revision semantics require nesting the per-subject mutations into one shared scope; attach/detach are the primitive it builds on.
+- **`syncVersioned`** — **[DONE 2026-08-06, commit `80b40c8`]** set the whole membership to a target list as a single revision (one version set wrapping the attach/detach diff), built on the idempotent attach/detach primitives.
 - **Transparent adapters** — version-aware `BelongsToMany`/`MorphToMany` so ordinary `attach`/`sync` are captured without explicit methods (no-bypass hardening).
 - **Shared-subject `uuid`** — stable identity on `reference` subjects (CMS categories/tags).
 - **CMS pilot** — wire `HasVersionedRelations` onto CMS `Content` (separate, CMS-scoped plan; blocked until Core foundation is approved).
