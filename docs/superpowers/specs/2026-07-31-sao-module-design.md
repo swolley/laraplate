@@ -565,7 +565,7 @@ Each phase gets its own spec and implementation plan.
 | Phase | Content | Exit criterion |
 |-------|---------|----------------|
 | **0** | Scaffolding parity with ERP/AI/CMS | Module tests green in the application suite; Pint, PHPStan and `composer validate` clean; SAO registered as a submodule |
-| **1a** | Projects, ticket keys, tickets, types, workflow schemes, comments, history, Filament | Usable as a standalone tracker, zero connections. Unblocks phase 2. See `2026-08-01-sao-phase-1a-ticketing-core-design.md` |
+| **1a** — **done 2026-08-04** | Projects, ticket keys, tickets, types, workflow schemes, comments, history, Filament | Usable as a standalone tracker, zero connections. Unblocks phase 2. See `2026-08-01-sao-phase-1a-ticketing-core-design.md` |
 | **1b** | Labels, watchers, attachments, due dates, ticket relations, search | Ticket enrichment; independent of the error flow |
 | **1c** | Kanban board | Custom Filament page; deliberately last, so it is designed against real data |
 | **2** | Shared fingerprint in Core + `Signal` + internal log source + loop protection (§6.1); **cross-project `group_key` comparability** (D13) | Laraplate error → signal → internal ticket, nothing external; a forced failure inside the pipeline produces no signal; same fingerprint across two projects is queryable as one cluster |
