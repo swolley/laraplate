@@ -101,14 +101,13 @@ public function facetCounts(ListRequestData $base, array $facets): array;
 - For each facet field `F`: `count` applies `$base->filters` **minus any node targeting `F`**; `total` applies base scope + ACL only.
 - Enumerable facets → one `count()` per option (no new query machinery). Open facets → `SELECT F, COUNT(*) … WHERE (filters − F) [AND F LIKE search] GROUP BY F [ORDER BY count|F] LIMIT/OFFSET` (single-hop relation → join). Always on the model's own connection. No per-request process fork.
 
-## HTTP surface — two thin entry points, one service
+## HTTP surface — a standalone facets endpoint (decided)
 
-Facet value pagination/search happens **independently of the data list** (scrolling or searching within one facet must not re-fetch `data`). So both are needed:
+**Decision:** the primary entry point is a **standalone** `/crud/facets/{module}/{entity}` read action, not a piggyback on the list. The frontend must be able to **reload only the facets** — paginate/search within a facet, or refresh counts — **without re-fetching the table data**. That independence requires a call of its own; the standalone route re-runs its full bootstrap (entity resolution, filter parsing, permission check) on purpose, and that recompute is the accepted cost of decoupling. It is also simpler: no entanglement with the list response envelope.
 
-- **Initial load → piggyback** on the Crud list request: an optional `facets: [...]` parameter makes one round-trip return list `data` **and** the first page of each facet. This is the assembled-screen win the funnel UX is about.
-- **Per-facet interaction → dedicated** `/crud/facets/{module}/{entity}` read action: paginate/search/sort a single facet's values without touching the data list.
+A later **piggyback** on the list (`facets: [...]` returning `data` + first facet page in one round-trip) is an optional optimization for the initial screen load, not required for v1.
 
-Both are thin wrappers over the same `facetCounts()` service, inside the Crud controller/permission model — no `/grid` prefix, no parallel request layer. **This is the whole difference from Grid:** Grid rebuilt an entire CRUD around funnels; here it is one service method plus two lean routes on top of `CrudService`.
+Both would be thin wrappers over the same `facetCounts()` service, inside the Crud controller/permission model — no `/grid` prefix, no parallel request layer. **This is the whole difference from Grid:** Grid rebuilt an entire CRUD around funnels; here it is one service method plus lean routes on top of `CrudService`.
 
 ## Testing
 
