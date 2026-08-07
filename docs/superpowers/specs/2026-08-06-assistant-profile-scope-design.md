@@ -12,7 +12,7 @@ The in-app assistant should be **specific to the app/module the user is in**; a 
 
 - The application-content surface already routes contextually to the current module.
 - The **documentation surface is not module-scoped**: `DocumentationRetrievalContext` filters by audience, permission, tenant, and locale, but has no module dimension, so an ERP user can retrieve unrelated CMS/Core guides.
-- There is no explicit "scope" abstraction a future generic superadmin profile could inherit, and the "page without a recognizable module → general documentation only" rule is not modeled.
+- There is no explicit "scope" abstraction a future generic superadmin profile could inherit, and no explicit model for what an in-app user gets when no module is recognizable.
 
 Scope is a **relevance** concern layered on top of the existing **security** boundary (audience / permission / tenant / safe projection), which is unchanged. Developer-oriented and internal content already lives in a physically separate developer index that the in-app profile cannot reach.
 
@@ -33,11 +33,11 @@ A new server-owned `AssistantScopeResolver` maps inputs to a scope:
 | Profile / context | moduleKey | dataAccess | docScope |
 |---|---|---|---|
 | `InAppAssistance` + verified module context | module | `Module` | `Module` |
-| `InAppAssistance` + no recognizable module | null | `None` | `Application` (general user docs only) |
+| `InAppAssistance` + no recognizable module | null | `Application` | `Application` (generic docs + authorized data via generic routing) |
 | `DeveloperHelp` (CLI) | null | `None` | `Application` (developer index, unchanged) |
 | *Superadmin (future seam — not built)* | null | `Application` | `Application` |
 
-The "page without a recognizable module → general documentation only" rule is a direct consequence of `dataAccess = None` in the second row: no application-data tools are offered, and documentation retrieval is not module-filtered.
+Data scope depends on the **module**, not on the frontend page. When an in-app user is not in a recognizable module (e.g. a general dashboard), the assistant stays **generic**: documentation is not module-filtered and authorized application data remains available via generic routing (the existing behavior) — always ACL/permission/tenant filtered. `dataAccess = None` is reserved for profiles that carry no runtime data (developer/CLI, and any future guest profile). Page-level context (entity/record) governs future *actions* (setting table filters, approving rows), not data scope, and is out of scope here.
 
 The resolver's inputs are already server-verified: the profile from `AssistantAccessContextFactory`, and the application context from the request attribute `assistant_application_context` (`module`/`entity`/`record_key`) that `InAppAssistanceService::serverApplicationContext()` already reads. Client-supplied module hints remain untrusted until matched against server-known route metadata; scope can only narrow, never expand, the profile's authorized reach.
 
@@ -64,7 +64,7 @@ Populating the marker on the few existing cross-cutting user guides is a small c
 
 `InAppAssistanceService` filters the contextual tool set by `AssistantScope.dataAccess` before the completion step:
 
-- `dataAccess = None`: neither the application content tool nor the Core Graph tools are offered. The assistant answers from documentation only (or clarifies/abstains).
+- `dataAccess = None`: neither the application content tool nor the Core Graph tools are offered (documentation-only). Reserved for profiles without runtime data (developer/CLI, future guest); not the default for an authenticated in-app user who merely lacks a module.
 - `dataAccess = Module`: application content is constrained to the current module's source (the existing contextual default); Core Graph tools are offered under their existing ACL/provider bounds.
 - `dataAccess = Application`: all authorized sources/tools are offered (future superadmin path).
 
@@ -86,7 +86,7 @@ Changes are surgical: the new value object + resolver, a module dimension on `Do
 2. The documentation module clause is relevance-only and is applied in the search query, after the existing audience/permission/tenant/locale filters, never instead of them.
 3. `cross_cutting_user` is relevance metadata; it never relaxes audience, permission, or tenant filtering and is absent from user-facing output.
 4. `dataAccess = None` guarantees no application-data tool is constructed for that turn.
-5. A missing or unrecognized module context yields `dataAccess = None` (fail-closed to documentation-only), never unrestricted access.
+5. A missing or unrecognized module context for an in-app user yields **generic** authorized access (`dataAccess = Application`) — never module-restricted-to-nothing and never unrestricted; ACL, permissions, and tenant still filter every source.
 6. The developer index remains physically separate; `docScope` narrows within a profile's index and never crosses profiles.
 
 ## Testing
@@ -107,7 +107,7 @@ Out of scope: the assistant-level evaluation (R1b); building the superadmin prof
 ## Success criteria
 
 - The in-app assistant retrieves only the current module's user documentation plus explicitly cross-cutting user guides; unrelated modules' docs are excluded.
-- A page without a recognizable module yields documentation-only assistance with no application-data tools.
+- A page without a recognizable module yields generic assistance (authorized data still available via generic routing), not documentation-only; module scoping applies only when a module is present.
 - The CLI/developer profile remains generic and unchanged.
 - Scope is a single server-owned value object a future superadmin profile can inherit as application-wide with no new plumbing.
 - The existing security boundary (audience/permission/tenant/safe projection) is provably unchanged.
