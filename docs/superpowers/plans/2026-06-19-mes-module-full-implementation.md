@@ -75,9 +75,17 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 7 — Operazioni**: `mes_production_order_operations`, enum `ProductionOrderOperationStatus`, modello, `ProductionOrderOperationService` (generazione da snapshot, start/complete/skip, efficienza standard/actual clampata, operazioni parallele), `release()` genera le operazioni, factory, test. (`laraplate-mes` `a1a3a9c`)
 - ✅ **Task 8 — Backflush**: `mes_material_consumptions` (unique operation+item), modello `MaterialConsumption`, `BackflushMaterialsJob` (queued, idempotente, match linea↔operazione per D5, stock-out via `StockMovementRecorder`), dispatch su complete operazione, factory, test. (`laraplate-mes` `f0ffc67`)
 
-Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5.
+- ✅ **Task 9 — Lotti/seriali**: `mes_lot_numbers`/`mes_serial_numbers`/`mes_lot_lineages`, modelli, `LotTracingService` (trace forward/backward BFS, generazione codice, lineage), lotto su `complete()` per item tracciati, factory, test. (`laraplate-mes` `fc5f9a9`)
+- ✅ **Task 10 — Qualità/NC**: `mes_quality_checks`/`_measurements`/`mes_non_conformances`, 3 enum, modelli, `QualityCheckService` (valuta limiti → apre NC), `NonConformanceService` (resolve con disposition, rework → PO collegato, close), factory, test. (`laraplate-mes` `d7704ee`)
+- ✅ **Task 11 — Capacità**: `CapacityService` (carico in minuti standard, schedule, stima completamento, overload, reschedule), test. Nessuna tabella nuova. (`laraplate-mes` `012fa0f`)
+- ✅ **Task 12 — Fermi/OEE**: `mes_downtimes`, enum `DowntimeCause`, modello, `DowntimeService` (open/close + flag WC down), `OeeCalculatorService` (A×P×Q clampato [0,1]), factory, test. (`laraplate-mes` `816c178`)
+- ✅ **Task 13 — Turni/operatori**: `mes_shifts`/`mes_shift_instances`/`mes_operator_logs`, enum `OperatorLogAction`, modelli, `ShiftVerificationService` (log operatore sempre, turno warning non-bloccante D6, efficienza media), log su start/complete operazione, factory, test. (`laraplate-mes` `53199d0`)
 
-**Parti differite ai task successivi** (segnalate nei commit): pipeline `SalesOrderConfirmed` (evento/listener/job auto-creazione PO), generazione lotto su `complete()` (Task 9), quality check su complete operazione (Task 10), consumo manuale ed evento stock-shortage (Task 8 residuo). `Bom/Routing::assertNotLocked()` referenziano `ProductionOrder`: ora testabili.
+**Dominio MES (Task 4-13) COMPLETO.** Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5.
+
+**ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward).
+
+**Parti differite ai task API/Filament** (segnalate nei commit): pipeline `SalesOrderConfirmed` (evento/listener/job auto-creazione PO), consumo manuale ed evento stock-shortage (residuo Task 8), quality-check auto su complete operazione (opzionale). Restano i Task 14 (API domain-action/policy), 15 (Filament), 16 (test hardening/E2E), 17 (docs).
 
 **Riferimenti obbligatori prima di ogni task:**
 
