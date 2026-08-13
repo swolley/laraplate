@@ -71,8 +71,13 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 
 - ✅ **Task 5 — Routing**: `mes_routing_operations`, modelli `Routing`/`RoutingOperation`, `RoutingResolverService` (versione attiva per data + lock guard), factory, test. (`laraplate-mes` `a614087`)
 - ✅ **Task 4 — BOM**: enum `ConsumptionMethod`, `routing_operation_id` su `mes_bom_lines`, modelli `Bom`/`BomLine`, `BomExplosionService` (esplosione multi-livello + lock guard), factory, test. (`laraplate-mes` `25ad38d`)
+- ✅ **Task 6 — Production Order**: `DocumentType::ProductionOrder` in ERP (`laraplate-erp` `1d1587a`), `sales_order_line_id`, enum `ProductionOrderStatus`, modello `ProductionOrder`, `ProductionOrderService` (create con numero via `DocumentNumberAllocator` + snapshot BOM/routing immutabili, release/complete/cancel via `DomainException`), factory, test. (`laraplate-mes` `2893783`)
+- ✅ **Task 7 — Operazioni**: `mes_production_order_operations`, enum `ProductionOrderOperationStatus`, modello, `ProductionOrderOperationService` (generazione da snapshot, start/complete/skip, efficienza standard/actual clampata, operazioni parallele), `release()` genera le operazioni, factory, test. (`laraplate-mes` `a1a3a9c`)
+- ✅ **Task 8 — Backflush**: `mes_material_consumptions` (unique operation+item), modello `MaterialConsumption`, `BackflushMaterialsJob` (queued, idempotente, match linea↔operazione per D5, stock-out via `StockMovementRecorder`), dispatch su complete operazione, factory, test. (`laraplate-mes` `f0ffc67`)
 
-Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5. `Bom/Routing::assertNotLocked()` referenziano `ProductionOrder` (Task 6): parse-safe, da testare dopo il Task 6.
+Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5.
+
+**Parti differite ai task successivi** (segnalate nei commit): pipeline `SalesOrderConfirmed` (evento/listener/job auto-creazione PO), generazione lotto su `complete()` (Task 9), quality check su complete operazione (Task 10), consumo manuale ed evento stock-shortage (Task 8 residuo). `Bom/Routing::assertNotLocked()` referenziano `ProductionOrder`: ora testabili.
 
 **Riferimenti obbligatori prima di ogni task:**
 
