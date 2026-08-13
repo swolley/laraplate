@@ -65,6 +65,15 @@ Due aggiornamenti importanti emersi in questa sessione, dettagliati sotto:
 1. **Task 14 (API) ridefinito** → niente 11 controller custom: si usano le rotte generiche di Core (CRUD + domain-action registry). Vedi sezione «API — architettura rivista (2026-08-13)» e il Task 14 aggiornato.
 2. **Ambiente di esecuzione cloud** → il codice richiede **PHP 8.5** (usa `#[Override]` su proprietà) e Composer non può usare i dist di GitHub (proxy repo-scoped). Provisioning documentato nella sezione «Esecuzione in ambiente cloud».
 
+### Avanzamento implementazione (2026-08-13)
+
+Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bumpato nel padre):
+
+- ✅ **Task 5 — Routing**: `mes_routing_operations`, modelli `Routing`/`RoutingOperation`, `RoutingResolverService` (versione attiva per data + lock guard), factory, test. (`laraplate-mes` `a614087`)
+- ✅ **Task 4 — BOM**: enum `ConsumptionMethod`, `routing_operation_id` su `mes_bom_lines`, modelli `Bom`/`BomLine`, `BomExplosionService` (esplosione multi-livello + lock guard), factory, test. (`laraplate-mes` `25ad38d`)
+
+Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5. `Bom/Routing::assertNotLocked()` referenziano `ProductionOrder` (Task 6): parse-safe, da testare dopo il Task 6.
+
 **Riferimenti obbligatori prima di ogni task:**
 
 - Decisioni: `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
