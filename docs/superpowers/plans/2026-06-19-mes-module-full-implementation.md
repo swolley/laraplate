@@ -52,6 +52,19 @@ Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (
 
 **Test attuali:** `php artisan test Modules/MES/tests --compact` → 31 pass, 5 fail (baseline da sistemare in Task 0).
 
+### Ri-verifica 2026-08-13
+
+Stato codice del submodule `Modules/MES` (commit `1dccb8d`) **invariato** rispetto al 2026-07-09: il monorepo è avanzato solo su AI/Core/CMS/ERP. Gap confermati leggendo il codice:
+
+- `mes_bom_lines` **senza** `routing_operation_id`; `mes_production_orders` **senza** `sales_order_line_id`; tabella `mes_routing_operations` **assente**; `DocumentType::ProductionOrder` **assente** in ERP.
+- Modelli presenti: solo `WorkCenter`, `WorkCenterCalendar`. Servizi: solo `ErpStockMovementRecorder`. Nessun Job. Nessun Filament. `routes/api.php` vuoto.
+- Enum presenti: `MESTables`, `WorkCenterType`.
+
+Due aggiornamenti importanti emersi in questa sessione, dettagliati sotto:
+
+1. **Task 14 (API) ridefinito** → niente 11 controller custom: si usano le rotte generiche di Core (CRUD + domain-action registry). Vedi sezione «API — architettura rivista (2026-08-13)» e il Task 14 aggiornato.
+2. **Ambiente di esecuzione cloud** → il codice richiede **PHP 8.5** (usa `#[Override]` su proprietà) e Composer non può usare i dist di GitHub (proxy repo-scoped). Provisioning documentato nella sezione «Esecuzione in ambiente cloud».
+
 **Riferimenti obbligatori prima di ogni task:**
 
 - Decisioni: `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
@@ -59,6 +72,86 @@ Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (
 - Contratto stock: `Modules/MES/app/Contracts/StockMovementRecorder.php`
 - Numerazione ERP: `Modules/ERP/app/Services/Accounting/DocumentNumberAllocator.php`
 - Filament pattern: `Modules/Core/app/Filament/Resources/Users/UserResource.php`
+
+---
+
+## API — architettura rivista (2026-08-13)
+
+Il piano originale (Task 14) prevedeva ~11 controller REST custom sotto `api/v1/mes`. **Superato**: Core espone già un CRUD generico e un registry di domain-action per qualsiasi entità, quindi MES **non dichiara rotte né controller CRUD**.
+
+**Coperto gratis dal CRUD generico Core** (rotte in `Modules/Core/routes/crud.php`, controller `CrudController`, risoluzione entità per convenzione via `DynamicEntity`/`models()` scan — nessun registry):
+
+```
+/app/crud/{select|detail|search|insert|update|delete|history|facets|tree}/mes/{entity}
+```
+
+Ogni modello in `Modules/MES/app/Models/` è auto-scoperto. I permessi per-tabella (`{conn}.{table}.{op}`) li genera il comando globale `permission:refresh`. Esposizione esterna `/api/v1` gated dal flag `core.expose_crud_api` (nessun lavoro per-modello).
+
+**Verbi di dominio via registry** (rotta unica `POST /app/crud/{action}/{module}/{entity}`, dispatcher `DomainActionDispatcher`, registry `DomainActionRegistry` — pattern ERP in `ErpDomainActionRegistrar` + `ERPModelPolicy`):
+
+| Entità | Verbi |
+|--------|-------|
+| production-orders | `release`, `complete`, `cancel` |
+| operations | `start`, `complete`, `skip` |
+| quality-checks | `execute`, `disposition` |
+| non-conformances | `resolve`, `close` |
+| downtimes | `open`, `close` |
+| boms | `explode` (record-scoped) |
+| lot-numbers | `forward_trace`, `backward_trace` |
+
+Nessuno collide coi verbi riservati Core (approve/lock/…) → `OverridesGenericCrudActions` non serve. Il backflush **non è una rotta**: interno, scatenato dall'observer sul complete operazione.
+
+**Cosa MES deve aggiungere (Task 14 aggiornato):** `MesDomainActionRegistrar`, `MesModelPolicy` (un metodo camelCase per verbo, predicato-di-stato + `hasPermission`), wiring in `MESServiceProvider::boot()` (`Gate::policy` + `register`), e seeding dei permessi domain in `MESDatabaseSeeder` (`permission:refresh` **non** li crea). Nessuna rotta.
+
+**Genuinamente non coperto** (read aggregati senza singolo record id): OEE, carico/schedule capacità, dashboard produzione. **Decisione presa 2026-08-13:** esporli **solo come widget Filament** (Task 15), niente rotte read custom.
+
+Mappatura completa e riferimenti file: report in-session (Core `CrudController`/`DynamicEntity`/`DomainActionRegistry`, ERP `ErpDomainActionRegistrar`/`ERPModelPolicy`).
+
+---
+
+## Esecuzione in ambiente cloud (Claude Code on the web)
+
+Vincoli scoperti il 2026-08-13 provisionando l'ambiente; **il codice non gira senza questi passi**:
+
+1. **PHP 8.5 obbligatorio.** Il codice usa `#[Override]` su proprietà (feature 8.5). Il container base ha PHP 8.4 → l'app non fa boot (`Attribute "Override" cannot target property`). Installare `php8.5` + estensioni (`mbstring xml curl intl gd zip bcmath gmp sqlite3 pgsql mysql redis soap`) dal PPA ondrej. Richiede **network access = Full** (o Custom con `ppa.launchpadcontent.net` in allowlist): il PPA è altrimenti bloccato dal proxy (403).
+2. **Composer non può usare i dist GitHub.** Il proxy GitHub è repo-scoped e indipendente dal livello di rete: gli archivi `api.github.com`/`codeload` danno 403. Installare **da sorgente** (`composer install --prefer-source`): il `git clone` dei repo pubblici funziona. Unico pacchetto senza source è **`phpstan/phpstan`** (dist-only): costruire il suo archivio da un `git clone` del tag e puntare il lock a un file locale, ripristinando il lock dopo l'install.
+3. **Submodule.** `git submodule update --init --recursive`; per pushare il codice MES serve attaccare `swolley/laraplate-mes` alla sessione (`add_repo` push).
+
+Setup script pronto (idempotente, container cachato dopo la prima corsa):
+
+```bash
+set -uo pipefail
+export DEBIAN_FRONTEND=noninteractive COMPOSER_ALLOW_SUPERUSER=1
+cd "${CLAUDE_PROJECT_DIR:-$(pwd)}"
+
+if ! command -v php8.5 >/dev/null 2>&1; then
+  apt-get update
+  apt-get install -y --no-install-recommends \
+    php8.5-cli php8.5-common php8.5-mbstring php8.5-xml php8.5-curl \
+    php8.5-intl php8.5-gd php8.5-zip php8.5-bcmath php8.5-gmp \
+    php8.5-sqlite3 php8.5-pgsql php8.5-mysql php8.5-redis php8.5-soap
+  update-alternatives --set php /usr/bin/php8.5 || true
+fi
+
+git submodule update --init --recursive
+[ -f .env ] || cp .env.example .env
+
+if [ ! -f vendor/autoload.php ]; then
+  PHPSTAN_VER=$(php -r '$l=json_decode(file_get_contents("composer.lock"),true);foreach(array_merge($l["packages"],$l["packages-dev"]) as $p){if($p["name"]==="phpstan/phpstan"){echo $p["version"];break;}}')
+  if [ -n "$PHPSTAN_VER" ]; then
+    rm -rf /tmp/phpstan-src /tmp/phpstan.zip
+    GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --branch "$PHPSTAN_VER" https://github.com/phpstan/phpstan /tmp/phpstan-src
+    git -C /tmp/phpstan-src archive --format=zip --prefix=phpstan-phpstan/ HEAD -o /tmp/phpstan.zip
+    php -r '$p="composer.lock";$d=json_decode(file_get_contents($p),true);foreach(["packages","packages-dev"] as $s){foreach($d[$s] as &$pk){if($pk["name"]==="phpstan/phpstan"){$pk["dist"]=["type"=>"zip","url"=>"file:///tmp/phpstan.zip","reference"=>$pk["dist"]["reference"]??"","shasum"=>""];}}unset($pk);}file_put_contents($p,json_encode($d,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)."\n");'
+  fi
+  composer install --prefer-source --ignore-platform-reqs --no-interaction --no-progress
+  git checkout -- composer.lock 2>/dev/null || true
+fi
+
+grep -q '^APP_KEY=base64:' .env || php artisan key:generate --no-interaction --force
+```
+
+**Nota di provenienza (2026-08-13):** in questa sessione web `vendor/` è stato installato con successo con questo metodo, ma i test **non** sono stati eseguibili perché il container aveva solo PHP 8.4 e la rete verso il PPA era chiusa. Nessun task d'implementazione (4–17) è quindi stato eseguito: vanno lavorati in una sessione con PHP 8.5 seguendo questo provisioning.
 
 ---
 
@@ -940,7 +1033,10 @@ expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
 
 ### Task 14: API REST — T13/R13
 
-**Files:**
+> **⚠️ RIVISTO 2026-08-13 — leggere prima la sezione «API — architettura rivista».**
+> Niente controller/resources/rotte custom: si usano le rotte generiche di Core (CRUD + domain-action registry). Il vero lavoro di questo task è: `MesDomainActionRegistrar`, `MesModelPolicy`, wiring in `MESServiceProvider::boot()`, seeding permessi domain in `MESDatabaseSeeder`, verifica esposizione entità. Il blocco «Files/Step» sottostante (controller REST) è **obsoleto** e va ignorato; resta come storia della stima originaria.
+
+**Files (OBSOLETO — vedi sopra):**
 - Modify: `Modules/MES/routes/api.php`
 - Modify: `Modules/MES/app/Providers/RouteServiceProvider.php` (prefix `api/v1/mes`, middleware `auth:sanctum`, throttle)
 - Modify: `Modules/MES/config/config.php` (uncomment `rate_limit`)
