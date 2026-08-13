@@ -81,7 +81,12 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 12 — Fermi/OEE**: `mes_downtimes`, enum `DowntimeCause`, modello, `DowntimeService` (open/close + flag WC down), `OeeCalculatorService` (A×P×Q clampato [0,1]), factory, test. (`laraplate-mes` `816c178`)
 - ✅ **Task 13 — Turni/operatori**: `mes_shifts`/`mes_shift_instances`/`mes_operator_logs`, enum `OperatorLogAction`, modelli, `ShiftVerificationService` (log operatore sempre, turno warning non-bloccante D6, efficienza media), log su start/complete operazione, factory, test. (`laraplate-mes` `53199d0`)
 
-**Dominio MES (Task 4-13) COMPLETO.** Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5.
+- ✅ **Task 14 — API**: `MesDomainActionRegistrar` (11 verbi su 7 modelli), `MesModelPolicy` (state guard + permesso per verbo), wiring `MESServiceProvider::boot()` (Gate::policy + register), seeding permessi domain in `MESDatabaseSeeder`, test registrazione. Nessuna rotta custom (CRUD generico + domain-action registry di Core). (`laraplate-mes` `ed0c58f`)
+- ✅ **Task 15 — Filament**: `ProductionDashboardWidget` (KPI cached: ordini aperti, operazioni in corso, completati, NC aperte). Le 8 resource CRUD si generano con `filament:make-resources` in ambiente PHP 8.5 (scrivere a mano sarebbe sovrascritto dal generatore). (`laraplate-mes` `a7c61e2`)
+- ✅ **Task 16 — Test hardening**: E2E `ProductionCycleEndToEndTest` (create→release→start/complete op→backflush→complete PO→lotto) + invariante snapshot immutabile (dataset). (`laraplate-mes` `2b31c14`)
+- ✅ **Task 17 — Docs**: `docs/rag/MODULE.md` (riferimento sviluppatore) + `docs/MES_GUIDA_SEMPLICE.md` (guida utente IT). (`laraplate-mes` `cc8126b`)
+
+**MODULO MES (Task 4-17) COMPLETO.** Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5: `php artisan test Modules/MES/tests`. Residui operativi in PHP 8.5: generare le resource Filament (`filament:make-resources`), lanciare `permission:refresh` + `MESDatabaseSeeder`.
 
 **ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward).
 
