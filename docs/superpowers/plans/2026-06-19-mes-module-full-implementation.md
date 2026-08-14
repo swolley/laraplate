@@ -86,7 +86,13 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 16 — Test hardening**: E2E `ProductionCycleEndToEndTest` (create→release→start/complete op→backflush→complete PO→lotto) + invariante snapshot immutabile (dataset). (`laraplate-mes` `2b31c14`)
 - ✅ **Task 17 — Docs**: `docs/rag/MODULE.md` (riferimento sviluppatore) + `docs/MES_GUIDA_SEMPLICE.md` (guida utente IT). (`laraplate-mes` `cc8126b`)
 
-**MODULO MES (Task 4-17) COMPLETO.** Verifica applicata a ogni file: `php -l` (con strip di `#[Override]`, 8.5-only) + `pint`. **Test scritti ma non eseguiti** (container PHP 8.4). Da lanciare dall'app base su PHP 8.5: `php artisan test Modules/MES/tests`. Residui operativi in PHP 8.5: generare le resource Filament (`filament:make-resources`), lanciare `permission:refresh` + `MESDatabaseSeeder`.
+**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 97 passed, 250 assertions, 0 failed.**
+
+Due fix emersi eseguendo i test su PHP 8.5:
+- **Core** (`fix(core)`, `laraplate-core` `87d75b4`): `MigrateUtils` emetteva `IF()` (MySQL) nelle colonne generate `is_deleted`/`is_locked` per driver non-pgsql/oracle → SQLite rompeva `RefreshDatabase` dell'intera suite. Aggiunto il caso `sqlite` con la forma portabile `<col> IS NOT NULL`.
+- **MES** (`fix(mes)`, `laraplate-mes` `ae9cb3a`): tabelle header con modello `Core\Overrides\Model` (boms/routings/production_orders) ora aggiungono la colonna generata `is_deleted` via `MigrateUtils::timestamps(hasSoftDelete: true)`; le `state()` dei factory usano la forma array (le closure staticizzate da pint non erano bindabili su PHP 8.5).
+
+Residui operativi in PHP 8.5 (non-test): generare le resource Filament (`filament:make-resources`), lanciare `permission:refresh` + `MESDatabaseSeeder`.
 
 **ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward).
 
