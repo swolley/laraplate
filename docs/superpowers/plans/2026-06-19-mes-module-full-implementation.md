@@ -86,7 +86,7 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 16 — Test hardening**: E2E `ProductionCycleEndToEndTest` (create→release→start/complete op→backflush→complete PO→lotto) + invariante snapshot immutabile (dataset). (`laraplate-mes` `2b31c14`)
 - ✅ **Task 17 — Docs**: `docs/rag/MODULE.md` (riferimento sviluppatore) + `docs/MES_GUIDA_SEMPLICE.md` (guida utente IT). (`laraplate-mes` `cc8126b`)
 
-**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 109 passed, 318 assertions, 0 failed** (include smoke test 8 resource Filament, `MaterialConsumptionServiceTest` e `SalesOrderProductionPlannerTest`).
+**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 118 passed, 346 assertions, 0 failed** (include smoke test 9 resource Filament, pipeline sales-order, quality-plan auto-check e stock-shortage).
 
 Due fix emersi eseguendo i test su PHP 8.5:
 - **Core** (`fix(core)`, `laraplate-core` `87d75b4`): `MigrateUtils` emetteva `IF()` (MySQL) nelle colonne generate `is_deleted`/`is_locked` per driver non-pgsql/oracle → SQLite rompeva `RefreshDatabase` dell'intera suite. Aggiunto il caso `sqlite` con la forma portabile `<col> IS NOT NULL`.
@@ -105,9 +105,11 @@ Config: `mes.production.default_warehouse`/`daily_minutes`/`default_lead_time_da
 
 **ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward). Evento `SalesOrderConfirmed` + hook sul modello aggiunti in questa iterazione.
 
-**Parti ancora differite (richiedono una decisione di design, NON forzate):**
-- **Quality-check automatico su complete operazione**: manca un'entità "piano di qualità" che colleghi item/operazione ai controlli attesi; per ora i `QualityCheck` si creano via domain action `execute`.
-- **Evento stock-shortage**: richiede un contratto di lettura stock lato ERP; il consumo (backflush + manuale) registra il movimento ma non emette un evento di carenza.
+**Quality-check automatico + stock-shortage implementati (2026-08-14):** i due residui differiti sono ora chiusi (design proposto e approvato).
+- **Piano di qualità → quality-check automatici**: nuove entità `QualityPlan` + `QualityPlanCharacteristic` (date-effective come BOM/routing), `QualityPlanResolver` + `QualityCheckPlanner`. Al complete operazione si crea il check in-process per `(item, routing_operation)`; al complete ordine il check finale (`routing_operation_id = null`). Non bloccante, idempotente per `(order, plan, operation)`. Aggiunta `quality_plan_id` nullable su `mes_quality_checks`. Resource Filament `QualityPlanResource` (header, come Bom). I `QualityCheck` restano valutati dal `QualityCheckService::execute` esistente.
+- **Stock-shortage**: nuovo contratto `StockReader` + adapter `ErpStockReader` (legge `StockLevel`). Backflush e consumo manuale leggono la giacenza prima di scaricare: se sufficiente registrano il movimento, se in carenza marcano `mes_material_consumptions.stock_shortage` ed emettono `MaterialShortageDetected` senza forzare un `out` che l'ERP rifiuterebbe (D: `recordOutbound` lancia su stock insufficiente → il nostro flusso è non bloccante e ri-eseguibile).
+
+Test: `QualityCheckPlannerTest`, `ErpStockReaderTest`, casi shortage in `BackflushMaterialsJobTest`/`MaterialConsumptionServiceTest`. Nessuna dipendenza/tabella ERP modificata (entrambe MES-only).
 
 **Riferimenti obbligatori prima di ogni task:**
 
