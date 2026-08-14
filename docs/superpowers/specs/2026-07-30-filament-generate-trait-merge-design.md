@@ -1,7 +1,7 @@
 # HasTable/HasForm — Filament generate merge (Design)
 
 Date: 2026-07-30  
-Status: approved
+Status: implemented (verified 2026-08-14 — generators `LaraplateResourceTable/Form/InfolistClassGenerator`, runtime strip via `FilamentTraitResolver::HAS_TABLE_STRIP_FROM_GENERATED_COLUMNS` in `HasTable::configureColumns`)
 
 ## Goal
 

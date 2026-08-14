@@ -106,7 +106,7 @@ Pure algorithm, no database. This is the task that fixes the originating defect.
 - Consumes: nothing
 - Produces: `SeedNode` (readonly: `string $seederClass`, `string $module`, `list<class-string> $dependsOn`); `SeedGraph::sort(list<SeedNode>): list<SeedNode>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -175,12 +175,12 @@ it('throws when a declared dependency is not in the graph', function (): void {
 })->throws(MissingSeedDependencyException::class, 'ErpSeeder');
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Seeding/SeedGraphTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\SeedGraph" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `Modules/Core/app/Seeding/SeedNode.php`:
 
@@ -325,12 +325,12 @@ final class SeedGraph
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Seeding/SeedGraphTest.php`
 Expected: PASS — 5 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -353,7 +353,7 @@ git commit -m "chore: bump Core for the seeder dependency graph"
 - Consumes: `SeedNode`, `SeedGraph::sort()` from Task 1
 - Produces: `SeedGraphBuilder::build(): list<SeedNode>` (already sorted)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 This asserts against the real module layout, so it is the regression test for the originating defect.
 
@@ -405,12 +405,12 @@ it('excludes Dev seeders from the production graph', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/SeedGraphBuilderTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\SeedGraphBuilder" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `Modules/Core/app/Seeding/Contracts/DeclaresSeedDependencies.php`:
 
@@ -544,14 +544,14 @@ final class SeedGraphBuilder
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/SeedGraphBuilderTest.php`
 Expected: PASS — 3 tests
 
 Note: `Core` is required implicitly by AI, CMS and ERP via their `module.json` `requires`, so the second test passes without special-casing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -573,7 +573,7 @@ git commit -m "chore: bump Core for seeder discovery"
 **Interfaces:**
 - Produces: `core_settings.module` (nullable string), `core_settings.seeded_value` (nullable json); `Setting::$module`, `Setting::$seeded_value`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -618,12 +618,12 @@ it('leaves both columns null for hand-created settings', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SettingSeedingColumnsTest.php`
 Expected: FAIL — unknown column `module`
 
-- [ ] **Step 3: Write the migration and model changes**
+- [x] **Step 3: Write the migration and model changes**
 
 `Modules/Core/database/migrations/2026_07_31_000002_add_seeding_columns_to_settings_table.php`:
 
@@ -673,12 +673,12 @@ In `Modules/Core/app/Models/Setting.php`, add `'module'` and `'seeded_value'` to
 'seeded_value' => 'json',
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SettingSeedingColumnsTest.php`
 Expected: PASS — 2 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -699,7 +699,7 @@ git commit -m "chore: bump Core for settings seeding columns"
 **Interfaces:**
 - Produces: `SeedDefinition::for(class-string<Model>)`, fluent `identity(list<string>)`, `structural(list<string>)`, `initial(list<string>)`, `ownedBy(string)`, `rows(list<array<string,mixed>>)`; readable properties `$modelClass`, `$identity`, `$structural`, `$initial`, `$module`, `$rows`; `identityColumn(): string`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -747,12 +747,12 @@ it('normalizes empty strings to null, replacing the SettingObserver saving hook'
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Seeding/SeedDefinitionTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\SeedDefinition" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```php
 <?php
@@ -884,12 +884,12 @@ final class SeedDefinition
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Seeding/SeedDefinitionTest.php`
 Expected: PASS — 3 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -914,7 +914,7 @@ The heart of the plan. One read, one upsert (which both inserts new rows and rea
 - Consumes: `SeedDefinition` from Task 4; `core_settings.module` / `seeded_value` from Task 3
 - Produces: `SeedReconciler::reconcile(SeedDefinition): ReconciliationOutcome`; `ReconciliationOutcome` readonly with `list<string> $created`, `$realigned`, `$restored`, `int $unchanged`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1053,12 +1053,12 @@ it('issues a fixed number of queries regardless of row count', function (): void
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SeedReconcilerTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\SeedReconciler" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `Modules/Core/app/Seeding/ReconciliationOutcome.php`:
 
@@ -1307,14 +1307,14 @@ final class ValueComparator
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SeedReconcilerTest.php`
 Expected: PASS — 7 tests
 
 If the query-count test reports a mismatch, check that `whereIn` is not being split — it should be one statement regardless of row count.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1337,7 +1337,7 @@ Replaces 749 hierarchy traversals with 107, and deletes the duplicate filesystem
 **Interfaces:**
 - Produces: `ModelCapabilityScanner::scan(): list<ModelCapabilities>` where each entry exposes `string $modelClass`, `string $table`, `bool $hasVersions`, `$hasSoftDeletes`, `$hasLocks`, `$hasOptimisticLocking`, `$hasTranslations`, `$hasApprovals`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1363,12 +1363,12 @@ it('computes the trait set once per model', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/ModelCapabilityScannerTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\ModelCapabilityScanner" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```php
 <?php
@@ -1449,12 +1449,12 @@ final class ModelCapabilityScanner
 
 Place `ModelCapabilities` in its own file `Modules/Core/app/Seeding/ModelCapabilities.php` rather than inline — the two-classes-per-file form above is shown only for readability.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/ModelCapabilityScannerTest.php`
 Expected: PASS — 2 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1475,7 +1475,7 @@ git commit -m "chore: bump Core for the single-pass capability scan"
 **Interfaces:**
 - Consumes: `SeedReconciler`, `SeedDefinition`, `ModelCapabilityScanner`, `SettingsCacheCoordinator::flushAll()`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1527,12 +1527,12 @@ it('no longer force-deletes settings during a run', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/CoreSettingsReconciliationTest.php`
 Expected: FAIL — the third test fails because `deleteRefuses()` still force-deletes the orphan
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Replace the body of `defaultSettings()` so that it:
 
@@ -1564,7 +1564,7 @@ app(SettingsCacheCoordinator::class)->flushAll();
 
 Delete `getModelsWithApprovals()`, `getClassNameFromFile()`, `usesHasApprovalsTrait()` and `deleteRefuses()`, and drop the now-unused `File`, `ReflectionClass` and `Throwable` imports. `defaultApprovalSettings()` folds into the single pass — its rows join the same definition.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/CoreSettingsReconciliationTest.php`
 Expected: PASS — 3 tests
@@ -1574,7 +1574,7 @@ Then confirm nothing else regressed:
 Run: `php artisan test --compact Modules/Core/tests/Feature/Settings`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1598,7 +1598,7 @@ git commit -m "chore: bump Core for single-pass settings reconciliation"
 **Interfaces:**
 - Produces: `SeedLedger::start(string $runId, string $node): void`, `::succeed(string $runId, string $node, string $contentHash): void`, `::fail(string $runId, string $node, string $error): void`, `::completedNodes(string $runId): list<string>`, `::lastFailedRunId(): ?string`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1650,12 +1650,12 @@ it('finds the most recent failed run', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SeedLedgerTest.php`
 Expected: FAIL — `Class "Modules\Core\Models\SeedRun" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Migration:
 
@@ -1811,12 +1811,12 @@ final class SeedLedger
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SeedLedgerTest.php`
 Expected: PASS — 4 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1840,7 +1840,7 @@ git commit -m "chore: bump Core for the seed run ledger"
 - Consumes: `SeedGraphBuilder::build()`, `SeedLedger`, `SettingsCacheCoordinator::flushAll()`
 - Produces: `SeedOrchestrator::run(?string $resumeRunId = null): int` returning an exit code; `SeedOrchestrator::withNodes(list<SeedNode>): self` for tests
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Stubs go in `Modules/Core/tests/Stubs/Seeding/` — `PassingStubSeeder` writes a marker to the container, `FailingStubSeeder` throws `RuntimeException('stub failure')`.
 
@@ -1893,12 +1893,12 @@ it('rolls back the failing node without touching earlier ones', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/SeedOrchestratorTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\SeedOrchestrator" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `Modules/Core/app/Seeding/SeedOrchestrator.php`:
 
@@ -2040,12 +2040,12 @@ extracting definitions without executing the seeder — capability no task here 
 flag over the placeholder hash would skip nodes whose content actually changed, which is worse than
 not having the flag. It belongs to a follow-up plan.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/SeedOrchestratorTest.php`
 Expected: PASS — 3 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -2099,7 +2099,7 @@ final class FixedModuleStateResolver extends ModuleStateResolver
 - Consumes: `core_settings.module` / `seeded_value` from Task 3
 - Produces: `ModuleState` enum (`Enabled`, `Disabled`, `Absent`); `ModuleStateResolver::for(?string $module): ModuleState`; `SettingsCleaner::clean(): CleanupReport` with `list<string> $hardDeleted`, `$softDeleted`, `$preserved`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `ModuleStateResolver` is bound in the container so tests can swap it for a stub returning a fixed map.
 
@@ -2189,12 +2189,12 @@ it('leaves settings of enabled modules alone', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SettingsCleanerTest.php`
 Expected: FAIL — `Class "Modules\Core\Seeding\ModuleState" not found`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```php
 <?php
@@ -2353,12 +2353,12 @@ if ($report->hardDeleted !== [] || $report->softDeleted !== []) {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Seeding/SettingsCleanerTest.php`
 Expected: PASS — 5 tests
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -2371,6 +2371,13 @@ git commit -m "chore: bump Core for settings cleanup"
 ---
 
 ### Task 11: Migrate AI, CMS, ERP and MES seeders
+
+> **✅ COMPLETED (verified 2026-08-14).** All four module seeders (`AIDatabaseSeeder`,
+> `CMSDatabaseSeeder`, `ERPDatabaseSeeder`, `MESDatabaseSeeder`) build settings via
+> `SeedDefinition::for(...)->ownedBy('<Module>')`; `ItalianTaxCodesSeeder implements
+> DeclaresSeedDependencies` with `dependsOn([ERPDatabaseSeeder::class])`; CMS replaced the
+> blanket `cache:clear` with `SettingsCacheCoordinator::flushAll()`. `FullSeedRunTest`
+> (idempotent full run + every setting attributed to a module) is green.
 
 > **Unblocked 2026-08-01.** This task was deferred while
 > `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` carried uncommitted work from a concurrent
@@ -2401,7 +2408,7 @@ git commit -m "chore: bump Core for settings cleanup"
 **Interfaces:**
 - Consumes: everything from Tasks 1–10
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -2432,19 +2439,19 @@ it('attributes every seeded setting to an owning module', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/FullSeedRunTest.php`
 Expected: FAIL — module seeders still write directly, leaving `module` null
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 For each module seeder, replace `seedSettingDefinitions()` and `firstOrCreate()` loops with a `SeedDefinition` handed to the reconciler, passing `->ownedBy('<Module>')`. Add `implements DeclaresSeedDependencies` with `dependsOn()` where intra-module order matters:
 
 - `ItalianTaxCodesSeeder::dependsOn()` returns `[ERPDatabaseSeeder::class]` — today that order holds only because `E` sorts before `I`.
 - `ERPDatabaseSeeder::ensureDomainPermissions()` keeps `firstOrCreate` on `Permission`, which is not a `SeedDefinition` target; leave it, but move the `permission:refresh` call out of `CoreDatabaseSeeder::defaultPermissions()` into its own seeder node so ERP can depend on it.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/FullSeedRunTest.php`
 Expected: PASS — 2 tests
@@ -2454,7 +2461,7 @@ Then the full suites of every touched module:
 Run: `php artisan test --compact Modules/Core/tests Modules/ERP/tests Modules/CMS/tests`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Four separate repositories plus the superproject. Run from the laraplate root:
 
@@ -2485,15 +2492,15 @@ never `git add -A`.
 - Modify: `Modules/Core/README.md` — seeding section
 - Modify: `docs/superpowers/plans/INDEX.md` — add this plan
 
-- [ ] **Step 1: Write the Core README section**
+- [x] **Step 1: Write the Core README section**
 
 Document, in the existing README style: the `dependsOn()` contract, the `SeedDefinition` structural/initial distinction, the `module` and `seeded_value` columns and what drift means, the cleanup matrix, and the `--resume` / `--skip-unchanged` options. No new env vars are introduced by this work, so the env table is unchanged.
 
-- [ ] **Step 2: Add the plan to the index**
+- [x] **Step 2: Add the plan to the index**
 
 Append a one-line entry to `docs/superpowers/plans/INDEX.md` following the existing format.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git -C Modules/Core add README.md

@@ -1,7 +1,7 @@
 # Filament Toggle inline default — Design
 
 Date: 2026-07-29  
-Status: approved
+Status: implemented (verified 2026-08-14 — `Toggle::configureUsing` in `CoreServiceProvider::boot`; tests in `Modules/Core/tests/Feature/Filament/UtilsTest.php`)
 
 ## Goal
 

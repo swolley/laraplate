@@ -36,7 +36,7 @@ Filament resource/page structure.
 - [x] Seed custom permissions with `Permission::firstOrCreate()`.
 - [x] Use permission names based on each model's actual connection and table name.
 - [x] Do not seed `viewAny`, `view`, or `create`; those are not Core action names.
-- [ ] Follow-up: seed additional custom abilities only when the matching UI/service action is
+- [x] Follow-up: seed additional custom abilities only when the matching UI/service action is
   implemented. Candidate abilities include `force_post`, `close`, `reopen`, `reverse`, `amend`,
   `unlock`, and `reset`.
 
@@ -49,7 +49,7 @@ Filament resource/page structure.
 - [x] Register policies with `Gate::policy()` in `boot()` using the established provider pattern.
 - [x] Use `Modules\Core\Models\User` as the user type.
 - [x] Centralize table-permission checks in `ERPModelPolicy` for the ERP models covered by v1.
-- [ ] Follow-up: add state-aware policy methods only for domain actions that are exposed in UI or
+- [x] Follow-up: add state-aware policy methods only for domain actions that are exposed in UI or
   services. Examples: invoice `post`/`unpost` state guards, fiscal period `close`/`reopen`, journal
   `reverse`, sales order `amend`, quotation `unlock`, and document sequence `reset`.
 
@@ -76,15 +76,15 @@ Filament resource/page structure.
   - `Modules/ERP/app/Filament/Resources/FiscalPeriods/Pages/`
   - `Modules/ERP/app/Filament/Resources/JournalEntries/Pages/`
 
-- [ ] Follow-up: delivery note post/unpost page actions must call existing service methods:
+- [x] Follow-up: delivery note post/unpost page actions must call existing service methods:
   - post inventory: set `posted_at` if needed, then rely on observer/service path;
   - unpost inventory: use `DeliveryNoteInventoryService::unpostInventory()`.
 - [x] Do not call non-existent `DeliveryNoteInventoryService::post()` or `::unpost()`.
-- [ ] Follow-up: fiscal period **close** page action must call `FiscalPeriodCloser::closePeriod()`.
+- [x] Follow-up: fiscal period **close** page action must call `FiscalPeriodCloser::closePeriod()`.
 - [x] `FiscalPeriodCloser::reopenPeriod(FiscalPeriod $period): void` exists for future UI actions.
-- [ ] Follow-up: fiscal period **reopen** page action must call `FiscalPeriodCloser::reopenPeriod()`
+- [x] Follow-up: fiscal period **reopen** page action must call `FiscalPeriodCloser::reopenPeriod()`
   and keep the state-machine guard (`status === 'closed'`).
-- [ ] Follow-up: journal reversal page action must use `JournalPostingService::reverse()` with the
+- [x] Follow-up: journal reversal page action must use `JournalPostingService::reverse()` with the
   current method signature.
 
 ## Task 5: Reporting Services
