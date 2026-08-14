@@ -46,7 +46,7 @@ Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (
 | 6 ProductionOrder | ⚠️ Solo migration | Dominio, `sales_order_line_id`, DocumentType ERP |
 | 7–13 | ❌ Assente | Migration, modelli, servizi, job, observer |
 | 14 API | ❌ `routes/api.php` vuoto | Controller, resources, auth |
-| 15 Filament | ❌ Assente | 8 resources + widget |
+| 15 Filament | ✅ Fatto | 8 resources + widget + smoke test |
 | 16 Test suite | ⚠️ Parziale | Factory mancanti, E2E, type coverage |
 | 17 Docs | ⚠️ Parziale | Mancano `MES_GUIDA_SEMPLICE.md`, `docs/rag/MODULE.md` |
 
@@ -82,21 +82,26 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 13 — Turni/operatori**: `mes_shifts`/`mes_shift_instances`/`mes_operator_logs`, enum `OperatorLogAction`, modelli, `ShiftVerificationService` (log operatore sempre, turno warning non-bloccante D6, efficienza media), log su start/complete operazione, factory, test. (`laraplate-mes` `53199d0`)
 
 - ✅ **Task 14 — API**: `MesDomainActionRegistrar` (11 verbi su 7 modelli), `MesModelPolicy` (state guard + permesso per verbo), wiring `MESServiceProvider::boot()` (Gate::policy + register), seeding permessi domain in `MESDatabaseSeeder`, test registrazione. Nessuna rotta custom (CRUD generico + domain-action registry di Core). (`laraplate-mes` `ed0c58f`)
-- ✅ **Task 15 — Filament**: `ProductionDashboardWidget` (KPI cached: ordini aperti, operazioni in corso, completati, NC aperte). Le 8 resource CRUD si generano con `filament:make-resources` in ambiente PHP 8.5 (scrivere a mano sarebbe sovrascritto dal generatore). (`laraplate-mes` `a7c61e2`)
+- ✅ **Task 15 — Filament**: `ProductionDashboardWidget` (KPI cached: ordini aperti, operazioni in corso, completati, NC aperte). Le 8 resource CRUD (WorkCenter, Bom, Routing, ProductionOrder, QualityCheck, NonConformance, Downtime, Shift) scritte a mano con pattern Core (`Resource` + `Schemas/*Form` con `HasForm` + `Tables/*Table` con `HasTable` + Pages), navigationGroup `MES`, slug `mes/*`; gli aggregati service-driven (ProductionOrder, NonConformance) espongono solo list+edit (`canCreate()=false`). Il generatore `filament:make-resources` rifiuta i moduli `laraplate_owned`, quindi le resource sono definitive. Smoke test `MesFilamentResourcesTest` (binding modello, pagine, form+table configurate). (`laraplate-mes` `ba0ea89`, `3d72952`)
 - ✅ **Task 16 — Test hardening**: E2E `ProductionCycleEndToEndTest` (create→release→start/complete op→backflush→complete PO→lotto) + invariante snapshot immutabile (dataset). (`laraplate-mes` `2b31c14`)
 - ✅ **Task 17 — Docs**: `docs/rag/MODULE.md` (riferimento sviluppatore) + `docs/MES_GUIDA_SEMPLICE.md` (guida utente IT). (`laraplate-mes` `cc8126b`)
 
-**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 97 passed, 250 assertions, 0 failed.**
+**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 101 passed, 292 assertions, 0 failed** (include lo smoke test delle 8 resource Filament e `MaterialConsumptionServiceTest`).
 
 Due fix emersi eseguendo i test su PHP 8.5:
 - **Core** (`fix(core)`, `laraplate-core` `87d75b4`): `MigrateUtils` emetteva `IF()` (MySQL) nelle colonne generate `is_deleted`/`is_locked` per driver non-pgsql/oracle → SQLite rompeva `RefreshDatabase` dell'intera suite. Aggiunto il caso `sqlite` con la forma portabile `<col> IS NOT NULL`.
 - **MES** (`fix(mes)`, `laraplate-mes` `ae9cb3a`): tabelle header con modello `Core\Overrides\Model` (boms/routings/production_orders) ora aggiungono la colonna generata `is_deleted` via `MigrateUtils::timestamps(hasSoftDelete: true)`; le `state()` dei factory usano la forma array (le closure staticizzate da pint non erano bindabili su PHP 8.5).
 
-Residui operativi in PHP 8.5 (non-test): generare le resource Filament (`filament:make-resources`), lanciare `permission:refresh` + `MESDatabaseSeeder`.
+Residui operativi in PHP 8.5 (non-test, deployment): lanciare `permission:refresh` + `MESDatabaseSeeder` per seminare i permessi CRUD/domain. Le resource Filament sono già in codice (non serve più il generatore).
+
+**Follow-up chiusura modulo (2026-08-14):** `MaterialConsumptionService::recordManual` + domain action `record_consumption` su `ProductionOrder` (residuo Task 8, prima differito) — `laraplate-mes` `873d300`. 8 resource Filament scritte a mano — `laraplate-mes` `ba0ea89`, `3d72952`.
 
 **ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward).
 
-**Parti differite ai task API/Filament** (segnalate nei commit): pipeline `SalesOrderConfirmed` (evento/listener/job auto-creazione PO), consumo manuale ed evento stock-shortage (residuo Task 8), quality-check auto su complete operazione (opzionale). Restano i Task 14 (API domain-action/policy), 15 (Filament), 16 (test hardening/E2E), 17 (docs).
+**Parti differite che richiedono una decisione di design** (NON forzate con assunzioni):
+- **Pipeline `SalesOrderConfirmed`** (evento ERP → listener/job auto-creazione PO): `SalesOrder`/`Party` non espongono `company_id`, quindi la derivazione company/warehouse del PO richiede una scelta di dominio. Resta il flusso manuale via domain action `create` + `release`.
+- **Quality-check automatico su complete operazione**: manca un'entità "piano di qualità" che colleghi item/operazione ai controlli attesi; per ora i `QualityCheck` si creano via domain action `execute`.
+- **Evento stock-shortage**: richiede un contratto di lettura stock lato ERP; il consumo (backflush + manuale) registra il movimento ma non emette un evento di carenza.
 
 **Riferimenti obbligatori prima di ogni task:**
 
