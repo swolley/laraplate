@@ -86,7 +86,7 @@ Branch `claude/mes-pending-work-2sdtwr` su `swolley/laraplate-mes` (puntatore bu
 - ✅ **Task 16 — Test hardening**: E2E `ProductionCycleEndToEndTest` (create→release→start/complete op→backflush→complete PO→lotto) + invariante snapshot immutabile (dataset). (`laraplate-mes` `2b31c14`)
 - ✅ **Task 17 — Docs**: `docs/rag/MODULE.md` (riferimento sviluppatore) + `docs/MES_GUIDA_SEMPLICE.md` (guida utente IT). (`laraplate-mes` `cc8126b`)
 
-**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 101 passed, 292 assertions, 0 failed** (include lo smoke test delle 8 resource Filament e `MaterialConsumptionServiceTest`).
+**MODULO MES (Task 4-17) COMPLETO E VALIDATO.** Suite eseguita su PHP 8.5: **`php artisan test Modules/MES/tests` → 109 passed, 318 assertions, 0 failed** (include smoke test 8 resource Filament, `MaterialConsumptionServiceTest` e `SalesOrderProductionPlannerTest`).
 
 Due fix emersi eseguendo i test su PHP 8.5:
 - **Core** (`fix(core)`, `laraplate-core` `87d75b4`): `MigrateUtils` emetteva `IF()` (MySQL) nelle colonne generate `is_deleted`/`is_locked` per driver non-pgsql/oracle → SQLite rompeva `RefreshDatabase` dell'intera suite. Aggiunto il caso `sqlite` con la forma portabile `<col> IS NOT NULL`.
@@ -96,10 +96,16 @@ Residui operativi in PHP 8.5 (non-test, deployment): lanciare `permission:refres
 
 **Follow-up chiusura modulo (2026-08-14):** `MaterialConsumptionService::recordManual` + domain action `record_consumption` su `ProductionOrder` (residuo Task 8, prima differito) — `laraplate-mes` `873d300`. 8 resource Filament scritte a mano — `laraplate-mes` `ba0ea89`, `3d72952`.
 
-**ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward).
+**Pipeline `SalesOrderConfirmed` implementata (2026-08-14):** deciso con l'utente — trigger via **evento ERP dedicato**. ERP emette `SalesOrderConfirmed` (hook `created`/`updated` su transizione a `Confirmed`, additivo, evento di proprietà ERP senza dipendenza da MES). MES ascolta con il listener queued `CreateProductionOrdersForSalesOrder` → `SalesOrderProductionPlanner`:
+- crea un PO **solo** per le righe con item avente **BOM attiva** (make); righe acquisto/servizio o già evase saltate con `ProductionPlanningSkipReason`;
+- pianifica la **quantità residua** (`qty_ordered − qty_delivered`), idempotente per `sales_order_line_id` (nessun duplicato su replay/ri-conferma);
+- warehouse via `ProductionWarehouseResolver` (mappa config per-company → unico warehouse → skip se ambiguo);
+- date via `ProductionLeadTimeEstimator` (minuti standard routing ÷ minuti/giorno, fallback lead-time di config).
+Config: `mes.production.default_warehouse`/`daily_minutes`/`default_lead_time_days`. Test: `SalesOrderConfirmedEventTest` (ERP), `SalesOrderProductionPlannerTest` (MES, 8 casi incl. idempotenza + end-to-end sync).
 
-**Parti differite che richiedono una decisione di design** (NON forzate con assunzioni):
-- **Pipeline `SalesOrderConfirmed`** (evento ERP → listener/job auto-creazione PO): `SalesOrder`/`Party` non espongono `company_id`, quindi la derivazione company/warehouse del PO richiede una scelta di dominio. Resta il flusso manuale via domain action `create` + `release`.
+**ERP:** `DocumentType::ProductionOrder` mergiato su `master` di `laraplate-erp` (`1d1587a`, fast-forward). Evento `SalesOrderConfirmed` + hook sul modello aggiunti in questa iterazione.
+
+**Parti ancora differite (richiedono una decisione di design, NON forzate):**
 - **Quality-check automatico su complete operazione**: manca un'entità "piano di qualità" che colleghi item/operazione ai controlli attesi; per ora i `QualityCheck` si creano via domain action `execute`.
 - **Evento stock-shortage**: richiede un contratto di lettura stock lato ERP; il consumo (backflush + manuale) registra il movimento ma non emette un evento di carenza.
 
