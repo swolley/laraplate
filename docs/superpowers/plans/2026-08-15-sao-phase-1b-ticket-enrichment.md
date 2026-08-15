@@ -26,9 +26,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Edit: `Ticket` — add `due_at` to fillable, cast `datetime`, add `scopeOverdue` and `scopeDueWithin(Builder, CarbonInterval|int $days)`; update create/update rules to allow `due_at` (nullable date).
 - Create: `tests/Feature/Models/TicketDueDateTest.php`.
 
-- [ ] **Step 1: failing test** — `overdue()` selects a past-due, unresolved ticket and excludes a future one; `dueWithin(7)` selects one due in 3 days.
-- [ ] **Step 2: run to fail → Step 3: implement → Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): ticket due dates with overdue/due-within scopes`).
+- [x] **Step 1: failing test** — `overdue()` selects a past-due, unresolved ticket and excludes a future one; `dueWithin(7)` selects one due in 3 days.
+- [x] **Step 2: run to fail → Step 3: implement → Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): ticket due dates with overdue/due-within scopes`).
 
 ---
 
@@ -39,9 +39,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Edit: `Ticket` — `labels(): BelongsToMany`.
 - Create: `tests/Feature/Models/LabelTest.php`.
 
-- [ ] **Step 1: failing test** — a label is project-scoped-unique; attaching/detaching labels to a ticket works; a ticket lists only its own labels.
-- [ ] **Step 2–4: red → implement → green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): project-scoped ticket labels`).
+- [x] **Step 1: failing test** — a label is project-scoped-unique; attaching/detaching labels to a ticket works; a ticket lists only its own labels.
+- [x] **Step 2–4: red → implement → green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): project-scoped ticket labels`).
 
 ---
 
@@ -51,9 +51,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Edit: `Ticket` — `watchers(): BelongsToMany` (to the app user model); helpers `watch(User)`/`unwatch(User)` idempotent.
 - Create: `tests/Feature/Models/TicketWatcherTest.php`.
 
-- [ ] **Step 1: failing test** — a user watches a ticket at most once (idempotent watch); unwatch removes; watchers list is correct. Notifications are explicitly not asserted (out of scope).
-- [ ] **Step 2–4: red → implement → green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): ticket watchers`).
+- [x] **Step 1: failing test** — a user watches a ticket at most once (idempotent watch); unwatch removes; watchers list is correct. Notifications are explicitly not asserted (out of scope).
+- [x] **Step 2–4: red → implement → green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): ticket watchers`).
 
 ---
 
@@ -63,9 +63,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Edit: `Ticket` — implement `HasMedia`, use `InteractsWithMedia`, register an `attachments` media collection (resolving the global Core `media_model`).
 - Create: `tests/Feature/Models/TicketAttachmentTest.php` (uses `Storage::fake`).
 
-- [ ] **Step 1: failing test** — adding a fake file to the `attachments` collection stores it and the ticket lists exactly one attachment with the right name.
-- [ ] **Step 2–4: red → implement → green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): ticket attachments via media library`).
+- [x] **Step 1: failing test** — adding a fake file to the `attachments` collection stores it and the ticket lists exactly one attachment with the right name.
+- [x] **Step 2–4: red → implement → green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): ticket attachments via media library`).
 
 ---
 
@@ -76,9 +76,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Create: `TicketRelation` model + factory; `Ticket` — `relations(): HasMany` (outgoing) and a `relatedVia(TicketRelationType)` helper that also resolves inverse (`blocked by`) by query.
 - Create: `tests/Feature/Models/TicketRelationTest.php`.
 
-- [ ] **Step 1: failing test** — create blocks/duplicates/relates; the inverse of `blocks` resolves as *blocked by*; symmetric types resolve both ways; a self-relation and a duplicate triple are rejected.
-- [ ] **Step 2–4: red → implement → green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): typed ticket-to-ticket relations`).
+- [x] **Step 1: failing test** — create blocks/duplicates/relates; the inverse of `blocks` resolves as *blocked by*; symmetric types resolve both ways; a self-relation and a duplicate triple are rejected.
+- [x] **Step 2–4: red → implement → green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): typed ticket-to-ticket relations`).
 
 ---
 
@@ -89,9 +89,9 @@ Tasks are ordered simplest-first; each is independently shippable.
 - Create: migration `..._create_sao_saved_filters_table.php` (user_id, nullable project_id, name, criteria json) + `SavedFilter` model + factory; `SAOTables` case `SavedFilters`.
 - Create: `tests/Feature/Services/TicketSearchServiceTest.php` and `tests/Feature/Models/SavedFilterTest.php`.
 
-- [ ] **Step 1: failing tests** — each criterion filters correctly; results stay ACL-scoped (a hidden ticket never appears); a saved filter round-trips its criteria and reapplies to produce the same result set.
-- [ ] **Step 2–4: red → implement → green; then run the full SAO suite green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): ticket search and saved filters`).
+- [x] **Step 1: failing tests** — each criterion filters correctly; results stay ACL-scoped (a hidden ticket never appears); a saved filter round-trips its criteria and reapplies to produce the same result set.
+- [x] **Step 2–4: red → implement → green; then run the full SAO suite green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): ticket search and saved filters`).
 
 ---
 
@@ -99,7 +99,7 @@ Tasks are ordered simplest-first; each is independently shippable.
 
 - Extend the Ticket Filament resource with labels, watchers, attachments (media plugin), due date, and a relations manager; add a saved-filter picker on the ticket list.
 - Create: `tests/Feature/Filament/TicketEnrichmentUiTest.php`.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): filament surfaces for ticket enrichment`).
+- [ ] Red → implement → green; Pint + commit (`feat(sao): filament surfaces for ticket enrichment`). **(deferred: optional UI; models + services ship and are fully tested)**
 
 ---
 

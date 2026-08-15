@@ -1,6 +1,6 @@
 # Core Media Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Re-home `spatie/laravel-medialibrary` ownership from CMS to Core — table, model and global config — keeping the `vend_media` table name and data intact, so CMS and (later) SAO are both consumers of one Core media foundation.
 
@@ -30,9 +30,9 @@
 - Move the media factory to Core if one exists.
 - Create: `Modules/Core/tests/.../MediaTest.php` (adapted from CMS): maps `vend_media`, soft-deletes, versions, `expires_at`.
 
-- [ ] **Step 1: failing test** — `Core\Models\Media` uses `vend_media`, soft-deletes and exposes `expires_at`.
-- [ ] **Step 2: run to fail → Step 3: implement → Step 4: run to pass** (Core suite green).
-- [ ] **Step 5: Pint + commit Core** (`feat(core): own the media library table, model and config`). Push + bump parent.
+- [x] **Step 1: failing test** — `Core\Models\Media` uses `vend_media`, soft-deletes and exposes `expires_at`.
+- [x] **Step 2: run to fail → Step 3: implement → Step 4: run to pass** (Core suite green).
+- [x] **Step 5: Pint + commit Core** (`feat(core): own the media library table, model and config`). Push + bump parent.
 
 ---
 
@@ -44,11 +44,11 @@
 - Delete the now-Core-owned CMS copies: `Modules/CMS/app/Models/Media.php`, `Modules/CMS/app/Helpers/HasMedia.php`, `Modules/CMS/app/Helpers/MediaFileNamer.php`, the CMS `create_media_table` migration, and `CMSTables::Media`. **Keep** `HasMultimedia`.
 - Edit: `Modules/CMS/tests/Unit/Models/MediaTest.php` — point at `Core\Models\Media` (or move its intent into Core's test and drop the CMS one).
 
-- [ ] **Step 1: run the CMS media/Content tests to see them fail against the removed model.**
-- [ ] **Step 2: repoint references and remove the CMS-owned pieces.**
-- [ ] **Step 3: run to pass** — CMS suite green; a `grep` for `CMS\Models\Media` returns nothing.
-- [ ] **Step 4: fresh-migrate check** — migrate a clean DB with CMS enabled and (separately, if feasible) with CMS disabled; `vend_media` exists once, created by Core.
-- [ ] **Step 5: Pint + commit CMS** (`refactor(cms): consume Core media model`). Push + bump parent.
+- [x] **Step 1: run the CMS media/Content tests to see them fail against the removed model.**
+- [x] **Step 2: repoint references and remove the CMS-owned pieces.**
+- [x] **Step 3: run to pass** — CMS suite green; a `grep` for `CMS\Models\Media` returns nothing.
+- [x] **Step 4: fresh-migrate check** — migrate a clean DB with CMS enabled and (separately, if feasible) with CMS disabled; `vend_media` exists once, created by Core.
+- [x] **Step 5: Pint + commit CMS** (`refactor(cms): consume Core media model`). Push + bump parent.
 
 ---
 
