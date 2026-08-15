@@ -59,8 +59,8 @@ Tasks are ordered simplest-first; each is independently shippable.
 
 ## Task 4: Attachments (spatie medialibrary)
 
-- Confirm the `media` table migration is present; if not, publish `spatie/laravel-medialibrary` migrations as the first step.
-- Edit: `Ticket` — implement `HasMedia`, use `InteractsWithMedia`, register an `attachments` media collection.
+- **Prerequisite:** `docs/superpowers/plans/2026-08-15-core-media-foundation.md` must be done — media (`vend_media` + `Core\Models\Media` + config) is Core-owned, so SAO uses it without depending on CMS.
+- Edit: `Ticket` — implement `HasMedia`, use `InteractsWithMedia`, register an `attachments` media collection (resolving the global Core `media_model`).
 - Create: `tests/Feature/Models/TicketAttachmentTest.php` (uses `Storage::fake`).
 
 - [ ] **Step 1: failing test** — adding a fake file to the `attachments` collection stores it and the ticket lists exactly one attachment with the right name.

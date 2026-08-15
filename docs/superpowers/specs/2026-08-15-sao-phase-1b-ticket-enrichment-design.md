@@ -22,7 +22,7 @@ Slice 1a delivered a usable standalone tracker. Slice 1b enriches the ticket wit
 |---|----------|--------|
 | H1 | **Labels are project-scoped** (`sao_labels`: project, name, colour; unique per project) and attached to tickets through a `sao_ticket_label` pivot. | A label vocabulary belongs to a project; the same name in two projects is two labels. |
 | H2 | **Watchers are an explicit ticket↔user list** (`sao_ticket_watchers`). Delivering notifications is **out of scope** — 1b records who watches; notifying them arrives with a notification pathway later. | Keeps 1b free of the notification/error machinery it must not depend on. |
-| H3 | **Attachments reuse `spatie/laravel-medialibrary`** (already a project dependency): `Ticket implements HasMedia` with an `attachments` collection. No bespoke attachment table. | Reuse over reinvention; the media table + Filament plugin already exist in the app. |
+| H3 | **Attachments reuse `spatie/laravel-medialibrary`** via the **Core media foundation** (`docs/superpowers/specs/2026-08-15-core-media-foundation-design.md`): `Ticket implements HasMedia` with an `attachments` collection. Media ownership is promoted from CMS to Core first, so SAO uses it without depending on CMS. No bespoke attachment table. | Reuse over reinvention; but the media table/model/config live in CMS today, so Core must own them before a Core-only module can use them. |
 | H4 | **Due date is a nullable `due_at` column** on tickets, with `overdue()`/`dueWithin()` query scopes. | The simplest correct model; no separate entity needed. |
 | H5 | **Ticket relations are typed** (`blocks`, `duplicates`, `relates`) in `sao_ticket_relations` (source, target, type). `blocks` is **directional** (inverse: *blocked by*); `duplicates`/`relates` are **symmetric**. One row is stored; the inverse is derived by query. A self-relation and a duplicate (source,target,type) are rejected. | Captures the three relations 1a deferred without a row per direction. |
 | H6 | **Advanced search is a `TicketSearchService`** over `TicketQueryService::visible()` (ACL-scoped) accepting structured criteria (free text, status, type, priority, assignee, label, due range); **saved filters** (`sao_saved_filters`) persist a criteria set per user (optionally project-scoped). | Reuses the one sanctioned read path; ACL is never bypassed. Saved filters are data, not code. |
@@ -84,7 +84,7 @@ Unchanged: `PermissionName` + Core ACL, all reads through `visible()`. Managing 
 
 | Risk | Mitigation |
 |------|-----------|
-| Attachments pull in unpublished medialibrary tables. | Confirm the `media` migration is present before task 4; otherwise publish it as that task's first step. |
+| Attachments depend on CMS (where media lives today). | The Core media foundation change promotes media ownership to Core before Task 4, so SAO depends only on Core. |
 | Search bypasses ACL with a raw query. | `TicketSearchService` is built strictly on `TicketQueryService::visible()`; a test asserts hidden tickets never surface. |
 | Relations grow a row-per-direction. | One stored row with a typed direction; the inverse is a query, enforced by a uniqueness rule and a self-relation guard. |
 | 1b creeps toward notifications. | H2 records watchers only; delivery is explicitly out of scope. |
