@@ -24,8 +24,8 @@
 - Create: `Modules/Core/database/migrations/..._create_media_table.php` — the `vend_media` schema (copied verbatim from the CMS migration), wrapped in `if (! Schema::hasTable(CoreTables::Media->value))`.
 - Create: `Modules/Core/app/Models/Media.php` — moved from CMS (`extends Spatie\...\Media`, `HasFactory`, `HasVersions`, `SoftDeletes`, `expires_at` accessor, `$table = CoreTables::Media->value`).
 - Create: `Modules/Core/app/Helpers/HasMedia.php` (moved from CMS; repoint the `CmsMedia` references to `Core\Models\Media`) — the generic soft-delete-aware media lifecycle trait SAO and CMS both use.
-- Create: `Modules/Core/app/Helpers/HasMultimedia.php` (moved from CMS; `use` Core's `HasMedia`, repoint the media model) — the opinionated multimedia trait (cover/images/videos/audios/files + thumb conversions). Generic; CMS remains its only consumer for now.
 - Create: `Modules/Core/app/Helpers/MediaFileNamer.php` (moved from CMS; generic `thumb-` namer over spatie's default).
+- Leave `HasMultimedia` in CMS (it stays a CMS consumer of Core's `HasMedia`/`Media`).
 - Create: `Modules/Core/config/media-library.php` (or extend Core config) binding `media_model => Modules\Core\Models\Media::class` and `file_namer => Modules\Core\Helpers\MediaFileNamer::class`; ensure it is the effective app-wide binding.
 - Move the media factory to Core if one exists.
 - Create: `Modules/Core/tests/.../MediaTest.php` (adapted from CMS): maps `vend_media`, soft-deletes, versions, `expires_at`.
@@ -39,8 +39,9 @@
 ## Task 2: CMS consumes Core media
 
 - Edit: `Modules/CMS/config/media-library.php` — remove the `media_model` and `file_namer` overrides so the Core bindings win.
-- Edit: `Modules/CMS/app/Models/Content.php` (and any other consumer) — `use Modules\Core\Helpers\HasMultimedia` and reference `Core\Models\Media`.
-- Delete the now-Core-owned CMS copies: `Modules/CMS/app/Models/Media.php`, `Modules/CMS/app/Helpers/HasMedia.php`, `Modules/CMS/app/Helpers/HasMultimedia.php`, `Modules/CMS/app/Helpers/MediaFileNamer.php`, the CMS `create_media_table` migration, and `CMSTables::Media`.
+- Edit: `Modules/CMS/app/Helpers/HasMultimedia.php` — `use Modules\Core\Helpers\HasMedia` and reference `Core\Models\Media` (HasMultimedia stays in CMS).
+- Edit: `Modules/CMS/app/Models/Content.php` (and any other consumer) — resolve to Core's `HasMedia`/media model.
+- Delete the now-Core-owned CMS copies: `Modules/CMS/app/Models/Media.php`, `Modules/CMS/app/Helpers/HasMedia.php`, `Modules/CMS/app/Helpers/MediaFileNamer.php`, the CMS `create_media_table` migration, and `CMSTables::Media`. **Keep** `HasMultimedia`.
 - Edit: `Modules/CMS/tests/Unit/Models/MediaTest.php` — point at `Core\Models\Media` (or move its intent into Core's test and drop the CMS one).
 
 - [ ] **Step 1: run the CMS media/Content tests to see them fail against the removed model.**
