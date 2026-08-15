@@ -31,7 +31,7 @@ The roadmap places Phase 2 (fingerprinting / `Signal` / internal log source / lo
 | F1 | A **driver** is registered code; a **connection** is a configured instance of it. | Matches parent §5; one token configured once, reused across capabilities. |
 | F2 | The registry is **open**: SAO's provider populates it, but any module or third-party package registers a driver without editing SAO. | The parent spec's failure test for the abstraction. |
 | F3 | Domain services depend **only** on per-capability contracts (`issues`, `vcs`, `logs`, `releases`), never on a concrete driver. | Keeps provider names (`github`, `redmine`, `graylog`) out of everything but `app/Drivers`. |
-| F4 | **Credentials live in the environment, never in the database** (parent §5). `Connection` stores a credential **reference** (an env/config key) plus non-secret coordinates. Resolves the parent's §4-vs-§5 tension in favour of §5. | A secret must be rotatable without a UI and unreadable from one. |
+| F4 | **Credentials are SAO domain data on `sao_connections`, stored encrypted-at-rest and write-only, with an optional env `credential_ref` that wins when set.** Never in Core Settings (those hold product behaviour only). | Multiple connectors need multiple secrets created from the panel (§11), so per-connection secrets are entity data with a lifecycle tied to the row — not global app config. Honours §5's *requirements* (never readable from a UI → write-only; rotatable without a UI → env-ref or a rotate command) while supporting §11's UI-created, N-per-driver connections. This is the same split the AI module uses (behaviour in settings, secret out of the settings row); SAO moves the secret into its own table because it has N accounts, not one. |
 | F5 | Product-behaviour configuration uses **Core settings**; only secrets/infrastructure live in the environment. | Parent §5: a threshold that needs a deploy to change never gets tuned. |
 | F6 | Every capability list operation returns a **`Page`** and the conformance suite proves multi-page traversal. | Parent §5: "a driver that reads the first page and stops loses data on a real project." |
 | F7 | **Status/priority maps live on the binding, not the driver** — passed into capability calls as data, with driver-proposed defaults. | Parent §5: Redmine statuses are per-installation; a hardcoded map makes the module single-tenant. |
@@ -54,7 +54,7 @@ Only one persisted entity enters in 3a.
 
 | Entity | Role |
 |--------|------|
-| `Connection` | A configured instance of a driver: `driver_key`, `name`, optional `base_url`, `credential_ref` (env/config key — **never** the secret), declared `capabilities` (a subset of the driver's), `health_state` (`unknown`/`healthy`/`unhealthy`) and `last_checked_at`. Prevents configuring the same token twice. |
+| `Connection` | A configured instance of a driver: `driver_key`, `name`, optional `base_url`, declared `capabilities` (a subset of the driver's), `health_state` (`unknown`/`healthy`/`unhealthy`), `last_checked_at`, and its secret via **one of two paths** (F4): an `encrypted` **`credential`** column (JSON, write-only — supports multi-field secrets like token + webhook secret) or an optional **`credential_ref`** env key that overrides it when present. Prevents configuring the same token twice. |
 
 Everything else in this slice is code, not tables: enums (`Capability`, `IngestMode`), contracts (`DriverInterface` + the four capability interfaces), value objects (`DriverConfigurationSchema`, `HealthCheckResult`, `Page`), the `DriverRegistry`, and the `ConnectionCredentialResolver`.
 
@@ -81,7 +81,7 @@ Per-capability contracts (method shapes only; every list returns `Page`):
 
 ## 6. Credentials and configuration (F4/F5)
 
-`ConnectionCredentialResolver::resolve(Connection): array` is the **single** path from a connection to its secret: it reads from `config()`/environment by `credential_ref`, returns the value for in-memory use, never writes it back and never logs it; a missing reference throws `MissingCredentialException`. No column ever holds a raw secret. Product-behaviour configuration (thresholds, RC suffixes, policy toggles) is stored through Core settings in later phases, not by a SAO mechanism.
+`ConnectionCredentialResolver::resolve(Connection): array` is the **single** path from a connection to its secret. Resolution order: if `credential_ref` is set, read from `config()`/environment by that key (infra-managed path); otherwise decrypt the `credential` column. It returns the value for in-memory use, never writes it back and never logs it; a connection with neither source throws `MissingCredentialException`. The raw secret is **never rendered back to a UI** (the Filament field is write-only, replaced by a rotate action, arriving in 3b) and **never stored in Core settings**. Product-behaviour configuration (thresholds, RC suffixes, policy toggles) is stored through Core settings in later phases, not by a SAO mechanism.
 
 ---
 
@@ -96,7 +96,7 @@ Entirely Laraplate's, consistent with phase 1a: `Connection` access is governed 
 - **Per-capability conformance suite** (`tests/Support/Conformance/*`): reusable assertions any driver implementing a capability must satisfy, run in 3a against one in-memory reference driver. Includes a **multi-page fixture** (more items than one page) proving pagination is structural (F6), and a status-translation case proving the map is passed-in data (F7).
 - **In-memory reference driver** (`tests/Stubs/Drivers/InMemoryDriver.php`): implements `issues` + `releases` over arrays; exists only in test support; proves registry → connection → credential resolver → capability calls run fully offline.
 - **Registry tests**: resolve by key and capability; unknown key throws; duplicate registration throws; a driver registered from outside SAO is resolvable (F2).
-- **Connection tests**: non-secret coordinates persist; `credential_ref` holds no secret; a capability the driver does not expose is rejected.
+- **Connection tests**: non-secret coordinates persist; the `credential` column is **encrypted at rest** (the stored DB value is ciphertext, not the plaintext secret); the resolver returns the env value when `credential_ref` is set and otherwise the decrypted column; a capability the driver does not expose is rejected.
 - **Zero-connections scenario** stays green (parent §12): the phase-1a tracker keeps working with no connection configured.
 
 ---
@@ -107,5 +107,5 @@ Entirely Laraplate's, consistent with phase 1a: `Connection` access is governed 
 |------|-----------|
 | Framework built before a real driver ossifies the wrong shape. | The conformance suite + in-memory driver force at least one full implementation; `issues`/`releases` shapes come straight from parent §5, which already anticipated the driver waves. |
 | Building 3a before Phase 2 leaves `logs` unexercised. | `logs` is declared and shape-tested only; its conformance battery is explicitly deferred to its consumer phase, recorded as a known gap. |
-| Credential-location tension (§4 vs §5) picked silently. | F4 records the decision and its reason; the plan halts before Task 4 if the spec owner wants encrypted-at-rest instead. |
+| Credential-location tension (§4 vs §5) picked silently. | Settled in F4: encrypted-at-rest on `sao_connections` (write-only) with an optional env `credential_ref` override, never in Core settings. DB dump exposes only ciphertext; a leaked APP_KEY is the residual risk, mitigated by the env-ref path for shops that require infra-managed secrets. |
 | Registry duplicate keys mask a collision. | Duplicate registration throws rather than last-wins. |

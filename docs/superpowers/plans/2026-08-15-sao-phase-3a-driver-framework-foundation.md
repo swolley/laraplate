@@ -19,14 +19,11 @@
 - Tests live in `Modules/SAO/tests/`. **Never** declare classes/interfaces/enums inside a test file — fakes and doubles go in `Modules/SAO/tests/Stubs/` with PSR-4 namespaces registered in the module `composer.json` `autoload-dev`.
 - Run the minimum relevant tests per step: `php artisan test --compact Modules/SAO/...`. Before each commit: `vendor/bin/pint` (SAO module config) on the touched files.
 
-## Decision to confirm before Task 4 (credentials location)
+## Credentials decision (settled — spec F4)
 
-The spec has an internal tension the implementer must not silently pick:
+The parent spec is internally in tension: §4 says `Connection` holds "encrypted credentials"; §5 says secrets "stay in the environment and are never written to the database", while §11 has the superadmin create connections through a UI form — and you cannot provision an env var from a form at runtime, nor point N connections of the same driver at one fixed env var.
 
-- §4 describes `Connection` as holding **"encrypted credentials"**.
-- §5 ("Where configuration lives") states secrets **"stay in the environment and are never written to the database … a secret must be rotatable without a UI and must never be readable from one."**
-
-**This plan follows §5** (recorded as spec decision **F4**): `Connection` stores a **credential reference** (an environment/config key) plus non-secret coordinates (driver key, base URL, declared capabilities, health state); the raw secret is resolved from the environment at use time and is never persisted or exposed. Product-behaviour configuration (thresholds, RC suffixes, …) uses Core settings, not a SAO mechanism. **If the spec owner instead wants encrypted-at-rest DB credentials, stop and revise F4 and Task 4 before implementing.**
+**Settled (F4):** credentials are SAO domain data on `sao_connections`, **encrypted at rest** and **write-only**, with an **optional `credential_ref` env key that overrides the column when set**. Never in Core settings (those hold product behaviour only). This honours §5's *requirements* — never readable from a UI (write-only), rotatable without a UI (env-ref path or a rotate action) — while supporting §11's UI-created, N-per-driver connections. It mirrors the AI module's split (behaviour in settings, secret out of the settings row); SAO keeps the secret in its own table because it has N accounts, not one.
 
 ---
 
@@ -85,7 +82,7 @@ The spec has an internal tension the implementer must not silently pick:
 
 ## Task 4: Connection model and migration
 
-> Implement the §5-consistent design confirmed above: no raw secret in the DB.
+> Implement the F4 design: encrypted-at-rest `credential` column (write-only) plus an optional env `credential_ref` override; never a raw secret in the DB.
 
 - Create: `Modules/SAO/database/migrations/2026_08_15_100000_create_sao_connections_table.php`
 - Create: `Modules/SAO/app/Models/Connection.php`
@@ -93,13 +90,13 @@ The spec has an internal tension the implementer must not silently pick:
 - Edit: `Modules/SAO/app/Enums/SAOTables.php` (add `Connections = 'sao_connections'`)
 - Create: `Modules/SAO/tests/Feature/Models/ConnectionTest.php`
 
-`sao_connections` columns: `id`, `driver_key` (string, indexed), `name` (string), `base_url` (string, nullable), `credential_ref` (string, nullable — the env/config key the secret is read from; never the secret), `capabilities` (json — a subset of the driver's declared capabilities), `health_state` (string enum-backed: `unknown`/`healthy`/`unhealthy`, default `unknown`), `last_checked_at` (nullable), Core timestamps + soft deletes. `Connection` casts `capabilities` to `list<Capability>` and exposes `driver(DriverRegistry): DriverInterface`. A model invariant rejects a `capabilities` value not ⊆ the driver's `capabilities()`.
+`sao_connections` columns: `id`, `driver_key` (string, indexed), `name` (string), `base_url` (string, nullable), `credential` (text, nullable — Laravel `encrypted` cast; JSON payload for multi-field secrets; **write-only**, never rendered back), `credential_ref` (string, nullable — an env/config key that, when set, overrides `credential`), `capabilities` (json — a subset of the driver's declared capabilities), `health_state` (string enum-backed: `unknown`/`healthy`/`unhealthy`, default `unknown`), `last_checked_at` (nullable), Core timestamps + soft deletes. `Connection` casts `capabilities` to `list<Capability>` and `credential` to `encrypted:array`, and exposes `driver(DriverRegistry): DriverInterface`. A model invariant rejects a `capabilities` value not ⊆ the driver's `capabilities()`.
 
-- [ ] **Step 1: Write the failing test** — a factory-made connection persists, `capabilities` round-trips as `Capability` instances, `credential_ref` holds no secret, and declaring a capability the driver does not expose is rejected.
+- [ ] **Step 1: Write the failing test** — a factory-made connection persists; `capabilities` round-trips as `Capability` instances; the **raw DB value of `credential` is ciphertext** (assert the stored column does not contain the plaintext secret) while the model attribute decrypts to the array; declaring a capability the driver does not expose is rejected.
 - [ ] **Step 2: Run the test to verify it fails.**
 - [ ] **Step 3: Create the migration, model, factory, and `SAOTables` entry.**
 - [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): connection model with env-referenced credentials`).
+- [ ] **Step 5: Format, analyse and commit** (`feat(sao): connection model with encrypted credentials and env override`).
 
 ---
 
@@ -109,9 +106,9 @@ The spec has an internal tension the implementer must not silently pick:
 - Create: `Modules/SAO/app/Exceptions/MissingCredentialException.php`
 - Create: `Modules/SAO/tests/Unit/Drivers/ConnectionCredentialResolverTest.php`
 
-`ConnectionCredentialResolver::resolve(Connection $connection): array` reads the secret from `config()`/env by `credential_ref`, returns it for in-memory use, and **never** writes it back or logs it. A missing reference throws `MissingCredentialException`. This is the single sanctioned path from a `Connection` to its secret.
+`ConnectionCredentialResolver::resolve(Connection $connection): array` is the single sanctioned path from a `Connection` to its secret. Resolution order: if `credential_ref` is set, read from `config()`/env by that key; otherwise return the decrypted `credential` array. It returns the value for in-memory use and **never** writes it back or logs it. A connection with neither source throws `MissingCredentialException`.
 
-- [ ] **Step 1: Write the failing test** — set a config value, resolve it via a connection's `credential_ref`, assert the secret is returned and that a missing ref throws; assert the resolver never mutates the connection.
+- [ ] **Step 1: Write the failing test** — (a) with `credential_ref` set, a config value is returned and the column is ignored; (b) with only `credential` set, the decrypted array is returned; (c) with neither, `MissingCredentialException` is thrown; assert the resolver never mutates the connection.
 - [ ] **Step 2: Run the test to verify it fails.**
 - [ ] **Step 3: Create the resolver and exception.**
 - [ ] **Step 4: Run the test to verify it passes.**
