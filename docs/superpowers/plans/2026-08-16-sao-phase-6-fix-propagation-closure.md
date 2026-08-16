@@ -41,4 +41,5 @@
 
 ## Known gaps
 
-- Ownership suggestion persistence/UI; AI-phrased suggestions (phase 8); Filament policy/audit surfaces; live PR-merge transport.
+- Closed by follow-on slices: closure application to the workflow (`ClosureApplicationService`); ownership suggestion persistence + read-only UI and its evidence chain (CODEOWNERS/recent-touch/blame → coordinator → suggestion, incl. PR file discovery); phase-8 AI phrasing via the optional Core `AiTextGenerationRequested` event seam; Filament policy/audit/release/environment surfaces.
+- Still open (gated on live infrastructure): binding a concrete live-model `SuggestionTextGenerator` (the AI listener exists behind `AI_TEXT_GENERATION_ENABLED`, exercised via mocks), and live PR-merge/webhook transport for drivers and ingest.
