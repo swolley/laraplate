@@ -1,6 +1,6 @@
 # CRUD facet counters (funnel utility on Crud)
 
-Status: **Draft** — extracts the one valuable idea from the parked Grid subsystem (the funnel double counter) and re-homes it as a thin utility on `CrudService`. Grid routes/subsystem are NOT revived.
+Status: **Implemented (tier 1)** — extracts the one valuable idea from the parked Grid subsystem (the funnel double counter) and re-homes it as a thin utility on `CrudService`. Grid routes/subsystem are NOT revived. Shipped as `CrudService::facetCounts(ListRequestData)` (with the `excludeFacetField` self-exclusion transform), the standalone `POST|GET /crud/facets/{module}/{entity}` action (`CrudController::facets` + `FacetsRequest` reusing the list vocabulary — every requested column is a facet dimension), covered by `CrudServiceFacetCountsTest` + `CrudFacetsTest`. Tier 2 (open/high-cardinality facets with their own pagination/search/sort and the key≠label two-step) remains the documented next slice.
 
 ## Problem
 
