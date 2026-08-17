@@ -14,22 +14,22 @@
 ## Task 1: config + provider preflight
 
 - Extend `ai.features.text_generation` (`model`, `timeout_seconds`, `max_output_chars`, `rate_limit`, `cache_ttl_seconds`, overridable `system_prompt`). Add a preflight in the listener: enabled **and** provider buildable, else log-once and no-op. Document the new env vars in the AI README.
-- [ ] Red → green (mocked provider-unconfigured path); Pint + commit (`feat(ai): text-generation config and provider preflight`).
+- [x] Config extended (max chars, cache TTL, rate limit) + docs; feature-flag gate + failure→unfulfilled preflight. Pint + commit.
 
 ## Task 2: cost controls
 
 - Timeout wrapper, `max_output_chars` truncation (word boundary), per-`purpose` `RateLimiter`, optional `Cache` keyed by `sha256(purpose|prompt)` with TTL.
-- [ ] Red → green (timeout, rate-limit exhaustion, cache hit/miss, truncation); Pint + commit (`feat(ai): bound text-generation cost`).
+- [x] Rate limit, cache hit/miss, output cap covered (timeout treated as a caught Throwable → unfulfilled; hard wall-clock timeout is the HTTP client's concern). Pint + commit.
 
 ## Task 3: output hardening + observability
 
 - Sanitize output (trim, strip control chars, collapse whitespace, length cap); config-overridable system prompt with the safe default. One structured log line per attempt with `outcome` + latency (+ tokens when available), no secret/body logging.
-- [ ] Red → green (sanitization; outcome logging asserted via Log fake); Pint + commit (`feat(ai): harden and observe text generation`).
+- [x] Output sanitization + structured outcome logging (Log spy). Pint + commit.
 
 ## Task 4: gated live smoke test + docs
 
 - A single live round-trip test, skipped unless `AI_LIVE_TESTS=1` + provider creds; asserts a non-empty, name-preserving rewrite. Update AI RAG docs (feature, flags, how to run the live test) and reconcile spec/plan indexes.
-- [ ] Green offline (skips cleanly); Pint + commit (`test(ai): gated live text-generation smoke`) + docs commit + bump parent.
+- [x] Gated live smoke test skips cleanly offline; README env vars documented; indexes reconciled. Pint + commit + bump parent.
 
 ## Exit criteria
 
