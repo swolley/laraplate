@@ -1,6 +1,11 @@
 # CRUD facet counters (funnel utility on Crud)
 
-Status: **Implemented (tier 1)** — extracts the one valuable idea from the parked Grid subsystem (the funnel double counter) and re-homes it as a thin utility on `CrudService`. Grid routes/subsystem are NOT revived. Shipped as `CrudService::facetCounts(ListRequestData)` (with the `excludeFacetField` self-exclusion transform), the standalone `POST|GET /crud/facets/{module}/{entity}` action (`CrudController::facets` + `FacetsRequest` reusing the list vocabulary — every requested column is a facet dimension), covered by `CrudServiceFacetCountsTest` + `CrudFacetsTest`. Tier 2 (open/high-cardinality facets with their own pagination/search/sort and the key≠label two-step) remains the documented next slice.
+Status: **Implemented (tier 1 + tier 2)** — extracts the one valuable idea from the parked Grid subsystem (the funnel double counter) and re-homes it as a thin utility on `CrudService`. Grid routes/subsystem are NOT revived.
+
+- **Tier 1** (enumerable facets): `CrudService::facetCounts(ListRequestData)` (with the `excludeFacetField` self-exclusion transform) — every requested column is a flat facet dimension.
+- **Tier 2** (open/high-cardinality facets): `CrudService::facetValues(ListRequestData, FacetQuery): FacetPage` — one SQL `GROUP BY` on a key column, with the facet's own pagination, value `search` and `sort` (count/key), a `distinctValues` count, and the key≠label two-step (`resolveFacetLabels` resolves display `fields` in a bounded `whereIn` over the page's keys). Deferred as documented: relation-sourced labels (`relation.column`) and label search/sort.
+
+Both hang off the same standalone `POST|GET /crud/facets/{module}/{entity}` action (`CrudController::facets` + `FacetsRequest`): a singular `facet` payload selects tier 2, its absence tier 1. Covered by `CrudServiceFacetCountsTest`, `CrudServiceFacetValuesTest` and `CrudFacetsTest`.
 
 ## Problem
 
