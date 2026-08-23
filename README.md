@@ -44,6 +44,7 @@ php artisan module:seed --all
 -   ✨ **AI**: artificial intelligence capabilities (embeddings, vector search, automatic translation). About [AI Module](https://github.com/swolley/laraplate-ai).
 -   📊 **ERP**: accounting and operations (multi-company, journal entries, tax codes, commercial scaffolding). About [ERP Module](https://github.com/swolley/laraplate-erp).
 -   🏭 **MES**: manufacturing execution foundation (work orders, shop-floor events, traceability, KPIs). About [MES Module](https://github.com/swolley/laraplate-mes).
+-   🔗 **SAO**: _Simply Another Orchestrator_ — a correlation engine between code, errors and work; a standalone ticketing core with optional VCS, log-source and issue-tracker integrations. About [SAO Module](https://github.com/swolley/laraplate-sao).
 
 ### Environment (principali variabili)
 
@@ -102,3 +103,5 @@ For a complete and detailed list of TODOs, read:
 - [CMS Module TODO](Modules/CMS/README.md#todo-and-fixme)
 - [AI Module TODO](Modules/AI/README.md#todo-and-fixme)
 - [ERP Module TODO](Modules/ERP/README.md#todo)
+- [MES Module Roadmap](Modules/MES/README.md#roadmap)
+- [SAO Module Roadmap](Modules/SAO/README.md#roadmap)
