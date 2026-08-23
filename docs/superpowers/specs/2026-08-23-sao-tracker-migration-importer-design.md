@@ -22,9 +22,18 @@
 - **Surfaces:** `sao:tracker:import {connection} {--project=} {--scope=all|open}
   {--cutover} {--cutover-direction=} {--queue}` runs inline or dispatches
   `ImportTrackerHistoryJob` per binding.
+- **Retention added (2026-08-23).** Instead of importing log history, SAO keeps
+  logs live-only and prunes aged data: `RetentionService` + `sao:prune` hard-delete
+  old signal occurrences, ingest events and deployments (latest-per-env kept), and
+  the heavy data of long-deactivated projects (project/environments/releases kept
+  as anagraphic). Windows via `sao.retention.*`, scheduling gated by
+  `SAO_RETENTION_SCHEDULE`.
 - **Still open (follow-ups):** comment/attachment history (needs an `issues`
-  capability extension), a stored resume cursor for very large histories,
-  error-service backfill, and the file-dump path (shared with the bulk-import spec).
+  capability extension) and keyset resume pagination — the current offset paging
+  is only stable under concurrent writes when the source orders ascending by an
+  immutable key; idempotency neutralises duplicates but a keyset cursor is the
+  provable fix. Error-service history is out (logs stay live-only). The file-dump
+  path is shared with the bulk-import spec.
 
 > One of four specs scaffolded together. Analysed and implemented on its own later.
 
