@@ -131,7 +131,11 @@ evidence only.
    Pure, no transport.
 2. **Release attribution writer** — map a fixing commit to its release via
    `ReleasesCapability::firstTagContaining` → upsert `Release`/`ReleaseTag`/
-   `TicketRelease`.
+   `TicketRelease` (shared `ReleaseRegistrar`). The version is always the normalized
+   stable label, so a candidate records the future stable version, still
+   `announced`. A `releases` tag sync (`ReleaseSyncService` / `sao:releases:sync`)
+   then promotes such a release to `shipped` deterministically once its stable tag
+   is cut — `firstTagContaining` alone can keep returning the earlier candidate.
 3. **Pull transport** — `sao:vcs:scan` walking `commits(range)` per `vcs` binding
    into the writer (cursor/last-scanned), backfillable.
 4. **Push transport** — a PR-merge webhook (new capability + ingest + the shared
