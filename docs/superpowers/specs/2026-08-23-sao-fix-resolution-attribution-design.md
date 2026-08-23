@@ -1,6 +1,6 @@
 # SAO — Fix Resolution & Attribution (which commits/versions actually fix a ticket)
 
-**Status:** accepted · **decisions locked 2026-08-23; implementation in phases** · **Module:** SAO
+**Status:** implemented · **all five phases shipped 2026-08-23** · **Module:** SAO
 **Related:** `2026-07-31-sao-module-design.md`, `2026-08-15-sao-phase-3b-issues-sync-design.md`,
 `Modules/SAO/docs/plans/release-health-and-deploy-ingest.md`.
 
