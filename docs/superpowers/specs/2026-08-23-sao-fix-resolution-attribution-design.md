@@ -1,6 +1,6 @@
 # SAO — Fix Resolution & Attribution (which commits/versions actually fix a ticket)
 
-**Status:** proposed · **draft — deep analysis pending** · **Module:** SAO
+**Status:** accepted · **decisions locked 2026-08-23; implementation in phases** · **Module:** SAO
 **Related:** `2026-07-31-sao-module-design.md`, `2026-08-15-sao-phase-3b-issues-sync-design.md`,
 `Modules/SAO/docs/plans/release-health-and-deploy-ingest.md`.
 
@@ -98,13 +98,43 @@ recurrence → auto-close (audited, reversible).
 - Whether "fixing" refs should also flow from external tracker "resolved-in-version"
   fields when present.
 
+## Decisions (locked 2026-08-23)
+
+1. **Fixes vs Mentions is first-class.** `ChangeRef` gains a `relation` column
+   (`ChangeRefRelation = Fixes | Mentions`, additive migration, default `Fixes`).
+   A closing verb (`fixes|closes|resolves|…`) before a ticket key → `Fixes`; a
+   bare key reference → `Mentions`. The resolution read-models (`FixStatusResolver`,
+   `TimeToTruthService`, closure) count only `Fixes`; mentions stay as timeline
+   context and never inflate the evidence. An upsert may upgrade `Mentions → Fixes`
+   but never downgrades.
+2. **Both transports.** A **pull** scan over `VcsCapability::commits(range)`
+   (backfillable, no new webhook — synergy with the migration importer) *and* a
+   **push** PR-merge webhook (low latency, precise `merged_at`) both feed the same
+   `CodeReferenceWriter`.
+3. **Read-model + propose, with a settings toggle for auto-close.** The pipeline
+   always computes the `FixStatus` and, where a `ClosurePolicy` is active,
+   proposes closure (never auto on a `shadow` binding — the existing `Propose`
+   default). Automatic closure (all conditions satisfied → close through
+   `WorkflowService`, audited, auto-reopen on recurrence — machinery already
+   built) is gated by a module setting, off by default.
+
 ## Out of scope
 
 SAO never hosts code and never gates a rollout. This spec is attribution and
 evidence only.
 
-## Sequencing
+## Sequencing (phased; each shippable and green)
 
-1. `ChangeRef` writer (message-parse merged PRs/commits; reuse `vcs` + webhook).
-2. `Release`/`TicketRelease` writer via `firstTagContaining`.
-3. Surfaces + metrics (fix-status badge, time-to-truth), and closure activation.
+1. **Attribution core** — `ChangeRefRelation` + migration, `TicketReferenceExtractor`
+   (configurable grammar), `CodeReferenceWriter` (idempotent upsert, mention→fix
+   upgrade), and `FixStatusResolver`/`TimeToTruthService` counting only `Fixes`.
+   Pure, no transport.
+2. **Release attribution writer** — map a fixing commit to its release via
+   `ReleasesCapability::firstTagContaining` → upsert `Release`/`ReleaseTag`/
+   `TicketRelease`.
+3. **Pull transport** — `sao:vcs:scan` walking `commits(range)` per `vcs` binding
+   into the writer (cursor/last-scanned), backfillable.
+4. **Push transport** — a PR-merge webhook (new capability + ingest + the shared
+   `webhooks/{connection}` route branch, mirroring deploy/logs).
+5. **Closure activation** — wire `ClosureApplicationService` behind a module
+   setting: propose by default, auto-close when the toggle is on.
