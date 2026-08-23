@@ -14,8 +14,21 @@
 - **Migration-friendly upsert.** `IssueSyncService::import()` reuses the reconcile
   upsert but drops the unmapped-status gate — a migration brings the whole history
   in, every ticket opening at the workflow's initial status. Idempotent by
-  `TicketLink`, so re-running is safe and effectively resumable (no stored cursor
-  needed yet).
+  `TicketLink`, so re-running is safe.
+- **Persistent resume shipped (2026-08-23).** `TrackerImportService` now records an
+  `ImportRun` per (binding, scope) in `sao_import_runs`: the driver's next-page
+  cursor and running counts, saved after every page. An import killed by a crash,
+  redeploy or requeue resumes the still-`running` run from its stored cursor
+  instead of restarting; it flips to `completed` only when the page walk is
+  exhausted, and re-importing a finished migration opens a fresh run.
+- **Comment/attachment history shipped (2026-08-23).** Optional
+  `IssueHistoryCapability` (an `issues` extension, driver-optional like
+  `BlameCapability`): when the driver implements it, each imported ticket also gets
+  its comments (idempotent by remote comment id, stored as `system` `TicketComment`s)
+  and attachments (idempotent by remote attachment id, stored in the `attachments`
+  media collection). The driver downloads attachment bytes itself — only it holds
+  the connection credentials — so the importer never makes an unauthenticated
+  request.
 - **Import + cutover shipped together.** `BindingCutoverService` flips the binding
   to authoritative — `disabled` (fully switched to Laraplate) by default, or
   `outbound` for a transition — keeping `TicketLink`s as provenance.
@@ -28,12 +41,14 @@
   the heavy data of long-deactivated projects (project/environments/releases kept
   as anagraphic). Windows via `sao.retention.*`, scheduling gated by
   `SAO_RETENTION_SCHEDULE`.
-- **Still open (follow-ups):** comment/attachment history (needs an `issues`
-  capability extension) and keyset resume pagination — the current offset paging
-  is only stable under concurrent writes when the source orders ascending by an
-  immutable key; idempotency neutralises duplicates but a keyset cursor is the
-  provable fix. Error-service history is out (logs stay live-only). The file-dump
-  path is shared with the bulk-import spec.
+- **Follow-ups closed (2026-08-23):** comment/attachment history and persistent
+  resume both shipped (above). Note on pagination correctness: the persistent
+  cursor makes an interrupted import resumable, but true stability under concurrent
+  writes still requires the driver to page ascending by an immutable key (keyset)
+  rather than by offset; idempotency neutralises duplicates a shifting offset could
+  reintroduce, so the practical guarantee holds, and per-driver keyset ordering
+  stays a driver-level refinement. Error-service history is out (logs stay
+  live-only). The file-dump path is shared with the bulk-import spec.
 
 > One of four specs scaffolded together. Analysed and implemented on its own later.
 
