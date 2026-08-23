@@ -1,9 +1,30 @@
 # SAO — External Tracker/Error-Service Migration Importer ("switch to Laraplate, import your history")
 
-**Status:** proposed · **draft — deep analysis pending** · **Module:** SAO
+**Status:** implemented (live-API path) · **decisions locked 2026-08-23** · **Module:** SAO
 **Related:** `2026-08-15-sao-phase-3b-issues-sync-design.md`,
 `2026-07-22-module-import-command-framework-design.md`,
 `2026-08-23-core-bulk-import-mapping-design.md`.
+
+## Decisions (locked 2026-08-23) & what shipped
+
+- **Open-only via `status_map` → category.** `TrackerImportService` maps each
+  issue's remote status through the binding's `status_map` to a canonical
+  `StatusCategory` and, under `ImportScope::Open`, skips terminal (closed/rejected)
+  issues; an unmapped status is kept as open so nothing active is lost.
+- **Migration-friendly upsert.** `IssueSyncService::import()` reuses the reconcile
+  upsert but drops the unmapped-status gate — a migration brings the whole history
+  in, every ticket opening at the workflow's initial status. Idempotent by
+  `TicketLink`, so re-running is safe and effectively resumable (no stored cursor
+  needed yet).
+- **Import + cutover shipped together.** `BindingCutoverService` flips the binding
+  to authoritative — `disabled` (fully switched to Laraplate) by default, or
+  `outbound` for a transition — keeping `TicketLink`s as provenance.
+- **Surfaces:** `sao:tracker:import {connection} {--project=} {--scope=all|open}
+  {--cutover} {--cutover-direction=} {--queue}` runs inline or dispatches
+  `ImportTrackerHistoryJob` per binding.
+- **Still open (follow-ups):** comment/attachment history (needs an `issues`
+  capability extension), a stored resume cursor for very large histories,
+  error-service backfill, and the file-dump path (shared with the bulk-import spec).
 
 > One of four specs scaffolded together. Analysed and implemented on its own later.
 
