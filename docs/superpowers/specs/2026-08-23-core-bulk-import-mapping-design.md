@@ -8,6 +8,31 @@
 
 > One of four specs scaffolded together. Analysed and implemented on its own later.
 
+## Decisions (locked 2026-08-23) & what shipped
+
+- **Surface: backend + Filament + Vue SPA.** Built **(B)** as the durable Core
+  feature. Backend framework in `Modules/Core/app/Import`: `EntityImporterInterface`
+  + open `EntityImporterRegistry`, streaming `SourceReader`s (CSV via league/csv,
+  XLSX/ODS via openspout, JSON in-process), `ImportPreviewService` (columns +
+  sample rows + header auto-match), `ImportSession`/`ImportRowError` models,
+  `ImportRunner` + `ProcessImportSessionJob`. SPA API at `/app/crud/imports`
+  (`ImportSessionController`). Vue UI in `laraplate-stack/laraplate-ui`
+  (`createImportsClient`, `useImportSession`, `ImportWizard.vue`, sao `/imports`
+  route). Filament monitoring resource (`ImportSessionResource`) in Core.
+- **SQL deferred** — a raw dump is a security concern; CSV/XLSX/ODS/JSON ship.
+- **Transaction: per-chunk commit + downloadable per-row failure report.** Each
+  chunk commits (durable progress on large files); each row runs in its own
+  savepoint so a failing row rolls back only itself and is recorded in
+  `core_import_row_errors` (CSV download in both the API and Filament).
+- **Pilots: both.** `core.user` (Core reference, dedupe by email) and `sao.ticket`
+  (SAO — closes the tracker-migration spec's "file-dump" follow-up).
+- **Per-entity registration gate.** Only a registered `EntityImporterInterface` is
+  importable — the framework never imports an arbitrary table. Modules register
+  their own importers from their provider's `boot`.
+- **Completion notification** depends on the not-yet-built in-app notifications
+  spec; for now `ImportRunner` fires `ImportSessionCompleted` / `ImportSessionFailed`
+  as the seam that tray will listen on.
+
 ## The idea
 
 A generic, interactive bulk import for selected entities: the user uploads a file
