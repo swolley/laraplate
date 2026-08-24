@@ -118,6 +118,11 @@ final class AdminPanelProvider extends PanelProvider
             // ->requiresMultiFactorAuthentication()
             ->revealablePasswords(false)
             ->authGuard('admin')
+            // NOTIFICATIONS
+            // Native bell reading the shared `notifications` table (same store the SPA
+            // tray uses), so import-finished notifications surface in the backoffice too.
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             // MIDDLEWARES
             ->middleware([
                 EncryptCookies::class,
