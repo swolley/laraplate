@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(tests)* Force English locale in phpunit and bump CMS/ERP
+
+## [1.13.7] - 2026-08-26
+
 ### 🚀 Features
 
 - *(perf)* Bump Core submodule for perf:bench benchmarking harness
