@@ -59,6 +59,10 @@ php artisan module:seed --all
 -   `OPENAI_API_KEY`: chiave AI (commentata).
 -   Core toggles: `ENABLE_USER_REGISTRATION`, `ENABLE_SOCIAL_LOGIN`, `ENABLE_USER_LICENSES`, `ENABLE_USER_2FA`, `VERIFY_NEW_USER`, `ENABLE_DYNAMIC_ENTITIES`, `ENABLE_DYNAMIC_GRIDUTILS`, `EXPOSE_CRUD_API`, `FORCE_HTTPS`, `SOFT_DELETES_EXPIRATION_DAYS`, `VECTOR_SEARCH_ENABLED`, `VECTOR_SEARCH_PROVIDER`.
 
+### Deprecations
+
+-   **`app/crud/grid/*` (the Grid surface) is deprecated** and will be removed. Its Funnels concept survives as **facets** on the ordinary CRUD routes, served by `Modules\Core\Services\Crud\CrudService`. `Modules\Core\Grids\Components\Grid` and `Modules\Core\Http\Controllers\GridsController` carry `@deprecated` tags pointing at the replacement — do not build on them.
+
 <br>
 <br>
 
