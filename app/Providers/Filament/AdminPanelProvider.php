@@ -30,6 +30,8 @@ use Modules\Core\Filament\Pages\PhpInfo;
 use Modules\Core\Filament\Pages\Swagger;
 use Modules\Core\Filament\Pages\Welcome;
 use Modules\Core\Filament\Plugins\EnvironmentIndicatorPlugin;
+use Modules\Core\Http\Middleware\AddContext;
+use Modules\Core\Http\Middleware\ApplyDatabaseSettingsOverlay;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
 
 final class AdminPanelProvider extends PanelProvider
@@ -134,8 +136,18 @@ final class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                // The panel does not use the "web" group, so the settings overlay has
+                // to be listed here too. It stays above the locale resolver: app.locale
+                // is a dotted setting like any other and would otherwise overwrite the
+                // language resolved for this user.
+                ApplyDatabaseSettingsOverlay::class,
                 LocalizationMiddleware::class,
             ])
+            // Persistent, unlike the block above: Livewire update requests reach the
+            // panel through the "web" group, which tags them as the "app" surface, so
+            // without this every table sort in the backoffice would be logged as SPA
+            // traffic.
+            ->middleware([AddContext::class . ':admin'], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
             ]);
