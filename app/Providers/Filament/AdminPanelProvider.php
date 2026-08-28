@@ -33,6 +33,7 @@ use Modules\Core\Filament\Plugins\EnvironmentIndicatorPlugin;
 use Modules\Core\Http\Middleware\AddContext;
 use Modules\Core\Http\Middleware\ApplyDatabaseSettingsOverlay;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
+use Modules\Core\Http\Middleware\PreviewMiddleware;
 
 final class AdminPanelProvider extends PanelProvider
 {
@@ -146,8 +147,12 @@ final class AdminPanelProvider extends PanelProvider
             // Persistent, unlike the block above: Livewire update requests reach the
             // panel through the "web" group, which tags them as the "app" surface, so
             // without this every table sort in the backoffice would be logged as SPA
-            // traffic.
-            ->middleware([AddContext::class . ':admin'], isPersistent: true)
+            // traffic. Preview stays session-backed on admin and must survive the same
+            // Livewire round-trips, otherwise a table refresh would drop the overlay.
+            ->middleware([
+                AddContext::class . ':admin',
+                PreviewMiddleware::class . ':session',
+            ], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

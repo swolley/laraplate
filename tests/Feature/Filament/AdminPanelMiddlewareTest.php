@@ -7,6 +7,7 @@ use Livewire\Mechanisms\PersistentMiddleware\PersistentMiddleware;
 use Modules\Core\Http\Middleware\AddContext;
 use Modules\Core\Http\Middleware\ApplyDatabaseSettingsOverlay;
 use Modules\Core\Http\Middleware\LocalizationMiddleware;
+use Modules\Core\Http\Middleware\PreviewMiddleware;
 
 it('applies the database settings overlay on panel page loads', function (): void {
     // The panel does not use the "web" group — it declares its own stack — so pushing
@@ -37,4 +38,9 @@ it('keeps the admin log scope on livewire updates', function (): void {
     // is the only place the registration can be observed after boot.
     expect(app(PersistentMiddleware::class)->getPersistentMiddleware())
         ->toContain(AddContext::class . ':admin');
+});
+
+it('keeps the session-backed preview flag on livewire updates', function (): void {
+    expect(app(PersistentMiddleware::class)->getPersistentMiddleware())
+        ->toContain(PreviewMiddleware::class . ':session');
 });
