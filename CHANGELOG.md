@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+### 🚀 Features
+
+- *(admin)* Keep session-backed approvals preview across Livewire updates
+
+### 🐛 Bug Fixes
+
+- *(admin)* Apply settings overlay and scoped log context on the panel
+
+### 📚 Documentation
+
+- *(plans)* Record the octane readiness plan and its execution outcome
+
+## [1.13.8] - 2026-08-27
+
 ### 🐛 Bug Fixes
 
 - *(tests)* Force English locale in phpunit and bump CMS/ERP
