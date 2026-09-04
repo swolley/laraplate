@@ -2,6 +2,55 @@
 
 Date: 2026-07-29
 
+## Scope: native modules share one schema
+
+Decision date: 2026-09-04.
+
+The native modules (`Core`, `CMS`, `AI`, `ERP`, `MES`, `SAO`) are one relational
+model split across folders, not separable databases. They share a single schema
+on a single connection. This bounds the invariant below: the invariant is a code
+discipline, not a promise that a module can be relocated to another database.
+
+Rationale:
+
+- 58 foreign keys already cross module boundaries: CMS to Core (9), AI to Core
+  (4), ERP to Core (15), SAO to Core (3), MES to ERP (27, several of them
+  `cascadeOnDelete`). MES rows carry no meaning without `erp_items` and
+  `erp_companies`.
+- The default driver is PostgreSQL, where a foreign key cannot cross databases
+  at all. Only MySQL and MariaDB support cross-database foreign keys, and only
+  within one server instance.
+- `whereHas`, `has`, `withCount`, `whereRelation` and every `join` compile into
+  a single statement on the parent model's connection. Eloquent applies no
+  cross-connection guard, so a relocated module fails at runtime, not at boot.
+- A transaction never spans connections.
+- The capability was never configured: `core.model_connections` and
+  `erp.model_connections` are empty, `config/database.php` declares no named
+  module connection, and no model declares `protected $connection`.
+- Connection-affinity tests provision secondary-connection tables inside the
+  test itself. They prove the code paths, not that the schema exists on that
+  connection.
+
+What stays allowed:
+
+- Cross-module foreign keys and cross-module relation queries.
+- Multiple connections at driver level: separate read and write hosts with
+  `sticky` on one logical database.
+- A future external integration reading a foreign database through a read-side
+  adapter. That is a different case: foreign data, not a native aggregate moved
+  elsewhere.
+
+What is frozen:
+
+- Do not add entries to `core.model_connections` or `erp.model_connections`.
+- Do not extend `ErpConnectionContext`, `ConnectionScopedTransaction` or
+  `ConnectionScopedModels` to new code. Existing usages stay as they are;
+  removing them carries more risk than value.
+
+The invariant below remains in force as a code discipline. Deriving queries and
+transactions from the owning model still prevents real single-connection bugs,
+notably a read reaching a replica inside a write transaction.
+
 ## Invariant
 
 Database operations that are logically owned by an Eloquent model must use that

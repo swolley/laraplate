@@ -62,6 +62,13 @@
 - `Core` is foundation. Other modules reuse Core contracts/services.
 - Module dependencies must be explicit in `module.json`.
 - Table names are prefixed by lowercase module name.
+- Native modules (Core, CMS, AI, ERP, MES, SAO) share one schema, one connection.
+- Cross-module foreign keys and cross-module `whereHas`/`join` are allowed.
+- Multiple connections only at driver level (read replica, `sticky`).
+- `core.model_connections` and `erp.model_connections` are frozen. Add no entries.
+- Do not extend `ConnectionScoped*` or `ErpConnectionContext` to new code.
+- Still derive queries and transactions from the owning model. No implicit `DB::`.
+- Details: `docs/database-connection-affinity-audit.md`.
 
 ## PHP
 
