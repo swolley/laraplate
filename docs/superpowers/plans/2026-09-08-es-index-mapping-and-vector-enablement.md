@@ -26,10 +26,12 @@ In `ElasticsearchEngine::createIndex()`, after `parent::createIndex()` (kept, to
 - [x] Embedding backfill + hybrid verification (Horizon running): 3 Content → `GenerateEmbeddingsJob` (sync) → 3 `ModelEmbedding` rows → indexed → ES reports `es_docs_with_embedding=3`. Hybrid query (Core fallback planner, reranker off) returned `strategies=["keyword","vector","hybrid"]`, 3 hits each matched across all three strategies. **Vector/hybrid retrieval works end-to-end against live ES.**
 - [ ] (Follow-up) Add an ES-gated integration test for the mapping application + a hybrid retrieval smoke (skips when ES/embedder unreachable). Not added yet — needs an ES-reachable runner; tracked.
 
-## Operational findings (separate from the index fix — flag to owner)
+## Operational findings — RESOLVED
 
-1. **AI LLM search planner is broken in this env.** With the AI module installed, `ISearchPlanner`=`SearchOrchestratorAgent` and the intent parser=`LlmQueryIntentParser`, both via NeuronAI Workflow, which throws `NeuronAI\Workflow\Workflow::$executor must not be accessed before initialization` (LLM executor not initialized). The assistant's LLM-driven query planning fails; the Core rule-based `FallbackSearchPlanner` works. Likely an LLM-provider/config or NeuronAI init issue — AI-module concern.
-2. **Cross-encoder reranker needs its microservice.** Reranker is on by default (R3), and the AI module binds `IReranker`=`CrossEncoderService` (HTTP `127.0.0.1:8001/score`). If that service is down, search throws (cURL error 7) at reranking. Options: run the cross-encoder service, or make `CrossEncoderService` degrade gracefully to no-rerank when unreachable. AI-module concern.
+1. **AI LLM search planner (NeuronAI executor) — FIXED.** Root cause was NOT LLM config: `ChatAgent extends NeuronAI\Agent\Agent -> Workflow`, and `ChatAgent::__construct` had an empty body that never called `parent::__construct()`, so `Workflow::$executor` was never initialised → `must not be accessed before initialization`. Fix: `ChatAgent` now calls `parent::__construct()` (AI 450d045). Additionally, `LlmSearchService` now catches any LLM/agent failure and degrades to the raw query / empty plan (AI bd5dac2), and the intent parser no longer breaks search when the LLM is unavailable.
+2. **Cross-encoder reranker down — degrades now.** `EnsembleSearchService` catches a reranker failure (e.g. cross-encoder service at `127.0.0.1:8001` down) and returns the fused results unreranked (`meta.reranked=false`) instead of throwing (Core c0f456a).
+
+**End-to-end result (verified live):** the full assistant search path now returns results even with Ollama (`.239:11434`) AND the cross-encoder (`:8001`) both unreachable — `strategies=[keyword,vector,hybrid]`, `reranked=false`, `hits=3`. The search pipeline is resilient: LLM failures degrade to non-LLM retrieval, reranker failures skip reranking, vector/hybrid still runs.
 
 ## RCA extension (2026-09-08, second pass)
 
