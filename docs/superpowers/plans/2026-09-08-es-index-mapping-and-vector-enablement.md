@@ -24,7 +24,7 @@ In `ElasticsearchEngine::createIndex()`, after `parent::createIndex()` (kept, to
 - [x] Fix `ElasticsearchEngine::createIndex` to apply the embedding mapping via `ElasticsearchService` — committed (Core 384861c).
 - [x] Verify live: recreated `cms_contents` → ES mapping now has `embedding: {type: dense_vector, dims: 384, index: true, similarity: cosine}` (ES adds int8_hnsw index_options). Core search suite 119 passed.
 - [x] Embedding backfill + hybrid verification (Horizon running): 3 Content → `GenerateEmbeddingsJob` (sync) → 3 `ModelEmbedding` rows → indexed → ES reports `es_docs_with_embedding=3`. Hybrid query (Core fallback planner, reranker off) returned `strategies=["keyword","vector","hybrid"]`, 3 hits each matched across all three strategies. **Vector/hybrid retrieval works end-to-end against live ES.**
-- [ ] (Follow-up) Add an ES-gated integration test for the mapping application + a hybrid retrieval smoke (skips when ES/embedder unreachable). Not added yet — needs an ES-reachable runner; tracked.
+- [x] ES-gated integration test asserting createIndex applies the dense_vector embedding mapping (dedicated throwaway index; skips without ES; verified passing against live ES). Core commit.
 
 ## Operational findings — RESOLVED
 
