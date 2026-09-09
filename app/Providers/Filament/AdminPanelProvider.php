@@ -70,7 +70,11 @@ final class AdminPanelProvider extends PanelProvider
 
                 return is_string($logo) ? $logo : null;
             })
-            ->spa(hasPrefetching: true)
+            // Prefetching is deliberately off: every row in a resource table links to
+            // the record's edit page, and Filament asks Livewire to preload those links
+            // on hover. Preloading builds the edit page server-side, which takes the
+            // editorial lease, so merely scrolling a list locked records for 15 minutes.
+            ->spa(hasPrefetching: false)
             ->maxContentWidth(Width::Full)
             ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop()
