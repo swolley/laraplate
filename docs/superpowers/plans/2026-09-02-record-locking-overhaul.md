@@ -8,6 +8,39 @@ Related spec: `docs/superpowers/specs/2026-07-10-nested-forms-and-draft-recovery
 (stack repo). That spec already fixes the frontend side of the contract; three of its details
 diverge from the implementation and are reconciled in Task 10.
 
+## Delivery status (2026-09-09): shipped
+
+All ten tasks are done and the exit criteria are met. The Core, CMS and ERP suites are green and
+`vendor/bin/pint --dirty` is clean. The plan's own work is committed across Core, CMS, ERP, SAO and
+the parent repository; the two follow-ups dated 2026-09-09 below are in the working tree.
+
+Four decisions were taken during execution that this document did not anticipate:
+
+- **The lease deadline is fixed, not rolling.** "A lease extends but never downgrades" is not
+  implementable against a TTL computed from the present: every poll would extend it. An implicit
+  re-lock on a lock the caller already holds now writes nothing, and the client re-acquires after
+  the lapse. There is no heartbeat verb.
+- **`Locked::withoutGuard()`** was added so a caller with a genuine reason can overrule the guard
+  in code rather than by configuration.
+- **`HasLocks::attributesWritableWhileLocked()`** was added afterwards, empty by default, so a
+  model can state which of its attributes a lock does not cover. `ERP\Models\SalesOrderLine`
+  derives it from `$fillable` minus `LOCKED_COMMERCIAL_FIELDS`, which aligns it with the database
+  trigger and removed the three `withoutGuard()` call sites the ERP fulfilment services carried.
+- **The freeze icon.** Heroicons has no snowflake, so Core draws one in the same grammar and serves
+  it from its own `laraplate` Blade Icons set. The panel and the frontend now show the same icon.
+
+Five defects unrelated to the plan surfaced while implementing it and were fixed with it: the lock
+guard subscriber had never been registered, the table filter called scopes that did not exist,
+direct permissions bypassed every ACL, role inheritance stopped short of the user gate, and write
+paths ignored row-level ACLs.
+
+One defect surfaced later. Giving permissions the connection segment (`default.<table>.<operation>`)
+made the per-row select check start finding its permission, where before every lookup missed and a
+miss reads as allowed. That woke a circularity: reading a role required an authorization answer,
+and producing the answer required reading roles. Roles and permissions are now exempt from the
+per-row check, and `Core\Authorization\ResolvingAuthorization` marks the window in which an answer
+is being worked out. Fixed 2026-09-09.
+
 ## Global Constraints
 
 - The product is not in production. Behaviour changes need no staged rollout or compatibility shim,
@@ -386,5 +419,3 @@ Per `AGENTS.md`, feature work updates the RAG docs of the module it touches.
   no notification or "request release" flow is planned. Bounded by leases always expiring.
 - ACL filters cannot express conditions relative to the current lock holder beyond what
   `@user.<attribute>` reaches (e.g. "locks held by my team members"). Those stay code rules.
-- `HasLocks::bootHasLocks` reads `request('lock_version')` inside a model event, which is fragile
-  on queues and in console and trusts client input. Not addressed here.
