@@ -57,6 +57,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    |
+    | Comma separated list of proxy IP addresses whose "X-Forwarded-*" headers
+    | may be trusted. Set this whenever the application runs behind a reverse
+    | proxy (nginx in front of FrankenPHP, a load balancer, ...), otherwise the
+    | application cannot detect the original HTTPS scheme and generates
+    | insecure URLs. Use "*" to trust the immediate calling IP address.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES', '127.0.0.1,::1'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

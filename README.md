@@ -51,6 +51,7 @@ php artisan module:seed --all
 -   `APP_*`: ambiente, URL, porta, localizzazione, logo.
 -   `DB_*`: connessione (default `pgsql`), host/porta, credenziali.
 -   `SESSION_*`: driver (default `redis`), lifetime e dominio.
+-   `TRUSTED_PROXIES`: elenco separato da virgole degli IP proxy di cui fidarsi per gli header `X-Forwarded-*` (default `127.0.0.1,::1`). Obbligatorio quando l'app sta dietro un reverse proxy (nginx davanti a FrankenPHP/PHP-FPM), altrimenti l'app non riconosce lo schema HTTPS originale e genera URL `http` che il browser blocca come mixed content. Usare `*` per fidarsi dell'IP chiamante.
 -   `CACHE_STORE`, `CACHE_PREFIX`, `QUEUE_CONNECTION`, `FILESYSTEM_DISK`, `BROADCAST_CONNECTION`: store/driver predefiniti (redis/redis/local/log).
 -   `REDIS_*`, `MEMCACHED_HOST`: configurazioni cache/sessioni.
 -   `LOG_*`: canale/stack/livello log.
