@@ -89,6 +89,11 @@ final class AdminPanelProvider extends PanelProvider
                 Swagger::class,
                 PhpInfo::class,
             ])
+            // Only the application's own groups are listed here. Every module registers
+            // its own group, with its own icon, from its Filament plugin, so adding a
+            // module needs no change in this file. Filament sorts groups by their
+            // position in this list and appends the ones registered later, which keeps
+            // the modules in plugin discovery order behind these two.
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Health')
@@ -96,18 +101,6 @@ final class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Documentation')
                     ->icon(Heroicon::OutlinedDocumentText),
-                NavigationGroup::make()
-                    ->label('Core')
-                    ->icon(Heroicon::OutlinedBolt),
-                NavigationGroup::make()
-                    ->label('CMS')
-                    ->icon(Heroicon::OutlinedNewspaper),
-                NavigationGroup::make()
-                    ->label('ERP')
-                    ->icon(Heroicon::OutlinedBuildingOffice),
-                NavigationGroup::make()
-                    ->label('AI')
-                    ->icon(Heroicon::OutlinedSparkles),
             ])
             ->widgets([
             ])

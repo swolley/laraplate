@@ -46,6 +46,11 @@ php artisan module:seed --all
 -   🏭 **MES**: manufacturing execution foundation (work orders, shop-floor events, traceability, KPIs). About [MES Module](https://github.com/swolley/laraplate-mes).
 -   🔗 **SAO**: _Simply Another Orchestrator_ — a correlation engine between code, errors and work; a standalone ticketing core with optional VCS, log-source and issue-tracker integrations. About [SAO Module](https://github.com/swolley/laraplate-sao).
 
+Each module owns its backoffice presence: a `Modules/{Name}/app/Filament/{Name}Plugin.php`
+class is auto-discovered by `coolsam/modules` and registers the module's resources, pages
+and widgets, plus its own navigation group and icon (`afterRegister()`). The admin panel
+provider therefore lists no module: it only declares the application's own groups.
+
 ### Environment (principali variabili)
 
 -   `APP_*`: ambiente, URL, porta, localizzazione, logo.
