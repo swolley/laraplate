@@ -12,6 +12,36 @@
 
 ---
 
+## Delivery status (2026-09-11): shipped, generalized
+
+Moderated comments work. The checkboxes below were never ticked and should not be read as
+outstanding work: the architecture stated above was deliberately widened during implementation, so
+several steps name artifacts that were replaced by platform-wide ones. Moderation is inherited from
+`HasApprovals` rather than rebuilt for comments.
+
+| This plan specified | What was built instead | Where |
+|---|---|---|
+| `CommentModerationLog` model | the `Modification` record approvals already produce | Core |
+| `CommentRequiresModeration` event | `ModificationRequiresModeration` | Core |
+| `HasCommentTranslations` trait | `HasTranslations` aliased on the model, plus `CommentTranslationScope` | CMS |
+| `CommentApprovalMode` enum | `ModerationApprovalMode::fromConfig()` | AI |
+| a comments-specific config block | `ai.features.moderation.*`, read through the `ai_config_*` helpers | AI |
+| `CommentModerationService` | `CommentModerationAdapter` registered into `ModerationAdapterRegistry` | CMS into Core |
+
+The registry is the part worth keeping in mind: AI moderation is no longer tied to comments. Any
+model that carries approvals can register an adapter, and the listener and job that apply the
+thresholds and the approval mode live in AI and serve all of them.
+
+Two smaller divergences: both tables are created by the single `create_cms_comments_table`
+migration rather than two, and the commented-out keys in the AI moderation config are documentation
+of what can be overridden, not gaps, since the helpers carry the defaults.
+
+One item was not confirmed while auditing: an explicit `comments` entry in the seeder's
+`defaultEntities()`. The permissions are seeded against `table_name = cms_comments` and the CRUD
+surface works, so this may simply be a step the implementation did not need.
+
+---
+
 ### Task 1: `CMSTables` enum + comments migration
 
 **Files:**
