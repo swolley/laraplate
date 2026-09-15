@@ -2,23 +2,29 @@
 	path = Modules/Core
 	url = https://github.com/swolley/laraplate-core.git
 	pushurl = git@github.com:swolley/laraplate-core.git
+	branch = master
 [submodule "Modules/CMS"]
 	path = Modules/CMS
 	url = https://github.com/swolley/laraplate-cms.git
 	pushurl = git@github.com:swolley/laraplate-cms.git
+	branch = master
 [submodule "Modules/AI"]
 	path = Modules/AI
 	url = https://github.com/swolley/laraplate-ai.git
 	pushurl = git@github.com:swolley/laraplate-ai.git
+	branch = master
 [submodule "Modules/ERP"]
 	path = Modules/ERP
 	url = https://github.com/swolley/laraplate-erp.git
 	pushurl = git@github.com:swolley/laraplate-erp.git
+	branch = master
 [submodule "Modules/MES"]
 	path = Modules/MES
 	url = https://github.com/swolley/laraplate-mes.git
 	pushurl = git@github.com:swolley/laraplate-mes.git
+	branch = master
 [submodule "Modules/SAO"]
 	path = Modules/SAO
 	url = https://github.com/swolley/laraplate-sao.git
 	pushurl = git@github.com:swolley/laraplate-sao.git
+	branch = master

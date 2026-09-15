@@ -143,12 +143,32 @@
       "npx npm-check-updates -u"
     ],
     "version": "./scripts/version.sh --nointeractive",
-    "version:module": "./scripts/version.sh",
-    "version:major": "./scripts/version.sh major",
-    "version:minor": "./scripts/version.sh minor",
-    "version:patch": "./scripts/version.sh patch",
+    "version:module": [
+      "Composer\\Config::disableProcessTimeout",
+      "./scripts/version.sh"
+    ],
+    "version:major": [
+      "Composer\\Config::disableProcessTimeout",
+      "./scripts/version.sh major"
+    ],
+    "version:minor": [
+      "Composer\\Config::disableProcessTimeout",
+      "./scripts/version.sh minor"
+    ],
+    "version:patch": [
+      "Composer\\Config::disableProcessTimeout",
+      "./scripts/version.sh patch"
+    ],
     "setup:hooks": "./scripts/install-hooks.sh",
-    "update-all": "./scripts/update-composer.sh"
+    "update-all": "./scripts/update-composer.sh",
+    "version:all": [
+      "Composer\\Config::disableProcessTimeout",
+      "./scripts/version.sh --all"
+    ],
+    "version:dry": "./scripts/version.sh --dry-run",
+    "version:test": "bash scripts/tests/version-test.sh",
+    "changelog": "./scripts/version.sh --changelog",
+    "changelog:check": "./scripts/version.sh --changelog-check"
   },
   "extra": {
     "laravel": {

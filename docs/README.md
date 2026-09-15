@@ -29,3 +29,7 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 ## Engineering audits
 
 - [Database connection affinity audit](database-connection-affinity-audit.md)
+
+## Operations
+
+- [Releasing the application and its modules](releasing.md)
