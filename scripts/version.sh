@@ -280,7 +280,7 @@ update_version() {
     fi
 }
 
-ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+ROOT_DIR="${VERSION_ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 # Resolve the repository to version. With no target, or with a target that is not a directory,
 # it is the application itself. A target may be a module name (Core) or a path (Modules/Core).
