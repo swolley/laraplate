@@ -1,7 +1,7 @@
 # MCP Server (external LLM access) — Design
 
 **Status:** Draft (for review)
-**Date:** 2026-09-12
+**Date:** 2026-09-12 (revised 2026-09-16)
 **Author:** swolley + Claude
 **Related:**
 - stack `.cursor/rules/01-ecosystem.mdc` — the three HTTP surfaces
@@ -46,8 +46,9 @@ commented `expose_crud_api` flag in `Modules/Core/config/config.php:47`).
 
 - `MCP_ENABLED` — default **false**. When off the routes are **not registered at
   all**, not 403. No endpoint to fingerprint.
-- `MCP_MODULES` — allowlist of modules whose entities are reachable (e.g. `cms,sao`).
-  Lets you ship CMS access without exposing ERP.
+
+No per-module switch. The caller is a real application user, so which modules and
+entities it reaches is already decided by its roles, permissions and ACL.
 
 ## Authentication: Sanctum personal access tokens
 
@@ -99,26 +100,24 @@ Two traps:
 
 Authorization is the **intersection** of two independent checks:
 
-- **Token ability** — may this *client* invoke this tool? (`mcp:read`, `mcp:write`, …)
-- **User policy** — may this *user* see or touch this record? (existing policies)
+- **Token ability** — may this *client* read, or also write?
+- **User authorization** — may this *user* see or touch this record? Existing
+  permissions and ACL, unchanged.
 
 The token is a delegation: it can only ever narrow what the user can already do.
 
-### Ability granularity
-
-Action abilities, intersected with module abilities:
+### Ability granularity: read or write, nothing finer
 
 | Ability | Grants |
 |---------|--------|
 | *(none required)* | `about`, `entities` — discovery only, already user-scoped |
-| `mcp:read` | list, detail, tree, history, graph, approval state |
-| `mcp:search` | `search` — separate because it hits ES and has a real cost profile |
-| `mcp:write` | insert, update, delete |
-| `mcp:lifecycle` | activate, inactivate, approve, disapprove, lock, unlock |
-| `mcp:module:{cms\|erp\|mes\|sao\|core}` | restricts which modules the above reach |
+| `mcp:read` | every read tool, `search` included |
+| `mcp:write` | every write and lifecycle tool; implies nothing about reads, so a writing token carries both |
 
-`mcp:read` alone reaches nothing without at least one `mcp:module:*`. Sanctum's
-`tokenCan` is an exact match, so the intersection needs a small helper.
+Everything finer belongs to permissions and ACL. Per-module or per-entity abilities
+were considered and dropped: they would duplicate the permission model on the token
+and drift from it. The only axis the token adds is one permissions cannot express:
+a user allowed to write can hand a client a **read-only** token.
 
 ## Tool surface
 
@@ -141,12 +140,10 @@ per-entity tools — the model discovers the entity set at runtime.
 Both helpers live in `Modules/Core/app/Helpers/helpers.php`
 (`modules()` at :68, `models()` at :375) and already do the job:
 
-- `modules(onlyActive: true)` returns **enabled** modules only. `MCP_MODULES`
-  therefore becomes an *intersection* on top of existing module enablement, not a
-  parallel mechanism.
+- `modules(onlyActive: true)` returns **enabled** modules only.
 - `models($onlyActive, $onlyModule, $filter)` returns concrete `Model` class-strings,
-  memoized, abstracts skipped, and accepts a **filter callable** — which is exactly
-  where the MCP deny-list plugs in.
+  memoized, abstracts skipped, and accepts a **filter callable** — which is where
+  `entities` drops the models the current user holds no read permission on.
 
 The decisive point: `DynamicEntity::tryResolveModel` (`Modules/Core/app/Models/DynamicEntity.php:78`)
 **already calls `models()`** to resolve `{module}/{entity}`. So `entities` is a
@@ -181,21 +178,18 @@ curated by convention (memory `laraplate-model-standard`). DB introspection via
 casts, accessors or validation, and would leak physical columns that are not part of
 the entity's contract.
 
-### Hard requirement: `crud.dynamic_entities` must be off for MCP
+### Note: `crud.dynamic_entities`
 
 `DynamicEntityService::resolve` falls back to a **DB-introspected** `DynamicEntity`
 for any table with no concrete model, gated on `config('crud.dynamic_entities')`
 (currently commented out in `Modules/Core/config/config.php:44`, so effectively
-`false`). Two regimes follow:
+`false`). When on, the gateway resolves *any table*, `users` and
+`personal_access_tokens` included.
 
-- **off** — the reachable surface is exactly what `models()` enumerates. Safe.
-- **on** — the gateway resolves *any table in the database*, including `users`,
-  `personal_access_tokens`, `password_reset_tokens` and the Spatie permission tables.
-
-The MCP layer must force the off behaviour for its own requests regardless of the
-global config value. Relying on the default is not enough: someone enabling dynamic
-entities for an unrelated reason would silently widen the MCP surface to the whole
-schema.
+This needs no MCP-specific guard. Permissions are keyed on the table name, so a
+non-superadmin caller still reaches only tables its roles were granted, and
+superadmin tokens are refused (below). `entities` should still advertise concrete
+models only, so the model is never invited to probe raw tables.
 
 ### What the existing ACL already covers
 
@@ -208,7 +202,7 @@ policies existing:
 - `AuthorizationService::getAclFilters` resolves the user's row-level ACL and injects
   it into the query, so filters are ANDed in before the read runs.
 
-Consequence: a positive, exhaustive per-model allowlist would mostly **duplicate the
+Consequence: any MCP-side allowlist or deny-list of entities would **duplicate the
 permission model** and rot against it. Dropped.
 
 ### Where it stops: the superadmin bypass
@@ -224,27 +218,24 @@ Authorization protects against a *narrow* user. It cannot protect against the
 
 A superadmin token turns the entire `models()` set into reachable surface with no row
 filtering. That includes `User` (email, password hash) and `PersonalAccessToken`
-(token hashes — reading them escalates one MCP token into every other token). And a
-superadmin token is precisely the first one anyone setting this up would mint.
+(token hashes — reading them escalates one MCP token into every other token).
 
-This is exactly the gap the two-gate design exists to close: the user gate answers
-*what may this person see*, the ability gate answers *what may this client do on their
-behalf*, and it can only ever narrow. The token is a delegation, so it must not
-inherit a bypass.
+This is not a privilege MCP adds: a superadmin already reads those tables from
+`/app`. What changes is **who drives**. Over MCP the caller is a model reading
+untrusted text, so an instruction hidden in a content body can steer it through the
+superadmin's unlimited reach.
 
-### Decision: a hard deny-list, not an allowlist
+### Decision: MCP refuses superadmin tokens
 
-Small, coarse, and **not overridable by any role, superadmin included** — applied as
-the `$filter` callable to `models()` and re-checked at resolution:
+The MCP middleware rejects a request whose token resolves to a superadmin, before
+any tool runs. MCP access goes through a dedicated user with ordinary roles, sized
+like any other account. Consequences:
 
-- `User`, and anything holding credentials or password-reset state
-- `PersonalAccessToken` / Sanctum token models
-- Spatie `Role` / `Permission` / pivot models
-- `DynamicEntity`
-
-Everything else stays governed by permissions and ACL as it is today. The deny-list
-is not a second authorization model; it is the floor that holds when the ACL
-deliberately abstains.
+- No entity allowlist or deny-list exists. Permissions and ACL are the whole
+  authorization model, as in `/app`.
+- The superadmin bypass stays untouched in Core; MCP simply never runs under it.
+- Minting a token for a superadmin should fail at creation too, so the refusal is
+  not first discovered by the client.
 
 ### Read — `mcp:read`
 
@@ -258,7 +249,7 @@ deliberately abstains.
 | `latest_disapproval` | `latestDisapproval` |
 | `graph_expand`, `graph_stats` | `GraphController::expand` / `stats` |
 
-### Search — `mcp:search`
+### Search — `mcp:read`
 
 | Tool | Backed by |
 |------|-----------|
@@ -282,12 +273,12 @@ must state that `update` is a two-step dance: `detail` first to read
 `lock_version`, then `update` carrying it. A model that guesses will simply fail,
 which is the correct outcome. See memory `locking-policy`.
 
-### Lifecycle — `mcp:lifecycle`
+### Lifecycle — `mcp:write`
 
 `activate`, `inactivate`, `approve`, `disapprove`, `lock`, `unlock`.
 
-Kept out of `mcp:write` deliberately: approving content is a governance act, not an
-edit, and you will want to grant editing without granting approval.
+No separate ability. Approving content is a governance act, and whether a user may
+do it is already a permission (`approve`, `lock`, …) checked by the gateway.
 
 ### Resources (not tools)
 
@@ -313,12 +304,44 @@ Not oversights. Each would break the security model.
 | `freshness` | Same shape as `facets`: it answers "has the list I am displaying gone stale". An external LLM holds no list and has no polling loop. |
 | Notifications | Per-user UI state; no value to an external LLM. |
 
+## Rate limiting
+
+A named Laravel rate limiter keyed on the **user**, applied to the MCP route group.
+
+It does not limit LLM tokens: those are spent and paid by the external client. It
+protects two things on our side:
+
+- **Load.** An agent in a retry or planning loop hammers the database and
+  Elasticsearch far faster than a person in `/app`.
+- **Cost.** In advanced mode, `search` embeds the query on every call
+  (`AdvancedSearchService::resolveVector` → `ITextEmbedder::embed`), which is a
+  provider call when the embedder is a paid API.
+
+Context: today only AI text generation is rate limited
+(`ai.features.text_generation.rate_limit`); `/app` and `/api/v1` carry no HTTP
+throttle (`throttle:api` is commented in `bootstrap/app.php`). A stricter bucket for
+`search` than for the other reads is reasonable; exact numbers are a plan detail.
+
+## Audit
+
+Because the caller is a real user, every MCP action is recorded as that user's
+action. After the fact, an edit made by the person in `/app` and one made by their
+LLM client are indistinguishable. If manipulated content steers the model into an
+update or an approval, the trail points at the person.
+
+Decision: log every `tools/call` on a dedicated log channel with user id, token id
+and name, tool, arguments, and outcome (ok, denied, validation error, exception).
+The token id is what identifies the channel. Arguments are logged without secrets.
+
+No generic audit layer exists today to absorb this: the only audits are
+domain-specific (ERP document sequences, SAO closure). A log channel is enough for
+v1; a queryable table is a later decision.
+
+Out of scope, recorded because it surfaced here: model versions do not record the
+acting user. `HasVersions::getVersionUserId` returns `null` unless the model has its
+own user column, with `auth()->id()` commented out. This affects `/app` equally.
+
 ## Open points
 
 1. MCP spec revision + PHP package choice (blocks implementation).
-2. Where the deny-list is enforced so a superadmin cannot lift it — config is not
-   enough if config is editable from the backoffice.
-3. Rate limiting per token: an LLM loops, and `search` is the expensive tool.
-4. Audit: every `tools/call` should be attributable to (token, user, tool, args).
-   Check whether the existing audit layer can absorb this or needs a new channel.
-5. Whether `mcp:module:*` should go finer, down to per-entity.
+2. Implementation plan — written after point 1, since the package shapes it.
