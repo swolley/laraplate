@@ -2289,3 +2289,86 @@ cd /srv/http/laraplate-stack/laraplate
 git add scripts/version.sh scripts/tests/version-test.sh docs/releasing.md docs/superpowers/specs/2026-08-30-release-tooling-design.md docs/superpowers/plans/2026-09-15-release-tooling.md
 git commit -m "fix(release): carry the module release level into the application under --all" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
+
+---
+
+### Task 11: `CHANGELOG.md` lists released versions only
+
+Found after Task 10, reviewing with the owner. `--changelog` rewrote the file with an `[unreleased]` section, so running it between releases (as Task 2 did once, mid-cycle) left a changelog that announced work not yet released and changed again at the next release. The rule is now that `CHANGELOG.md` changes only when a release is cut: a release writes it with `--tag`, which leaves no `[unreleased]` section, and `--changelog` writes only the released sections, with the same `released_sections` filter `--changelog-check` already applies. No changelog in the repositories is rewritten by this task: the owner's releases had already closed every module's `[unreleased]` section, and the application's closes at its next release.
+
+**Files:**
+- Modify: `scripts/version.sh` (`run_changelog`)
+- Modify: `scripts/tests/version-test.sh` (replace `test_changelog_regenerates_only_the_target`)
+- Modify: `docs/releasing.md`, spec section "Changelog"
+
+**Interfaces:**
+- Consumes: `regenerate_changelog`, `released_sections`, `module_paths`, `display_name` (Tasks 4 and 7).
+- Produces: nothing new.
+
+- [x] **Step 1: Replace the failing test**
+
+Replace `test_changelog_regenerates_only_the_target`, which asserted the `[unreleased]` section, with:
+
+```bash
+test_changelog_never_writes_unreleased_work() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app" released
+    make_app "$app" Core
+    run_version "$app" --changelog Core
+    assert_status 0
+    released=$(cat "$app/Modules/Core/CHANGELOG.md")
+    commit "$app/Modules/Core" "fix: repair parsing"
+    run_version "$app" --changelog Core
+    assert_status 0
+    assert_file_lacks "$app/Modules/Core/CHANGELOG.md" "## [unreleased]"
+    assert_file_lacks "$app/Modules/Core/CHANGELOG.md" "Repair parsing"
+    assert_eq "$(cat "$app/Modules/Core/CHANGELOG.md")" "$released" "changelog after an unreleased commit"
+    [ ! -e "$app/CHANGELOG.md" ] || fail "the application changelog must not be written"
+}
+```
+
+Run: `bash scripts/tests/version-test.sh changelog`
+
+Expected: `FAIL test_changelog_never_writes_unreleased_work`, the other three changelog tests `ok`.
+
+- [x] **Step 2: Implement**
+
+Replace `run_changelog`:
+
+```bash
+# Rewrites CHANGELOG.md of each target with its released versions only; work after the last tag is
+# left out until it is released, so the file stays what the last release wrote.
+run_changelog() {
+    local path tmp
+    if [ "$ALL" = true ]; then
+        mapfile -t TARGETS < <(module_paths)
+        TARGETS+=("$ROOT_DIR")
+    elif [ "${#TARGETS[@]}" -eq 0 ]; then
+        TARGETS=("$ROOT_DIR")
+    fi
+    for path in "${TARGETS[@]}"; do
+        tmp=$(mktemp) || die "$EXIT_FAILURE" "cannot create a temporary file"
+        if ! regenerate_changelog "$path" "$tmp"; then
+            rm -f "$tmp"
+            die "$EXIT_FAILURE" "$(display_name "$path"): changelog regeneration failed"
+        fi
+        released_sections "$tmp" > "$path/CHANGELOG.md"
+        rm -f "$tmp"
+        printf 'Regenerated %s\n' "$(display_name "$path")"
+    done
+    exit "$EXIT_OK"
+}
+```
+
+- [x] **Step 3: Run the tests**
+
+Run: `bash scripts/tests/version-test.sh`
+
+Expected: `38 passed, 0 failed`, and `git status` in the real repositories shows no `CHANGELOG.md` change.
+
+- [x] **Step 4: Commit**
+
+```bash
+cd /srv/http/laraplate-stack/laraplate
+git add scripts/version.sh scripts/tests/version-test.sh docs/releasing.md docs/superpowers/specs/2026-08-30-release-tooling-design.md docs/superpowers/plans/2026-09-15-release-tooling.md
+git commit -m "fix(release): keep unreleased work out of CHANGELOG.md" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+```

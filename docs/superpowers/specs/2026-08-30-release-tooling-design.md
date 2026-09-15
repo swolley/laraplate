@@ -214,6 +214,8 @@ The shared `cliff.toml` (already the only copy, in the application) changes as f
 
 Full regeneration is the only mode. `--changelog-check` regenerates each repository's changelog to a temporary file and diffs it against the committed one, **ignoring the `[unreleased]` section on both sides**, exiting `4` on divergence. The committed `[unreleased]` section is stale by nature after any commit, so comparing it would fail on every commit following a release; released sections never change unless history or `cliff.toml` does. That check turns the defect class found here, releases silently vanishing from changelogs, into a failure visible the same day.
 
+`CHANGELOG.md` only ever lists released versions and changes only when a release is cut. `--changelog` writes the regenerated file without the `[unreleased]` section, so running it between releases leaves the file identical to what the last release wrote; it exists to repair released sections after a `cliff.toml` change. Work committed after the last tag appears in the changelog when it is released, under its version, never before.
+
 Hand edits to `CHANGELOG.md` are discarded by design. Release prose belongs in the commit body, which git-cliff renders.
 
 ## Hooks

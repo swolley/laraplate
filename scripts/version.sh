@@ -566,8 +566,10 @@ run_release() {
     exit "$EXIT_OK"
 }
 
+# Rewrites CHANGELOG.md of each target with its released versions only; work after the last tag is
+# left out until it is released, so the file stays what the last release wrote.
 run_changelog() {
-    local path
+    local path tmp
     if [ "$ALL" = true ]; then
         mapfile -t TARGETS < <(module_paths)
         TARGETS+=("$ROOT_DIR")
@@ -575,7 +577,13 @@ run_changelog() {
         TARGETS=("$ROOT_DIR")
     fi
     for path in "${TARGETS[@]}"; do
-        regenerate_changelog "$path" "$path/CHANGELOG.md" || die "$EXIT_FAILURE" "$(display_name "$path"): changelog regeneration failed"
+        tmp=$(mktemp) || die "$EXIT_FAILURE" "cannot create a temporary file"
+        if ! regenerate_changelog "$path" "$tmp"; then
+            rm -f "$tmp"
+            die "$EXIT_FAILURE" "$(display_name "$path"): changelog regeneration failed"
+        fi
+        released_sections "$tmp" > "$path/CHANGELOG.md"
+        rm -f "$tmp"
         printf 'Regenerated %s\n' "$(display_name "$path")"
     done
     exit "$EXIT_OK"

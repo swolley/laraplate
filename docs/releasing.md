@@ -29,7 +29,7 @@ Interactively, each target shows the inferred version and accepts `major`, `mino
 
 ## Changelogs
 
-`CHANGELOG.md` is regenerated in full from history on every release. Do not edit it by hand: the next release discards the edit. Anything a release note should say belongs in the commit body. `composer run changelog:check` fails when a released section no longer matches history.
+`CHANGELOG.md` is regenerated in full from history on every release, and only ever lists released versions: work committed after the last tag appears when it is released, and `composer run changelog` rewrites the file without it. Do not edit it by hand: the next release discards the edit. Anything a release note should say belongs in the commit body. `composer run changelog:check` fails when a released section no longer matches history.
 
 ## `--all`
 
