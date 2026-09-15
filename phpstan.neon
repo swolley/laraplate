@@ -54,10 +54,6 @@ parameters:
           identifier: larastan.noEnvCallsOutsideOfConfig
           path: Modules/*/config/*
         # - '#Static call to instance method __construct\(\)#'
-        - '#Class PHP_CodeSniffer\\Standards\\Squiz\\Sniffs\\PHP\\EvalSniff not found.#'
-        - '#Class PHP_CodeSniffer\\Standards\\PSR1\\Sniffs\\Methods\\CamelCapsMethodNameSniff not found.#'
-        - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\WhiteSpace\\DisallowTabIndentSniff not found.#'
-        - '#Class PHP_CodeSniffer\\Standards\\Generic\\Sniffs\\Metrics\\CyclomaticComplexitySniff not found.#'
         - '#PHPDoc tag @mixin contains unknown class.*IdeHelper.*#'
         # Laravel Scout - metodi aggiunti dal trait Searchable
         - '#Call to an undefined method.*::searchableAs\(\)#'
