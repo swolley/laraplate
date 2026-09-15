@@ -118,19 +118,24 @@ git commit -m "test(importers): add anonymized Nebula cash fixture"
 
 **Owner:** `laraplate-importers`
 
+> **Partly done already (2026-09-15).** When the Naxos SQL dump channel was removed, its three
+> parsers were not deleted but promoted, unchanged, to `src/Shared/Source/Sql/` under the
+> `Shared\Source\Sql\` namespace, with `tests/Unit/Shared/SqlInsertParserTest.php` and a
+> source-neutral `tests/Fixtures/sql-dump-sample.sql`. There is no `src/Acme/Source/Sql/` left to
+> migrate and no duplicate to reconcile: start from the shared files as they stand. What this task
+> still owes is `SqlNumericMode` (exact decimal preservation) and `SqlDumpReaderTest`.
+
 **Files:**
 
 - Create: `src/Shared/Source/Sql/SqlNumericMode.php`
-- Create: `src/Shared/Source/Sql/SqlInsertParser.php`
-- Create: `src/Shared/Source/Sql/SqlCreateTableParser.php`
-- Create: `src/Shared/Source/Sql/SqlDumpReader.php`
-- Modify: `src/Acme/Source/Sql/SqlInsertParser.php`
-- Modify: `src/Acme/Source/Sql/SqlCreateTableParser.php`
-- Modify: `src/Acme/Source/Sql/SqlDumpReader.php`
+- ~~Create: `src/Shared/Source/Sql/SqlInsertParser.php`~~ — exists since 2026-09-15
+- ~~Create: `src/Shared/Source/Sql/SqlCreateTableParser.php`~~ — exists since 2026-09-15
+- ~~Create: `src/Shared/Source/Sql/SqlDumpReader.php`~~ — exists since 2026-09-15
+- ~~Modify: `src/Acme/Source/Sql/*`~~ — the Naxos dump path was deleted, nothing to migrate
 - Modify: `composer.json`
-- Create: `tests/Unit/Shared/SqlInsertParserTest.php`
+- ~~Create: `tests/Unit/Shared/SqlInsertParserTest.php`~~ — exists since 2026-09-15
 - Create: `tests/Unit/Shared/SqlDumpReaderTest.php`
-- Modify: `tests/Unit/SqlInsertParserTest.php`
+- Modify: `tests/Unit/Shared/SqlInsertParserTest.php` (numeric-mode cases)
 
 ### Step 1: Write parser regression tests first
 
