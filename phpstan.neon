@@ -22,8 +22,8 @@ parameters:
     # File da escludere
     excludePaths:
         # Escludo solo _ide_helper.php principale (generato da barryvdh/laravel-ide-helper)
-        - _ide_helper.php
-        - .phpstorm.meta.php
+        - _ide_helper.php (?)
+        - .phpstorm.meta.php (?)
         # MES module — out of scope for now
         - Modules/MES/**
         # Escludi file vendor che possono causare problemi
@@ -66,6 +66,41 @@ parameters:
         -
           message: '#Property Modules\\CMS\\Models\\Pivot\\Categorizable::\$primaryKey \(string\) does not accept default value#'
           path: Modules/CMS/app/Models/Pivot/Categorizable.php
+        # Carried over from the module phpstan.neon files when the toolchain was centralized
+        # (2026-09-15). Their paths were module-relative; they are prefixed here.
+        -
+            identifier: generics.lessTypes
+            path: Modules/*/app/Models
+        -
+            identifier: return.type
+            path: Modules/*/app/Models
+        -
+            identifier: property.onlyWritten
+            path: Modules/CMS/app/Models/Content.php
+        -
+            identifier: property.onlyWritten
+            path: Modules/CMS/app/Models/Pivot/Fieldable.php
+        -
+            identifier: return.unusedType
+            path: Modules/CMS/app/Models/Tag.php
+        -
+            identifier: return.unusedType
+            path: Modules/CMS/app/Models/Contributor.php
+        -
+            identifier: new.staticInAbstractClassStaticMethod
+            path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
+        -
+            identifier: new.static
+            path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
+        -
+            identifier: return.type
+            path: Modules/CMS/app/Services/Contracts/AbstractGeocodingService.php
+        -
+            identifier: method.notFound
+            path: Modules/CMS/app/Helpers/HasMedia.php
+        -
+            identifier: arguments.count
+            path: Modules/AI/app/Listeners/*
     # Non segnalare pattern non corrispondenti (per evitare warning sui file IDE helper)
     reportUnmatchedIgnoredErrors: false
 

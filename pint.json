@@ -6,8 +6,7 @@
     ],
     "notPath": [
         "tests/TestCase.php",
-        "tmp",
-        "Modules"
+        "tmp"
     ],
     "rules": {
         "array_push": true,

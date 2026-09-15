@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\MethodCall\RemoveNullArgOnNullDefaultParamRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
@@ -43,6 +44,8 @@ return RectorConfig::configure()
     ->withPaths($paths)
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        // Turns where('col', null) into where('col'), which changes query semantics (e.g. soft-delete unique rules).
+        RemoveNullArgOnNullDefaultParamRector::class,
         __DIR__ . '/vendor',
         __DIR__ . '/node_modules',
         __DIR__ . '/storage',
