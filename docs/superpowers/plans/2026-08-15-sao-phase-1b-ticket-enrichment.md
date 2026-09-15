@@ -117,6 +117,8 @@ Tasks are ordered simplest-first; each is independently shippable.
 
 ## Delivery status (2026-09-15): shipped, one step deferred on purpose
 
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`.
+
 Models and services ship and are fully tested. The one open box is the optional Filament
 surface, deferred deliberately rather than left undone; the step says so itself. Nothing here
 is waiting on anybody.

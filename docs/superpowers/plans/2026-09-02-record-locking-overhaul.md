@@ -10,6 +10,8 @@ diverge from the implementation and are reconciled in Task 10.
 
 ## Delivery status (2026-09-09): shipped
 
+**Documented in:** `Modules/Core/docs/rag/RECORD_LOCKING_USER.md`, `Modules/Core/docs/rag/RECORD_LOCKING_DEVELOPER.md`.
+
 All ten tasks are done and the exit criteria are met. The Core, CMS and ERP suites are green and
 `vendor/bin/pint --dirty` is clean. The plan's own work is committed across Core, CMS, ERP, SAO and
 the parent repository; the two follow-ups dated 2026-09-09 below are in the working tree.

@@ -14,6 +14,8 @@
 
 ## Delivery status (2026-09-11): shipped, generalized
 
+**Documented in:** `Modules/CMS/docs/COMMENT_MODERATION.md`, `Modules/CMS/docs/rag/COMMENT_MODERATION.md`.
+
 Moderated comments work. The checkboxes below were never ticked and should not be read as
 outstanding work: the architecture stated above was deliberately widened during implementation, so
 several steps name artifacts that were replaced by platform-wide ones. Moderation is inherited from

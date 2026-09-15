@@ -52,6 +52,11 @@
 - No new base folders without user approval.
 - Create docs only when user asks.
 - Feature implementations must update affected user/operator and developer RAG docs when the behavior is worth documenting. Use the docs of the module where the change was made; cross-module work updates each affected module's own docs. Added, removed, renamed, or behavior-changing env vars must be documented in the affected module README using the existing style. Patch-only fixes, formatting, narrow tests, and internal refactors can skip RAG docs, but state that judgment when finishing.
+- Specs and plans are dated decisions, not documentation. A spec stays true forever about one moment; module docs describe the present and go stale when code moves.
+- Nothing ships documented only in a spec or plan. The behaviour of a shipped feature belongs in `Modules/{Module}/docs/` and `docs/rag/`.
+- Closing a plan means adding a `**Documented in:**` line naming the module docs that describe the behaviour now. Enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`.
+- Mark a finished plan with a `## Delivery status (date): ...` section. Record divergences from the plan there: the file is the only place saying an artifact was deliberately not built.
+- Do not tick a plan's checkboxes from the artifact names it imagined. Read what the code does and map it. Names can survive a design the implementation replaced.
 
 ## Project
 

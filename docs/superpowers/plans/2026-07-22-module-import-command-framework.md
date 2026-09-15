@@ -165,6 +165,8 @@ The shared framework is complete when Core import tests, CMS import tests, and e
 
 ## Delivery status (2026-09-15): code complete, one manual step outstanding
 
+**Documented in:** `Modules/Core/docs/IMPORT_FRAMEWORK.md`, `Modules/Core/docs/rag/MODULE.md`.
+
 Every code step is done. The single open box is an operational one: running a dry-run smoke
 import against an anonymized fixture. It needs a fixture and a person, not a change to the
 codebase, so it stays open until somebody runs it.

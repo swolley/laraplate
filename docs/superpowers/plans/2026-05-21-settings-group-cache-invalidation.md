@@ -12,6 +12,8 @@
 
 ## Delivery status (2026-09-15): shipped as designed
 
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`.
+
 Built as written, unusually for these plans, and the empty checkboxes below are not
 outstanding work.
 

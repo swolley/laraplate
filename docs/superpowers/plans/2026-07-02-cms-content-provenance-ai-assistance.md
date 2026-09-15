@@ -14,6 +14,8 @@
 
 ## Delivery status (2026-09-15): shipped, provenance generalized
 
+**Documented in:** `Modules/CMS/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/GLOSSARY.md`.
+
 Everything this plan asked for exists. The empty checkboxes below are not outstanding work.
 
 The bibliography and the disclosure landed as designed: the `AiAssistance` enum, the

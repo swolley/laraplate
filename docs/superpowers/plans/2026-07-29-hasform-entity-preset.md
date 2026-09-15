@@ -96,6 +96,8 @@ Resolve active via `Preset::activePresettable()`; clear on entity change; hydrat
 
 ## Delivery status (2026-09-15): shipped, with a simpler signature
 
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`.
+
 `HasForm::configureForm()` prepends the Entity and Preset selects and the hidden
 `presettable_id`, gated on the schema model using `HasDynamicContents`, and CMS resources call
 it. `LaraplateResourceFormSchemaClassGenerator` emits `return self::configureForm(...)`, which

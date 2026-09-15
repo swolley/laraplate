@@ -40,6 +40,8 @@
 
 ## Delivery status (2026-09-15): shipped
 
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/GLOSSARY.md`.
+
 All four tasks done. `ChangeRef`, `Release`, `ReleaseTag`, `TicketRelease`, `Environment` and
 `DeployCensusService` are in `Modules/SAO`, the SAO RAG docs and glossary describe them, and the
 work is committed with the parent pointing at it.
