@@ -166,15 +166,14 @@ amend_or_commit() {
 # Returns:
 #   None
 #
-# Resolves the package composer.json next to this script (repository root or module root).
-# Only the root JSON key "version" is updated; never scripts.version (the composer script name).
+# Resolves the package composer.json in the target repository (the application, or a module
+# named on the command line). Only the root JSON key "version" is updated; never scripts.version
+# (the composer script name).
 update_composer_version() {
     local new_version=$1
 
-    local version_script_dir
-    version_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
     local composer_file
-    composer_file="$(cd "$version_script_dir/.." && pwd)/composer.json"
+    composer_file="$TARGET_DIR/composer.json"
 
     if [ ! -f "$composer_file" ]; then
         echo "Error: composer.json not found at $composer_file"
@@ -206,8 +205,8 @@ update_composer_version() {
 update_changelog() {
     local new_version=$1
     
-    # update the changelog
-    git cliff --output CHANGELOG.md
+    # update the changelog; the configuration is shared, the output belongs to the target repository
+    git cliff --config "$ROOT_DIR/cliff.toml" --output CHANGELOG.md
     
     # add the file to git (but don't commit yet)
     git add CHANGELOG.md
@@ -249,7 +248,7 @@ update_version() {
     fi
     
     if [ "$DRY_RUN" = true ]; then
-        echo "Dry run: would update version from $current_version to $new_version"
+        echo "Dry run: would update $TARGET_NAME from $current_version to $new_version"
         return
     fi
 
@@ -258,7 +257,7 @@ update_version() {
         return
     fi
 
-    echo "Updating version from $current_version to $new_version"
+    echo "Updating $TARGET_NAME from $current_version to $new_version"
     
     # update composer.json (stages the file)
     update_composer_version "$new_version"
@@ -280,6 +279,42 @@ update_version() {
         echo "Warning: Could not push tag. You may need to push manually: git push origin $new_version"
     fi
 }
+
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+
+# Resolve the repository to version. With no target, or with a target that is not a directory,
+# it is the application itself. A target may be a module name (Core) or a path (Modules/Core).
+TARGET_DIR="$ROOT_DIR"
+TARGET_NAME="the application"
+case "$1" in
+    "" | major | minor | patch | --*) ;;
+    *)
+        if [ -d "$ROOT_DIR/$1" ]; then
+            TARGET_DIR=$(cd "$ROOT_DIR/$1" && pwd)
+        elif [ -d "$ROOT_DIR/Modules/$1" ]; then
+            TARGET_DIR=$(cd "$ROOT_DIR/Modules/$1" && pwd)
+        else
+            echo "Error: no such module or directory: $1"
+            echo "Usage: $0 [<Module>|<path>] {major|minor|patch} [--nointeractive] [--silent] [--dry-run] [--allow-dirty]"
+            exit 1
+        fi
+        TARGET_NAME="$1"
+        shift
+        ;;
+esac
+
+if [ ! -e "$TARGET_DIR/.git" ]; then
+    echo "Error: $TARGET_DIR is not a git repository, cannot version it"
+    exit 1
+fi
+
+if [ ! -f "$TARGET_DIR/composer.json" ]; then
+    echo "Error: composer.json not found at $TARGET_DIR/composer.json"
+    exit 1
+fi
+
+# Every git call below acts on the current repository, so the target must be the working directory.
+cd "$TARGET_DIR" || exit 1
 
 SILENT=false
 DRY_RUN=false
@@ -315,7 +350,7 @@ else
             exit 0
             ;;
         *)
-            echo "Usage: $0 {major|minor|patch} [--nointeractive] [--silent]"
+            echo "Usage: $0 [<Module>|<path>] {major|minor|patch} [--nointeractive] [--silent] [--dry-run] [--allow-dirty]"
             exit 1
             ;;
     esac
