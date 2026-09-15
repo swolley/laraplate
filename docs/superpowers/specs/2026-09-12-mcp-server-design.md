@@ -146,7 +146,7 @@ Both helpers live in `Modules/Core/app/Helpers/helpers.php`
   parallel mechanism.
 - `models($onlyActive, $onlyModule, $filter)` returns concrete `Model` class-strings,
   memoized, abstracts skipped, and accepts a **filter callable** — which is exactly
-  where the MCP allowlist plugs in.
+  where the MCP deny-list plugs in.
 
 The decisive point: `DynamicEntity::tryResolveModel` (`Modules/Core/app/Models/DynamicEntity.php:78`)
 **already calls `models()`** to resolve `{module}/{entity}`. So `entities` is a
@@ -174,7 +174,7 @@ fail.
 
 ### Schema source: the model class, not the DB
 
-Superseding the earlier open point. For concrete models the schema comes from the
+For concrete models the schema comes from the
 class itself — `$fillable`, `$casts`, and the in-model validation rules — which are
 curated by convention (memory `laraplate-model-standard`). DB introspection via
 `DynamicEntityService::getInspectedTable` stays a fallback only, since it cannot see
@@ -245,94 +245,6 @@ the `$filter` callable to `models()` and re-checked at resolution:
 Everything else stays governed by permissions and ACL as it is today. The deny-list
 is not a second authorization model; it is the floor that holds when the ACL
 deliberately abstains.
-
-## Tool surface
-
-### Design choice: generic tools, not N tools per entity
-
-Clients degrade badly past a few dozen tools, and the context cost of `tools/list` is
-paid on every conversation. Laraplate already has a generic gateway keyed on
-`{module}/{entity}` (`routes/crud.php`), so the tool surface is a thin projection of
-it: ~15 parameterized tools instead of hundreds. `entities` is what replaces
-per-entity tools — the model discovers the entity set at runtime.
-
-### Discovery
-
-| Tool | Backed by | Notes |
-|------|-----------|-------|
-| `entities` | `modules()` + `models()` | module/entity pairs the current user can read, each with fields and filterable columns. Load-bearing: without it the generic tools are unusable. |
-
-### Enumeration: reuse `modules()` and `models()`
-
-Both helpers live in `Modules/Core/app/Helpers/helpers.php`
-(`modules()` at :68, `models()` at :375) and already do the job:
-
-- `modules(onlyActive: true)` returns **enabled** modules only. `MCP_MODULES`
-  therefore becomes an *intersection* on top of existing module enablement, not a
-  parallel mechanism.
-- `models($onlyActive, $onlyModule, $filter)` returns concrete `Model` class-strings,
-  memoized, abstracts skipped, and accepts a **filter callable** — which is exactly
-  where the MCP allowlist plugs in.
-
-The decisive point: `DynamicEntity::tryResolveModel` (`Modules/Core/app/Models/DynamicEntity.php:78`)
-**already calls `models()`** to resolve `{module}/{entity}`. So `entities` is a
-projection of the same function the gateway resolves through, and the advertised tool
-surface cannot drift from what the gateway actually accepts.
-
-### Per-entity capabilities: reuse `ModelCapabilityScanner`
-
-`Modules/Core/app/Seeding/ModelCapabilityScanner` already walks `models()` and reports
-per-model traits (`hasVersions`, `hasSoftDeletes`, `hasLocks`, `hasOptimisticLocking`,
-`hasTranslations`, `hasApprovals`). `entities` should surface these, because they say
-**which tools even apply** to a given entity:
-
-| Capability | Gates |
-|------------|-------|
-| `hasVersions` | `history` |
-| `hasLocks` | `lock`, `unlock` |
-| `hasApprovals` | `approve`, `disapprove`, `pending_approvals`, `latest_disapproval` |
-| `hasOptimisticLocking` | whether `update` must carry `lock_version` |
-| `hasTranslations` | whether writes are per-locale |
-
-This is what makes a generic tool set usable: the model stops guessing which
-operations exist on which entity, and stops burning turns on calls that can only
-fail.
-
-### Schema source: the model class, not the DB
-
-Superseding the earlier open point. For concrete models the schema comes from the
-class itself — `$fillable`, `$casts`, and the in-model validation rules — which are
-curated by convention (memory `laraplate-model-standard`). DB introspection via
-`DynamicEntityService::getInspectedTable` stays a fallback only, since it cannot see
-casts, accessors or validation, and would leak physical columns that are not part of
-the entity's contract.
-
-### Hard requirement: `crud.dynamic_entities` must be off for MCP
-
-`DynamicEntityService::resolve` falls back to a **DB-introspected** `DynamicEntity`
-for any table with no concrete model, gated on `config('crud.dynamic_entities')`
-(currently commented out in `Modules/Core/config/config.php:44`, so effectively
-`false`). Two regimes follow:
-
-- **off** — the reachable surface is exactly what `models()` enumerates. Safe.
-- **on** — the gateway resolves *any table in the database*, including `users`,
-  `personal_access_tokens`, `password_reset_tokens` and the Spatie permission tables.
-
-The MCP layer must force the off behaviour for its own requests regardless of the
-global config value. Relying on the default is not enough: someone enabling dynamic
-entities for an unrelated reason would silently widen the MCP surface to the whole
-schema.
-
-### Still open: the exposability predicate
-
-`models()` returns *every* concrete model, `User`, `PersonalAccessToken`, Spatie
-`Role`/`Permission` and `DynamicEntity` included. An allowlist is required, passed as
-the `$filter` callable, **deny by default**.
-
-"Has a policy" does not work as the predicate: policies are per-module and generic
-(`ERPModelPolicy`, `MesModelPolicy`, `SaoModelPolicy`), so they do not discriminate
-between models within a module. The choice is therefore between an explicit config
-allowlist and a marker interface on exposable models. Undecided.
 
 ### Read — `mcp:read`
 
