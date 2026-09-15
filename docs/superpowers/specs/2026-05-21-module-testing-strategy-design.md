@@ -103,10 +103,8 @@ behavior. Those tests are valuable, but they are not pure unit tests.
   the installed set must not change.
 - Do not build the standalone-package test setup (path repositories, `Core` as a real requirement,
   Testbench). That is a separate decision with its own spec, taken when packaging is scheduled.
-- Do not remove anything a module still needs in order to boot, autoload, or version itself. Where
+- Do not remove anything a module still needs in order to boot or autoload. Where
   the safe order is unclear, the file stays and the question is recorded rather than guessed.
-- Do not remove a capability while centralizing it. Versioning a module must work before, during
-  and after the move, and the module's own `version` field, `CHANGELOG.md` and tags are untouched.
 - Do not change a single formatting or analysis rule while centralizing the configuration. The
   merged configuration is the union of what is already declared, and the reformatting pass is
   mechanical.
@@ -324,27 +322,8 @@ module files, all of it whitespace, import order, brace position and PHPDoc spac
 mechanical commit is a smaller cost than six configuration files that exist so that formatting can
 be skipped.
 
-Release tooling follows the same rule, with one distinction that matters. Every module is a Git
-repository with its own tags and its own `CHANGELOG.md`, so *versioning a module* is a capability
-that must survive; `version.sh` produces the `chore: bump version to vX.Y.Z` commits found
-throughout the modules, 58 of them in Core, the most recent three days before this revision. But
-the capability is not the same thing as seven byte-identical copies of the script and seven of
-`cliff.toml`. One script, taking the module as an argument, is the same capability with one place
-to fix.
-
-It does not work that way today. `version.sh` resolves the `composer.json` to bump from its own
-location while every Git call in it acts on the current directory, so the root's copy run inside a
-module would write the application's version and tag the module. Making the target explicit is a
-small change to one function, and it is the precondition for deleting the copies rather than an
-excuse to keep them.
-
-The hook installer is a different case: `setup-hooks.sh` installs a `post-commit` that runs
-`version.sh` automatically, and it has never been installed in any module or in the application.
-The bumps have always been run by hand. It goes, along with `scripts/hooks/`.
-
-What genuinely stays with a module is its `composer.json` `version` field, its `CHANGELOG.md`, its
-tags and its `autoload-dev`. Those are facts about the module. The programs that read and write
-them are not.
+Release tooling (`scripts/version.sh`, `cliff.toml`, git hooks) is not part of this spec: see
+`2026-08-30-release-tooling-design.md`.
 
 This does not weaken the module boundary. A module still declares its runtime dependencies, still
 owns its tests, and is still reviewed on its own. It simply stops carrying a second, divergent copy
@@ -429,9 +408,7 @@ Broad stubs of `Core` should be avoided because they hide production integration
 - The root application runs aggregate unit, integration, and feature suites, and is the only place
   that runs them.
 - No module declares a `require-dev` entry, a `phpunit.xml`, a `test:*` script, or a copy of the
-  root's tool configuration, and no module carries a `scripts/` directory.
-- `./scripts/version.sh <Module> patch` versions that module from the application, and the module's
-  tags, `CHANGELOG.md` and `version` field are the ones that change.
+  root's tool configuration.
 - The root `pint.json` formats module code, and `vendor/bin/pint --test` is clean across `Modules/`.
 - `vendor/bin/phpstan` actually analyses instead of aborting on its own `excludePaths`.
 - The installed package set is unchanged by the toolchain move: `composer.lock` gains no package

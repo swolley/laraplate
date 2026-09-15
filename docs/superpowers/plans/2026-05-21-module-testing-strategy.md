@@ -63,15 +63,9 @@ Three consequences, all binding:
   what is already declared. Where the root and a module disagree, the stricter side wins and the
   choice is written down. Reformatting is mechanical and lands in its own commit, never mixed with
   a behavioral change.
-- **Versioning is kept as a capability, not as seven copies.** `version.sh` is in active use: it
-  produces the `chore: bump version to vX.Y.Z` commits found across every module, 58 of them in
-  Core, the most recent on 2026-09-12. It cannot be deleted without losing the ability to version a
-  module. It can be moved, but only after it learns to take a target: today it resolves
-  `composer.json` next to itself and operates on the Git repository of the current directory, so
-  the root's copy run from inside a module would bump the application's `composer.json` and tag the
-  module. Task 4c makes it parameterizable first, then removes the copies. The hook machinery
-  (`setup-hooks.sh`, `scripts/hooks/`) needs no such care: no module has a hook installed, and
-  neither does the application.
+- **Release tooling is not part of this plan.** `version.sh`, `cliff.toml` and the git hooks moved
+  to `docs/superpowers/plans/2026-09-15-release-tooling.md`, together with the tasks already
+  delivered for them.
 
 ---
 
@@ -81,8 +75,7 @@ Three consequences, all binding:
   Promote the merged test/quality dev dependencies into the root `require-dev`; adopt the module
   scripts worth keeping.
 - Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json`
-  Drop `require-dev` and every `test:*` script; keep `require`, `autoload`, `autoload-dev`, and the
-  release scripts.
+  Drop `require-dev` and every `test:*` script; keep `require`, `autoload` and `autoload-dev`.
 - Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/phpunit.xml`
 - Modify: `pint.json`
   Drop `Modules` from `notPath` so the application formatter reaches module code.
@@ -98,15 +91,7 @@ Three consequences, all binding:
   `Modules/ERP/docs/rag/MODULE.md`
   They document `composer test:standalone`, which is being removed.
 - Modify: module READMEs and RAG docs that document a module-local test or lint command.
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/setup-hooks.sh` and
-  `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/hooks/`
-  Never installed anywhere; the version bumps have always been run by hand.
-- Modify: `scripts/version.sh`
-  Accept a target module so one copy can version any repository in the stack.
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/version.sh` and
-  `Modules/{Core,CMS,AI,ERP,MES,SAO}/cliff.toml`, after the root script can target a module.
-- Keep untouched: `Modules/*/composer.json` `autoload-dev`, and the `version` field each module
-  carries (the root script writes it).
+- Keep untouched: `Modules/*/composer.json` `autoload-dev`.
 - Verify only: `phpunit.xml`, `tests/Pest.php`, `Modules/*/tests/Pest.php`, `Modules/*/tests/`.
 
 ---
@@ -339,9 +324,8 @@ Keep, in every module:
 - `repositories` — needed to resolve `swolley/license-compliance-checker`;
 - `update:requirements`, which acts on the module's own dependencies.
 
-The versioning scripts (`version`, `version:*`) and `setup:hooks` are not in this list: Task 4b
-removes the hook installer and Task 4c moves versioning to a single root script. Leave them in
-place until those tasks run, so the ability to version a module is never absent.
+The versioning scripts (`version`, `version:*`) and `setup:hooks` are not in this list: they are
+release tooling, handled in `docs/superpowers/plans/2026-09-15-release-tooling.md`.
 
 - [x] **Step 2: Remove the test and quality scripts from each module**
 
@@ -405,238 +389,6 @@ rtk git commit -m "build: modules declare functionality, not the test toolchain"
 
 Expected: commit succeeds. Remember each module is a submodule: commit inside the module first,
 then record the pointer in the application.
-
----
-
-### Task 4b: Remove The Git Hook Installer From The Modules
-
-`setup-hooks.sh` installs a `post-commit` hook that runs `version.sh` after every commit. It has
-never been installed: no module has a hook in its git directory, and neither does the application.
-The version bumps have always been run by hand, which is how `version.sh` is meant to be used
-anyway.
-
-**Files:**
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/setup-hooks.sh`
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/hooks/`
-- Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json` (drop `setup:hooks`)
-
-- [x] **Step 1: Confirm no hook is installed anywhere**
-
-Run:
-
-```bash
-for m in Core CMS AI ERP MES SAO; do echo -n "$m: "; rtk git -C Modules/$m rev-parse --git-dir; done
-rtk ls "$(git rev-parse --git-dir)/hooks" | rtk rg -v sample
-```
-
-Expected: no non-sample hook in the application's git directory, and none in any module's. If a
-hook turns up in a module, stop: someone installed it and this task needs their input first.
-
-- [x] **Step 2: Confirm `version.sh` is the part that is actually used**
-
-Run:
-
-```bash
-for m in Core CMS AI ERP MES SAO; do echo -n "$m bumps: "; rtk git -C Modules/$m log --oneline -i --grep='bump version' | wc -l; done
-```
-
-Expected: a non-zero count in most modules (Core 58, CMS 50, AI 14, ERP 9 as of 2026-09-15), in the
-`chore: bump version to vX.Y.Z` form `version.sh` produces. This is the evidence that separates the
-script being deleted from the one being kept.
-
-- [x] **Step 3: Delete the hook machinery**
-
-Run:
-
-```bash
-rtk git rm -r Modules/Core/scripts/hooks Modules/CMS/scripts/hooks Modules/AI/scripts/hooks Modules/ERP/scripts/hooks Modules/MES/scripts/hooks Modules/SAO/scripts/hooks
-rtk git rm Modules/Core/scripts/setup-hooks.sh Modules/CMS/scripts/setup-hooks.sh Modules/AI/scripts/setup-hooks.sh Modules/ERP/scripts/setup-hooks.sh Modules/MES/scripts/setup-hooks.sh Modules/SAO/scripts/setup-hooks.sh
-```
-
-Then remove the `"setup:hooks"` entry from each module's `composer.json` `scripts`.
-
-- [x] **Step 4: Confirm versioning still works**
-
-Run:
-
-```bash
-rtk ls Modules/*/scripts/version.sh
-rtk rg -n '"version"|"version:patch"' Modules/Core/composer.json
-```
-
-Expected: `version.sh` present in all six modules and the `version*` scripts intact. Do not run a
-bump to test this; it tags and pushes.
-
-- [x] **Step 5: Check the documentation**
-
-Run:
-
-```bash
-rtk rg -n 'setup-hooks|setup:hooks' --glob '!vendor' .
-```
-
-Expected: after this task, hits only in the application's own `scripts/` and `composer.json`. Any
-module README or RAG doc describing the hook installation is corrected or removed. The application
-keeps its copy for now, even though nothing has installed it either; that is a separate call and is
-recorded in the delivery status.
-
-- [x] **Step 6: Commit**
-
-Run:
-
-```bash
-rtk git add Modules
-rtk git commit -m "chore: drop the unused git hook installer from the modules"
-```
-
-Expected: commit succeeds. Each module is a submodule: commit inside the module first, then record
-the pointer.
-
----
-
-### Task 4c: Centralize Versioning In One Script
-
-`version.sh` is byte-identical in the root and all six modules, and so is `cliff.toml`. Seven
-copies of each. The obvious move is to keep one and pass it a module name, and that is the right
-move, but the script cannot do it today and the reason matters.
-
-It resolves the package to bump from its own location:
-
-```bash
-version_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-composer_file="$(cd "$version_script_dir/.." && pwd)/composer.json"
-```
-
-while every Git operation in it (`git describe`, `git tag`, `git add`, `git commit`, `git push`)
-acts on the repository of the *current directory*. The two halves disagree the moment they are not
-the same place: running the root copy from inside `Modules/Core` would write the version into the
-application's `composer.json` and tag Core. Its argument parsing has no target either, only
-`{major|minor|patch}` plus `--nointeractive`, `--silent`, `--dry-run` and `--allow-dirty`.
-
-So: teach it the target, prove it works, then delete the copies.
-
-**Files:**
-- Modify: `scripts/version.sh`
-- Modify: `composer.json`
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/version.sh`
-- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/cliff.toml`
-- Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json` (drop `version`, `version:*`)
-
-- [x] **Step 1: Give the script a target directory**
-
-In `scripts/version.sh`, accept an optional first argument naming a module (`Core`) or a path
-(`Modules/Core`), defaulting to the application itself. Resolve it to an absolute `TARGET_DIR`,
-fail with a clear message if it is not a Git repository, and `cd` into it before anything else
-runs.
-
-Then make the two halves agree: `update_composer_version` must read `"$TARGET_DIR/composer.json"`
-instead of deriving the path from `BASH_SOURCE`. That single substitution is what currently makes
-the script un-relocatable.
-
-- [x] **Step 2: Point `git cliff` at the shared configuration**
-
-`git cliff --output CHANGELOG.md` reads `cliff.toml` from the working directory, which is why every
-module carries its own identical copy. Pass the root one explicitly:
-
-```bash
-git cliff --config "$ROOT_DIR/cliff.toml" --output CHANGELOG.md
-```
-
-where `ROOT_DIR` is the directory holding the script. `CHANGELOG.md` still lands in `TARGET_DIR`,
-which is correct: the changelog belongs to the repository being versioned.
-
-- [x] **Step 3: Prove it on a module without tagging anything**
-
-Run:
-
-```bash
-rtk ./scripts/version.sh Core patch --dry-run
-rtk ./scripts/version.sh Modules/CMS --nointeractive --dry-run
-rtk ./scripts/version.sh patch --dry-run
-```
-
-Expected: the first two report the next version for that module, computed from *that module's*
-tags and commits, and name that module's `composer.json`. The third still targets the application.
-Nothing is tagged, committed or pushed.
-
-Then confirm nothing was touched:
-
-```bash
-rtk git status --short
-rtk git -C Modules/Core status --short
-```
-
-Expected: no change in either. `--dry-run` exists in the script already; if it turns out not to
-cover the composer write, stop and fix that before going further, because the next step deletes the
-fallback.
-
-- [x] **Step 4: Add the root Composer entry points**
-
-In the root `composer.json`:
-
-```json
-"version:module": "./scripts/version.sh"
-```
-
-Used as `composer version:module Core patch`. Keep the existing application-level `version` and
-`version:*` scripts as they are.
-
-- [x] **Step 5: Delete the copies**
-
-Run:
-
-```bash
-rtk git rm Modules/Core/scripts/version.sh Modules/CMS/scripts/version.sh Modules/AI/scripts/version.sh Modules/ERP/scripts/version.sh Modules/MES/scripts/version.sh Modules/SAO/scripts/version.sh
-rtk git rm Modules/Core/cliff.toml Modules/CMS/cliff.toml Modules/AI/cliff.toml Modules/ERP/cliff.toml Modules/MES/cliff.toml Modules/SAO/cliff.toml
-```
-
-Then remove `version`, `version:silent`, `version:major`, `version:minor` and `version:patch` from
-each module's `composer.json` `scripts`. The `version` *field* stays: it is data about the module,
-and the root script writes it.
-
-At this point `Modules/*/scripts/` is empty in every module and the directory goes too.
-
-- [ ] **Step 6: Verify a real bump end to end** (NOT RUN: tags and pushes, awaiting the user)
-
-Pick the module with the least traffic and run a real patch bump:
-
-```bash
-rtk ./scripts/version.sh MES patch
-```
-
-Expected: `Modules/MES/composer.json` gains the new version, `Modules/MES/CHANGELOG.md` is
-regenerated, and the tag is created on the MES repository, not on the application. Confirm with:
-
-```bash
-rtk git -C Modules/MES log -1 --oneline
-rtk git -C Modules/MES tag --points-at HEAD
-rtk git log -1 --oneline
-```
-
-Expected: the bump commit and tag are in MES; the application's HEAD is untouched except for the
-submodule pointer. Ask the user before running this step: it tags and pushes.
-
-- [x] **Step 7: Update the documentation**
-
-Run:
-
-```bash
-rtk rg -n 'composer version|scripts/version.sh|cliff.toml' --glob '*.md' --glob '!vendor' .
-```
-
-Expected: every module document describing `composer version:patch` now describes
-`composer version:module <Module> patch`, run from the application.
-
-- [x] **Step 8: Commit**
-
-Run:
-
-```bash
-rtk git add scripts/version.sh composer.json Modules
-rtk git commit -m "chore: one versioning script for the whole stack"
-```
-
-Expected: commit succeeds.
 
 ---
 
@@ -1046,8 +798,7 @@ Run:
 rtk rg -n 'require-dev|pestphp|orchestra/testbench|pint.json|rector.php|phpstan.neon' --glob '*.md' Modules
 ```
 
-Expected: no module document claims to own test dependencies or its own tool configuration. A
-document describing the release scripts is correct and stays: those are still the module's.
+Expected: no module document claims to own test dependencies or its own tool configuration.
 
 - [ ] **Step 4: Commit**
 
@@ -1143,22 +894,7 @@ rtk ls Modules/*/phpunit.xml Modules/*/pint.json Modules/*/rector.php Modules/*/
 
 Expected: the first command returns nothing; the second reports no such file, for every pattern.
 
-- [ ] **Step 2: Prove the module release scripts survived**
-
-Run:
-
-```bash
-rtk ls Modules/*/scripts Modules/*/cliff.toml
-rtk rg -n '"version' Modules/*/composer.json
-rtk ./scripts/version.sh Core patch --dry-run
-```
-
-Expected: no `scripts/` directory and no `cliff.toml` in any module; each module's `composer.json`
-keeps its `version` *field* and none of the `version:*` *scripts*; and the root script computes
-Core's next version from Core's own history. That last command is the real assertion: the
-capability moved, it was not dropped.
-
-- [ ] **Step 3: Prove the module test helpers still autoload**
+- [ ] **Step 2: Prove the module test helpers still autoload**
 
 Run:
 
@@ -1171,7 +907,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration
 Expected: `autoload-dev` is intact in every module and the Core integration tests, which use
 namespaced fixtures, resolve them.
 
-- [ ] **Step 4: Run the full suite**
+- [ ] **Step 3: Run the full suite**
 
 Run:
 
@@ -1182,7 +918,7 @@ rtk php artisan test --compact
 Expected: matches the Task 1 baseline. Ask the user to confirm the run on their machine as well,
 since this is the change's real assertion.
 
-- [ ] **Step 5: Format and analyse from the root**
+- [ ] **Step 4: Format and analyse from the root**
 
 Run:
 
@@ -1194,7 +930,7 @@ rtk vendor/bin/phpstan analyse --memory-limit=3G --no-progress
 Expected: Pint is clean across the application and the modules, which is the assertion Task 8
 bought. PHPStan runs and reports the count Task 7 recorded.
 
-- [ ] **Step 6: Close the plan**
+- [ ] **Step 5: Close the plan**
 
 Add the two closing sections this repository requires: a delivery-status heading carrying the
 date, and a `**Documented in:**` line naming the module documentation that now describes how tests
@@ -1206,7 +942,7 @@ the `peckphp/peck` constraint left at the installed version, the PHPStan error b
 `tests/Unit/ClosedPlansPointToDocumentationTest.php` reads the delivery heading as the marker that
 a plan is closed, and this plan is not.)
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 Run:
 
@@ -1265,7 +1001,8 @@ for the work to land in the working tree of `master` in each repository, for rev
 
 **Committed (nothing pushed).** Each module carries three commits, MES two: the safe formatting
 (558 files across the six), `mb_str_functions` isolated on its own (60 files), and the toolchain
-removal. The application carries five: the tool configuration, the versioning script, the
+removal. The application carries five: the tool configuration, the versioning script (its record moved to
+`2026-09-15-release-tooling.md`), the
 composer/lock promotion, this documentation, and the submodule pointers.
 
 **Not done, and the first one is not a formality:**
@@ -1275,7 +1012,6 @@ composer/lock promotion, this documentation, and the submodule pointers.
   suites run, `mb_str_functions` is unverified against 60 files of behavioural change. That is why
   it sits in its own commit per module.
 - `peck` printed its usage rather than running, in Task 9 Step 3.
-- Task 4c Step 6, the end-to-end version bump. It tags and pushes, so it needs the user.
 - Tasks 10 to 12: documentation, `UnitShell` classification, final verification.
 
 ---
