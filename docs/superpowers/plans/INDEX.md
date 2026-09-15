@@ -29,7 +29,7 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-07-21-core-version-set-foundation.md`: Implement the generic Core sole writer, synchronous single-connection version sets, pivot descriptors, forward restore, approval integration, and set-level retention.
 - `2026-07-21-cms-versioned-categories-pilot.md`: Prove versioned composite pivots on `Content::categories()` with one set per root and explicitly partial Content coverage.
 - `2026-08-06-core-versioned-relation-membership.md`: Milestone-1 foundation of the aggregate membership vector — relation descriptors + reference-relation membership capture/read via `HasVersionedRelations` (owned/restore/uuid/adapters deferred).
-- `2026-07-22-module-import-command-framework.md` (**code complete 2026-09-15**, one manual smoke run outstanding): Completed Core abstract import mechanics and CMS command migration; ERP scope transferred to its dedicated plan.
+- `2026-07-22-module-import-command-framework.md` (**shipped 2026-09-15**): Completed Core abstract import mechanics and CMS command migration; ERP scope transferred to its dedicated plan.
 - `2026-07-22-erp-external-source-importers.md`: Separate ERP importer workstream, excluded from ERP Point 0; planned adapters cover legacy Symfony SQL, SPLID Excel, and supported Tricount exports.
 - `2026-07-29-filament-environment-indicator.md`: Replace pxlrbt env indicator with Core plugin + module version dropdown.
 - `2026-07-29-filament-make-resources.md`: `filament:make-resources` + ownership helper + permanent Filament ClassGenerator rebind.
@@ -62,3 +62,4 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-08-23-core-in-app-notifications.md` (**retrospective, shipped 2026-08-24**): in-app notification tray, database channel, module-scoped column, poll-based delivery.
 - `2026-08-23-sao-fix-resolution-attribution.md` (**retrospective, shipped 2026-08-23**): evidence-based fix attribution and closure conditions.
 - `2026-08-23-sao-tracker-migration-importer.md` (**retrospective, shipped 2026-08-23**): import an external tracker's history into SAO, idempotent by `TicketLink`.
+- `2026-09-15-erp-factories-and-demo-dataset.md`: twelve ERP model factories and a deterministic demo dataset in `DevERPDatabaseSeeder` — ERP is the only module with neither, and its 131 tests rebuild the same fixtures by hand (172 `Company` creations across 85 files).

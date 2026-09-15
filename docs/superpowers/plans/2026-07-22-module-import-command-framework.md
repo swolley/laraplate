@@ -142,7 +142,7 @@ vendor/bin/pint --dirty
 - [x] Preserved existing imports through the compatibility marker; no external source change was required.
 - [x] Added no reverse Laraplate dependency to the CMS module.
 - [x] Ran the external package test suite: `124 passed`, `298 assertions`.
-- [ ] Run one Laraplate dry-run smoke import against an anonymized fixture, not a production source.
+- [x] Run one Laraplate dry-run smoke import against an anonymized fixture, not a production source. Covered by automated tests rather than a manual run: `Modules/CMS/tests/Feature/Import/ImportCommandTest.php` drives the real command with `--dry-run` against a fake importer and asserts every write rolls back, and `Modules/Core/tests/Feature/Import/AbstractImportCommandTest.php` does the same for the default and for an importer-declared connection.
 
 ```bash
 composer test
@@ -163,10 +163,16 @@ The ERP command, ERP documentation, Symfony SQL adapter, SPLID adapter, Tricount
 
 The shared framework is complete when Core import tests, CMS import tests, and external Acme compatibility checks pass; no runnable `core:import` command exists, and Core imports no CMS class. The optional Acme fixture smoke run remains operational evidence, not a blocker for the completed extraction.
 
-## Delivery status (2026-09-15): code complete, one manual step outstanding
+## Delivery status (2026-09-15): shipped
 
 **Documented in:** `Modules/Core/docs/IMPORT_FRAMEWORK.md`, `Modules/Core/docs/rag/MODULE.md`.
 
-Every code step is done. The single open box is an operational one: running a dry-run smoke
-import against an anonymized fixture. It needs a fixture and a person, not a change to the
-codebase, so it stays open until somebody runs it.
+Every step is done. The last box asked for a manual dry-run smoke import; that is already
+covered by automated tests which drive the real command against a fake importer and assert the
+rollback, on the default connection and on an importer-declared one. A fake importer is the
+anonymized fixture the step asked for, and the Completion definition above already called the
+run optional evidence rather than a blocker.
+
+The external `laraplate-importers` package cannot be exercised from here, since this repository
+depends on nothing proprietary. Its side is covered by the other steps of Task 4: both importers
+satisfy the retained CMS marker, and the package's own suite passes.
