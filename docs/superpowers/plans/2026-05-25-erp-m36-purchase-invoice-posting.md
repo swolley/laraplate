@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M3.6 - Purchase Invoice Posting Cleanup Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M3.6 is implemented and this verification plan is historical. Current ERP status: `Modules/ERP/docs/STATUS.md`.
 
@@ -95,3 +102,9 @@ Expected result: focused tests pass; Pint has no unrelated changes.
 - The current M3.6 implementation is the source of truth.
 - This plan intentionally avoids creating new domain abstractions for 3-way match.
 - Any future accounting role rename requires a separate migration/refactor plan.
+
+## Delivery status (2026-09-15): M3.6 purchase invoice posting
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `Services/Accounting/InvoicePostingService` posts both directions, and the purchase-posting and 3-way-match tests the plan asked for are in the suite. Every checkbox was already ticked; this only records the delivery in the canonical form.

@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M6.1 - Bank Reconciliation Implementation Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M6.1 plus difference journals, CAMT.053, and the minimal MT940 slice are implemented. This plan is historical; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
@@ -149,3 +156,9 @@ Test scenarios:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/BankReconciliationServiceTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php --filter "bank reconciliation"`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentRouteSmokeTest.php`
+
+## Delivery status (2026-09-15): M6.1 bank reconciliation
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `Services/Banking/BankReconciliationService` and `Filament/Pages/BankReconciliationPage`. The plan carries no checkboxes — it was written before that convention — so its own status note is the record of what shipped.

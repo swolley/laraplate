@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M6.3 - E-Invoice Stub And Submission Structure Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M6.3, FatturaPA FPR12/XSD, and the Aruba operational adapter are implemented. Contracted-tenant and legal-retention verification remain go-live obligations. Current ERP status: `Modules/ERP/docs/STATUS.md`.
 
@@ -186,3 +193,11 @@ fiscal mappings, and full legal-retention governance remain deployment/future-de
 - Add `natura_code`, fiscal regime, PEC/SDI, transmitter data, and required address fields.
 - Add Aruba or other intermediary driver with HTTP fakes.
 - Cover advanced SDI states, rejection details, and legal retention requirements.
+
+## Delivery status (2026-09-15): M6.3 e-invoice, with go-live obligations outstanding
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `EInvoiceSubmissionService`, `FatturaPaXmlBuilder`, `FatturaPaEInvoiceProvider`, the operational `ArubaEInvoiceProvider` (submit, remote status, XML validation) and `StubEInvoiceProvider`, all bound in `ERPServiceProvider`. The full FatturaPA that the alignment spec deferred to Spec 2 Phase 2C is therefore delivered.
+
+**Still outstanding, and not code:** contracted-tenant and legal-retention verification remain go-live obligations, as the plan's own status note says.

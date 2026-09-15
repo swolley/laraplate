@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M4 - Policies, Filament Actions, Reporting Alignment Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M4 and its approved reporting/action follow-ups are implemented. This plan is kept for historical context; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
@@ -156,3 +163,9 @@ the reason.
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentResourcesTest.php Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php`
   - `php artisan migrate --pretend --no-interaction` -> `Nothing to migrate`
   - `vendor/bin/pint --dirty`
+
+## Delivery status (2026-09-15): M4 policies, Filament actions and reporting
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `Authorization/ERPPermissions` plus the read-only reporting pages (`TrialBalancePage`, `BalanceSheetPage`, `IncomeStatementPage`, `StockValuationPage`, `SalesPipelinePage`). The three follow-ups the alignment spec left open in May have since shipped as well: `DeliveryNotePostingActions` (DDT post/unpost), `FiscalPeriodActions` (close/reopen) and `JournalEntryActions` (reversal).

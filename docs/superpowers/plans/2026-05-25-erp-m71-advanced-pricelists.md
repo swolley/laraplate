@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M7.1 - Advanced Pricelists Implementation Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M7.1, Party price-rule UI, and direct item-specific prices are implemented. This plan preserves the original taxonomy-first design history; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
@@ -197,3 +204,9 @@ Test scenarios:
 - Additional verification on 2026-05-30:
   - `php artisan test --compact Modules/ERP/tests/Feature/Services/InvoiceLinePricingServiceTest.php`
   - `php artisan test --compact Modules/ERP/tests/Feature/Filament/ERPFilamentCommercialResourcesTest.php --filter "invoice resource form"`
+
+## Delivery status (2026-09-15): M7.1 advanced pricelists
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `Services/Pricing/PriceResolverService`, the `PartyPriceRule` model and the `PriceRulesRelationManager` under the Parties resource — the party price-rule UI the alignment spec listed as a follow-up in May.

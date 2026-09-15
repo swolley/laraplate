@@ -1,4 +1,11 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+---
 # ERP M6.2 - Returns Management Implementation Plan
+
+**Alignment spec:** `docs/superpowers/specs/2026-05-25-erp-m36-m4-m6-m7-design.md`
 
 > **Point 0 status:** M6.2, optional automatic NC/ND, invoice-based fiscal pricing, and safe processed-return reversal are implemented. This plan is historical; current ERP status is `Modules/ERP/docs/STATUS.md`.
 
@@ -206,3 +213,9 @@ Test scenarios:
 - Follow-up: optional automatic credit/debit-note creation remains deferred; v1 keeps the action
   manual and requires explicit source invoice or purchase-order line contracts before creating
   fiscal document drafts.
+
+## Delivery status (2026-09-15): M6.2 returns management
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` and `Modules/ERP/docs/STATUS.md`.
+
+Verified 2026-09-15: `ReturnOrderService`, `SupplierReturnService`, `SupplierReturnShipmentService` and `CustomerReturnReceiptService`, with the `ReturnOrders` and `SupplierReturns` Filament resources. No checkboxes by the same convention gap as M6.1.
