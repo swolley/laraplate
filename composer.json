@@ -159,7 +159,6 @@
       "Composer\\Config::disableProcessTimeout",
       "./scripts/version.sh patch"
     ],
-    "setup:hooks": "./scripts/install-hooks.sh",
     "update-all": "./scripts/update-composer.sh",
     "version:all": [
       "Composer\\Config::disableProcessTimeout",

@@ -479,48 +479,6 @@ test_changelog_check_detects_a_missing_release() {
     assert_output_contains "application"
 }
 
-# Runs the commit-msg hook on message $1; sets STATUS and OUTPUT.
-run_commit_msg() {
-    local file="$WORK_DIR/message-$RANDOM$RANDOM.txt"
-    printf '%s\n' "$1" > "$file"
-    OUTPUT=$(bash "$SCRIPTS_DIR/hooks/commit-msg" "$file" 2>&1)
-    STATUS=$?
-}
-
-test_commit_msg_accepts_conventional_and_git_generated_messages() {
-    local message
-    for message in "feat(core)!: drop the old lock columns" "fix: repair parsing" "chore(release): v1.2.3" \
-        "Merge branch 'side'" 'Revert "feat: add a feature"' "fixup! feat: add a feature"; do
-        run_commit_msg "$message"
-        assert_status 0
-    done
-}
-
-test_commit_msg_rejects_free_text() {
-    local message
-    for message in "Refactor code structure for improved readability" "feat:missing space" "wip"; do
-        run_commit_msg "$message"
-        assert_status 1
-        assert_output_contains "Conventional Commit"
-    done
-}
-
-test_commit_msg_ignores_comment_lines() {
-    run_commit_msg $'# Please enter the commit message\n\nfeat: add a feature'
-    assert_status 0
-}
-
-test_install_hooks_gates_the_application_and_its_modules() {
-    local app="$WORK_DIR/${FUNCNAME[0]}/app"
-    make_app "$app" Core
-    OUTPUT=$(VERSION_ROOT_DIR="$app" bash "$SCRIPTS_DIR/install-hooks.sh" 2>&1)
-    STATUS=$?
-    assert_status 0
-    ! git -C "$app/Modules/Core" commit --quiet --allow-empty -m "bad message" 2>/dev/null || fail "module accepted a free-text message"
-    git -C "$app/Modules/Core" commit --quiet --allow-empty -m "chore: fine" || fail "module rejected a conventional message"
-    ! git -C "$app" commit --quiet --allow-empty -m "bad message" 2>/dev/null || fail "application accepted a free-text message"
-}
-
 # Composer runs scripts with SIGPIPE ignored, so a reader that stops early makes the writer report
 # "write error: Broken pipe" instead of dying silently. Core is listed first, so its lookup stops early.
 test_no_broken_pipe_when_sigpipe_is_ignored() {

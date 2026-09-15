@@ -32,7 +32,7 @@ Still present in the application: `scripts/setup-hooks.sh`, `scripts/hooks/post-
 | 1 | `update_changelog()` runs `git cliff` **before** the tag exists, so the release being cut is written under `## [unreleased]` | All seven `CHANGELOG.md` files carry an `[unreleased]` section holding their latest release (rechecked 2026-09-15). Reproduced live when `v1.14.0` was cut during design. | Open |
 | 2 | `amend_or_commit()` runs `git commit --amend` when there are unpushed commits. From a `post-commit` hook this recursed without bound; run manually it folds the release into the user's last commit | `scripts/version.sh`, `amend_or_commit` | Open |
 | 3 | `determine_release_type()` prints two lines when HEAD is already tagged (`"Commit is already tagged..."` then `"null"`). The caller tests `[ "$position" != "null" ]`, which is true, so `update_version` runs with a garbage position | Survives only through the "already up to date" branch | Open |
-| 4 | `scripts/setup-hooks.sh` assumes `$APP_DIR/.git` is a directory. `laraplate` is a submodule of the stack, so `.git` is a file and both `mkdir -p` and `ln -sf` fail | `laraplate/.git` contains `gitdir: ../.git/modules/laraplate` | Open |
+| 4 | `scripts/setup-hooks.sh` assumes `$APP_DIR/.git` is a directory. `laraplate` is a submodule of the stack, so `.git` is a file and both `mkdir -p` and `ln -sf` fail | `laraplate/.git` contains `gitdir: ../.git/modules/laraplate` | Resolved by deletion |
 | 5 | Module `setup-hooks.sh:14` used `[ ! -f "$GIT_DIR" \|\| ! -f ... ]`, a runtime `missing ']'` error | Module copies | Resolved by deletion |
 | 6 | Module `post-commit` resolved `version.sh` through a hardcoded `Modules/Cms` path and a path that never existed, working only by falling through | Module copies | Resolved by deletion |
 | 7 | `get_latest_version()` uses `git rev-list --tags --max-count=1`: most recent tag by commit date, not highest semver, and no filter on the tag namespace | The application carries nine `backup/v1.11.x` to `backup/v1.13.x` tags alongside `v*` | Open |
@@ -40,7 +40,7 @@ Still present in the application: `scripts/setup-hooks.sh`, `scripts/hooks/post-
 | 9 | Flags are parsed by substring match on `"$*"`, unknown flags are ignored, there is no `--help` | Bottom of `version.sh` | Open |
 | 10 | `cliff.toml` contains `{ body = "$^", skip = true }`, which drops every commit with an empty body. It sits above the group parsers, so it wins | See below. Since `cliff.toml` is now shared, it applies to all seven repositories | Open |
 | 11 | A bump keyword placed before the target silently versions the application. `version.sh minor Core --dry-run` prints `would update the application from v1.14.0 to v1.15.0`, while `version.sh Core minor --dry-run` correctly targets Core. `composer run version:minor Core` expands to the first form | Verified 2026-09-15 | Open |
-| 12 | `scripts/setup-hooks.sh` still runs `Modules/*/scripts/setup-hooks.sh` for every module, and those files no longer exist | Application `scripts/setup-hooks.sh`, module loop | Open |
+| 12 | `scripts/setup-hooks.sh` still runs `Modules/*/scripts/setup-hooks.sh` for every module, and those files no longer exist | Application `scripts/setup-hooks.sh`, module loop | Resolved by deletion |
 
 ### The `body = "$^"` rule
 
@@ -74,7 +74,7 @@ git cliff --bumped-version, rule removed     ->  v1.13.9
 3. **git-cliff stays.** The configuration was at fault, not the tool. git-cliff also replaces the hand-written bump inference through `--bumped-version`, so `cliff.toml` is the single grammar for changelog and version.
 4. **Changelogs are fully regenerated, never appended.** `CHANGELOG.md` is a pure function of `(history, cliff.toml)` and therefore verifiable.
 5. **The engine is automatable, but no automation is built now.** A future GitHub Action calls the same command unchanged.
-6. **One hook survives:** a `commit-msg` validator, because bump inference depends on conventional commit messages.
+6. **No git hooks.** Nothing in git triggers a release, a changelog regeneration or a message check. Bump inference relies on commit discipline: a message that is not a conventional commit cannot signal a feature or a breaking change.
 
 ## Non-goals
 
@@ -100,7 +100,7 @@ A single file, `laraplate/scripts/version.sh`, organised as functions over one c
 The script stays a single file. The implementation plan measured the complete script at about 580 lines, including the help text; splitting it into sourced libraries would add path resolution to a script reached through Composer and symlinks, for no second consumer. The unit of reuse is the function, and every function is exercised by the harness.
 
 **To delete:** `scripts/setup-hooks.sh`, `scripts/hooks/post-commit`, `scripts/test-hooks.sh`.
-**To add:** `scripts/hooks/commit-msg`, `scripts/install-hooks.sh` (using `git rev-parse --git-path hooks`), `scripts/tests/version-test.sh`.
+**To add:** `scripts/tests/version-test.sh`.
 
 ## CLI surface
 
@@ -148,7 +148,6 @@ composer run version:dry [targets]      version.sh --dry-run
 composer run version:test               scripts/tests/version-test.sh
 composer run changelog [targets]        version.sh --changelog
 composer run changelog:check            version.sh --changelog-check
-composer run setup:hooks                scripts/install-hooks.sh
 ```
 
 `version:silent` is removed with `--silent`.
@@ -217,11 +216,9 @@ Hand edits to `CHANGELOG.md` are discarded by design. Release prose belongs in t
 
 ## Hooks
 
-No hook creates a release. `scripts/hooks/post-commit`, `scripts/setup-hooks.sh` and `scripts/test-hooks.sh` are deleted; none was ever installed, and `setup-hooks.sh` is already broken by defects 4 and 12.
+There are no git hooks. `scripts/hooks/post-commit`, `scripts/setup-hooks.sh`, `scripts/test-hooks.sh` and the `setup:hooks` Composer script are deleted; none was ever installed, and `setup-hooks.sh` was already broken by defects 4 and 12.
 
-One hook is installed: **`commit-msg`**, rejecting messages that are not conventional commits. Two of the commits released as `v1.14.0` (`Refactor code structure for improved readability`, `Add plans for Octane readiness`) are not conventional and contribute nothing to an inferred bump.
-
-`scripts/install-hooks.sh` resolves the hooks directory with `git rev-parse --git-path hooks`, correct whether `.git` is a directory or a file, and does not `chmod` tracked files.
+A `commit-msg` gate for conventional commits was built during implementation and removed on 2026-09-15 by the owner's decision, consistent with the module testing strategy work, which had already dropped the hooks. Bump inference therefore rests on commit discipline. Two of the commits released as `v1.14.0` (`Refactor code structure for improved readability`, `Add plans for Octane readiness`) are not conventional and show what that discipline has to catch.
 
 ## Testing
 
@@ -247,7 +244,7 @@ Remaining, in order:
 3. Argument parsing: classification, keyword in any position (defect 11), target validation, `--help`, exit codes, removal of `--silent` (defect 9).
 4. Write-path correctness: plain commit (defect 2), tag detection and version lookup (defects 3 and 7), explicit push (defect 8).
 5. New surface: plan rendering, interactive per-target choice, `--nointeractive` semantics, `--set-version`, `--no-push`, `--all` with pointer consolidation, `--changelog`, `--changelog-check`.
-6. Hooks: delete `setup-hooks.sh`, `hooks/post-commit`, `test-hooks.sh`; add `commit-msg` and `install-hooks.sh`.
+6. Hooks: delete `setup-hooks.sh`, `hooks/post-commit`, `test-hooks.sh` and the `setup:hooks` Composer script.
 7. `branch = master` in `.gitmodules`.
 8. Composer scripts as listed above.
 9. Document the release process.

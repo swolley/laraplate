@@ -17,7 +17,6 @@ The application and each module under `Modules/` are released with one script, `
 | `composer run version [Module...]` | Non-interactive release with the inferred level |
 | `composer run changelog [Module...]` | Regenerate `CHANGELOG.md` only |
 | `composer run changelog:check` | Verify all seven changelogs against history |
-| `composer run setup:hooks` | Install the `commit-msg` hook in the application and every module |
 | `composer run version:test` | Run the release tooling tests |
 
 Flags cannot be passed through `composer run` (Composer consumes them). For combinations not listed, call the script directly, for example `./scripts/version.sh Core CMS --no-push`. Run `./scripts/version.sh --help` for every option.

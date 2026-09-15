@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Turn `scripts/version.sh` into a single, tested release tool for the application and its six modules: correct changelogs, safe tagging, interactive and non-interactive use, `--all` orchestration, and a `commit-msg` gate.
+**Goal:** Turn `scripts/version.sh` into a single, tested release tool for the application and its six modules: correct changelogs, safe tagging, interactive and non-interactive use, `--all` orchestration.
 
 **Architecture:** One bash script in the application (`laraplate/scripts/version.sh`) organised as small functions over one code path; git-cliff with the shared `cliff.toml` computes both the changelog and the inferred version. A dependency-free bash harness (`scripts/tests/version-test.sh`) builds throwaway repositories, including submodules, and drives the script through two test seams.
 
@@ -32,8 +32,6 @@
 | `cliff.toml` | Shared git-cliff grammar for changelog and version inference | 1 |
 | `scripts/version.sh` | The release tool | 1, 3, 4, 5, 6, 7 |
 | `scripts/tests/version-test.sh` | Harness: fixtures, assertions, tests | 3 to 8 |
-| `scripts/hooks/commit-msg` | Conventional commit gate | 8 |
-| `scripts/install-hooks.sh` | Installs `scripts/hooks/*` into the application and every module | 8 |
 | `scripts/setup-hooks.sh`, `scripts/hooks/post-commit`, `scripts/test-hooks.sh` | Deleted | 8 |
 | `CHANGELOG.md`, `Modules/*/CHANGELOG.md` | Regenerated | 2 |
 | `composer.json` | Composer scripts | 4, 8, 9 |
@@ -1934,165 +1932,45 @@ git commit -m "feat(release): regenerate and verify changelogs against history" 
 
 ---
 
-### Task 8: `commit-msg` hook and its installer; delete the old hook machinery
+### Task 8: Delete the old hook machinery
+
+No git hook is part of the release tooling. A `commit-msg` gate and its installer were first built in this task (`76e88b1`) and removed the same day by the owner's decision, recorded in the spec under Hooks. This task describes the final state.
 
 **Files:**
-- Create: `scripts/hooks/commit-msg`
-- Create: `scripts/install-hooks.sh`
-- Delete: `scripts/hooks/post-commit`, `scripts/setup-hooks.sh`, `scripts/test-hooks.sh`
-- Modify: `composer.json` (`setup:hooks`)
-- Modify: `scripts/tests/version-test.sh` (append tests)
+- Delete: `scripts/hooks/`, `scripts/setup-hooks.sh`, `scripts/test-hooks.sh`, `scripts/install-hooks.sh`
+- Modify: `composer.json` (remove `setup:hooks`)
+- Modify: `Modules/Core/README.md`, `Modules/AI/README.md`, `Modules/ERP/README.md`
 
-**Interfaces:**
-- Consumes: harness helpers from Task 3.
-- Produces: `scripts/hooks/commit-msg <message-file>` exits 0 or 1; `scripts/install-hooks.sh` honours `VERSION_ROOT_DIR`.
+**Interfaces:** none.
 
-- [ ] **Step 1: Append the failing tests**
-
-Insert above `# --- runner ---...`:
-
-```bash
-# Runs the commit-msg hook on message $1; sets STATUS and OUTPUT.
-run_commit_msg() {
-    local file="$WORK_DIR/message-$RANDOM$RANDOM.txt"
-    printf '%s\n' "$1" > "$file"
-    OUTPUT=$(bash "$SCRIPTS_DIR/hooks/commit-msg" "$file" 2>&1)
-    STATUS=$?
-}
-
-test_commit_msg_accepts_conventional_and_git_generated_messages() {
-    local message
-    for message in "feat(core)!: drop the old lock columns" "fix: repair parsing" "chore(release): v1.2.3" \
-        "Merge branch 'side'" 'Revert "feat: add a feature"' "fixup! feat: add a feature"; do
-        run_commit_msg "$message"
-        assert_status 0
-    done
-}
-
-test_commit_msg_rejects_free_text() {
-    local message
-    for message in "Refactor code structure for improved readability" "feat:missing space" "wip"; do
-        run_commit_msg "$message"
-        assert_status 1
-        assert_output_contains "Conventional Commit"
-    done
-}
-
-test_commit_msg_ignores_comment_lines() {
-    run_commit_msg $'# Please enter the commit message\n\nfeat: add a feature'
-    assert_status 0
-}
-
-test_install_hooks_gates_the_application_and_its_modules() {
-    local app="$WORK_DIR/${FUNCNAME[0]}/app"
-    make_app "$app" Core
-    OUTPUT=$(VERSION_ROOT_DIR="$app" bash "$SCRIPTS_DIR/install-hooks.sh" 2>&1)
-    STATUS=$?
-    assert_status 0
-    ! git -C "$app/Modules/Core" commit --quiet --allow-empty -m "bad message" 2>/dev/null || fail "module accepted a free-text message"
-    git -C "$app/Modules/Core" commit --quiet --allow-empty -m "chore: fine" || fail "module rejected a conventional message"
-    ! git -C "$app" commit --quiet --allow-empty -m "bad message" 2>/dev/null || fail "application accepted a free-text message"
-}
-```
-
-- [ ] **Step 2: Run the tests to see them fail**
-
-Run: `bash scripts/tests/version-test.sh hook`
-
-Expected: `FAIL` for all four tests (the hook and the installer do not exist).
-
-- [ ] **Step 3: Create `scripts/hooks/commit-msg`**
-
-```bash
-#!/usr/bin/env bash
-#
-# Rejects commit messages whose subject is not a Conventional Commit. scripts/version.sh infers the
-# release version from the commit type and the "!" marker, so a free-text subject is invisible to it.
-
-subject=$(grep -v '^#' "$1" | grep -m 1 -v '^[[:space:]]*$')
-
-conventional='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^()]+\))?!?: .+'
-git_generated='^(Merge |Revert "|fixup! |squash! |amend! )'
-
-if [[ "$subject" =~ $conventional ]] || [[ "$subject" =~ $git_generated ]]; then
-    exit 0
-fi
-
-cat >&2 <<EOF
-Commit message rejected: the subject is not a Conventional Commit.
-
-  $subject
-
-Expected: <type>[(scope)][!]: <description>
-Types:    feat fix docs style refactor perf test build ci chore revert
-Example:  fix(core): keep the lock when the save fails
-EOF
-exit 1
-```
-
-- [ ] **Step 4: Create `scripts/install-hooks.sh`**
-
-```bash
-#!/usr/bin/env bash
-#
-# Links every hook in scripts/hooks into the application and each module under Modules/.
-# Hook directories are resolved by git, so this works whether .git is a directory or a file.
-
-set -uo pipefail
-
-ROOT_DIR="${VERSION_ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-HOOKS_SOURCE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/hooks"
-
-install_into() {
-    local repo=$1 label=$2 hooks_dir hook
-    hooks_dir=$(git -C "$repo" rev-parse --path-format=absolute --git-path hooks) || return 1
-    mkdir -p "$hooks_dir" || return 1
-    for hook in "$HOOKS_SOURCE"/*; do
-        ln -sfn "$hook" "$hooks_dir/${hook##*/}" || return 1
-        printf 'Installed %s in %s\n' "${hook##*/}" "$label"
-    done
-}
-
-status=0
-install_into "$ROOT_DIR" "application" || status=1
-for module in "$ROOT_DIR"/Modules/*/; do
-    module=${module%/}
-    if [ -e "$module/.git" ]; then
-        install_into "$module" "${module##*/}" || status=1
-    fi
-done
-exit "$status"
-```
-
-- [ ] **Step 5: Make both executable, delete the old machinery, repoint Composer**
+- [x] **Step 1: Delete the files and the Composer script**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
-chmod +x scripts/hooks/commit-msg scripts/install-hooks.sh
-git rm --quiet scripts/hooks/post-commit scripts/setup-hooks.sh scripts/test-hooks.sh
-tmp=$(mktemp) && jq '.scripts["setup:hooks"] = "./scripts/install-hooks.sh"' composer.json > "$tmp" && mv "$tmp" composer.json
-git diff composer.json
+git rm -r --quiet scripts/hooks scripts/setup-hooks.sh scripts/test-hooks.sh scripts/install-hooks.sh
+tmp=$(mktemp) && jq 'del(.scripts["setup:hooks"])' composer.json > "$tmp" && mv "$tmp" composer.json
 ```
 
-Expected diff: only the `setup:hooks` line changes, from `./scripts/setup-hooks.sh` to `./scripts/install-hooks.sh`.
+Expected: `git diff composer.json` removes only the `setup:hooks` line. `jq` adds a final newline the file does not have; remove it so the diff stays one line.
 
-- [ ] **Step 6: Run the tests to see them pass**
+- [x] **Step 2: Point the module READMEs at the application**
+
+The Core, AI and ERP READMEs still told the reader to run `composer version:*` and `composer setup:hooks` inside the module, where neither script exists any more. Replace both with one sentence saying releases run from the application, and the command to use there. Commit inside each module, then record the pointers in the application.
+
+- [x] **Step 3: Confirm nothing references hooks any more**
+
+```bash
+cd /srv/http/laraplate-stack/laraplate
+grep -rnE "install-hooks|setup:hooks|setup-hooks" scripts composer.json docs/releasing.md Modules/*/README.md || echo none
+```
+
+Expected: `none`.
+
+- [x] **Step 4: Run the harness**
 
 Run: `bash scripts/tests/version-test.sh`
 
-Expected: final line `39 passed, 0 failed`.
-
-- [ ] **Step 7: Commit**
-
-```bash
-cd /srv/http/laraplate-stack/laraplate
-git add scripts/hooks/commit-msg scripts/install-hooks.sh scripts/tests/version-test.sh composer.json
-git commit -m "feat(release): gate commit messages and replace the unused post-commit machinery" -m "setup-hooks.sh assumed .git was a directory and still called module scripts that no longer exist; post-commit was never installed. install-hooks.sh resolves hook directories through git." -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
-```
-
-Installing the hooks in the real repositories is the user's decision: tell them `composer run setup:hooks` is available, do not run it.
-
----
+Expected: `35 passed, 0 failed`.
 
 ### Task 9: Composer scripts, `.gitmodules` branch, documentation
 
@@ -2103,7 +1981,7 @@ Installing the hooks in the real repositories is the user's decision: tell them 
 - Modify: `docs/README.md`
 
 **Interfaces:**
-- Consumes: the complete `scripts/version.sh`, `scripts/install-hooks.sh`, `scripts/tests/version-test.sh`.
+- Consumes: the complete `scripts/version.sh` and `scripts/tests/version-test.sh`.
 - Produces: the operator surface.
 
 - [ ] **Step 1: Verify how Composer passes arguments to an array script**
@@ -2133,7 +2011,6 @@ tmp=$(mktemp) && jq '
   | .scripts["version:test"] = "bash scripts/tests/version-test.sh"
   | .scripts["changelog"] = "./scripts/version.sh --changelog"
   | .scripts["changelog:check"] = "./scripts/version.sh --changelog-check"
-  | .scripts["setup:hooks"] = "./scripts/install-hooks.sh"
 ' composer.json > "$tmp" && mv "$tmp" composer.json
 composer validate --no-check-publish --no-check-lock 2>&1 | tail -2
 composer run version:dry Core
@@ -2175,7 +2052,6 @@ The application and each module under `Modules/` are released with one script, `
 | `composer run version [Module...]` | Non-interactive release with the inferred level |
 | `composer run changelog [Module...]` | Regenerate `CHANGELOG.md` only |
 | `composer run changelog:check` | Verify all seven changelogs against history |
-| `composer run setup:hooks` | Install the `commit-msg` hook in the application and every module |
 | `composer run version:test` | Run the release tooling tests |
 
 Flags cannot be passed through `composer run` (Composer consumes them). For combinations not listed, call the script directly, for example `./scripts/version.sh Core CMS --no-push`. Run `./scripts/version.sh --help` for every option.
@@ -2232,7 +2108,7 @@ test_no_broken_pipe_when_sigpipe_is_ignored() {
 
 Run: `bash scripts/tests/version-test.sh`
 
-Expected: `40 passed, 0 failed`.
+Expected: `36 passed, 0 failed`.
 
 - [ ] **Step 7: Commit**
 
