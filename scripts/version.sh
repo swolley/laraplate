@@ -422,13 +422,40 @@ confirm() {
     [[ "$answer" =~ ^[Yy]$ ]]
 }
 
+# Plans the application under --all. Releasing any module adds a pointer commit to the
+# application, so the application is then released too, at least as a patch.
+plan_application_after_modules() {
+    local path any=false
+    for path in "$@"; do
+        if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
+            any=true
+        fi
+    done
+    plan_target "$ROOT_DIR"
+    if [ "$any" = true ] && [ "${PLAN_VERDICT[$ROOT_DIR]}" != "release" ]; then
+        PLAN_VERDICT[$ROOT_DIR]="release"
+        PLAN_NEXT[$ROOT_DIR]=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "${BUMP:-patch}")
+    fi
+}
+
+# Records the new HEAD of every released module in the application with one commit.
+consolidate_pointers() {
+    local path joined summary=()
+    for path in "$@"; do
+        git -C "$ROOT_DIR" add -- "${path#"$ROOT_DIR"/}" || return 1
+        summary+=("${path##*/} ${PLAN_NEXT[$path]}")
+    done
+    printf -v joined '%s, ' "${summary[@]}"
+    git -C "$ROOT_DIR" commit --quiet -m "chore(modules): bump ${joined%, }"
+}
+
 run_release() {
-    local path pending=()
+    local path choosing=false pending=() modules=() released_modules=()
 
     if [ "$ALL" = true ]; then
-        die "$EXIT_USAGE" "--all is not implemented yet"
-    fi
-    if [ "${#TARGETS[@]}" -eq 0 ]; then
+        mapfile -t modules < <(module_paths)
+        TARGETS=("${modules[@]}")
+    elif [ "${#TARGETS[@]}" -eq 0 ]; then
         TARGETS=("$ROOT_DIR")
     fi
 
@@ -437,12 +464,21 @@ run_release() {
     done
 
     if [ "$DRY_RUN" != true ] && is_interactive && [ -z "$BUMP" ] && [ -z "$SET_VERSION" ]; then
+        choosing=true
         render_plan "${TARGETS[@]}"
         for path in "${TARGETS[@]}"; do
             if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
                 choose_version "$path"
             fi
         done
+    fi
+
+    if [ "$ALL" = true ]; then
+        plan_application_after_modules "${modules[@]}"
+        if [ "$choosing" = true ] && [ "${PLAN_VERDICT[$ROOT_DIR]}" = "release" ]; then
+            choose_version "$ROOT_DIR"
+        fi
+        TARGETS+=("$ROOT_DIR")
     fi
 
     for path in "${TARGETS[@]}"; do
@@ -468,8 +504,16 @@ run_release() {
         printf 'Aborted, nothing was written.\n'
         exit "$EXIT_FAILURE"
     fi
+
     for path in "${pending[@]}"; do
+        if [ "$path" = "$ROOT_DIR" ] && [ "$ALL" = true ] && [ "${#released_modules[@]}" -gt 0 ]; then
+            consolidate_pointers "${released_modules[@]}" \
+                || die "$EXIT_FAILURE" "application: could not commit the module pointers; the modules are already released"
+        fi
         release_target "$path" "${PLAN_NEXT[$path]}"
+        if [ "$path" != "$ROOT_DIR" ]; then
+            released_modules+=("$path")
+        fi
     done
     exit "$EXIT_OK"
 }

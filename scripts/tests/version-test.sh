@@ -387,6 +387,67 @@ test_dry_run_never_prompts() {
     assert_no_tag "$app" v1.0.1
 }
 
+test_all_releases_modules_then_the_application() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "feat: add a core feature"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    assert_tag "$app/Modules/Core" v1.1.0
+    assert_tag "$app.modules/Core.origin.git" v1.1.0
+    assert_no_tag "$app/Modules/CMS" v1.0.1
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "chore(modules): bump Core v1.1.0" "pointer commit"
+    assert_eq "$(git -C "$app" log -1 --pretty=%s)" "chore(release): v1.0.1" "application release commit"
+    assert_tag "$app" v1.0.1
+    assert_eq "$(git -C "$app" ls-tree HEAD Modules/Core | awk '{ print $3 }')" "$(git -C "$app/Modules/Core" rev-parse HEAD)" "recorded Core pointer"
+}
+
+test_all_releases_core_first() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" AI Core
+    commit "$app/Modules/AI" "fix: repair the assistant"
+    commit "$app/Modules/Core" "fix: repair the core"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    local core_line ai_line
+    core_line=$(printf '%s\n' "$OUTPUT" | grep -n '^Releasing Core ' | cut -d: -f1)
+    ai_line=$(printf '%s\n' "$OUTPUT" | grep -n '^Releasing AI ' | cut -d: -f1)
+    [ -n "$core_line" ] && [ -n "$ai_line" ] && [ "$core_line" -lt "$ai_line" ] || fail "Core must be released before AI"
+}
+
+test_all_aborts_before_writing_when_a_module_is_dirty() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "feat: add a core feature"
+    commit "$app/Modules/CMS" "fix: repair the content"
+    printf 'work in progress\n' > "$app/Modules/CMS/untracked.txt"
+    local before
+    before=$(git -C "$app" rev-parse HEAD)
+    run_version "$app" --all --nointeractive
+    assert_status 3
+    assert_no_tag "$app/Modules/Core" v1.1.0
+    assert_eq "$(git -C "$app" rev-parse HEAD)" "$before" "application HEAD"
+}
+
+test_all_with_nothing_pending_exits_10() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    run_version "$app" --all --nointeractive
+    assert_status 10
+}
+
+test_explicit_module_does_not_touch_the_application() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    commit "$app/Modules/Core" "fix: repair the core"
+    local before
+    before=$(git -C "$app" rev-parse HEAD)
+    run_version "$app" Core --nointeractive
+    assert_status 0
+    assert_tag "$app/Modules/Core" v1.0.1
+    assert_eq "$(git -C "$app" rev-parse HEAD)" "$before" "application HEAD"
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {
