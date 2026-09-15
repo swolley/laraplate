@@ -59,10 +59,25 @@
   },
   "require-dev": {
     "swolley/license-compliance-checker": "dev-master",
+    "barryvdh/laravel-ide-helper": "^3.7",
+    "dg/bypass-finals": "^1.11",
+    "driftingly/rector-laravel": "^2.6",
     "fakerphp/faker": "^1.24.1",
+    "larastan/larastan": "^3.12",
+    "laravel/boost": "^2.9",
+    "laravel/pail": "^1.2",
+    "laravel/pint": "^1.32",
     "laravel/sail": "^1.59",
     "mockery/mockery": "^1.6.12",
-    "nunomaduro/collision": "^8.9.4"
+    "mtrajano/laravel-swagger": "^0.6.4",
+    "nunomaduro/collision": "^8.9.4",
+    "nunomaduro/phpinsights": "^2.14",
+    "peckphp/peck": "^0.1.3",
+    "pestphp/pest": "^4.7",
+    "pestphp/pest-plugin-laravel": "^4.1",
+    "pestphp/pest-plugin-stressless": "^4.0",
+    "pestphp/pest-plugin-type-coverage": "^4.0",
+    "rector/rector": "^2.6"
   },
   "autoload": {
     "psr-4": {
@@ -133,6 +148,8 @@
       "@test:integration",
       "@test:feature"
     ],
+    "test:pest": "vendor/bin/pest --compact",
+    "test:pest:parallel": "vendor/bin/pest --parallel --compact",
     "test:types": "phpstan",
     "test:refactor": "rector",
     "test:licenses": "@php vendor/bin/check-licenses",
@@ -150,6 +167,7 @@
       "npx npm-check-updates -u"
     ],
     "version": "./scripts/version.sh --nointeractive",
+    "version:module": "./scripts/version.sh",
     "version:silent": "./scripts/version.sh --silent --nointeractive",
     "version:major": "./scripts/version.sh major",
     "version:minor": "./scripts/version.sh minor",
