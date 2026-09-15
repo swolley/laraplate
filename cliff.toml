@@ -44,6 +44,8 @@ postprocessors = [
 # output = "test.md"
 
 [git]
+# only plain semantic version tags are releases; backup/* and other tags are ignored
+tag_pattern = "^v?[0-9]+\\.[0-9]+\\.[0-9]+$"
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
@@ -60,11 +62,12 @@ commit_preprocessors = [
 ]
 # regex for parsing and grouping commits
 commit_parsers = [
-  { message = "^\\(Merge branch ", skip = true },
+  { message = "^Merge branch ", skip = true },
   { message = "^\\(merge conflict\\)$", skip = true },
   { message = "^\\(merge divergent conflict\\)$", skip = true },
   { message = "^[Ii]nitial commit$", skip = true },
-  { body = "$^", skip = true },
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^chore: bump version to", skip = true },
   { message = "^feat", group = "<!-- 0 -->🚀 Features" },
   { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
   { message = "^doc", group = "<!-- 3 -->📚 Documentation" },
@@ -72,8 +75,6 @@ commit_parsers = [
   { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
   { message = "^style", group = "<!-- 5 -->🎨 Styling" },
   { message = "^test", group = "<!-- 6 -->🧪 Testing" },
-  { message = "^chore\\(release\\): prepare for", skip = true },
-  { message = "^chore\\(deps.*\\)", skip = true },
   { message = "^chore\\(pr\\)", skip = true },
   { message = "^chore\\(pull\\)", skip = true },
   { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },

@@ -206,7 +206,7 @@ update_changelog() {
     local new_version=$1
     
     # update the changelog; the configuration is shared, the output belongs to the target repository
-    git cliff --config "$ROOT_DIR/cliff.toml" --output CHANGELOG.md
+    git cliff --config "$ROOT_DIR/cliff.toml" --tag "$new_version" --output CHANGELOG.md
     
     # add the file to git (but don't commit yet)
     git add CHANGELOG.md
