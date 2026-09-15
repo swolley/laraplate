@@ -57,6 +57,8 @@
 - Closing a plan means adding a `**Documented in:**` line naming the module docs that describe the behaviour now. Enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`.
 - Mark a finished plan with a `## Delivery status (date): ...` section. Record divergences from the plan there: the file is the only place saying an artifact was deliberately not built.
 - Do not tick a plan's checkboxes from the artifact names it imagined. Read what the code does and map it. Names can survive a design the implementation replaced.
+- Tick a task's checkbox when that task finishes, in the same work block. Not at the end of the plan, not next month. A plan whose boxes lag is worse than one with none: it reports work as outstanding that is done, and the drift is only ever found by the user.
+- A plan is finished when its boxes are ticked, it carries a delivery status, its documentation exists, and it lives in the repository that owns its subject. See `Where specs and plans live` in the stack `AGENTS.md`: a finished plan at the stack root whose subject is only the backend moves here, spec included, with links and indexes repaired.
 
 ## Project
 
