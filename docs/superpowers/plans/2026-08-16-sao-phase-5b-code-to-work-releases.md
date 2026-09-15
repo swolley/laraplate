@@ -28,7 +28,7 @@
 ## Task 4: docs + parent bump
 
 - Update SAO RAG docs/glossary + spec/plan indexes.
-- [ ] Commit (SAO) + bump parent.
+- [x] Commit (SAO) + bump parent.
 
 ## Exit criteria
 
@@ -37,3 +37,9 @@
 ## Known gaps
 
 - Fix propagation + evidence-based closure (phase 6); Filament release/environment surfaces; live probe transport.
+
+## Delivery status (2026-09-15): shipped
+
+All four tasks done. `ChangeRef`, `Release`, `ReleaseTag`, `TicketRelease`, `Environment` and
+`DeployCensusService` are in `Modules/SAO`, the SAO RAG docs and glossary describe them, and the
+work is committed with the parent pointing at it.

@@ -1,3 +1,9 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+note: AssistantEvaluation{Case,Dataset,Service}, the scripted-runner fixtures and AssistantBaselineGateTest are all present. The Level-2 live ai:evaluate-assistant command stays deferred by design.
+---
 # Assistant End-to-End Evaluation (R1b) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -40,7 +46,7 @@
 **Interfaces:**
 - Produces: `final readonly class AssistantEvaluationCase` with public props `string $id, string $query, string $locale, ?string $moduleKey, string $expectedSurface, list<string> $expectedCitations, bool $expectClarification, bool $expectRefusal, list<string> $slices`. `expectedSurface` ∈ `{documentation, application_content, graph, clarify, refuse}`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -99,12 +105,12 @@ it('rejects a malformed id, locale, module key, or slice slug', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationCaseTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -191,12 +197,12 @@ final readonly class AssistantEvaluationCase
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationCaseTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationCase.php Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationCaseTest.php
@@ -217,7 +223,7 @@ git commit -m "feat(ai): assistant evaluation case value object"
 - Consumes: `AssistantEvaluationCase` (Task 1).
 - Produces: `final readonly class AssistantEvaluationDataset` with public props `string $version, string $corpusRevision, string $module, string $dataClassification, list<AssistantEvaluationCase> $cases`; static `fromFile(string $path): self` and `fromArray(array $data): self`. Mirror `DocumentationEvaluationDataset` exactly (exact-key assertions, bounded sizes, typed extractors, `data_classification` must equal `synthetic`, module matches `^[a-z][a-z0-9_]*$`, non-empty unique case ids, ≤1000 cases).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -268,12 +274,12 @@ it('accepts a null module_key case', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationDatasetTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Read `Modules/AI/app/Services/Documentation/Evaluation/DocumentationEvaluationDataset.php` and mirror it. The dataset-level exact keys are `cases, corpus_revision, data_classification, module, version`. The case-level exact keys are `expect_clarification, expect_refusal, expected_citations, expected_surface, id, locale, module_key, query, slices`. `module_key` is string-or-null (mirror the `tenant_id` string-or-null handling in the documentation dataset). Build each case with:
 
@@ -293,12 +299,12 @@ new AssistantEvaluationCase(
 
 Copy the constructor invariants (`validRevision` on version/corpus_revision; module pattern; unique non-empty ids; ≤1000 cases; `data_classification === 'synthetic'`), `fromFile`/`fromArray`, `assertExactKeys`, and the `string`/`integer`/`boolean`/`stringList` helpers verbatim from the documentation dataset, adjusting the key sets and the case construction only.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationDatasetTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationDataset.php Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationDatasetTest.php
@@ -319,7 +325,7 @@ git commit -m "feat(ai): assistant evaluation dataset loader"
 - Consumes: `AssistantEvaluationDataset`, `AssistantEvaluationCase` (Tasks 1–2); NeuronAI `Message`.
 - Produces: `final readonly class AssistantEvaluationService` with `evaluate(AssistantEvaluationDataset $dataset, string $mode, callable $runner): array`, where `$runner` is `fn(AssistantEvaluationCase $case): Message`. Report keys: `schema_version, module, mode, dataset_version, corpus_revision, data_classification, case_count, metrics, latency_ms, slices`. Metric keys: `citation_assembly, clarification_trigger_accuracy, abstention_accuracy, output_valid, unavailable_rate`. (`surface_offered` is asserted by the runner/fixture in Task 4, not scored here — see note.) The service reads each `Message`: `metadata['refused'] === true` → refused; `metadata['citations']` (a list of `['label' => ...]`) → returned citation labels.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -374,12 +380,12 @@ it('counts a runner exception as unavailable', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationServiceTest.php`
 Expected: FAIL (service not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 First confirm the NeuronAI `Message` metadata API (`AssistantMessage`): read how `respond()`/`Conversation::addMessage` stores and how a `Message` exposes metadata (grep `Modules/AI/app/Models/Message.php` and the NeuronAI message class). Use the confirmed getter (e.g. `$message->getMetadata()` or the `Message` model's `metadata` attribute) consistently in both the test helper and the service. Then implement, mirroring `DocumentationEvaluationService` (same `ratio`/`percentile`/`rounded`/`slices` helpers, `Throwable` → unavailable, `hrtime` clock):
 
@@ -392,12 +398,12 @@ Metric definitions:
 
 Slices by `locale` and by slice tag, mirroring R0.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationServiceTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/Evaluation/AssistantEvaluationService.php Modules/AI/tests/Unit/Services/Assistance/Evaluation/AssistantEvaluationServiceTest.php
@@ -420,7 +426,7 @@ git commit -m "feat(ai): assistant evaluation scoring service"
 
 Because the helper `inAppContentService` currently lives inside the test file, **first extract the reusable parts** (`inAppContentService`, `executeInAppContentTool`, `inAppContentDescriptor`, `inAppContentResult`) into the Stub or a shared test-support file so both the existing test and this runner use one copy — do NOT duplicate the logic. Confirm the existing `InAppApplicationContentAssistanceTest` still passes after the extraction.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -457,18 +463,18 @@ it('drives respond() to a refusal for a refuse case (empty evidence)', function 
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `composer dump-autoload -o && php artisan test --compact Modules/AI/tests/Feature/Assistance/ScriptedAssistantRunnerTest.php`
 Expected: FAIL (runner not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Build `ScriptedAssistantRunner` reusing the exact construction from `inAppContentService` (copy its body into the Stub as the canonical implementation and have the existing test call the Stub). Per-case: register an `InAppAssistanceContentProvider` fake whose `retrieve()` returns `inAppContentResult()` sized to the case (empty for `refuse`; ambiguous-source for `clarify`); set `request->attributes->set('assistant_application_context', ['module' => $case->moduleKey])` when non-null; pass a `completion` that switches on `$case->expectedSurface` and uses the `executeInAppContentTool`-style invocation for `application_content`. Return `respond($conversation, $user, $case->query)`.
 
 `bootstrap()` performs the `beforeEach` setup (superadmin role + user + login + conversation + request), returning a configured runner.
 
-- [ ] **Step 4: Run to verify it passes, and the extracted helper didn't break the sibling test**
+- [x] **Step 4: Run to verify it passes, and the extracted helper didn't break the sibling test**
 
 Run:
 ```bash
@@ -476,7 +482,7 @@ php artisan test --compact Modules/AI/tests/Feature/Assistance/ScriptedAssistant
 ```
 Expected: PASS (runner green; the sibling test still green after the helper extraction).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/tests/Stubs/Assistance/ScriptedAssistantRunner.php Modules/AI/tests/Feature/Assistance/ScriptedAssistantRunnerTest.php
@@ -497,9 +503,9 @@ git commit -m "test(ai): scripted assistant runner fixture over real respond()"
 - Consumes: `AssistantEvaluationDataset`, `AssistantEvaluationService` (Tasks 2–3), `ScriptedAssistantRunner` (Task 4).
 - Produces: the CMS assistant dataset (a handful of cases: an `application_content` hit with a citation, a `documentation` case, a `clarify` case, a `refuse` case) and the gate test asserting committed Level-1 thresholds and `unavailable_rate === 0.0`.
 
-- [ ] **Step 1: Write the CMS dataset** (`Modules/CMS/docs/rag/evaluations/assistant-cms.json`) with `module: "cms"`, `data_classification: "synthetic"`, and 4 cases whose `expected_citations` match what `ScriptedAssistantRunner`'s fake application-content provider returns (`Publishing guide`). Keep it small and aligned with the runner's fixtures.
+- [x] **Step 1: Write the CMS dataset** (`Modules/CMS/docs/rag/evaluations/assistant-cms.json`) with `module: "cms"`, `data_classification: "synthetic"`, and 4 cases whose `expected_citations` match what `ScriptedAssistantRunner`'s fake application-content provider returns (`Publishing guide`). Keep it small and aligned with the runner's fixtures.
 
-- [ ] **Step 2: Write the gate test**
+- [x] **Step 2: Write the gate test**
 
 ```php
 <?php
@@ -528,12 +534,12 @@ it('keeps the CMS assistant baseline at or above committed thresholds', function
 })->skip(fn (): bool => ! is_file(base_path('Modules/CMS/docs/rag/evaluations/assistant-cms.json')), 'CMS assistant dataset missing');
 ```
 
-- [ ] **Step 3: Run the gate**
+- [x] **Step 3: Run the gate**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/Assistance/AssistantBaselineGateTest.php`
 Expected: PASS (thresholds met by the deterministic runner). If a metric is below 1.0, reconcile the dataset's expected values with what `ScriptedAssistantRunner` produces — do NOT weaken thresholds to force green.
 
-- [ ] **Step 4: Commit (two submodules)**
+- [x] **Step 4: Commit (two submodules)**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate/Modules/CMS
@@ -553,9 +559,9 @@ git commit -m "test(ai): CMS assistant baseline regression gate"
 - Modify: `Modules/AI/docs/rag/MODULE.md` (add an "Assistant evaluation" subsection)
 - Create: `Modules/AI/docs/rag/ASSISTANT_EVALUATION.md`
 
-- [ ] **Step 1: Write the docs** — `ASSISTANT_EVALUATION.md` (RAG section model): the assistant evaluation measures the composed `respond()` per module; Level-1 is deterministic (scripted router over the real `respond()`, no LLM/Elasticsearch) and gates CI via `AssistantBaselineGateTest`; it measures composition plumbing (surface offered, citation assembly, clarification, abstention, output validation), NOT the LLM's routing accuracy; Level-2 (live routing/answer quality via `ai:evaluate-assistant --live`) is specified but deferred. Datasets live under each module's `docs/rag/evaluations/assistant-*.json`. Add a one-line pointer from `MODULE.md`. Reference the design spec.
+- [x] **Step 1: Write the docs** — `ASSISTANT_EVALUATION.md` (RAG section model): the assistant evaluation measures the composed `respond()` per module; Level-1 is deterministic (scripted router over the real `respond()`, no LLM/Elasticsearch) and gates CI via `AssistantBaselineGateTest`; it measures composition plumbing (surface offered, citation assembly, clarification, abstention, output validation), NOT the LLM's routing accuracy; Level-2 (live routing/answer quality via `ai:evaluate-assistant --live`) is specified but deferred. Datasets live under each module's `docs/rag/evaluations/assistant-*.json`. Add a one-line pointer from `MODULE.md`. Reference the design spec.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate/Modules/AI
@@ -567,7 +573,7 @@ git commit -m "docs(ai): assistant evaluation guide"
 
 ## Final verification
 
-- [ ] Run the whole R1b surface together:
+- [x] Run the whole R1b surface together:
 ```bash
 php artisan test --compact \
   Modules/AI/tests/Unit/Services/Assistance/Evaluation/ \
@@ -575,7 +581,7 @@ php artisan test --compact \
   Modules/AI/tests/Feature/Assistance/AssistantBaselineGateTest.php \
   Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php
 ```
-- [ ] `vendor/bin/pint` clean on all changed files.
+- [x] `vendor/bin/pint` clean on all changed files.
 
 ## Self-review notes (author)
 

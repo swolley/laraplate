@@ -1,3 +1,9 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+note: SaoApplicationContentRetrievalProvider, SaoTicketEvidenceProjector, the SAOServiceProvider registration and their tests are all present.
+---
 # SAO Application-Content Provider (R2) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -45,7 +51,7 @@
 **Interfaces:**
 - Produces: `Ticket` uses `Modules\Core\Search\Traits\Searchable`; `toSearchableWith(): array` returns `['project', 'type', 'status', 'assignee', 'reporter', 'watchers', 'labels']`; `toSearchableArray(): array` returns a document with keys `title, description, priority, key, number, due_at, project, type, status, assignee, reporter, watchers, labels` (related entities as `{id, name}`-shaped arrays; `project`/`status` may carry extra `key`/`category`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -76,12 +82,12 @@ it('eager-loads the relations it denormalizes', function (): void {
 
 Adjust the factory setup to whatever `Ticket::factory()` and the SAO factories provide (read `Modules/SAO/database/factories`); create related project/type/status/assignee/label via their factories or states so the relations resolve.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Models/TicketSearchableTest.php`
 Expected: FAIL (`toSearchableWith`/`toSearchableArray` not defined, or missing keys).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `Ticket.php`, add the trait and the two methods (mirror `Content`'s approach — the trait provides the default `toSearchableArray`; override it to add the denormalized relations):
 
@@ -129,12 +135,12 @@ public function toSearchableArray(): array
 
 Verify the actual attribute names on the related models (`project->name`/`key`, `status->name`/`category`, `type->name`, `assignee`/`reporter` are `User` with `name`, `label->name`) against their model files and adjust the accessors to the real columns. Keep the base document's `title`/`description`/`priority`/`key`/`number`/`due_at` from the trait (they are model attributes).
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/Models/TicketSearchableTest.php`
 Expected: PASS. (`SCOUT_DRIVER=collection` in the SAO test env means no live engine is contacted.)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/SAO/app/Models/Ticket.php Modules/SAO/tests/Unit/Models/TicketSearchableTest.php
@@ -155,7 +161,7 @@ git commit -m "feat(sao): make Ticket Core-searchable with denormalized relation
 - Consumes: `Ticket`; `Modules\Core\ApplicationContent\Data\ApplicationContentHit`.
 - Produces: `final class SaoTicketEvidenceProjector` with `project(Ticket $ticket, string $requestedLocale, string $strategy, ?float $score): ?ApplicationContentHit`. Returns null when the ticket has no title. Hit id = `'sao.tickets:' . $ticket->key`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -192,12 +198,12 @@ it('returns null when the ticket has no title', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/ApplicationContent/SaoTicketEvidenceProjectorTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Mirror `CmsContentEvidenceProjector` but WITHOUT translations (tickets are single-locale). Build the excerpt from `description` (bounded, e.g. 1000 chars) and the label from `title` (bounded 200). Include only safe metadata in the hit via the `ApplicationContentHit` constructor:
 
@@ -248,12 +254,12 @@ final class SaoTicketEvidenceProjector
 
 Confirm the exact `ApplicationContentHit` constructor parameter names/order against `Modules/Core/app/ApplicationContent/Data/ApplicationContentHit.php` and adjust if they differ.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/SAO/tests/Unit/ApplicationContent/SaoTicketEvidenceProjectorTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/SAO/app/ApplicationContent/SaoTicketEvidenceProjector.php Modules/SAO/tests/Unit/ApplicationContent/SaoTicketEvidenceProjectorTest.php
@@ -274,7 +280,7 @@ git commit -m "feat(sao): ticket evidence projector for application content"
 - Consumes: `AdvancedSearchService`, `TicketQueryService`, `QueryBuilder`, `SaoTicketEvidenceProjector` (Task 2), the Core application-content DTOs.
 - Produces: `final class SaoApplicationContentRetrievalProvider implements ApplicationContentRetrievalProviderInterface` with `descriptor(): ApplicationContentSourceDescriptor` (source `sao.tickets`) and `retrieve(ApplicationContentQuery, ApplicationContentAuthorization): ApplicationContentResult`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Mirror `CmsApplicationContentRetrievalProviderTest`: build the provider with a real `AdvancedSearchService` whose engine/ensemble is mocked to return a canned `AdvancedSearchResult` of candidate ticket ids, a real `TicketQueryService`, `QueryBuilder`, and the projector; seed tickets in the DB; authenticate a user. Read the CMS test first and copy its mocking scaffold (the `ISearchEngine`/`EnsembleSearchService` mock + `config()->set('scout.driver', ...)`).
 
@@ -303,12 +309,12 @@ it('never returns a ticket outside visible() even if the engine matches it', fun
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/ApplicationContent/SaoApplicationContentRetrievalProviderTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Mirror `CmsApplicationContentRetrievalProvider` exactly, with these adaptations: model is `Ticket`; `authorizedQuery()` is `TicketQueryService::visible()` (SAO's ACL gate) with the optional `authorization->filters` applied via `QueryBuilder`; no translations relation; the lexical fallback does `LIKE` on `title`/`description` over `visible()`; project via `SaoTicketEvidenceProjector`.
 
@@ -501,12 +507,12 @@ final class SaoApplicationContentRetrievalProvider implements ApplicationContent
 
 Confirm `TicketQueryService::visible()` returns a `Ticket` query on the right connection, and that `authorization->filters`/`QueryBuilder::applyFilters` apply cleanly to it. If `visible()` already imposes ordering incompatible with the lexical fallback's `orderBy`, adjust the fallback to reorder.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/ApplicationContent/SaoApplicationContentRetrievalProviderTest.php`
 Expected: PASS (authorized hit returned; hidden ticket excluded; lexical fallback works).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/SAO/app/ApplicationContent/SaoApplicationContentRetrievalProvider.php Modules/SAO/tests/Feature/ApplicationContent/SaoApplicationContentRetrievalProviderTest.php
@@ -527,7 +533,7 @@ git commit -m "feat(sao): sao.tickets application-content retrieval provider"
 - Consumes: `ApplicationContentRetrievalProviderRegistryInterface`, `SaoApplicationContentRetrievalProvider` (Task 3).
 - Produces: the registry resolves `sao.tickets` to the provider; the provider's descriptor reports source `sao.tickets`, module `sao`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -548,12 +554,12 @@ it('registers the sao.tickets application-content provider', function (): void {
 
 Confirm the registry's lookup method name (`descriptorFor`/`providerFor`) against `Modules/Core/app/ApplicationContent/ApplicationContentRetrievalProviderRegistry.php` and use the real one.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/ApplicationContent/SaoProviderRegistrationTest.php`
 Expected: FAIL (source not registered).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `SAOServiceProvider::boot()` (mirror the CMS registration), add:
 
@@ -564,12 +570,12 @@ $this->app->make(ApplicationContentRetrievalProviderRegistryInterface::class)
 
 with the matching `use` imports. Place it alongside any existing SAO provider/registry registrations; guard consistently with how CMS does (only when the module is enabled — follow the CMS pattern).
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/SAO/tests/Feature/ApplicationContent/SaoProviderRegistrationTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/SAO/app/Providers/SAOServiceProvider.php Modules/SAO/tests/Feature/ApplicationContent/SaoProviderRegistrationTest.php
@@ -585,11 +591,11 @@ git commit -m "feat(sao): register sao.tickets application-content provider"
 **Files:**
 - Modify: `Modules/SAO/docs/rag/MODULE.md` (add an "Application-content provider" subsection)
 
-- [ ] **Step 1: Add the note**
+- [x] **Step 1: Add the note**
 
 Add a section to `Modules/SAO/docs/rag/MODULE.md` stating: SAO tickets are exposed to the in-app assistant as the `sao.tickets` application-content source; tickets are Core-searchable over a denormalized document (title/description + project/type/status/assignee/reporter/watchers/labels names); the provider ranks candidates with the search engine and re-authorizes them through `TicketQueryService::visible()` at rehydration (the index holds no ACL data); the safe projection exposes only title/excerpt/status/type/project/assignee/key/reference; comments, attachments, and global tags are out of scope. Reference the design spec `docs/superpowers/specs/2026-08-29-sao-application-content-provider-design.md`.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate/Modules/SAO
@@ -601,7 +607,7 @@ git commit -m "docs(sao): document the sao.tickets application-content provider"
 
 ## Final verification
 
-- [ ] Run the whole R2 surface together:
+- [x] Run the whole R2 surface together:
 ```bash
 php artisan test --compact \
   Modules/SAO/tests/Unit/Models/TicketSearchableTest.php \
@@ -609,8 +615,8 @@ php artisan test --compact \
   Modules/SAO/tests/Feature/ApplicationContent/SaoApplicationContentRetrievalProviderTest.php \
   Modules/SAO/tests/Feature/ApplicationContent/SaoProviderRegistrationTest.php
 ```
-- [ ] Confirm the broader SAO suite still passes (Ticket now Searchable): `php artisan test --compact Modules/SAO/tests` (or the ticket-related subset).
-- [ ] `vendor/bin/pint` clean on changed files.
+- [x] Confirm the broader SAO suite still passes (Ticket now Searchable): `php artisan test --compact Modules/SAO/tests` (or the ticket-related subset).
+- [x] `vendor/bin/pint` clean on changed files.
 
 ## Self-review notes (author)
 

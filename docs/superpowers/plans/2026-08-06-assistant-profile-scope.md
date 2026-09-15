@@ -1,3 +1,9 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+note: DataAccess/DocScope enums, AssistantScopeResolver, the module clause in retrieval and ASSISTANT_SCOPE.md are all present.
+---
 # Profile-Driven Assistant Scope (R1a) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -45,7 +51,7 @@
 **Interfaces:**
 - Produces: `enum DataAccess: string { case None='none'; case Module='module'; case Application='application'; }`; `enum DocScope: string { case Module='module'; case Application='application'; }`; `final readonly class AssistantScope` with public `?string $moduleKey`, `DataAccess $dataAccess`, `DocScope $docScope`, and a static `AssistantScope::generic(): self` (moduleKey null, dataAccess None, docScope Application) plus validation.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -86,12 +92,12 @@ it('rejects a malformed module key', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeTest.php`
 Expected: FAIL (classes not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `DataAccess.php`:
 
@@ -161,12 +167,12 @@ final readonly class AssistantScope
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/Scope/DataAccess.php Modules/AI/app/Services/Assistance/Scope/DocScope.php Modules/AI/app/Services/Assistance/Scope/AssistantScope.php Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeTest.php
@@ -187,7 +193,7 @@ git commit -m "feat(ai): assistant scope value object (module/dataAccess/docScop
 - Consumes: `AssistantScope`, `DataAccess`, `DocScope` (Task 1); `Modules\AI\Enums\AssistantProfile`.
 - Produces: `final readonly class AssistantScopeResolver` with `resolve(AssistantProfile $profile, ?string $moduleKey): AssistantScope`. `$moduleKey` is the server-verified module of the current page (null when none). Mapping: `InAppAssistance` + module → `(module, Module, Module)`; `InAppAssistance` + null → `AssistantScope::generic()`; `DeveloperHelp` → `AssistantScope::generic()`. (The future superadmin profile is not an input yet.)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -221,12 +227,12 @@ it('keeps developer help generic and data-free even if a module is passed', func
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeResolverTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -254,12 +260,12 @@ final readonly class AssistantScopeResolver
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeResolverTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/Scope/AssistantScopeResolver.php Modules/AI/tests/Unit/Services/Assistance/Scope/AssistantScopeResolverTest.php
@@ -282,7 +288,7 @@ git commit -m "feat(ai): resolve assistant scope from profile + module context"
 - Consumes: `AssistantScope`, `DocScope` (Task 1).
 - Produces: `DocumentationRetrievalContext` gains public `?string $moduleKey` and `DocScope $docScope`, a second factory `fromAccessContextAndScope(AssistantAccessContext $access, AssistantScope $scope): self`, and its `elasticsearchFilter()` adds a `module OR cross_cutting_user` clause when `docScope === DocScope::Module`. `InAppDocumentationRetrieval::retrieve(string $question, AssistantAccessContext $access, ?AssistantScope $scope = null)` and `DocumentationService::retrieveForInApp(string $question, AssistantAccessContext $access, ?AssistantScope $scope = null)` accept an optional scope (null → generic, unchanged behavior).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -348,12 +354,12 @@ it('keeps fromAccessContext (no scope) module-agnostic', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Rag/Retrieval/DocumentationRetrievalScopeTest.php`
 Expected: FAIL (`fromAccessContextAndScope` / `moduleKey` not defined).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `DocumentationRetrievalContext.php`:
 
@@ -427,7 +433,7 @@ In `DocumentationService.php`:
 1. Add `use Modules\AI\Services\Assistance\Scope\AssistantScope;`.
 2. Change `retrieveForInApp(string $question, AssistantAccessContext $access, ?AssistantScope $scope = null): array` and pass `$scope` into `$retrieval->retrieve($question, $access, $scope)`.
 
-- [ ] **Step 4: Run the new test AND the R0 suite (backward compat)**
+- [x] **Step 4: Run the new test AND the R0 suite (backward compat)**
 
 Run:
 ```bash
@@ -435,7 +441,7 @@ php artisan test --compact Modules/AI/tests/Unit/Ai/Rag/Retrieval/DocumentationR
 ```
 Expected: PASS (new scope test green; existing retrieval + R0 gate still green — null scope unchanged).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Ai/Rag/Retrieval/DocumentationRetrievalContext.php Modules/AI/app/Ai/Rag/Retrieval/InAppDocumentationRetrieval.php Modules/AI/app/Services/DocumentationService.php Modules/AI/tests/Unit/Ai/Rag/Retrieval/DocumentationRetrievalScopeTest.php
@@ -456,7 +462,7 @@ git commit -m "feat(ai): module-scope documentation retrieval via AssistantScope
 - Consumes: `DocumentationRetrievalContext` (Task 3, now carrying `moduleKey`/`docScope`); `DocScope`.
 - Produces: `FakeDocumentationSearch::isVisible()` additionally enforces the module-or-cross-cutting clause when the context is module-scoped; `::document(...)` gains an optional `bool $crossCuttingUser = false` and a `string $module = 'core'` parameter so fixtures can set `metadata.module` and `metadata.cross_cutting_user`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -515,12 +521,12 @@ it('with generic scope returns all modules (no module clause)', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/FakeDocumentationSearchScopeTest.php`
 Expected: FAIL (`document()` has no `module`/`crossCuttingUser` params; `isVisible` ignores module scope).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `FakeDocumentationSearch.php`:
 
@@ -563,7 +569,7 @@ if ($context->docScope === \Modules\AI\Services\Assistance\Scope\DocScope::Modul
 
 (Place it alongside the existing `$metadata = $document->metadata;` read.)
 
-- [ ] **Step 4: Run test to verify it passes, then re-run R0 fixtures**
+- [x] **Step 4: Run test to verify it passes, then re-run R0 fixtures**
 
 Run:
 ```bash
@@ -571,7 +577,7 @@ php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluati
 ```
 Expected: PASS (new scope test green; R0 fixture + gate still green — default `module='core'`, `crossCuttingUser=false`, and no scope passed by R0 → module clause not triggered).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/tests/Stubs/Documentation/FakeDocumentationSearch.php Modules/AI/tests/Unit/Services/Documentation/Evaluation/FakeDocumentationSearchScopeTest.php
@@ -593,7 +599,7 @@ git commit -m "test(ai): fixture honors module-or-cross-cutting doc scope"
 - Consumes: `AssistantScopeResolver`, `AssistantScope`, `DataAccess` (Tasks 1–2); the module context from `serverApplicationContext()`; `documentation->retrieveForInApp(..., $scope)` / injected `documentation_retrieval` closure (Task 3).
 - Produces: `respond()` resolves an `AssistantScope`, passes it to documentation retrieval, and returns an empty tool list when `dataAccess === DataAccess::None`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 First read one existing `Modules/AI/tests/Unit/Services/Assistance/*Test.php` to copy its exact setup for constructing `InAppAssistanceService` with injected `documentation_retrieval` and `completion` closures and its authenticated-user + `Conversation` fabrication (no live provider/LLM). Then write two tests with this precise arrange/act/assert (no `->todo()` in the committed file):
 
@@ -607,12 +613,12 @@ Test B — "resolves DataAccess::None and builds no application-data tools when 
 - Act: `respond(...)`.
 - Assert: the captured scope has `dataAccess === DataAccess::None` and the captured `$tools` is an empty array.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/Assistance/AssistantScopeRespondTest.php`
 Expected: FAIL (scope not resolved / tools not gated).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 In `InAppAssistanceService.php`:
 
@@ -644,7 +650,7 @@ $tools = $scope->dataAccess === DataAccess::None
 
 Add `use Modules\AI\Services\Assistance\Scope\AssistantScope;`, `use Modules\AI\Services\Assistance\Scope\AssistantScopeResolver;`, and `use Modules\AI\Services\Assistance\Scope\DataAccess;`.
 
-- [ ] **Step 4: Run test to verify it passes, then the assistance suite**
+- [x] **Step 4: Run test to verify it passes, then the assistance suite**
 
 Run:
 ```bash
@@ -652,7 +658,7 @@ php artisan test --compact Modules/AI/tests/Feature/Assistance/AssistantScopeRes
 ```
 Expected: PASS (new behavior green; existing assistance tests still green).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint Modules/AI/app/Services/Assistance/InAppAssistanceService.php Modules/AI/tests/Feature/Assistance/AssistantScopeRespondTest.php
@@ -675,7 +681,7 @@ git commit -m "feat(ai): resolve and apply assistant scope in respond()"
 - Consumes: `FileDocumentReader` (frontmatter extraction).
 - Produces: a documented, tested convention that `cross_cutting_user: true` in a doc's YAML frontmatter reaches chunk metadata as `metadata.cross_cutting_user === true`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -703,24 +709,24 @@ it('carries the cross_cutting_user frontmatter marker into document metadata', f
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails or passes**
+- [x] **Step 2: Run test to verify it fails or passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/CrossCuttingMarkerTest.php`
 Expected: PASS immediately if `FileDocumentReader` already passes arbitrary frontmatter through (it does — `extractFrontMatter()` returns the parsed YAML as metadata). If it PASSES, the reader needs no code change; keep the test as a regression guard. If it FAILS (frontmatter stripped or filtered), add the minimal change to `createDocument()`/`extractFrontMatter()` to preserve the key, then re-run.
 
-- [ ] **Step 3: Verify the marker survives indexing to the vector store**
+- [x] **Step 3: Verify the marker survives indexing to the vector store**
 
 Read `Modules/AI/app/Console/IndexDocumentationCommand.php` and the enrichment path it calls (audience/permission classification before the vector store `put`). Confirm `cross_cutting_user` is not dropped by an allowlist before indexing. If an allowlist exists, add `cross_cutting_user` to the preserved metadata keys (relevance-only; do NOT add it to the user-facing safe projection in `InAppDocumentationRetrieval::safeDocuments()`). State in the report what you found and any change made.
 
-- [ ] **Step 4: Tag the cross-cutting user guides**
+- [x] **Step 4: Tag the cross-cutting user guides**
 
 For each genuinely cross-cutting, `audience: user` Core guide that answers a task a user performs from any module (approve modification, permission visibility, grid export, draft recovery), add `cross_cutting_user: true` to its YAML frontmatter (add frontmatter if absent, preserving existing keys). Do not tag developer/architecture docs. List each file tagged in the report.
 
-- [ ] **Step 5: Document the scope model**
+- [x] **Step 5: Document the scope model**
 
 Create `Modules/AI/docs/rag/ASSISTANT_SCOPE.md` following the RAG section model (Purpose, Capabilities, HowToUse, InternalFlow, PermissionsAndSecurity, ...): explain that the in-app assistant is scoped to the page's module; documentation retrieval returns the current module's user guides plus `cross_cutting_user`-marked guides; app-data tools are withheld when there is no module ("docs only"); the CLI stays generic; scope is server-owned and never model-chosen; the security boundary (audience/permission/tenant/safe projection) is unchanged. Add a one-line pointer from `Modules/AI/docs/rag/MODULE.md`.
 
-- [ ] **Step 6: Run the marker test and commit**
+- [x] **Step 6: Run the marker test and commit**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/CrossCuttingMarkerTest.php`
 Expected: PASS.
@@ -741,7 +747,7 @@ git commit -m "docs(ai): assistant scope model + cross_cutting_user marker conve
 
 ## Final verification
 
-- [ ] Run the whole scope + R0 surface together (deterministic, no external services):
+- [x] Run the whole scope + R0 surface together (deterministic, no external services):
 ```bash
 php artisan test --compact \
   Modules/AI/tests/Unit/Services/Assistance/Scope/ \
@@ -750,8 +756,8 @@ php artisan test --compact \
   Modules/AI/tests/Feature/Assistance/AssistantScopeRespondTest.php \
   Modules/AI/tests/Feature/DocumentationBaselineGateTest.php
 ```
-- [ ] Confirm R0 stayed green (null-scope backward compatibility).
-- [ ] `vendor/bin/pint` clean on all changed files.
+- [x] Confirm R0 stayed green (null-scope backward compatibility).
+- [x] `vendor/bin/pint` clean on all changed files.
 
 ## Self-review notes (author)
 

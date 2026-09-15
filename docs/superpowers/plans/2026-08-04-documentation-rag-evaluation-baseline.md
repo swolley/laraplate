@@ -1,3 +1,9 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+note: DocumentationEvaluation{Case,Dataset,Service}, ai:evaluate-documentation and DocumentationBaselineGateTest are all present.
+---
 # Documentation RAG Evaluation Baseline (R0) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -46,7 +52,7 @@
 **Interfaces:**
 - Produces: `final readonly class DocumentationEvaluationCase` with public props `string $id, string $query, string $locale, int $topK, list<string> $expectedSourceLabels, list<string> $expectedCitationLabels, bool $expectAuthorizedEmpty, bool $expectSupportedAnswer, bool $expectRefusal, list<string> $slices, AssistantTenantScope $tenantScope, ?string $tenantId, list<string> $effectivePermissions`; plus `accessContext(): AssistantAccessContext`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -116,12 +122,12 @@ it('rejects a bad locale and a bad slice slug', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationCaseTest.php`
 Expected: FAIL (class `DocumentationEvaluationCase` not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -231,12 +237,12 @@ final readonly class DocumentationEvaluationCase
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationCaseTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -256,7 +262,7 @@ git commit -m "feat(ai): documentation evaluation case value object"
 - Consumes: `DocumentationEvaluationCase` (Task 1).
 - Produces: `final readonly class DocumentationEvaluationDataset` with public props `string $version, string $corpusRevision, string $module, string $indexProfile, string $dataClassification, list<DocumentationEvaluationCase> $cases`; static `fromFile(string $path): self` and `fromArray(array $data): self`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -321,12 +327,12 @@ it('rejects a non-synthetic classification', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationDatasetTest.php`
 Expected: FAIL (class not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -568,12 +574,12 @@ final readonly class DocumentationEvaluationDataset
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationDatasetTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -599,7 +605,7 @@ git commit -m "feat(ai): documentation evaluation dataset loader"
 
 The stub embedder and the fake search agree on the key `(int) crc32($query)`, so ranking is authored per query while the real `InAppDocumentationRetrieval::retrieve()` (embedding + safe projection) still runs. The fake applies locale, tenant, and permission filtering equivalent to the production Elasticsearch filter, then truncates to `context->topK`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -664,12 +670,12 @@ it('excludes a document in another locale', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/FakeDocumentationSearchTest.php`
 Expected: FAIL (stub classes not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `StubDocumentationEmbeddingService.php`:
 
@@ -844,12 +850,12 @@ final class FakeDocumentationSearch
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `composer dump-autoload -o && php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/FakeDocumentationSearchTest.php`
 Expected: PASS. (Run `composer dump-autoload -o` once so the new Stubs namespace paths resolve.)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -869,7 +875,7 @@ git commit -m "test(ai): deterministic documentation retrieval fixtures"
 - Consumes: `DocumentationEvaluationDataset`, `DocumentationEvaluationCase` (Tasks 1–2); NeuronAI `Document`.
 - Produces: `final readonly class DocumentationEvaluationService` with `evaluate(DocumentationEvaluationDataset $dataset, string $driver, callable $retrieval): array<string, mixed>` where `$retrieval` is `fn(string $question, AssistantAccessContext $access, DocumentationEvaluationCase $case): list<Document>`. Report keys: `schema_version, module, index_profile, driver, dataset_version, corpus_revision, data_classification, case_count, metrics, latency_ms, slices`. Metric keys: `source_hit_at_k, mean_reciprocal_rank, citation_precision, authorized_empty_accuracy, supported_answer_rate, refusal_accuracy, unavailable_rate`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -941,12 +947,12 @@ it('counts a retrieval that throws as unavailable', function (): void {
 
 (`docDatasetArray()` is the helper defined in Task 2's test file; redefine it locally at the top of this test file to keep files independent.)
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationServiceTest.php`
 Expected: FAIL (service not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -1163,12 +1169,12 @@ final readonly class DocumentationEvaluationService
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/DocumentationEvaluationServiceTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1189,7 +1195,7 @@ git commit -m "feat(ai): documentation evaluation scoring service"
 - Consumes: `DocumentationEvaluationDataset`, `DocumentationEvaluationService` (Tasks 2, 4); `InAppDocumentationRetrieval` (resolved from container); fixtures (Task 3).
 - Produces: artisan command `ai:evaluate-documentation --module= --index=user --dataset= --output= --force`, writing a JSON report atomically. Commands in `app/Console` are auto-registered by the module provider (same as `EvaluateApplicationContentCommand`, which has no explicit registration) — verify with `php artisan list | grep ai:evaluate`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1259,12 +1265,12 @@ it('fails when the dataset module does not match --module', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php`
 Expected: FAIL (command `ai:evaluate-documentation` not found).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Command `EvaluateDocumentationCommand.php`:
 
@@ -1391,12 +1397,12 @@ $this->app->singleton(DocumentationEvaluationService::class);
 
 (Import `use Modules\AI\Services\Documentation\Evaluation\DocumentationEvaluationService;` at the top with the other imports.)
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php`
 Expected: PASS. Also confirm registration: `php artisan list | grep ai:evaluate-documentation`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1419,7 +1425,7 @@ git commit -m "feat(ai): ai:evaluate-documentation command"
 
 The dataset questions are authored from real Core user docs (`Modules/Core/docs/rag/SEARCH_MATCHING_USER.md`, `GLOSSARY.md`, `EVENT_ORCHESTRATION.md`, `MODULE.md`). In deterministic mode the fixture corpus stands in for the indexed Core docs; labels are shared by construction between dataset and fixture. A later opt-in live-Elasticsearch run reuses the same questions and may require reconciling labels with the real indexer output — that is out of scope for R0.
 
-- [ ] **Step 1: Write the Core dataset file**
+- [x] **Step 1: Write the Core dataset file**
 
 ```json
 {
@@ -1477,7 +1483,7 @@ The dataset questions are authored from real Core user docs (`Modules/Core/docs/
 }
 ```
 
-- [ ] **Step 2: Write the fixture corpus + failing gate test**
+- [x] **Step 2: Write the fixture corpus + failing gate test**
 
 `CoreUserDocumentationCorpus.php`:
 
@@ -1558,12 +1564,12 @@ it('keeps the Core/user documentation baseline at or above committed thresholds'
 })->skip(fn (): bool => ! is_file(base_path('Modules/Core/docs/rag/evaluations/2026-08-documentation-user.json')), 'Core dataset missing');
 ```
 
-- [ ] **Step 3: Run gate test to verify it fails, then passes**
+- [x] **Step 3: Run gate test to verify it fails, then passes**
 
 Run: `composer dump-autoload -o && php artisan test --compact Modules/AI/tests/Feature/DocumentationBaselineGateTest.php`
 Expected: FAILs first if the corpus stub or dataset is absent/misaligned; PASSes once both exist and labels match.
 
-- [ ] **Step 4: Generate and commit the human-readable baseline report**
+- [x] **Step 4: Generate and commit the human-readable baseline report**
 
 Run:
 ```bash
@@ -1574,7 +1580,7 @@ php artisan ai:evaluate-documentation \
 ```
 Note: with no live Elasticsearch bound this command run uses the real `InAppDocumentationRetrieval` (empty index) and will report zeros; the deterministic **gate** (Step 2–3) is the enforcement of record. Commit the gate test and dataset regardless; commit the report artifact only if produced against a fixture-bound or live index. If the report is all-zeros because no index is available, skip committing the artifact and note it.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1592,7 +1598,7 @@ git commit -m "feat(core): Core/user documentation evaluation baseline + regress
 
 Per `AGENTS.md`, feature work updates affected RAG docs. This adds operator/developer pointers; no behavior change.
 
-- [ ] **Step 1: Add the note to `docs/rag/README.md`**
+- [x] **Step 1: Add the note to `docs/rag/README.md`**
 
 Under the `## Command` section, after the `ai:laraplate-help` block, add:
 
@@ -1609,7 +1615,7 @@ Datasets live under each module's `docs/rag/evaluations/`. See
 `docs/superpowers/specs/2026-08-04-documentation-rag-evaluation-baseline-design.md`.
 ```
 
-- [ ] **Step 2: Add the subsection to `Modules/AI/docs/rag/MODULE.md`**
+- [x] **Step 2: Add the subsection to `Modules/AI/docs/rag/MODULE.md`**
 
 Add a `## Documentation evaluation` section:
 
@@ -1625,7 +1631,7 @@ profile (Level-1, deterministic, no chat model), mirroring
 `docs/superpowers/specs/2026-08-04-documentation-rag-evaluation-baseline-design.md`.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add laraplate/docs/rag/README.md Modules/AI/docs/rag/MODULE.md
@@ -1638,12 +1644,12 @@ git commit -m "docs(ai): document ai:evaluate-documentation baseline"
 
 ## Final verification
 
-- [ ] Run the whole new suite:
+- [x] Run the whole new suite:
 ```bash
 php artisan test --compact Modules/AI/tests/Unit/Services/Documentation Modules/AI/tests/Feature/EvaluateDocumentationCommandTest.php Modules/AI/tests/Feature/DocumentationBaselineGateTest.php
 ```
-- [ ] `vendor/bin/pint --dirty` clean.
-- [ ] `php artisan list | grep ai:evaluate-documentation` shows the command.
+- [x] `vendor/bin/pint --dirty` clean.
+- [x] `php artisan list | grep ai:evaluate-documentation` shows the command.
 
 ## Self-review notes (author)
 

@@ -1,3 +1,9 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: repo audit
+note: Profiles, separated indexes, filtered retrieval, the guardrail pipeline, GraphToolGateway, contextual graph tools and the security/adversarial tests are all present (the adversarial test shipped as ApplicationContentRetrievalAdversarialTest.php).
+---
 # In-app AI Assistance Security Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -34,7 +40,7 @@ Do not expose the in-app assistant before every task is complete. Do not enable 
 - Modify: `Modules/AI/app/Http/Requests/SendMessageRequest.php`
 - Modify: `Modules/AI/app/Http/Controllers/ChatController.php`
 
-- [ ] **Step 1: Write failing access-context tests**
+- [x] **Step 1: Write failing access-context tests**
 
 Cover the `DeveloperHelp` and `InAppAssistance` enum cases, authenticated conversation ownership, server-derived tenant/locale/permissions, and rejection before provider execution when the authenticated user differs from the conversation owner.
 
@@ -51,7 +57,7 @@ it('builds in-app identity only from the authenticated owner', function (): void
 });
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php
@@ -59,17 +65,17 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/Assista
 
 Expected: FAIL because the profile and access-context types do not exist.
 
-- [ ] **Step 3: Implement immutable profile and context types**
+- [x] **Step 3: Implement immutable profile and context types**
 
 `AssistantAccessContext` is backend control-plane data containing profile, user ID, tenant ID, locale, effective permission names, and conversation ID. `forInApp()` obtains every field from authenticated server state and fails on owner mismatch or unresolved tenant/permissions. `forDeveloperHelp()` is callable only by the Artisan entry point and has no runtime user or tenant access. It must not be serialized into prompts or tool results.
 
 `AssistantPromptContext` is a separate sanitized data-plane DTO containing only approved policy version, presentation preferences, safe citations, and already-authorized RAG/tool results. It cannot carry role names, permission names, ACL expressions, tenant internals, raw policy configuration, or identity claims.
 
-- [ ] **Step 4: close request-controlled escalation surfaces**
+- [x] **Step 4: close request-controlled escalation surfaces**
 
 For the in-app route, reject request keys `profile`, `user_id`, `tenant_id`, `permissions`, `roles`, `tools`, and `system_message`. Remove any use of conversation metadata or message context to select the profile. Keep the server-owned context out of mass-assigned model metadata.
 
-- [ ] **Step 5: Run focused tests and commit**
+- [x] **Step 5: Run focused tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistantAccessContextFactoryTest.php Modules/AI/tests/Integration/ChatControllerTest.php
@@ -91,23 +97,23 @@ rtk git -C Modules/AI commit -m "feat(ai): add server-owned assistant profiles"
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/tests/Integration/IndexDocumentationCommandTest.php`
 
-- [ ] **Step 1: Write failing corpus-isolation tests**
+- [x] **Step 1: Write failing corpus-isolation tests**
 
 Assert that developer indexing accepts `developer`, `shared`, and `user` documents, while user indexing accepts only explicitly classified `user` or `shared` documents that pass the restricted-topic policy. Missing/invalid audience metadata must be excluded from the user index, never treated as shared.
 
-- [ ] **Step 2: Add distinct index configuration**
+- [x] **Step 2: Add distinct index configuration**
 
 Define `AI_FAQ_DEVELOPER_ES_INDEX` and `AI_FAQ_USER_ES_INDEX`. Validate at boot/indexing time that their resolved names differ and do not alias one another. Existing `AI_FAQ_ES_INDEX` may remain a deprecated developer-index fallback for migration compatibility only.
 
-- [ ] **Step 3: make index selection typed and explicit**
+- [x] **Step 3: make index selection typed and explicit**
 
 The vector store and `DocumentationAgent` receive `DocumentationIndexProfile`; they must not accept a raw request-supplied index name. Add `ai:index-rag-docs --profile=developer|user|all`, with `developer` preserving the current full documentation workflow and `user` applying deny-by-default classification.
 
-- [ ] **Step 4: persist safe retrieval metadata**
+- [x] **Step 4: persist safe retrieval metadata**
 
 Each user chunk stores audience, module, locale, canonical source, safe source label, required permissions, tenant scope/ID, version, heading breadcrumb, and policy classification version. Reject sources whose restricted classification or permission metadata cannot be validated.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/DocumentAudiencePolicyTest.php Modules/AI/tests/Integration/IndexDocumentationCommandTest.php Modules/AI/tests/Unit/Ai/Rag/ElasticsearchRagVectorStoreTest.php
@@ -125,19 +131,19 @@ rtk git -C Modules/AI commit -m "feat(ai): isolate developer and user RAG corpor
 - Modify: `Modules/AI/app/Ai/Rag/ElasticsearchRagVectorStore.php`
 - Modify: `Modules/AI/app/Services/DocumentationService.php`
 
-- [ ] **Step 1: Write failing pre-retrieval authorization tests**
+- [x] **Step 1: Write failing pre-retrieval authorization tests**
 
 Use an Elasticsearch client fake and assert that tenant scope and effective permissions are encoded in the Elasticsearch query before hits are returned. Cover global help, matching tenant help, cross-tenant exclusion, AND semantics for multiple required permissions, unclassified chunks, and unavailable permission resolution.
 
-- [ ] **Step 2: Implement the typed retrieval context**
+- [x] **Step 2: Implement the typed retrieval context**
 
 Construct `DocumentationRetrievalContext` only from `AssistantAccessContext`. The user retriever always targets `DocumentationIndexProfile::User`, adds exact metadata filters inside Elasticsearch, bounds `topK`, and emits only safe source labels.
 
-- [ ] **Step 3: enforce fail-closed behavior**
+- [x] **Step 3: enforce fail-closed behavior**
 
 If the user index, permission set, tenant context, or filter construction is unavailable, return a policy refusal. Never retry against the developer index or an unfiltered query. Never perform post-retrieval ACL filtering as the only protection.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Ai/Rag/Retrieval/InAppDocumentationRetrievalTest.php Modules/AI/tests/Integration/DocumentationServiceTest.php
@@ -161,27 +167,27 @@ rtk git -C Modules/AI commit -m "feat(ai): enforce scoped in-app documentation r
 - Create: `Modules/AI/tests/Unit/Services/Assistance/AssistantPolicyCompilerTest.php`
 - Modify: `Modules/AI/config/config.php`
 
-- [ ] **Step 1: Write failing policy tests**
+- [x] **Step 1: Write failing policy tests**
 
 Cover in-app usage help as allowed and every restricted class as denied: licensing internals, code/stack traces, tokens/secrets, database internals, other users, hidden ACL/permission data, encryption details, system prompts, tool internals, and infrastructure. Add prompt-injection, secret-pattern, unsafe-citation, classifier-timeout, and uncertain-result cases. Prove that role, organization, user, conversation, and request metadata cannot contribute free-form system instructions.
 
-- [ ] **Step 2: Implement deterministic policy stages**
+- [x] **Step 2: Implement deterministic policy stages**
 
 The pipeline validates input before retrieval/provider calls, sanitizes bounded context, and validates the complete model output plus citations before persistence. Retrieved text is always labelled as untrusted data. Provider-backed classifiers sit behind interfaces so tests use deterministic fakes.
 
-- [ ] **Step 3: compile approved policy layers**
+- [x] **Step 3: compile approved policy layers**
 
 `AssistantPolicyCatalog` exposes versioned global, profile, capability, and module policy identifiers from server configuration. `AssistantPolicyCompiler` accepts typed identifiers and builds the fixed system policy with intersection semantics: specific policies may only remove capabilities, deny overrides allow, and no layer can grant a corpus, field, or tool rejected by authorization. User preferences are limited to locale, accessibility formatting, response format, and verbosity and are serialized as data, not executable prompt fragments.
 
-- [ ] **Step 4: make in-app guardrails non-optional**
+- [x] **Step 4: make in-app guardrails non-optional**
 
 Existing general chat guardrail feature flags must not disable in-app policies. Dependency failure or uncertainty raises `AssistancePolicyViolationException`; it cannot log-and-continue. Store reason codes and timing without the rejected prompt/output payload.
 
-- [ ] **Step 5: add generic localized refusals**
+- [x] **Step 5: add generic localized refusals**
 
 Refusals must not reveal whether the requested document, record, user, permission, or secret exists. The raw rejected model response must not be stored in messages, ordinary logs, traces, or exception text.
 
-- [ ] **Step 6: Run tests and commit**
+- [x] **Step 6: Run tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance/AssistanceGuardrailPipelineTest.php Modules/AI/tests/Unit/Services/Assistance/AssistantPolicyCompilerTest.php Modules/AI/tests/Integration/GuardrailsServiceTest.php
@@ -201,19 +207,19 @@ rtk git -C Modules/AI commit -m "feat(ai): enforce fail-closed in-app guardrails
 - Create: `Modules/Core/tests/Feature/Graph/GraphToolGatewayTest.php`
 - Modify: `Modules/Core/app/Providers/CoreServiceProvider.php`
 
-- [ ] **Step 1: Write failing gateway security tests**
+- [x] **Step 1: Write failing gateway security tests**
 
 Cover `search`, `expand`, and `stats` with visible and hidden records, cross-tenant data, hidden relations, provider-rule exclusions, unauthorized centers, sensitive-but-readable internal fields, and configured depth/node/relation/detail limits. Assert that input DTOs expose no user ID, tenant ID, class name, connection, SQL, mutation, or arbitrary query JSON.
 
-- [ ] **Step 2: Implement a direct service gateway**
+- [x] **Step 2: Implement a direct service gateway**
 
 `GraphToolGateway` adapts the typed inputs to existing Core Graph request DTOs and calls `GraphService` directly under the authenticated request/user context. Reuse `AuthorizationService`, ACL query filters, entity resolution, provider rules, traversal limits, and serializers; do not duplicate their logic in AI and do not call Core over HTTP.
 
-- [ ] **Step 3: enforce read-only and bounded output**
+- [x] **Step 3: enforce read-only and bounded output**
 
 Expose only `search`, `expand`, and `stats`. Return user-safe graph DTOs through explicit per-entity safe-field allowlists after record authorization; general model readability must not imply that every serialized attribute is assistant-safe. Map unauthorized/missing centers to a generic unavailable result that does not confirm existence.
 
-- [ ] **Step 4: Run Core graph tests and commit**
+- [x] **Step 4: Run Core graph tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/Core/tests/Feature/Graph/GraphToolGatewayTest.php Modules/Core/tests/Feature/Graph
@@ -231,19 +237,19 @@ rtk git -C Modules/Core commit -m "feat(core): expose authorized read-only graph
 - Modify: `Modules/AI/app/Services/Tools/ToolRegistry.php`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
-- [ ] **Step 1: Write failing tool-schema and binding tests**
+- [x] **Step 1: Write failing tool-schema and binding tests**
 
 Assert exactly three tools named `graph_search`, `graph_expand`, and `graph_stats`; explicit bounded schemas; no mutation verbs; no identity/tenant/permission arguments; and a handler bound to the current `AssistantAccessContext`. Assert tools are absent for `DeveloperHelp`.
 
-- [ ] **Step 2: implement contextual registration**
+- [x] **Step 2: implement contextual registration**
 
 `GraphToolProvider` creates tool definitions per request/context and invokes `GraphToolGatewayInterface`. Do not place these handlers in a global registry without access context. Treat tool arguments as untrusted and validate module, entity, relation, depth, limit, and detail against stricter in-app bounds.
 
-- [ ] **Step 3: keep Graph tools outside action replay**
+- [x] **Step 3: keep Graph tools outside action replay**
 
 The tools are read-only capabilities, not business actions. They must not create `ActionRequest` records, enter approval/replay mutation flows, or become writable through risk configuration.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Tools/GraphToolProviderTest.php Modules/AI/tests/Integration/ToolRegistryTest.php
@@ -262,23 +268,23 @@ rtk git -C Modules/AI commit -m "feat(ai): add contextual read-only graph tools"
 - Modify: `Modules/AI/app/Console/LaraplateHelpCommand.php`
 - Modify: `Modules/AI/routes/web.php`
 
-- [ ] **Step 1: Write end-to-end failing security tests**
+- [x] **Step 1: Write end-to-end failing security tests**
 
 Assert that the in-app route uses `InAppAssistance`, a policy compiled only from approved server-owned identifiers, the user index, and contextual Graph tools. Assert owner mismatch, restricted input, hidden data, unsafe output, free-form role/user policy metadata, and guardrail failure cause no provider/tool execution or raw assistant-message persistence.
 
-- [ ] **Step 2: implement the protected orchestration order**
+- [x] **Step 2: implement the protected orchestration order**
 
 The service must execute: ownership/context creation → effective backend authorization → approved policy compilation → input policy → authorized RAG/Graph context → complete model response → output/DLP policy → persistence → response. Safe citations contain labels, not internal filesystem paths. Do not expose role names, ACL expressions, or permission internals to the model when the resulting authorized capability set is sufficient.
 
-- [ ] **Step 3: lock developer CLI behavior**
+- [x] **Step 3: lock developer CLI behavior**
 
 `ai:help` explicitly selects `DeveloperHelp`, retrieves all approved documentation audiences, registers no live Graph tools, and receives no runtime secrets or customer data.
 
-- [ ] **Step 4: reject in-app streaming in v1**
+- [x] **Step 4: reject in-app streaming in v1**
 
 The streaming endpoint must not select `InAppAssistance` or register Graph tools. Return a documented validation/capability error if a protected in-app request attempts streaming. No generated token may be persisted or delivered before full output validation.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/AI/tests/Integration/ChatControllerTest.php Modules/AI/tests/Integration/LaraplateHelpCommandTest.php
@@ -297,19 +303,19 @@ rtk git -C Modules/AI commit -m "feat(ai): integrate protected in-app assistance
 - Modify: `Modules/Core/docs/GRAPH_SYSTEM.md`
 - Modify: `Modules/Core/docs/rag/MODULE.md`
 
-- [ ] **Step 1: add a versioned adversarial evaluation set**
+- [x] **Step 1: add a versioned adversarial evaluation set**
 
 Include direct and indirect prompt injection, corpus crossover, tenant/user spoofing, permission enumeration, hidden-record inference, secret patterns, licensing/code/database/encryption requests, unsafe citations, tool argument abuse, and guardrail dependency failure. Include safe positive cases for app usage and authorized Graph questions.
 
-- [ ] **Step 2: verify invariant tests**
+- [x] **Step 2: verify invariant tests**
 
 Use fake LLM, embeddings, classifier, Elasticsearch, and Graph gateway implementations. Assert forbidden data never enters the provider prompt, denied tool results disclose no existence signal, raw rejected output is absent from persistence/logs, and all allowed answers pass the output policy.
 
-- [ ] **Step 3: update operator and module documentation**
+- [x] **Step 3: update operator and module documentation**
 
 Document the two profiles/indexes, required metadata, index build commands, mandatory production guardrails, read-only Graph tools, ACL inheritance, limits, refusal behavior, logging constraints, and the no-streaming v1 contract. State explicitly that Core Graph tools are unrelated to Graphify/GraphRAG.
 
-- [ ] **Step 4: Run the complete release gate**
+- [x] **Step 4: Run the complete release gate**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Assistance Modules/AI/tests/Unit/Ai/Rag Modules/AI/tests/Unit/Services/Tools Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/AI/tests/Feature/InAppAssistanceAdversarialTest.php Modules/Core/tests/Feature/Graph
@@ -318,11 +324,11 @@ rtk php artisan test --compact Modules/AI/tests/Integration/AiRagModuleDocumenta
 
 Expected: PASS with no live LLM or Elasticsearch dependency.
 
-- [ ] **Step 5: record and review the security report**
+- [x] **Step 5: record and review the security report**
 
 Commit aggregate pass/fail counts, policy version, fixture revision, and latency only. Do not store adversarial prompts containing real secrets or any rejected raw model output. Release requires zero unauthorized-context, corpus-crossover, identity-spoofing, or unsafe-output successes.
 
-- [ ] **Step 6: commit module documentation and evaluation**
+- [x] **Step 6: commit module documentation and evaluation**
 
 ```bash
 rtk git -C Modules/AI add tests/Feature/InAppAssistanceAdversarialTest.php docs/rag/evaluations/2026-07-in-app-security.json docs/rag/MODULE.md README.md
@@ -333,16 +339,16 @@ rtk git -C Modules/Core commit -m "docs(core): document graph tool security boun
 
 ## Completion checklist
 
-- [ ] Developer CLI can retrieve all approved documentation audiences and no live customer data.
-- [ ] In-app requests cannot select a profile, identity, tenant, permissions, tools, system prompt, or index.
-- [ ] Roles, organizations, users, conversations, and requests cannot append free-form prompt rules.
-- [ ] User preferences affect only locale, accessibility, response format, or verbosity and never expand authorization.
-- [ ] User RAG never queries or falls back to the developer index.
-- [ ] Permissions and tenant filters apply before retrieved chunks reach the LLM.
-- [ ] Graph `search`, `expand`, and `stats` preserve Core permissions, ACL, provider rules, safe-field projections, and limits.
-- [ ] Graph tools have no mutation or action-replay path.
-- [ ] Application content providers, when enabled by the follow-up plan, use the same server-owned access context and remain read-only.
-- [ ] Restricted inputs and unsafe outputs fail closed without existence disclosure.
-- [ ] No rejected raw output is streamed, stored, or logged.
-- [ ] In-app streaming remains unavailable in v1.
-- [ ] Security and documentation tests pass with deterministic fakes.
+- [x] Developer CLI can retrieve all approved documentation audiences and no live customer data.
+- [x] In-app requests cannot select a profile, identity, tenant, permissions, tools, system prompt, or index.
+- [x] Roles, organizations, users, conversations, and requests cannot append free-form prompt rules.
+- [x] User preferences affect only locale, accessibility, response format, or verbosity and never expand authorization.
+- [x] User RAG never queries or falls back to the developer index.
+- [x] Permissions and tenant filters apply before retrieved chunks reach the LLM.
+- [x] Graph `search`, `expand`, and `stats` preserve Core permissions, ACL, provider rules, safe-field projections, and limits.
+- [x] Graph tools have no mutation or action-replay path.
+- [x] Application content providers, when enabled by the follow-up plan, use the same server-owned access context and remain read-only.
+- [x] Restricted inputs and unsafe outputs fail closed without existence disclosure.
+- [x] No rejected raw output is streamed, stored, or logged.
+- [x] In-app streaming remains unavailable in v1.
+- [x] Security and documentation tests pass with deterministic fakes.

@@ -93,3 +93,15 @@ Resolve active via `Preset::activePresettable()`; clear on entity change; hydrat
 - [ ] `vendor/bin/pint --dirty`
 - [ ] Targeted Pest suite green
 - [ ] Spec status note if needed (plan checkboxes)
+
+## Delivery status (2026-09-15): shipped, with a simpler signature
+
+`HasForm::configureForm()` prepends the Entity and Preset selects and the hidden
+`presettable_id`, gated on the schema model using `HasDynamicContents`, and CMS resources call
+it. `LaraplateResourceFormSchemaClassGenerator` emits `return self::configureForm(...)`, which
+was the plan's last step.
+
+One divergence: the signature is `configureForm(Schema $schema): Schema`, without the
+`?array $components` the architecture line describes. It turned out not to be needed, because
+callers compose the schema first and pass it in, which is the second shape the plan itself
+proposed for the generator. The empty checkboxes below are not outstanding work.

@@ -162,3 +162,9 @@ The ERP command, ERP documentation, Symfony SQL adapter, SPLID adapter, Tricount
 ## Completion definition
 
 The shared framework is complete when Core import tests, CMS import tests, and external Acme compatibility checks pass; no runnable `core:import` command exists, and Core imports no CMS class. The optional Acme fixture smoke run remains operational evidence, not a blocker for the completed extraction.
+
+## Delivery status (2026-09-15): code complete, one manual step outstanding
+
+Every code step is done. The single open box is an operational one: running a dry-run smoke
+import against an anonymized fixture. It needs a fixture and a person, not a change to the
+codebase, so it stays open until somebody runs it.
