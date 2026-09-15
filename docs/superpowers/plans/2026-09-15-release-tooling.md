@@ -17,7 +17,7 @@
 - No new dependencies: no bats, shellcheck, shfmt, npm packages or Composer packages.
 - Exactly one release script: `scripts/version.sh`. Modules carry no scripts and no `cliff.toml` (already true).
 - Version tags match `^v?[0-9]+\.[0-9]+\.[0-9]+$`; new tags are always written as `vX.Y.Z`.
-- Release commit message: `chore(release): vX.Y.Z`. Pointer commit message: `chore(modules): bump <Name> vX.Y.Z[, <Name> vX.Y.Z...]`.
+- Release commit message: `chore(release): vX.Y.Z`. Pointer commit message: `<type>: bump <Name> vX.Y.Z[, <Name> vX.Y.Z...]`, where `<type>` is `feat(modules)!`, `feat(modules)` or `chore(modules)` after the highest module level (Task 10).
 - Never `git commit --amend`. Never `git push` without an explicit remote and refspec. Never discard stderr of a failing step.
 - Exit codes: `0` done, `1` failure, `2` usage, `3` precondition, `4` changelog diverged, `10` nothing to release.
 - Test seams, used only by the harness: `VERSION_ROOT_DIR` (application root), `VERSION_FORCE_INTERACTIVE` (`1` prompts read stdin, `0` never prompt).
@@ -2146,3 +2146,146 @@ if [ "$(git rev-parse HEAD)" = "$before" ]; then echo "application untouched"; f
 ```
 
 Expected: `exit=0`, `chore(release): vX.Y.Z` as the MES subject, the same `vX.Y.Z` as the tag on MES, and `application untouched`. The application then shows `Modules/MES` as modified in `git status`: recording that pointer is the user's call.
+
+---
+
+### Task 10: Carry the module release level into the application under `--all`
+
+Found after Task 9, reviewing with the owner. Task 6 recorded released modules with a plain `chore(modules): bump ...` commit and released the application at least as a patch. For git-cliff a `chore` is a patch, so a feature or a breaking change in a module reached the application as a patch and landed under Miscellaneous in its changelog: the application's version could not show what kind of update the modules brought. This task supersedes `plan_application_after_modules` and `consolidate_pointers` from Task 6 and the pointer-commit assertion of `test_all_releases_modules_then_the_application`. Releasing named modules without `--all` still does not touch the application.
+
+**Files:**
+- Modify: `scripts/version.sh` (add `release_level`, `highest_module_level`; replace `plan_application_after_modules`, `consolidate_pointers`)
+- Modify: `scripts/tests/version-test.sh`
+- Modify: `docs/releasing.md`, spec section "Orchestration order for `--all`"
+
+**Interfaces:**
+- Consumes: `PLAN_CURRENT`, `PLAN_NEXT`, `PLAN_VERDICT`, `increment_version`, `version_gt`, `plan_target` (Task 4).
+- Produces: `release_level <from> <to>` prints `major|minor|patch`; `highest_module_level <module-path...>` prints the highest level among modules planned for release (default `patch`).
+
+- [x] **Step 1: Write the failing tests**
+
+In `test_all_releases_modules_then_the_application`, the pointer commit becomes `feat(modules): bump Core v1.1.0`, the release commit `chore(release): v1.1.0` and the application tag `v1.1.0`. Add, above the SIGPIPE test:
+
+```bash
+test_all_carries_a_breaking_module_release_into_the_application() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "feat(api)!: drop the old endpoint"
+    commit "$app/Modules/CMS" "fix: repair the content"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    assert_tag "$app/Modules/Core" v2.0.0
+    assert_tag "$app/Modules/CMS" v1.0.1
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "feat(modules)!: bump Core v2.0.0, CMS v1.0.1" "pointer commit"
+    assert_tag "$app" v2.0.0
+    assert_file_contains "$app/CHANGELOG.md" "Bump Core v2.0.0, CMS v1.0.1"
+}
+
+test_all_keeps_a_patch_only_module_release_a_patch() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    commit "$app/Modules/Core" "fix: repair the core"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "chore(modules): bump Core v1.0.1" "pointer commit"
+    assert_tag "$app" v1.0.1
+}
+```
+
+Run: `bash scripts/tests/version-test.sh all_`
+
+Expected: `FAIL` for `test_all_carries_a_breaking_module_release_into_the_application` and `test_all_releases_modules_then_the_application`; `test_all_keeps_a_patch_only_module_release_a_patch` already passes and pins the patch case.
+
+- [x] **Step 2: Implement**
+
+Add the two helpers above `plan_application_after_modules` and replace both functions:
+
+```bash
+# Prints the level (major, minor or patch) that separates version $1 from the higher version $2.
+release_level() {
+    local from_major from_minor to_major to_minor rest
+    IFS=. read -r from_major from_minor rest <<< "${1#v}"
+    IFS=. read -r to_major to_minor rest <<< "${2#v}"
+    if [ "$to_major" != "$from_major" ]; then
+        printf 'major\n'
+    elif [ "$to_minor" != "$from_minor" ]; then
+        printf 'minor\n'
+    else
+        printf 'patch\n'
+    fi
+}
+
+# Prints the highest release level among the given module paths that are planned for release.
+highest_module_level() {
+    local path level highest=patch
+    for path in "$@"; do
+        if [ "${PLAN_VERDICT[$path]}" != "release" ]; then
+            continue
+        fi
+        level=$(release_level "${PLAN_CURRENT[$path]}" "${PLAN_NEXT[$path]}")
+        if [ "$level" = major ]; then
+            highest=major
+        elif [ "$level" = minor ] && [ "$highest" != major ]; then
+            highest=minor
+        fi
+    done
+    printf '%s\n' "$highest"
+}
+
+# Plans the application under --all. Releasing any module adds a pointer commit to the
+# application, so the application is then released too, at least at the highest module level.
+plan_application_after_modules() {
+    local path any=false candidate
+    for path in "$@"; do
+        if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
+            any=true
+        fi
+    done
+    plan_target "$ROOT_DIR"
+    if [ "$any" != true ]; then
+        return 0
+    fi
+    if [ -n "$BUMP" ]; then
+        candidate=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "$BUMP")
+    else
+        candidate=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "$(highest_module_level "$@")")
+    fi
+    if [ "${PLAN_VERDICT[$ROOT_DIR]}" != "release" ]; then
+        PLAN_VERDICT[$ROOT_DIR]="release"
+        PLAN_NEXT[$ROOT_DIR]=$candidate
+    elif version_gt "$candidate" "${PLAN_NEXT[$ROOT_DIR]}"; then
+        PLAN_NEXT[$ROOT_DIR]=$candidate
+    fi
+}
+
+# Records the new HEAD of every released module in the application with one commit, typed after
+# the highest module level so git-cliff infers the application's level and changelog group from it.
+consolidate_pointers() {
+    local path joined type summary=()
+    for path in "$@"; do
+        git -C "$ROOT_DIR" add -- "${path#"$ROOT_DIR"/}" || return 1
+        summary+=("${path##*/} ${PLAN_NEXT[$path]}")
+    done
+    case "$(highest_module_level "$@")" in
+        major) type="feat(modules)!" ;;
+        minor) type="feat(modules)" ;;
+        *) type="chore(modules)" ;;
+    esac
+    printf -v joined '%s, ' "${summary[@]}"
+    git -C "$ROOT_DIR" commit --quiet -m "$type: bump ${joined%, }"
+}
+```
+
+- [x] **Step 3: Run the tests**
+
+Run: `bash scripts/tests/version-test.sh`
+
+Expected: `38 passed, 0 failed`. Then `./scripts/version.sh --all --dry-run` still lists Core, AI, CMS, ERP, MES, SAO and the application, writing nothing.
+
+- [x] **Step 4: Commit**
+
+```bash
+cd /srv/http/laraplate-stack/laraplate
+git add scripts/version.sh scripts/tests/version-test.sh docs/releasing.md docs/superpowers/specs/2026-08-30-release-tooling-design.md docs/superpowers/plans/2026-09-15-release-tooling.md
+git commit -m "fix(release): carry the module release level into the application under --all" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+```

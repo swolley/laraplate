@@ -196,8 +196,10 @@ Selected by `--nointeractive` or by the absence of a TTY. The bump comes from `g
 ## Orchestration order for `--all`
 
 1. Every module with pending commits, Core first, then alphabetical.
-2. In the application: `git add Modules/<released...>` and a commit `chore(modules): bump Core v1.73.5, CMS v1.42.4`. It is a real commit, so it appears in the application changelog and contributes to its bump.
-3. The application release.
+2. In the application: `git add Modules/<released...>` and one pointer commit whose type carries the highest level among the released modules: `feat(modules)!: bump Core v2.0.0, CMS v1.42.4` when any module released a major, `feat(modules): bump ...` for a minor, `chore(modules): bump ...` when every module released a patch. It is a real commit, so git-cliff files it under the matching changelog group and infers the application's level from it. A plain `chore(modules)` would count as a patch whatever the modules released, which is how a module feature or breaking change used to reach the application as a patch.
+3. The application release, at least at the highest module level; a forced `major|minor|patch` still wins. Interactively the application's level can be lowered when a module change does not reach the application; the pointer commit keeps the modules' level either way.
+
+Releasing named modules without `--all` does not touch the application.
 
 ## Changelog
 

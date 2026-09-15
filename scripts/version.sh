@@ -423,31 +423,78 @@ confirm() {
     [[ "$answer" =~ ^[Yy]$ ]]
 }
 
+# Prints the level (major, minor or patch) that separates version $1 from the higher version $2.
+release_level() {
+    local from_major from_minor to_major to_minor rest
+    IFS=. read -r from_major from_minor rest <<< "${1#v}"
+    IFS=. read -r to_major to_minor rest <<< "${2#v}"
+    if [ "$to_major" != "$from_major" ]; then
+        printf 'major\n'
+    elif [ "$to_minor" != "$from_minor" ]; then
+        printf 'minor\n'
+    else
+        printf 'patch\n'
+    fi
+}
+
+# Prints the highest release level among the given module paths that are planned for release.
+highest_module_level() {
+    local path level highest=patch
+    for path in "$@"; do
+        if [ "${PLAN_VERDICT[$path]}" != "release" ]; then
+            continue
+        fi
+        level=$(release_level "${PLAN_CURRENT[$path]}" "${PLAN_NEXT[$path]}")
+        if [ "$level" = major ]; then
+            highest=major
+        elif [ "$level" = minor ] && [ "$highest" != major ]; then
+            highest=minor
+        fi
+    done
+    printf '%s\n' "$highest"
+}
+
 # Plans the application under --all. Releasing any module adds a pointer commit to the
-# application, so the application is then released too, at least as a patch.
+# application, so the application is then released too, at least at the highest module level.
 plan_application_after_modules() {
-    local path any=false
+    local path any=false candidate
     for path in "$@"; do
         if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
             any=true
         fi
     done
     plan_target "$ROOT_DIR"
-    if [ "$any" = true ] && [ "${PLAN_VERDICT[$ROOT_DIR]}" != "release" ]; then
+    if [ "$any" != true ]; then
+        return 0
+    fi
+    if [ -n "$BUMP" ]; then
+        candidate=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "$BUMP")
+    else
+        candidate=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "$(highest_module_level "$@")")
+    fi
+    if [ "${PLAN_VERDICT[$ROOT_DIR]}" != "release" ]; then
         PLAN_VERDICT[$ROOT_DIR]="release"
-        PLAN_NEXT[$ROOT_DIR]=$(increment_version "${PLAN_CURRENT[$ROOT_DIR]}" "${BUMP:-patch}")
+        PLAN_NEXT[$ROOT_DIR]=$candidate
+    elif version_gt "$candidate" "${PLAN_NEXT[$ROOT_DIR]}"; then
+        PLAN_NEXT[$ROOT_DIR]=$candidate
     fi
 }
 
-# Records the new HEAD of every released module in the application with one commit.
+# Records the new HEAD of every released module in the application with one commit, typed after
+# the highest module level so git-cliff infers the application's level and changelog group from it.
 consolidate_pointers() {
-    local path joined summary=()
+    local path joined type summary=()
     for path in "$@"; do
         git -C "$ROOT_DIR" add -- "${path#"$ROOT_DIR"/}" || return 1
         summary+=("${path##*/} ${PLAN_NEXT[$path]}")
     done
+    case "$(highest_module_level "$@")" in
+        major) type="feat(modules)!" ;;
+        minor) type="feat(modules)" ;;
+        *) type="chore(modules)" ;;
+    esac
     printf -v joined '%s, ' "${summary[@]}"
-    git -C "$ROOT_DIR" commit --quiet -m "chore(modules): bump ${joined%, }"
+    git -C "$ROOT_DIR" commit --quiet -m "$type: bump ${joined%, }"
 }
 
 run_release() {

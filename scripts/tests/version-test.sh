@@ -396,9 +396,9 @@ test_all_releases_modules_then_the_application() {
     assert_tag "$app/Modules/Core" v1.1.0
     assert_tag "$app.modules/Core.origin.git" v1.1.0
     assert_no_tag "$app/Modules/CMS" v1.0.1
-    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "chore(modules): bump Core v1.1.0" "pointer commit"
-    assert_eq "$(git -C "$app" log -1 --pretty=%s)" "chore(release): v1.0.1" "application release commit"
-    assert_tag "$app" v1.0.1
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "feat(modules): bump Core v1.1.0" "pointer commit"
+    assert_eq "$(git -C "$app" log -1 --pretty=%s)" "chore(release): v1.1.0" "application release commit"
+    assert_tag "$app" v1.1.0
     assert_eq "$(git -C "$app" ls-tree HEAD Modules/Core | awk '{ print $3 }')" "$(git -C "$app/Modules/Core" rev-parse HEAD)" "recorded Core pointer"
 }
 
@@ -477,6 +477,30 @@ test_changelog_check_detects_a_missing_release() {
     run_version "$app" --changelog-check
     assert_status 4
     assert_output_contains "application"
+}
+
+test_all_carries_a_breaking_module_release_into_the_application() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "feat(api)!: drop the old endpoint"
+    commit "$app/Modules/CMS" "fix: repair the content"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    assert_tag "$app/Modules/Core" v2.0.0
+    assert_tag "$app/Modules/CMS" v1.0.1
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "feat(modules)!: bump Core v2.0.0, CMS v1.0.1" "pointer commit"
+    assert_tag "$app" v2.0.0
+    assert_file_contains "$app/CHANGELOG.md" "Bump Core v2.0.0, CMS v1.0.1"
+}
+
+test_all_keeps_a_patch_only_module_release_a_patch() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    commit "$app/Modules/Core" "fix: repair the core"
+    run_version "$app" --all --nointeractive
+    assert_status 0
+    assert_eq "$(git -C "$app" log -1 --pretty=%s HEAD~1)" "chore(modules): bump Core v1.0.1" "pointer commit"
+    assert_tag "$app" v1.0.1
 }
 
 # Composer runs scripts with SIGPIPE ignored, so a reader that stops early makes the writer report

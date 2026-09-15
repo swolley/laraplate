@@ -33,7 +33,7 @@ Interactively, each target shows the inferred version and accepts `major`, `mino
 
 ## `--all`
 
-Modules are released first, Core before the others. The application then gets one `chore(modules): bump ...` commit recording the released modules, and is released as well, at least as a patch. If any module fails a precondition, nothing is written anywhere. Releasing a named module never touches the application.
+Modules are released first, Core before the others. The application then gets one commit recording the released modules, typed after the highest module level (`feat(modules)!:` when a module released a major, `feat(modules):` for a minor, `chore(modules):` when all are patches), and is released at least at that level, so its version and changelog show what kind of update the modules brought. If any module fails a precondition, nothing is written anywhere. Releasing a named module never touches the application.
 
 ## Exit codes
 
