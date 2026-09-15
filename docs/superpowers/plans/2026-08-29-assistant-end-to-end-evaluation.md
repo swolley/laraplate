@@ -589,3 +589,9 @@ php artisan test --compact \
 - **Known soft spots (flag for the reviewer / implementer):** (1) the exact NeuronAI `Message` metadata getter (`getMeta`/`getMetadata`/model attribute) must be confirmed in Task 3 Step 3 and used consistently in Tasks 3–5 — the plan marks each spot. (2) Task 4 requires extracting `inAppContentService`/`executeInAppContentTool` from the existing test into the Stub without duplication and re-running the sibling test green. (3) clarification/abstention detection compares message content to `AssistanceGuardrailPipeline::defaults()->clarificationRequired($locale)` / `insufficientEvidence($locale)`; if those methods' names differ, confirm against `AssistanceGuardrailPipeline` and use the real ones.
 - **Type consistency:** `AssistantEvaluationCase` props and the `expected_surface` enum-of-strings are used identically across Tasks 1–5; report metric keys (`citation_assembly, clarification_trigger_accuracy, abstention_accuracy, output_valid, unavailable_rate`) match between Task 3 and Task 5.
 - **Determinism:** no test uses a live LLM or Elasticsearch; the scripted completion replaces the agent, fake providers replace live data, and the R0 documentation fixtures back the docs surface.
+
+## Delivery status (2026-09-15): shipped, Level-2 deferred on purpose
+
+**Documented in:** `Modules/AI/docs/rag/ASSISTANT_EVALUATION.md`.
+
+Verified against the code: `AssistantEvaluation{Case,Dataset,Service}`, the scripted-runner fixtures and `AssistantBaselineGateTest` are in place. The Level-2 live `ai:evaluate-assistant` command is deliberately not built; the spec defers it.

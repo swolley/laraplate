@@ -8,6 +8,8 @@
 
 **Tech Stack:** Laravel 12, Filament 5, Pest, Core `HasDynamicContents` / `Preset::activePresettable()`.
 
+**Spec:** `docs/superpowers/specs/2026-07-29-hasform-entity-preset-design.md`
+
 ## Global Constraints
 
 - Chat Italian; code/comments English.

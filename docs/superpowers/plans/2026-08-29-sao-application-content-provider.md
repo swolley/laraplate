@@ -624,3 +624,9 @@ php artisan test --compact \
 - **ACL invariant:** authorization is `TicketQueryService::visible()` at rehydration for BOTH the engine path and the lexical fallback (`authorizedQuery()`); the index carries no ACL; Task 3's tests assert a hidden ticket never surfaces even when the engine matches it.
 - **Type consistency:** `sao.tickets` source key, `ApplicationContentHit`/`Result`/`Descriptor` constructor shapes, and `visible()`/`AdvancedSearchService::search` signatures are used identically across tasks and match the CMS templates.
 - **Known verifications for the implementer (flagged in-task, not placeholders):** exact related-model attribute columns (project/status/type/label names), the `ApplicationContentHit` constructor param order, the registry lookup method name, and the `SAOServiceProvider` registration guard — each task says to confirm against the named real file and adjust. These are cross-file confirmations, not undefined logic.
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`.
+
+Verified against the code: `SaoApplicationContentRetrievalProvider` and `SaoTicketEvidenceProjector` ship in `Modules/SAO/app/ApplicationContent/` (not the path the plan imagined), registered in the SAO service provider, with their own tests.

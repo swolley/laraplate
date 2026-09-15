@@ -1656,3 +1656,9 @@ php artisan test --compact Modules/AI/tests/Unit/Services/Documentation Modules/
 - **Spec coverage:** dataset schema + value objects (Tasks 1–2); deterministic retrieval-only harness via the `$search` seam (Tasks 3–4); `ai:evaluate-documentation` (Task 5); Core/user first dataset + regression gate (Task 6); RAG doc updates (Task 7). Level-2 and the assistant-level (R1) contract are spec-only and intentionally have no task.
 - **Determinism honesty:** the CI gate measures ranking + harness + the emulated permission/tenant/locale filter in the fixture; real Elasticsearch filtering and Level-2 generation are opt-in and out of scope, as the spec states. This is called out in Task 6.
 - **Type consistency:** the report metric keys (`source_hit_at_k`, `mean_reciprocal_rank`, `citation_precision`, `authorized_empty_accuracy`, `supported_answer_rate`, `refusal_accuracy`, `unavailable_rate`) and the case fields are used identically across Tasks 4–6. Grading identity is `Document::$sourceName` (= `safe_source_label`) everywhere.
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_USER.md` and `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_DEVELOPER.md`.
+
+Verified against the code: `DocumentationEvaluation{Case,Dataset,Service}`, `ai:evaluate-documentation` and `DocumentationBaselineGateTest` exist and carry the behaviour the tasks specify. Level-2 live scoring stays opt-in, as the plan intended.

@@ -45,3 +45,5 @@
 ---
 
 **Spec:** `docs/superpowers/specs/2026-07-29-filament-make-resources-design.md`
+
+**Also implements:** `docs/superpowers/specs/2026-07-30-filament-generate-trait-merge-design.md` — the generate/trait merge (`LaraplateResource*ClassGenerator`, `FilamentTraitResolver::HAS_TABLE_STRIP_FROM_GENERATED_COLUMNS`) shipped through this plan.

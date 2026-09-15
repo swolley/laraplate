@@ -766,3 +766,9 @@ php artisan test --compact \
 - **Type consistency:** `AssistantScope(moduleKey, dataAccess: DataAccess, docScope: DocScope)`, `DataAccess::{None,Module,Application}`, `DocScope::{Module,Application}`, `DocumentationRetrievalContext->{moduleKey,docScope}`, `retrieve(question, access, ?scope)`, `retrieveForInApp(question, access, ?scope)`, `metadata.cross_cutting_user` — used identically across Tasks 1–6.
 - **Security invariant:** the module clause is additive to `bool.filter`; `cross_cutting_user` is relevance-only and excluded from `safeDocuments()` output (Task 6 Step 3 explicitly forbids adding it to the safe projection).
 - **Known soft spot (Task 5 test):** the `respond()` feature test's arrange/act/assert are specified precisely, but the exact conversation/user/access fabrication must be copied from an existing `Modules/AI/tests/Unit/Services/Assistance/*Test.php` sibling — the implementer reads one first. No `->todo()` may remain in the committed test.
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `Modules/AI/docs/rag/ASSISTANT_SCOPE.md`.
+
+Verified against the code: the `DataAccess`/`DocScope` enums, `AssistantScopeResolver`, the module clause in documentation retrieval and the `cross_cutting_user` front-matter marker are all present.

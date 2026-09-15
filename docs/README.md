@@ -10,7 +10,7 @@ This convention separates **general** documentation from documentation that shou
 - Module RAG material lives under `Modules/{ModuleName}/docs/rag/`.
 - `resources/` is not used for product documentation (Laravel assets only).
 
-## Automatic indexing (`ai:index-docs` without `--path`)
+## Automatic indexing (`ai:index-rag-docs` without `--path`)
 
 Roots are resolved by the `rag_paths()` helper (see `Modules/AI/app/Helpers/helpers.php`). In short:
 
@@ -24,7 +24,7 @@ This avoids accidentally indexing every Markdown file under `docs/` that was nev
 
 - Write human-readable docs in `docs/` or `Modules/*/docs/`.
 - Copy or move into `*/docs/rag/` only what you want the assistant to see.
-- Run `php artisan ai:index-docs` (or `--full` when you need a full rebuild of the vector store).
+- Run `php artisan ai:index-rag-docs` (or `--full` when you need a full rebuild of the vector store).
 
 ## Engineering audits
 

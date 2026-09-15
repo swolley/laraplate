@@ -7,9 +7,9 @@ This folder holds **global** documentation you want available to the documentati
 | Audience | Typical questions | How they reach RAG |
 |----------|-------------------|-------------------|
 | **End user** (application operator) | “How do I approve a modification?”, “Where is the grid export?” | In-app **chat** (`ChatService`), when FAQ/RAG is enabled and the message is treated as a question (or `use_rag: true` in context) |
-| **Developer** (extends Laraplate) | “How does ACL inheritance work?”, “Which event triggers indexing?” | Terminal **`php artisan ai:laraplate-help`** (REPL or `--question=`) |
+| **Developer** (extends Laraplate) | “How does ACL inheritance work?”, “Which event triggers indexing?” | Terminal **`php artisan ai:help`** (REPL or `--question=`) |
 
-Both paths use the **same indexed corpus** (`ai:index-docs`). Split content by **writing style and scope**, not by separate indexes (unless you later add filtered roots via `--path` or `AI_FAQ_DOCS_PATH`):
+Both paths use the **same indexed corpus** (`ai:index-rag-docs`). Split content by **writing style and scope**, not by separate indexes (unless you later add filtered roots via `--path` or `AI_FAQ_DOCS_PATH`):
 
 - **User-oriented** docs: tasks, UI flows, permissions from an operator perspective, troubleshooting for daily use.
 - **Developer-oriented** docs: architecture, events, commands, config keys, extension points, module boundaries.
@@ -20,7 +20,7 @@ Place files under `docs/rag/` or `Modules/<Module>/docs/rag/` according to which
 
 | Concern | Corpus location | Command / trigger |
 |---------|-----------------|-------------------|
-| **FAQ / assistant RAG** | `docs/rag/`, `Modules/*/docs/rag/` | `php artisan ai:index-docs` |
+| **FAQ / assistant RAG** | `docs/rag/`, `Modules/*/docs/rag/` | `php artisan ai:index-rag-docs` |
 | **Search index (models)** | Scout engine + embeddings tables | `ModelRequiresIndexing`, `queueMakeSearchable()` |
 
 Event orchestration (moderation + search pre-processing) is documented for humans in `Modules/Core/docs/EVENT_ORCHESTRATION.md` and mirrored for the assistant under `Modules/Core/docs/rag/EVENT_ORCHESTRATION.md` (plus `Modules/AI/docs/rag/`, `Modules/CMS/docs/rag/` where relevant).
@@ -48,7 +48,7 @@ Avoid vague descriptions that do not map to code behavior.
 ## Command
 
 ```bash
-php artisan ai:index-docs
+php artisan ai:index-rag-docs
 ```
 
 Useful options:
@@ -59,8 +59,8 @@ Useful options:
 Terminal assistant command:
 
 ```bash
-php artisan ai:laraplate-help
-php artisan ai:laraplate-help --question="How does ACL inheritance work?"
+php artisan ai:help
+php artisan ai:help --question="How does ACL inheritance work?"
 ```
 
 ### Evaluating documentation retrieval quality

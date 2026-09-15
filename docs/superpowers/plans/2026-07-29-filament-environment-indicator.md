@@ -8,6 +8,8 @@
 
 **Tech stack:** Laravel 12, Filament 5, Pest, Core module views (`core::`).
 
+**Spec:** `docs/superpowers/specs/2026-07-29-filament-environment-indicator-design.md`
+
 ---
 
 ### Task 1: Catalog DTO + service (TDD)

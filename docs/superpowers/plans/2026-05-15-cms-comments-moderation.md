@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-15-cms-comments-moderation-design.md`
 
+**Also implements:** `docs/superpowers/specs/2026-05-15-modification-moderation-design.md` — the generic Core pipeline (`ModificationRequiresModeration`, `ModerationAdapter`, `HasModerationMeta`) that superseded the comment-specific events named in the plan below.
+
 ---
 
 ## Delivery status (2026-09-11): shipped, generalized

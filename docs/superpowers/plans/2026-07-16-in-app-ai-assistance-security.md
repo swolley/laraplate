@@ -352,3 +352,9 @@ rtk git -C Modules/Core commit -m "docs(core): document graph tool security boun
 - [x] No rejected raw output is streamed, stored, or logged.
 - [x] In-app streaming remains unavailable in v1.
 - [x] Security and documentation tests pass with deterministic fakes.
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md` and `Modules/AI/docs/rag/ASSISTANT_SCOPE.md`.
+
+Verified at artifact level across all eight tasks: server-owned profiles, separated documentation indexes, permission- and ACL-filtered retrieval, the fail-closed guardrail pipeline, `GraphToolGateway`, the contextual graph tools and the security tests are all present. The adversarial test shipped as `ApplicationContentRetrievalAdversarialTest.php`, not under the name the plan imagined.

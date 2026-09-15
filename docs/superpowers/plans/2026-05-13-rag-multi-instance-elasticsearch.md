@@ -245,3 +245,9 @@ git commit -m "docs(ai): document Elasticsearch RAG driver in README"
 2. **Esecuzione inline** — stessa sessione con checkpoint (skill: executing-plans).
 
 Quale approccio preferisci per passare all’implementazione?
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `Modules/AI/docs/rag/DEPLOYMENT.md`.
+
+Verified by reading the shipped artifacts: `ElasticsearchRagVectorStore`, `CreateRagElasticsearchIndexCommand`, the `AI_FAQ_VECTOR_STORE` config keys and the deployment guide are all present and match what the tasks describe.

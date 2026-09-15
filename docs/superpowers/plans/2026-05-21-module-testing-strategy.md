@@ -8,6 +8,8 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, Pest 4, PHPUnit config, nwidart/laravel-modules, Composer scripts.
 
+**Spec:** `docs/superpowers/specs/2026-05-21-module-testing-strategy-design.md`
+
 ---
 
 ## File Map
