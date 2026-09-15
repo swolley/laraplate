@@ -448,6 +448,37 @@ test_explicit_module_does_not_touch_the_application() {
     assert_eq "$(git -C "$app" rev-parse HEAD)" "$before" "application HEAD"
 }
 
+test_changelog_regenerates_only_the_target() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    commit "$app/Modules/Core" "fix: repair parsing"
+    run_version "$app" --changelog Core
+    assert_status 0
+    assert_file_contains "$app/Modules/Core/CHANGELOG.md" "## [unreleased]"
+    assert_file_contains "$app/Modules/Core/CHANGELOG.md" "Repair parsing"
+    [ ! -e "$app/CHANGELOG.md" ] || fail "the application changelog must not be written"
+}
+
+test_changelog_check_ignores_unreleased_work() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    run_version "$app" --changelog --all
+    assert_status 0
+    commit "$app" "fix: later work"
+    run_version "$app" --changelog-check
+    assert_status 0
+}
+
+test_changelog_check_detects_a_missing_release() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    run_version "$app" --changelog --all
+    sed -i '/^## \[1\.0\.0\]/d' "$app/CHANGELOG.md"
+    run_version "$app" --changelog-check
+    assert_status 4
+    assert_output_contains "application"
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

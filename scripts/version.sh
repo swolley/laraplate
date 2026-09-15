@@ -518,12 +518,61 @@ run_release() {
     exit "$EXIT_OK"
 }
 
+run_changelog() {
+    local path
+    if [ "$ALL" = true ]; then
+        mapfile -t TARGETS < <(module_paths)
+        TARGETS+=("$ROOT_DIR")
+    elif [ "${#TARGETS[@]}" -eq 0 ]; then
+        TARGETS=("$ROOT_DIR")
+    fi
+    for path in "${TARGETS[@]}"; do
+        regenerate_changelog "$path" "$path/CHANGELOG.md" || die "$EXIT_FAILURE" "$(display_name "$path"): changelog regeneration failed"
+        printf 'Regenerated %s\n' "$(display_name "$path")"
+    done
+    exit "$EXIT_OK"
+}
+
+# Prints changelog $1 without its [unreleased] section, which is stale after any commit by nature.
+released_sections() {
+    awk '
+        /^## \[unreleased\]/ { skip = 1; next }
+        /^## \[/ { skip = 0 }
+        !skip { print }
+    ' "$1"
+}
+
+run_changelog_check() {
+    local path tmp repos=() diverged=()
+    mapfile -t repos < <(module_paths)
+    repos+=("$ROOT_DIR")
+    for path in "${repos[@]}"; do
+        tmp=$(mktemp) || die "$EXIT_FAILURE" "cannot create a temporary file"
+        if ! regenerate_changelog "$path" "$tmp"; then
+            rm -f "$tmp"
+            die "$EXIT_FAILURE" "$(display_name "$path"): changelog regeneration failed"
+        fi
+        if [ ! -f "$path/CHANGELOG.md" ] || ! diff -q <(released_sections "$tmp") <(released_sections "$path/CHANGELOG.md") >/dev/null; then
+            diverged+=("$(display_name "$path")")
+        fi
+        rm -f "$tmp"
+    done
+    if [ "${#diverged[@]}" -gt 0 ]; then
+        printf 'Changelog diverges from history in: %s\n' "${diverged[*]}" >&2
+        printf 'Regenerate with: ./scripts/version.sh --changelog --all\n' >&2
+        exit "$EXIT_CHANGELOG_DIVERGED"
+    fi
+    printf 'All changelogs match history.\n'
+    exit "$EXIT_OK"
+}
+
 main() {
     parse_args "$@"
     require_tools
     case "$MODE" in
         release) run_release ;;
-        *) die "$EXIT_USAGE" "--$MODE is not implemented yet" ;;
+        changelog) run_changelog ;;
+        changelog-check) run_changelog_check ;;
     esac
 }
 
