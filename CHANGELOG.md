@@ -2,12 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [1.14.1] - 2026-09-15
 
 ### 🚀 Features
 
 - *(modules)* [**breaking**] Record locking overhaul across Core, CMS, ERP and SAO
 - *(admin)* Let each module own its navigation group
+- *(release)* Choose, skip or confirm each target interactively
+- *(release)* Release every pending module, then the application, with --all
+- *(release)* Regenerate and verify changelogs against history
+- *(release)* Gate commit messages and replace the unused post-commit machinery
 
 ### 🐛 Bug Fixes
 
@@ -17,6 +21,11 @@ All notable changes to this project will be documented in this file.
 - *(http)* Trust the reverse proxy headers so HTTPS is detected
 - *(core)* Update Core submodule with Number field validation fix
 - *(release)* Keep single-line commits and tag the release being written
+- *(release)* Rewrite version.sh around a plan and a plain release commit
+- *(release)* Read the whole module list before matching a target
+- *(release)* Carry the module release level into the application under --all
+- *(modules)* Update subproject commits for AI, CMS, Core, ERP, MES, and SAO modules
+- *(release)* Keep unreleased work out of CHANGELOG.md
 
 ### 💼 Other
 
@@ -75,6 +84,12 @@ All notable changes to this project will be documented in this file.
 - *(specs)* Move MCP server design into the backend repo
 - *(release)* Plan the release tooling and move versioning out of the testing strategy
 - *(specs)* Remove duplicated sections from MCP server design
+- *(changelog)* Regenerate with the corrected git-cliff configuration
+- *(release)* Document the release process and expose it through Composer
+
+### 🧪 Testing
+
+- *(release)* Add a harness that drives version.sh against throwaway repositories
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -101,6 +116,8 @@ All notable changes to this project will be documented in this file.
 - One versioning script for the whole stack
 - *(modules)* Record the toolchain centralization pointers
 - *(deps)* Modules own their dependencies, the application keeps the platform
+- *(modules)* Record the regenerated module changelogs
+- *(modules)* Record the module release documentation
 
 ## [1.14.0] - 2026-08-31
 
