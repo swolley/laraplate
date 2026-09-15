@@ -10,6 +10,21 @@
 
 ---
 
+## Delivery status (2026-09-15): shipped as designed
+
+Built as written, unusually for these plans, and the empty checkboxes below are not
+outstanding work.
+
+`PerModelSettingResolver` caches per group and keeps the lightweight `name => group_name`
+index the plan called for. `SettingsCacheCoordinator` exposes `flushGroup()`,
+`flushGroups()` and `registerGroupInvalidator()` alongside the wholesale `flushAll()`.
+`SettingObserver` calls `flushSetting()` on both save and delete, so an ordinary Eloquent
+change no longer flushes every group.
+
+Covered by `SettingsCacheCoordinatorTest` and `PerModelSettingResolverTest`.
+
+---
+
 ## File Map
 
 - Modify: `Modules/Core/app/Services/PerModelSettingResolver.php`

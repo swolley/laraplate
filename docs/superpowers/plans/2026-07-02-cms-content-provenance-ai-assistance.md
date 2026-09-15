@@ -12,6 +12,29 @@
 
 ---
 
+## Delivery status (2026-09-15): shipped, provenance generalized
+
+Everything this plan asked for exists. The empty checkboxes below are not outstanding work.
+
+The bibliography and the disclosure landed as designed: the `AiAssistance` enum, the
+`ContentReference` model and its factory, the `cms_contents_references` table, the
+`ContentsReferences` case on `CMSTables`, and `Content::references()`.
+
+Two things were done differently:
+
+- **Origin metadata is not columns on `cms_contents`.** It became `Core\Models\RecordOrigin`,
+  a polymorphic record on `core_record_origins` reached through `Content::origin()`. Provenance is
+  therefore a platform capability that any model can carry, rather than a CMS content feature.
+  `Content` is the only model using it today.
+- **`ai_assistance` is not an additive migration.** The column is declared in
+  `create_contents_translations_table`, where the project puts schema changes while the database is
+  still rebuilt with `migrate:fresh` rather than patched with corrective migrations.
+
+Only the references table needed a migration of its own, so one of the plan's three additive
+migrations exists and the other two were folded into the tables they belong to.
+
+---
+
 ## File map
 
 | File | Action | Responsibility |

@@ -5,7 +5,7 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-05-13-rag-multi-instance-elasticsearch.md`: Implement Elasticsearch-backed RAG vector store.
 - `2026-05-15-cms-comments-moderation.md` (**shipped 2026-09-11**, generalized): Implement CMS comments with AI-assisted moderation. Moderation is inherited from `HasApprovals`; the AI side became a module-agnostic `ModerationAdapterRegistry` in Core, so the plan's comments-specific log, event and service were never built. Unticked checkboxes are not outstanding work.
 - `2026-05-21-module-testing-strategy.md`: Reorganize module/application test suites.
-- `2026-05-21-settings-group-cache-invalidation.md`: Implement group-level settings cache invalidation.
+- `2026-05-21-settings-group-cache-invalidation.md` (**shipped 2026-09-15**): Implement group-level settings cache invalidation.
 - `2026-05-25-erp-m36-purchase-invoice-posting.md`: Verify and complete purchase invoice posting cleanup.
 - `2026-05-25-erp-m4-policies-filament-reporting.md`: ERP policies, Filament actions, and reporting alignment.
 - `2026-05-25-erp-m61-bank-reconciliation.md`: ERP bank statement import and reconciliation.
@@ -20,7 +20,7 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, and reporting polish (**completed**; deferred ideas moved to the master backlog).
 - `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Point 0 history — mandatory non-API work and internal `/app` domain actions complete; external `/api/v1` deferred, Gantt/mobile optional, importers tracked separately.
 - `2026-06-30-cms-graph-layer.md`: Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider, Phase 5 materialized edges gated by benchmarks and invalidation design.
-- `2026-07-02-cms-content-provenance-ai-assistance.md`: CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
+- `2026-07-02-cms-content-provenance-ai-assistance.md` (**shipped 2026-09-15**, provenance generalized): CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.
 - `2026-07-16-rag-retrieval-strategy.md`: Evaluation-first documentation RAG evolution from vector baseline to optional hybrid/reranking, with a separate authorization gate for any graph spike.
 - `2026-07-16-in-app-ai-assistance-security.md`: Mandatory server-owned profiles, isolated user RAG, fail-closed guardrails, and ACL-preserving read-only Core Graph tools for in-app assistance.
