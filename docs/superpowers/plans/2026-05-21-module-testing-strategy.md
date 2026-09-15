@@ -683,7 +683,7 @@ rtk git rm Modules/Core/phpunit.xml Modules/CMS/phpunit.xml Modules/AI/phpunit.x
 
 Expected: six files removed.
 
-- [x] **Step 4: Re-run the three suites**
+- [ ] **Step 4: Re-run the three suites** (PARTIAL: only `Unit` was run, and it matched the baseline. `Integration` and `Feature` were interrupted every time and remain unverified.)
 
 Run:
 
@@ -901,7 +901,7 @@ Expected: the same file count is fixed. Note `mb_str_functions` among the fixers
 the modules' own declared rule, applied for the first time because nothing was ever formatting
 them. The suite run in the next step is what confirms it.
 
-- [x] **Step 4: Run the full suite**
+- [ ] **Step 4: Run the full suite** (PARTIAL, and this is the step that matters)
 
 Run:
 
@@ -912,6 +912,13 @@ rtk php artisan test --compact
 Expected: matches the Task 1 baseline. A new failure here is almost certainly `mb_str_functions`
 meeting a test that asserted byte semantics; fix the test or exclude that specific call, and say
 which in the delivery status.
+
+**Status 2026-09-15:** only `Unit` was run after the reformatting: 1 failed, 497 passed, exactly
+the baseline. `Integration` and `Feature` were attempted four times and interrupted every time
+(backgrounded runs killed, the per-module foreground run cancelled). They are the verification
+that `mb_str_functions` did not break a byte-semantics assumption, and they have not run. The
+`mb_str_functions` changes sit in their own commit per module precisely so they can be reverted
+alone if this step fails.
 
 - [x] **Step 5: Commit the reformatting on its own**
 
@@ -972,6 +979,10 @@ rtk vendor/bin/peck
 Expected: Pint is clean after Task 8. Rector and PHPStan reach module code through the root's own
 paths (`rector.php` globs `Modules/*/app`, `phpstan.neon` lists `Modules/`). Their error counts
 match what Task 7 recorded, with no new category introduced by the deletion.
+
+**Status 2026-09-15:** Pint clean, Rector reaches the modules (548 files it would change,
+pre-existing), PHPStan reports the 33282 recorded in Task 7. `peck` printed its usage instead of
+running and was not re-attempted; it needs the right invocation before this step is honest.
 
 - [x] **Step 4: Note what MES tells you**
 
@@ -1252,8 +1263,18 @@ for the work to land in the working tree of `master` in each repository, for rev
 - `composer run --list` at the root now lists only scripts the root defines. `test:standalone`,
   `test:unit:parallel` and the module `test:pest*` entries are gone.
 
-**Not done:**
+**Committed (nothing pushed).** Each module carries three commits, MES two: the safe formatting
+(558 files across the six), `mb_str_functions` isolated on its own (60 files), and the toolchain
+removal. The application carries five: the tool configuration, the versioning script, the
+composer/lock promotion, this documentation, and the submodule pointers.
 
+**Not done, and the first one is not a formality:**
+
+- **`Integration` and `Feature` have not been run since the reformatting.** Four attempts, four
+  interruptions. Only `Unit` was verified (1 failed / 497 passed, the baseline). Until those two
+  suites run, `mb_str_functions` is unverified against 60 files of behavioural change. That is why
+  it sits in its own commit per module.
+- `peck` printed its usage rather than running, in Task 9 Step 3.
 - Task 4c Step 6, the end-to-end version bump. It tags and pushes, so it needs the user.
 - Tasks 10 to 12: documentation, `UnitShell` classification, final verification.
 
