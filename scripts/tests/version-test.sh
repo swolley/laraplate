@@ -324,6 +324,69 @@ test_set_version_with_several_targets_is_a_usage_error() {
     assert_status 2
 }
 
+test_interactive_skip_leaves_a_target_untouched() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "fix: repair the core"
+    commit "$app/Modules/CMS" "fix: repair the content"
+    run_version_answering "$app" $'skip\n\ny' Core CMS
+    assert_status 0
+    assert_no_tag "$app/Modules/Core" v1.0.1
+    assert_tag "$app/Modules/CMS" v1.0.1
+}
+
+test_interactive_level_choice_overrides_inference() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version_answering "$app" $'minor\ny'
+    assert_status 0
+    assert_tag "$app" v1.1.0
+}
+
+test_interactive_explicit_version_is_accepted() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version_answering "$app" $'3.0.0\ny'
+    assert_status 0
+    assert_tag "$app" v3.0.0
+}
+
+test_interactive_decline_writes_nothing() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    local before
+    before=$(git -C "$app" rev-parse HEAD)
+    run_version_answering "$app" $'\nn'
+    assert_status 1
+    assert_no_tag "$app" v1.0.1
+    assert_eq "$(git -C "$app" rev-parse HEAD)" "$before" "HEAD"
+    assert_output_contains "Aborted"
+}
+
+test_forced_level_asks_only_for_confirmation() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version_answering "$app" 'y' patch
+    assert_status 0
+    assert_tag "$app" v1.0.1
+    assert_output_lacks "[major/minor/patch"
+}
+
+test_dry_run_never_prompts() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version_answering "$app" '' --dry-run
+    assert_status 0
+    assert_output_contains "TARGET"
+    assert_output_lacks "Proceed?"
+    assert_no_tag "$app" v1.0.1
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

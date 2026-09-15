@@ -362,6 +362,66 @@ release_target() {
     fi
 }
 
+# True when prompts can be shown. VERSION_FORCE_INTERACTIVE=1 or 0 overrides terminal detection.
+is_interactive() {
+    if [ "$NONINTERACTIVE" = true ]; then
+        return 1
+    fi
+    case "${VERSION_FORCE_INTERACTIVE:-}" in
+        1) return 0 ;;
+        0) return 1 ;;
+    esac
+    { : </dev/tty; } 2>/dev/null
+}
+
+# Asks $1 and prints the answer. Uses /dev/tty, which works under composer run, or stdin when forced.
+prompt() {
+    local answer=""
+    if [ "${VERSION_FORCE_INTERACTIVE:-}" = 1 ]; then
+        printf '%s' "$1" >&2
+        IFS= read -r answer || answer=""
+    else
+        printf '%s' "$1" >/dev/tty
+        IFS= read -r answer </dev/tty || answer=""
+    fi
+    printf '%s\n' "$answer"
+}
+
+# Asks which version repository $1 gets. Enter keeps the planned version.
+choose_version() {
+    local path=$1 answer version name
+    name=$(display_name "$path")
+    while true; do
+        answer=$(prompt "$name ${PLAN_CURRENT[$path]} -> ${PLAN_NEXT[$path]} [major/minor/patch/<version>/skip, enter keeps ${PLAN_NEXT[$path]}]: ")
+        case "$answer" in
+            "")
+                return 0
+                ;;
+            major|minor|patch)
+                PLAN_NEXT[$path]=$(increment_version "${PLAN_CURRENT[$path]}" "$answer")
+                return 0
+                ;;
+            skip)
+                PLAN_VERDICT[$path]="skipped"
+                return 0
+                ;;
+            *)
+                if version=$(normalize_version "$answer" 2>/dev/null) && version_gt "$version" "${PLAN_CURRENT[$path]}"; then
+                    PLAN_NEXT[$path]=$version
+                    return 0
+                fi
+                printf 'Not a valid choice: %s\n' "$answer" >&2
+                ;;
+        esac
+    done
+}
+
+confirm() {
+    local answer
+    answer=$(prompt "Proceed? [y/N]: ")
+    [[ "$answer" =~ ^[Yy]$ ]]
+}
+
 run_release() {
     local path pending=()
 
@@ -374,6 +434,18 @@ run_release() {
 
     for path in "${TARGETS[@]}"; do
         plan_target "$path"
+    done
+
+    if [ "$DRY_RUN" != true ] && is_interactive && [ -z "$BUMP" ] && [ -z "$SET_VERSION" ]; then
+        render_plan "${TARGETS[@]}"
+        for path in "${TARGETS[@]}"; do
+            if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
+                choose_version "$path"
+            fi
+        done
+    fi
+
+    for path in "${TARGETS[@]}"; do
         if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
             pending+=("$path")
         fi
@@ -392,6 +464,10 @@ run_release() {
     for path in "${pending[@]}"; do
         check_preconditions "$path"
     done
+    if is_interactive && ! confirm; then
+        printf 'Aborted, nothing was written.\n'
+        exit "$EXIT_FAILURE"
+    fi
     for path in "${pending[@]}"; do
         release_target "$path" "${PLAN_NEXT[$path]}"
     done
