@@ -1,357 +1,410 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Versions the application and its modules: for each target, bump composer.json, regenerate
+# CHANGELOG.md with git-cliff, commit, tag and push. Run with --help for usage.
 
-# function to get the last commit message
-get_last_commit_message() {
-    # git log -1 --pretty=%B
-    local last_tag=$(git describe --tags --abbrev=0 HEAD 2>/dev/null)
-    
-    if [ -z "$last_tag" ]; then
-        git log -1 --pretty=%B
+set -uo pipefail
+
+export LC_COLLATE=C
+
+readonly EXIT_OK=0
+readonly EXIT_FAILURE=1
+readonly EXIT_USAGE=2
+readonly EXIT_PRECONDITION=3
+readonly EXIT_CHANGELOG_DIVERGED=4
+readonly EXIT_NOTHING_TO_RELEASE=10
+
+readonly VERSION_TAG_PATTERN='^v?[0-9]+\.[0-9]+\.[0-9]+$'
+
+ROOT_DIR="${VERSION_ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+readonly ROOT_DIR
+readonly CLIFF_CONFIG="$ROOT_DIR/cliff.toml"
+
+TARGETS=()
+BUMP=""
+SET_VERSION=""
+ALL=false
+NONINTERACTIVE=false
+DRY_RUN=false
+PUSH=true
+ALLOW_DIRTY=false
+MODE="release"
+
+declare -A PLAN_CURRENT=() PLAN_NEXT=() PLAN_COMMITS=() PLAN_VERDICT=()
+
+die() {
+    local code=$1
+    shift
+    printf 'Error: %s\n' "$*" >&2
+    exit "$code"
+}
+
+usage() {
+    cat <<'USAGE'
+Usage: version.sh [target ...] [major|minor|patch] [options]
+
+Targets:
+  (none)               the application
+  <Module>             a module under Modules/, case-insensitive (Core, cms, ...)
+  Modules/<Module>     the same module, by path
+  --all                every module with pending commits, then the application
+
+Bump:
+  major|minor|patch    force the level; without it git-cliff infers the level
+
+Options:
+  --set-version <v>    explicit version, single target only
+  --nointeractive      never prompt; skip targets with nothing to release
+  -n, --dry-run        print the plan and write nothing
+  --no-push            commit and tag locally, do not push
+  --allow-dirty        proceed with a dirty working tree
+  --changelog          regenerate CHANGELOG.md for the targets and stop
+  --changelog-check    verify every CHANGELOG.md against a fresh regeneration
+  -h, --help           show this help
+
+Exit codes: 0 done, 10 nothing to release, 2 usage, 3 precondition, 4 changelog diverged, 1 failure.
+USAGE
+}
+
+# Prints the absolute path of every module repository under Modules/, Core first, then by name.
+module_paths() {
+    local dir
+    if [ -e "$ROOT_DIR/Modules/Core/.git" ]; then
+        printf '%s\n' "$ROOT_DIR/Modules/Core"
+    fi
+    for dir in "$ROOT_DIR"/Modules/*/; do
+        dir=${dir%/}
+        if [ "${dir##*/}" != "Core" ] && [ -e "$dir/.git" ]; then
+            printf '%s\n' "$dir"
+        fi
+    done
+}
+
+# Prints "application" for the application root, the module name otherwise.
+display_name() {
+    if [ "$1" = "$ROOT_DIR" ]; then
+        printf 'application\n'
     else
-        git log "$last_tag..HEAD" --pretty=%B
+        printf '%s\n' "${1##*/}"
     fi
 }
 
-# Function to determine the importance of a single commit message
-get_commit_importance() {
-    local commit_message="$1"
-    
-    # Check for breaking changes (major) - highest priority
-    if [[ "$commit_message" =~ ^(feat|fix|perf|refactor)(\([a-z0-9-]+\))?! ]]; then
-        echo "major"
-        return
-    fi
-    
-    # Check for features (minor) - medium priority
-    if [[ "$commit_message" =~ ^feat(\([a-z0-9-]+\))?: ]]; then
-        echo "minor"
-        return
-    fi
-    
-    # Check for other conventional commit types (patch) - low priority
-    if [[ "$commit_message" =~ ^(fix|perf|refactor)(\([a-z0-9-]+\))?: ]]; then
-        echo "patch"
-        return
-    fi
-    
-    # If no recognizable pattern is found, default to null
-    echo "null"
+# Appends the module named by $1 (Core, cms, Modules/Core) to TARGETS once, or exits with usage.
+add_target() {
+    local wanted=${1#Modules/}
+    wanted=${wanted%/}
+    wanted=${wanted,,}
+    local path name existing names=()
+    while IFS= read -r path; do
+        name=${path##*/}
+        names+=("$name")
+        if [ "${name,,}" = "$wanted" ]; then
+            for existing in "${TARGETS[@]}"; do
+                if [ "$existing" = "$path" ]; then
+                    return 0
+                fi
+            done
+            TARGETS+=("$path")
+            return 0
+        fi
+    done < <(module_paths)
+    die "$EXIT_USAGE" "unknown target '$1'. Valid targets: ${names[*]:-none}"
 }
 
-is_already_tagged() {
-    local last_commit_hash=$(git rev-parse HEAD)
-    local tag_at_commit=$(git tag --points-at "$last_commit_hash")
-    if [ -n "$tag_at_commit" ]; then
-        return 0
+# Prints $1 as vX.Y.Z, or returns 1 when it is not a plain semantic version.
+normalize_version() {
+    if [[ ! "$1" =~ $VERSION_TAG_PATTERN ]]; then
+        printf 'Error: not a version: %s\n' "$1" >&2
+        return 1
+    fi
+    printf 'v%s\n' "${1#v}"
+}
+
+# True when version $1 is strictly greater than version $2.
+version_gt() {
+    [ "${1#v}" != "${2#v}" ] && [ "$(printf '%s\n%s\n' "${1#v}" "${2#v}" | sort -V | tail -n 1)" = "${1#v}" ]
+}
+
+# Prints version $1 incremented at level $2 (major, minor or patch).
+increment_version() {
+    local major minor patch
+    IFS=. read -r major minor patch <<< "${1#v}"
+    case "$2" in
+        major) printf 'v%d.0.0\n' "$((major + 1))" ;;
+        minor) printf 'v%d.%d.0\n' "$major" "$((minor + 1))" ;;
+        patch) printf 'v%d.%d.%d\n' "$major" "$minor" "$((patch + 1))" ;;
+    esac
+}
+
+parse_args() {
+    local value
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            major|minor|patch)
+                if [ -n "$BUMP" ] && [ "$BUMP" != "$1" ]; then
+                    die "$EXIT_USAGE" "conflicting bump levels: $BUMP and $1"
+                fi
+                BUMP=$1
+                ;;
+            --set-version|--set-version=*)
+                if [ "$1" = "--set-version" ]; then
+                    [ "$#" -ge 2 ] || die "$EXIT_USAGE" "--set-version needs a value"
+                    value=$2
+                    shift
+                else
+                    value=${1#*=}
+                fi
+                SET_VERSION=$(normalize_version "$value") || exit "$EXIT_USAGE"
+                ;;
+            --all) ALL=true ;;
+            --nointeractive) NONINTERACTIVE=true ;;
+            -n|--dry-run) DRY_RUN=true ;;
+            --no-push) PUSH=false ;;
+            --allow-dirty) ALLOW_DIRTY=true ;;
+            --changelog) MODE="changelog" ;;
+            --changelog-check) MODE="changelog-check" ;;
+            -h|--help)
+                usage
+                exit "$EXIT_OK"
+                ;;
+            -*) die "$EXIT_USAGE" "unknown option '$1' (see --help)" ;;
+            *) add_target "$1" ;;
+        esac
+        shift
+    done
+
+    if [ "$ALL" = true ] && [ "${#TARGETS[@]}" -gt 0 ]; then
+        die "$EXIT_USAGE" "--all cannot be combined with explicit targets"
+    fi
+    if [ -n "$SET_VERSION" ] && [ -n "$BUMP" ]; then
+        die "$EXIT_USAGE" "--set-version cannot be combined with $BUMP"
+    fi
+    if [ -n "$SET_VERSION" ] && { [ "$ALL" = true ] || [ "${#TARGETS[@]}" -gt 1 ]; }; then
+        die "$EXIT_USAGE" "--set-version applies to a single target"
+    fi
+}
+
+require_tools() {
+    local tool missing=()
+    for tool in git git-cliff jq; do
+        command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
+    done
+    if [ "${#missing[@]}" -gt 0 ]; then
+        die "$EXIT_PRECONDITION" "missing required tools: ${missing[*]}"
+    fi
+}
+
+# Prints the name of the highest version tag of repository $1, or nothing when there is none.
+latest_tag() {
+    git -C "$1" tag --list \
+        | grep -E "$VERSION_TAG_PATTERN" \
+        | awk '{ v = $0; sub(/^v/, "", v); print v "\t" $0 }' \
+        | sort -t$'\t' -k1,1V \
+        | tail -n 1 \
+        | cut -f2
+}
+
+current_version() {
+    local tag
+    tag=$(latest_tag "$1")
+    if [ -z "$tag" ]; then
+        printf 'v0.0.0\n'
     else
+        printf 'v%s\n' "${tag#v}"
+    fi
+}
+
+commits_since() {
+    local tag
+    tag=$(latest_tag "$1")
+    if [ -z "$tag" ]; then
+        git -C "$1" rev-list --count HEAD
+    else
+        git -C "$1" rev-list --count "$tag..HEAD"
+    fi
+}
+
+# Prints the version git-cliff infers for repository $1 from the commits after its last tag.
+inferred_version() {
+    local inferred
+    inferred=$(cd "$1" && git cliff --config "$CLIFF_CONFIG" --bumped-version 2>/dev/null) || return 1
+    normalize_version "$inferred"
+}
+
+head_has_version_tag() {
+    git -C "$1" tag --points-at HEAD | grep -Eq "$VERSION_TAG_PATTERN"
+}
+
+# Fills the PLAN_* maps for repository $1. Reads only.
+plan_target() {
+    local path=$1 current inferred
+    current=$(current_version "$path")
+    inferred=$(inferred_version "$path") || die "$EXIT_FAILURE" "$(display_name "$path"): git cliff could not infer a version"
+    PLAN_CURRENT[$path]=$current
+    PLAN_COMMITS[$path]=$(commits_since "$path")
+    PLAN_NEXT[$path]="-"
+
+    if head_has_version_tag "$path"; then
+        PLAN_VERDICT[$path]="tagged"
+    elif [ "$inferred" = "$current" ]; then
+        PLAN_VERDICT[$path]="nothing"
+    else
+        PLAN_VERDICT[$path]="release"
+        if [ -n "$SET_VERSION" ]; then
+            version_gt "$SET_VERSION" "$current" || die "$EXIT_USAGE" "$SET_VERSION is not greater than $current"
+            PLAN_NEXT[$path]=$SET_VERSION
+        elif [ -n "$BUMP" ]; then
+            PLAN_NEXT[$path]=$(increment_version "$current" "$BUMP")
+        else
+            PLAN_NEXT[$path]=$inferred
+        fi
+    fi
+}
+
+render_plan() {
+    local path next
+    printf '%-12s %-10s %-10s %7s  %s\n' TARGET CURRENT NEXT COMMITS ACTION
+    for path in "$@"; do
+        next=${PLAN_NEXT[$path]}
+        if [ "${PLAN_VERDICT[$path]}" != "release" ]; then
+            next="-"
+        fi
+        printf '%-12s %-10s %-10s %7s  %s\n' "$(display_name "$path")" "${PLAN_CURRENT[$path]}" "$next" "${PLAN_COMMITS[$path]}" "${PLAN_VERDICT[$path]}"
+    done
+}
+
+# Exits with a precondition error when repository $1 cannot be released safely.
+check_preconditions() {
+    local path=$1 name branch
+    name=$(display_name "$path")
+    branch=$(git -C "$path" symbolic-ref --short -q HEAD) || die "$EXIT_PRECONDITION" "$name: HEAD is detached, check out a branch first"
+    if [ "$ALLOW_DIRTY" != true ] && [ -n "$(git -C "$path" status --porcelain --ignore-submodules=all)" ]; then
+        die "$EXIT_PRECONDITION" "$name: working tree has uncommitted changes (commit or stash them, or use --allow-dirty)"
+    fi
+    if [ "$PUSH" = true ] && [ -z "$(git -C "$path" config "branch.$branch.remote")" ]; then
+        die "$EXIT_PRECONDITION" "$name: branch $branch has no upstream (set one, or use --no-push)"
+    fi
+    if git -C "$path" rev-parse -q --verify "refs/tags/${PLAN_NEXT[$path]}" >/dev/null; then
+        die "$EXIT_PRECONDITION" "$name: tag ${PLAN_NEXT[$path]} already exists"
+    fi
+}
+
+update_composer_version() {
+    local file="$1/composer.json" tmp
+    [ -f "$file" ] || return 1
+    tmp=$(mktemp) || return 1
+    if jq --arg version "$2" '.version = $version' "$file" > "$tmp"; then
+        mv "$tmp" "$file"
+    else
+        rm -f "$tmp"
         return 1
     fi
 }
 
-# Function to determine the maximum importance among all commit messages
-determine_max_importance() {
-    local commit_messages="$1"
-    local max_importance="null"
-    
-    # Read each line (each commit message)
-    while IFS= read -r commit_message; do
-        if [ -n "$commit_message" ]; then
-            local importance=$(get_commit_importance "$commit_message")
-            
-            # Update the maximum importance
-            case "$importance" in
-                "major")
-                    max_importance="major"
-                    break  # Major is the maximum, we can stop
-                    ;;
-                "minor")
-                    if [ "$max_importance" != "major" ]; then
-                        max_importance="minor"
-                    fi
-                    ;;
-                "patch")
-                    if [ "$max_importance" = "null" ]; then
-                        max_importance="patch"
-                    fi
-                    ;;
-            esac
+# Writes the changelog of repository $1 to $2. With $3, unreleased commits are released as $3.
+regenerate_changelog() {
+    local path=$1 output=$2 tag=${3:-} log
+    local args=(--config "$CLIFF_CONFIG" --output "$output")
+    if [ -n "$tag" ]; then
+        args+=(--tag "$tag")
+    fi
+    log=$(mktemp) || return 1
+    if (cd "$path" && git cliff "${args[@]}" 2>"$log"); then
+        rm -f "$log"
+        return 0
+    fi
+    cat "$log" >&2
+    rm -f "$log"
+    return 1
+}
+
+push_target() {
+    local path=$1 branch=$2 version=$3 remote merge
+    remote=$(git -C "$path" config "branch.$branch.remote")
+    merge=$(git -C "$path" config "branch.$branch.merge")
+    git -C "$path" push --quiet "$remote" "HEAD:${merge:-refs/heads/$branch}" \
+        && git -C "$path" push --quiet "$remote" "refs/tags/$version"
+}
+
+# Reports what a failed release of repository $1 left behind, then exits.
+fail_release() {
+    local path=$1 version=$2 step=$3
+    {
+        printf 'Error: %s: release %s failed at: %s\n' "$(display_name "$path")" "$version" "$step"
+        printf 'Inspect before retrying: git -C %q status\n' "$path"
+        if git -C "$path" rev-parse -q --verify "refs/tags/$version" >/dev/null; then
+            printf 'Local tag %s exists. Remove it with: git -C %q tag -d %s\n' "$version" "$path" "$version"
         fi
-    done <<< "$commit_messages"
-    
-    echo "$max_importance"
-}
-
-# Determine the release type from the commit messages
-determine_release_type() {
-    local commit_messages=$(get_last_commit_message)
-
-    if is_already_tagged; then
-        echo "Commit is already tagged, skipping version bump"
-        echo "null"
-        return
-    fi
-    
-    # Determine the maximum importance among all commit messages
-    local max_importance=$(determine_max_importance "$commit_messages")
-    echo "$max_importance"
-}
-
-# Function to increment the version
-# Arguments:
-#   $1: Version string
-#   $2: Position to increment (major, minor, patch)
-# Returns:
-#   Incremented version string
-increment_version() {
-    local version=$1
-    local position=$2
-
-    # Remove the 'v' prefix if present
-    version=${version#v}
-    
-    # split version in array
-    IFS='.' read -ra VERSION_PARTS <<< "$version"
-    
-    # increment the specified part
-    case $position in
-        "major")
-            ((VERSION_PARTS[0]++))
-            VERSION_PARTS[1]=0
-            VERSION_PARTS[2]=0
-            ;;
-        "minor")
-            ((VERSION_PARTS[1]++))
-            VERSION_PARTS[2]=0
-            ;;
-        "patch")
-            ((VERSION_PARTS[2]++))
-            ;;
-    esac
-
-    # rebuild version with prefix 'v'
-    echo "v${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.${VERSION_PARTS[2]}"
-}
-
-# function to get the latest version tag
-get_latest_version() {
-    local latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null)
-    if [ -z "$latest_tag" ]; then
-        echo "v0.0.0"
-    else
-        echo "$latest_tag"
-    fi
-}
-
-# Function to amend or commit
-# Arguments:
-#   $1: Commit message
-# Returns:
-#   None
-amend_or_commit() {
-    local message=$1
-    
-    local unpushed=$(git rev-list @{upstream}..HEAD 2>/dev/null)
-    if [ -n "$unpushed" ]; then
-        # if there are unpushed commits, amend the last one
-        git commit --amend --no-edit
-    else
-        # if no unpushed commits and version has changed, create new commit
-        git commit -m "$message"
-    fi
-}
-
-# Function to update composer.json
-# Arguments:
-#   $1: New version string
-# Returns:
-#   None
-#
-# Resolves the package composer.json in the target repository (the application, or a module
-# named on the command line). Only the root JSON key "version" is updated; never scripts.version
-# (the composer script name).
-update_composer_version() {
-    local new_version=$1
-
-    local composer_file
-    composer_file="$TARGET_DIR/composer.json"
-
-    if [ ! -f "$composer_file" ]; then
-        echo "Error: composer.json not found at $composer_file"
-        exit 1
-    fi
-
-    if command -v jq >/dev/null 2>&1; then
-        local tmp
-        tmp=$(mktemp)
-        jq --arg version "$new_version" '.version = $version' "$composer_file" > "$tmp" && mv "$tmp" "$composer_file"
-    elif command -v composer >/dev/null 2>&1; then
-        if ! composer config --file "$composer_file" version "$new_version"; then
-            echo "Error: could not set version via composer (invalid semver?). Install jq for reliable updates."
-            exit 1
-        fi
-    else
-        echo "Error: install jq or ensure composer is available to update composer.json safely (sed cannot target root version without breaking scripts.version)."
-        exit 1
-    fi
-
-    git add "$composer_file"
-}
-
-# Function to update the changelog
-# Arguments:
-#   $1: New version string
-# Returns:
-#   None
-update_changelog() {
-    local new_version=$1
-    
-    # update the changelog; the configuration is shared, the output belongs to the target repository
-    git cliff --config "$ROOT_DIR/cliff.toml" --tag "$new_version" --output CHANGELOG.md
-    
-    # add the file to git (but don't commit yet)
-    git add CHANGELOG.md
-}
-
-# Function to update the version in the current repository
-# Arguments:
-#   $1: Position to increment (major, minor, patch)
-#   $2: Silent mode
-# Returns:
-#   None
-update_version() {
-    local position=$1
-    local silent=$2
-
-    # Check for uncommitted changes unless allowed or dry-run
-    if [ "$DRY_RUN" != true ] && [ "$ALLOW_DIRTY" != true ] && [ -n "$(git status --porcelain)" ]; then
-        echo "Error: There are uncommitted changes in the working directory."
-        echo "Please commit or stash your changes before updating the version, or re-run with --allow-dirty."
-        exit 1
-    fi
-    if [ "$DRY_RUN" != true ] && [ "$ALLOW_DIRTY" = true ] && [ -n "$(git status --porcelain)" ]; then
-        echo "Warning: proceeding with a dirty working tree; only composer.json and CHANGELOG.md will be staged."
-    fi
-
-    local current_version=$(get_latest_version)
-    local new_version=$(increment_version "$current_version" "$position")
-
-    if [ "$silent" = true ]; then
-        echo "DEBUG: Current version: $current_version"
-        echo "DEBUG: Position: $position" 
-        echo "DEBUG: New version: $new_version"
-        echo "DEBUG: Are they equal? $([ "$current_version" == "$new_version" ] && echo "YES" || echo "NO")"
-    fi
-    
-    if [ $current_version == $new_version ]; then
-        echo "Version is already up to date"
-        exit 0
-    fi
-    
-    if [ "$DRY_RUN" = true ]; then
-        echo "Dry run: would update $TARGET_NAME from $current_version to $new_version"
-        return
-    fi
-
-    if [ "$silent" = true ]; then
-        echo "Silent mode: should update version from $current_version to $new_version"
-        return
-    fi
-
-    echo "Updating $TARGET_NAME from $current_version to $new_version"
-    
-    # update composer.json (stages the file)
-    update_composer_version "$new_version"
-    
-    # update the changelog (stages the file)
-    update_changelog "$new_version"
-    
-    # create a single commit with all changes
-    amend_or_commit "chore: bump version to $new_version"
-    
-    # create and push the tag
-    git tag -a "$new_version" -m "Release $new_version"
-    
-    # try to push, but don't fail if credentials are not available
-    if git push 2>/dev/null; then
-        git push origin "$new_version" 2>/dev/null || echo "Warning: Could not push tag. You may need to push manually: git push origin $new_version"
-    else
-        echo "Warning: Could not push commits. You may need to push manually: git push"
-        echo "Warning: Could not push tag. You may need to push manually: git push origin $new_version"
-    fi
-}
-
-ROOT_DIR="${VERSION_ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-
-# Resolve the repository to version. With no target, or with a target that is not a directory,
-# it is the application itself. A target may be a module name (Core) or a path (Modules/Core).
-TARGET_DIR="$ROOT_DIR"
-TARGET_NAME="the application"
-case "$1" in
-    "" | major | minor | patch | --*) ;;
-    *)
-        if [ -d "$ROOT_DIR/$1" ]; then
-            TARGET_DIR=$(cd "$ROOT_DIR/$1" && pwd)
-        elif [ -d "$ROOT_DIR/Modules/$1" ]; then
-            TARGET_DIR=$(cd "$ROOT_DIR/Modules/$1" && pwd)
+        if [ "$(git -C "$path" log -1 --pretty=%s)" = "chore(release): $version" ]; then
+            printf 'Release commit exists. Undo it with: git -C %q reset --keep HEAD~1\n' "$path"
         else
-            echo "Error: no such module or directory: $1"
-            echo "Usage: $0 [<Module>|<path>] {major|minor|patch} [--nointeractive] [--silent] [--dry-run] [--allow-dirty]"
-            exit 1
+            printf 'Staged changes may exist. Undo them with: git -C %q restore --staged --worktree composer.json CHANGELOG.md\n' "$path"
         fi
-        TARGET_NAME="$1"
-        shift
-        ;;
-esac
+        if [ "$step" = "push" ]; then
+            printf 'Or keep the release and push by hand: git -C %q push <remote> HEAD:<branch> refs/tags/%s\n' "$path" "$version"
+        fi
+    } >&2
+    exit "$EXIT_FAILURE"
+}
 
-if [ ! -e "$TARGET_DIR/.git" ]; then
-    echo "Error: $TARGET_DIR is not a git repository, cannot version it"
-    exit 1
-fi
+release_target() {
+    local path=$1 version=$2 branch
+    branch=$(git -C "$path" symbolic-ref --short HEAD)
+    printf 'Releasing %s %s\n' "$(display_name "$path")" "$version"
 
-if [ ! -f "$TARGET_DIR/composer.json" ]; then
-    echo "Error: composer.json not found at $TARGET_DIR/composer.json"
-    exit 1
-fi
-
-# Every git call below acts on the current repository, so the target must be the working directory.
-cd "$TARGET_DIR" || exit 1
-
-SILENT=false
-DRY_RUN=false
-ALLOW_DIRTY=false
-if [[ "$*" == *"--silent"* ]]; then
-    SILENT=true
-fi
-if [[ "$*" == *"--dry-run"* ]]; then
-    DRY_RUN=true
-fi
-if [[ "$*" == *"--allow-dirty"* ]]; then
-    ALLOW_DIRTY=true
-fi
-
-# Check if --nointeractive flag is present
-if [[ "$*" == *"--nointeractive"* ]]; then
-    # Determine release type from commit message
-    position=$(determine_release_type)
-    if [ "$position" != "null" ]; then
-        update_version "$position" "$SILENT"
-    else
-        echo "No version change needed"
-        exit 0
+    update_composer_version "$path" "$version" || fail_release "$path" "$version" "composer.json"
+    regenerate_changelog "$path" "$path/CHANGELOG.md" "$version" || fail_release "$path" "$version" "changelog"
+    git -C "$path" add composer.json CHANGELOG.md || fail_release "$path" "$version" "stage"
+    git -C "$path" commit --quiet -m "chore(release): $version" || fail_release "$path" "$version" "commit"
+    git -C "$path" tag -a "$version" -m "Release $version" || fail_release "$path" "$version" "tag"
+    if [ "$PUSH" = true ]; then
+        push_target "$path" "$branch" "$version" || fail_release "$path" "$version" "push"
     fi
-else
-    # Interactive mode
-    case $1 in
-        "major"|"minor"|"patch")
-            update_version $1 "$SILENT"
-            ;;
-        "null")
-            echo "No version change detected"
-            exit 0
-            ;;
-        *)
-            echo "Usage: $0 [<Module>|<path>] {major|minor|patch} [--nointeractive] [--silent] [--dry-run] [--allow-dirty]"
-            exit 1
-            ;;
+}
+
+run_release() {
+    local path pending=()
+
+    if [ "$ALL" = true ]; then
+        die "$EXIT_USAGE" "--all is not implemented yet"
+    fi
+    if [ "${#TARGETS[@]}" -eq 0 ]; then
+        TARGETS=("$ROOT_DIR")
+    fi
+
+    for path in "${TARGETS[@]}"; do
+        plan_target "$path"
+        if [ "${PLAN_VERDICT[$path]}" = "release" ]; then
+            pending+=("$path")
+        fi
+    done
+
+    render_plan "${TARGETS[@]}"
+
+    if [ "${#pending[@]}" -eq 0 ]; then
+        printf 'Nothing to release.\n'
+        exit "$EXIT_NOTHING_TO_RELEASE"
+    fi
+    if [ "$DRY_RUN" = true ]; then
+        exit "$EXIT_OK"
+    fi
+
+    for path in "${pending[@]}"; do
+        check_preconditions "$path"
+    done
+    for path in "${pending[@]}"; do
+        release_target "$path" "${PLAN_NEXT[$path]}"
+    done
+    exit "$EXIT_OK"
+}
+
+main() {
+    parse_args "$@"
+    require_tools
+    case "$MODE" in
+        release) run_release ;;
+        *) die "$EXIT_USAGE" "--$MODE is not implemented yet" ;;
     esac
-fi
+}
+
+main "$@"

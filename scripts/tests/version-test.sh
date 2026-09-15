@@ -144,6 +144,186 @@ test_release_gives_the_new_version_its_own_changelog_section() {
     assert_eq "$(jq -r .version "$app/composer.json")" v1.1.0 "composer.json version"
 }
 
+test_bump_keyword_before_target_versions_the_module() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    commit "$app/Modules/Core" "fix: repair the core"
+    run_version "$app" patch Core --dry-run
+    assert_status 0
+    assert_output_contains "Core"
+    assert_output_contains "v1.0.1"
+    assert_output_lacks "application"
+}
+
+test_unknown_target_is_a_usage_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    run_version "$app" Nope --dry-run
+    assert_status 2
+    assert_output_contains "Valid targets: Core"
+}
+
+test_all_with_explicit_target_is_a_usage_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core
+    run_version "$app" --all Core
+    assert_status 2
+}
+
+test_unknown_option_is_a_usage_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    run_version "$app" --silent
+    assert_status 2
+}
+
+test_nothing_to_release_exits_10() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    run_version "$app" --nointeractive
+    assert_status 10
+    assert_no_tag "$app" v1.0.1
+}
+
+test_skipped_commits_alone_are_nothing_to_release() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "chore(release): v1.0.1"
+    run_version "$app" --nointeractive
+    assert_status 10
+}
+
+test_backup_tags_are_ignored() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    git -C "$app" tag backup/v9.9.9
+    run_version "$app" --nointeractive --dry-run
+    assert_status 0
+    assert_output_contains "v1.0.1"
+    assert_output_lacks "9.9."
+}
+
+test_unprefixed_tags_are_recognised() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: first"
+    git -C "$app" tag -a 1.4.0 -m "Release 1.4.0"
+    commit "$app" "fix: second"
+    run_version "$app" --nointeractive --dry-run
+    assert_status 0
+    assert_output_contains "v1.4.1"
+}
+
+test_inferred_bump_follows_breaking_changes() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "feat(api)!: drop the old endpoint"
+    run_version "$app" --nointeractive
+    assert_status 0
+    assert_tag "$app" v2.0.0
+}
+
+test_release_does_not_amend_the_last_commit() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "feat: add a feature"
+    local before
+    before=$(git -C "$app" rev-parse HEAD)
+    run_version "$app" --nointeractive
+    assert_status 0
+    assert_eq "$(git -C "$app" rev-parse HEAD~1)" "$before" "parent of the release commit"
+    assert_eq "$(git -C "$app" log -1 --pretty=%s)" "chore(release): v1.1.0" "release commit subject"
+}
+
+test_release_pushes_commit_and_tag() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version "$app" --nointeractive
+    assert_status 0
+    assert_tag "$app.origin.git" v1.0.1
+    assert_eq "$(git -C "$app.origin.git" rev-parse master)" "$(git -C "$app" rev-parse HEAD)" "origin master"
+}
+
+test_no_push_keeps_the_release_local() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version "$app" --nointeractive --no-push
+    assert_status 0
+    assert_tag "$app" v1.0.1
+    assert_no_tag "$app.origin.git" v1.0.1
+}
+
+test_dirty_tree_is_a_precondition_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    printf 'work in progress\n' > "$app/untracked.txt"
+    run_version "$app" --nointeractive
+    assert_status 3
+    assert_no_tag "$app" v1.0.1
+}
+
+test_detached_head_is_a_precondition_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    git -C "$app" checkout --quiet --detach
+    run_version "$app" --nointeractive
+    assert_status 3
+    assert_output_contains "detached"
+}
+
+test_missing_upstream_requires_no_push() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    git -C "$app" branch --quiet --unset-upstream
+    run_version "$app" --nointeractive
+    assert_status 3
+    run_version "$app" --nointeractive --no-push
+    assert_status 0
+    assert_tag "$app" v1.0.1
+}
+
+test_several_targets_release_each() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    commit "$app/Modules/Core" "fix: repair the core"
+    commit "$app/Modules/CMS" "feat: add a content feature"
+    run_version "$app" core Modules/CMS --nointeractive
+    assert_status 0
+    assert_tag "$app/Modules/Core" v1.0.1
+    assert_tag "$app/Modules/CMS" v1.1.0
+    assert_no_tag "$app" v1.0.1
+}
+
+test_set_version_releases_that_version() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version "$app" --nointeractive --set-version 2.5.0
+    assert_status 0
+    assert_tag "$app" v2.5.0
+}
+
+test_set_version_must_be_greater_than_current() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app"
+    commit "$app" "fix: repair something"
+    run_version "$app" --nointeractive --set-version v0.9.0
+    assert_status 2
+}
+
+test_set_version_with_several_targets_is_a_usage_error() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app"
+    make_app "$app" Core CMS
+    run_version "$app" Core CMS --set-version 2.0.0
+    assert_status 2
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

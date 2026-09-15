@@ -144,7 +144,6 @@
     ],
     "version": "./scripts/version.sh --nointeractive",
     "version:module": "./scripts/version.sh",
-    "version:silent": "./scripts/version.sh --silent --nointeractive",
     "version:major": "./scripts/version.sh major",
     "version:minor": "./scripts/version.sh minor",
     "version:patch": "./scripts/version.sh patch",
