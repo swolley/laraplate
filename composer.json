@@ -3,7 +3,7 @@
   "name": "swolley/laraplate",
   "vendor": "swolley",
   "type": "project",
-  "description": "The skeleton application for the Laravel framework.",
+  "description": "The full Laraplate boilerplate.",
   "version": "v1.14.0",
   "keywords": [
     "laravel",
