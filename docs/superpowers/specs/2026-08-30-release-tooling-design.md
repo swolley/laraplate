@@ -1,6 +1,6 @@
 # Release tooling: versioning, changelog, and tagging
 
-**Status:** Approved for planning
+**Status:** Implemented (2026-09-15)
 
 **Date:** 2026-08-30
 

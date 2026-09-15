@@ -1,3 +1,8 @@
+---
+status: completed
+verified_on: 2026-09-15
+verified_by: harness (38 passed), changelog check on seven repositories, owner releases
+---
 # Release Tooling Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -272,7 +277,7 @@ Fixes defects #1 and #10 in place, before any rewrite, because every release mad
 - Consumes: nothing.
 - Produces: the corrected `cliff.toml` that every later task and the harness copy verbatim.
 
-- [ ] **Step 1: Record the baseline**
+- [x] **Step 1: Record the baseline**
 
 Run:
 
@@ -284,7 +289,7 @@ grep -n 'body = "\$\^"\|tag_pattern\|Merge branch\|chore\\\\(release\|chore\\\\(
 
 Expected: no output from `git status`; the grep shows `{ body = "$^", skip = true }`, `^\\(Merge branch `, `^chore\\(release\\): prepare for`, `^chore\\(deps.*\\)`, and no `tag_pattern`. If `git status` shows changes, stop and ask the user.
 
-- [ ] **Step 2: Edit `cliff.toml`**
+- [x] **Step 2: Edit `cliff.toml`**
 
 In the `[git]` table, directly under the line `[git]`, add:
 
@@ -321,7 +326,7 @@ commit_parsers = [
 
 The group names keep their existing emoji because they are rendered into the existing changelogs; changing them would rewrite every section heading. What changed: the empty-body skip is gone (#10), the merge skip no longer requires a literal `(`, release mechanics (`chore(release)`, legacy `chore: bump version to`) are skipped before any group rule, and `chore(deps...)` is no longer skipped.
 
-- [ ] **Step 3: Edit `update_changelog` in `scripts/version.sh`**
+- [x] **Step 3: Edit `update_changelog` in `scripts/version.sh`**
 
 Replace the line
 
@@ -335,7 +340,7 @@ with
     git cliff --config "$ROOT_DIR/cliff.toml" --tag "$new_version" --output CHANGELOG.md
 ```
 
-- [ ] **Step 4: Verify the configuration against all seven repositories without writing any changelog**
+- [x] **Step 4: Verify the configuration against all seven repositories without writing any changelog**
 
 Run:
 
@@ -364,7 +369,7 @@ rm -rf "$OUT"
 
 Expected: seven lines, every one with `problems=0` and `unreleased=0` or `unreleased=1`. On 2026-09-15 the section counts were laraplate 35, Core 152, CMS 98, AI 36, ERP 49, MES 2, SAO 5; they may only have grown since. Any line starting with `<name>: <tag> has no section` is a failure: stop and report it.
 
-- [ ] **Step 5: Verify the tag pattern ignores backup tags**
+- [x] **Step 5: Verify the tag pattern ignores backup tags**
 
 Run:
 
@@ -375,7 +380,7 @@ git cliff --config cliff.toml --bumped-version 2>/dev/null
 
 Expected: a `v`-prefixed version, never a `backup/...` value. On 2026-09-15 it was `v2.0.0`, because `8322ea0 feat(modules)!: record locking overhaul` is a breaking change after `v1.14.0`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -394,7 +399,7 @@ git commit -m "fix(release): keep single-line commits and tag the release being 
 - Consumes: `cliff.toml` from Task 1.
 - Produces: changelogs that match history, which Task 7's `--changelog-check` relies on.
 
-- [ ] **Step 1: Check that every repository is clean**
+- [x] **Step 1: Check that every repository is clean**
 
 Run:
 
@@ -407,7 +412,7 @@ done
 
 Expected: `0 changed files` for every repository. If any repository has changes, stop and ask the user; do not stash or commit their work.
 
-- [ ] **Step 2: Regenerate**
+- [x] **Step 2: Regenerate**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -419,7 +424,7 @@ done
 
 Expected: no `FAILED` line.
 
-- [ ] **Step 3: Sanity-check the diffs**
+- [x] **Step 3: Sanity-check the diffs**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -431,7 +436,7 @@ done
 
 Expected: every repository changed only `CHANGELOG.md`; the first heading is `## [unreleased]` (every repository has commits after its last tag) followed by the latest tag's version, for example `## [1.14.0]` in the application.
 
-- [ ] **Step 4: Commit each module**
+- [x] **Step 4: Commit each module**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -441,7 +446,7 @@ for module in Core CMS AI ERP MES SAO; do
 done
 ```
 
-- [ ] **Step 5: Commit the application changelog, then the module pointers**
+- [x] **Step 5: Commit the application changelog, then the module pointers**
 
 Before staging pointers, review what each pointer will record:
 
@@ -479,7 +484,7 @@ git commit -m "chore(modules): record the regenerated module changelogs" -m "Co-
   - `fail`, `assert_status <code>`, `assert_output_contains <text>`, `assert_output_lacks <text>`, `assert_tag <repo> <tag>`, `assert_no_tag <repo> <tag>`, `assert_file_contains <file> <text>`, `assert_file_lacks <file> <text>`, `assert_eq <actual> <expected> [label]`.
   - Each test is a function named `test_*`, run in its own subshell; a failed assertion ends only that test. Tests are appended above the last line `run_tests "${1:-}"`.
 
-- [ ] **Step 1: Add the root seam to `scripts/version.sh`**
+- [x] **Step 1: Add the root seam to `scripts/version.sh`**
 
 Replace
 
@@ -493,7 +498,7 @@ with
 ROOT_DIR="${VERSION_ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 ```
 
-- [ ] **Step 2: Create `scripts/tests/version-test.sh`**
+- [x] **Step 2: Create `scripts/tests/version-test.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -663,7 +668,7 @@ run_tests() {
 run_tests "${1:-}"
 ```
 
-- [ ] **Step 3: Run the harness**
+- [x] **Step 3: Run the harness**
 
 Run: `chmod +x scripts/tests/version-test.sh && bash scripts/tests/version-test.sh`
 
@@ -678,11 +683,11 @@ ok   test_release_gives_the_new_version_its_own_changelog_section
 
 If `test_release_gives_the_new_version_its_own_changelog_section` fails on `## [unreleased]` or on `Add a feature`, Task 1 was not applied.
 
-- [ ] **Step 4: Prove the harness can fail**
+- [x] **Step 4: Prove the harness can fail**
 
 Temporarily change `assert_tag "$app" v1.1.0` to `assert_tag "$app" v9.9.9`, run `bash scripts/tests/version-test.sh changelog_section`, expect `FAIL test_release_gives_the_new_version_its_own_changelog_section` and exit status 1, then revert the change and rerun to `1 passed, 0 failed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -707,7 +712,7 @@ Replaces `scripts/version.sh` wholesale. Fixes #2, #3, #7, #8, #9 and #11, remov
   - Globals: `ROOT_DIR`, `CLIFF_CONFIG`, `TARGETS` (array of absolute repository paths), `BUMP` (`""|major|minor|patch`), `SET_VERSION` (`""|vX.Y.Z`), `ALL`, `NONINTERACTIVE`, `DRY_RUN`, `PUSH`, `ALLOW_DIRTY` (`true|false`), `MODE` (`release|changelog|changelog-check`); maps `PLAN_CURRENT`, `PLAN_NEXT`, `PLAN_COMMITS`, `PLAN_VERDICT` keyed by repository path, verdict one of `release|nothing|tagged|skipped`.
   - `die <code> <message...>`; `module_paths` prints module paths, Core first; `display_name <path>` prints `application` or the module name; `normalize_version <v>` prints `vX.Y.Z` or returns 1; `version_gt <a> <b>`; `increment_version <vX.Y.Z> <level>`; `current_version <path>`; `plan_target <path>`; `render_plan <path...>`; `check_preconditions <path>`; `regenerate_changelog <path> <output> [tag]`; `release_target <path> <version>`; `run_release`; `main`.
 
-- [ ] **Step 1: Append the failing tests**
+- [x] **Step 1: Append the failing tests**
 
 Insert above the line `# --- runner ---...` in `scripts/tests/version-test.sh`:
 
@@ -893,13 +898,13 @@ test_set_version_with_several_targets_is_a_usage_error() {
 }
 ```
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: `FAIL` for at least `test_bump_keyword_before_target_versions_the_module`, `test_unknown_target_is_a_usage_error`, `test_all_with_explicit_target_is_a_usage_error`, `test_unknown_option_is_a_usage_error`, `test_nothing_to_release_exits_10`, `test_skipped_commits_alone_are_nothing_to_release`, `test_backup_tags_are_ignored`, `test_release_does_not_amend_the_last_commit`, `test_no_push_keeps_the_release_local`, `test_dirty_tree_is_a_precondition_error`, `test_detached_head_is_a_precondition_error`, `test_missing_upstream_requires_no_push`, `test_several_targets_release_each`, `test_set_version_releases_that_version`, `test_set_version_must_be_greater_than_current`, `test_set_version_with_several_targets_is_a_usage_error`; the two Task 3 tests still `ok`.
 
-- [ ] **Step 3: Replace `scripts/version.sh`**
+- [x] **Step 3: Replace `scripts/version.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1315,13 +1320,13 @@ main() {
 main "$@"
 ```
 
-- [ ] **Step 4: Run the tests to see them pass**
+- [x] **Step 4: Run the tests to see them pass**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: every test `ok`, final line `21 passed, 0 failed`.
 
-- [ ] **Step 5: Smoke-test against the real repositories without writing**
+- [x] **Step 5: Smoke-test against the real repositories without writing**
 
 Run:
 
@@ -1335,7 +1340,7 @@ git status --porcelain --ignore-submodules=all
 
 Expected: a plan table for `application`, then a table whose only row is `Core` with `NEXT` one minor above its current version, then `Error: unknown target 'Nope'. Valid targets: Core AI CMS ERP MES SAO` with `exit=2`, and no changed files.
 
-- [ ] **Step 6: Remove `version:silent` from `composer.json`**
+- [x] **Step 6: Remove `version:silent` from `composer.json`**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -1345,7 +1350,7 @@ git diff --stat composer.json
 
 Expected: `composer.json | 1 -`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -1365,7 +1370,7 @@ git commit -m "fix(release): rewrite version.sh around a plan and a plain releas
 - Consumes: everything produced by Task 4.
 - Produces: `is_interactive`; `prompt <question>` prints the answer line; `choose_version <path>` updates `PLAN_NEXT`/`PLAN_VERDICT`; `confirm`. `run_release` is replaced again in Task 6.
 
-- [ ] **Step 1: Append the failing tests**
+- [x] **Step 1: Append the failing tests**
 
 Insert above `# --- runner ---...`:
 
@@ -1434,13 +1439,13 @@ test_dry_run_never_prompts() {
 }
 ```
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: exactly four failures, `test_interactive_decline_writes_nothing`, `test_interactive_explicit_version_is_accepted`, `test_interactive_level_choice_overrides_inference` and `test_interactive_skip_leaves_a_target_untouched`, with `23 passed, 4 failed`. `test_forced_level_asks_only_for_confirmation` and `test_dry_run_never_prompts` already pass: they pin behaviour the prompts must not break.
 
-- [ ] **Step 3: Add the prompt functions**
+- [x] **Step 3: Add the prompt functions**
 
 Insert directly above `run_release()` in `scripts/version.sh`:
 
@@ -1506,7 +1511,7 @@ confirm() {
 }
 ```
 
-- [ ] **Step 4: Replace `run_release`**
+- [x] **Step 4: Replace `run_release`**
 
 ```bash
 run_release() {
@@ -1562,13 +1567,13 @@ run_release() {
 }
 ```
 
-- [ ] **Step 5: Run the tests to see them pass**
+- [x] **Step 5: Run the tests to see them pass**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: final line `27 passed, 0 failed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -1588,7 +1593,7 @@ git commit -m "feat(release): choose, skip or confirm each target interactively"
 - Consumes: Tasks 4 and 5.
 - Produces: final `run_release`; `plan_application_after_modules <module-path...>`; `consolidate_pointers <module-path...>`.
 
-- [ ] **Step 1: Append the failing tests**
+- [x] **Step 1: Append the failing tests**
 
 Insert above `# --- runner ---...`:
 
@@ -1655,13 +1660,13 @@ test_explicit_module_does_not_touch_the_application() {
 }
 ```
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `bash scripts/tests/version-test.sh all_`
 
 Expected: `FAIL` for `test_all_releases_modules_then_the_application`, `test_all_releases_core_first`, `test_all_aborts_before_writing_when_a_module_is_dirty` (all exit 2 with `--all is not implemented yet`) and `test_all_with_nothing_pending_exits_10`.
 
-- [ ] **Step 3: Add the orchestration functions**
+- [x] **Step 3: Add the orchestration functions**
 
 Insert directly above `run_release()`:
 
@@ -1694,7 +1699,7 @@ consolidate_pointers() {
 }
 ```
 
-- [ ] **Step 4: Replace `run_release`**
+- [x] **Step 4: Replace `run_release`**
 
 ```bash
 run_release() {
@@ -1767,19 +1772,19 @@ run_release() {
 }
 ```
 
-- [ ] **Step 5: Run the tests to see them pass**
+- [x] **Step 5: Run the tests to see them pass**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: final line `32 passed, 0 failed`.
 
-- [ ] **Step 6: Smoke-test against the real repositories without writing**
+- [x] **Step 6: Smoke-test against the real repositories without writing**
 
 Run: `cd /srv/http/laraplate-stack/laraplate && ./scripts/version.sh --all --dry-run; echo "exit=$?"`
 
 Expected: a table with rows `Core`, `AI`, `CMS`, `ERP`, `MES`, `SAO`, `application` in that order, and `exit=0` or `exit=10`. No file changes (`git status --porcelain --ignore-submodules=all` prints nothing).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -1799,7 +1804,7 @@ git commit -m "feat(release): release every pending module, then the application
 - Consumes: `regenerate_changelog`, `module_paths`, `display_name`, `TARGETS`, `ALL`.
 - Produces: final `main`.
 
-- [ ] **Step 1: Append the failing tests**
+- [x] **Step 1: Append the failing tests**
 
 Insert above `# --- runner ---...`:
 
@@ -1836,13 +1841,13 @@ test_changelog_check_detects_a_missing_release() {
 }
 ```
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `bash scripts/tests/version-test.sh changelog`
 
 Expected: `FAIL` for the three new tests (exit 2, `--changelog is not implemented yet`); `test_release_gives_the_new_version_its_own_changelog_section` stays `ok`.
 
-- [ ] **Step 3: Add the changelog modes**
+- [x] **Step 3: Add the changelog modes**
 
 Insert directly above `main()`:
 
@@ -1896,7 +1901,7 @@ run_changelog_check() {
 }
 ```
 
-- [ ] **Step 4: Replace `main`**
+- [x] **Step 4: Replace `main`**
 
 ```bash
 main() {
@@ -1910,19 +1915,19 @@ main() {
 }
 ```
 
-- [ ] **Step 5: Run the tests to see them pass**
+- [x] **Step 5: Run the tests to see them pass**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: final line `35 passed, 0 failed`.
 
-- [ ] **Step 6: Check the real repositories**
+- [x] **Step 6: Check the real repositories**
 
 Run: `cd /srv/http/laraplate-stack/laraplate && ./scripts/version.sh --changelog-check; echo "exit=$?"`
 
 Expected: `All changelogs match history.` and `exit=0`, because Task 2 regenerated every changelog with the same configuration. `exit=4` means a repository changed history or configuration after Task 2: report which one, do not regenerate without asking.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -1984,7 +1989,7 @@ Expected: `35 passed, 0 failed`.
 - Consumes: the complete `scripts/version.sh` and `scripts/tests/version-test.sh`.
 - Produces: the operator surface.
 
-- [ ] **Step 1: Verify how Composer passes arguments to an array script**
+- [x] **Step 1: Verify how Composer passes arguments to an array script**
 
 ```bash
 S=$(mktemp -d)
@@ -1996,7 +2001,7 @@ rm -rf "$S"
 
 Expected: `ARGS=[--all Core]`. If the extra argument is missing, use plain string scripts (no `disableProcessTimeout`) in Step 2 and note in `docs/releasing.md` that an unanswered prompt is killed after Composer's 300 second process timeout.
 
-- [ ] **Step 2: Set the Composer scripts**
+- [x] **Step 2: Set the Composer scripts**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -2018,7 +2023,7 @@ composer run version:dry Core
 
 Expected: `composer validate` reports the file as valid (warnings unrelated to `scripts` are acceptable); the last command prints a plan table whose only row is `Core`.
 
-- [ ] **Step 3: Declare the tracked branch of every module**
+- [x] **Step 3: Declare the tracked branch of every module**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -2030,7 +2035,7 @@ git config --file .gitmodules --get-regexp branch
 
 Expected: six lines `submodule.Modules/<Name>.branch master`.
 
-- [ ] **Step 4: Create `docs/releasing.md`**
+- [x] **Step 4: Create `docs/releasing.md`**
 
 ````markdown
 # Releasing
@@ -2075,7 +2080,7 @@ Modules are released first, Core before the others. The application then gets on
 `0` done, `10` nothing to release, `2` usage error, `3` precondition failed, `4` changelog diverged, `1` failure. After a failure the script prints what it left behind and the commands to undo it.
 ````
 
-- [ ] **Step 5: Link it from `docs/README.md`**
+- [x] **Step 5: Link it from `docs/README.md`**
 
 Append at the end of `docs/README.md`:
 
@@ -2104,13 +2109,13 @@ test_no_broken_pipe_when_sigpipe_is_ignored() {
 }
 ```
 
-- [ ] **Step 6: Run the harness one last time**
+- [x] **Step 6: Run the harness one last time**
 
 Run: `bash scripts/tests/version-test.sh`
 
 Expected: `36 passed, 0 failed`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /srv/http/laraplate-stack/laraplate
@@ -2118,7 +2123,7 @@ git add composer.json .gitmodules docs/releasing.md docs/README.md
 git commit -m "docs(release): document the release process and expose it through Composer" -m "Modules now declare master as their tracked branch, so a fresh submodule update does not leave them detached for the release preconditions." -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 8: Verify a real module release end to end (ask the user first: it tags and pushes)**
+- [x] **Step 8: Verify a real module release end to end (ask the user first: it tags and pushes)**
 
 First confirm no module carries release tooling any more and each keeps its version field:
 
@@ -2372,3 +2377,24 @@ cd /srv/http/laraplate-stack/laraplate
 git add scripts/version.sh scripts/tests/version-test.sh docs/releasing.md docs/superpowers/specs/2026-08-30-release-tooling-design.md docs/superpowers/plans/2026-09-15-release-tooling.md
 git commit -m "fix(release): keep unreleased work out of CHANGELOG.md" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
+
+---
+
+## Delivery status (2026-09-15): shipped
+
+**Documented in:** `docs/releasing.md`, `Modules/Core/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/MODULE.md`, `Modules/AI/docs/rag/MODULE.md`, `Modules/ERP/docs/rag/MODULE.md`, `Modules/MES/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/MODULE.md`.
+
+`bash scripts/tests/version-test.sh` runs 38 passed, 0 failed, and `./scripts/version.sh --changelog-check` passes on all seven repositories. Every module and the application were released with the new script on 2026-09-15: Core v1.77.0, CMS v1.45.0, AI v2.19.0, ERP v1.24.0, MES v1.1.0, SAO v1.2.0 and the application v1.14.1. Each release is a separate `chore(release)` commit touching only `composer.json` and `CHANGELOG.md`, tagged and pushed.
+
+Where the implementation diverged from the plan, recorded so the next reader does not rebuild what was replaced:
+
+- **No git hooks.** Task 8 first built a `commit-msg` gate and its installer; both were removed the same day by the owner's decision, and the `setup:hooks` Composer script set in Task 9 Step 2 went with them.
+- **`add_target` stopped reading the module list at the match** (Task 4). Composer runs scripts with SIGPIPE ignored, so `module_paths` printed `write error: Broken pipe`. Fixed in Task 9 Step 5b, with a regression test.
+- **The pointer commit carries the modules' release level** (Task 10, superseding Task 6): `feat(modules)!`, `feat(modules)` or `chore(modules)`, and the application is released at least at that level.
+- **`CHANGELOG.md` lists released versions only** (Task 11, superseding the `--changelog` behaviour of Task 7).
+- **The application was released as v1.14.1**, not the v2.0.0 that git-cliff infers from the breaking commit `8322ea0`: the level was chosen at release time, which the tool allows.
+- **Task 9 Step 8 was carried out by the owner** while releasing every repository, rather than as a single MES release.
+
+Deliberately not done, as deferred in the spec: CI release automation, versioning for `laraplate-ui` and `laraplate-importers`, and removing the `version` key from `composer.json`.
+
+Found and left out of scope: `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md`, `Modules/ERP/docs/rag/MODULE.md` and `Modules/SAO/docs/rag/MODULE.md` still document module-local `composer test*`, `lint`, `check` and `fix` scripts that the module testing strategy work removed. They belong to that plan.
