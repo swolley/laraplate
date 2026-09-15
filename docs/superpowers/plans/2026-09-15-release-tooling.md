@@ -1000,8 +1000,9 @@ add_target() {
     local wanted=${1#Modules/}
     wanted=${wanted%/}
     wanted=${wanted,,}
-    local path name existing names=()
-    while IFS= read -r path; do
+    local path name existing paths=() names=()
+    mapfile -t paths < <(module_paths)
+    for path in "${paths[@]}"; do
         name=${path##*/}
         names+=("$name")
         if [ "${name,,}" = "$wanted" ]; then
@@ -1013,7 +1014,7 @@ add_target() {
             TARGETS+=("$path")
             return 0
         fi
-    done < <(module_paths)
+    done
     die "$EXIT_USAGE" "unknown target '$1'. Valid targets: ${names[*]:-none}"
 }
 
@@ -2209,11 +2210,29 @@ Append at the end of `docs/README.md`:
 - [Releasing the application and its modules](releasing.md)
 ```
 
+- [x] **Step 5b: Fix the broken pipe found by `composer run version:dry Core`** (found during execution)
+
+Composer runs scripts with SIGPIPE ignored. The first version of `add_target` returned from inside `while read ... done < <(module_paths)`, so `module_paths` kept writing into a closed pipe and bash printed `printf: write error: Broken pipe` on stderr. Measured with SIGPIPE ignored over 20 runs: Core 96 error lines, AI 40, SAO 0, an unknown target 0, which is the early return and nothing else. `add_target` in Task 4 above is already the corrected version: it reads the whole list with `mapfile` before matching. Regression test, appended above `# --- runner`:
+
+```bash
+# Composer runs scripts with SIGPIPE ignored, so a reader that stops early makes the writer report
+# "write error: Broken pipe" instead of dying silently. Core is listed first, so its lookup stops early.
+test_no_broken_pipe_when_sigpipe_is_ignored() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app" i
+    make_app "$app" Core AI CMS ERP
+    for i in 1 2 3 4 5; do
+        OUTPUT=$( (trap '' PIPE; LC_ALL=C VERSION_ROOT_DIR="$app" VERSION_FORCE_INTERACTIVE=0 bash "$VERSION_SH" Core --dry-run) 2>&1 </dev/null)
+        STATUS=$?
+        assert_output_lacks "Broken pipe"
+    done
+}
+```
+
 - [ ] **Step 6: Run the harness one last time**
 
 Run: `bash scripts/tests/version-test.sh`
 
-Expected: `39 passed, 0 failed`.
+Expected: `40 passed, 0 failed`.
 
 - [ ] **Step 7: Commit**
 

@@ -521,6 +521,18 @@ test_install_hooks_gates_the_application_and_its_modules() {
     ! git -C "$app" commit --quiet --allow-empty -m "bad message" 2>/dev/null || fail "application accepted a free-text message"
 }
 
+# Composer runs scripts with SIGPIPE ignored, so a reader that stops early makes the writer report
+# "write error: Broken pipe" instead of dying silently. Core is listed first, so its lookup stops early.
+test_no_broken_pipe_when_sigpipe_is_ignored() {
+    local app="$WORK_DIR/${FUNCNAME[0]}/app" i
+    make_app "$app" Core AI CMS ERP
+    for i in 1 2 3 4 5; do
+        OUTPUT=$( (trap '' PIPE; LC_ALL=C VERSION_ROOT_DIR="$app" VERSION_FORCE_INTERACTIVE=0 bash "$VERSION_SH" Core --dry-run) 2>&1 </dev/null)
+        STATUS=$?
+        assert_output_lacks "Broken pipe"
+    done
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

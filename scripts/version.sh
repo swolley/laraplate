@@ -94,8 +94,9 @@ add_target() {
     local wanted=${1#Modules/}
     wanted=${wanted%/}
     wanted=${wanted,,}
-    local path name existing names=()
-    while IFS= read -r path; do
+    local path name existing paths=() names=()
+    mapfile -t paths < <(module_paths)
+    for path in "${paths[@]}"; do
         name=${path##*/}
         names+=("$name")
         if [ "${name,,}" = "$wanted" ]; then
@@ -107,7 +108,7 @@ add_target() {
             TARGETS+=("$path")
             return 0
         fi
-    done < <(module_paths)
+    done
     die "$EXIT_USAGE" "unknown target '$1'. Valid targets: ${names[*]:-none}"
 }
 
