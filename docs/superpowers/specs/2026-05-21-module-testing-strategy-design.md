@@ -1,9 +1,72 @@
 # Module testing strategy
 
-**Status:** Draft
+**Status:** Revised
 **Date:** 2026-05-21
-**Scope:** Laraplate application and module test organization
-**Chosen approach:** Keep tests inside each module, split suites by bootstrap level
+**Revised:** 2026-09-15
+**Scope:** Laraplate application and module test organization, test toolchain ownership
+**Chosen approach:** Keep test files inside each module, split suites by bootstrap level, and run
+every suite from the application root with a single toolchain
+
+## Revision 2026-09-15: one runner, one toolchain
+
+The original version of this spec had two decisions in it. The first was a taxonomy: classify
+tests by the bootstrap they need, not by the folder they sit in. That decision held, and it is
+implemented. The second was a runner policy: every module keeps its own `phpunit.xml`, its own
+Pest, and its own `composer test:*` scripts so it can be tested alone. That decision is reversed
+here.
+
+It is reversed because it never described the repository. A module-local test run cannot work,
+and the reasons are structural rather than incidental:
+
+- **The module test cases extend the application.** `Modules/{CMS,AI,ERP,MES,SAO}/tests/TestCase.php`
+  each declare `extends \Tests\TestCase`, and `Modules/Core/tests/LaravelTestCase.php` does the
+  same. `\Tests\TestCase` lives in the application's `tests/` directory, outside every module. A
+  module cannot autoload it.
+- **No module declares Core as a Composer dependency.** `module.json` records `requires: ["Core"]`,
+  but the `composer.json` of CMS, AI, ERP, MES and SAO requires only `laravel/framework`. Nothing
+  resolves `swolley/laraplate-core`, and there is no `path` repository that would. Meanwhile the
+  module code uses Core everywhere: 184 files under `Modules/ERP/app`, 93 under `Modules/SAO/app`,
+  73 under `Modules/CMS/app`. Installed alone, a module would not compile.
+- **No module has a `vendor/` directory,** and every module test script invokes a relative
+  `vendor/bin/pest`. Those scripts have never been runnable.
+- **`orchestra/testbench` was the way out and was never taken.** It sits in the `require-dev` of
+  AI, ERP, MES and SAO, but there is no `testbench.yaml` anywhere and no test case extends it. The
+  only trace of the attempt is a comment in a Core test migration.
+
+The same investigation found the opposite of what the file layout suggests about dependencies.
+The module `require-dev` blocks are not dormant: they are the application's real test toolchain.
+The root `composer.json` configures `wikimedia/composer-merge-plugin` with
+`include: ["Modules/*/composer.json"]`, `merge-dev: true` and `merge-scripts: true`. The root's own
+`require-dev` holds five packages and Pest is not among them. Pest, PHPUnit, Larastan, Pint,
+Rector, PHPInsights, Peck and BypassFinals all reach `vendor/` because a module asked for them.
+
+That indirection costs more than it gives:
+
+- **Constraints silently lose.** `Modules/Core/composer.json` requires `peckphp/peck: ^0.2.0`; the
+  installed version is `v0.1.3`, because `ignore-duplicates: true` drops the duplicate rather than
+  reconciling it. Four packages carry divergent constraints across modules
+  (`larastan/larastan`, `laravel/pint`, `driftingly/rector-laravel`, `peckphp/peck`) and which one
+  wins is an artifact of merge order.
+- **Module scripts leak into the root.** `composer run --list` at the root offers `test:pest`,
+  `test:pest:parallel`, `test:unit:parallel` and `test:standalone`, none of which the root defines.
+  `test:standalone` is an alias for `test:unit` and names a capability that does not exist.
+- **The toolchain configuration is duplicated rather than specialized.** `peck.json` and
+  `pint.json` are byte-identical across the root and all six modules; a module `rector.php` is a
+  copy of the root's, down to paths like `bootstrap/app.php` that do not exist inside a module. The
+  root already globs `Modules/*/app` for Rector and analyses `Modules/` with PHPStan. The one
+  configuration that differs, `phpstan.neon`, differs by contradicting the root (`level: 5` against
+  `level: 9`) while neither side is actually running.
+
+So the revised decision is: **a module contains functionality and the tests for that functionality,
+and nothing else.** The runner, the test dependencies and the quality toolchain belong to the
+application.
+
+The forward-looking argument for the old policy was the move to Composer packages. It is not lost.
+A module that is genuinely installable alone needs Core declared as a real dependency, a path
+repository to resolve it, and a Testbench-based test case that does not extend the application.
+None of that exists, and none of it is created by keeping an unusable `phpunit.xml` in place. When
+that work is actually scheduled, it starts from a clean module, not from scaffolding that has been
+pretending for a year.
 
 ## Problem
 
@@ -14,7 +77,8 @@ Most modules depend on `Core`, and some depend on other modules that themselves 
 
 The initial goal was to make every module testable as if it existed alone. That led to too
 many stubs and mocks for `Core`, which weakens the tests by breaking the same dependency
-contracts that production code relies on.
+contracts that production code relies on. As the revision above records, it also produced a
+module-local runner that could never run.
 
 The test suite also has a semantic drift problem: many tests under `tests/Unit` boot the full
 Laravel application, use `RefreshDatabase`, touch Eloquent models, or exercise framework
@@ -22,21 +86,30 @@ behavior. Those tests are valuable, but they are not pure unit tests.
 
 ## Goals
 
-1. Keep module test ownership inside each module.
+1. Keep module test ownership inside each module: the tests for a module's behavior live with it.
 2. Allow fast pure unit test runs.
 3. Allow module integration tests with Laravel bootstrapped and declared module dependencies loaded.
 4. Keep application-level tests focused on the assembled app, not on owning module behavior.
-5. Prepare the test structure for the future Composer-package model.
-6. Avoid heavy mocking of declared package/module dependencies such as `Core`.
-7. Make runner intent obvious from suite names and paths.
+5. Run every suite from the application root, with one runner and one configuration.
+6. Keep every test and quality dependency in the application's `require-dev`, declared once.
+7. Avoid heavy mocking of declared package/module dependencies such as `Core`.
+8. Make runner intent obvious from suite names and paths.
 
 ## Non-Goals
 
 - Do not move module behavior tests into the root application test folder.
-- Do not remove module test runners.
 - Do not make every existing test a perfect pure unit test in the first pass.
-- Do not introduce new dependencies.
-- Do not solve external package CI publishing in this design.
+- Do not add dependencies. Promoting a module's existing dependency to the root is not an addition:
+  the installed set must not change.
+- Do not build the standalone-package test setup (path repositories, `Core` as a real requirement,
+  Testbench). That is a separate decision with its own spec, taken when packaging is scheduled.
+- Do not remove anything a module still needs in order to boot, autoload, or version itself. Where
+  the safe order is unclear, the file stays and the question is recorded rather than guessed.
+- Do not remove a capability while centralizing it. Versioning a module must work before, during
+  and after the move, and the module's own `version` field, `CHANGELOG.md` and tags are untouched.
+- Do not change a single formatting or analysis rule while centralizing the configuration. The
+  merged configuration is the union of what is already declared, and the reformatting pass is
+  mechanical.
 
 ## Test Taxonomy
 
@@ -62,6 +135,10 @@ Examples:
 - Pure helpers.
 - Small services whose dependencies are explicit interfaces.
 - Data transformation and parsing logic.
+
+Core is the module that actually exercises this level: `Modules/Core/tests/TestCase.php` extends
+`PHPUnit\Framework\TestCase` and boots `minimal-test-environment.php` instead of the application.
+That test case is the point of the `Unit` suite, and it is unaffected by where the runner lives.
 
 ### Integration
 
@@ -124,7 +201,7 @@ Examples:
 
 ## Directory Layout
 
-Each module should converge on this layout:
+Each module converges on this layout:
 
 ```text
 Modules/X/tests/Unit
@@ -132,10 +209,13 @@ Modules/X/tests/Integration
 Modules/X/tests/Feature
 Modules/X/tests/TestCase.php
 Modules/X/tests/Pest.php
-Modules/X/phpunit.xml
 ```
 
-The root application should converge on this layout:
+There is no `Modules/X/phpunit.xml`. A module that needs extra test fixtures keeps them beside its
+tests (`tests/Stubs`, `tests/Support`, `tests/Fixtures`), and registers their namespaces in its own
+`autoload-dev` so the merged root autoloader can resolve them.
+
+The root application converges on this layout:
 
 ```text
 tests/Unit
@@ -151,21 +231,8 @@ module integration tests.
 
 ## Runner Design
 
-Each module `phpunit.xml` should expose three suites:
-
-```xml
-<testsuite name="Unit">
-    <directory suffix="Test.php">./tests/Unit</directory>
-</testsuite>
-<testsuite name="Integration">
-    <directory suffix="Test.php">./tests/Integration</directory>
-</testsuite>
-<testsuite name="Feature">
-    <directory suffix="Test.php">./tests/Feature</directory>
-</testsuite>
-```
-
-The root `phpunit.xml` should expose aggregate suites:
+There is one runner: the root `phpunit.xml`, driven by `php artisan test` or `vendor/bin/pest`.
+It exposes three aggregate suites that glob the modules:
 
 ```text
 Unit
@@ -175,45 +242,118 @@ Unit
 Integration
   tests/Integration
   Modules/*/tests/Integration
+  Modules/*/tests/UnitShell
 
 Feature
   tests/Feature
   Modules/*/tests/Feature
 ```
 
-Useful commands:
+The glob matters: a new module joins the suites by existing, with no configuration to update.
+
+Commands:
 
 ```bash
-php artisan test --testsuite=Unit
-php artisan test --testsuite=Integration
-php artisan test --testsuite=Feature
+php artisan test --compact --testsuite=Unit
+php artisan test --compact --testsuite=Integration
+php artisan test --compact --testsuite=Feature
 php artisan test --compact Modules/CMS/tests/Integration
+vendor/bin/pest --filter=someTest
 ```
 
-Module-local commands should remain available:
+Running a single module is a path argument, not a separate runner. `php artisan test --compact
+Modules/ERP/tests` is the supported way, and unlike the removed module scripts it actually works.
 
-```bash
-vendor/bin/pest --testsuite=Unit
-vendor/bin/pest --testsuite=Integration
-vendor/bin/pest --testsuite=Feature
-```
-
-Composer scripts in each module should converge on:
+Root Composer scripts:
 
 ```text
 test:unit
 test:integration
 test:feature
-test:pest
+test:modules
+test:coverage
+test:type-coverage
+test:lint
+test:types
+test:refactor
+test:licenses
 test
 ```
 
-The root project can orchestrate all modules, but it should not replace module-local ownership.
+Modules define no `test:*` script. Because `merge-scripts` is enabled, a script defined in a
+module is offered at the root as if the root owned it, which is how `test:standalone` came to be
+listed by a project that has no standalone test mode.
+
+## Toolchain Ownership
+
+Test and quality tooling is declared once, in the root `composer.json`, under `require-dev`.
+
+Modules declare no `require-dev` at all. What a module depends on to *run* stays in its `require`;
+what the project needs to *test and check* the module is the application's concern. A module's
+`autoload-dev` stays, because it is what makes the module's test helpers loadable from the merged
+root autoloader.
+
+The same applies to tool configuration. `pint.json`, `rector.php`, `peck.json` and `phpstan.neon`
+exist once, at the root, and their paths cover `Modules/`. What the modules carry today is not
+six configurations of six modules:
+
+- **`peck.json` is byte-identical in all six modules and at the root.** Six copies of twelve lines.
+- **`pint.json` is identical too**, rule for rule, all 72 of them. The only difference is that the
+  root adds `Modules` to `notPath`. So the modules do not configure a different style, they exist
+  because the root refuses to format them.
+- **`rector.php` in a module is a copy of the root's**, paths included: it lists `__DIR__ . '/app'`,
+  `__DIR__ . '/bootstrap/app.php'`, `__DIR__ . '/config'`, `__DIR__ . '/routes'` and globs
+  `__DIR__ . '/Modules/*'`. Inside `Modules/CMS` those resolve to `Modules/CMS/bootstrap/app.php`
+  and `Modules/CMS/Modules/*`, which do not exist. Meanwhile the root `rector.php` already globs
+  `Modules/*/app` on its own. One difference is real and must survive the merge: CMS, ERP, MES and
+  SAO skip `RemoveNullArgOnNullDefaultParamRector`, with the reason written next to it (it turns
+  `where('col', null)` into `where('col')`, changing query semantics). The root does not skip it.
+  The module copies are newer than the root's, so the merge takes the strictest union.
+- **`phpstan.neon` is the one genuine exception,** and it points at a problem rather than a
+  configuration to keep. The module files analyse at `level: 5` with per-file `ignoreErrors`, while
+  the root analyses `Modules/` at `level: 9`. Two settings that contradict each other, and neither
+  is in force: no module can run PHPStan without a `vendor/`, and the root invocation aborts before
+  analysing anything because `excludePaths` names `.phpstorm.meta.php`, a file that does not exist.
+  Repairing the root is the prerequisite; only then is it known what the module `ignoreErrors`
+  would still be covering.
+
+The formatter exclusion goes with them. `Modules` leaves the root `notPath`, and the module code is
+formatted once, by the same 72 rules it already declares for itself. That reformats 618 of 3426
+module files, all of it whitespace, import order, brace position and PHPDoc spacing, plus the
+`mb_str_functions` substitutions the modules' own configuration has always asked for. A single
+mechanical commit is a smaller cost than six configuration files that exist so that formatting can
+be skipped.
+
+Release tooling follows the same rule, with one distinction that matters. Every module is a Git
+repository with its own tags and its own `CHANGELOG.md`, so *versioning a module* is a capability
+that must survive; `version.sh` produces the `chore: bump version to vX.Y.Z` commits found
+throughout the modules, 58 of them in Core, the most recent three days before this revision. But
+the capability is not the same thing as seven byte-identical copies of the script and seven of
+`cliff.toml`. One script, taking the module as an argument, is the same capability with one place
+to fix.
+
+It does not work that way today. `version.sh` resolves the `composer.json` to bump from its own
+location while every Git call in it acts on the current directory, so the root's copy run inside a
+module would write the application's version and tag the module. Making the target explicit is a
+small change to one function, and it is the precondition for deleting the copies rather than an
+excuse to keep them.
+
+The hook installer is a different case: `setup-hooks.sh` installs a `post-commit` that runs
+`version.sh` automatically, and it has never been installed in any module or in the application.
+The bumps have always been run by hand. It goes, along with `scripts/hooks/`.
+
+What genuinely stays with a module is its `composer.json` `version` field, its `CHANGELOG.md`, its
+tags and its `autoload-dev`. Those are facts about the module. The programs that read and write
+them are not.
+
+This does not weaken the module boundary. A module still declares its runtime dependencies, still
+owns its tests, and is still reviewed on its own. It simply stops carrying a second, divergent copy
+of the application's test environment.
 
 ## Pest Binding Rules
 
-`tests/Pest.php` and `Modules/*/tests/Pest.php` should avoid broad bindings that make every
-`Unit` test a Laravel integration test.
+`tests/Pest.php` and `Modules/*/tests/Pest.php` avoid broad bindings that make every `Unit` test a
+Laravel integration test.
 
 Target behavior:
 
@@ -222,8 +362,9 @@ Target behavior:
 - `Feature` uses the module Laravel `TestCase` and can use `RefreshDatabase`.
 - Module-specific fakes may still be loaded from the module test bootstrap.
 
-This replaces broad patterns such as binding all `Modules/AI/tests/Unit` tests to
-`RefreshDatabase`.
+The root `tests/Pest.php` discovers module bootstraps by glob and requires each one, so a module's
+bindings and helpers load without the root naming the module. This is the Pest-side counterpart of
+the suite globbing in `phpunit.xml`: optional modules never become root-level dependencies.
 
 ## Test Reclassification Rules
 
@@ -253,6 +394,11 @@ Keep in `Unit` when a test:
 - has explicit mock/fake boundaries;
 - tests a small unit with stable inputs and outputs.
 
+`UnitShell` is a transitional directory, not a fourth level. It holds tests that were written as
+unit tests but need the shell, and the root and module suites classify it as integration. Each file
+is reviewed and lands in `Unit` or `Integration` on its own merits; the directory disappears when
+it empties.
+
 ## Dependency Policy
 
 Declared module dependencies are part of the test environment for integration and feature tests.
@@ -267,31 +413,29 @@ Examples:
 Mocking should focus on external or unstable systems:
 
 - HTTP APIs.
-- AI providers.
 - Search engines.
+- AI providers.
 - Queues when testing synchronous service logic.
 - Filesystems and generated artifacts.
 - Time-sensitive services where deterministic fakes are needed.
 
 Broad stubs of `Core` should be avoided because they hide production integration failures.
 
-## Migration Plan
-
-1. Add `Integration` suites to root and module `phpunit.xml` files.
-2. Create missing `tests/Integration` directories where tests need them.
-3. Narrow Pest bindings so `Unit` is not automatically bootstrapped as Laravel integration.
-4. Move obvious misclassified tests using the reclassification rules.
-5. Update module Composer scripts to expose `test:unit`, `test:integration`, and `test:feature`.
-6. Update root Composer scripts to orchestrate aggregate suites.
-7. Run the smallest relevant suite after each module migration.
-8. Run `vendor/bin/pint --dirty` after code/config changes.
-
 ## Success Criteria
 
 - A developer can run pure unit tests separately from Laravel integration tests.
 - Module tests remain inside their owning module.
 - Integration and feature tests use real declared module dependencies.
-- The root application can run aggregate unit, integration, and feature suites.
+- The root application runs aggregate unit, integration, and feature suites, and is the only place
+  that runs them.
+- No module declares a `require-dev` entry, a `phpunit.xml`, a `test:*` script, or a copy of the
+  root's tool configuration, and no module carries a `scripts/` directory.
+- `./scripts/version.sh <Module> patch` versions that module from the application, and the module's
+  tags, `CHANGELOG.md` and `version` field are the ones that change.
+- The root `pint.json` formats module code, and `vendor/bin/pint --test` is clean across `Modules/`.
+- `vendor/bin/phpstan` actually analyses instead of aborting on its own `excludePaths`.
+- The installed package set is unchanged by the toolchain move: `composer.lock` gains no package
+  and loses only what nothing used.
+- `composer run --list` at the root shows only scripts the root defines.
 - The application test folder contains only app assembly and cross-module smoke coverage.
 - Test placement communicates bootstrap requirements without reading each file.
-

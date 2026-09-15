@@ -2,746 +2,169 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Reorganize Laraplate tests so module-owned tests remain inside modules while pure unit, integration, feature, and application-level suites can run independently.
+**Goal:** Finish the test reorganization by centralizing the runner and the test toolchain in the
+application, so a module carries functionality and its tests and nothing else.
 
-**Architecture:** Keep module ownership unchanged and make bootstrap requirements explicit through suite names and paths. Add `Integration` suites to root and module PHPUnit configs, move mechanically identifiable non-unit tests out of `Unit`, then narrow Pest bindings so `Unit` no longer implies full Laravel bootstrapping.
+**Architecture:** The suite taxonomy (`Unit` / `Integration` / `Feature`, classified by required
+bootstrap) is already in place and is confirmed rather than rebuilt. What remains is removing the
+module-local test runner that never worked, and moving the test dependencies that modules declare
+today into the application's `require-dev`, where they are already being used from.
 
-**Tech Stack:** PHP 8.5, Laravel 12, Pest 4, PHPUnit config, nwidart/laravel-modules, Composer scripts.
+**Tech Stack:** PHP 8.5, Laravel 12, Pest 4, PHPUnit config, nwidart/laravel-modules,
+wikimedia/composer-merge-plugin, Composer scripts.
 
 **Spec:** `docs/superpowers/specs/2026-05-21-module-testing-strategy-design.md`
+(revised 2026-09-15: the module-local runner policy is reversed there, with the evidence)
+
+---
+
+## Why this plan changed
+
+The 2026-05-21 version of this plan had ten tasks: create `Integration` directories, add suites to
+the root and module PHPUnit configs, add per-module `test:*` scripts, move misclassified tests, and
+narrow the Pest bindings.
+
+Most of that shipped. Every module has the three suites, the root globs them, the tests were moved,
+and the Pest bindings are narrow. The checkboxes were never ticked, which is what made the work
+look outstanding.
+
+What did not survive review is the half of the design that kept a runner inside each module. It
+cannot work: the module test cases extend `\Tests\TestCase`, which lives in the application; no
+module requires `swolley/laraplate-core` in Composer even though its code uses Core in hundreds of
+files; no module has a `vendor/`; and the `orchestra/testbench` that would have made standalone
+runs possible was never wired to anything. The spec records the full evidence.
+
+Investigating that turned up the inverse problem. Module `require-dev` blocks are not idle
+scaffolding, they are the application's actual test toolchain: the root `composer.json` merges
+`Modules/*/composer.json` through `wikimedia/composer-merge-plugin` with `merge-dev` and
+`merge-scripts` on, and the root's own `require-dev` does not contain Pest. So the constraints that
+decide which Pest, which Larastan and which Pint get installed live in six files that disagree with
+each other, and the loser is silently dropped: Core asks for `peckphp/peck: ^0.2.0` and the project
+runs `v0.1.3`.
+
+So tasks 1 to 4 and 9 of the old plan are now verification tasks, tasks 5 to 8 are recorded as
+delivered, and the new work is the toolchain move.
+
+---
+
+## Safety rule for this plan
+
+Remove only what the module does not need. Anything that a module still requires in order to boot,
+autoload, or be formatted stays, even when it looks redundant, and the open question is written
+down instead of guessed.
+
+Three consequences, all binding:
+
+- **Promote before removing.** The root must require a package, and carry every rule a module
+  configuration carries, *before* the module stops declaring it. `composer.lock` must be checked to
+  prove the installed set did not change. Removing first empties `vendor/` of the tooling the
+  application runs on.
+- **Centralizing a configuration must not change a rule.** The merged configuration is the union of
+  what is already declared. Where the root and a module disagree, the stricter side wins and the
+  choice is written down. Reformatting is mechanical and lands in its own commit, never mixed with
+  a behavioral change.
+- **Versioning is kept as a capability, not as seven copies.** `version.sh` is in active use: it
+  produces the `chore: bump version to vX.Y.Z` commits found across every module, 58 of them in
+  Core, the most recent on 2026-09-12. It cannot be deleted without losing the ability to version a
+  module. It can be moved, but only after it learns to take a target: today it resolves
+  `composer.json` next to itself and operates on the Git repository of the current directory, so
+  the root's copy run from inside a module would bump the application's `composer.json` and tag the
+  module. Task 4c makes it parameterizable first, then removes the copies. The hook machinery
+  (`setup-hooks.sh`, `scripts/hooks/`) needs no such care: no module has a hook installed, and
+  neither does the application.
 
 ---
 
 ## File Map
 
-- Modify: `phpunit.xml`  
-  Root aggregate suites: `Unit`, `Integration`, `Feature`.
-- Modify: `tests/Pest.php`  
-  Root Pest bindings for app tests and module bootstrap includes.
-- Create: `tests/Integration/.gitkeep`  
-  Root app-assembly integration test placeholder.
-- Modify: `composer.json`  
-  Root orchestration scripts for suite-level runs.
-- Modify: `Modules/Core/phpunit.xml`  
-  Add `Integration` suite and keep `UnitShell` explicitly classified.
-- Modify: `Modules/Core/tests/Pest.php`  
-  Bind `Unit` to minimal Core test case and `Integration`/`Feature` to Laravel test case after moves.
-- Create: `Modules/Core/tests/Integration/.gitkeep`
-- Modify: `Modules/CMS/phpunit.xml`
-- Modify: `Modules/CMS/tests/Pest.php`
-- Create: `Modules/CMS/tests/Integration/.gitkeep`
-- Modify: `Modules/CMS/composer.json`
-- Modify: `Modules/AI/phpunit.xml`
-- Modify: `Modules/AI/tests/Pest.php`
-- Create: `Modules/AI/tests/Integration/.gitkeep`
-- Modify: `Modules/AI/composer.json`
-- Modify: `Modules/ERP/phpunit.xml`
-- Modify: `Modules/ERP/tests/Pest.php`
-- Create: `Modules/ERP/tests/Integration/.gitkeep`
-- Modify: `Modules/ERP/composer.json`
-- Modify: `Modules/MES/phpunit.xml`
-- Modify: `Modules/MES/tests/Pest.php`
-- Create: `Modules/MES/tests/Integration/.gitkeep`
-- Modify: `Modules/MES/composer.json`
-- Move: mechanically misclassified tests from `Modules/*/tests/Unit` to `Modules/*/tests/Integration` or `Modules/*/tests/Feature`.
-
----
-
-### Task 1: Establish Suite Directories
-
-**Files:**
-- Create: `tests/Integration/.gitkeep`
-- Create: `Modules/Core/tests/Integration/.gitkeep`
-- Create: `Modules/CMS/tests/Integration/.gitkeep`
-- Create: `Modules/AI/tests/Integration/.gitkeep`
-- Create: `Modules/ERP/tests/Integration/.gitkeep`
-- Create: `Modules/MES/tests/Integration/.gitkeep`
-
-- [ ] **Step 1: Create integration directories**
-
-Run:
-
-```bash
-rtk mkdir -p tests/Integration Modules/Core/tests/Integration Modules/CMS/tests/Integration Modules/AI/tests/Integration Modules/ERP/tests/Integration Modules/MES/tests/Integration
-rtk touch tests/Integration/.gitkeep Modules/Core/tests/Integration/.gitkeep Modules/CMS/tests/Integration/.gitkeep Modules/AI/tests/Integration/.gitkeep Modules/ERP/tests/Integration/.gitkeep Modules/MES/tests/Integration/.gitkeep
-```
-
-Expected: commands exit with status `0`.
-
-- [ ] **Step 2: Verify directories exist**
-
-Run:
-
-```bash
-rtk rg --files tests Modules | rtk rg '/Integration/\\.gitkeep$'
-```
-
-Expected output includes:
-
-```text
-tests/Integration/.gitkeep
-Modules/Core/tests/Integration/.gitkeep
-Modules/CMS/tests/Integration/.gitkeep
-Modules/AI/tests/Integration/.gitkeep
-Modules/ERP/tests/Integration/.gitkeep
-Modules/MES/tests/Integration/.gitkeep
-```
-
-- [ ] **Step 3: Commit**
-
-Run:
-
-```bash
-rtk git add tests/Integration/.gitkeep Modules/Core/tests/Integration/.gitkeep Modules/CMS/tests/Integration/.gitkeep Modules/AI/tests/Integration/.gitkeep Modules/ERP/tests/Integration/.gitkeep Modules/MES/tests/Integration/.gitkeep
-rtk git commit -m "test: add integration suite directories"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 2: Add Root Aggregate Suites
-
-**Files:**
-- Modify: `phpunit.xml`
-
-- [ ] **Step 1: Replace root testsuites block**
-
-In `phpunit.xml`, replace the current `<testsuites>` block with:
-
-```xml
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">tests/Unit</directory>
-            <directory suffix="Test.php">Modules/Core/tests/Unit</directory>
-            <directory suffix="Test.php">Modules/CMS/tests/Unit</directory>
-            <directory suffix="Test.php">Modules/AI/tests/Unit</directory>
-            <directory suffix="Test.php">Modules/ERP/tests/Unit</directory>
-            <directory suffix="Test.php">Modules/MES/tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">tests/Integration</directory>
-            <directory suffix="Test.php">Modules/Core/tests/Integration</directory>
-            <directory suffix="Test.php">Modules/Core/tests/UnitShell</directory>
-            <directory suffix="Test.php">Modules/CMS/tests/Integration</directory>
-            <directory suffix="Test.php">Modules/CMS/tests/UnitShell</directory>
-            <directory suffix="Test.php">Modules/AI/tests/Integration</directory>
-            <directory suffix="Test.php">Modules/ERP/tests/Integration</directory>
-            <directory suffix="Test.php">Modules/MES/tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">tests/Feature</directory>
-            <directory suffix="Test.php">Modules/Core/tests/Feature</directory>
-            <directory suffix="Test.php">Modules/CMS/tests/Feature</directory>
-            <directory suffix="Test.php">Modules/AI/tests/Feature</directory>
-            <directory suffix="Test.php">Modules/ERP/tests/Feature</directory>
-            <directory suffix="Test.php">Modules/MES/tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-```
-
-Rationale: `UnitShell` tests are not pure unit tests; classify them as integration until each file is reviewed.
-
-- [ ] **Step 2: Validate PHPUnit config syntax**
-
-Run:
-
-```bash
-rtk vendor/bin/phpunit --list-suites
-```
-
-Expected: output lists `Unit`, `Integration`, and `Feature`.
-
-- [ ] **Step 3: Commit**
-
-Run:
-
-```bash
-rtk git add phpunit.xml
-rtk git commit -m "test: split root phpunit suites by bootstrap level"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 3: Add Module Integration Suites
-
-**Files:**
-- Modify: `Modules/Core/phpunit.xml`
-- Modify: `Modules/CMS/phpunit.xml`
-- Modify: `Modules/AI/phpunit.xml`
-- Modify: `Modules/ERP/phpunit.xml`
-
-- [ ] **Step 1: Update Core testsuites**
-
-In `Modules/Core/phpunit.xml`, use:
-
-```xml
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-            <directory suffix="Test.php">./tests/UnitShell</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-```
-
-- [ ] **Step 2: Update CMS testsuites**
-
-In `Modules/CMS/phpunit.xml`, use:
-
-```xml
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-            <directory suffix="Test.php">./tests/UnitShell</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-```
-
-- [ ] **Step 3: Update AI testsuites**
-
-In `Modules/AI/phpunit.xml`, use:
-
-```xml
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-```
-
-- [ ] **Step 4: Update ERP testsuites**
-
-In `Modules/ERP/phpunit.xml`, use the same three-suite shape:
-
-```xml
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-```
-
-- [ ] **Step 5: Create MES phpunit config if missing**
-
-If `Modules/MES/phpunit.xml` does not exist, create it with the same structure as ERP plus the standard testing env:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true">
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-    <source>
-        <include>
-            <directory suffix=".php">./app</directory>
-        </include>
-    </source>
-    <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="SCOUT_DRIVER" value="collection"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-    </php>
-</phpunit>
-```
-
-- [ ] **Step 6: Validate module configs**
-
-Run:
-
-```bash
-rtk vendor/bin/phpunit --configuration Modules/Core/phpunit.xml --list-suites
-rtk vendor/bin/phpunit --configuration Modules/CMS/phpunit.xml --list-suites
-rtk vendor/bin/phpunit --configuration Modules/AI/phpunit.xml --list-suites
-rtk vendor/bin/phpunit --configuration Modules/ERP/phpunit.xml --list-suites
-rtk vendor/bin/phpunit --configuration Modules/MES/phpunit.xml --list-suites
-```
-
-Expected: each command lists `Unit`, `Integration`, and `Feature`.
-
-- [ ] **Step 7: Commit**
-
-Run:
-
-```bash
-rtk git add Modules/Core/phpunit.xml Modules/CMS/phpunit.xml Modules/AI/phpunit.xml Modules/ERP/phpunit.xml Modules/MES/phpunit.xml
-rtk git commit -m "test: add module integration suites"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 4: Update Composer Test Scripts
-
-**Files:**
 - Modify: `composer.json`
-- Modify: `Modules/Core/composer.json`
-- Modify: `Modules/CMS/composer.json`
-- Modify: `Modules/AI/composer.json`
-- Modify: `Modules/ERP/composer.json`
-- Modify: `Modules/MES/composer.json`
-
-- [ ] **Step 1: Add root suite scripts**
-
-In root `composer.json`, add these scripts without removing existing quality scripts:
-
-```json
-"test:unit": "php artisan test --compact --testsuite=Unit",
-"test:integration": "php artisan test --compact --testsuite=Integration",
-"test:feature": "php artisan test --compact --testsuite=Feature",
-"test:modules": [
-  "@test:unit",
-  "@test:integration",
-  "@test:feature"
-]
-```
-
-If `test:unit` already exists and currently means coverage, rename the current coverage command to `test:coverage` before assigning `test:unit` to the fast suite command.
-
-- [ ] **Step 2: Add module suite scripts**
-
-In each module `composer.json`, converge these scripts:
-
-```json
-"test:unit": "vendor/bin/pest --compact --testsuite=Unit",
-"test:integration": "vendor/bin/pest --compact --testsuite=Integration",
-"test:feature": "vendor/bin/pest --compact --testsuite=Feature",
-"test:pest": "vendor/bin/pest --compact",
-"test:pest:parallel": "vendor/bin/pest --parallel --compact"
-```
-
-Keep strict coverage scripts such as `test:type-coverage` and `test:unit:parallel` only if they already exist, but do not use `test:unit` for coverage after this change.
-
-- [ ] **Step 3: Validate Composer script names**
-
-Run:
-
-```bash
-rtk composer run --list | rtk rg 'test:(unit|integration|feature|modules)'
-rtk composer --working-dir=Modules/Core run --list | rtk rg 'test:(unit|integration|feature|pest)'
-rtk composer --working-dir=Modules/CMS run --list | rtk rg 'test:(unit|integration|feature|pest)'
-rtk composer --working-dir=Modules/AI run --list | rtk rg 'test:(unit|integration|feature|pest)'
-rtk composer --working-dir=Modules/ERP run --list | rtk rg 'test:(unit|integration|feature|pest)'
-rtk composer --working-dir=Modules/MES run --list | rtk rg 'test:(unit|integration|feature|pest)'
-```
-
-Expected: all listed scripts are present.
-
-- [ ] **Step 4: Commit**
-
-Run:
-
-```bash
-rtk git add composer.json Modules/Core/composer.json Modules/CMS/composer.json Modules/AI/composer.json Modules/ERP/composer.json Modules/MES/composer.json
-rtk git commit -m "test: standardize suite composer scripts"
-```
-
-Expected: commit succeeds.
+  Promote the merged test/quality dev dependencies into the root `require-dev`; adopt the module
+  scripts worth keeping.
+- Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json`
+  Drop `require-dev` and every `test:*` script; keep `require`, `autoload`, `autoload-dev`, and the
+  release scripts.
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/phpunit.xml`
+- Modify: `pint.json`
+  Drop `Modules` from `notPath` so the application formatter reaches module code.
+- Modify: `rector.php`
+  Absorb the `RemoveNullArgOnNullDefaultParamRector` skip that four modules declare and the root
+  does not.
+- Modify: `phpstan.neon`
+  Repair `excludePaths` so the analysis runs at all, then decide what the module configs covered.
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/{pint.json,rector.php,peck.json}` and the five module
+  `phpstan.neon` files (MES has none).
+- Modify: 618 module PHP files, by `vendor/bin/pint`, in a commit of their own.
+- Modify: `Modules/ERP/README.md`, `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md`,
+  `Modules/ERP/docs/rag/MODULE.md`
+  They document `composer test:standalone`, which is being removed.
+- Modify: module READMEs and RAG docs that document a module-local test or lint command.
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/setup-hooks.sh` and
+  `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/hooks/`
+  Never installed anywhere; the version bumps have always been run by hand.
+- Modify: `scripts/version.sh`
+  Accept a target module so one copy can version any repository in the stack.
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/version.sh` and
+  `Modules/{Core,CMS,AI,ERP,MES,SAO}/cliff.toml`, after the root script can target a module.
+- Keep untouched: `Modules/*/composer.json` `autoload-dev`, and the `version` field each module
+  carries (the root script writes it).
+- Verify only: `phpunit.xml`, `tests/Pest.php`, `Modules/*/tests/Pest.php`, `Modules/*/tests/`.
 
 ---
 
-### Task 5: Move Obvious AI Integration Tests
+### Task 1: Confirm The Suite Taxonomy Already In Place
+
+The previous plan's tasks 1 to 9 are believed delivered. Confirm that from the code before removing
+anything, because the removals below assume the root runner already covers every module.
 
 **Files:**
-- Move selected files from `Modules/AI/tests/Unit` to `Modules/AI/tests/Integration`
+- Verify: `phpunit.xml`, `Modules/*/tests/`, `tests/Pest.php`, `Modules/*/tests/Pest.php`
 
-- [ ] **Step 1: Move database-backed AI tests**
-
-Run:
-
-```bash
-rtk mkdir -p Modules/AI/tests/Integration
-rtk mv Modules/AI/tests/Unit/ActionRequestControllerTest.php Modules/AI/tests/Integration/ActionRequestControllerTest.php
-rtk mv Modules/AI/tests/Unit/SuggestionControllerTest.php Modules/AI/tests/Integration/SuggestionControllerTest.php
-rtk mv Modules/AI/tests/Unit/ChatControllerTest.php Modules/AI/tests/Integration/ChatControllerTest.php
-rtk mv Modules/AI/tests/Unit/MemoryServiceFullTest.php Modules/AI/tests/Integration/MemoryServiceFullTest.php
-rtk mv Modules/AI/tests/Unit/ChatServiceFullTest.php Modules/AI/tests/Integration/ChatServiceFullTest.php
-rtk mv Modules/AI/tests/Unit/ExecuteActionRequestJobTest.php Modules/AI/tests/Integration/ExecuteActionRequestJobTest.php
-rtk mv Modules/AI/tests/Unit/ContextualSuggestionModelTest.php Modules/AI/tests/Integration/ContextualSuggestionModelTest.php
-rtk mv Modules/AI/tests/Unit/ContextualSuggestionServiceTest.php Modules/AI/tests/Integration/ContextualSuggestionServiceTest.php
-rtk mv Modules/AI/tests/Unit/ToolRegistryTest.php Modules/AI/tests/Integration/ToolRegistryTest.php
-rtk mv Modules/AI/tests/Unit/ConversationSummaryModelTest.php Modules/AI/tests/Integration/ConversationSummaryModelTest.php
-rtk mv Modules/AI/tests/Unit/ConversationModelExtendedTest.php Modules/AI/tests/Integration/ConversationModelExtendedTest.php
-rtk mv Modules/AI/tests/Unit/ActionRequestServiceTest.php Modules/AI/tests/Integration/ActionRequestServiceTest.php
-rtk mv Modules/AI/tests/Unit/ActionRequestModelTest.php Modules/AI/tests/Integration/ActionRequestModelTest.php
-rtk mv Modules/AI/tests/Unit/MessageModelExtendedTest.php Modules/AI/tests/Integration/MessageModelExtendedTest.php
-```
-
-Rationale: these files currently use `RefreshDatabase` or controller/model behavior and should not live in `Unit`.
-
-- [ ] **Step 2: Move obvious controller tests to Feature if they issue HTTP requests**
-
-Open the moved controller tests. If they call `$this->get()`, `$this->post()`, `$this->put()`, `$this->delete()`, or `actingAs()->...` HTTP assertions, move them from `Modules/AI/tests/Integration` to `Modules/AI/tests/Feature`.
-
-Run for files that match:
-
-```bash
-rtk rg -n "\\$this->(get|post|put|patch|delete|actingAs)\\(" Modules/AI/tests/Integration/*ControllerTest.php
-```
-
-Expected: files with HTTP assertions are moved to `Modules/AI/tests/Feature`.
-
-- [ ] **Step 3: Run AI suites**
+- [x] **Step 1: Confirm the root suites glob every module**
 
 Run:
 
 ```bash
-rtk php artisan test --compact Modules/AI/tests/Integration
-rtk php artisan test --compact Modules/AI/tests/Feature
+rtk rg -n 'testsuite name|directory suffix' phpunit.xml
 ```
 
-Expected: both suites pass or expose pre-existing failures to fix in the same task.
+Expected: suites `Unit`, `Integration` and `Feature`, each pairing a root directory with a
+`Modules/*/tests/...` glob, and `Modules/*/tests/UnitShell` classified under `Integration`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 2: Confirm every module has the three directories**
 
 Run:
 
 ```bash
-rtk git add Modules/AI/tests
-rtk git commit -m "test: move AI framework tests out of unit suite"
+rtk ls -d Modules/*/tests/Unit Modules/*/tests/Integration Modules/*/tests/Feature
 ```
 
-Expected: commit succeeds.
+Expected: all six modules (`Core`, `CMS`, `AI`, `ERP`, `MES`, `SAO`) present for each of the three.
 
----
-
-### Task 6: Move Obvious CMS Integration Tests
-
-**Files:**
-- Move selected files from `Modules/CMS/tests/Unit` to `Modules/CMS/tests/Integration`
-
-- [ ] **Step 1: Move CMS unit tests that use RefreshDatabase**
+- [x] **Step 3: Confirm the Pest bindings are narrow**
 
 Run:
 
 ```bash
-rtk rg -l "RefreshDatabase" Modules/CMS/tests/Unit | while read -r file; do target="${file/Modules\\/CMS\\/tests\\/Unit/Modules\\/CMS\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
+rtk rg -n 'pest\(\)->extend|uses\(' Modules/*/tests/Pest.php
 ```
 
-Expected: files using `RefreshDatabase` are under `Modules/CMS/tests/Integration`.
+Expected: no module binds a Laravel `TestCase` or `RefreshDatabase` to its `Unit` directory, except
+AI, which binds `Unit` to its own `TestCase` without `RefreshDatabase`. `Modules/Core/tests/Pest.php`
+binds `Unit` to the minimal `Modules\Core\Tests\TestCase` and the other directories to
+`LaravelTestCase`.
 
-- [ ] **Step 2: Move CMS unit tests that explicitly use module Laravel TestCase**
+- [x] **Step 4: Confirm the root Pest bootstrap discovers modules by glob**
 
 Run:
 
 ```bash
-rtk rg -l "Modules\\\\CMS\\\\Tests\\\\TestCase|uses\\(TestCase::class" Modules/CMS/tests/Unit | while read -r file; do target="${file/Modules\\/CMS\\/tests\\/Unit/Modules\\/CMS\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
+rtk rg -n 'glob|require_once' tests/Pest.php
 ```
 
-Expected: framework-dependent CMS tests are under `Modules/CMS/tests/Integration`.
+Expected: `tests/Pest.php` globs `Modules/*/tests/Pest.php` and requires each, so no module is
+named at the root.
 
-- [ ] **Step 3: Move CMS controller tests to Feature**
-
-Run:
-
-```bash
-rtk mkdir -p Modules/CMS/tests/Feature/Controllers
-rtk rg --files Modules/CMS/tests/Integration | rtk rg '/Controllers/.*Test\\.php$' | while read -r file; do target="${file/Modules\\/CMS\\/tests\\/Integration/Modules\\/CMS\\/tests\\/Feature}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: controller tests live under `Modules/CMS/tests/Feature/Controllers`.
-
-- [ ] **Step 4: Run CMS suites**
-
-Run:
-
-```bash
-rtk php artisan test --compact Modules/CMS/tests/Integration
-rtk php artisan test --compact Modules/CMS/tests/Feature
-```
-
-Expected: both suites pass or expose pre-existing failures to fix in the same task.
-
-- [ ] **Step 5: Commit**
-
-Run:
-
-```bash
-rtk git add Modules/CMS/tests
-rtk git commit -m "test: move CMS framework tests out of unit suite"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 7: Move Obvious Core Integration Tests
-
-**Files:**
-- Move selected files from `Modules/Core/tests/Unit` to `Modules/Core/tests/Integration`
-
-- [ ] **Step 1: Move Core unit tests that use RefreshDatabase**
-
-Run:
-
-```bash
-rtk rg -l "RefreshDatabase" Modules/Core/tests/Unit | while read -r file; do target="${file/Modules\\/Core\\/tests\\/Unit/Modules\\/Core\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: files using `RefreshDatabase` are under `Modules/Core/tests/Integration`.
-
-- [ ] **Step 2: Move Core provider tests to Integration**
-
-Run:
-
-```bash
-rtk mkdir -p Modules/Core/tests/Integration/Providers
-rtk rg --files Modules/Core/tests/Unit/Providers | rtk rg 'Test\\.php$' | while read -r file; do target="${file/Modules\\/Core\\/tests\\/Unit/Modules\\/Core\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: provider tests live under `Modules/Core/tests/Integration/Providers`.
-
-- [ ] **Step 3: Move Core console tests to Feature**
-
-Run:
-
-```bash
-rtk mkdir -p Modules/Core/tests/Feature/Console
-rtk rg --files Modules/Core/tests/Unit/Console | rtk rg 'Test\\.php$' | while read -r file; do target="${file/Modules\\/Core\\/tests\\/Unit/Modules\\/Core\\/tests\\/Feature}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: console tests live under `Modules/Core/tests/Feature/Console`.
-
-- [ ] **Step 4: Run Core suites**
-
-Run:
-
-```bash
-rtk php artisan test --compact Modules/Core/tests/Integration
-rtk php artisan test --compact Modules/Core/tests/Feature
-```
-
-Expected: both suites pass or expose pre-existing failures to fix in the same task.
-
-- [ ] **Step 5: Commit**
-
-Run:
-
-```bash
-rtk git add Modules/Core/tests
-rtk git commit -m "test: move Core framework tests out of unit suite"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 8: Move Obvious ERP and MES Integration Tests
-
-**Files:**
-- Move selected files from `Modules/ERP/tests/Unit` to `Modules/ERP/tests/Integration`
-- Move selected files from `Modules/MES/tests/Unit` to `Modules/MES/tests/Integration`
-
-- [ ] **Step 1: Move ERP unit tests that use RefreshDatabase**
-
-Run:
-
-```bash
-rtk rg -l "RefreshDatabase" Modules/ERP/tests/Unit | while read -r file; do target="${file/Modules\\/ERP\\/tests\\/Unit/Modules\\/ERP\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: ERP database-backed tests are under `Modules/ERP/tests/Integration`.
-
-- [ ] **Step 2: Move MES unit tests that use full module dependencies**
-
-Run:
-
-```bash
-rtk rg -l "Modules\\\\ERP|RefreshDatabase|Tests\\\\TestCase|uses\\(TestCase::class" Modules/MES/tests/Unit | while read -r file; do target="${file/Modules\\/MES\\/tests\\/Unit/Modules\\/MES\\/tests\\/Integration}"; mkdir -p "$(dirname "$target")"; mv "$file" "$target"; done
-```
-
-Expected: MES tests depending on ERP or Laravel are under `Modules/MES/tests/Integration`.
-
-- [ ] **Step 3: Run ERP and MES suites**
-
-Run:
-
-```bash
-rtk php artisan test --compact Modules/ERP/tests/Integration
-rtk php artisan test --compact Modules/MES/tests/Integration
-```
-
-Expected: both suites pass or expose pre-existing failures to fix in the same task.
-
-- [ ] **Step 4: Commit**
-
-Run:
-
-```bash
-rtk git add Modules/ERP/tests Modules/MES/tests
-rtk git commit -m "test: move ERP and MES integration tests out of unit suite"
-```
-
-Expected: commit succeeds.
-
----
-
-### Task 9: Narrow Pest Bindings
-
-**Files:**
-- Modify: `tests/Pest.php`
-- Modify: `Modules/Core/tests/Pest.php`
-- Modify: `Modules/AI/tests/Pest.php`
-- Modify: `Modules/ERP/tests/Pest.php`
-- Modify: `Modules/MES/tests/Pest.php`
-- Modify: `Modules/CMS/tests/Pest.php`
-
-- [ ] **Step 1: Update AI Pest bindings**
-
-Replace `Modules/AI/tests/Pest.php` with:
-
-```php
-<?php
-
-declare(strict_types=1);
-
-require_once __DIR__ . '/bootstrap-test-fakes.php';
-
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\AI\Tests\TestCase;
-
-pest()->extend(TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in('Integration', 'Feature');
-```
-
-- [ ] **Step 2: Update ERP Pest bindings**
-
-Replace `Modules/ERP/tests/Pest.php` with:
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Modules\ERP\Tests\TestCase;
-
-pest()->extend(TestCase::class)
-    ->in(__DIR__ . '/Integration', __DIR__ . '/Feature');
-```
-
-- [ ] **Step 3: Update MES Pest bindings**
-
-Replace `Modules/MES/tests/Pest.php` with:
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Modules\MES\Tests\TestCase;
-
-pest()->extend(TestCase::class)
-    ->in(__DIR__ . '/Integration', __DIR__ . '/Feature');
-```
-
-- [ ] **Step 4: Update Core Pest bindings**
-
-Replace the binding section at the top of `Modules/Core/tests/Pest.php` with:
-
-```php
-uses(Modules\Core\Tests\TestCase::class)->in(__DIR__ . '/Unit');
-
-uses(Modules\Core\Tests\LaravelTestCase::class)->in(
-    __DIR__ . '/Integration',
-    __DIR__ . '/Feature',
-    __DIR__ . '/UnitShell',
-);
-```
-
-Keep the helper functions below unchanged.
-
-- [ ] **Step 5: Keep CMS helpers and add integration binding**
-
-At the top of `Modules/CMS/tests/Pest.php`, after `require_once __DIR__ . '/helpers.php';`, add:
-
-```php
-use Modules\CMS\Tests\TestCase;
-
-pest()->extend(TestCase::class)
-    ->in(__DIR__ . '/Integration', __DIR__ . '/Feature', __DIR__ . '/UnitShell');
-```
-
-Do not remove the existing CMS helper functions.
-
-- [ ] **Step 6: Update root Pest includes**
-
-In `tests/Pest.php`, remove the broad AI root bindings:
-
-```php
-pest()->extend(Modules\AI\Tests\TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in(__DIR__ . '/../Modules/AI/tests/Feature');
-
-pest()->extend(Modules\AI\Tests\TestCase::class)
-    ->use(RefreshDatabase::class)
-    ->in(__DIR__ . '/../Modules/AI/tests/Unit');
-```
-
-Then require module Pest files directly:
-
-```php
-require_once __DIR__ . '/../Modules/Core/tests/Pest.php';
-require_once __DIR__ . '/../Modules/CMS/tests/Pest.php';
-require_once __DIR__ . '/../Modules/AI/tests/Pest.php';
-require_once __DIR__ . '/../Modules/ERP/tests/Pest.php';
-require_once __DIR__ . '/../Modules/MES/tests/Pest.php';
-```
-
-Keep root app binding:
-
-```php
-pest()->extend(Tests\TestCase::class)
-    ->in('Feature', 'Unit', 'Integration');
-```
-
-- [ ] **Step 7: Run suite smoke checks**
+- [x] **Step 5: Record the baseline**
 
 Run:
 
@@ -751,27 +174,560 @@ rtk php artisan test --compact --testsuite=Integration
 rtk php artisan test --compact --testsuite=Feature
 ```
 
-Expected: all suites pass or expose classification mistakes to fix before committing.
+Expected: record the pass/fail counts. These are the numbers every later task compares against; a
+pre-existing failure stays a pre-existing failure and is not fixed here.
 
-- [ ] **Step 8: Commit**
+---
+
+### Task 2: Capture The Merged Dependency Set
+
+Before changing any `composer.json`, write down what is installed and where each constraint comes
+from. The removals in Task 4 are only verifiable against this baseline.
+
+**Files:**
+- Create: no repository files. Work in the scratchpad.
+
+- [x] **Step 1: Snapshot the installed dev packages**
 
 Run:
 
 ```bash
-rtk git add tests/Pest.php Modules/Core/tests/Pest.php Modules/CMS/tests/Pest.php Modules/AI/tests/Pest.php Modules/ERP/tests/Pest.php Modules/MES/tests/Pest.php
-rtk git commit -m "test: narrow pest bindings by suite"
+rtk php -r '$l=json_decode(file_get_contents("composer.lock"),true); $r=[]; foreach($l["packages-dev"] as $p){$r[]=$p["name"]." ".$p["version"];} sort($r); echo implode(PHP_EOL,$r),PHP_EOL;' > /tmp/dev-packages-before.txt
+rtk wc -l /tmp/dev-packages-before.txt
+```
+
+Expected: the file lists every installed dev package with its exact version.
+
+- [x] **Step 2: List every module dev constraint and flag the divergent ones**
+
+Run:
+
+```bash
+rtk php -r 'foreach(["Core","CMS","AI","ERP","MES","SAO"] as $m){$d=json_decode(file_get_contents("Modules/$m/composer.json"),true); foreach(($d["require-dev"]??[]) as $k=>$v){echo "$m $k $v",PHP_EOL;}}' | sort -k2
+```
+
+Expected: the constraints that disagree between modules are visible. As of 2026-09-15 these are
+`larastan/larastan`, `laravel/pint`, `driftingly/rector-laravel` and `peckphp/peck`. For each of
+them the version actually installed wins, not the strictest constraint.
+
+- [x] **Step 3: Identify what the root already provides**
+
+Run:
+
+```bash
+rtk php -r '$d=json_decode(file_get_contents("composer.json"),true); echo "require: ",implode(", ",array_keys($d["require"])),PHP_EOL,PHP_EOL,"require-dev: ",implode(", ",array_keys($d["require-dev"])),PHP_EOL;'
+```
+
+Expected: `filament/filament` and `nwidart/laravel-modules` are already in the root `require`, and
+`fakerphp/faker` and `swolley/license-compliance-checker` in the root `require-dev`. Those four
+need no promotion: they are module `require-dev` entries the root already covers.
+
+---
+
+### Task 3: Promote The Test Toolchain To The Root
+
+Add to the root `require-dev` every package a module currently contributes, pinned to the version
+already installed. Nothing new is introduced: the goal is an unchanged `vendor/` with an honest
+declaration.
+
+**Files:**
+- Modify: `composer.json`
+
+- [x] **Step 1: Add the promoted dev dependencies**
+
+In the root `composer.json`, extend `require-dev` so it reads (constraints match the installed
+versions recorded in Task 2; re-derive them from the lock rather than copying these if time has
+passed):
+
+```json
+"require-dev": {
+    "barryvdh/laravel-ide-helper": "^3.7",
+    "dg/bypass-finals": "^1.11",
+    "driftingly/rector-laravel": "^2.6",
+    "fakerphp/faker": "^1.24.1",
+    "larastan/larastan": "^3.12",
+    "laravel/boost": "^2.9",
+    "laravel/pail": "^1.2",
+    "laravel/pint": "^1.32",
+    "laravel/sail": "^1.59",
+    "mockery/mockery": "^1.6.12",
+    "mtrajano/laravel-swagger": "^0.6.4",
+    "nunomaduro/collision": "^8.9.4",
+    "nunomaduro/phpinsights": "^2.14",
+    "peckphp/peck": "^0.1.3",
+    "pestphp/pest": "^4.7",
+    "pestphp/pest-plugin-laravel": "^4.1",
+    "pestphp/pest-plugin-stressless": "^4.0",
+    "pestphp/pest-plugin-type-coverage": "^4.0",
+    "rector/rector": "^2.6",
+    "swolley/license-compliance-checker": "dev-master"
+}
+```
+
+`orchestra/testbench` is deliberately absent. It is in the `require-dev` of AI, ERP, MES and SAO,
+but there is no `testbench.yaml` in the repository and no test case extends it. It is dropped in
+Task 4 rather than promoted.
+
+Note the `peckphp/peck` constraint: it records `^0.1.3`, what is installed, not Core's `^0.2.0`,
+which the merge plugin has been discarding. Raising it is a separate upgrade with its own test run,
+not a side effect of this move.
+
+- [x] **Step 2: Adopt the module scripts the root was inheriting**
+
+The root currently offers `test:pest`, `test:pest:parallel` and `test:unit:parallel` only because
+`merge-scripts` copies them up from the modules. Task 4 removes them from the modules, so define in
+the root `composer.json` the ones worth keeping:
+
+```json
+"test:pest": "vendor/bin/pest --compact",
+"test:pest:parallel": "vendor/bin/pest --parallel --compact"
+```
+
+Do not define `test:standalone`. It is an alias for `test:unit` that names a capability the project
+does not have, and keeping it would re-advertise the thing this plan removes.
+
+- [x] **Step 3: Verify the installed set did not change**
+
+Run:
+
+```bash
+rtk composer update --lock
+rtk php -r '$l=json_decode(file_get_contents("composer.lock"),true); $r=[]; foreach($l["packages-dev"] as $p){$r[]=$p["name"]." ".$p["version"];} sort($r); echo implode(PHP_EOL,$r),PHP_EOL;' > /tmp/dev-packages-after-promote.txt
+rtk diff /tmp/dev-packages-before.txt /tmp/dev-packages-after-promote.txt
+```
+
+Expected: empty diff. A non-empty diff means a constraint was mistyped; fix the constraint, do not
+accept the upgrade.
+
+- [x] **Step 4: Commit**
+
+Run:
+
+```bash
+rtk git add composer.json composer.lock
+rtk git commit -m "build: declare the test toolchain in the application"
 ```
 
 Expected: commit succeeds.
 
 ---
 
-### Task 10: Final Verification
+### Task 4: Remove The Module Dev Dependencies
+
+Only now, with the root declaring them, do the module `require-dev` blocks go. Each module is a
+separate submodule commit.
 
 **Files:**
-- All files changed by previous tasks
+- Modify: `Modules/Core/composer.json`
+- Modify: `Modules/CMS/composer.json`
+- Modify: `Modules/AI/composer.json`
+- Modify: `Modules/ERP/composer.json`
+- Modify: `Modules/MES/composer.json`
+- Modify: `Modules/SAO/composer.json`
 
-- [ ] **Step 1: Run aggregate tests**
+- [x] **Step 1: Delete the `require-dev` block from each module**
+
+Remove the whole `require-dev` key from all six module `composer.json` files.
+
+Keep, in every module:
+
+- `require` — the module's runtime dependencies, which is what actually documents the module;
+- `autoload` — the module's own PSR-4 namespaces;
+- `autoload-dev` — this one is load-bearing and must not be touched. It is what lets the merged
+  root autoloader resolve `Modules\X\Tests\TestCase`, the `Stubs`, `Support` and `Fixtures`
+  classes. Removing it breaks the suite instantly;
+- `repositories` — needed to resolve `swolley/license-compliance-checker`;
+- `update:requirements`, which acts on the module's own dependencies.
+
+The versioning scripts (`version`, `version:*`) and `setup:hooks` are not in this list: Task 4b
+removes the hook installer and Task 4c moves versioning to a single root script. Leave them in
+place until those tasks run, so the ability to version a module is never absent.
+
+- [x] **Step 2: Remove the test and quality scripts from each module**
+
+From each module's `scripts`, delete: `test`, `test:unit`, `test:integration`, `test:feature`,
+`test:pest`, `test:pest:parallel`, `test:coverage`, `test:unit:parallel`, `test:type-coverage`,
+`test:typos`, `test:lint`, `test:types`, `test:refactor`, `test:licenses`, `test:standalone`
+(ERP, MES, SAO only), and the `lint`, `check`, `fix`, `refactor` entries, which invoke the same
+now-absent binaries.
+
+None of these can run: they call a relative `vendor/bin/...` and no module has a `vendor/`. With
+`merge-scripts` enabled they are worse than dead, because they appear at the root as if the root
+had defined them.
+
+- [x] **Step 3: Confirm nothing in the module code referenced Testbench**
+
+Run:
+
+```bash
+rtk rg -n 'Orchestra\\Testbench' Modules tests app
+```
+
+Expected: no match in executable code. The only hit should be a comment in
+`Modules/Core/tests/database/migrations/2024_01_01_000000_create_users_table.php`. Leave that
+migration alone: it is part of the Core test environment and out of scope here.
+
+- [x] **Step 4: Verify the installed set still did not change**
+
+Run:
+
+```bash
+rtk composer update --lock
+rtk php -r '$l=json_decode(file_get_contents("composer.lock"),true); $r=[]; foreach($l["packages-dev"] as $p){$r[]=$p["name"]." ".$p["version"];} sort($r); echo implode(PHP_EOL,$r),PHP_EOL;' > /tmp/dev-packages-after-remove.txt
+rtk diff /tmp/dev-packages-before.txt /tmp/dev-packages-after-remove.txt
+```
+
+Expected: exactly one removal, `orchestra/testbench`, plus any package that existed only to satisfy
+it. Every other line identical. Anything else disappearing means a package was contributed by a
+module and not promoted in Task 3; put it in the root `require-dev` and repeat.
+
+- [x] **Step 5: Verify the toolchain still runs**
+
+Run:
+
+```bash
+rtk vendor/bin/pest --version
+rtk vendor/bin/pint --version
+rtk vendor/bin/phpstan --version
+rtk php artisan test --compact --testsuite=Unit
+```
+
+Expected: all four succeed, and the `Unit` suite matches the Task 1 baseline.
+
+- [x] **Step 6: Commit**
+
+Run:
+
+```bash
+rtk git add Modules/Core/composer.json Modules/CMS/composer.json Modules/AI/composer.json Modules/ERP/composer.json Modules/MES/composer.json Modules/SAO/composer.json composer.lock
+rtk git commit -m "build: modules declare functionality, not the test toolchain"
+```
+
+Expected: commit succeeds. Remember each module is a submodule: commit inside the module first,
+then record the pointer in the application.
+
+---
+
+### Task 4b: Remove The Git Hook Installer From The Modules
+
+`setup-hooks.sh` installs a `post-commit` hook that runs `version.sh` after every commit. It has
+never been installed: no module has a hook in its git directory, and neither does the application.
+The version bumps have always been run by hand, which is how `version.sh` is meant to be used
+anyway.
+
+**Files:**
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/setup-hooks.sh`
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/hooks/`
+- Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json` (drop `setup:hooks`)
+
+- [x] **Step 1: Confirm no hook is installed anywhere**
+
+Run:
+
+```bash
+for m in Core CMS AI ERP MES SAO; do echo -n "$m: "; rtk git -C Modules/$m rev-parse --git-dir; done
+rtk ls "$(git rev-parse --git-dir)/hooks" | rtk rg -v sample
+```
+
+Expected: no non-sample hook in the application's git directory, and none in any module's. If a
+hook turns up in a module, stop: someone installed it and this task needs their input first.
+
+- [x] **Step 2: Confirm `version.sh` is the part that is actually used**
+
+Run:
+
+```bash
+for m in Core CMS AI ERP MES SAO; do echo -n "$m bumps: "; rtk git -C Modules/$m log --oneline -i --grep='bump version' | wc -l; done
+```
+
+Expected: a non-zero count in most modules (Core 58, CMS 50, AI 14, ERP 9 as of 2026-09-15), in the
+`chore: bump version to vX.Y.Z` form `version.sh` produces. This is the evidence that separates the
+script being deleted from the one being kept.
+
+- [x] **Step 3: Delete the hook machinery**
+
+Run:
+
+```bash
+rtk git rm -r Modules/Core/scripts/hooks Modules/CMS/scripts/hooks Modules/AI/scripts/hooks Modules/ERP/scripts/hooks Modules/MES/scripts/hooks Modules/SAO/scripts/hooks
+rtk git rm Modules/Core/scripts/setup-hooks.sh Modules/CMS/scripts/setup-hooks.sh Modules/AI/scripts/setup-hooks.sh Modules/ERP/scripts/setup-hooks.sh Modules/MES/scripts/setup-hooks.sh Modules/SAO/scripts/setup-hooks.sh
+```
+
+Then remove the `"setup:hooks"` entry from each module's `composer.json` `scripts`.
+
+- [x] **Step 4: Confirm versioning still works**
+
+Run:
+
+```bash
+rtk ls Modules/*/scripts/version.sh
+rtk rg -n '"version"|"version:patch"' Modules/Core/composer.json
+```
+
+Expected: `version.sh` present in all six modules and the `version*` scripts intact. Do not run a
+bump to test this; it tags and pushes.
+
+- [x] **Step 5: Check the documentation**
+
+Run:
+
+```bash
+rtk rg -n 'setup-hooks|setup:hooks' --glob '!vendor' .
+```
+
+Expected: after this task, hits only in the application's own `scripts/` and `composer.json`. Any
+module README or RAG doc describing the hook installation is corrected or removed. The application
+keeps its copy for now, even though nothing has installed it either; that is a separate call and is
+recorded in the delivery status.
+
+- [x] **Step 6: Commit**
+
+Run:
+
+```bash
+rtk git add Modules
+rtk git commit -m "chore: drop the unused git hook installer from the modules"
+```
+
+Expected: commit succeeds. Each module is a submodule: commit inside the module first, then record
+the pointer.
+
+---
+
+### Task 4c: Centralize Versioning In One Script
+
+`version.sh` is byte-identical in the root and all six modules, and so is `cliff.toml`. Seven
+copies of each. The obvious move is to keep one and pass it a module name, and that is the right
+move, but the script cannot do it today and the reason matters.
+
+It resolves the package to bump from its own location:
+
+```bash
+version_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+composer_file="$(cd "$version_script_dir/.." && pwd)/composer.json"
+```
+
+while every Git operation in it (`git describe`, `git tag`, `git add`, `git commit`, `git push`)
+acts on the repository of the *current directory*. The two halves disagree the moment they are not
+the same place: running the root copy from inside `Modules/Core` would write the version into the
+application's `composer.json` and tag Core. Its argument parsing has no target either, only
+`{major|minor|patch}` plus `--nointeractive`, `--silent`, `--dry-run` and `--allow-dirty`.
+
+So: teach it the target, prove it works, then delete the copies.
+
+**Files:**
+- Modify: `scripts/version.sh`
+- Modify: `composer.json`
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/scripts/version.sh`
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/cliff.toml`
+- Modify: `Modules/{Core,CMS,AI,ERP,MES,SAO}/composer.json` (drop `version`, `version:*`)
+
+- [x] **Step 1: Give the script a target directory**
+
+In `scripts/version.sh`, accept an optional first argument naming a module (`Core`) or a path
+(`Modules/Core`), defaulting to the application itself. Resolve it to an absolute `TARGET_DIR`,
+fail with a clear message if it is not a Git repository, and `cd` into it before anything else
+runs.
+
+Then make the two halves agree: `update_composer_version` must read `"$TARGET_DIR/composer.json"`
+instead of deriving the path from `BASH_SOURCE`. That single substitution is what currently makes
+the script un-relocatable.
+
+- [x] **Step 2: Point `git cliff` at the shared configuration**
+
+`git cliff --output CHANGELOG.md` reads `cliff.toml` from the working directory, which is why every
+module carries its own identical copy. Pass the root one explicitly:
+
+```bash
+git cliff --config "$ROOT_DIR/cliff.toml" --output CHANGELOG.md
+```
+
+where `ROOT_DIR` is the directory holding the script. `CHANGELOG.md` still lands in `TARGET_DIR`,
+which is correct: the changelog belongs to the repository being versioned.
+
+- [x] **Step 3: Prove it on a module without tagging anything**
+
+Run:
+
+```bash
+rtk ./scripts/version.sh Core patch --dry-run
+rtk ./scripts/version.sh Modules/CMS --nointeractive --dry-run
+rtk ./scripts/version.sh patch --dry-run
+```
+
+Expected: the first two report the next version for that module, computed from *that module's*
+tags and commits, and name that module's `composer.json`. The third still targets the application.
+Nothing is tagged, committed or pushed.
+
+Then confirm nothing was touched:
+
+```bash
+rtk git status --short
+rtk git -C Modules/Core status --short
+```
+
+Expected: no change in either. `--dry-run` exists in the script already; if it turns out not to
+cover the composer write, stop and fix that before going further, because the next step deletes the
+fallback.
+
+- [x] **Step 4: Add the root Composer entry points**
+
+In the root `composer.json`:
+
+```json
+"version:module": "./scripts/version.sh"
+```
+
+Used as `composer version:module Core patch`. Keep the existing application-level `version` and
+`version:*` scripts as they are.
+
+- [x] **Step 5: Delete the copies**
+
+Run:
+
+```bash
+rtk git rm Modules/Core/scripts/version.sh Modules/CMS/scripts/version.sh Modules/AI/scripts/version.sh Modules/ERP/scripts/version.sh Modules/MES/scripts/version.sh Modules/SAO/scripts/version.sh
+rtk git rm Modules/Core/cliff.toml Modules/CMS/cliff.toml Modules/AI/cliff.toml Modules/ERP/cliff.toml Modules/MES/cliff.toml Modules/SAO/cliff.toml
+```
+
+Then remove `version`, `version:silent`, `version:major`, `version:minor` and `version:patch` from
+each module's `composer.json` `scripts`. The `version` *field* stays: it is data about the module,
+and the root script writes it.
+
+At this point `Modules/*/scripts/` is empty in every module and the directory goes too.
+
+- [ ] **Step 6: Verify a real bump end to end** (NOT RUN: tags and pushes, awaiting the user)
+
+Pick the module with the least traffic and run a real patch bump:
+
+```bash
+rtk ./scripts/version.sh MES patch
+```
+
+Expected: `Modules/MES/composer.json` gains the new version, `Modules/MES/CHANGELOG.md` is
+regenerated, and the tag is created on the MES repository, not on the application. Confirm with:
+
+```bash
+rtk git -C Modules/MES log -1 --oneline
+rtk git -C Modules/MES tag --points-at HEAD
+rtk git log -1 --oneline
+```
+
+Expected: the bump commit and tag are in MES; the application's HEAD is untouched except for the
+submodule pointer. Ask the user before running this step: it tags and pushes.
+
+- [x] **Step 7: Update the documentation**
+
+Run:
+
+```bash
+rtk rg -n 'composer version|scripts/version.sh|cliff.toml' --glob '*.md' --glob '!vendor' .
+```
+
+Expected: every module document describing `composer version:patch` now describes
+`composer version:module <Module> patch`, run from the application.
+
+- [x] **Step 8: Commit**
+
+Run:
+
+```bash
+rtk git add scripts/version.sh composer.json Modules
+rtk git commit -m "chore: one versioning script for the whole stack"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 5: Remove The Module PHPUnit Configs
+
+**Files:**
+- Delete: `Modules/Core/phpunit.xml`
+- Delete: `Modules/CMS/phpunit.xml`
+- Delete: `Modules/AI/phpunit.xml`
+- Delete: `Modules/ERP/phpunit.xml`
+- Delete: `Modules/MES/phpunit.xml`
+- Delete: `Modules/SAO/phpunit.xml`
+
+- [x] **Step 1: Check nothing outside the modules points at them**
+
+Run:
+
+```bash
+rtk rg -n 'Modules/[A-Za-z]+/phpunit.xml' --glob '!vendor' .
+```
+
+Expected: no hit in CI, scripts, or hooks. `.github/workflows/laravel.yml` runs `php artisan test`
+at the root and never names a module config. Any hit found here is fixed before the deletion.
+
+- [x] **Step 2: Confirm the root config does not inherit from them**
+
+Run:
+
+```bash
+rtk rg -n 'env name' phpunit.xml
+```
+
+Expected: the root `phpunit.xml` declares its own testing environment (`APP_ENV`, `DB_CONNECTION`,
+`CACHE_STORE`, `QUEUE_CONNECTION`, and the rest). The module configs duplicated a subset of these;
+nothing is lost by deleting them because PHPUnit only ever reads one configuration file.
+
+- [x] **Step 3: Delete them**
+
+Run:
+
+```bash
+rtk git rm Modules/Core/phpunit.xml Modules/CMS/phpunit.xml Modules/AI/phpunit.xml Modules/ERP/phpunit.xml Modules/MES/phpunit.xml Modules/SAO/phpunit.xml
+```
+
+Expected: six files removed.
+
+- [x] **Step 4: Re-run the three suites**
+
+Run:
+
+```bash
+rtk php artisan test --compact --testsuite=Unit
+rtk php artisan test --compact --testsuite=Integration
+rtk php artisan test --compact --testsuite=Feature
+```
+
+Expected: identical to the Task 1 baseline.
+
+- [x] **Step 5: Commit**
+
+Run:
+
+```bash
+rtk git commit -m "test: one phpunit configuration, at the application root"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 6: Confirm The Root Script Surface Is The Root's Own
+
+The point of removing the module scripts is that `composer run --list` should describe the project,
+not the merge order of six files.
+
+**Files:**
+- Verify: `composer.json`
+
+- [x] **Step 1: List the scripts the root offers**
+
+Run:
+
+```bash
+rtk composer run --list
+```
+
+Expected: every listed script is defined in the root `composer.json`. `test:standalone` is gone.
+`test:pest` and `test:pest:parallel` are present because Task 3 defined them, not because a module
+leaked them.
+
+- [x] **Step 2: Run the aggregate entry points**
 
 Run:
 
@@ -781,35 +737,546 @@ rtk composer test:integration
 rtk composer test:feature
 ```
 
-Expected: all three commands pass.
+Expected: matches the Task 1 baseline.
 
-- [ ] **Step 2: Run formatting**
-
-Run:
-
-```bash
-rtk vendor/bin/pint --dirty
-```
-
-Expected: Pint exits with status `0`; commit any formatting changes.
-
-- [ ] **Step 3: Review remaining Unit suite for Laravel bootstrap leaks**
+- [x] **Step 3: Confirm a single module can still be run by path**
 
 Run:
 
 ```bash
-rtk rg -n "RefreshDatabase|Tests\\\\TestCase|Modules\\\\.*\\\\Tests\\\\TestCase|\\$this->(get|post|put|patch|delete|artisan)\\(" Modules/*/tests/Unit tests/Unit
+rtk php artisan test --compact Modules/ERP/tests
 ```
 
-Expected: no matches, or each match is intentionally justified and moved before final commit.
+Expected: the ERP tests run. This is the replacement for the deleted module scripts, and unlike
+them it works.
 
-- [ ] **Step 4: Commit final cleanup**
+---
+
+### Task 7: Merge The Tool Configurations Into The Root
+
+Before deleting anything, make the root configuration carry everything the module copies carry.
+Two of the four tools need a real change; two need none.
+
+**Files:**
+- Modify: `rector.php`
+- Modify: `phpstan.neon`
+
+- [x] **Step 1: Confirm `peck.json` and `pint.json` are pure duplicates**
 
 Run:
 
 ```bash
-rtk git add phpunit.xml composer.json tests Modules
-rtk git commit -m "test: finalize module suite reclassification"
+for m in Core CMS AI ERP MES SAO; do rtk diff -q peck.json Modules/$m/peck.json; done
+rtk php -r '$r=json_decode(file_get_contents("pint.json"),true); foreach(["Core","CMS","AI","ERP","MES","SAO"] as $m){$c=json_decode(file_get_contents("Modules/$m/pint.json"),true); echo $m," rules identical: ",var_export($r["rules"]===$c["rules"],true),PHP_EOL;}'
 ```
 
-Expected: commit succeeds if there are remaining changes; otherwise report that the worktree is clean.
+Expected: no diff output for Peck, and `true` six times for Pint. The module configurations declare
+the same 72 rules the root does; only the root's `notPath` differs. Nothing to merge for these two.
+
+- [x] **Step 2: Absorb the Rector skip the modules declare**
+
+CMS, ERP, MES and SAO skip a rule the root does not. In `rector.php`, add to the `withSkip([...])`
+list, keeping the modules' own explanation:
+
+```php
+// Turns where('col', null) into where('col'), which changes query semantics (e.g. soft-delete unique rules).
+RemoveNullArgOnNullDefaultParamRector::class,
+```
+
+with the matching `use Rector\DeadCode\Rector\MethodCall\RemoveNullArgOnNullDefaultParamRector;`.
+
+Run:
+
+```bash
+rtk vendor/bin/rector --dry-run
+```
+
+Expected: the run completes. Any change it proposes is reviewed but not applied here; this task
+only widens the skip list.
+
+- [x] **Step 3: Repair the root PHPStan configuration**
+
+The root analysis does not run today. It aborts with:
+
+```text
+Invalid entry in excludePaths:
+Path ".../.phpstorm.meta.php" is neither a directory, nor a file path, nor a fnmatch pattern.
+```
+
+In `phpstan.neon`, mark the optional entries as optional:
+
+```yaml
+    excludePaths:
+        - _ide_helper.php (?)
+        - .phpstorm.meta.php (?)
+```
+
+Run:
+
+```bash
+rtk vendor/bin/phpstan analyse --memory-limit=3G --no-progress
+```
+
+Expected: PHPStan analyses instead of aborting. Record the error count. It will be large: this is
+`level: 9` over `Modules/`, and nothing has enforced it.
+
+- [x] **Step 4: Decide what the module PHPStan configs were covering** (done: ignores carried over, backlog recorded)
+
+This is the only configuration that is not a duplicate. The module files declare `level: 5` with
+per-file `ignoreErrors`; the root declares `level: 9` over the same code. They contradict each
+other and neither has been running.
+
+Compare the module `ignoreErrors` against the errors the root now reports:
+
+```bash
+rtk rg -n 'identifier:|path:|message:' Modules/*/phpstan.neon
+```
+
+For each module entry, either carry it into the root `ignoreErrors` with its path prefixed
+(`app/Models/Content.php` becomes `Modules/CMS/app/Models/Content.php`), or drop it because the
+root does not report that error. Do not lower the root level to make the merge easier: the
+module level was never enforced, so it is not a standard being given up.
+
+If the root error count is too large to triage in this task, say so in the delivery status, keep
+the root at `level: 9`, and record the module ignore lists in the plan before Task 9 deletes the
+files. What must not happen is deleting them while nobody has read them.
+
+- [x] **Step 5: Commit**
+
+Run:
+
+```bash
+rtk git add rector.php phpstan.neon
+rtk git commit -m "build: the application's tool configuration covers the modules"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 8: Format Module Code From The Root
+
+The root `pint.json` excludes `Modules`, which is why six identical copies of it exist. Remove the
+exclusion and format once.
+
+**Files:**
+- Modify: `pint.json`
+- Modify: 618 files under `Modules/*`
+
+- [x] **Step 1: Drop the exclusion**
+
+In `pint.json`, remove `"Modules"` from `notPath`, leaving:
+
+```json
+"notPath": [
+    "tests/TestCase.php",
+    "tmp"
+]
+```
+
+- [x] **Step 2: Measure before applying**
+
+Run:
+
+```bash
+rtk vendor/bin/pint --test Modules
+```
+
+Expected: a failure listing the files to change. As of 2026-09-15 that is 618 files of 3426:
+Core 272, ERP 162, SAO 58, AI 55, CMS 48, MES 23. Every fixer in the list is stylistic
+(`not_operator_with_successor_space`, `unary_operator_spaces`, `ordered_imports`,
+`phpdoc_separation`, `braces_position`, and so on). If the list contains something that is not,
+stop and review it rather than applying.
+
+- [x] **Step 3: Apply**
+
+Run:
+
+```bash
+rtk vendor/bin/pint Modules
+```
+
+Expected: the same file count is fixed. Note `mb_str_functions` among the fixers: it rewrites
+`str_*` calls to their `mb_*` equivalents, which does change behavior on multibyte strings. It is
+the modules' own declared rule, applied for the first time because nothing was ever formatting
+them. The suite run in the next step is what confirms it.
+
+- [x] **Step 4: Run the full suite**
+
+Run:
+
+```bash
+rtk php artisan test --compact
+```
+
+Expected: matches the Task 1 baseline. A new failure here is almost certainly `mb_str_functions`
+meeting a test that asserted byte semantics; fix the test or exclude that specific call, and say
+which in the delivery status.
+
+- [x] **Step 5: Commit the reformatting on its own**
+
+Run:
+
+```bash
+rtk git add pint.json Modules
+rtk git commit -m "style: format module code with the application's Pint configuration"
+```
+
+Expected: one commit containing the configuration change and the mechanical reformatting, and
+nothing else. Each module is a submodule: commit inside each module first, then record the
+pointers.
+
+---
+
+### Task 9: Delete The Module Tool Configurations
+
+**Files:**
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/pint.json`
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/rector.php`
+- Delete: `Modules/{Core,CMS,AI,ERP,MES,SAO}/peck.json`
+- Delete: `Modules/{Core,CMS,AI,ERP,SAO}/phpstan.neon` (MES has none)
+
+- [x] **Step 1: Confirm nothing invokes them**
+
+Run:
+
+```bash
+rtk rg -n 'Modules/[A-Za-z]+/(pint.json|rector.php|peck.json|phpstan.neon)' --glob '!vendor' .
+```
+
+Expected: no hit outside the files themselves. The module Composer scripts that referenced them
+were removed in Task 4, and CI runs `php artisan test` at the root.
+
+- [x] **Step 2: Delete**
+
+Run:
+
+```bash
+rtk git rm Modules/*/pint.json Modules/*/rector.php Modules/*/peck.json
+rtk git rm Modules/Core/phpstan.neon Modules/CMS/phpstan.neon Modules/AI/phpstan.neon Modules/ERP/phpstan.neon Modules/SAO/phpstan.neon
+```
+
+Expected: 23 files removed.
+
+- [x] **Step 3: Verify the root toolchain still covers the modules**
+
+Run:
+
+```bash
+rtk vendor/bin/pint --test Modules
+rtk vendor/bin/rector --dry-run
+rtk vendor/bin/phpstan analyse --memory-limit=3G --no-progress
+rtk vendor/bin/peck
+```
+
+Expected: Pint is clean after Task 8. Rector and PHPStan reach module code through the root's own
+paths (`rector.php` globs `Modules/*/app`, `phpstan.neon` lists `Modules/`). Their error counts
+match what Task 7 recorded, with no new category introduced by the deletion.
+
+- [x] **Step 4: Note what MES tells you**
+
+`Modules/MES/**` is in the root `phpstan.neon` `excludePaths`, and MES was the one module with no
+`phpstan.neon` of its own. So MES has never been analysed from either side. Leave the exclusion
+in place, and record it in the delivery status as known, deliberate, and outstanding.
+
+- [x] **Step 5: Commit**
+
+Run:
+
+```bash
+rtk git commit -m "build: one tool configuration, at the application root"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 10: Update The Documentation That Promised A Module Runner
+
+A removed command that is still documented is worse than no documentation: the reader tries it.
+
+**Files:**
+- Modify: `Modules/ERP/README.md`
+- Modify: `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md`
+- Modify: `Modules/ERP/docs/rag/MODULE.md`
+- Modify: any other module README or RAG doc the search below turns up
+
+- [ ] **Step 1: Find every documented module test command**
+
+Run:
+
+```bash
+rtk rg -n 'composer (test|test:unit|test:integration|test:feature|test:standalone|test:pest|lint|check|refactor)' --glob '*.md' --glob '!vendor' Modules docs
+```
+
+Expected: a list of documentation lines to correct. As of 2026-09-15 the known ones are
+`Modules/ERP/README.md:452`, `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md:409` and
+`Modules/ERP/docs/rag/MODULE.md:484`, all documenting `composer test:standalone`.
+
+- [ ] **Step 2: Replace them with the root commands**
+
+Each occurrence becomes the equivalent root invocation, run from the application:
+
+```bash
+php artisan test --compact Modules/ERP/tests              # the whole module
+php artisan test --compact Modules/ERP/tests/Unit         # one suite of it
+php artisan test --compact --testsuite=Unit               # the fast suite, all modules
+```
+
+Say in each document that module tests run from the application root, because the module test cases
+extend the application's and a module has no `vendor/` of its own. A reader who knows why will not
+try to reinstate the old command.
+
+- [ ] **Step 3: Check no module README still advertises tooling it no longer declares**
+
+Run:
+
+```bash
+rtk rg -n 'require-dev|pestphp|orchestra/testbench|pint.json|rector.php|phpstan.neon' --glob '*.md' Modules
+```
+
+Expected: no module document claims to own test dependencies or its own tool configuration. A
+document describing the release scripts is correct and stays: those are still the module's.
+
+- [ ] **Step 4: Commit**
+
+Run:
+
+```bash
+rtk git add Modules/ERP/README.md Modules/ERP/docs Modules
+rtk git commit -m "docs: module tests run from the application"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 11: Review What UnitShell Is Still Holding
+
+`UnitShell` is a transitional directory: tests written as unit tests that need the application
+shell. It has 13 files left, 12 in Core and 1 in CMS, and both the root and the module suites
+classify it as integration. It is the last piece of the original reclassification that was left
+half-done.
+
+**Files:**
+- Move: files from `Modules/Core/tests/UnitShell` and `Modules/CMS/tests/UnitShell` to `Unit` or
+  `Integration`
+
+- [ ] **Step 1: List what is there**
+
+Run:
+
+```bash
+rtk rg --files Modules/Core/tests/UnitShell Modules/CMS/tests/UnitShell
+```
+
+Expected: 13 files.
+
+- [ ] **Step 2: Classify each file against the spec's rules**
+
+For each file, read it and decide with the taxonomy in the spec:
+
+- needs no application bootstrap and no database, and can run under
+  `Modules\Core\Tests\TestCase` (the minimal environment): move to `tests/Unit`;
+- needs the shell, config overlays, migrations, or the database: move to `tests/Integration`.
+
+Do not classify from the file name. `DatabaseConfigOverlayTest` and `ObjectCastTest` sound like
+opposite cases and may not be.
+
+- [ ] **Step 3: Move and run each file as you go**
+
+After each move:
+
+```bash
+rtk php artisan test --compact <moved file path>
+```
+
+Expected: the file passes in its new suite. If it fails in `Unit`, it belongs in `Integration`;
+that is the classification answer, not a bug to fix.
+
+- [ ] **Step 4: Drop UnitShell from the suite definitions once empty**
+
+When both directories are empty, remove the `Modules/*/tests/UnitShell` line from the `Integration`
+suite in `phpunit.xml` and delete the directories.
+
+If files remain because their classification is genuinely unclear, leave the directory and the
+suite line in place and record which files and why in the delivery status. A half-empty transitional
+directory that is documented is fine; an undocumented one is how this became invisible for months.
+
+- [ ] **Step 5: Commit**
+
+Run:
+
+```bash
+rtk git add phpunit.xml Modules/Core/tests Modules/CMS/tests
+rtk git commit -m "test: classify the remaining UnitShell tests"
+```
+
+Expected: commit succeeds.
+
+---
+
+### Task 12: Final Verification
+
+**Files:**
+- All files changed by previous tasks
+
+- [ ] **Step 1: Prove no module declares test or toolchain infrastructure**
+
+Run:
+
+```bash
+rtk rg -n 'require-dev|"test:|"lint"|"check"|"refactor"' Modules/*/composer.json
+rtk ls Modules/*/phpunit.xml Modules/*/pint.json Modules/*/rector.php Modules/*/peck.json Modules/*/phpstan.neon
+```
+
+Expected: the first command returns nothing; the second reports no such file, for every pattern.
+
+- [ ] **Step 2: Prove the module release scripts survived**
+
+Run:
+
+```bash
+rtk ls Modules/*/scripts Modules/*/cliff.toml
+rtk rg -n '"version' Modules/*/composer.json
+rtk ./scripts/version.sh Core patch --dry-run
+```
+
+Expected: no `scripts/` directory and no `cliff.toml` in any module; each module's `composer.json`
+keeps its `version` *field* and none of the `version:*` *scripts*; and the root script computes
+Core's next version from Core's own history. That last command is the real assertion: the
+capability moved, it was not dropped.
+
+- [ ] **Step 3: Prove the module test helpers still autoload**
+
+Run:
+
+```bash
+rtk rg -n 'autoload-dev' -A 12 Modules/Core/composer.json Modules/CMS/composer.json
+rtk composer dump-autoload
+rtk php artisan test --compact Modules/Core/tests/Integration
+```
+
+Expected: `autoload-dev` is intact in every module and the Core integration tests, which use
+namespaced fixtures, resolve them.
+
+- [ ] **Step 4: Run the full suite**
+
+Run:
+
+```bash
+rtk php artisan test --compact
+```
+
+Expected: matches the Task 1 baseline. Ask the user to confirm the run on their machine as well,
+since this is the change's real assertion.
+
+- [ ] **Step 5: Format and analyse from the root**
+
+Run:
+
+```bash
+rtk vendor/bin/pint --test
+rtk vendor/bin/phpstan analyse --memory-limit=3G --no-progress
+```
+
+Expected: Pint is clean across the application and the modules, which is the assertion Task 8
+bought. PHPStan runs and reports the count Task 7 recorded.
+
+- [ ] **Step 6: Close the plan**
+
+Add the two closing sections this repository requires: a delivery-status heading carrying the
+date, and a `**Documented in:**` line naming the module documentation that now describes how tests
+are run. Record anything deliberately not done, in particular: the module quality configurations
+the `peckphp/peck` constraint left at the installed version, the PHPStan error backlog and the
+`Modules/MES/**` exclusion left standing, and any `UnitShell` file still unclassified.
+
+(Both headings are written out in `AGENTS.md`; they are not spelled literally here because
+`tests/Unit/ClosedPlansPointToDocumentationTest.php` reads the delivery heading as the marker that
+a plan is closed, and this plan is not.)
+
+- [ ] **Step 7: Commit**
+
+Run:
+
+```bash
+rtk git add docs/superpowers
+rtk git commit -m "docs: close the module testing strategy plan"
+```
+
+Expected: commit succeeds.
+
+---
+
+## Execution log (2026-09-15)
+
+Tasks 1 through 9 are done, with the exceptions noted below. Nothing is committed: the user asked
+for the work to land in the working tree of `master` in each repository, for review first.
+
+**What the execution found that the plan had not predicted:**
+
+- **`composer update --lock` does not drop a package that nothing requires any more.** After the
+  module `require-dev` blocks were removed, `orchestra/testbench` was still in the lock. A full
+  `composer update` would have removed it but also upgraded 16 unrelated packages (Symfony,
+  Livewire), which the plan forbids. The fix was a targeted `composer update "orchestra/*"`:
+  exactly six removals (`testbench`, `testbench-core`, `workbench`, `canvas`, `canvas-core`,
+  `sidekick`), no version changed anywhere else.
+- **Removing a package with `--no-scripts` leaves Laravel's package manifest stale.** Every suite
+  died with `Class "Orchestra\Canvas\LaravelServiceProvider" not found`, from
+  `bootstrap/cache/services.php`. `php artisan package:discover` alone did not repair it, because
+  it fails while reading the stale manifest; the cache files had to be deleted first.
+- **SAO encodes the old model in its own tests.** `ScaffoldingComplianceTest` asserted that the
+  module ships `phpunit.xml`, `phpstan.neon`, `pint.json`, `peck.json`, `rector.php`, `cliff.toml`
+  and three executable scripts; `ModuleMetadataTest` asserted the full `test:*` script battery.
+  They are good tests of the wrong law. They were rewritten to assert the new one: the module must
+  *not* carry the toolchain, the application's suites must glob it, and the application must be
+  able to version it. No other module has compliance tests of this kind.
+- **PHPStan's real state.** With `excludePaths` repaired, the analysis runs for the first time and
+  reports **33.282 errors at `level: 9`** (Core 21.252, ERP 3.822, CMS 3.392, AI 2.485, SAO 2.332,
+  app 1). This backlog is not new and was not introduced here: it was invisible because the root
+  aborted before analysing and the modules had no `vendor/`. The module `ignoreErrors` were carried
+  into the root with their paths prefixed before their files were deleted; they account for 2 of
+  those errors. Fixing the rest is not this plan's work.
+- **`Modules/Core/scripts/bench/`** holds benchmark SQL fixtures, not tooling. It stays, so Core is
+  the one module that still has a `scripts/` directory.
+- **Rector** reports 548 files it would change across the modules. Pre-existing, untouched: the
+  root `rector.php` already globbed `Modules/*/app` before this work.
+
+**Results:**
+
+- `Unit`: 1 failed, 497 passed, both before and after. The failure is pre-existing and unrelated
+  (`Modules/CMS/tests/Unit/Casts/FieldTypeTest` expects `FieldType::Number->getRule()` to be
+  `'number'`; it returns `'numeric'`).
+- Dev packages: 90 before, 84 after. The six removed are Testbench and its chain.
+- Pint: 618 module files reformatted, then `pint --test Modules` passes clean.
+- `composer run --list` at the root now lists only scripts the root defines. `test:standalone`,
+  `test:unit:parallel` and the module `test:pest*` entries are gone.
+
+**Not done:**
+
+- Task 4c Step 6, the end-to-end version bump. It tags and pushes, so it needs the user.
+- Tasks 10 to 12: documentation, `UnitShell` classification, final verification.
+
+---
+
+## Delivered before this revision
+
+Recorded here so the work is not repeated. Verified against the code on 2026-09-15 by reading what
+exists, not by trusting the old task list.
+
+- **Suite directories.** `tests/Integration` and `Modules/*/tests/Integration` exist for all six
+  modules, SAO included, which the original plan did not cover.
+- **Root aggregate suites.** `phpunit.xml` defines `Unit`, `Integration` and `Feature`. It improves
+  on the plan's design by globbing `Modules/*/tests/...` instead of listing each module, so a new
+  module needs no configuration change.
+- **Module suites.** Every module had the three suites in its `phpunit.xml`. Task 5 above deletes
+  those files; the classification they expressed lives on in the root globs.
+- **Composer suite scripts.** The root defines `test:unit`, `test:integration`, `test:feature` and
+  `test:modules`. The per-module equivalents were also added, and Task 4 removes them.
+- **Test reclassification.** The moves happened: Core holds 23 `Unit`, 214 `Integration` and 146
+  `Feature`; CMS 20/23/58; AI 30/58/21; ERP 1/14/119; MES 3/2/25; SAO 14/2/119. `UnitShell` still
+  holds 13 files, which is Task 11.
+- **Pest bindings.** Narrowed as designed. `Modules/Core/tests/Pest.php` binds `Unit` to the
+  minimal `TestCase` and `Integration`/`Feature` to `LaravelTestCase`; no module applies
+  `RefreshDatabase` to `Unit`. The root `tests/Pest.php` improves on the plan by globbing module
+  bootstraps rather than requiring each by name.
