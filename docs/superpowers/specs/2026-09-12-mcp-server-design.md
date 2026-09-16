@@ -76,6 +76,48 @@ Token mode is **not** wired yet, despite Sanctum being installed:
 - `HasApiTokens` is **absent** from `Modules/Core/app/Models/User.php`. ❌ — to add.
 - A stateless route group is needed. ❌ — to add.
 
+### Token lifecycle: who mints one
+
+**The owner mints their own token.** A token is a delegation of the holder's own
+rights, so an administrator never mints one for another person: that would create a
+credential its owner does not know exists, while the audit trail attributes every
+action to them.
+
+The administrator governs three other things instead: the permission to create MCP
+tokens at all, a list of existing tokens to inspect and revoke (never their values),
+and the `MCP_ENABLED` kill switch.
+
+**Service accounts are the exception.** The dedicated non-superadmin account MCP runs
+under exists only for the integration, so an administrator creates it and mints its
+token.
+
+Rules at creation:
+
+| Rule | Why |
+|------|-----|
+| Read-only by default | The safe choice should be the default one |
+| Ability fixed at creation, never edited | A token that changes powers while it sits in an external client is impossible to reason about. More powers means a new token and the old one revoked |
+| Finite expiry required | The column is nullable, i.e. "never expires". An MCP token sits in a client's config file for months |
+| Name required | It says what you are revoking. Logs carry the token id, which on its own means nothing |
+| Value shown once | Only the hash is stored |
+
+**No schema change is needed.** `personal_access_tokens` already carries `name`,
+`abilities`, `last_used_at` and `expires_at`, and Sanctum checks a token's own
+`expires_at` independently of the global `sanctum.expiration`
+(`vendor/laravel/sanctum/src/Guard.php:129`), so a per-token deadline works even
+though the global expiry is off. `last_used_at` is tracked by default and should be
+surfaced in the list, since it is what makes a forgotten token visible.
+
+What Sanctum does **not** record is the caller's IP and client. That belongs to the
+audit log line, not to the token row.
+
+### Surfaces, given the UI is in construction
+
+Nothing exists today: there is no token management in Filament and none in `/app`.
+For v1, an Artisan command creates and revokes, and a read-only Filament page lists
+tokens with their last use and a revoke action. Self-service moves into `/app` when
+the Vue frontend reaches it.
+
 ### Trap: the `auth` middleware group is cookie-laden
 
 `bootstrap/app.php:71` appends `EncryptCookies`, `StartSession`, `VerifyCsrfToken`
