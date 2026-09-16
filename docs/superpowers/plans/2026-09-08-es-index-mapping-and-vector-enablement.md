@@ -47,3 +47,11 @@ Two further ES-side facts found by applying the mapping against the live cluster
 - Embedding service: localhost:8000, sentence-transformers, 384-dim (verified live).
 - `SCOUT_QUEUE=true`, vector enabled, dim 384 (live setting corrected).
 - Only `Content` is embedding-ready (`$embed = ['title','textual_only']`); Ticket/Location are not.
+
+## Delivery status (2026-09-16): delivered — later superseded on the index scope
+
+All boxes above shipped: ES vector/hybrid search runs end-to-end against live ES, and `createIndex` applies the `embedding` dense_vector mapping via `ElasticsearchService`. The scope was **deliberately embedding-only** (all other fields kept on ES dynamic mapping) precisely to avoid the translator's invalid-ES output on object/relation fields (see "RCA extension, second pass": `meta.filterable` emitted as a **boolean** and `index`/`meta` set on **object/relation** fields → ES 400).
+
+**Superseded by** `2026-09-12-es-multilingual-index-and-multimodel-embeddings.md` (Task 3), which changed `createIndex` to push the **full** translated mapping, not just the embedding field. That reverses this plan's embedding-only decision and **reintroduces the exact 400 risk this plan avoided**: the translator still emits `meta.filterable` as a boolean and `index:true` on the `nested`/`object` fields (tags/contributors/categories/locations) at `Modules/Core/app/Search/Translators/ElasticsearchTranslator.php:120-132`. The 2026-09-12 ES-gated tests skipped (no ES in the runner), so this was not caught. Fixing the translator field-by-field (meta values as strings; no `index` on object/nested/dense_vector) is a prerequisite for the 2026-09-12 cutover (recreating the index with the full mapping) and is an outstanding follow-up.
+
+**Documented in:** `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`.
