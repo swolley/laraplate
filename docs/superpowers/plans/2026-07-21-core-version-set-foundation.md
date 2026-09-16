@@ -20,7 +20,7 @@
 
 **Schema transition rule:** Task 2 introduces `version_set_id`, `sequence`, and `change_type` as nullable compatibility columns so the existing writers remain executable while the sole writer is still RED. Task 4 backfills no production data (the database baseline is fresh), makes all three columns required in the edited base migration, and turns on the final invariant that every new version row belongs to one ordered set. No release or module pilot may occur between those two tasks.
 
-**Sequencing rule:** The stack-level `../docs/superpowers/plans/2026-07-19-model-connection-affinity.md` overlaps `HasVersions`, `CrudService`, `CompactVersions`, and their tests. Complete its affected Core work before this plan, or designate this plan as the owner of those exact overlaps during one coordinated implementation. Do not execute both plans concurrently against those files.
+**Sequencing rule:** The `2026-07-19-model-connection-affinity.md` plan overlaps `HasVersions`, `CrudService`, `CompactVersions`, and their tests. Complete its affected Core work before this plan, or designate this plan as the owner of those exact overlaps during one coordinated implementation. Do not execute both plans concurrently against those files.
 
 ### Task 1: Characterize the existing writer paths
 
