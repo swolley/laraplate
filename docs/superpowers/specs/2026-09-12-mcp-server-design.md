@@ -15,6 +15,27 @@ Expose a controlled, authenticated slice of Laraplate to **external** LLM client
 (Claude Desktop/Code, ChatGPT, custom agents) over the Model Context Protocol, as a
 **fourth HTTP surface** next to `/admin`, `/app` and `/api/v1`.
 
+## Phasing: phase 1 is read-only
+
+**Decided.** Phase 1 ships the read and search tools. No write tool, no lifecycle tool, no
+`mcp:write` token is issued or honoured.
+
+This is a sequencing decision, not a verdict on writes. **Writes will have to be opened**:
+an MCP server that can only read is half a product, and the point of binding a session to a
+specific user is precisely that the user's own actions become reachable. What is missing is
+not the will but a home for the approval mechanism, and shipping writes before that home
+exists would mean shipping the most exposed surface in the system with the least protection
+on it. See *Write approval* for what has to be solved and the order to solve it in.
+
+Two consequences worth stating so phase 1 does not quietly become permanent:
+
+- The write and lifecycle tool sets below stay **designed and specified**, marked as phase 2.
+  They are not struck out, and the next person does not redesign them.
+- The `mcp:write` ability stays in the token model from the start. Minting must be able to
+  refuse it in phase 1 while the concept, the naming and the two-gate intersection remain in
+  place, so that opening writes is a matter of lifting a refusal rather than retrofitting a
+  permission axis into a shipped protocol.
+
 ## Direction: this is not the AI module
 
 The two must not be confused; they point opposite ways.
@@ -95,7 +116,7 @@ Rules at creation:
 
 | Rule | Why |
 |------|-----|
-| Read-only by default | The safe choice should be the default one |
+| Read-only by default | The safe choice should be the default one. **In phase 1 read-only is also the only option**: minting refuses `mcp:write` outright (see *Phasing*) |
 | Ability fixed at creation, never edited | A token that changes powers while it sits in an external client is impossible to reason about. More powers means a new token and the old one revoked |
 | Finite expiry required | The column is nullable, i.e. "never expires". An MCP token sits in a client's config file for months |
 | Name required | It says what you are revoking. Logs carry the token id, which on its own means nothing |
@@ -154,7 +175,7 @@ The token is a delegation: it can only ever narrow what the user can already do.
 |---------|--------|
 | *(none required)* | `about`, `entities` — discovery only, already user-scoped |
 | `mcp:read` | every read tool, `search` included |
-| `mcp:write` | every write and lifecycle tool; implies nothing about reads, so a writing token carries both |
+| `mcp:write` | every write and lifecycle tool; implies nothing about reads, so a writing token carries both. **Phase 2: not minted and not honoured in phase 1** (see *Phasing*), but part of the token model from the start |
 
 Everything finer belongs to permissions and ACL. Per-module or per-entity abilities
 were considered and dropped: they would duplicate the permission model on the token
@@ -300,7 +321,19 @@ like any other account. Consequences:
 Highest-value tool of the set: it is the one an external LLM actually wants, and the
 one that makes Laraplate content usable as a knowledge source.
 
-### Write — `mcp:write`
+**It passes `mode=deep`.** Search cost is becoming a per-request choice rather than a global
+setting (`2026-09-16-search-modes-and-strategy-resolution-design.md`), and this is the caller
+that should pay it: an external agent tolerates seconds where a rendered grid does not. Two
+consequences for this server. The per-user rate limiting reasoned about below is not optional
+for this tool, it is the control that makes a deep search affordable. And `deep` is gated by a
+permission, so the MCP service account needs it like any other user: a token cannot grant what
+the person behind it does not have.
+
+### Write — `mcp:write` (phase 2)
+
+Specified now, shipped once *Write approval* is settled. Nothing below changes when it is;
+what changes is whether a call executes directly or raises an approval request first.
+
 
 | Tool | `CrudService` method |
 |------|----------------------|
@@ -315,7 +348,7 @@ must state that `update` is a two-step dance: `detail` first to read
 `lock_version`, then `update` carrying it. A model that guesses will simply fail,
 which is the correct outcome. See memory `locking-policy`.
 
-### Lifecycle — `mcp:write`
+### Lifecycle — `mcp:write` (phase 2)
 
 `activate`, `inactivate`, `approve`, `disapprove`, `lock`, `unlock`.
 
@@ -345,6 +378,84 @@ Not oversights. Each would break the security model.
 | `facets` (`facetCounts` / `facetValues`) | Facet counts exist to render a filter sidebar. A model cannot render one, and the two questions it would actually ask are already answered elsewhere: *what can I filter on* by `entities`, *is this query too broad* by `CrudMeta::totalRecords` on a small-page `list`. Per-value cardinality is not decision-relevant to a model. Also still WIP (funnel → Crud), so exposing it would pin a moving target. |
 | `freshness` | Same shape as `facets`: it answers "has the list I am displaying gone stale". An external LLM holds no list and has no polling loop. |
 | Notifications | Per-user UI state; no value to an external LLM. |
+
+## Write approval: what MCP inherits from the AI module, and what it must not
+
+The AI module is building an approval-gated tool path: when a model proposes a write,
+`ToolRegistry` creates an `ActionRequest` classified by `RiskClassifier`, a person approves
+or rejects it, and `ExecuteActionRequestJob` runs the handler only after approval. It is
+being reconnected to the in-app assistant through a policy capability, so that which tools a
+caller may reach is decided by the compiled policy for its profile rather than by the calling
+code. The same shape was proposed for this server, on the reasoning that an MCP session is
+always bound to one specific user.
+
+**Two things transfer, one does not.**
+
+*Does not transfer:* the AI module's `AssistantPolicyCatalog`. That catalog governs prompts
+Laraplate itself composes, in the direction described under *Direction: this is not the AI
+module*. Reusing it here would couple a served resource to a client, and its profiles answer
+a question this server does not ask (which corpora and instructions shape an answer we
+generate). Tool eligibility here is already answered by ability plus ACL.
+
+*Transfers, and should:* **human approval for writes.** Reconsider the current position that
+`mcp:write` plus ordinary ACL is enough. In-app, the input steering a tool call is typed by
+the person sitting there. Here, by this spec's own opening premise, it is untrusted and
+model-driven. The *more* exposed surface is the one currently without the safeguard, which is
+backwards. Under the same threat model the *Audit* section already accepts (manipulated
+content steering the model into an update, with the trail pointing at the person), an audit
+log records the damage; an approval gate prevents it.
+
+*Transfers as a principle:* the tool set a caller can reach is **declared, not assembled by
+the caller**. Whatever declares it here (the ability, a profile, a capability), it must not be
+a list built inside the request handler, or this server and the assistant will drift apart
+tool by tool, and the user's "one day expose a few safe, controlled tools" over `/api/v1`
+becomes a third hand-maintained list.
+
+### Consequence to settle before implementation
+
+`ActionRequestService` and `RiskClassifier` live in `Modules/AI`. Making MCP writes pass
+through them as they stand would make this server depend on the AI module, against the
+direction this spec sets. Three ways out, in order of preference:
+
+1. **Move the approval mechanism to Core** behind a contract, and let both the AI assistant
+   and MCP depend on the contract, not on each other. This matches how search already works
+   (`ISearchPlanner` / `IReranker` in Core, AI overlaying implementations) and keeps each
+   perimeter readable on its own. Cost: one refactor of the AI module before MCP writes ship.
+2. **Ship MCP read-only first**, defer every write until the mechanism has a home. Cheapest,
+   and read tools are where the value is anyway (`search` is named here as the highest-value
+   tool of the set).
+3. Accept the dependency `MCP → Modules/AI` for writes. Fastest, and the one that will be
+   regretted, because it inverts the direction on the exact axis this spec opens by defining.
+
+**Decided: 2 now, 1 when writes are opened.** Phase 1 ships read-only (see *Phasing*), which
+buys the time to give the approval mechanism a home in Core without holding up the read tools,
+where the value already is. Option 3 stays available only with a written reason, because it
+inverts the direction this spec opens by defining.
+
+### What phase 2 has to answer, recorded now so it is not rediscovered
+
+Writes are a certainty, so these are open questions with a deadline, not hypotheticals:
+
+1. **Where the approval mechanism lives.** Moving `ActionRequestService` and `RiskClassifier`
+   to Core behind a contract, with `Modules/AI` overlaying its implementation the way the AI
+   module already overlays `ISearchPlanner` and `IReranker`. This is the piece of work that
+   gates everything else.
+2. **Which writes need a human at all.** Requiring approval for every `insert` would make the
+   server useless for the ordinary cases it exists to serve. `RiskClassifier` already maps a
+   tool name to a risk level; the question is whether risk here should also read the entity
+   and the operation, since `delete` on an ERP document and `update` on a draft note are not
+   the same act. Deciding this badly in either direction is how a safety gate gets switched
+   off wholesale by whoever finds it annoying.
+3. **How an approval reaches the person.** In `/app` the requester is looking at the screen.
+   Here the caller is an external client, possibly unattended, and the person may be nowhere
+   near. A pending request needs somewhere to surface and a way to answer the client that the
+   call is parked rather than failed, which is a protocol-shaped question and not only a UI
+   one: MCP has no native "come back later".
+4. **What a token may pre-approve.** A user might legitimately want a client that can write
+   low-risk entities without a prompt each time. If so, that is a third gate, and it belongs
+   in the token model, not in a config file.
+
+None of this blocks phase 1. All of it blocks the first write tool.
 
 ## Rate limiting
 
@@ -387,3 +498,7 @@ own user column, with `auth()->id()` commented out. This affects `/app` equally.
 
 1. MCP spec revision + PHP package choice (blocks implementation).
 2. Implementation plan — written after point 1, since the package shapes it.
+3. **Settled for phase 1:** the server ships read-only, so no write tool is implemented yet.
+   Reopening the write set means answering the four questions under *Write approval → What
+   phase 2 has to answer*, starting with giving the approval mechanism a home in Core. Blocks
+   phase 2 only; the read set is unaffected.
