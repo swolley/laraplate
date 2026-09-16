@@ -191,3 +191,4 @@ Out of scope: a third mode (recorded as the likely outcome of measurement, not a
 - `docs/superpowers/specs/2026-09-12-mcp-server-design.md` (the `search` tool, rate limiting, and the same reasoning about keeping an authorization axis from day one)
 - `docs/superpowers/specs/2026-09-15-measured-retrieval-tuning-l1-design.md` (ranking quality, a different question from cost)
 - `Modules/AI/docs/rag/MODULE.md`, section *Perimeters* (why search belongs to Core and AI only overlays it)
+- `docs/superpowers/plans/2026-07-16-rag-retrieval-strategy.md` (the *documentation* corpus retriever, NeuronAI `RetrievalInterface` — a different path from this one; its hybrid and reranking tasks remain open and are not delivered by the work here)

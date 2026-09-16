@@ -2,7 +2,7 @@
 status: in-progress
 verified_on: 2026-09-15
 verified_by: repo audit
-note: Umbrella roadmap. Its measurement stages shipped as the stack R3 plans (2026-09-09 baseline, 2026-09-10 per-strategy); hybrid/rerank shipped through the ensemble work. The graph decision checkpoint is still open and stays evidence-gated.
+note: Umbrella roadmap, partially delivered. Measurement (Tasks 1-2) shipped under different names — DocumentationEvaluationCase/Dataset/Service and the ai:evaluate-documentation command, plus the stack R3 plans (2026-09-09 baseline, 2026-09-10 per-strategy). NOT built: the explicit retrieval factory (Task 3), documentation-corpus hybrid + reciprocal-rank fusion (Task 4), and reranking (Task 5). Master runs InAppDocumentationRetrieval (vector-only) with no DocumentationRetrievalFactory and no AI_FAQ_RETRIEVAL switch. The hybrid/rerank that did ship belongs to the application-content search path (EnsembleSearchService), a different retriever — see 2026-09-16-search-modes-and-strategy-resolution — so it does not cover this documentation corpus. The graph decision checkpoint (Task 6) stays open and evidence-gated.
 ---
 # RAG Retrieval Strategy Implementation Plan
 
@@ -33,6 +33,8 @@ Do not start Task 4 until Tasks 1–3 have produced a committed baseline report.
 This plan evaluates documentation retrieval quality. It does not authorize sharing a corpus between assistant profiles or exposing Core Graph data. Evaluation reports must slice results by server-owned profile, and user-profile cases must use only the physically separate user index defined by the security prerequisite.
 
 Application-module data must not be added to this evaluation corpus. Its search indexes, provider results, citations, and metrics belong to the application content retrieval plan.
+
+**Relationship to `2026-09-16-search-modes-and-strategy-resolution`.** That plan reworks the *application-content* search path (`AdvancedSearchService` / `EnsembleSearchService`, Core `ISearchPlanner`/`IReranker`), where hybrid retrieval and cross-encoder reranking already run. This plan is the *documentation* corpus (NeuronAI `RetrievalInterface`, served today by `InAppDocumentationRetrieval`, vector-only). They are two different retrievers over two different indexes and must not be conflated: shipping hybrid on the application-content path did not give the documentation corpus hybrid retrieval. Tasks 4 and 5 remain the only route to it. Task 5 already reuses Core `IReranker`; a documentation `SearchStrategy` analogue is out of scope unless the Task 1-2 measurement justifies it.
 
 ### Task 1: Versioned RAG evaluation dataset and loader
 
@@ -238,6 +240,8 @@ rtk git -C Modules/AI commit -m "refactor(ai): make documentation retrieval stra
 ```
 
 ### Task 4: Feature-flagged Elasticsearch hybrid retrieval
+
+> **Scope:** the documentation retriever only (NeuronAI `RetrievalInterface`, `InAppDocumentationRetrieval`). This is a different path from the application-content ensemble hybrid reworked in `2026-09-16-search-modes-and-strategy-resolution`; that work does not deliver hybrid retrieval to this corpus. See *Relationship to search-modes* above. As of 2026-09-16 none of the classes below exist on master.
 
 **Files:**
 
