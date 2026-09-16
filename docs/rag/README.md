@@ -6,8 +6,10 @@ This folder holds **global** documentation you want available to the documentati
 
 | Audience | Typical questions | How they reach RAG |
 |----------|-------------------|-------------------|
-| **End user** (application operator) | “How do I approve a modification?”, “Where is the grid export?” | In-app **chat** (`ChatService`), when FAQ/RAG is enabled and the message is treated as a question (or `use_rag: true` in context) |
+| **End user** (application operator) | “How do I approve a modification?”, “Where is the grid export?” | In-app **assistant** (`InAppAssistanceService::respond()`), which retrieves documentation under the compiled policy and scope for that user |
 | **Developer** (extends Laraplate) | “How does ACL inheritance work?”, “Which event triggers indexing?” | Terminal **`php artisan ai:help`** (REPL or `--question=`) |
+
+> The end-user path no longer goes through `ChatService` and no longer depends on question detection or a `use_rag` flag: those belonged to the superseded chat. Retrieval is now decided by the assistant's policy and scope. See `Modules/AI/docs/rag/MODULE.md`, section *Perimeters*.
 
 Both paths use the **same indexed corpus** (`ai:index-rag-docs`). Split content by **writing style and scope**, not by separate indexes (unless you later add filtered roots via `--path` or `AI_FAQ_DOCS_PATH`):
 
