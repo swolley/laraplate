@@ -8,7 +8,7 @@
 
 ## Problem
 
-The assistant remembers only *within* one conversation: `MemoryService` summarizes a long chat and re-injects that summary into the same chat's system prompt. Nothing survives across conversations, so the user repeats stable facts every session. `MemoryService::extractFacts()` already extracts key facts from a conversation but the result is never persisted or reused.
+The assistant remembers only *within* one conversation: `MemoryService` summarizes a long chat and re-injects that summary into the same chat's system prompt (`getContextForNewMessage`). Extracted facts *are* persisted today, but only inside per-conversation `ConversationSummary.facts` snapshots (a JSON blob tied to one `conversation_id`) — they are never promoted to a cross-session, per-user, queryable store, and injection reads only the current conversation's summaries. So the user repeats stable facts every new conversation.
 
 ## Decision summary
 
@@ -16,7 +16,7 @@ Introduce a per-user, tenant-scoped store of durable **memory facts**, extracted
 
 ## Scope and isolation
 
-- A fact belongs to one **user** within one **tenant**. Retrieval and every write are filtered by `user_id` + tenant scope, always. No cross-user or cross-tenant read.
+- A fact belongs to one **user**. Retrieval and every write are filtered by `user_id`, always. No cross-user read. Tenant is inherited via the Core user: AI tables carry no tenant column today (the assistant is Global-scope, like `Conversation`), so `user_id` is the isolation key; a tenant column is added only if/when AI tenant scoping lands.
 - **Module-agnostic:** facts describe the user, so they surface to that same user in any module (a preference stated in CMS is useful in ERP). Module scope (R1a) governs docs/data retrieval, not user memory.
 - Facts are the user's own data, not ACL-record-gated content: no per-record ACL applies. Secrets are never stored (see security invariants).
 
@@ -24,7 +24,7 @@ Introduce a per-user, tenant-scoped store of durable **memory facts**, extracted
 
 New table (module-prefixed, e.g. `ai_memory_facts`), one row per fact:
 
-- `id`, `user_id` (indexed), tenant scope column consistent with existing module tables.
+- `id`, `user_id` (FK to Core users, indexed) — the isolation key, matching `Conversation`. No tenant column (see Scope and isolation).
 - `fact` — the bounded plain-text fact.
 - `source_message_id` (nullable FK to the message it was extracted from) — provenance.
 - `confidence` — normalized score when available.
@@ -50,8 +50,8 @@ New table (module-prefixed, e.g. `ai_memory_facts`), one row per fact:
 
 ## Security and information-flow invariants
 
-1. Every read and write is filtered by `user_id` + tenant; a fact is never visible to another user or tenant.
-2. Facts are user-owned data; no per-record ACL, but the user/tenant filter is mandatory and fail-closed (a missing/ambiguous principal yields no memory, never all memory).
+1. Every read and write is filtered by `user_id`; a fact is never visible to another user (and, transitively, another tenant, since a user belongs to one).
+2. Facts are user-owned data; no per-record ACL, but the `user_id` filter is mandatory and fail-closed (a missing/ambiguous principal yields no memory, never all memory).
 3. No secrets, credentials, or sensitive tokens are persisted: the extraction prompt and a write-time filter exclude them; when in doubt, drop.
 4. Injected facts are untrusted data and cannot instruct the assistant (guardrail-consistent).
 5. Provenance (`source_message_id`) never exposes another user's message.
