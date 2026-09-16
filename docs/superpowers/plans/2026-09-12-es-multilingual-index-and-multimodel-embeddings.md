@@ -1002,3 +1002,15 @@ Run once after all tasks land (dev environment):
 All 15 code tasks verified against the repo: locale-object mappings with per-language analyzers, the nested agnostic `embeddings` array and its kNN with a document-level `locales` filter, the embedding-model registry with query/passage prefixes, the `locale` + `model_key` stamps, per-locale generation, the incremental re-embed observer, Ticket as the mono-lingual exemplar, and the repair command.
 
 The post-implementation cutover (switch the service model, migrate, repair embeddings, delete/recreate/import the indexes, then measure) is manual and has **not** been run. Until it is, the index still holds vectors from the previous model.
+
+### Pre-cutover blocker: full mapping is rejected by ES (fix before running the cutover)
+
+Task 3 changed `ElasticsearchEngine::createIndex` to push the **full** translated mapping (not just the `embedding` field, which was the earlier scope in `2026-09-08-es-index-mapping-and-vector-enablement.md`). But `ElasticsearchTranslator` (`Modules/Core/app/Search/Translators/ElasticsearchTranslator.php:120-132`) adds `meta` (`relation`, `filterable`) and `index: true` to the `nested`/`object` relation fields (tags/contributors/categories/locations), and ES `object`/`nested` field types accept **neither** parameter. `stringifyFieldMeta` (`ElasticsearchEngine.php:793`) only stringifies the meta values; it does not remove `meta`/`index`, so it does not prevent the failure.
+
+Verified live 2026-09-16 (throwaway index on the real cluster, then deleted): applying the full `Content` mapping returns `mapper_parsing_exception: Mapping definition for [tags] has unsupported parameters: [meta : {filterable=true, relation=tags}] [index : true]` (HTTP 400). The Task 3 ES-gated test skipped in the runner (no ES), so this was not caught. Step 4 of the cutover above (`scout:delete-index` → `scout:index`) recreates the index with the full mapping and therefore **fails today** — the cutover is blocked until this is fixed.
+
+**Fix (do before the cutover):**
+- In `ElasticsearchTranslator::translateField`, emit `meta` (`relation`, `filterable`) and `index` **only on leaf field types** (text/keyword/integer/float/boolean/date). Never add them to `object`/`nested` fields. The vector `nested` field keeps its own valid `dense_vector` `index: true` (that one is legal on `dense_vector`).
+- Add an ES-gated test that actually creates the full `Content` mapping against a live cluster (throwaway index) and asserts success — not one that silently skips when ES is absent — so this class of bug is caught.
+
+See `2026-09-08-es-index-mapping-and-vector-enablement.md` (Delivery status) for the full history: that plan deliberately scoped `createIndex` to embedding-only to avoid this exact 400.
