@@ -1,4 +1,9 @@
 includes:
+    # The 9.851 errors that existed on 2026-09-17, frozen so new ones fail the run.
+    # This is not a list of things that are fine: it is the debt, made visible and
+    # kept from growing. Shrink it by category (see the notes in ignoreErrors) and
+    # regenerate; never add to it to silence something new.
+    - phpstan-baseline.neon
     - vendor/larastan/larastan/extension.neon
     - vendor/nesbot/carbon/extension.neon
     - vendor/phpstan/phpstan/conf/bleedingEdge.neon
@@ -38,6 +43,18 @@ parameters:
         # extension, not defects. Delete these two lines when the plugin is installed.
         - Modules/*/tests/*
         - Modules/*/tests/**
+        # SentenceTransformersEmbeddingGenerator implements an interface from LLPhant,
+        # a package this application does not depend on (no llphant entry in
+        # composer.json) and cannot autoload. Nothing references the class either, so
+        # it is dead code left behind by a dependency that went away. `interface.notFound`
+        # is not ignorable, so the file leaves the analysis instead. Delete the file and
+        # this exclusion goes with it.
+        - Modules/Core/app/Search/Ai/SentenceTransformersEmbeddingGenerator.php
+        # Two files under Modules/Core/stubs are App-side templates used only by the
+        # test suite; one deliberately extends a final class, which works there because
+        # BypassFinals is active and is an error to report anywhere else.
+        - Modules/*/stubs/*
+        - Modules/*/stubs/**
     
     # Ignore specific errors
     ignoreErrors:
@@ -79,6 +96,24 @@ parameters:
         -
           identifier: property.notFound
           message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+::\$\w+\.$#'
+        # HasBenchmark is analysed once per command that uses it, and the ?? on the
+        # Oracle branch resolves differently depending on the context. The baseline
+        # cannot pin a count that moves, so the error is named here instead.
+        -
+          identifier: nullCoalesce.expr
+          path: Modules/Core/app/Console/Concerns/HasBenchmark.php
+        -
+          identifier: nullCoalesce.expr
+          path: Modules/Core/app/Overrides/Command.php
+        # Both engines are analysed in more than one context, and this error appears in
+        # some and not others. A baseline entry pins a count, and a count that moves is
+        # reported as ignore.count, so these two are named here without one.
+        -
+          identifier: function.alreadyNarrowedType
+          path: Modules/Core/app/Search/Engines/ElasticsearchEngine.php
+        -
+          identifier: function.alreadyNarrowedType
+          path: Modules/Core/app/Search/Engines/TypesenseEngine.php
         # Laravel Scout - methods added by the Searchable trait
         - '#Call to an undefined method.*::searchableAs\(\)#'
         # Cache::remember with an array as TTL (likely a bug, but ignore for now)
