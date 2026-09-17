@@ -10615,12 +10615,6 @@ parameters:
 			path: Modules/Core/app/Http/Controllers/CrudController.php
 
 		-
-			rawMessage: 'Parameter #1 $record of method Modules\Core\Services\Crud\DomainActionDispatcher::dispatch() expects Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Collection<(int|string), Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Http/Controllers/CrudController.php
-
-		-
 			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
 			identifier: method.nonObject
 			count: 1
@@ -24271,12 +24265,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
 
 		-
-			rawMessage: 'Parameter #1 $movement of method Modules\ERP\Services\Cash\PartnerPoolSettlementService::allocate() expects Modules\ERP\Models\Movement, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
 			rawMessage: 'Parameter #1 $pool of method Modules\ERP\Services\Cash\PartnerPoolSettlementService::settle() expects Modules\ERP\Models\PartnerPool, Illuminate\Database\Eloquent\Model|int|string|null given.'
 			identifier: argument.type
 			count: 1
@@ -29557,12 +29545,6 @@ parameters:
 			path: Modules/ERP/app/Import/Services/ExternalCashMovementImportService.php
 
 		-
-			rawMessage: 'Parameter #2 $account of method Modules\ERP\Services\Cash\MovementPostingService::validateCounterparty() expects Modules\ERP\Models\Account, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Account>|Modules\ERP\Models\Account given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Import/Services/ExternalCashMovementImportService.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 3
@@ -30925,30 +30907,6 @@ parameters:
 			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
 
 		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\ChartOfAccountsInstaller::installWhenEmpty() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\DocumentNumberAllocator::next() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\InvoicePostingService::applyThreeWayMatch() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\JournalPostingService::post() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
 			rawMessage: 'Parameter #1 $posted_entry of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\JournalEntry, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\JournalEntry>|Modules\ERP\Models\JournalEntry given.'
 			identifier: argument.type
 			count: 1
@@ -30956,24 +30914,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $values of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\InvoiceLine>::update() expects array<model property of Modules\ERP\Models\InvoiceLine, mixed>, array<string, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Accounting\InvoicePostingService::buildJournalLines() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Accounting\InvoicePostingService::resolveFiscalPeriod() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Accounting/InvoicePostingService.php
@@ -31279,12 +31219,6 @@ parameters:
 			path: Modules/ERP/app/Services/Banking/BankReconciliationService.php
 
 		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Banking\BankDifferenceJournalService::postDifference() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Banking/BankReconciliationService.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\BankStatement>::create() expects array<model property of Modules\ERP\Models\BankStatement, mixed>, array<string, mixed> given.'
 			identifier: argument.type
 			count: 1
@@ -31393,18 +31327,6 @@ parameters:
 			path: Modules/ERP/app/Services/Cash/CashBalanceService.php
 
 		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company::$default_currency.'
-			identifier: property.notFound
-			count: 2
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Anonymous function should return Modules\ERP\Models\JournalEntry but returns Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\JournalEntry>|Modules\ERP\Models\JournalEntry.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
 			rawMessage: 'Match expression does not handle remaining value: mixed'
 			identifier: match.unhandled
 			count: 2
@@ -31435,76 +31357,10 @@ parameters:
 			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
 
 		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\JournalPostingService::post() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $account of method Modules\ERP\Services\Cash\MovementPostingService::validateCounterparty() expects Modules\ERP\Models\Account, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Account>|Modules\ERP\Models\Account given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Cash\MovementPostingService::bankCashAccount() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Cash\MovementPostingService::fiscalPeriod() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Parameter #2 $counterparty of method Modules\ERP\Services\Cash\MovementPostingService::journalLines() expects Modules\ERP\Models\Account, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Account>|Modules\ERP\Models\Account given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
 			rawMessage: 'Parameter #2 $lines of method Modules\ERP\Services\Accounting\JournalPostingService::post() expects list<array{account_id: int, amount_doc: float|string, currency_doc: string, amount_local: float|string, currency_local: string, fx_rate: float|string, description?: string|null, tax_code?: string|null, ...}>, list<array<string, int|string>> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement::$amount_doc.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement::$company_id.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement::$currency_doc.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement::$type.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PartnerPool>|Modules\ERP\Models\PartnerPool::$company_id.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PartnerPool>|Modules\ERP\Models\PartnerPool::$currency.'
-			identifier: property.notFound
-			count: 2
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
 
 		-
 			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$amount.
@@ -31543,24 +31399,6 @@ parameters:
 			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Movement>|Modules\ERP\Models\Movement::getKey().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PartnerPool>|Modules\ERP\Models\PartnerPool::getKey().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PartnerPool>|Modules\ERP\Models\PartnerPool::members().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 2
@@ -31586,12 +31424,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\MovementAllocation>::where() expects array<int|model property of Modules\ERP\Models\MovementAllocation, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\MovementAllocation>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\MovementAllocation, ''movement_id'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: 'Parameter #1 $pool of method Modules\ERP\Services\Cash\PartnerPoolSettlementService::balances() expects Modules\ERP\Models\PartnerPool, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PartnerPool>|Modules\ERP\Models\PartnerPool given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
@@ -32323,32 +32155,14 @@ parameters:
 			path: Modules/ERP/app/Services/Payments/PaymentAllocationService.php
 
 		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentRequest>|Modules\ERP\Models\PaymentRequest::$provider_code.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentRequest>|Modules\ERP\Models\PaymentRequest::$status.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentRequest>|Modules\ERP\Models\PaymentRequest::refresh().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentRequest>|Modules\ERP\Models\PaymentRequest::update().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Services\Payments\PaymentRequestService::applyCallback() has parameter $payload with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
+			count: 1
+			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
+
+		-
+			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\ERP\Models\PaymentRequest, mixed>, array<string, array|Carbon\CarbonImmutable|Modules\ERP\Casts\PaymentRequestStatus::Pending|string> given.'
+			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
 
@@ -32366,12 +32180,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\PaymentRequest>::where() expects array<int|model property of Modules\ERP\Models\PaymentRequest, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\PaymentRequest, ''provider_code'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
-
-		-
-			rawMessage: 'Parameter #1 $request of method Modules\ERP\Contracts\PaymentRequestProvider::createCheckout() expects Modules\ERP\Models\PaymentRequest, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentRequest>|Modules\ERP\Models\PaymentRequest given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Payments/PaymentRequestService.php
@@ -32429,12 +32237,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: Modules/ERP/app/Services/Payments/PaymentRunBuilderService.php
-
-		-
-			rawMessage: 'Access to an undefined property Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\PaymentTerm>|Modules\ERP\Models\PaymentTerm::$rate_lines.'
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Payments/PaymentScheduleGeneratorService.php
 
 		-
 			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
@@ -32870,12 +32672,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Relations\HasOneOrMany<Modules\ERP\Models\SalesOrderLine,Modules\ERP\Models\SalesOrder,Illuminate\Database\Eloquent\Collection<int, Modules\ERP\Models\SalesOrderLine>>::create() expects array<model property of Modules\ERP\Models\SalesOrderLine, mixed>, array<string, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/SalesOrders/SalesOrderAmendmentService.php
-
-		-
-			rawMessage: 'Parameter #1 $company of method Modules\ERP\Services\Accounting\DocumentNumberAllocator::next() expects Modules\ERP\Models\Company, Illuminate\Database\Eloquent\Collection<(int|string), Modules\ERP\Models\Company>|Modules\ERP\Models\Company given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/SalesOrders/SalesOrderAmendmentService.php
@@ -40811,18 +40607,6 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $project of method Modules\SAO\Services\TicketCreationService::open() expects Modules\SAO\Models\Project, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\Project>|Modules\SAO\Models\Project given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Pages/CreateTicket.php
-
-		-
-			rawMessage: 'Parameter #2 $type of method Modules\SAO\Services\TicketCreationService::open() expects Modules\SAO\Models\TicketType, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\TicketType>|Modules\SAO\Models\TicketType given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Pages/CreateTicket.php
 
 		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
