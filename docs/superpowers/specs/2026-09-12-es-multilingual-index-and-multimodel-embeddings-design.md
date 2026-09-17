@@ -461,14 +461,13 @@ tests skip when ES is unreachable.
 
 ## Risks & open items
 
-- **Full mapping rejected by ES — cutover blocker (found post-delivery, 2026-09-16).**
-  Pushing the full translated `Content` mapping fails with `mapper_parsing_exception`
-  because `ElasticsearchTranslator` adds `meta` and `index: true` to `object`/`nested`
-  relation fields (tags/contributors/categories/locations), which ES rejects on those
-  types. Recreating the index during cutover therefore fails today. Fix before cutover:
-  emit `meta`/`index` only on leaf field types (never object/nested; the vector
-  `dense_vector` keeps its valid `index: true`), plus a non-skipping ES-gated test.
-  Details in the plan's "Pre-cutover blocker" section.
+- **Full mapping rejected by ES — cutover blocker (found post-delivery 2026-09-16, RESOLVED 2026-09-17).**
+  Pushing the full translated `Content` mapping failed with `mapper_parsing_exception`
+  because the translator adds `meta` and `index: true` to `object`/`nested` relation
+  fields (tags/contributors/categories/locations), which ES rejects on those types.
+  Fixed by sanitising at index-creation time (`ElasticsearchEngine::sanitizeMappingProperty`)
+  rather than in the translator, whose output the constraint layer reads back for nested
+  filtering. Details and tests in the plan's "Pre-cutover blocker" section.
 - **pgvector column is fixed-dimension.** Fine for the 384→384 switch; a future model
   with other dims needs a column migration. The profile makes dims explicit.
 - **Nested kNN + hybrid scoring.** Confirm ES combines nested `knn` with a top-level
