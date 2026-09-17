@@ -29,6 +29,15 @@ parameters:
         - vendor/**
         - storage/*
         - bootstrap/cache/*
+        # Module test suites. PHPStan cannot read Pest's DSL without
+        # pestphp/pest-plugin-phpstan, which is not installed (its include is
+        # commented out at the top of this file). Without it the suites reported
+        # 23.067 of the 33.282 errors, 11.793 of them the single identifier
+        # method.internalClass: every `expect(...)->toBe(...)` call in the project,
+        # read as reaching into Pest's internals. They are artefacts of the missing
+        # extension, not defects. Delete these two lines when the plugin is installed.
+        - Modules/*/tests/*
+        - Modules/*/tests/**
     
     # Ignore specific errors
     ignoreErrors:

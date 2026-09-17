@@ -44,6 +44,15 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="SCOUT_DRIVER" value="collection"/>
+        <!--
+            Vector search and AI embeddings reach real services. With
+            QUEUE_CONNECTION=sync the job the observer dispatches runs in-process,
+            so every save of an embeddable translation made an outbound call and
+            waited 30s for it to time out. The tests that need them turn them on
+            themselves with Config::set, which is what they already assume.
+        -->
+        <env name="VECTOR_SEARCH_ENABLED" value="false"/>
+        <env name="AI_EMBEDDINGS_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="LOG_CHANNEL" value="null"/>
         <env name="LOG_LEVEL" value="emergency"/>
