@@ -104,12 +104,12 @@
       "php artisan ide-helper:models --nowrite --reset",
       "php artisan ide-helper:meta"
     ],
-    "check": "vendor/bin/phpstan analyse --memory-limit=2G -v",
-    "fix": "vendor/bin/phpstan analyse --memory-limit=2G -v --fix",
+    "check": "vendor/bin/phpstan analyse --memory-limit=4G -v",
+    "fix": "vendor/bin/phpstan analyse --memory-limit=4G -v --fix",
     "refactor": "rector",
     "test:type-coverage": [
       "Composer\\Config::disableProcessTimeout",
-      "php -d memory_limit=2G vendor/bin/pest --type-coverage --min=100"
+      "php -d memory_limit=4G vendor/bin/pest --type-coverage --min=100"
     ],
     "test:typos": "peck",
     "test:lint": [
