@@ -38,7 +38,7 @@ content.
 | C6 | CMS owns the seam (column, scope, opt-in, morph-map contract, upcast pipeline). The **extender** owns its table, its `content(): BelongsTo` back-relation, its alias registration, and setting `extended_type` on the content it creates. | Clean split: CMS is the extension point, the module is the plug. |
 | C7 | The extender declares an interface/contract (working name `ExtendsContent`) exposing `content(): BelongsTo` and its alias. CMS resolves extenders only through the morph map + this contract. | A typed seam CMS can rely on without importing any concrete class. |
 | C8 | The extender's back-relation **removes the hide scope**: `content(): BelongsTo` is defined `->withoutGlobalScope(HidesExtendedContent::class)`. | The owner points to a content whose `extended_type` is set; under the default scope the relation would resolve to `null`. This is the seam's sharpest silent-failure trap. |
-| C9 | **The extender owns the content's lifecycle.** Extender soft-delete/force-delete/restore cascade to its content, in a transaction. A content deleted **independently** (soft or hard) **orphans** the extender: `content_id` set null, the extender removed from its channel (e.g. `is_published_in_shop = false`), and a signal raised to the owner; order and stock links are untouched. Deletion is reacted to, never prevented (no `valid_to = now()` interception). | The content is the extender's descriptive body, so it lives and dies with it; but an editorial deletion must not silently break the sale — the extender survives without a body and is flagged. |
+| C9 | **The extender owns the content's lifecycle and declares whether the content is mandatory.** Extender soft-delete/force-delete/restore always cascade to the content, in a transaction. The reverse (a content deleted directly) depends on that declaration: **mandatory content → symmetric cascade** (deleting the content deletes the extender; there is no bodiless-orphan state, because the FK is NOT NULL); **optional content → orphan** (`content_id` set null, extender removed from its channel, a signal raised, order/stock links untouched). Deletion is reacted to, never prevented (no `valid_to = now()` interception). Ecommerce `Product` uses the **mandatory/symmetric** policy. | An extender that cannot exist without a body has no orphan state, so it collapses to a symmetric cascade; one whose body is optional degrades to an orphan instead. The seam supports both; the extender picks. |
 | C10 | **Cascade guard.** When a content is deleted as part of its extender's cascade, the content observer must **not** run the orphan handler. A context flag distinguishes "deleting via extender cascade" from "content deleted directly". | Without the guard the two directions collide: the cascade would orphan an extender that is itself already being deleted. |
 | C11 | **Search is governed by the same two levers.** `extended_type` is indexed as a **filterable attribute**; the generic content search filters `extended_type = null` at the index (no missing-hit holes); surfaces that want extenders remove that filter and apply the same upcast to the rehydrated hits (search returns `Content`, then swaps to the extender). | Hiding only at DB rehydration while indexing everything yields short pages (index returns N, model hides some). Filtering at the index keeps counts honest and gives search the same opt-in as the routes. |
 | C12 | An `extended_type` whose alias is **not in the morph map fails loud** during upcast (explicit exception), never a silent skip. | A missing registration must surface, not return a half-resolved object. |
@@ -149,12 +149,13 @@ content is attached with `setRelation`), but any ad-hoc access needs it.
 
 - Extender `deleting` (soft) → soft-delete the content; `forceDeleting` → force-delete it;
   `restoring` → restore it. All in one transaction.
-- A content deleted directly (soft or hard) orphans the extender: `content_id` null,
-  channel visibility off (`is_published_in_shop = false` for Ecommerce), a signal to the owner.
-  Order and stock links are left intact. Deletion is reacted to, never intercepted/prevented.
-- **Cascade guard:** the content observer skips the orphan handler when the content is being deleted
-  as part of its extender's cascade (a context flag set by the extender before it cascades), so the
-  two directions do not collide.
+- A content deleted directly follows the extender's declared policy: **mandatory content → symmetric
+  cascade** (the extender is deleted with it — the case for Ecommerce `Product`, whose `content_id` is
+  NOT NULL); **optional content → orphan** (`content_id` null, channel visibility off, a signal to the
+  owner, order/stock links intact). Deletion is reacted to, never intercepted/prevented.
+- **Cascade guard:** the content observer skips its reverse handler (cascade-delete or orphan) when the
+  content is being deleted as part of its extender's own cascade (a context flag set by the extender
+  before it cascades), so the two directions do not collide.
 
 **Search (C11).** One physical index, `contents`. The extender does **not** get its own index; it
 enriches the content's document. The `ExtendsContent` contract exposes two projection methods, called
