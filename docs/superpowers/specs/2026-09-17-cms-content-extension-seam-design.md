@@ -43,6 +43,7 @@ content.
 | C11 | **Search is governed by the same two levers.** `extended_type` is indexed as a **filterable attribute**; the generic content search filters `extended_type = null` at the index (no missing-hit holes); surfaces that want extenders remove that filter and apply the same upcast to the rehydrated hits (search returns `Content`, then swaps to the extender). | Hiding only at DB rehydration while indexing everything yields short pages (index returns N, model hides some). Filtering at the index keeps counts honest and gives search the same opt-in as the routes. |
 | C12 | An `extended_type` whose alias is **not in the morph map fails loud** during upcast (explicit exception), never a silent skip. | A missing registration must surface, not return a half-resolved object. |
 | C13 | **The `ContentExtenderRegistry` is code, keyed by the stable alias, populated at boot** by each extender's service provider — never keyed by `entity_id` and never read from a CMS table. On an install with no extender it is empty and every extension path is a no-op. The extender **seeds its own `Entity`** and resolves its id at runtime. | CMS does not and must not know extenders; the numeric `entity_id` differs per install and does not exist on a fresh app. Only a stable, code-level alias (like a Laravel morph type) survives both facts. |
+| C15 | **One extender per content.** A content has at most one extender: a single `extended_type` value (one column) and a `unique` constraint on the extender's `content_id`. A registered alias with no owner row is a data-integrity error surfaced by the upcast's fail-loud (C12) or a reconciliation check, never a silently half-resolved row. | The upcast keys extenders by `content_id`; a second extender or a duplicate link would make the swap ambiguous. |
 | C14 | **CMS owns the physical `contents` search index; extenders contribute, they do not manage it.** Only CMS index-lifecycle commands create/delete/recreate it. At (re)creation CMS **composes the mapping** from each registered extender's `searchableExtensionMapping()`. A module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. A module "unindex" clears the extender's `extension` section (or deletes only its documents), never drops the shared index. | A shared index has one owner. Letting a module drop or recreate it would wipe editorial content; letting mapping be implicit reintroduces the dynamic-mapping bug. A full CMS content reindex already restores the product data, because `toSearchableArray()` pulls the extender's projection at import. |
 
 ---
@@ -239,14 +240,12 @@ global scope.
 
 To close when the implementation plan is written; none blocks the seam's shape.
 
-- **Single extender per content.** Confirm one `extended_type` per content and a `unique` index on the
-  extender's `content_id`. Policy for a row whose alias is registered but has no owner extender:
-  fail-loud (C12) or treat as orphan.
-- **Extender without a content** (`content_id` null — a draft with no body): allowed, and how it shows
-  (not indexed, not content-searchable).
-- **State vs sale precedence.** How the content's approval / validity / scheduling axes interact with
-  channel publication (`is_published_in_shop`): the exact rule for when the storefront shows, hides or
-  degrades ("card unavailable") a product whose content is draft, unapproved, scheduled or expired.
+- **Extender without a content** (`content_id` null — a draft with no body): allowed for an extender
+  that declares content optional, and how it shows (not indexed, not content-searchable). Ecommerce
+  `Product` forbids it (content mandatory), so this is a generic-seam question only.
+- **Content-state precedence** (per extender). How the content's approval / validity / scheduling axes
+  gate the extender's own channel; the seam leaves the rule to the extender. Ecommerce settles it in
+  its spec (E18): storefront visibility = editorial public-visibility AND `is_published_in_shop`.
 - **Scope composition.** `withExtended()` must remove only `HidesExtendedContent`, leaving the
   company, soft-delete and validity global scopes intact; verify they compose.
 - **Extension i18n and embeddings.** Which `extension` fields are per-locale vs flat, and whether the
