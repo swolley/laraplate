@@ -107,6 +107,30 @@
 
 ### Task 4: retries, and retiring `IntelligentSearchAction`
 
+**Found on 2026-09-17, while triaging PHPStan: the class is already broken, and has
+been for months.** `runSearchPipeline()` calls `EnsembleSearchService::search()`
+against a signature that no longer exists:
+
+```php
+// IntelligentSearchAction.php:93
+return $this->ensemble->search($intent, $vector, $final_query, $plan, $index);
+
+// EnsembleSearchService::search() as it is today
+search(Model $model, string $query, array $plan, ?array $vector,
+       int $page, int $perPage, …): AdvancedSearchResult
+```
+
+All five arguments are of the wrong type, two required parameters are missing, and
+the return value is an object the caller indexes as `array{results, meta}`. With
+`declare(strict_types=1)` that is a TypeError on the first line executed. It never
+fires because nothing calls it: the class is referenced only by its own two tests,
+and both assert `toBeInstanceOf` and nothing else.
+
+This does not change the plan, it confirms it. Do not repair the call as part of
+Task 4 — salvage `evaluateResults()` and `shouldRetry()` as Step 1 says, then delete
+the rest. It does mean the class cannot be trusted as a reference for how search is
+meant to work: read `AdvancedSearchService`, not this.
+
 **Files:**
 - Modify: `Modules/Core/app/Search/Services/AdvancedSearchService.php`
 - Create: `Modules/Core/app/Search/Services/SearchQualityEvaluator.php`
