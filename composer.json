@@ -143,6 +143,8 @@
       "composer bump",
       "npx npm-check-updates -u"
     ],
+    "plan-status": "@php scripts/plan-status.php",
+    "plan-status:test": "bash scripts/tests/plan-status-test.sh",
     "version": "./scripts/version.sh --nointeractive",
     "version:module": [
       "Composer\\Config::disableProcessTimeout",
