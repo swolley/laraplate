@@ -38,7 +38,7 @@ SAO or Core capability is a defect, not a shortcut.
 | E7c | **Virtual commercial bundles ship in v1** through that pivot: price = sum of component prices or a bundle override, availability = min over components (quantity-weighted), one ERP order line per component `Item`. A **physically assembled kit** is not an Ecommerce concern: it is a single ERP `Item` produced via MES `Bom`, sold as a one-row variant. Ecommerce never re-implements a BOM. | Separates manufacturing (MES/ERP) from sales grouping (Ecommerce); the sales bundle is a first-class v1 capability, the manufactured kit stays where it belongs. |
 | E8 | Web-only price adjustments (promotions, campaigns) are an **override layer above** ERP's `PriceResolverService`, computed at read time, never a second price source of truth. | Shop promos are a channel concern; the catalogue price stays in ERP `PriceList`/`PriceListItem`. |
 | E9 | Customer support / RMA / refund-request ticketing **reuses SAO**, it is not rebuilt in Ecommerce. Ecommerce tickets are a SAO project/ticket-type; Ecommerce carries only the order references and raises events toward ERP for actions that need an ERP document. The exact mapping is **borderline and deferred** (see Open questions). | SAO already models projects, workflow schemes, enforced transitions, comments and a timeline. Rebuilding that in Ecommerce violates E-reuse. The embryo's "keep it in Ecommerce for now" predates SAO maturity. |
-| E10 | Reviews/ratings **moderation reuses Core's generic pipeline** (`Core\Services\ModerationAdapterRegistry` + `ModificationRequiresModeration` event + listeners) and Core's `HasApprovals`, not a bespoke Ecommerce state machine. Reviews are a standalone `ecommerce_reviews` entity, not a `Content`. Separately, because the product's body **is** a `Content`, product **comments and their moderation are inherited for free** from the shipped CMS content comments — a text/Q&A surface distinct from rated reviews. | Core generalised comment moderation into a module-agnostic registry; reviews (rating + verified-purchase + aggregate) plug into it, while free content comments cover discussion. The two surfaces are complementary. |
+| E10 | **Reviews reuse the shipped CMS comment+rating system, not a new entity.** CMS `Comment` already carries a per-comment `rating_score`; `cms_content_ratings` (`ContentRating`) stores one moderated `score` (1-5) per `(content_id, user_id)` and `ContentRatingService::syncFromApprovedComment` aggregates only approved comments. Since the product's body **is** a `Content`, product comments **and** ratings and their moderation and aggregate are inherited **for free**. The **only** Ecommerce addition is an optional **verified-purchase gate** (who may rate, with an optional order/order-line link). No standalone `ecommerce_reviews` table. | The comment+rating+moderation+aggregate stack (plan `2026-05-15-cms-comments-moderation`, shipped) is exactly a review system minus verified-purchase; rebuilding it in Ecommerce would duplicate shipped code. |
 | E11 | The **seller is an ERP `Company`** (the ERP tenant root). Ecommerce does not invent a "vendor" concept; `company_id` on products/variants/carts reuses ERP's `BelongsToCompany`. The buyer is an ERP customer (business partner), not a `Company`. | ERP `Company` is documented as "tenant root for the Business/ERP domain"; it already is the seller with its own catalogue, pricelists and books. Marketplace "operator ≠ seller" is then just another `Company` whose product is the selling service, invoiced through ERP. |
 | E12 | The **data model is multi-tenant from day one** (`company_id` propagated via `BelongsToCompany`), but the **v1 storefront is single-vendor**: one active company per storefront, one cart, one ERP order. Multi-vendor cart, per-vendor order split, payouts and commission accounting are an explicit **phase 2 (marketplace)**. | The multi-tenant schema is near-free (the global scope exists) and keeps the marketplace door open; the marketplace's real cost (cart fan-out and per-vendor settlement) is deferred, not designed away. |
 | E13 | Payments use a **multi-PSP driver abstraction**. v1 reference drivers: **Stripe** and **PayPal**, both hosted checkout. An Italian provider (Nexi/Satispay) is an optional later driver. | Hosted checkout keeps card data and strong authentication in the provider's perimeter. The abstraction lets a new PSP be a driver, not a rewrite. |
@@ -101,8 +101,11 @@ database; PHP/migration/test work in CMS/ERP/SAO beyond the extension seam named
 - `id`, `variant_id`, `item_id` FK → `erp_items`, `quantity`, `role`
 - one row = simple; several rows = virtual bundle; zero rows = virtual/display-only (not purchasable via ERP)
 
-`ecommerce_reviews` (standalone, not a `Content`):
-- `id`, `product_id`, nullable `user_id`, optional `order_line_id` (for verified-purchase policy), `rating`, `body`, moderation state via Core `HasApprovals` / `ModerationAdapterRegistry`. Aggregate rating derived or cached on `ecommerce_products` (consistency vs query — decided at implementation).
+Reviews: **no Ecommerce table.** A review is a CMS `Comment` (with `rating_score`) on the product's
+content, moderated, aggregated into `cms_content_ratings` (`ContentRating`) — all shipped. The only
+Ecommerce-specific piece is an optional **verified-purchase gate**: a thin policy (and, if a hard link
+to the order is wanted, a small `product_id`/`order_line_id` ↔ `comment_id` association) deciding who
+may rate. Shape decided when the review slice is planned.
 
 `ecommerce_payment_reconciliations` (E14):
 - `id`, `order_id` (ERP correlation), PSP driver key, opaque provider ids, normalised status, amount, currency, outcome, non-sensitive error reason, timestamps. No card data, no PSP secrets.
@@ -203,9 +206,11 @@ code. `Product` declares the inverse `content(): BelongsTo` to `contents`.
   `BelongsToCompany` (tenancy). Ecommerce adds `ProductAvailabilityService` (reads ERP stock) and the
   web promotion override over `PriceResolverService`.
 - **CMS:** `Content` (i18n, gallery, SEO, `HasApprovals`, `HasValidity`, `HasLocks`, `Searchable`,
-  `HasPath`) plus the extension seam of §7. `EntityType::PRODUCTS` and a seeded `Entity` for products.
-- **SAO:** the ticketing engine for customer support (E9).
-- **Core:** `ModerationAdapterRegistry` for reviews (E10); model concerns; permissions/ACL.
+  `HasPath`) plus the extension seam of §7. `Comment` + `ContentRating` + `ContentRatingService` give
+  product comments and moderated 1-5 reviews for free (E10). `EntityType::PRODUCTS` and a seeded
+  `Entity` for products.
+- **SAO:** the ticketing engine for customer support (E9, boundary deferred).
+- **Core:** `ModerationAdapterRegistry` (behind CMS comments); model concerns; permissions/ACL.
 
 ---
 
@@ -250,7 +255,7 @@ All paths relative to `Modules/Ecommerce/`.
 | `app/Models/Product.php` | Catalog anchor; `content()`, variants |
 | `app/Models/ProductVariant.php` | Sellable unit; `items()` pivot |
 | `app/Models/VariantItem.php` (pivot) | Variant ↔ ERP `Item` with quantity/role |
-| `app/Models/Review.php` | UGC review with Core moderation |
+| `app/Policies/VerifiedPurchasePolicy.php` | Gates who may rate a product (reviews reuse CMS comments+`ContentRating`) |
 | `app/Models/PaymentReconciliation.php` | PSP reconciliation record (E14) |
 | `app/Services/ProductAvailabilityService.php` | Reads ERP stock; min-over-components for bundles |
 | `app/Services/ShopPriceService.php` | Web override over ERP `PriceResolverService`; sum/override for bundles |
@@ -275,10 +280,9 @@ To settle when the relevant slice is planned; none blocks the module's shape.
   support. Deferred.
 - **Cart → ERP order handoff.** The precise point where an Ecommerce cart becomes an ERP document,
   guest vs logged sessions, and cart merge.
-- **Reviews vs comments.** Product comments come free from CMS content comments (text/Q&A, moderated);
-  reviews are the standalone rated + verified-purchase artifact (E10). Decide whether to expose both
-  surfaces, fold reviews into the comment stream, or keep only reviews.
-- **Reviews.** Verified-purchase policy (needs `order_line_id`?), aggregate rating derived vs cached.
+- **Verified-purchase gate.** Reviews already exist as rated CMS comments + `ContentRating` (E10); the
+  only open piece is the verified-purchase policy — whether to enforce it, and whether to hard-link a
+  rating/comment to an `order_line_id` or just check purchase history at write time.
 - **PSP driver contract.** The minimal driver surface (create session, handle webhook, reconcile) and
   idempotency, before choosing beyond the Stripe/PayPal references.
 - Plus the content-extension seam's own open questions (single extender + unique `content_id`, state
