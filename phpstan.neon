@@ -62,6 +62,23 @@ parameters:
           identifier: larastan.noEnvCallsOutsideOfConfig
           path: Modules/*/config/*
         # - '#Static call to instance method __construct\(\)#'
+        # Eloquent columns read off a model. The models carry no @property docblocks
+        # (the generated ones were dropped on 2026-09-16) and Larastan cannot infer
+        # the schema here: databaseMigrationsPath was measured and changed nothing,
+        # because the migrations name their tables through enums (ERPTables::Invoices)
+        # and build columns through helpers (MigrateUtils::timestamps).
+        #
+        # This covers 1.790 of the 1.910 reports, all of them the same fact: a column
+        # exists in the database and nowhere in the type system. It is scoped to
+        # properties whose owner sits under a \Models\ namespace, so an undefined
+        # property on a service, a Filament page or a vendor class is still reported
+        # (120 of those remain, and they are the ones worth reading).
+        #
+        # The cost: a genuinely misspelled column on a model is now silent. Restoring
+        # `ide-helper:models --write` would let this rule go.
+        -
+          identifier: property.notFound
+          message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+::\$\w+\.$#'
         # Laravel Scout - methods added by the Searchable trait
         - '#Call to an undefined method.*::searchableAs\(\)#'
         # Cache::remember with an array as TTL (likely a bug, but ignore for now)

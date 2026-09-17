@@ -27,8 +27,8 @@ alwaysApply: false
 - Eloquent model traits (IDE / PHPStan):
   - Use `@phpstan-require-extends \Illuminate\Database\Eloquent\Model` on traits meant for Eloquent models.
   - Do not use `@mixin Model` on traits (duplicate API across traits, IDE conflicts).
-  - Use `@mixin \Eloquent` and `@mixin IdeHelper{Model}` on concrete models (`ide-helper:models -MN` + `EloquentMixinModelHook`).
-  - Intelephense does not chain mixins: `IdeHelper*` alone hides inherited Eloquent instance methods (`hasManyThrough`, etc.).
+  - Do **not** add `@mixin IdeHelper{Model}` to models. `_ide_helper_models.php` is gitignored and outside PHPStan's `paths`, so every such tag is a `class.notFound` error (177 of them, 2026-09-17) and buys nothing back. `post_migrate` runs `ide-helper:models -N`: generated docblocks go to the helper file, model files are left alone. `EloquentMixinModelHook`, which completed those tags, is deleted for the same reason.
+  - If the IDE link is ever wanted back, it costs more than the tags: `_ide_helper_models.php` must be generated before every analysis and declared in PHPStan's `scanFiles`. Measured gain when it was tried: 674 -> 591 errors on `Modules/Core/app/Models`.
   - Add `@property` on the trait only for host-specific fields the trait reads (not the full Model API).
   - Factory/command traits that are not used on models must not declare `require-extends Model`.
 

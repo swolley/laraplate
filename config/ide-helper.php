@@ -170,7 +170,8 @@ return [
     */
 
     'model_hooks' => [
-        Modules\Core\IdeHelper\EloquentMixinModelHook::class,
+        // EloquentMixinModelHook lived here until 2026-09-17. It only ever added
+        // `@mixin \Eloquent` next to a `@mixin IdeHelper*` line, and those are gone.
     ],
 
     /*
@@ -309,6 +310,11 @@ return [
     |
     */
     'post_migrate' => [
-        'ide-helper:models -MN',
+        // -N only: write the generated docblocks to _ide_helper_models.php and leave
+        // the model files alone. -M used to be here, and it is what wrote a
+        // `@mixin IdeHelper{Model}` line into all 177 models after every migrate.
+        // Those mixins point at classes PHPStan cannot see (_ide_helper_models.php is
+        // gitignored and outside its paths), so each one was an error rather than help.
+        'ide-helper:models -N',
     ],
 ];
