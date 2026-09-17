@@ -181,10 +181,11 @@ Two rules this imposes:
 - **Reindex trigger from the extender.** The `extension` fields change on the extender, not the
   content, so an extender change must re-push its content (`$product->content->searchable()` via an
   observer) — otherwise the section goes stale.
-- **No volatile data in the index.** Price and live stock are never indexed (price is ERP + computed
-  promotions; stock changes constantly). `extension` holds only stable attributes (brand, shop
-  category, variant attributes, `is_published_in_shop`, at most a coarse availability flag); exact
-  price and stock resolve at read time through ERP services.
+- **No ERP-owned or ERP-derived data in the index.** Price, stock, availability and any `Item` field
+  are never indexed — they are authoritative and volatile in ERP and take no part in the indexes. The
+  `extension` section holds only the extender's **own** stable attributes (for Ecommerce: variant
+  attributes, `is_published_in_shop`, merchandising metadata). Price, stock and availability resolve at
+  read time through ERP services, never from the index.
 
 This gives search the same opt-in "sometimes yes, sometimes no" as the routes, symmetric with the DB
 global scope.
