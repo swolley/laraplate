@@ -16369,18 +16369,6 @@ parameters:
 			path: Modules/Core/app/Search/Engines/DatabaseEngine.php
 
 		-
-			rawMessage: 'Parameter #3 $prefixColumns of method Modules\Core\Search\Engines\DatabaseEngine::initializeSearchQuery() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Search/Engines/DatabaseEngine.php
-
-		-
-			rawMessage: 'Parameter #4 $fullTextColumns of method Modules\Core\Search\Engines\DatabaseEngine::initializeSearchQuery() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Search/Engines/DatabaseEngine.php
-
-		-
 			rawMessage: Cannot access offset 'properties' on mixed.
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -22789,18 +22777,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
 
 		-
-			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\Company, Modules\ERP\Models\Company|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Actions/JournalEntryActions.php
-
-		-
-			rawMessage: 'Parameter #4 $posted_by_user_id of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects int|null, int|string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Actions/JournalEntryActions.php
-
-		-
 			rawMessage: 'Only iterables can be unpacked, mixed given.'
 			identifier: arrayUnpacking.nonIterable
 			count: 1
@@ -24229,20 +24205,8 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
 
 		-
-			rawMessage: Cannot access property $company_id on Illuminate\Database\Eloquent\Model|int|string|null.
-			identifier: property.nonObject
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
-			rawMessage: Cannot access property $currency on Illuminate\Database\Eloquent\Model|int|string|null.
-			identifier: property.nonObject
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
-			rawMessage: 'Cannot call method members() on Illuminate\Database\Eloquent\Model|int|string|null.'
-			identifier: method.nonObject
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, string given.'
+			identifier: argument.type
 			count: 3
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
 
@@ -24260,24 +24224,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Movement>::where() expects array<int|model property of Modules\ERP\Models\Movement, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Movement, ''type'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
-			rawMessage: 'Parameter #1 $pool of method Modules\ERP\Services\Cash\PartnerPoolSettlementService::settle() expects Modules\ERP\Models\PartnerPool, Illuminate\Database\Eloquent\Model|int|string|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
-			rawMessage: 'Parameter #1 $root of static method Modules\ERP\Support\ConnectionScopedModels::for() expects Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model|int|string|null given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
-
-		-
-			rawMessage: 'Parameter #2 $pool of method Modules\ERP\Services\Cash\PartnerPoolSettlementService::allocate() expects Modules\ERP\Models\PartnerPool, Illuminate\Database\Eloquent\Model|int|string|null given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Pages/EditPartnerPool.php
@@ -31543,181 +31489,67 @@ parameters:
 			path: Modules/ERP/app/Services/Diagnostics/ErpHealthCheckService.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$company.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$forceThreeWayMatchOnPosting.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: Anonymous function should return Illuminate\Database\Eloquent\Model but returns Illuminate\Database\Eloquent\Model|null.
+			rawMessage: Anonymous function should return Modules\ERP\Models\DeliveryNote but returns Modules\ERP\Models\DeliveryNote|null.
 			identifier: return.type
-			count: 8
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::eInvoiceSubmissions().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model, mixed>, array<string, Carbon\CarbonImmutable> given.'
-			identifier: argument.type
 			count: 2
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model, mixed>, array<string, null> given.'
-			identifier: argument.type
+			rawMessage: Anonymous function should return Modules\ERP\Models\DocumentSequence but returns Modules\ERP\Models\DocumentSequence|null.
+			identifier: return.type
+			count: 1
+			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
+
+		-
+			rawMessage: Anonymous function should return Modules\ERP\Models\FiscalPeriod but returns Modules\ERP\Models\FiscalPeriod|null.
+			identifier: return.type
 			count: 2
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $invoice of method Modules\ERP\Services\EInvoice\EInvoiceSubmissionService::submit() expects Modules\ERP\Models\Invoice, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: Anonymous function should return Modules\ERP\Models\FiscalYear but returns Modules\ERP\Models\FiscalYear|null.
+			identifier: return.type
+			count: 1
+			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
+
+		-
+			rawMessage: Anonymous function should return Modules\ERP\Models\Invoice but returns Modules\ERP\Models\Invoice|null.
+			identifier: return.type
+			count: 2
+			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
+
+		-
+			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\ERP\Models\DeliveryNote, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $payment_run of method Modules\ERP\Services\Payments\CbiBonificiExporter::export() expects Modules\ERP\Models\PaymentRun, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\ERP\Models\DeliveryNote, mixed>, array<string, null> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $payment_run of method Modules\ERP\Services\Payments\SepaPain001Exporter::export() expects Modules\ERP\Models\PaymentRun, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\ERP\Models\Invoice, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $period of method Modules\ERP\Services\Accounting\FiscalPeriodCloser::closePeriod() expects Modules\ERP\Models\FiscalPeriod, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\ERP\Models\Invoice, mixed>, array<string, null> given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $period of method Modules\ERP\Services\Accounting\FiscalPeriodCloser::reopenPeriod() expects Modules\ERP\Models\FiscalPeriod, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\EInvoiceSubmission>::where() expects array<int|model property of Modules\ERP\Models\EInvoiceSubmission, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\EInvoiceSubmission, ''status'' given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
 
 		-
-			rawMessage: 'Parameter #1 $posted_entry of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\JournalEntry, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $quotation of method Modules\ERP\Services\Quotations\QuotationRevisionService::createRevision() expects Modules\ERP\Models\Quotation, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $request of method Modules\ERP\Services\Payments\PaymentRequestService::send() expects Modules\ERP\Models\PaymentRequest, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $return_order of method Modules\ERP\Services\Returns\ReturnOrderService::approve() expects Modules\ERP\Models\ReturnOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $return_order of method Modules\ERP\Services\Returns\ReturnOrderService::cancel() expects Modules\ERP\Models\ReturnOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $return_order of method Modules\ERP\Services\Returns\ReturnOrderService::complete() expects Modules\ERP\Models\ReturnOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $return_order of method Modules\ERP\Services\Returns\ReturnOrderService::createCreditNote() expects Modules\ERP\Models\ReturnOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $return_order of method Modules\ERP\Services\Returns\ReturnOrderService::reverseProcessed() expects Modules\ERP\Models\ReturnOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $sequence of method Modules\ERP\Services\Accounting\DocumentSequenceResetService::reset() expects Modules\ERP\Models\DocumentSequence, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $source_order of method Modules\ERP\Services\SalesOrders\SalesOrderAmendmentService::amend() expects Modules\ERP\Models\SalesOrder, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $statement of method Modules\ERP\Services\Banking\BankStatementImportService::importFile() expects Modules\ERP\Models\BankStatement, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $supplier_return of method Modules\ERP\Services\Returns\SupplierReturnService::approve() expects Modules\ERP\Models\SupplierReturn, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $supplier_return of method Modules\ERP\Services\Returns\SupplierReturnService::cancel() expects Modules\ERP\Models\SupplierReturn, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $supplier_return of method Modules\ERP\Services\Returns\SupplierReturnService::complete() expects Modules\ERP\Models\SupplierReturn, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $supplier_return of method Modules\ERP\Services\Returns\SupplierReturnService::createDebitNote() expects Modules\ERP\Models\SupplierReturn, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $supplier_return of method Modules\ERP\Services\Returns\SupplierReturnService::reverseProcessed() expects Modules\ERP\Models\SupplierReturn, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $task of method Modules\ERP\Services\Calendar\TaskIcsExporter::export() expects Modules\ERP\Models\Task, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $task of method Modules\ERP\Services\Calendar\TaskIcsExporter::fileName() expects Modules\ERP\Models\Task, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $year of method Modules\ERP\Services\Accounting\FiscalPeriodCloser::closeYear() expects Modules\ERP\Models\FiscalYear, Illuminate\Database\Eloquent\Model given.'
+			rawMessage: 'Parameter #2 $company of method Modules\ERP\Services\Accounting\JournalPostingService::reverse() expects Modules\ERP\Models\Company, Modules\ERP\Models\Company|null given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/DomainActions/ErpDomainActionRegistrar.php
@@ -41335,6 +41167,12 @@ parameters:
 			path: Modules/SAO/app/Ingest/DeploymentIngestService.php
 
 		-
+			rawMessage: Cannot cast mixed to int.
+			identifier: cast.int
+			count: 2
+			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
+
+		-
 			rawMessage: 'Method Modules\SAO\Ingest\DriverWebhookIngestService::ingest() should return Modules\SAO\Ingest\WebhookIngestOutcome but returns mixed.'
 			identifier: return.type
 			count: 1
@@ -41366,18 +41204,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\SAO\Models\ProjectBinding>::where() expects array<int|model property of Modules\SAO\Models\ProjectBinding, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\SAO\Models\ProjectBinding, ''capability'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
-
-		-
-			rawMessage: 'Parameter #4 $projectId of method Modules\SAO\Ingest\DriverWebhookIngestService::record() expects int|null, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
-
-		-
-			rawMessage: 'Parameter #5 $signalId of method Modules\SAO\Ingest\DriverWebhookIngestService::record() expects int|null, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/SAO/app/Ingest/DriverWebhookIngestService.php
@@ -41869,24 +41695,6 @@ parameters:
 			path: Modules/SAO/app/Services/ContributorIdentityMap.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$health_state.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$last_checked_at.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$source_profile_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<int,Modules\SAO\Models\WorkflowTransition>::map() contains unresolvable type.'
 			identifier: argument.unresolvableType
 			count: 1
@@ -41894,54 +41702,6 @@ parameters:
 
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\SAO\Models\TicketStatus>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Modules\SAO\Models\TicketStatus, string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $connection of method Modules\SAO\Services\ConnectionHealthService::check() expects Modules\SAO\Models\Connection, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $event of method Modules\SAO\Ingest\IngestReplayService::dryRun() expects Modules\SAO\Models\IngestEvent, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $suggestion of method Modules\SAO\Services\OwnershipSuggestionApplier::apply() expects Modules\SAO\Models\OwnershipSuggestion, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $ticket of method Modules\SAO\Services\ClosureApplicationService::apply() expects Modules\SAO\Models\Ticket, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $ticket of method Modules\SAO\Services\WorkflowService::availableTransitions() expects Modules\SAO\Models\Ticket, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #1 $ticket of method Modules\SAO\Services\WorkflowService::transition() expects Modules\SAO\Models\Ticket, Illuminate\Database\Eloquent\Model given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #2 $policy of method Modules\SAO\Services\ClosureApplicationService::apply() expects Modules\SAO\Models\ClosurePolicy, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\ClosurePolicy>|Modules\SAO\Models\ClosurePolicy given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
-
-		-
-			rawMessage: 'Parameter #2 $profile of method Modules\SAO\Ingest\IngestReplayService::dryRun() expects Modules\SAO\Models\SourceProfile, Illuminate\Database\Eloquent\Collection<(int|string), Modules\SAO\Models\SourceProfile>|Modules\SAO\Models\SourceProfile given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/SAO/app/Services/DomainActions/SaoDomainActionRegistrar.php
