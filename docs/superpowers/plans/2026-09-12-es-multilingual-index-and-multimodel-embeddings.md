@@ -1003,6 +1003,12 @@ All 15 code tasks verified against the repo: locale-object mappings with per-lan
 
 The post-implementation cutover (switch the service model, migrate, repair embeddings, delete/recreate/import the indexes, then measure) is manual and has **not** been run. Until it is, the index still holds vectors from the previous model.
 
+### Cutover progress (2026-09-18)
+
+Step 1 is done and extended: the embedding service now serves `intfloat/multilingual-e5-small`, and it was made **multi-model + request-driven** — `EmbeddingsProviderFactory` sends the active profile's `service_model` on every `/embed` call, so `/health`↔config drift is structurally eliminated rather than merely reconciled once. The self-hosted service (lazy-load + LRU cache + `EMBEDDING_MODEL` default) is documented in `Modules/AI/docs/SENTENCE_TRANSFORMERS_INSTALLATION.md`. Two related fixes landed alongside: the embeddings HTTP client's timeout/batch became configurable (a hardcoded 10s/128 aborted indexing on a CPU service), and the RAG retrieval now applies the active profile's `query:` prefix (it embedded queries raw while documents carry `passage:`).
+
+The RAG **documentation** corpus was re-embedded with e5 and measured — tracked in `2026-07-16-rag-retrieval-strategy.md`. Steps 2-5 (migrate, `ai:embeddings:repair` for CMS Content / SAO Ticket, `scout:delete-index`/`index`/`import`, `ai:evaluate-retrieval-strategies`) remain outstanding for the **application-content** corpus: those tables are currently empty, so there are no `ModelEmbedding` rows to regenerate yet. Run steps 2-5 once real content exists.
+
 ### Pre-cutover blocker: full mapping was rejected by ES — RESOLVED 2026-09-17
 
 Task 3 changed `ElasticsearchEngine::createIndex` to push the **full** translated mapping (not just the `embedding` field, which was the earlier scope in `2026-09-08-es-index-mapping-and-vector-enablement.md`). But `ElasticsearchTranslator` adds `meta` (`relation`, `filterable`) and `index: true` to the `nested`/`object` relation fields (tags/contributors/categories/locations), and ES `object`/`nested` field types accept **neither** parameter; leaf `meta` also accepts only string values, not booleans. `stringifyFieldMeta` only stringified the meta values; it did not remove `meta`/`index` from object/nested, so it did not prevent the failure.
