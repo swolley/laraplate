@@ -536,3 +536,22 @@ Rating moderation policy (if toxic text in rating-only submissions) is out of sc
 
 To be created via `writing-plans` skill after spec approval:  
 `docs/superpowers/plans/2026-05-15-cms-comments-moderation.md`
+
+## Addendum (2026-09-18): media attachments on comments
+
+Promotes the v1 non-goal "Media attachments on comments" to a defined, still-generic CMS follow-up.
+
+- **Capability, not a new model.** `Comment` gains the project media concern **`HasMultimedia`** (the
+  same wrapper `Content` uses, over `spatie/laravel-medialibrary`), not raw `HasMedia` and not a
+  bespoke table. Any commenter on any content benefits; this stays a CMS capability with no knowledge
+  of consumer modules.
+- **Moderation gates the media.** A comment's attachments follow the comment's approval state exactly
+  like its body and `rating_score`: attachments on an unapproved comment are not public. The moderation
+  input may include attachment metadata so a classifier/human can judge them.
+- **Exposure is form-context, not a model split.** Whether a form shows the upload fields is decided
+  per surface (e.g. the CMS admin form omits them; a consumer's review form shows them). No subclass,
+  no per-consumer model.
+- **Out of scope here:** allowed types/size limits, conversions/thumbnails, and per-surface UI are
+  implementation detail; consumer-specific rules (e.g. an ecommerce verified-purchase gate on who may
+  attach) belong to the consumer, which cites this addendum. First consumer:
+  `docs/superpowers/specs/2026-09-17-ecommerce-module-design.md` (product reviews).
