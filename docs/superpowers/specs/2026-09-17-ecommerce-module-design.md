@@ -37,7 +37,7 @@ SAO or Core capability is a defect, not a shortcut.
 | E7b | **The sellable unit ↔ `Item` link is a pivot with quantity and role from v1.** The sellable unit is a `ProductVariant` (a simple product has one default variant); a pivot (`ecommerce_variant_items`: `variant_id`, `item_id`, `quantity`, `role`) composes each variant from its `Item`(s). One pivot row = simple; a variant per SKU = a range; several rows = a bundle; **zero rows = a virtual/display-only product** not purchasable through the ERP flow. | One structure expresses simple, variants, bundles and item-less products uniformly, and avoids a painful migration later. The pivot is cheap and load-bearing once bundles exist in v1. |
 | E7c | **Virtual commercial bundles ship in v1** through that pivot: price = sum of component prices or a bundle override, availability = min over components (quantity-weighted), one ERP order line per component `Item`. A **physically assembled kit** is not an Ecommerce concern: it is a single ERP `Item` produced via MES `Bom`, sold as a one-row variant. Ecommerce never re-implements a BOM. | Separates manufacturing (MES/ERP) from sales grouping (Ecommerce); the sales bundle is a first-class v1 capability, the manufactured kit stays where it belongs. |
 | E8 | Web-only price adjustments (promotions, campaigns) are an **override layer above** ERP's `PriceResolverService`, computed at read time, never a second price source of truth. | Shop promos are a channel concern; the catalogue price stays in ERP `PriceList`/`PriceListItem`. |
-| E9 | Customer support / RMA / refund-request ticketing **reuses SAO**, it is not rebuilt in Ecommerce. Ecommerce tickets are a SAO project/ticket-type; Ecommerce carries only the order references and raises events toward ERP for actions that need an ERP document. | SAO already models projects, workflow schemes, enforced transitions, comments and a timeline. Rebuilding that in Ecommerce violates E-reuse. The embryo's "keep it in Ecommerce for now" predates SAO maturity. |
+| E9 | Customer support / RMA / refund-request ticketing **reuses SAO**, it is not rebuilt in Ecommerce. Ecommerce tickets are a SAO project/ticket-type; Ecommerce carries only the order references and raises events toward ERP for actions that need an ERP document. The exact mapping is **borderline and deferred** (see Open questions). | SAO already models projects, workflow schemes, enforced transitions, comments and a timeline. Rebuilding that in Ecommerce violates E-reuse. The embryo's "keep it in Ecommerce for now" predates SAO maturity. |
 | E10 | Reviews/ratings **moderation reuses Core's generic pipeline** (`Core\Services\ModerationAdapterRegistry` + `ModificationRequiresModeration` event + listeners) and Core's `HasApprovals`, not a bespoke Ecommerce state machine. Reviews are a standalone `ecommerce_reviews` entity, not a `Content`. | Core generalised comment moderation into a module-agnostic registry; reviews plug into it. Reviews are not editorial content and do not need CMS's content surface. |
 | E11 | The **seller is an ERP `Company`** (the ERP tenant root). Ecommerce does not invent a "vendor" concept; `company_id` on products/variants/carts reuses ERP's `BelongsToCompany`. The buyer is an ERP customer (business partner), not a `Company`. | ERP `Company` is documented as "tenant root for the Business/ERP domain"; it already is the seller with its own catalogue, pricelists and books. Marketplace "operator ≠ seller" is then just another `Company` whose product is the selling service, invoiced through ERP. |
 | E12 | The **data model is multi-tenant from day one** (`company_id` propagated via `BelongsToCompany`), but the **v1 storefront is single-vendor**: one active company per storefront, one cart, one ERP order. Multi-vendor cart, per-vendor order split, payouts and commission accounting are an explicit **phase 2 (marketplace)**. | The multi-tenant schema is near-free (the global scope exists) and keeps the marketplace door open; the marketplace's real cost (cart fan-out and per-vendor settlement) is deferred, not designed away. |
@@ -261,3 +261,22 @@ All paths relative to `Modules/Ecommerce/`.
 
 CMS-side additions for the seam (owned by CMS, delivered in the same work block): the `extended_type`
 column and migration, the global scope, the alias→resolver registry, and the batch upcast pipeline.
+
+---
+
+## 12. Open questions
+
+To settle when the relevant slice is planned; none blocks the module's shape.
+
+- **SAO support boundary (borderline).** SAO's native role is code/ops orchestration ticketing, not
+  ecommerce customer care, yet the mechanics fit: a customer is a user opening tickets on a project
+  that could map to a seller or to an order. Define the exact mapping — project = seller? per-order
+  tickets? customer identity vs internal user, and which SAO permissions/ACL apply — before building
+  support. Deferred.
+- **Cart → ERP order handoff.** The precise point where an Ecommerce cart becomes an ERP document,
+  guest vs logged sessions, and cart merge.
+- **Reviews.** Verified-purchase policy (needs `order_line_id`?), aggregate rating derived vs cached.
+- **PSP driver contract.** The minimal driver surface (create session, handle webhook, reconcile) and
+  idempotency, before choosing beyond the Stripe/PayPal references.
+- Plus the content-extension seam's own open questions (single extender + unique `content_id`, state
+  vs sale precedence, extension i18n/embeddings, import) tracked in that spec.
