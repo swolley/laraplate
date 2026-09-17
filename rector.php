@@ -6,6 +6,7 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\MethodCall\RemoveNullArgOnNullDefaultParamRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Php85\Rector\Property\AddOverrideAttributeToOverriddenPropertiesRector;
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
 
@@ -44,6 +45,13 @@ return RectorConfig::configure()
     ->withPaths($paths)
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        // Same defect as the methods rule above, on properties: it reads a property
+        // coming from a trait as one inherited from a parent. A trait is copied into
+        // the class, so there is no parent property, and PHP refuses to load it:
+        //   Modules\CMS\Models\Content::$sortable has #[\Override] attribute,
+        //   but no matching parent property exists
+        // Verified 2026-09-17 on $sortable, which comes from Spatie's SortableTrait.
+        AddOverrideAttributeToOverriddenPropertiesRector::class,
         // Turns where('col', null) into where('col'), which changes query semantics (e.g. soft-delete unique rules).
         RemoveNullArgOnNullDefaultParamRector::class,
         __DIR__ . '/vendor',

@@ -57,7 +57,7 @@
         },
         "ordered_interfaces": true,
         "ordered_traits": true,
-        "protected_to_private": false,
+        "protected_to_private": true,
         "self_accessor": true,
         "self_static_accessor": true,
         "visibility_required": true,
@@ -96,9 +96,7 @@
         "cast_spaces": {
             "space": "single"
         },
-        "phpdoc_to_return_type": {
-            "scalar_types": true
-        },
+        "phpdoc_to_return_type": false,
         "phpdoc_types_order": {
             "null_adjustment": "always_last",
             "sort_algorithm": "none"
