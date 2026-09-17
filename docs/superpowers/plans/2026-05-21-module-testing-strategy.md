@@ -435,7 +435,7 @@ rtk git rm Modules/Core/phpunit.xml Modules/CMS/phpunit.xml Modules/AI/phpunit.x
 
 Expected: six files removed.
 
-- [ ] **Step 4: Re-run the three suites** (PARTIAL: only `Unit` was run, and it matched the baseline. `Integration` and `Feature` were interrupted every time and remain unverified.)
+- [x] **Step 4: Re-run the three suites** (done 2026-09-17, after the four interrupted attempts of 2026-09-15: `Integration` 2.229 passed / 0 failed in 8m26s, `Feature` run with `memory_limit=-1` — see the execution log below for why, and for the failures that had to be fixed first.)
 
 Run:
 
@@ -653,7 +653,7 @@ Expected: the same file count is fixed. Note `mb_str_functions` among the fixers
 the modules' own declared rule, applied for the first time because nothing was ever formatting
 them. The suite run in the next step is what confirms it.
 
-- [ ] **Step 4: Run the full suite** (PARTIAL, and this is the step that matters)
+- [x] **Step 4: Run the full suite** (done 2026-09-17, and it was the step that mattered: `mb_str_functions` had broken exactly one thing, and the suite found it — see the execution log.)
 
 Run:
 
@@ -671,6 +671,17 @@ the baseline. `Integration` and `Feature` were attempted four times and interrup
 that `mb_str_functions` did not break a byte-semantics assumption, and they have not run. The
 `mb_str_functions` changes sit in their own commit per module precisely so they can be reverted
 alone if this step fails.
+
+**Status 2026-09-17: both suites ran, and the step paid for itself.** `mb_str_functions` had
+broken exactly one thing, and this is what found it. `SearchQuerySyntaxParser` indexes the raw
+string by byte (`$query[$offset]`, `$end++`) while the rule turned `strlen`/`substr` into
+`mb_strlen`/`mb_substr`, which count characters. Every accented query came back in fragments:
+
+    +"D'Angiò José" +città \"citazione\"   ->   'tà "ci azione"'   instead of   '"citazione"'
+
+The fix was not a revert: the parser now walks `mb_str_split()`, so indices, lengths and cuts all
+count the same unit and the module's own rule is honoured rather than worked around. Fixed in
+Core `44392c6`. Nothing else in the 618 reformatted files was broken.
 
 - [x] **Step 5: Commit the reformatting on its own**
 
@@ -764,7 +775,7 @@ A removed command that is still documented is worse than no documentation: the r
 - Modify: `Modules/ERP/docs/rag/MODULE.md`
 - Modify: any other module README or RAG doc the search below turns up
 
-- [ ] **Step 1: Find every documented module test command**
+- [x] **Step 1: Find every documented module test command**
 
 Run:
 
@@ -776,7 +787,7 @@ Expected: a list of documentation lines to correct. As of 2026-09-15 the known o
 `Modules/ERP/README.md:452`, `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md:409` and
 `Modules/ERP/docs/rag/MODULE.md:484`, all documenting `composer test:standalone`.
 
-- [ ] **Step 2: Replace them with the root commands**
+- [x] **Step 2: Replace them with the root commands**
 
 Each occurrence becomes the equivalent root invocation, run from the application:
 
@@ -790,7 +801,7 @@ Say in each document that module tests run from the application root, because th
 extend the application's and a module has no `vendor/` of its own. A reader who knows why will not
 try to reinstate the old command.
 
-- [ ] **Step 3: Check no module README still advertises tooling it no longer declares**
+- [x] **Step 3: Check no module README still advertises tooling it no longer declares**
 
 Run:
 

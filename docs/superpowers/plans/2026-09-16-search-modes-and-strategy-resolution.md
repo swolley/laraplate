@@ -135,6 +135,8 @@ meant to work: read `AdvancedSearchService`, not this.
 - Modify: `Modules/Core/app/Search/Services/AdvancedSearchService.php`
 - Create: `Modules/Core/app/Search/Services/SearchQualityEvaluator.php`
 - Delete: `Modules/AI/app/Actions/IntelligentSearchAction.php` and `Modules/AI/tests/Integration/IntelligentSearchActionTest.php`
+- Delete: `Modules/Core/app/Search/Ai/SentenceTransformersEmbeddingGenerator.php` and `Modules/Core/app/Search/Ai/SentenceTransformersConfig.php`
+- Modify: `phpstan.neon` (drop the exclusion those two files needed)
 - Test: `Modules/Core/tests/Unit/Search/SearchRetryTest.php`
 
 - [ ] **Step 1: Salvage before deleting.** Port `evaluateResults()` and `shouldRetry()` out of `IntelligentSearchAction` into `SearchQualityEvaluator` in Core, keeping the behaviour and adding types. Read what the methods do; do not reimplement them from their names. This is the only part of that class worth keeping, and it is the part that makes a retry mean something instead of being a repeated identical query.
@@ -144,6 +146,26 @@ meant to work: read `AdvancedSearchService`, not this.
 - [ ] **Step 3: Delete the Action and its test.** Deleting a test file needs approval under AGENTS; it is granted here by the spec, which retires the class. Record in the commit message that `evaluateResults`/`shouldRetry` moved to `SearchQualityEvaluator` rather than being lost, and say why the rest went: pagination is the CRUD layer's, and its cache was keyed on query plus index with no authorization context, which would let two users with different ACL trade results.
 
 - [ ] **Step 4:** run the tests (PASS), pint, commit in both submodules separately: `feat(search): quality-driven retries` in Core, `refactor(ai): retire IntelligentSearchAction` in AI.
+
+- [ ] **Step 5: delete the orphaned SentenceTransformers pair in Core.** Same area, same
+  kind of leftover, found on 2026-09-17.
+
+  `Modules/Core/app/Search/Ai/SentenceTransformersEmbeddingGenerator.php` implements
+  `LLPhant\Embeddings\EmbeddingGenerator\EmbeddingGeneratorInterface`. **LLPhant is not a
+  dependency of this application** — there is no llphant entry in `composer.json` and the
+  interface is not autoloadable — so the class cannot even be loaded. Nothing references it.
+  `SentenceTransformersConfig.php`, in the same directory, is used by that class and by
+  nothing else, so it goes with it.
+
+  This is not the provider the application uses: embeddings run through
+  `Modules\AI\Ai\Embeddings\SentenceTransformersEmbeddingsProvider`, built by
+  `EmbeddingsProviderFactory` from `ai.features.embeddings.default_provider`. The Core pair
+  is a leftover from a dependency that went away, and keeping it invites someone to wire
+  the wrong one.
+
+  When they are deleted, remove the matching exclusion from `phpstan.neon` (it is commented
+  there with this reason): `interface.notFound` is not ignorable, so the file had to leave
+  the analysis until it leaves the repository.
 
 ---
 
