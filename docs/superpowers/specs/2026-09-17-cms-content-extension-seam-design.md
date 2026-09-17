@@ -31,7 +31,7 @@ content.
 | # | Decision | Rationale |
 |---|----------|-----------|
 | C1 | A `Content` becomes self-describing about extension through a **nullable `contents.extended_type`** column holding a **morph alias** (e.g. `ecommerce.product`). `null` means a normal content. | Reading a content in isolation must reveal whether it is extended without every query consulting an external registry. A column makes the default-hide a single, reliable global scope, and covers the partial case (a content of an extended entity that has no extender). |
-| C2 | The column stores a **morph alias, never an FQCN**, resolved through Laravel `Relation::enforceMorphMap`. The alias→class map is registered by the extending module; CMS only reads/writes the alias string. | Keeps CMS free of any extender class name; the dependency direction stays extender → CMS. Aliases also survive class renames. |
+| C2 | The column stores a **stable alias string, never an FQCN** (convention `module.model`, e.g. `ecommerce.product`), resolved through a **dedicated `ContentExtenderRegistry`** — **not** Laravel's global Eloquent morph map. The alias→class map is registered by the extending module; CMS only reads/writes the alias string. | Keeps CMS free of any extender class name and the dependency direction extender → CMS; aliases survive class renames. A dedicated registry holds only content extenders, so the list never fills with unrelated morph aliases (taggable, mediable, and the like) the way the shared morph map would. |
 | C3 | A **global scope on `Content`** hides `extended_type IS NOT NULL` by default on every read path. | Registering an extender must not leak its content into generic CMS routes, admin lists or search rehydration. Existing call sites change nowhere. |
 | C4 | Extended contents are returned only through an **explicit opt-in** (`withExtended()` scope and/or an ACL-gated flag). Opt-in alone yields plain `Content`; the **upcast** step yields the extender. | "Sometimes I want them, sometimes not" is an explicit choice, not a side effect of registration. |
 | C5 | The upcast is a **named, batched projection**: it groups the page by alias, resolves each extender class from the morph map, loads all extenders for the page in one query per alias (`whereIn('content_id', $ids)` with the extender's own eager-loads), swaps items, and sets the inverse relation `setRelation('content', $content)`. It never mutates the base `Content` query and never lazy-loads per row. | Preserves pagination/eager-loading; guarantees O(aliases-on-page) queries, not O(rows). See §4. |
@@ -53,15 +53,22 @@ content.
 `contents` table; partitioned-table migration variant updated in the same block if present.
 
 **Registration is code, not data.** The extending module registers itself in its service provider **at
-boot**: `Relation::enforceMorphMap(['ecommerce.product' => Product::class])` (merged into the app-wide
-map, never overriding it) plus an entry in an in-memory `ContentExtenderRegistry` **keyed by the stable
-alias** — never by the numeric `entity_id`, which differs per install and does not exist on a fresh
-app. Exactly like Laravel's polymorphic morph map (`commentable_type = 'post'`), the alias→class map
-lives in code and is present whenever the module is installed and booted, independent of any table
-contents. On an install with no extender registered the registry is empty and every extension code
-path is a no-op; CMS never needs a row to know an extender exists. Seeding the `Entity` row (e.g.
-PRODUCTS) is the **extender's** responsibility, and its id is resolved at runtime (by slug/type) when a
-product's content is created — never hard-coded.
+boot**, into a **dedicated `ContentExtenderRegistry`** (a CMS singleton), keyed by the stable alias:
+`ContentExtenderRegistry::register('ecommerce.product', Product::class)`. This registry is **not**
+Laravel's global `Relation::enforceMorphMap`: the global morph map is shared by every polymorphic
+relation in the app (taggable, mediable, commentable, module morphs), so an alias placed there would
+sit among unrelated entries. The content-extension registry holds **only** content extenders. (The
+extender may still use the global morph map for its *own* polymorphic relations; that is unrelated to
+this seam.) The pattern is the same as a morph map — a stable alias string mapped to a class in code —
+but the storage is dedicated.
+
+The registry is keyed by the alias, **never by the numeric `entity_id`** (which differs per install
+and does not exist on a fresh app). Like a morph map, the alias→class map lives in code and is present
+whenever the module is installed and booted, independent of any table contents. On an install with no
+extender registered the registry is empty and every extension code path is a no-op; CMS never needs a
+row to know an extender exists. Seeding the `Entity` row (e.g. PRODUCTS) is the **extender's**
+responsibility, and its id is resolved at runtime (by slug/type) when a product's content is created —
+never hard-coded.
 
 **Default hide.** A `Content` global scope adds `whereNull('extended_type')`. Anonymous/admin/search
 paths exclude extended rows automatically.
