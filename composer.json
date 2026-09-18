@@ -105,6 +105,7 @@
       "php artisan ide-helper:meta"
     ],
     "check": "vendor/bin/phpstan analyse --memory-limit=4G -v",
+    "check:debt": "@php scripts/phpstan-debt.php",
     "fix": "vendor/bin/phpstan analyse --memory-limit=4G -v --fix",
     "refactor": "rector",
     "test:type-coverage": [
