@@ -835,7 +835,7 @@ half-done.
 - Move: files from `Modules/Core/tests/UnitShell` and `Modules/CMS/tests/UnitShell` to `Unit` or
   `Integration`
 
-- [ ] **Step 1: List what is there**
+- [x] **Step 1: List what is there**
 
 Run:
 
@@ -845,7 +845,7 @@ rtk rg --files Modules/Core/tests/UnitShell Modules/CMS/tests/UnitShell
 
 Expected: 13 files.
 
-- [ ] **Step 2: Classify each file against the spec's rules**
+- [x] **Step 2: Classify each file against the spec's rules**
 
 For each file, read it and decide with the taxonomy in the spec:
 
@@ -856,7 +856,7 @@ For each file, read it and decide with the taxonomy in the spec:
 Do not classify from the file name. `DatabaseConfigOverlayTest` and `ObjectCastTest` sound like
 opposite cases and may not be.
 
-- [ ] **Step 3: Move and run each file as you go**
+- [x] **Step 3: Move and run each file as you go**
 
 After each move:
 
@@ -867,7 +867,7 @@ rtk php artisan test --compact <moved file path>
 Expected: the file passes in its new suite. If it fails in `Unit`, it belongs in `Integration`;
 that is the classification answer, not a bug to fix.
 
-- [ ] **Step 4: Drop UnitShell from the suite definitions once empty**
+- [x] **Step 4: Drop UnitShell from the suite definitions once empty** (CMS's is gone; Core's stays, with the five files and their reasons recorded below)
 
 When both directories are empty, remove the `Modules/*/tests/UnitShell` line from the `Integration`
 suite in `phpunit.xml` and delete the directories.
@@ -876,7 +876,41 @@ If files remain because their classification is genuinely unclear, leave the dir
 suite line in place and record which files and why in the delivery status. A half-empty transitional
 directory that is documented is fine; an undocumented one is how this became invisible for months.
 
-- [ ] **Step 5: Commit**
+**Classified on 2026-09-18: 8 of 13 moved, 5 stay, and none of the five is unclear — each is
+blocked by a concrete incompatibility.**
+
+Moved to `Unit` (they need no application bootstrap):
+- `Core/tests/Unit/Casts/ObjectCastTest.php` — a cast and Mockery, nothing else. 6 tests in 0.09s.
+- `Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php` — asserts seeder definitions.
+
+Moved to `Integration` (they need the container, the database, or both — verified by running them
+in `Unit` first and reading the failure, not by guessing):
+- `Core/tests/Integration/Services/DatabaseConfigOverlayTest.php` — resolves `request` and a
+  connection resolver.
+- `Core/tests/Integration/Seeding/BatchSeederScaleTest.php`, `BatchSeederVersioningTest.php`,
+  `CoreDatabaseSeederConnectionAffinityTest.php` — `DatabaseManager` needs `$app`.
+- `Core/tests/Integration/Services/DynamicContentsServiceClearCacheTest.php` — uses the cache.
+- `CMS/tests/Integration/Models/TaxonomyTranslationsForeignKeyTest.php` — `RefreshDatabase`.
+
+Staying in `Core/tests/UnitShell`, with the reason:
+- `BatchSeederBootstrapTest.php` — runs `VACUUM` and creates the `migrations` table, so it manages
+  its own database lifecycle. `LaravelTestCase` wraps each test in a transaction, and SQLite
+  refuses: *cannot VACUUM from within a transaction*. It needs an environment that neither `Unit`
+  nor `Integration` offers.
+- `Migrations/` (4 tests + its own `Pest.php`) — bound to `Modules\Core\Tests\ApplicationTestCase`
+  by a local `Pest.php`. Moving the directory under `Integration` makes Pest refuse the file:
+  *Test case [X] can not be used. The folder already uses the test case [LaravelTestCase]*. Two
+  directory bindings cannot coexist.
+
+Both groups need a third environment — the application shell without a wrapping transaction — which
+is exactly what `UnitShell` was created to be. The honest conclusion is that the directory is not
+transitional after all: it is a third suite that was never named. Naming it, or giving `Integration`
+a way to opt out of the transaction, is the decision that would empty it. That is not this plan's
+call, and it is written here so the next reader does not rediscover it.
+
+`CMS/tests/UnitShell` is gone: its single file moved. The `phpunit.xml` glob stays for Core's.
+
+- [x] **Step 5: Commit** (Core `79c8ee7`, CMS `ed5b845`)
 
 Run:
 
@@ -894,7 +928,7 @@ Expected: commit succeeds.
 **Files:**
 - All files changed by previous tasks
 
-- [ ] **Step 1: Prove no module declares test or toolchain infrastructure**
+- [x] **Step 1: Prove no module declares test or toolchain infrastructure** (verified 2026-09-18: no `require-dev`, no `test:*` scripts, and none of `phpunit.xml`, `pint.json`, `rector.php`, `peck.json`, `phpstan.neon` in any module)
 
 Run:
 
@@ -905,7 +939,7 @@ rtk ls Modules/*/phpunit.xml Modules/*/pint.json Modules/*/rector.php Modules/*/
 
 Expected: the first command returns nothing; the second reports no such file, for every pattern.
 
-- [ ] **Step 2: Prove the module test helpers still autoload**
+- [x] **Step 2: Prove the module test helpers still autoload** (all six keep their `autoload-dev`, and the namespaced fixtures resolve)
 
 Run:
 
@@ -918,7 +952,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration
 Expected: `autoload-dev` is intact in every module and the Core integration tests, which use
 namespaced fixtures, resolve them.
 
-- [ ] **Step 3: Run the full suite**
+- [x] **Step 3: Run the full suite** (2026-09-18: **5.618 passed, 0 failed, 30 skipped**, 15.858 assertions, 26m41s with `memory_limit=-1` — see the delivery status for why that flag is needed)
 
 Run:
 
@@ -929,7 +963,7 @@ rtk php artisan test --compact
 Expected: matches the Task 1 baseline. Ask the user to confirm the run on their machine as well,
 since this is the change's real assertion.
 
-- [ ] **Step 4: Format and analyse from the root**
+- [x] **Step 4: Format and analyse from the root** (Pint clean across application and modules; PHPStan exits `No errors` against a baseline of 9.785, and the 36 errors that arrived with the merge were fixed rather than frozen)
 
 Run:
 
@@ -941,7 +975,7 @@ rtk vendor/bin/phpstan analyse --memory-limit=3G --no-progress
 Expected: Pint is clean across the application and the modules, which is the assertion Task 8
 bought. PHPStan runs and reports the count Task 7 recorded.
 
-- [ ] **Step 5: Close the plan**
+- [x] **Step 5: Close the plan**
 
 Add the two closing sections this repository requires: a delivery-status heading carrying the
 date, and a `**Documented in:**` line naming the module documentation that now describes how tests
@@ -963,6 +997,48 @@ rtk git commit -m "docs: close the module testing strategy plan"
 ```
 
 Expected: commit succeeds.
+
+---
+
+## Delivery status (2026-09-18)
+
+**Done.** A module now carries functionality and its tests, and nothing else: no `require-dev`,
+no `phpunit.xml`, no `pint.json`, `rector.php`, `peck.json` or `phpstan.neon`. The runner, the
+toolchain and the three suites live once in the application.
+
+**Documented in:** `Modules/Core/README.md` (*Code Quality and Testing* — how the suites are
+classified, why everything runs from the application root, and the memory flag the full run
+needs), `Modules/ERP/README.md`, `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md` and
+`Modules/ERP/docs/rag/MODULE.md`.
+
+**What the final verification cost, and what it was worth.** Tasks 5 and 8 hung on one step —
+running `Integration` and `Feature` — attempted four times on 2026-09-15 and interrupted every
+time. They ran on 2026-09-17 and found what the plan predicted they would: `mb_str_functions`
+had broken `SearchQuerySyntaxParser`, which indexes the raw string by byte while the rule made
+the lengths count characters. Every accented search query came back in fragments
+(`+città \"citazione\"` returning `'tà "ci azione"'`) and had been doing so for two days. Fixed
+in Core `44392c6` by walking `mb_str_split()`, not by reverting the rule.
+
+Final run, 2026-09-18: **5.618 passed, 0 failed, 30 skipped**, 15.858 assertions, 26m41s.
+
+**Deliberately not done, and why:**
+
+- **`UnitShell` is not empty, and will not be by this plan.** Five files stay: `BatchSeederBootstrapTest`
+  runs `VACUUM` and creates the `migrations` table, which SQLite refuses inside the transaction
+  `LaravelTestCase` opens; `Migrations/` (4 tests) is bound to `ApplicationTestCase` by a local
+  `Pest.php`, and two directory bindings cannot coexist. Both want the application shell *without*
+  a wrapping transaction. That is a third environment, and the directory has been it all along:
+  it is not transitional, it is an unnamed suite. Naming it — or letting `Integration` opt out of
+  the transaction — is what would empty it. The `phpunit.xml` glob stays for Core's;
+  `CMS/tests/UnitShell` is gone.
+- **The full suite needs `memory_limit=-1`.** At the default 2G it dies about two thirds through,
+  with no failing test: a single 640MB allocation exhausts the limit. That allocation deserves its
+  own look and is not this plan's subject.
+- **The `peckphp/peck` constraint** stayed at the installed version, as recorded in Task 9.
+- **PHPStan's backlog** was never this plan's work, but it moved anyway: 33.282 errors at the
+  start of 2026-09-17, 9.785 frozen in a baseline by the end, and the analysis exits clean, so a
+  new error now fails the run. The 36 errors that arrived with a merge on 2026-09-18 were fixed,
+  not added to the baseline.
 
 ---
 
