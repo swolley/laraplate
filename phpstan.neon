@@ -96,6 +96,14 @@ parameters:
         -
           identifier: property.notFound
           message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+::\$\w+\.$#'
+        # Same fact, written by PHPStan as a union or an intersection: a narrowing
+        # `instanceof A || instanceof B` leaves `A|B`, and a relation carrying pivot
+        # data leaves `Release&object{pivot: Pivot}`. The owner is still a model and
+        # the property is still a column, so the rule above has to accept both shapes
+        # or the pattern would only cover the case where one class survives narrowing.
+        -
+          identifier: property.notFound
+          message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?(\|[\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?)*::\$\w+\.$#'
         # HasBenchmark is analysed once per command that uses it, and the ?? on the
         # Oracle branch resolves differently depending on the context. The baseline
         # cannot pin a count that moves, so the error is named here instead.
