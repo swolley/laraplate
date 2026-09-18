@@ -1,7 +1,7 @@
 # CMS content extension seam — design
 
 **Date:** 2026-09-17
-**Module:** `Modules/CMS` (with Core morph-map registration)
+**Module:** `Modules/CMS` (with a dedicated `ContentExtenderRegistry`)
 **First consumer:** `docs/superpowers/specs/2026-09-17-ecommerce-module-design.md` (`Product` extends a `Content`)
 **Status:** Design agreed. No implementation started.
 
@@ -34,17 +34,17 @@ content.
 | C2 | The column stores a **stable alias string, never an FQCN** (convention `module.model`, e.g. `ecommerce.product`), resolved through a **dedicated `ContentExtenderRegistry`** — **not** Laravel's global Eloquent morph map. The alias→class map is registered by the extending module; CMS only reads/writes the alias string. | Keeps CMS free of any extender class name and the dependency direction extender → CMS; aliases survive class renames. A dedicated registry holds only content extenders, so the list never fills with unrelated morph aliases (taggable, mediable, and the like) the way the shared morph map would. |
 | C3 | A **global scope on `Content`** hides `extended_type IS NOT NULL` by default on every read path. | Registering an extender must not leak its content into generic CMS routes, admin lists or search rehydration. Existing call sites change nowhere. |
 | C4 | Extended contents are returned only through an **explicit opt-in** (`withExtended()` scope and/or an ACL-gated flag). Opt-in alone yields plain `Content`; the **upcast** step yields the extender. | "Sometimes I want them, sometimes not" is an explicit choice, not a side effect of registration. |
-| C5 | The upcast is a **named, batched projection**: it groups the page by alias, resolves each extender class from the morph map, loads all extenders for the page in one query per alias (`whereIn('content_id', $ids)` with the extender's own eager-loads), swaps items, and sets the inverse relation `setRelation('content', $content)`. It never mutates the base `Content` query and never lazy-loads per row. | Preserves pagination/eager-loading; guarantees O(aliases-on-page) queries, not O(rows). See §4. |
-| C6 | CMS owns the seam (column, scope, opt-in, morph-map contract, upcast pipeline). The **extender** owns its table, its `content(): BelongsTo` back-relation, its alias registration, and setting `extended_type` on the content it creates. | Clean split: CMS is the extension point, the module is the plug. |
-| C7 | The extender declares an interface/contract (working name `ExtendsContent`) exposing `content(): BelongsTo` and its alias. CMS resolves extenders only through the morph map + this contract. | A typed seam CMS can rely on without importing any concrete class. |
+| C5 | The upcast is a **named, batched projection**: it groups the page by alias, resolves each extender class from the `ContentExtenderRegistry`, loads all extenders for the page in one query per alias (`whereIn('content_id', $ids)` with the extender's own eager-loads), swaps items, and sets the inverse relation `setRelation('content', $content)`. It never mutates the base `Content` query and never lazy-loads per row. | Preserves pagination/eager-loading; guarantees O(aliases-on-page) queries, not O(rows). See §4. |
+| C6 | CMS owns the seam (column, scope, opt-in, the `ContentExtenderRegistry`, upcast pipeline). The **extender** owns its table, its `content(): BelongsTo` back-relation, its alias registration, and setting `extended_type` on the content it creates. | Clean split: CMS is the extension point, the module is the plug. |
+| C7 | The extender declares an interface/contract (working name `ExtendsContent`) exposing `content(): BelongsTo` and its alias. CMS resolves extenders only through the `ContentExtenderRegistry` + this contract. | A typed seam CMS can rely on without importing any concrete class. |
 | C8 | The extender's back-relation **removes the hide scope**: `content(): BelongsTo` is defined `->withoutGlobalScope(HidesExtendedContent::class)`. | The owner points to a content whose `extended_type` is set; under the default scope the relation would resolve to `null`. This is the seam's sharpest silent-failure trap. |
 | C9 | **The extender owns the content's lifecycle and declares whether the content is mandatory.** Extender soft-delete/force-delete/restore always cascade to the content, in a transaction. The reverse (a content deleted directly) depends on that declaration: **mandatory content → symmetric cascade** (deleting the content deletes the extender; there is no bodiless-orphan state, because the FK is NOT NULL); **optional content → orphan** (`content_id` set null, extender removed from its channel, a signal raised, order/stock links untouched). Deletion is reacted to, never prevented (no `valid_to = now()` interception). Ecommerce `Product` uses the **mandatory/symmetric** policy. | An extender that cannot exist without a body has no orphan state, so it collapses to a symmetric cascade; one whose body is optional degrades to an orphan instead. The seam supports both; the extender picks. |
 | C10 | **Cascade guard.** When a content is deleted as part of its extender's cascade, the content observer must **not** run the orphan handler. A context flag distinguishes "deleting via extender cascade" from "content deleted directly". | Without the guard the two directions collide: the cascade would orphan an extender that is itself already being deleted. |
 | C11 | **Search is governed by the same two levers.** `extended_type` is indexed as a **filterable attribute**; the generic content search filters `extended_type = null` at the index (no missing-hit holes); surfaces that want extenders remove that filter and apply the same upcast to the rehydrated hits (search returns `Content`, then swaps to the extender). | Hiding only at DB rehydration while indexing everything yields short pages (index returns N, model hides some). Filtering at the index keeps counts honest and gives search the same opt-in as the routes. |
-| C12 | An `extended_type` whose alias is **not in the morph map fails loud** during upcast (explicit exception), never a silent skip. | A missing registration must surface, not return a half-resolved object. |
+| C12 | An `extended_type` whose alias is **not in the `ContentExtenderRegistry` fails loud** during upcast (explicit exception), never a silent skip. | A missing registration must surface, not return a half-resolved object. |
 | C13 | **The `ContentExtenderRegistry` is code, keyed by the stable alias, populated at boot** by each extender's service provider — never keyed by `entity_id` and never read from a CMS table. On an install with no extender it is empty and every extension path is a no-op. The extender **seeds its own `Entity`** and resolves its id at runtime. | CMS does not and must not know extenders; the numeric `entity_id` differs per install and does not exist on a fresh app. Only a stable, code-level alias (like a Laravel morph type) survives both facts. |
-| C15 | **One extender per content.** A content has at most one extender: a single `extended_type` value (one column) and a `unique` constraint on the extender's `content_id`. A registered alias with no owner row is a data-integrity error surfaced by the upcast's fail-loud (C12) or a reconciliation check, never a silently half-resolved row. | The upcast keys extenders by `content_id`; a second extender or a duplicate link would make the swap ambiguous. |
 | C14 | **CMS owns the physical `contents` search index; extenders contribute, they do not manage it.** Only CMS index-lifecycle commands create/delete/recreate it. At (re)creation CMS **composes the mapping** from each registered extender's `searchableExtensionMapping()`. A module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. A module "unindex" clears the extender's `extension` section (or deletes only its documents), never drops the shared index. | A shared index has one owner. Letting a module drop or recreate it would wipe editorial content; letting mapping be implicit reintroduces the dynamic-mapping bug. A full CMS content reindex already restores the product data, because `toSearchableArray()` pulls the extender's projection at import. |
+| C15 | **One extender per content.** A content has at most one extender: a single `extended_type` value (one column) and a `unique` constraint on the extender's `content_id`. A registered alias with no owner row is a data-integrity error surfaced by the upcast's fail-loud (C12) or a reconciliation check, never a silently half-resolved row. | The upcast keys extenders by `content_id`; a second extender or a duplicate link would make the swap ambiguous. |
 
 ---
 
@@ -82,8 +82,8 @@ result, or a `ContentExtensionResolver::resolve($page)`), applied by the caller 
 
 1. Take the fetched page (with `withExtended()`).
 2. Group rows by `extended_type` (rows with `null` stay as `Content`).
-3. For each alias: resolve the class from the morph map; load all its extenders for the page in one
-   query, `whereIn('content_id', $idsForThatAlias)`, eager-loading the extender's own relations.
+3. For each alias: resolve the class from the `ContentExtenderRegistry`; load all its extenders for the
+   page in one query, `whereIn('content_id', $idsForThatAlias)`, eager-loading the extender's own relations.
 4. Map `content_id => extender`; replace each content with its extender; `setRelation('content', $content)`.
 5. Return the mixed collection (extenders where present, plain `Content` otherwise), preserving order
    and the paginator.
@@ -215,10 +215,12 @@ global scope.
   order, with `content` already set (assert no additional query via a query count).
 - Query count for an entity-scoped extended page is exactly two.
 - The extender's `content()` relation resolves the content despite the hide scope (asserts C8).
-- A row whose alias is not in the morph map **fails loud** during upcast (C12).
-- Extender soft-delete/force-delete/restore cascade to the content; a direct content deletion orphans
-  the extender (`content_id` null, channel off, signal raised) without touching order/stock links; the
-  cascade guard prevents the orphan handler firing during the extender's own cascade (C9, C10).
+- A row whose alias is not in the `ContentExtenderRegistry` **fails loud** during upcast (C12).
+- Extender soft-delete/force-delete/restore cascade to the content. Both reverse policies are tested:
+  **mandatory/symmetric** (a direct content deletion cascades to delete the extender — Ecommerce's
+  case) and **optional/orphan** (`content_id` null, channel off, signal raised, order/stock links
+  untouched); the cascade guard prevents the reverse handler firing during the extender's own cascade
+  (C9, C10).
 - Generic content search excludes extended rows with no result holes; an opt-in search returns the
   extender for extended hits (C11).
 
