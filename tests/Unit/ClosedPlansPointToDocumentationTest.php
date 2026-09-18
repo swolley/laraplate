@@ -15,8 +15,6 @@ declare(strict_types=1);
  * The rule this enforces: closing a plan means saying where the behaviour is described now.
  */
 
-use Illuminate\Support\Str;
-
 /**
  * @return list<string>
  */
@@ -26,7 +24,17 @@ function closedPlanFiles(): array
 
     return array_values(array_filter(
         $files,
-        static fn (string $file): bool => Str::contains((string) file_get_contents($file), '## Delivery status'),
+        static function (string $file): bool {
+            $content = (string) file_get_contents($file);
+
+            // A "## Delivery status" heading marks a plan as closed only when it is
+            // a real heading. An unexecuted plan may quote the closing block as an
+            // example inside a fenced code block (```...```); that is instructions,
+            // not a delivery record, so strip fenced blocks before looking.
+            $withoutFences = preg_replace('#^```.*?^```#ms', '', $content) ?? $content;
+
+            return preg_match('/^## Delivery status/m', $withoutFences) === 1;
+        },
     ));
 }
 

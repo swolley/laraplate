@@ -27,30 +27,37 @@ SAO or Core capability is a defect, not a shortcut.
 | # | Decision | Rationale |
 |---|----------|-----------|
 | E1 | Ecommerce is a **native module** (`Modules/Ecommerce`) depending on **Core, CMS, ERP, SAO** via explicit `module.json` dependencies. | Reuse is the whole point; the dependencies are the reuse. No premature inversion of control. |
-| E2 | `Product` is an **anchor in its own table** (`ecommerce_products`), not a subtype of `Content` and not a subtype of `Item`. It links to both with nullable FKs (`content_id`, `item_id`). | Product is a commercial object with its own columns and lifecycle. It is neither editorial content nor an accounting record; it references them. |
+| E2 | `Product` is an **anchor in its own table** (`ecommerce_products`), not a subtype of `Content` and not a subtype of `Item`. It links to a `Content` (`content_id`) and, through its variants, to one or more ERP `Item`s via the pivot of E7b. | Product is a commercial object with its own columns and lifecycle. It is neither editorial content nor an accounting record; it references them. |
+| E2a | **`Product` transparently merges its `Content` onto its own root via magic getters/setters, following the `Contributor`↔`User` pattern.** As `Contributor` does (`Modules/CMS/app/Models/Contributor.php`), the pieces are: overridden `getAttribute`/`setAttribute` (the "magic" — cf. `Core\Models\Concerns\HasTranslatedDynamicContents`) that route content-owned keys to the merged `Content` so they read and write as if native on the product; an always-loaded relation (`protected $with = ['content']`, opt out with `->without('content')`); a temp holder + `setTempContent()`; and a `save()` override that persists the content if dirty and sets `content_id` under the hood. The ERP **`Item` link is NOT merged**: it stays an explicit relation via the variant pivot. | A mandatory 1:1 editorial body should read and write as one object, exactly as `Contributor` surfaces `User` fields on itself; merging the `Item` would be ambiguous because it is many (variants/bundle) and volatile (stock/price) — which SKU, which price? |
 | E3 | A `Content` becomes aware it is extended through a **nullable `extended_type` column** on `contents` holding a **morph alias** (e.g. `ecommerce.product`), never an FQCN. `null` means a normal content. | Reading a content in isolation must reveal whether it is extended without every query consulting an external registry; a self-describing column makes the default-hide a trivial, reliable global scope, and covers the partial case (a content of an extended entity that has no extender). Storing an alias (via Laravel `Relation::enforceMorphMap`) keeps CMS generic and free of any Ecommerce class name. |
 | E4 | CMS provides the **generic extension seam** (the column, a global scope hiding `extended_type IS NOT NULL`, an opt-in `withExtended()` scope, an alias→resolver registry, and the batch upcast pipeline). Ecommerce **registers** `ecommerce.product => Product` and sets `extended_type` when it creates the product's content. | CMS learns the *concept* "a content may be extended", never the concrete `Product`. Dependency direction stays Ecommerce → CMS. Any future module can extend content the same way. |
 | E5 | Extended contents are **hidden by default** on every read path (global scope). They are returned only through the explicit opt-in path, which **upcasts** each content row to its extender and attaches the content back via `setRelation('content', $content)`. | Registering the product entity must not leak product-content into generic CMS surfaces. "A volte lo voglio, a volte no" is an explicit opt-in, not a side effect of registration. |
 | E6 | The upcast is a **named, batched projection**, never a hidden mutation of the base `Content` query and never a per-row lazy load. It groups the current page by `extended_type`, resolves the extender class from the alias, loads all extenders in one query per alias (`whereIn('content_id', $ids)`), swaps the items, and sets the inverse relation. | Preserves pagination and eager-loading semantics; guarantees O(number of aliases on the page) queries, not O(rows). See §7. |
 | E7 | Pricing, stock, orders, invoices, accounting, fulfilment and shipment tracking are **authoritative in ERP**. Ecommerce reads them through ERP services (`PriceResolverService`, an availability service over `Item`), never by duplicating listino or stock. | ERP already owns this and is the system of record. A price or stock copy in Ecommerce is decision E7's forbidden case. |
+| E7a | **ERP has no `Product`; its noun is `Item`** (the accounting/inventory article: SKU, UoM, costing, `tracing_type`, stock via `StockLevel`/`StockMovement`). Ecommerce `Product` is a **web-sales projection over one or more `Item`s**, not a duplicate. Stock is read from ERP; a bundle's availability is derived (min over components), never stored. | The word "product" was overloaded. Naming this explicitly stops Ecommerce from re-modelling what ERP already owns. |
+| E7b | **The sellable unit ↔ `Item` link is a pivot with quantity and role from v1.** The sellable unit is a `ProductVariant` (a simple product has one default variant); a pivot (`ecommerce_variant_items`: `variant_id`, `item_id`, `quantity`, `role`) composes each variant from its `Item`(s). One pivot row = simple; a variant per SKU = a range; several rows = a bundle; **zero rows = a virtual/display-only product** not purchasable through the ERP flow. | One structure expresses simple, variants, bundles and item-less products uniformly, and avoids a painful migration later. The pivot is cheap and load-bearing once bundles exist in v1. |
+| E7c | **Virtual commercial bundles ship in v1** through that pivot: price = sum of component prices or a bundle override, availability = min over components (quantity-weighted), one ERP order line per component `Item`. A **physically assembled kit** is not an Ecommerce concern: it is a single ERP `Item` produced via MES `Bom`, sold as a one-row variant. Ecommerce never re-implements a BOM. | Separates manufacturing (MES/ERP) from sales grouping (Ecommerce); the sales bundle is a first-class v1 capability, the manufactured kit stays where it belongs. |
 | E8 | Web-only price adjustments (promotions, campaigns) are an **override layer above** ERP's `PriceResolverService`, computed at read time, never a second price source of truth. | Shop promos are a channel concern; the catalogue price stays in ERP `PriceList`/`PriceListItem`. |
-| E9 | Customer support / RMA / refund-request ticketing **reuses SAO**, it is not rebuilt in Ecommerce. Ecommerce tickets are a SAO project/ticket-type; Ecommerce carries only the order references and raises events toward ERP for actions that need an ERP document. | SAO already models projects, workflow schemes, enforced transitions, comments and a timeline. Rebuilding that in Ecommerce violates E-reuse. The embryo's "keep it in Ecommerce for now" predates SAO maturity. |
-| E10 | Reviews/ratings **moderation reuses Core's generic pipeline** (`Core\Services\ModerationAdapterRegistry` + `ModificationRequiresModeration` event + listeners) and Core's `HasApprovals`, not a bespoke Ecommerce state machine. Reviews are a standalone `ecommerce_reviews` entity, not a `Content`. | Core generalised comment moderation into a module-agnostic registry; reviews plug into it. Reviews are not editorial content and do not need CMS's content surface. |
+| E9 | Customer support / RMA / refund-request ticketing **reuses SAO**, it is not rebuilt in Ecommerce. Ecommerce tickets are a SAO project/ticket-type; Ecommerce carries only the order references and raises events toward ERP for actions that need an ERP document. The exact mapping is **borderline and deferred** (see Open questions). | SAO already models projects, workflow schemes, enforced transitions, comments and a timeline. Rebuilding that in Ecommerce violates E-reuse. The embryo's "keep it in Ecommerce for now" predates SAO maturity. |
+| E10a | **Review photos/videos are the generic CMS "media attachments on comments" capability**, owned by the comments spec (`2026-05-15-cms-comments-moderation-design.md`, addendum 2026-09-18: `HasMultimedia` on `Comment`, moderation-gated, form-context exposure). Ecommerce **cites** it and adds only its consumer rule (which forms show the upload, and any verified-purchase gate on attaching). | The capability benefits any commenter, so the decision lives in CMS; Ecommerce is just its first consumer. |
+| E10 | **Reviews reuse the shipped CMS comment+rating system, not a new entity.** CMS `Comment` already carries a per-comment `rating_score`; `cms_content_ratings` (`ContentRating`) stores one moderated `score` (1-5) per `(content_id, user_id)` and `ContentRatingService::syncFromApprovedComment` aggregates only approved comments. Since the product's body **is** a `Content`, product comments **and** ratings and their moderation and aggregate are inherited **for free**. The **only** Ecommerce addition is an optional **verified-purchase gate** (who may rate, with an optional order/order-line link). No standalone `ecommerce_reviews` table. | The comment+rating+moderation+aggregate stack (plan `2026-05-15-cms-comments-moderation`, shipped) is exactly a review system minus verified-purchase; rebuilding it in Ecommerce would duplicate shipped code. |
 | E11 | The **seller is an ERP `Company`** (the ERP tenant root). Ecommerce does not invent a "vendor" concept; `company_id` on products/variants/carts reuses ERP's `BelongsToCompany`. The buyer is an ERP customer (business partner), not a `Company`. | ERP `Company` is documented as "tenant root for the Business/ERP domain"; it already is the seller with its own catalogue, pricelists and books. Marketplace "operator ≠ seller" is then just another `Company` whose product is the selling service, invoiced through ERP. |
 | E12 | The **data model is multi-tenant from day one** (`company_id` propagated via `BelongsToCompany`), but the **v1 storefront is single-vendor**: one active company per storefront, one cart, one ERP order. Multi-vendor cart, per-vendor order split, payouts and commission accounting are an explicit **phase 2 (marketplace)**. | The multi-tenant schema is near-free (the global scope exists) and keeps the marketplace door open; the marketplace's real cost (cart fan-out and per-vendor settlement) is deferred, not designed away. |
 | E13 | Payments use a **multi-PSP driver abstraction**. v1 reference drivers: **Stripe** and **PayPal**, both hosted checkout. An Italian provider (Nexi/Satispay) is an optional later driver. | Hosted checkout keeps card data and strong authentication in the provider's perimeter. The abstraction lets a new PSP be a driver, not a rewrite. |
 | E14 | The application **never persists cardholder data** (PAN, CVV/CVC, track data, PIN) **nor PSP account secrets** (secret API keys, webhook signing secrets, merchant private keys). Secrets live in config/secret-manager/env, outside business tables. Ecommerce stores only **reconciliation records**: opaque provider ids (payment intent / charge / session), normalised status, amount, currency, timestamp, outcome, non-sensitive error reason, and the `order_id`/checkout-session correlation for idempotent webhooks and audit. | Zero card-derived PCI scope in the application. Logging and exception dumps must redact known PSP webhook payloads. |
 | E15 | Delivery tracking is a **read model**: carrier, tracking numbers and shipment events are authoritative in ERP (or an ERP-side logistics integration); Ecommerce's "my order / parcel status" screens consume an ERP read API and never become a second source of truth for logistics events. | Same principle as E7 applied to fulfilment. |
-| E16 | No automatic bidirectional sync between `Item.name` and `Content.title`. Different names (management vs marketing) are a **feature**. `content_id`/`item_id` are nullable with `onDelete('set null')`; the UI handles the "card unavailable" state. | Editorial and management identities are legitimately distinct; coupling them is the embryo's known trap. |
+| E16 | `content_id` is **mandatory (NOT NULL)**: a product always has a descriptive body, so it is always a content-extender. Item links are **optional** and live on the variant pivot (E7b): a product with zero pivot rows is virtual/display-only. No automatic sync between `Item.name` and `Content.title` — different management vs marketing names are a **feature**. A draft/expired/scheduled content shows the storefront a "card unavailable" state via content validity, not via a missing link. | The body is essential to a sellable web product; the purchasable SKU is not (virtual products exist). Editorial and management identities stay distinct. |
+| E18 | **Storefront visibility = editorial public-visibility AND channel intent.** A product is shown on the storefront only when its content is **approved and currently valid** (`HasApprovals` + the `HasValidity` window) **and** `is_published_in_shop` is true; it is **purchasable** only if it additionally has at least one variant whose `Item`(s) are available. A draft/unapproved/expired content, or one scheduled with a future `valid_from`, hides or degrades the card ("card unavailable") regardless of `is_published_in_shop`; `is_published_in_shop = false` hides it regardless of content state. | Editorial readiness and channel intent are orthogonal axes and both must gate the shop; neither alone is sufficient, which is why the two flags cannot be collapsed into one. |
+| E17 | Because the content is mandatory, `Product` and its `Content` are **one unit with symmetric lifecycle**: product soft-delete/force-delete/restore cascade to the content, and deleting the content cascades to the product (there is no bodiless-orphan state — `content_id` is NOT NULL). ERP order and stock links live on the variant/`Item` side and are unaffected; a soft-deleted product preserves history. Detailed in the extension-seam spec (C9, C10). | With a mandatory body the orphan-without-content state is impossible, so the earlier orphan handling collapses into a simpler symmetric cascade. |
 
 ---
 
 ## 3. Phasing and non-goals
 
-**v1 (this design):** product anchor + variants; content extension seam in CMS; single-vendor
-storefront, cart, checkout; ERP-backed price/availability read paths; multi-PSP hosted payments with
-reconciliation only; reviews with Core moderation; customer support as a SAO project; order and
-delivery read models.
+**v1 (this design):** product anchor + variants + virtual bundles (sellable unit ↔ `Item` pivot);
+content extension seam in CMS; single-vendor storefront, cart, checkout; ERP-backed price/availability
+read paths; multi-PSP hosted payments with reconciliation only; reviews with Core moderation; customer
+support as a SAO project; order and delivery read models.
 
 **Phase 2 (marketplace):** multi-vendor cart, per-vendor order split, payouts, commission accounting
 (platform-as-service `Company`), per-vendor merchandising.
@@ -86,15 +93,22 @@ database; PHP/migration/test work in CMS/ERP/SAO beyond the extension seam named
 
 ## 6. Data model (draft)
 
-`ecommerce_products`:
-- `id`, `company_id` (`BelongsToCompany`, ERP), `content_id` nullable FK → `contents`, `item_id` nullable FK → `erp_items`
-- `is_published_in_shop` bool, `featured` bool, `release_date` nullable, `metadata` JSON (marketing badges / promo flags)
+`ecommerce_products` (catalog anchor):
+- `id`, `company_id` (`BelongsToCompany`, ERP), `content_id` **NOT NULL, UNIQUE** FK → `contents` (one extender per content, seam C15), `is_published_in_shop` bool, `featured` bool, `release_date` nullable, `metadata` JSON (marketing badges / promo flags)
+- no `item_id`: composition lives on the variant pivot below
 
-`ecommerce_product_variants`:
-- `id`, `product_id`, `item_id` (one variant = one ERP SKU), `attributes` JSON (size, colour, ...)
+`ecommerce_product_variants` (the sellable unit; a simple product has one `is_default` variant):
+- `id`, `product_id`, `is_default` bool, `attributes` JSON (size, colour, ...)
 
-`ecommerce_reviews` (standalone, not a `Content`):
-- `id`, `product_id`, nullable `user_id`, optional `order_line_id` (for verified-purchase policy), `rating`, `body`, moderation state via Core `HasApprovals` / `ModerationAdapterRegistry`. Aggregate rating derived or cached on `ecommerce_products` (consistency vs query — decided at implementation).
+`ecommerce_variant_items` (pivot — composes a variant from ERP `Item`s):
+- `id`, `variant_id`, `item_id` FK → `erp_items`, `quantity`, `role`
+- one row = simple; several rows = virtual bundle; zero rows = virtual/display-only (not purchasable via ERP)
+
+Reviews: **no Ecommerce table.** A review is a CMS `Comment` (with `rating_score`) on the product's
+content, moderated, aggregated into `cms_content_ratings` (`ContentRating`) — all shipped. The only
+Ecommerce-specific piece is an optional **verified-purchase gate**: a thin policy (and, if a hard link
+to the order is wanted, a small `product_id`/`order_line_id` ↔ `comment_id` association) deciding who
+may rate. Shape decided when the review slice is planned.
 
 `ecommerce_payment_reconciliations` (E14):
 - `id`, `order_id` (ERP correlation), PSP driver key, opaque provider ids, normalised status, amount, currency, outcome, non-sensitive error reason, timestamps. No card data, no PSP secrets.
@@ -195,9 +209,11 @@ code. `Product` declares the inverse `content(): BelongsTo` to `contents`.
   `BelongsToCompany` (tenancy). Ecommerce adds `ProductAvailabilityService` (reads ERP stock) and the
   web promotion override over `PriceResolverService`.
 - **CMS:** `Content` (i18n, gallery, SEO, `HasApprovals`, `HasValidity`, `HasLocks`, `Searchable`,
-  `HasPath`) plus the extension seam of §7. `EntityType::PRODUCTS` and a seeded `Entity` for products.
-- **SAO:** the ticketing engine for customer support (E9).
-- **Core:** `ModerationAdapterRegistry` for reviews (E10); model concerns; permissions/ACL.
+  `HasPath`) plus the extension seam of §7. `Comment` + `ContentRating` + `ContentRatingService` give
+  product comments and moderated 1-5 reviews for free (E10). `EntityType::PRODUCTS` and a seeded
+  `Entity` for products.
+- **SAO:** the ticketing engine for customer support (E9, boundary deferred).
+- **Core:** `ModerationAdapterRegistry` (behind CMS comments); model concerns; permissions/ACL.
 
 ---
 
@@ -239,12 +255,13 @@ All paths relative to `Modules/Ecommerce/`.
 | File | Responsibility |
 |------|----------------|
 | `app/Enums/EcommerceTables.php` | Table-name registry |
-| `app/Models/Product.php` | Anchor; `content()`, `item()`, variants |
-| `app/Models/ProductVariant.php` | Variant ↔ ERP SKU |
-| `app/Models/Review.php` | UGC review with Core moderation |
+| `app/Models/Product.php` | Catalog anchor; `content()`, variants |
+| `app/Models/ProductVariant.php` | Sellable unit; `items()` pivot |
+| `app/Models/VariantItem.php` (pivot) | Variant ↔ ERP `Item` with quantity/role |
+| `app/Policies/VerifiedPurchasePolicy.php` | Gates who may rate a product (reviews reuse CMS comments+`ContentRating`) |
 | `app/Models/PaymentReconciliation.php` | PSP reconciliation record (E14) |
-| `app/Services/ProductAvailabilityService.php` | Reads ERP stock |
-| `app/Services/ShopPriceService.php` | Web override over ERP `PriceResolverService` |
+| `app/Services/ProductAvailabilityService.php` | Reads ERP stock; min-over-components for bundles |
+| `app/Services/ShopPriceService.php` | Web override over ERP `PriceResolverService`; sum/override for bundles |
 | `app/Payments/PaymentDriver.php` (contract) + `Stripe`/`PayPal` drivers | Multi-PSP abstraction |
 | `app/Support/ContentExtenderRegistration.php` | Registers `ecommerce.product` alias + extender |
 | `database/migrations/*` | Product/variant/review/reconciliation tables + the `contents.extended_type` column |
@@ -252,3 +269,24 @@ All paths relative to `Modules/Ecommerce/`.
 
 CMS-side additions for the seam (owned by CMS, delivered in the same work block): the `extended_type`
 column and migration, the global scope, the alias→resolver registry, and the batch upcast pipeline.
+
+---
+
+## 12. Open questions
+
+To settle when the relevant slice is planned; none blocks the module's shape.
+
+- **SAO support boundary (borderline).** SAO's native role is code/ops orchestration ticketing, not
+  ecommerce customer care, yet the mechanics fit: a customer is a user opening tickets on a project
+  that could map to a seller or to an order. Define the exact mapping — project = seller? per-order
+  tickets? customer identity vs internal user, and which SAO permissions/ACL apply — before building
+  support. Deferred.
+- **Cart → ERP order handoff.** The precise point where an Ecommerce cart becomes an ERP document,
+  guest vs logged sessions, and cart merge.
+- **Verified-purchase gate.** Reviews already exist as rated CMS comments + `ContentRating` (E10); the
+  only open piece is the verified-purchase policy — whether to enforce it, and whether to hard-link a
+  rating/comment to an `order_line_id` or just check purchase history at write time.
+- **PSP driver contract.** The minimal driver surface (create session, handle webhook, reconcile) and
+  idempotency, before choosing beyond the Stripe/PayPal references.
+- Plus the content-extension seam's own open questions (single extender + unique `content_id`, state
+  vs sale precedence, extension i18n/embeddings, import) tracked in that spec.
