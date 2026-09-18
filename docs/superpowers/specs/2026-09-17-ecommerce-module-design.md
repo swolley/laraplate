@@ -22,6 +22,28 @@ SAO or Core capability is a defect, not a shortcut.
 
 ---
 
+## 1a. Build native, do not integrate Magento
+
+The foundational choice. **Build the commerce layer natively in this stack; do not integrate an
+external commerce engine (Magento or similar).** The reason is single-source-of-truth: ERP already is
+the system of record for catalogue (`Item`), pricing, stock, orders, invoices and e-invoicing. An
+external engine keeps its own catalogue, customers and orders, so integration means permanent
+bidirectional sync — catalogue, stock, prices, orders, customers — between two diverging sources: the
+exact "double source of truth" this design exists to avoid. Building native is cheap **here
+specifically** because the hard parts already exist as stack primitives (attribute sets =
+Entity+Preset, layered navigation = Core facets, search, comments+ratings+moderation, media, i18n, ACL,
+versioning, ERP pricing/stock/orders): the module is mostly wiring, and the genuinely missing part
+(cart/checkout, PSP orchestration, storefront UI, verified-purchase) is a fraction of a commerce
+engine and already fits the roadmap (`laraplate-ui` for the storefront over `/app`). Drawing design
+ideas from Magento (attribute sets, layered navigation, price rules, configurable/bundle product types)
+is encouraged; taking on Magento as an operational dependency is not.
+
+**Re-evaluate only if** the shop becomes decoupled from ERP (commodity B2C with light integration),
+time-to-market with a mature storefront outweighs everything, or the needed merchandising/B2B surface
+grows to where a large share of Magento's features would actually be used.
+
+---
+
 ## 2. Locked decisions
 
 | # | Decision | Rationale |
