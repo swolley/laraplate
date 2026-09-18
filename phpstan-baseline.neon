@@ -6961,12 +6961,6 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Class Modules\Core\Models\License uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
 			identifier: missingType.generics
 			count: 1
@@ -6975,18 +6969,6 @@ parameters:
 		-
 			rawMessage: 'Generic type Illuminate\Database\Eloquent\Relations\HasOne<Modules\Core\Models\User> in PHPDoc tag @return does not specify all template types of class Illuminate\Database\Eloquent\Relations\HasOne: TRelatedModel, TDeclaringModel'
 			identifier: generics.lessTypes
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7003,38 +6985,14 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\License::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\License::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\License::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\License::occupied() has parameter $query with generic class Illuminate\Database\Eloquent\Builder but does not specify its types: TModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7051,20 +7009,8 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: PHPDoc tag @throws with type InvalidFormatException is not subtype of Throwable
 			identifier: throws.notThrowable
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7077,18 +7023,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''valid_to'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\License::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\License::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7111,80 +7045,14 @@ parameters:
 			path: Modules/Core/app/Models/Media.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Media::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Media.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Media::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Media::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Models/Media.php
 
@@ -7291,12 +7159,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Class Modules\Core\Models\Permission uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
 			identifier: missingType.generics
 			count: 1
@@ -7315,56 +7177,14 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Permission::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Permission::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Permission::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Permission::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
@@ -7377,12 +7197,6 @@ parameters:
 		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\Permission::$hidden is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$hidden.'
 			identifier: property.phpDocType
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
@@ -7405,18 +7219,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Property Modules\Core\Models\Permission::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Permission::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Strict comparison using === between string and null will always evaluate to false.'
 			identifier: identical.alwaysFalse
 			count: 1
@@ -7425,42 +7227,6 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
 			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
@@ -7477,44 +7243,14 @@ parameters:
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Pivot\Fieldable::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Pivot\Fieldable::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
@@ -7753,25 +7489,7 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Class Modules\Core\Models\Role uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/Role.php
@@ -7779,18 +7497,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Role::getAllPermissions() return type with generic class Illuminate\Support\Collection does not specify its types: TKey, TValue'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Role.php
 
@@ -7813,20 +7519,8 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Role::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Role::rejectAnyPermissionForSuperAdmin() has parameter $permissions with generic class Illuminate\Support\Collection but does not specify its types: TKey, TValue'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Role.php
 
@@ -7855,12 +7549,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\Role::$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$fillable.'
 			identifier: property.phpDocType
 			count: 1
@@ -7869,12 +7557,6 @@ parameters:
 		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\Role::$hidden is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$hidden.'
 			identifier: property.phpDocType
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/Role.php
 
@@ -7888,18 +7570,6 @@ parameters:
 			rawMessage: 'Parameter #1 $permissions of method Modules\Core\Models\Role::rejectAnyPermissionForSuperAdmin() expects array<int, BackedEnum|Illuminate\Support\Collection|int|Modules\Core\Models\Permission|string>, array<int<0, max>|string, array|BackedEnum|Illuminate\Support\Collection|int|Modules\Core\Models\Permission|string> given.'
 			identifier: argument.type
 			count: 2
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Role::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\Role::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
 			path: Modules/Core/app/Models/Role.php
 
 		-
@@ -8505,36 +8175,12 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
 		-
 			rawMessage: 'Method Modules\Core\Models\User::getImpersonator() should return Modules\Core\Models\User but returns Illuminate\Contracts\Auth\Authenticatable.'
 			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -8551,12 +8197,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\User::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\User::roles() should return Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\Role, $this(Modules\Core\Models\User), Modules\Core\Models\Pivot\ModelHasRole, ''pivot''> but returns Illuminate\Database\Eloquent\Relations\BelongsToMany<Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Model, Modules\Core\Models\Pivot\ModelHasRole, ''pivot''>.'
 			identifier: return.type
 			count: 1
@@ -8565,12 +8205,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\User::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -8613,18 +8247,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #2 $array of function implode expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\User::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Property Modules\Core\Models\User::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -9001,43 +8623,7 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Class Modules\Core\Overrides\Model uses generic trait Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
@@ -9049,26 +8635,8 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Property Modules\Core\Overrides\Model::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Property Modules\Core\Overrides\Model::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
@@ -14257,80 +13825,14 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: Cannot cast mixed to string.
-			identifier: cast.string
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::createdBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::modifiedBy() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::shouldBeVersioning() should return bool but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::trashingVersions() should return Illuminate\Database\Eloquent\Builder<Overtrue\LaravelVersionable\Version> but returns Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Property Modules\ERP\Models\FiscalPeriod::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
-			identifier: assign.propertyType
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Property Modules\ERP\Models\FiscalPeriod::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
-			identifier: assign.propertyType
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
