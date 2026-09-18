@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18
 **Module:** `Modules/Core` (media Core fields, deterministic extraction, event, Searchable, contributor seam) + `Modules/AI` (analysis listener, job, and AI-owned extension table)
-**Status:** Design agreed. No implementation started.
+**Status:** Core architecture agreed (M1-M15). Open questions still to decide are tracked in §13 (design-level: ACL, locale/multilingual, media lifecycle, seam choice, media-type scope, DAM). No implementation started.
 
 ---
 
@@ -256,17 +256,56 @@ drops in without redoing analysis; the current design serves reuse-by-duplicatio
 
 ---
 
-## 13. Open points to confirm at implementation
+## 13. Open questions — still to discuss or decide
 
-- Exact deterministic-extraction observer seam on `Media` (create), while the indexing/analysis trigger
-  is fixed at claim (M14) — confirm the precise claim hook in `MediaController::claim` / the draft flow.
-- The media search-document contributor seam (M4a): whether to reuse/generalize the existing content
-  extension seam (`2026-09-17-cms-content-extension-seam-design.md`, `searchableExtensionMapping()`
-  contract) or add a media-scoped equivalent in Core. AI registers as a contributor; Core stays
-  AI-agnostic.
+These are deliberately unresolved. The first group can change the schema or the flow and should be
+settled before (or early in) planning; the second is implementation detail that a plan can carry.
+
+### 13a. Open design decisions (may change schema/flow)
+
+- **ACL / security — not yet designed.** A standalone media search result must respect who may see it.
+  The established pattern in this codebase (`2026-08-29-sao-application-content-provider-design.md`,
+  `2026-07-17-application-content-retrieval-design.md`) is: the index holds no ACL; authorization is
+  enforced by re-authorizing at rehydration through the owner's visibility. Media almost certainly
+  inherits its owner's ACL (`media->model`), but a library/ownerless case, mixed-ACL reuse of the same
+  file across owners, and how a media hit rehydrates and re-checks visibility all need a decision.
+  Decide before schema/flow freeze.
+- **Locale / multilingual — not yet designed.** In which locale are caption / transcript / idea /
+  intent produced? The embedding infra is per-locale (`prepareDataToEmbedByLocale`) and content models
+  use `HasTranslations`. Open: does analysis run once in a source language, or per target locale;
+  is caption/idea/intent translated (and if so through the existing translation pipeline —
+  `TranslatedModelSaved` / `HandleModelTranslationListener`); does the transcript keep its spoken
+  language; how do per-locale embeddings and the `content_hash` dedup interact when the same file
+  yields locale-specific text.
+- **Media lifecycle beyond claim.** When a media is replaced, its file changes, it is edited, or it is
+  soft-deleted / restored / force-deleted: when to re-run analysis (new `content_hash`), when to
+  reindex the media, when to remove it from the index, and when to reindex the owner. Only create/claim
+  is specified so far; the edit/replace/delete paths and their owner-reindex triggers are open.
+- **The media search-document contributor seam (M4a).** Reuse/generalize the existing content extension
+  seam (`2026-09-17-cms-content-extension-seam-design.md`, `searchableExtensionMapping()` contract) or
+  add a media-scoped equivalent in Core. AI registers as a contributor; Core stays AI-agnostic.
+- **Phase 1 media-type scope.** Confirmed so far: image (caption + OCR), audio (transcription),
+  document/PDF (text + OCR), video (audio transcription only; visual is Phase 2). Open: which
+  `download`/generic mime types get only the deterministic layer, and whether any type is excluded from
+  Phase 1 entirely.
+- **True media library / DAM (M15).** Shared asset ↔ many contents; left as a non-precluded future, but
+  if the product needs a real library soon it becomes a prerequisite decision rather than a follow-up,
+  and would also settle the "human edit is per-copy" reconciliation.
+
+### 13b. Implementation details to confirm
+
+- Exact deterministic-extraction observer seam on `Media` (create), with the indexing/analysis trigger
+  fixed at claim (M14) — confirm the precise claim hook in `MediaController::claim` / the draft flow.
+- Providers/models for the analysis: vision caption, OCR, audio/video transcription — which services and
+  which Claude models, gated behind config and the feature flag.
+- PHP libraries for embedded-metadata extraction (IPTC/XMP/EXIF/ID3/PDF XMP), subject to the
+  no-new-dependency-without-approval rule.
 - Chaining mechanism enforcing analysis-before-embeddings (M11): job-chained dispatch vs deferred
   embeddings dispatch on `media_analysis` completion.
 - Where `content_hash` is computed (sync small / async large) and stored in `custom_properties`; the
   embed-text-hash reuse mechanism for `ModelEmbedding` (M15).
-- Library/embedded-metadata extraction implementation (which PHP libraries for IPTC/XMP/EXIF/ID3/PDF
-  XMP), subject to the no-new-dependency-without-approval rule.
+- Cost / quota / rate-limit sizing for the heavy analysis queue (building on the existing
+  `ThrottlesExceptions` / `RateLimited('embeddings')` pattern; a dedicated `media_analysis` limiter).
+- Filament / gallery UI for editing the `custom_properties` display fields and viewing (not editing) the
+  AI analysis, including provenance so an editor sees what was AI-generated.
+- Testing depth and factories/states for an analyzed `Media` and a deduplicated (same-hash) pair.
