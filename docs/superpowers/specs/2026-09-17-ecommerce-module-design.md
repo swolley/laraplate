@@ -50,7 +50,7 @@ SAO or Core capability is a defect, not a shortcut.
 | E18 | **Storefront visibility = editorial public-visibility AND channel intent.** A product is shown on the storefront only when its content is **approved and currently valid** (`HasApprovals` + the `HasValidity` window) **and** `is_published_in_shop` is true; it is **purchasable** only if it additionally has at least one variant whose `Item`(s) are available. A draft/unapproved/expired content, or one scheduled with a future `valid_from`, hides or degrades the card ("card unavailable") regardless of `is_published_in_shop`; `is_published_in_shop = false` hides it regardless of content state. | Editorial readiness and channel intent are orthogonal axes and both must gate the shop; neither alone is sufficient, which is why the two flags cannot be collapsed into one. |
 | E17 | Because the content is mandatory, `Product` and its `Content` are **one unit with symmetric lifecycle**: product soft-delete/force-delete/restore cascade to the content, and deleting the content cascades to the product (there is no bodiless-orphan state — `content_id` is NOT NULL). ERP order and stock links live on the variant/`Item` side and are unaffected; a soft-deleted product preserves history. Detailed in the extension-seam spec (C9, C10). | With a mandatory body the orphan-without-content state is impossible, so the earlier orphan handling collapses into a simpler symmetric cascade. |
 | E19 | **A shop customer is a Core `User` + an ERP customer (business partner)**, the same "identity extends user" pattern CMS uses for `Contributor`↔`User` (optionally with the same transparent merge). Orders, invoices and pricelists key off the **ERP customer**; SAO enters only when that user opens a support ticket. An anonymous visitor has no ERP customer yet: public pricelist, guest cart; the ERP customer is created/linked at checkout or registration. | The buyer that appears on ERP documents and drives pricing is an ERP concern, not a bare auth user and not a SAO entity. Keeps the chain Core (auth) → ERP (customer/orders/prices) → SAO (support) one-way. |
-| E20 | **Storefront browsing reuses existing primitives, Magento-style, not new ones.** Per-category attribute sets = CMS `Entity` + `Preset` dynamic fields (`HasTranslatedDynamicContents`); the filter set shown is derived from the product Entity's Preset. Layered navigation = Core's facet feature (`FacetQuery`/`FacetSort`, `crud-facet-counters`) over indexed fields. Variant attributes (size/colour) are indexed as facetable and drive both SKU selection and filtering. A "configurable" product = choosing among predefined variants (v1); a component configurator with dependent options is later, over the `variant_items` pivot. | CMS presets already are attribute sets and Core already has layered navigation; the module wires product presets and facet config rather than building an EAV. |
+| E20 | **Storefront browsing reuses existing primitives, Magento-style, not new ones.** `Entity` is a **Core abstraction** (`abstract Modules\Core\Models\Entity`, shared `entities` table) that each module specializes; the product content-**entity** is the module's to seed, not a hard-coded CMS `EntityType::PRODUCTS`. **Per-category attribute sets = a `Preset` per category** under that product entity (`HasTranslatedDynamicContents` dynamic fields); a product content attaches to (product entity, category preset), and the filter set shown is derived from that preset. Layered navigation = Core's facet feature (`FacetQuery`/`FacetSort`, `crud-facet-counters`) over the indexed dynamic fields. Variant attributes (size/colour) are indexed as facetable and drive both SKU selection and filtering. A "configurable" product = choosing among predefined variants (v1); a component configurator with dependent options is later, over the `variant_items` pivot. | Core `Entity` + `Preset` already are Magento's entity + attribute sets, and Core already has layered navigation; the module seeds product entities/presets and facet config rather than building an EAV. |
 
 ---
 
@@ -212,8 +212,9 @@ code. `Product` declares the inverse `content(): BelongsTo` to `contents`.
   web promotion override over `PriceResolverService`.
 - **CMS:** `Content` (i18n, gallery, SEO, `HasApprovals`, `HasValidity`, `HasLocks`, `Searchable`,
   `HasPath`) plus the extension seam of §7. `Comment` + `ContentRating` + `ContentRatingService` give
-  product comments and moderated 1-5 reviews for free (E10). `EntityType::PRODUCTS` and a seeded
-  `Entity` for products.
+  product comments and moderated 1-5 reviews for free (E10). A product content-`Entity` (specializing
+  Core's abstract `Entity`) plus one `Preset` per category (the attribute sets, E20), seeded by the
+  module.
 - **SAO:** the ticketing engine for customer support (E9, boundary deferred).
 - **Core:** `ModerationAdapterRegistry` (behind CMS comments); model concerns; permissions/ACL.
 
@@ -240,8 +241,9 @@ code. `Product` declares the inverse `content(): BelongsTo` to `contents`.
 ## 10. Ready criteria (before implementation starts)
 
 - ERP M7.1 (advanced pricelists) GA — **met**.
-- CMS: `EntityType::PRODUCTS` added and a seeded product `Entity`; the `extended_type` column, global
-  scope, morph-alias registry and upcast pipeline agreed as a CMS change owned by this work.
+- A product content-`Entity` (specializing Core's abstract `Entity`) and its per-category `Preset`s
+  seeded by the module (E20); the `extended_type` column, global scope, morph-alias registry and upcast
+  pipeline agreed as a CMS change owned by this work.
 - A short ADR confirming multi-tenant schema + single-vendor v1 (E11, E12).
 - Reviews: moderation policy and optional verified-purchase rule aligned to ERP orders.
 - SAO: the support ticket types and the map of "which transitions always require an ERP command".
