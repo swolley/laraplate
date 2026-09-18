@@ -112,9 +112,11 @@ parameters:
         #
         # Listed by name on purpose. A blanket rule on Builder would also have hidden
         # `notLocked()` and `expiring()`, two scopes that existed nowhere and made the
-        # lock and validity filters throw on every table; both were found this way and
-        # fixed on 2026-09-18. Every name below was checked against its definition:
-        # locked/unlocked in HasLocks, valid/scheduled/expired/draft/withValidityFilter
+        # lock and validity filters throw on every table; both were found this way on
+        # 2026-09-18 (notLocked corrected to unlocked, expiring written).
+        #
+        # Every name below was checked against its definition:
+        # locked/unlocked in HasLocks, valid/scheduled/expired/expiring/draft/withValidityFilter
         # in HasValidity, customers/suppliers in ERP Party, overdue in SAO Ticket,
         # role in spatie's HasRoles, and the three trashed scopes in Laravel's
         # SoftDeletes. Add a name here only after finding the scope it refers to.
@@ -124,7 +126,7 @@ parameters:
         # #[Scope] methods are protected and interface methods must be public.
         -
           identifier: method.notFound
-          message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder(<[^>]*>)?::(locked|unlocked|lockedBy|unlockedBy|valid|scheduled|expired|draft|withValidityFilter|customers|suppliers|overdue|role|onlyTrashed|withTrashed|withoutTrashed)\(\)\.$#'
+          message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder(<[^>]*>)?::(locked|unlocked|lockedBy|unlockedBy|valid|scheduled|expired|expiring|draft|withValidityFilter|customers|suppliers|overdue|role|onlyTrashed|withTrashed|withoutTrashed)\(\)\.$#'
         # HasBenchmark is analysed once per command that uses it, and the ?? on the
         # Oracle branch resolves differently depending on the context. The baseline
         # cannot pin a count that moves, so the error is named here instead.
