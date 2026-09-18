@@ -3175,18 +3175,6 @@ parameters:
 			path: Modules/CMS/database/factories/ContributorFactory.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\ContributorFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\ContributorFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, string given.'
 			identifier: argument.type
 			count: 1
@@ -3223,18 +3211,6 @@ parameters:
 			path: Modules/CMS/database/factories/LocationFactory.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\LocationFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/database/factories/LocationFactory.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\LocationFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/database/factories/LocationFactory.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, string given.'
 			identifier: argument.type
 			count: 1
@@ -3255,18 +3231,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Database\Factories\TagFactory::definitionsArray() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/database/factories/TagFactory.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\TagFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/database/factories/TagFactory.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Database\Factories\TagFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/database/factories/TagFactory.php
 
@@ -7081,18 +7045,6 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\License::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 2
@@ -7161,12 +7113,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\License::getRulesFromTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7273,18 +7219,6 @@ parameters:
 			path: Modules/Core/app/Models/Media.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\Media::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 1
@@ -7311,12 +7245,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Media::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Media::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/Media.php
 
@@ -7471,18 +7399,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\Permission::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
 			identifier: method.nonObject
 			count: 1
@@ -7557,12 +7473,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Permission::getRulesTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
@@ -7663,18 +7573,6 @@ parameters:
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\Pivot\Fieldable::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 1
@@ -7701,12 +7599,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Pivot\Fieldable::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
@@ -8017,21 +7909,9 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\Role::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Call to function is_array() with array<int, string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
 			path: Modules/Core/app/Models/Role.php
 
 		-
@@ -8103,12 +7983,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Role::getRulesTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/Role.php
 
@@ -8887,18 +8761,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Models\User::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
@@ -8949,12 +8811,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\User::getRulesTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -9289,18 +9145,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Factory.php
 
 		-
-			rawMessage: 'Method Modules\Core\Overrides\Factory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Factory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Support\Collection<(int|string),mixed>::filter() expects (callable(mixed, int|string): bool)|null, Closure(string): bool given.'
 			identifier: argument.type
 			count: 1
@@ -9445,21 +9289,9 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\Core\Overrides\Model::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Call to function is_array() with list<string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
@@ -9507,12 +9339,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Overrides\Model::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
@@ -12259,18 +12085,6 @@ parameters:
 			path: Modules/Core/config/search.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Factories\CronJobFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/CronJobFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\CronJobFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/factories/CronJobFactory.php
-
-		-
 			rawMessage: PHPDoc type class-string<Illuminate\Database\Eloquent\Model> of property Modules\Core\Database\Factories\CronJobFactory::$model is not covariant with PHPDoc type class-string<Modules\Core\Models\CronJob> of overridden property Illuminate\Database\Eloquent\Factories\Factory<Modules\Core\Models\CronJob>::$model.
 			identifier: property.phpDocType
 			count: 1
@@ -12297,18 +12111,6 @@ parameters:
 		-
 			rawMessage: 'Call to an undefined static method Modules\Core\Database\Factories\Entity::getEntityTypeEnumClass().'
 			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/Core/database/factories/EntityFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\EntityFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/EntityFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\EntityFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/database/factories/EntityFactory.php
 
@@ -12367,18 +12169,6 @@ parameters:
 			path: Modules/Core/database/factories/LicenseFactory.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Factories\LicenseFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/LicenseFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\LicenseFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/factories/LicenseFactory.php
-
-		-
 			rawMessage: PHPDoc type class-string<Illuminate\Database\Eloquent\Model> of property Modules\Core\Database\Factories\LicenseFactory::$model is not covariant with PHPDoc type class-string<Modules\Core\Models\License> of overridden property Illuminate\Database\Eloquent\Factories\Factory<Modules\Core\Models\License>::$model.
 			identifier: property.phpDocType
 			count: 1
@@ -12417,18 +12207,6 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 1
-			path: Modules/Core/database/factories/PermissionFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\PermissionFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/PermissionFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\PermissionFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
 			count: 1
 			path: Modules/Core/database/factories/PermissionFactory.php
 
@@ -12475,18 +12253,6 @@ parameters:
 			path: Modules/Core/database/factories/RoleFactory.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Factories\RoleFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/RoleFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\RoleFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/factories/RoleFactory.php
-
-		-
 			rawMessage: PHPDoc type class-string<Illuminate\Database\Eloquent\Model> of property Modules\Core\Database\Factories\RoleFactory::$model is not covariant with PHPDoc type class-string<Modules\Core\Models\Role> of overridden property Illuminate\Database\Eloquent\Factories\Factory<Modules\Core\Models\Role>::$model.
 			identifier: property.phpDocType
 			count: 1
@@ -12517,18 +12283,6 @@ parameters:
 			path: Modules/Core/database/factories/SettingFactory.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Factories\SettingFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/SettingFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\SettingFactory::uniqueValue() should return string but returns mixed.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/factories/SettingFactory.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, string given.'
 			identifier: argument.type
 			count: 1
@@ -12547,19 +12301,7 @@ parameters:
 			path: Modules/Core/database/factories/UserFactory.php
 
 		-
-			rawMessage: 'Method Modules\Core\Database\Factories\UserFactory::generateFallbackValues() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/database/factories/UserFactory.php
-
-		-
 			rawMessage: 'Method Modules\Core\Database\Factories\UserFactory::modelName() should return class-string<Modules\Core\Models\User> but returns class-string<Illuminate\Contracts\Auth\Authenticatable>.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/database/factories/UserFactory.php
-
-		-
-			rawMessage: 'Method Modules\Core\Database\Factories\UserFactory::uniqueValue() should return string but returns mixed.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/database/factories/UserFactory.php
@@ -14845,18 +14587,6 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Call to an undefined static method Modules\ERP\Models\FiscalPeriod::lockVersionColumn().'
-			identifier: staticMethod.notFound
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: Cannot access offset string on mixed.
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 2
@@ -14889,12 +14619,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::getVersionUserId() has no return type specified.'
-			identifier: missingType.return
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
