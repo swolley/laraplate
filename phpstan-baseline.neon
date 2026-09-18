@@ -1063,36 +1063,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Categories/Schemas/CategoryForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Schemas/CategoryForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Categories/Schemas/CategoryForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Schemas/CategoryForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -1225,36 +1195,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Contents/Schemas/ContentForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Schemas/ContentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Contents/Schemas/ContentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Schemas/ContentForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -1361,36 +1301,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/CMS/app/Filament/Resources/Contributors/Schemas/ContributorForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Schemas/ContributorForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Contributors/Schemas/ContributorForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Schemas/ContributorForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -1507,36 +1417,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Entities/Schemas/EntityForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Schemas/EntityForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Entities/Schemas/EntityForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Schemas/EntityForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -1651,36 +1531,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Locations/Schemas/LocationForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Schemas/LocationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Locations/Schemas/LocationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Schemas/LocationForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -1781,36 +1631,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/CMS/app/Filament/Resources/Presets/Schemas/PresetForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Schemas/PresetForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Presets/Schemas/PresetForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Schemas/PresetForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -1921,36 +1741,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Tags/Schemas/TagForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Schemas/TagForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Tags/Schemas/TagForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Schemas/TagForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -2051,36 +1841,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/CMS/app/Filament/Resources/Templates/Schemas/TemplateForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Schemas/TemplateForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/CMS/app/Filament/Resources/Templates/Schemas/TemplateForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Schemas/TemplateForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -5809,36 +5569,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/ACLS/Schemas/ACLForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Schemas/ACLForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/ACLS/Schemas/ACLForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Schemas/ACLForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -5941,39 +5671,9 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/CronJobs/Schemas/CronJobForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Schemas/CronJobForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/CronJobs/Schemas/CronJobForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Schemas/CronJobForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Modules\Core\Models\CronJob::run().'
 			identifier: method.notFound
 			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
 			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
 
 		-
@@ -6073,36 +5773,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Fields/Schemas/FieldForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Schemas/FieldForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Fields/Schemas/FieldForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Schemas/FieldForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -6178,18 +5848,6 @@ parameters:
 			rawMessage: Binary operation "." between 'import-' and mixed results in an error.
 			identifier: binaryOp.invalid
 			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
 			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
 
 		-
@@ -6299,36 +5957,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/Core/app/Filament/Resources/Licenses/Schemas/LicenseForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Schemas/LicenseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Licenses/Schemas/LicenseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Schemas/LicenseForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -6457,24 +6085,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Modifications/Schemas/ModificationForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Schemas/ModificationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Modifications/Schemas/ModificationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Schemas/ModificationForm.php
-
-		-
 			rawMessage: Anonymous function never returns null so it can be removed from the return type.
 			identifier: return.unusedType
 			count: 1
@@ -6490,18 +6100,6 @@ parameters:
 			rawMessage: Binary operation "." between non-falsy-string and mixed results in an error.
 			identifier: binaryOp.invalid
 			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
 			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
 
 		-
@@ -6599,36 +6197,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/Core/app/Filament/Resources/Permissions/Schemas/PermissionForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Schemas/PermissionForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Permissions/Schemas/PermissionForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Schemas/PermissionForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -6755,36 +6323,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/Core/app/Filament/Resources/Roles/Schemas/RoleForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Schemas/RoleForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Roles/Schemas/RoleForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Schemas/RoleForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -6917,36 +6455,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -7085,36 +6593,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/Core/app/Filament/Resources/Users/Schemas/UserForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Schemas/UserForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/Core/app/Filament/Resources/Users/Schemas/UserForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Schemas/UserForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -15541,36 +15019,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Accounts/Schemas/AccountForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Schemas/AccountForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Accounts/Schemas/AccountForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Schemas/AccountForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -15641,36 +15089,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/BankAccounts/Schemas/BankAccountForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Schemas/BankAccountForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Schemas/BankAccountForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Schemas/BankAccountForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -15751,36 +15169,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/BankStatements/Schemas/BankStatementForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Schemas/BankStatementForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Schemas/BankStatementForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Schemas/BankStatementForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -15851,36 +15239,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Companies/Schemas/CompanyForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Schemas/CompanyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Companies/Schemas/CompanyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Schemas/CompanyForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -15967,40 +15325,10 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Party>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Party, string given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -16141,24 +15469,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Item>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Item, string given.'
 			identifier: argument.type
 			count: 1
@@ -16169,18 +15479,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -16253,36 +15551,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Schemas/DocumentSequenceForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Schemas/DocumentSequenceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Schemas/DocumentSequenceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Schemas/DocumentSequenceForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -16363,36 +15631,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -16463,36 +15701,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -16621,24 +15829,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Item>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Item, string given.'
 			identifier: argument.type
 			count: 1
@@ -16649,18 +15839,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -16957,24 +16135,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\DeliveryNoteLine>::where() expects array<int|model property of Modules\ERP\Models\DeliveryNoteLine, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\DeliveryNoteLine, ''company_id'' given.'
 			identifier: argument.type
 			count: 1
@@ -16985,18 +16145,6 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -17081,36 +16229,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Items/Schemas/ItemForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Schemas/ItemForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Items/Schemas/ItemForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Schemas/ItemForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -17209,24 +16327,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryCreateForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryCreateForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryCreateForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryCreateForm.php
-
-		-
 			rawMessage: 'Parameter #1 $components of method Filament\Schemas\Components\Component::schema() expects array<Illuminate\Contracts\Support\Htmlable|string>|Closure|Filament\Schemas\Schema, array<int, Filament\Forms\Components\Component> given.'
 			identifier: argument.type
 			count: 1
@@ -17248,24 +16348,6 @@ parameters:
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 2
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryEditForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryEditForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryEditForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryEditForm.php
 
 		-
@@ -17365,18 +16447,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryLineSchema.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -17473,36 +16543,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Leads/Schemas/LeadForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Schemas/LeadForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Leads/Schemas/LeadForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Schemas/LeadForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -17575,24 +16615,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Account>::where() expects array<int|model property of Modules\ERP\Models\Account, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Account>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Account, ''company_id'' given.'
 			identifier: argument.type
 			count: 1
@@ -17609,18 +16631,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -17719,36 +16729,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Opportunities/Schemas/OpportunityForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Schemas/OpportunityForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Schemas/OpportunityForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Schemas/OpportunityForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -17819,36 +16799,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Parties/Schemas/PartyForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Schemas/PartyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Parties/Schemas/PartyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Schemas/PartyForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -17959,36 +16909,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Schemas/PartnerPoolForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Schemas/PartnerPoolForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Schemas/PartnerPoolForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Schemas/PartnerPoolForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -18077,36 +16997,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Schemas/PaymentRequestForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Schemas/PaymentRequestForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Schemas/PaymentRequestForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Schemas/PaymentRequestForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -18223,24 +17113,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\BankAccount>::pluck() expects Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\BankAccount, string given.'
 			identifier: argument.type
 			count: 1
@@ -18295,18 +17167,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -18377,36 +17237,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Schemas/PaymentTermForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Schemas/PaymentTermForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Schemas/PaymentTermForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Schemas/PaymentTermForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -18481,36 +17311,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Payments/Schemas/PaymentForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Schemas/PaymentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Payments/Schemas/PaymentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Schemas/PaymentForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -18581,36 +17381,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/PriceLists/Schemas/PriceListForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Schemas/PriceListForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Schemas/PriceListForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Schemas/PriceListForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -18689,36 +17459,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -18877,24 +17617,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::mapWithKeys() expects callable(Illuminate\Database\Eloquent\Model, int): array<int, non-falsy-string>, Closure(Modules\ERP\Models\Item): non-empty-array<int, non-falsy-string> given.'
 			identifier: argument.type
 			count: 1
@@ -18947,18 +17669,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -19081,36 +17791,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Quotations/Schemas/QuotationForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Schemas/QuotationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Quotations/Schemas/QuotationForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Schemas/QuotationForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -19219,40 +17899,10 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\InvoiceLine>::where() expects array<int|model property of Modules\ERP\Models\InvoiceLine, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\InvoiceLine, ''invoice_id'' given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -19471,24 +18121,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::mapWithKeys() expects callable(Illuminate\Database\Eloquent\Model, int): array<int, non-falsy-string>, Closure(Modules\ERP\Models\Item): non-empty-array<int, non-falsy-string> given.'
 			identifier: argument.type
 			count: 1
@@ -19609,18 +18241,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -19693,36 +18313,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Sites/Schemas/SiteForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Schemas/SiteForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Sites/Schemas/SiteForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Schemas/SiteForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -19793,36 +18383,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/StockLevels/Schemas/StockLevelForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Schemas/StockLevelForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Schemas/StockLevelForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Schemas/StockLevelForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -19933,24 +18493,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\ERP\Models\Invoice>::where() expects array<int|model property of Modules\ERP\Models\Invoice, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\ERP\Models\Invoice, ''direction'' given.'
 			identifier: argument.type
 			count: 1
@@ -19981,18 +18523,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -20063,36 +18593,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Tasks/Schemas/TaskForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Schemas/TaskForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Tasks/Schemas/TaskForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Schemas/TaskForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -20167,36 +18667,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/TaxCodes/Schemas/TaxCodeForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Schemas/TaxCodeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Schemas/TaxCodeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Schemas/TaxCodeForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -20255,18 +18725,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -20339,18 +18797,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/VatSettlements/Pages/ListVatSettlements.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
 
 		-
 			rawMessage: Cannot cast mixed to float.
@@ -20429,36 +18875,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/Warehouses/Schemas/WarehouseForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Schemas/WarehouseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Schemas/WarehouseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Schemas/WarehouseForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -23593,36 +22009,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Boms/Schemas/BomForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Schemas/BomForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/Boms/Schemas/BomForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Schemas/BomForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -23693,36 +22079,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/MES/app/Filament/Resources/Downtimes/Schemas/DowntimeForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Schemas/DowntimeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/Downtimes/Schemas/DowntimeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Schemas/DowntimeForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -23797,36 +22153,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/NonConformances/Schemas/NonConformanceForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Schemas/NonConformanceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/NonConformances/Schemas/NonConformanceForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Schemas/NonConformanceForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -23897,36 +22223,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/MES/app/Filament/Resources/ProductionOrders/Schemas/ProductionOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Schemas/ProductionOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Schemas/ProductionOrderForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Schemas/ProductionOrderForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -24001,36 +22297,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/QualityChecks/Schemas/QualityCheckForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Schemas/QualityCheckForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Schemas/QualityCheckForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Schemas/QualityCheckForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -24101,36 +22367,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/MES/app/Filament/Resources/QualityPlans/Schemas/QualityPlanForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Schemas/QualityPlanForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Schemas/QualityPlanForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Schemas/QualityPlanForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -24205,36 +22441,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Routings/Schemas/RoutingForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Schemas/RoutingForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/Routings/Schemas/RoutingForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Schemas/RoutingForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -24307,36 +22513,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Shifts/Schemas/ShiftForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Schemas/ShiftForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/Shifts/Schemas/ShiftForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Schemas/ShiftForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -24407,36 +22583,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/MES/app/Filament/Resources/WorkCenters/Schemas/WorkCenterForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Schemas/WorkCenterForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Schemas/WorkCenterForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Schemas/WorkCenterForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -26377,18 +24523,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Pages/ListClosureAudits.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -26483,36 +24617,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Schemas/ClosurePolicyForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Schemas/ClosurePolicyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Schemas/ClosurePolicyForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Schemas/ClosurePolicyForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -26611,36 +24715,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Connections/Schemas/ConnectionForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Schemas/ConnectionForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Connections/Schemas/ConnectionForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Schemas/ConnectionForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -26711,18 +24785,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Deployments/Pages/ListDeployments.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -26821,36 +24883,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Environments/Schemas/EnvironmentForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Schemas/EnvironmentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Environments/Schemas/EnvironmentForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Schemas/EnvironmentForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -26921,18 +24953,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/IngestEvents/Pages/ListIngestEvents.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -27011,18 +25031,6 @@ parameters:
 			identifier: cast.string
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Schemas/OwnershipSuggestionInfolist.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -27121,36 +25129,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Projects/Schemas/ProjectForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Schemas/ProjectForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -27247,36 +25225,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Releases/Schemas/ReleaseForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Schemas/ReleaseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Releases/Schemas/ReleaseForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Schemas/ReleaseForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -27359,36 +25307,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/SAO/app/Filament/Resources/Signals/Schemas/SignalForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Schemas/SignalForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Signals/Schemas/SignalForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Schemas/SignalForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -27499,36 +25417,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Schemas/SourceProfileForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Schemas/SourceProfileForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Schemas/SourceProfileForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Schemas/SourceProfileForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -27625,36 +25513,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Schemas/TicketStatusForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Schemas/TicketStatusForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Schemas/TicketStatusForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Schemas/TicketStatusForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -27749,36 +25607,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/SAO/app/Filament/Resources/TicketTypes/Schemas/TicketTypeForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Schemas/TicketTypeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Schemas/TicketTypeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Schemas/TicketTypeForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
@@ -27895,36 +25723,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -28031,36 +25829,6 @@ parameters:
 			identifier: cast.int
 			count: 2
 			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Schemas/WorkflowSchemeForm.php
-
-		-
-			rawMessage: PHPDoc tag @param for parameter $model_class contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Schemas/WorkflowSchemeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model_class contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 2
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Schemas/WorkflowSchemeForm.php
-
-		-
-			rawMessage: PHPDoc tag @var with type mixed is not subtype of native type string.
-			identifier: varTag.nativeType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Schemas/WorkflowSchemeForm.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getLockedAtColumn().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
-
-		-
-			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::activationColumn().'
-			identifier: staticMethod.notFound
-			count: 3
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
 
 		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IValidatableModel, mixed>, array<string, Carbon\CarbonImmutable> given.'
