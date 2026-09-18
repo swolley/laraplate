@@ -104,29 +104,23 @@ parameters:
         -
           identifier: property.notFound
           message: '#^Access to an undefined property [\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?(\|[\w\\]+\\Models\\[\w\\]+(&object\{[^}]*\})?)*::\$\w+\.$#'
-        # Query scopes called on a Builder the analyser cannot tie to a concrete model.
-        # Generic code (above all the Filament table builder, which accounts for 1.272
-        # of these) receives Builder<Model>, and a scope lives on the model: Larastan
-        # resolves $query->locked() by looking for a #[Scope] method on the builder's
-        # model, finds Model, and reports it. 14 names, 17 physical call sites.
+        # Query scopes called on a Builder whose model type is a contract rather than
+        # a concrete class. Larastan's BuilderHelper resolves $query->locked() by
+        # reading `scope` . ucfirst($method) off the method tags of every class in the
+        # builder's model type, so a contract declaring `@method scopeLocked(...)` is
+        # enough and the 1.262 reports this rule used to hold are types now, not
+        # silence. See ILockableModel, IValidatableModel, IActivatableModel and
+        # ISoftDeletableModel, and the Builder<Model&Contract> annotations in HasTable.
         #
-        # Listed by name on purpose. A blanket rule on Builder would also have hidden
-        # `notLocked()` and `expiring()`, two scopes that existed nowhere and made the
-        # lock and validity filters throw on every table; both were found this way on
-        # 2026-09-18 (notLocked corrected to unlocked, expiring written).
-        #
-        # Every name below was checked against its definition:
-        # locked/unlocked in HasLocks, valid/scheduled/expired/expiring/draft/withValidityFilter
-        # in HasValidity, customers/suppliers in ERP Party, overdue in SAO Ticket,
-        # role in spatie's HasRoles, and the three trashed scopes in Laravel's
-        # SoftDeletes. Add a name here only after finding the scope it refers to.
-        #
-        # The rule goes away by giving the traits their own Builder classes, which is
-        # the only way to type these properly: a contract cannot declare them, because
-        # #[Scope] methods are protected and interface methods must be public.
+        # What is left are scopes on concrete models (ERP Party, SAO Ticket) and
+        # spatie's scopeRole, reached through generic code that has no contract to
+        # narrow to. Listed by name on purpose: a blanket rule on Builder would also
+        # have hidden notLocked(), expiring() and withValidityFilter(), three scopes
+        # that existed nowhere or were never registered and threw at runtime. All
+        # three were found because these errors were visible, and fixed on 2026-09-18.
         -
           identifier: method.notFound
-          message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder(<[^>]*>)?::(locked|unlocked|lockedBy|unlockedBy|valid|scheduled|expired|expiring|draft|withValidityFilter|customers|suppliers|overdue|role|onlyTrashed|withTrashed|withoutTrashed)\(\)\.$#'
+          message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder(<[^>]*>)?::(customers|suppliers|overdue|role)\(\)\.$#'
         # HasBenchmark is analysed once per command that uses it, and the ?? on the
         # Oracle branch resolves differently depending on the context. The baseline
         # cannot pin a count that moves, so the error is named here instead.
