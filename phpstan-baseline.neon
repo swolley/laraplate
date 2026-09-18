@@ -1423,12 +1423,6 @@ parameters:
 			path: Modules/CMS/app/Models/Category.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
 			rawMessage: 'Class Modules\CMS\Models\Comment uses generic trait Modules\Core\Models\Concerns\HasTranslations but does not specify its types: TModel, TTranslationModel'
 			identifier: missingType.generics
 			count: 1
@@ -1467,12 +1461,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Comment::getDefaultTranslation() should return (Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated)|null but returns Illuminate\Database\Eloquent\Model|null.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::getPreviewAttribute() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
 
@@ -1621,12 +1609,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getKeyName().'
 			identifier: method.notFound
 			count: 1
@@ -1705,8 +1687,8 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Content::_internalDynamicContentsGetRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
+			rawMessage: 'Method Modules\CMS\Models\Content::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
+			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1796,18 +1778,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\CMS\Models\Content::getDynamicFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getPresettableClass() should return class-string<Modules\Core\Models\Pivot\Presettable> but returns string.'
-			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getPreviewAttribute() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
@@ -1945,6 +1915,12 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Approval\Models\Modification>::where() expects array<int|model property of Approval\Models\Modification, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Approval\Models\Modification, ''md5'' given.'
+			identifier: argument.type
+			count: 1
+			path: Modules/CMS/app/Models/Content.php
+
+		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated>::orWhere() expects array<int|model property of Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, ''locale'' given.'
 			identifier: argument.type
 			count: 1
@@ -2008,12 +1984,6 @@ parameters:
 			rawMessage: 'Parameter #1 $name of class Modules\Core\Search\Schema\FieldDefinition constructor expects string, int|string given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Parameter #1 $string of function md5 expects string, string|false given.'
-			identifier: argument.type
-			count: 2
 			path: Modules/CMS/app/Models/Content.php
 
 		-
@@ -2179,8 +2149,8 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::_internalDynamicContentsGetRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
+			rawMessage: 'Method Modules\CMS\Models\Contributor::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
+			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -2253,12 +2223,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::getDynamicFields() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::getPresettableClass() should return class-string<Modules\Core\Models\Pivot\Presettable> but returns string.'
-			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -6673,12 +6637,6 @@ parameters:
 			path: Modules/Core/app/Models/ACL.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\ACL::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/ACL.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\ACL::permission() should return Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\Permission> but returns Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\Permission, $this(Modules\Core\Models\ACL)>.'
 			identifier: return.type
 			count: 1
@@ -6799,12 +6757,6 @@ parameters:
 			path: Modules/Core/app/Models/CronJob.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\CronJob::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/CronJob.php
-
-		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\CronJob::$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$fillable.'
 			identifier: property.phpDocType
 			count: 1
@@ -6883,12 +6835,6 @@ parameters:
 			path: Modules/Core/app/Models/Entity.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Entity::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Entity.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Entity::path() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
 			count: 1
@@ -6949,12 +6895,6 @@ parameters:
 			path: Modules/Core/app/Models/Entity.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Field.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getKeyName().'
 			identifier: method.notFound
 			count: 1
@@ -6963,18 +6903,6 @@ parameters:
 		-
 			rawMessage: Cannot access constant class on mixed.
 			identifier: classConstant.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Field.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Field::getPreviewAttribute() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Field.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Field::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Field.php
 
@@ -6991,9 +6919,9 @@ parameters:
 			path: Modules/Core/app/Models/Field.php
 
 		-
-			rawMessage: 'Parameter #1 $string of function md5 expects string, string|false given.'
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Approval\Models\Modification>::where() expects array<int|model property of Approval\Models\Modification, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Approval\Models\Modification, ''md5'' given.'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Field.php
 
 		-
@@ -7033,21 +6961,9 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/License.php
 
 		-
@@ -7087,12 +7003,6 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\License::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\License::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7106,12 +7016,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Models\License::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\License::getRulesFromTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/License.php
@@ -7177,12 +7081,6 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Property Modules\Core\Models\License::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
 			identifier: assign.propertyType
 			count: 1
@@ -7191,12 +7089,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\Core\Models\License::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: Property Modules\Core\Models\License::$rules has no type specified.
-			identifier: missingType.property
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -7387,18 +7279,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Cannot call method getCacheTags() on class-string|object.'
 			identifier: method.nonObject
 			count: 1
@@ -7413,7 +7293,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
 		-
@@ -7447,12 +7327,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Permission::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Permission::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7466,12 +7340,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Models\Permission::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Permission::getRulesTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
@@ -7525,12 +7393,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: Property Modules\Core\Models\Permission::$append type has no value type specified in iterable type array.
 			identifier: missingType.iterableValue
 			count: 1
@@ -7551,12 +7413,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\Core\Models\Permission::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Permission::$rules has no type specified.
-			identifier: missingType.property
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
@@ -7729,12 +7585,6 @@ parameters:
 			path: Modules/Core/app/Models/Place.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Preset.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getKeyName().'
 			identifier: method.notFound
 			count: 1
@@ -7783,18 +7633,6 @@ parameters:
 			path: Modules/Core/app/Models/Preset.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Preset::getPreviewAttribute() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Preset::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Preset.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Preset::template() should return Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\Template> but returns Illuminate\Database\Eloquent\Relations\BelongsTo<Modules\Core\Models\Template, $this(Modules\Core\Models\Preset)>.'
 			identifier: return.type
 			count: 1
@@ -7813,15 +7651,15 @@ parameters:
 			path: Modules/Core/app/Models/Preset.php
 
 		-
-			rawMessage: 'Parameter #1 $related of method Illuminate\Database\Eloquent\Model::belongsTo() expects class-string<Illuminate\Database\Eloquent\Model>, string given.'
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Approval\Models\Modification>::where() expects array<int|model property of Approval\Models\Modification, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Approval\Models\Modification, ''md5'' given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/Preset.php
 
 		-
-			rawMessage: 'Parameter #1 $string of function md5 expects string, string|false given.'
+			rawMessage: 'Parameter #1 $related of method Illuminate\Database\Eloquent\Model::belongsTo() expects class-string<Illuminate\Database\Eloquent\Model>, string given.'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Preset.php
 
 		-
@@ -7897,18 +7735,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Call to function is_array() with array<int, string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -7929,7 +7755,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Role.php
 
 		-
@@ -7957,12 +7783,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Role::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Role::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7976,12 +7796,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Models\Role::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Role::getRulesTrait() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Role.php
@@ -8077,12 +7891,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Property Modules\Core\Models\Role::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
 			identifier: assign.propertyType
 			count: 1
@@ -8095,22 +7903,10 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: Property Modules\Core\Models\Role::$rules has no type specified.
-			identifier: missingType.property
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Type string in generic type Illuminate\Database\Eloquent\Relations\BelongsToMany<Modules\Core\Models\User, Illuminate\Database\Eloquent\Relations\Pivot, string> in PHPDoc tag @return is not subtype of template type TPivotModel of Illuminate\Database\Eloquent\Relations\Pivot = Illuminate\Database\Eloquent\Relations\Pivot of class Illuminate\Database\Eloquent\Relations\BelongsToMany.'
 			identifier: generics.notSubtype
 			count: 1
 			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/Setting.php
 
 		-
 			rawMessage: 'Call to an undefined method object::getKeyName().'
@@ -8133,18 +7929,6 @@ parameters:
 		-
 			rawMessage: 'Cannot call method store() on mixed.'
 			identifier: method.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Setting::getPreviewAttribute() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Setting.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Setting::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Setting.php
 
@@ -8173,9 +7957,9 @@ parameters:
 			path: Modules/Core/app/Models/Setting.php
 
 		-
-			rawMessage: 'Parameter #1 $string of function md5 expects string, string|false given.'
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Approval\Models\Modification>::where() expects array<int|model property of Approval\Models\Modification, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Approval\Models\Modification, ''md5'' given.'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: Modules/Core/app/Models/Setting.php
 
 		-
@@ -8218,12 +8002,6 @@ parameters:
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::hasTranslation().'
 			identifier: method.notFound
 			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Relations\MorphMany::activeOnly().'
-			identifier: method.notFound
-			count: 2
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
@@ -8305,8 +8083,8 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::_internalDynamicContentsGetRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
+			rawMessage: 'Method Modules\Core\Models\Taxonomy::_internalDynamicContentsGetRules() should return array<string, array<string, mixed>> but returns array<string>.'
+			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 
@@ -8384,24 +8162,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::getDynamicFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::getPresettableClass() should return class-string<Modules\Core\Models\Pivot\Presettable> but returns string.'
-			identifier: return.type
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::getPreviewAttribute() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
@@ -8533,6 +8293,12 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
+			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Approval\Models\Modification>::where() expects array<int|model property of Approval\Models\Modification, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Approval\Models\Modification, ''md5'' given.'
+			identifier: argument.type
+			count: 1
+			path: Modules/Core/app/Models/Taxonomy.php
+
+		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::orWhere() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''locale'' given.'
 			identifier: argument.type
 			count: 1
@@ -8596,12 +8362,6 @@ parameters:
 			rawMessage: 'Parameter #1 $related of method Illuminate\Database\Eloquent\Model::hasOne() expects class-string<Illuminate\Database\Eloquent\Model>, string given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Parameter #1 $string of function md5 expects string, string|false given.'
-			identifier: argument.type
-			count: 2
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
@@ -8689,12 +8449,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Template::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Template.php
-
-		-
 			rawMessage: Anonymous function should return string|null but returns mixed.
 			identifier: return.type
 			count: 1
@@ -8743,18 +8497,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getTable().'
 			identifier: method.notFound
 			count: 1
@@ -8763,7 +8505,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 3
+			count: 2
 			path: Modules/Core/app/Models/User.php
 
 		-
@@ -8785,12 +8527,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\User::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\User::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8805,12 +8541,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\User::getPermissionsViaRoles() return type with generic class Illuminate\Support\Collection does not specify its types: TKey, TValue'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\User::getRulesTrait() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -8887,12 +8617,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Property Modules\Core\Models\User::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
 			identifier: assign.propertyType
 			count: 1
@@ -8901,12 +8625,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\Core\Models\User::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: Property Modules\Core\Models\User::$rules has no type specified.
-			identifier: missingType.property
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -9277,18 +8995,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Call to function is_array() with list<string> will always evaluate to true.'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -9297,7 +9003,7 @@ parameters:
 		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
@@ -9319,12 +9025,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Method Modules\Core\Overrides\Model::getOriginalVersionableAttributes() has parameter $replacements with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -9332,12 +9032,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\Core\Overrides\Model::getOriginalVersionableAttributes() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Method Modules\Core\Overrides\Model::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
@@ -9367,12 +9061,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Property Modules\Core\Overrides\Model::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
 			identifier: assign.propertyType
 			count: 1
@@ -9381,12 +9069,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\Core\Overrides\Model::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: Property Modules\Core\Overrides\Model::$rules has no type specified.
-			identifier: missingType.property
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
@@ -14575,21 +14257,9 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::shouldSkipValidation().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::validateWithRules().'
-			identifier: method.notFound
-			count: 2
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
-			count: 2
+			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
@@ -14601,12 +14271,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::creator() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::getOperationRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
@@ -14641,12 +14305,6 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Models\FiscalPeriod::validationsHasRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Offset ''mode'' does not exist on array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}.'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -14665,12 +14323,6 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Property Modules\ERP\Models\FiscalPeriod::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''hard'', original: array<string, mixed>}.'
 			identifier: assign.propertyType
 			count: 1
@@ -14679,12 +14331,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\ERP\Models\FiscalPeriod::$pending_version_delete (array{strategy: Overtrue\LaravelVersionable\VersionStrategy, original: array<string, mixed>}|null) does not accept array{mode: ''soft'', strategy: Overtrue\LaravelVersionable\VersionStrategy, deleted_at_column: string, original: non-empty-array<string, mixed>}.'
 			identifier: assign.propertyType
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: Property Modules\ERP\Models\FiscalPeriod::$rules has no type specified.
-			identifier: missingType.property
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
@@ -14719,18 +14365,6 @@ parameters:
 			path: Modules/ERP/app/Models/Movement.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Models\Movement::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/Movement.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\MovementAllocation::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/MovementAllocation.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\MovementAllocation::movement() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types: TRelatedModel, TDeclaringModel'
 			identifier: missingType.generics
 			count: 1
@@ -14759,12 +14393,6 @@ parameters:
 			identifier: class.missingImplements
 			count: 1
 			path: Modules/ERP/app/Models/OpportunityStage.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\PartnerPool::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/PartnerPool.php
 
 		-
 			rawMessage: 'Method Modules\ERP\Models\PartnerPool::members() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsToMany does not specify its types: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor (2-4 required)'
@@ -14807,12 +14435,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: Modules/ERP/app/Models/PartyPriceRule.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\PaymentRequest::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/PaymentRequest.php
 
 		-
 			rawMessage: 'Method Modules\ERP\Models\PaymentRequest::partner_pool() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types: TRelatedModel, TDeclaringModel'
@@ -14865,12 +14487,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\ERP\Models\PoolTransaction::from_user() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types: TRelatedModel, TDeclaringModel'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/PoolTransaction.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\PoolTransaction::getRules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/ERP/app/Models/PoolTransaction.php
 
