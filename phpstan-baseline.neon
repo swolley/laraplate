@@ -3373,12 +3373,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Parameter #1 $array (list<string>) of array_values is already a list, call has no effect.'
 			identifier: arrayValues.list
 			count: 1
@@ -3793,12 +3787,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: 'Parameter #1 $array (list<string>) of array_values is already a list, call has no effect.'
 			identifier: arrayValues.list
 			count: 1
@@ -4173,12 +4161,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::updateTranslation() has parameter $data with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
 
@@ -6079,34 +6061,10 @@ parameters:
 			path: Modules/Core/app/Contracts/Geocoding/GeocodingResult.php
 
 		-
-			rawMessage: 'Type static(Modules\Core\Contracts\IActivatableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\IActivatableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\IActivatableModel::active() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/IActivatableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\IActivatableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\IActivatableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\IActivatableModel::inactive() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/IActivatableModel.php
-
-		-
 			rawMessage: 'Type $this(Modules\Core\Contracts\IEmbeddableModel) in generic type Illuminate\Database\Eloquent\Relations\MorphMany<Modules\Core\Models\ModelEmbedding, $this(Modules\Core\Contracts\IEmbeddableModel)> in PHPDoc tag @return is not subtype of template type TDeclaringModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Relations\MorphMany.'
 			identifier: generics.notSubtype
 			count: 1
 			path: Modules/Core/app/Contracts/IEmbeddableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\ILockableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\ILockableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\ILockableModel::locked() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/ILockableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\ILockableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\ILockableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\ILockableModel::notLocked() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/ILockableModel.php
 
 		-
 			rawMessage: 'Method Modules\Core\Contracts\ISearchableModel::searchable() has no return type specified.'
@@ -6119,36 +6077,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: Modules/Core/app/Contracts/ISearchableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\ISoftDeletableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\ISoftDeletableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\ISoftDeletableModel::onlyTrashed() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/ISoftDeletableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\ISoftDeletableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\ISoftDeletableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\ISoftDeletableModel::withTrashed() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/ISoftDeletableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\ISoftDeletableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\ISoftDeletableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\ISoftDeletableModel::withoutTrashed() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/ISoftDeletableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\IValidatableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\IValidatableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\IValidatableModel::published() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/IValidatableModel.php
-
-		-
-			rawMessage: 'Type static(Modules\Core\Contracts\IValidatableModel) in generic type Illuminate\Database\Eloquent\Builder<static(Modules\Core\Contracts\IValidatableModel)> in PHPDoc tag @method for method Modules\Core\Contracts\IValidatableModel::valid() return type is not subtype of template type TModel of Illuminate\Database\Eloquent\Model of class Illuminate\Database\Eloquent\Builder.'
-			identifier: generics.notSubtype
-			count: 1
-			path: Modules/Core/app/Contracts/IValidatableModel.php
 
 		-
 			rawMessage: Property Modules\Core\Events\ModelRequiresIndexing::$completed_pre_processing type has no value type specified in iterable type array.
@@ -10489,21 +10417,9 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: PHPDoc tag @throws with type InvalidFormatException is not subtype of Throwable
 			identifier: throws.notThrowable
 			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
 			path: Modules/Core/app/Models/License.php
 
 		-
@@ -10525,38 +10441,8 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: Property Modules\Core\Models\License::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
-			rawMessage: Property Modules\Core\Models\License::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/License.php
 
@@ -10669,18 +10555,6 @@ parameters:
 			path: Modules/Core/app/Models/Media.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/Core/app/Models/Media.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
 			identifier: argument.type
 			count: 1
@@ -10689,36 +10563,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Media::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Media::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Media.php
 
@@ -10957,18 +10801,6 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\Permission::$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$fillable.'
 			identifier: property.phpDocType
 			count: 1
@@ -10993,43 +10825,13 @@ parameters:
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
 
 		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
 			rawMessage: Property Modules\Core\Models\Permission::$append type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Permission::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Permission::$encryptedVersionable type has no value type specified in iterable type array.
 			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
@@ -11155,18 +10957,6 @@ parameters:
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
 			identifier: argument.type
 			count: 1
@@ -11175,36 +10965,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Pivot\Fieldable::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Pivot\Fieldable::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
@@ -11623,18 +11383,6 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'PHPDoc type array<int, string> of property Modules\Core\Models\Role::$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$fillable.'
 			identifier: property.phpDocType
 			count: 1
@@ -11665,38 +11413,8 @@ parameters:
 			path: Modules/Core/app/Models/Role.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/Role.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Role::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Role.php
-
-		-
-			rawMessage: Property Modules\Core\Models\Role::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Role.php
 
@@ -12139,12 +11857,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Parameter #1 $array (list<string>) of array_values is already a list, call has no effect.'
 			identifier: arrayValues.list
 			count: 1
@@ -12499,12 +12211,6 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: PHPDoc tag @param for parameter $query contains generic type Illuminate\Contracts\Database\Eloquent\Builder<Modules\Core\Models\User> but interface Illuminate\Contracts\Database\Eloquent\Builder is not generic.
 			identifier: generics.notGeneric
 			count: 2
@@ -12520,12 +12226,6 @@ parameters:
 			rawMessage: PHPDoc tag @throws with type InvalidFormatException is not subtype of Throwable
 			identifier: throws.notThrowable
 			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
 			path: Modules/Core/app/Models/User.php
 
 		-
@@ -12553,38 +12253,8 @@ parameters:
 			path: Modules/Core/app/Models/User.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: Property Modules\Core\Models\User::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
-			rawMessage: Property Modules\Core\Models\User::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/User.php
 
@@ -13087,56 +12757,14 @@ parameters:
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::where() expects array<int|model property of Illuminate\Database\Eloquent\Model, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model, ''change_type'' given.'
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: Property Modules\Core\Overrides\Model::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
-
-		-
-			rawMessage: Property Modules\Core\Overrides\Model::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Overrides/Model.php
 
@@ -24205,18 +23833,6 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: PHPDoc tag @param for parameter $model contains unresolvable type.
-			identifier: parameter.unresolvableType
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: PHPDoc tag @var for variable $model contains unresolvable type.
-			identifier: varTag.unresolvableType
-			count: 6
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Parameter #1 $callback of function call_user_func expects callable(): mixed, array{*NEVER*, ''shouldVersioning''} given.'
 			identifier: argument.type
 			count: 1
@@ -24229,38 +23845,8 @@ parameters:
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
-			rawMessage: 'Parameter #2 $attributes of static method Modules\Core\Versioning\Data\VersionChange::encryptSelected() expects list<string>, array given.'
-			identifier: argument.type
-			count: 5
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
 			rawMessage: 'Parameter #2 ...$arrays of function array_merge expects array, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of class Modules\Core\Versioning\Data\VersionChange constructor expects list<string>, array given.'
-			identifier: argument.type
-			count: 3
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: 'Parameter $encryptedAttributes of static method Modules\Core\Versioning\Data\VersionChange::forModel() expects list<string>, array given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: Property Modules\ERP\Models\FiscalPeriod::$dontVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
-
-		-
-			rawMessage: Property Modules\ERP\Models\FiscalPeriod::$encryptedVersionable type has no value type specified in iterable type array.
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/ERP/app/Models/FiscalPeriod.php
 
