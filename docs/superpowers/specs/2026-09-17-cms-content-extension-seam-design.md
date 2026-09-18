@@ -185,7 +185,10 @@ Two rules this imposes:
   are never indexed — they are authoritative and volatile in ERP and take no part in the indexes. The
   `extension` section holds only the extender's **own** stable attributes (for Ecommerce: variant
   attributes, `is_published_in_shop`, merchandising metadata). Price, stock and availability resolve at
-  read time through ERP services, never from the index.
+  read time through ERP services, never from the index. A consumer may index a clearly
+  **non-authoritative, browse-only snapshot** of such data as a deliberate, bounded exception it owns
+  and refreshes on change (e.g. Ecommerce's price / in-stock browse snapshot for sort and facets,
+  spec `2026-09-17-ecommerce-module-design.md` E21) — never used for a transaction.
 
 This gives search the same opt-in "sometimes yes, sometimes no" as the routes, symmetric with the DB
 global scope.
