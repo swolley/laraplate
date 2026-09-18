@@ -1099,12 +1099,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -1231,12 +1225,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -1336,12 +1324,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
 
 		-
@@ -1453,12 +1435,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -1567,12 +1543,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -1666,12 +1636,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
 
 		-
@@ -1777,12 +1741,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -1876,12 +1834,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
 
 		-
@@ -5605,12 +5557,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -5713,12 +5659,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -5809,12 +5749,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -5884,12 +5818,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
 
 		-
@@ -5992,12 +5920,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
 
 		-
@@ -6139,12 +6061,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -6232,12 +6148,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
 
 		-
@@ -6358,12 +6268,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
 
 		-
@@ -6499,12 +6403,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -6628,12 +6526,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
 
 		-
@@ -15055,12 +14947,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -15124,12 +15010,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
 
 		-
@@ -15205,12 +15085,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -15274,12 +15148,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
 
 		-
@@ -15364,12 +15232,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
 
 		-
@@ -15517,12 +15379,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -15586,12 +15442,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
 
 		-
@@ -15667,12 +15517,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -15736,12 +15580,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
 
 		-
@@ -15874,12 +15712,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
 
 		-
@@ -16183,12 +16015,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -16264,12 +16090,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
 
 		-
@@ -16483,12 +16303,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -16579,12 +16393,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -16666,12 +16474,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
 
 		-
@@ -16765,12 +16567,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -16834,12 +16630,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
 
 		-
@@ -16945,12 +16735,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -17032,12 +16816,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
 
 		-
@@ -17203,12 +16981,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -17272,12 +17044,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
 
 		-
@@ -17347,12 +17113,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -17416,12 +17176,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
 
 		-
@@ -17494,12 +17248,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
 
 		-
@@ -17707,12 +17455,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -17827,12 +17569,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -17938,12 +17674,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
 
 		-
@@ -18277,12 +18007,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -18349,12 +18073,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -18418,12 +18136,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
 
 		-
@@ -18559,12 +18271,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -18628,12 +18334,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
 
 		-
@@ -18703,12 +18403,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -18760,12 +18454,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
 
 		-
@@ -18841,12 +18529,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -18910,12 +18592,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
 
 		-
@@ -22045,12 +21721,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -22114,12 +21784,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
 
 		-
@@ -22189,12 +21853,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -22258,12 +21916,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
 
 		-
@@ -22333,12 +21985,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -22402,12 +22048,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
 
 		-
@@ -22477,12 +22117,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -22549,12 +22183,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -22618,12 +22246,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
 
 		-
@@ -24559,12 +24181,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -24652,12 +24268,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
 
 		-
@@ -24751,12 +24361,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -24820,12 +24424,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
 
 		-
@@ -24919,12 +24517,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -24988,12 +24580,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
 
 		-
@@ -25066,12 +24652,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
 
 		-
@@ -25165,12 +24745,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -25261,12 +24835,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -25342,12 +24910,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
 
 		-
@@ -25453,12 +25015,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -25549,12 +25105,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -25642,12 +25192,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
 
 		-
@@ -25759,12 +25303,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
 			rawMessage: 'Parameter #1 $keyBy of method Illuminate\Support\Collection<int,Filament\Actions\Action>::keyBy() expects (callable(Filament\Actions\Action, int): string)|list<Closure|string>|string, Closure(Filament\Actions\Action): (string|null) given.'
 			identifier: argument.type
 			count: 1
@@ -25864,12 +25402,6 @@ parameters:
 			rawMessage: 'Parameter #1 $class of method Modules\Core\Inspector\ModelMetadataRegistry::get() expects class-string<Illuminate\Database\Eloquent\Model>, class-string<Illuminate\Database\Eloquent\Model>|null given.'
 			identifier: argument.type
 			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::whereDate() expects Illuminate\Contracts\Database\Query\Expression|string, string|null given.'
-			identifier: argument.type
-			count: 8
 			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
 
 		-
