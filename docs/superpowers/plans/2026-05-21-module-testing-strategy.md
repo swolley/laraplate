@@ -811,7 +811,7 @@ rtk rg -n 'require-dev|pestphp|orchestra/testbench|pint.json|rector.php|phpstan.
 
 Expected: no module document claims to own test dependencies or its own tool configuration.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit** (ERP `38e1a12`; the Core and AI READMEs followed in `8975029`, `fc0d03c` and `d399526`)
 
 Run:
 
@@ -987,7 +987,7 @@ the `peckphp/peck` constraint left at the installed version, the PHPStan error b
 `tests/Unit/ClosedPlansPointToDocumentationTest.php` reads the delivery heading as the marker that
 a plan is closed, and this plan is not.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit** (Core `d399526`, AI `56916ce`, SAO `fd2f799`, application `f2fb306`)
 
 Run:
 
