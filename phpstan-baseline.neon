@@ -1447,13 +1447,7 @@ parameters:
 			path: Modules/CMS/app/Models/Comment.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::getAllTranslations() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::getAllTranslations() should return Illuminate\Database\Eloquent\Collection&iterable<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
+			rawMessage: 'Method Modules\CMS\Models\Comment::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
@@ -1465,20 +1459,8 @@ parameters:
 			path: Modules/CMS/app/Models/Comment.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::getTranslatableFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Comment::getTranslationModelClass() should return class-string<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns class-string<Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::locale() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
 
@@ -1489,26 +1471,8 @@ parameters:
 			path: Modules/CMS/app/Models/Comment.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::setTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Comment::translations() should return Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Comment)>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::translationsToArray() has parameter $parsed with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Comment.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Comment::updateTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Comment.php
 
@@ -1597,18 +1561,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::hasTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getKeyName().'
 			identifier: method.notFound
 			count: 1
@@ -1635,12 +1587,6 @@ parameters:
 		-
 			rawMessage: Cannot access property $entity_id on mixed.
 			identifier: property.nonObject
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Cannot call method firstWhere() on mixed.'
-			identifier: method.nonObject
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1723,12 +1669,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Content::_internalTranslationsToArray() has parameter $parsed with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Content::approvalsToArray() has parameter $parsed with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1759,13 +1699,7 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getAllTranslations() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getAllTranslations() should return Illuminate\Database\Eloquent\Collection&iterable<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
+			rawMessage: 'Method Modules\CMS\Models\Content::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
@@ -1789,12 +1723,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Content::getTranslatableFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Content::getTranslation() should return (Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated)|null but returns Illuminate\Database\Eloquent\Model|null.'
 			identifier: return.type
 			count: 2
@@ -1803,12 +1731,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Content::getTranslationModelClass() should return class-string<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns class-string<Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::locale() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -1849,12 +1771,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Content::setTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Content::syncMakeSearchable() has parameter $models with no type specified.'
 			identifier: missingType.parameter
 			count: 1
@@ -1881,12 +1797,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Content::type() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Content::updateTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -2083,18 +1993,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::hasTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: Cannot access offset string on mixed.
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 5
@@ -2103,12 +2001,6 @@ parameters:
 		-
 			rawMessage: Cannot access property $entity_id on mixed.
 			identifier: property.nonObject
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Cannot call method firstWhere() on mixed.'
-			identifier: method.nonObject
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -2185,12 +2077,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::_internalTranslationsToArray() has parameter $parsed with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::dynamicSlugFields() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -2203,13 +2089,7 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::getAllTranslations() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::getAllTranslations() should return Illuminate\Database\Eloquent\Collection&iterable<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
+			rawMessage: 'Method Modules\CMS\Models\Contributor::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
@@ -2227,12 +2107,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::getTranslatableFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::getTranslation() should return (Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated)|null but returns Illuminate\Database\Eloquent\Model|null.'
 			identifier: return.type
 			count: 2
@@ -2241,12 +2115,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::getTranslationModelClass() should return class-string<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns class-string<Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::locale() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -2275,12 +2143,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::setTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::translation() should return Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Contributor)>.'
 			identifier: return.type
 			count: 1
@@ -2295,12 +2157,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Contributor::type() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Contributor.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Contributor::updateTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Contributor.php
 
@@ -2557,24 +2413,6 @@ parameters:
 			path: Modules/CMS/app/Models/Preset.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::hasTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Cannot call method firstWhere() on mixed.'
-			identifier: method.nonObject
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 1
@@ -2605,13 +2443,7 @@ parameters:
 			path: Modules/CMS/app/Models/Tag.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::getAllTranslations() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::getAllTranslations() should return Illuminate\Database\Eloquent\Collection&iterable<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
+			rawMessage: 'Method Modules\CMS\Models\Tag::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>|Illuminate\Database\Eloquent\Collection<int, Modules\Core\Services\Translation\Definitions\ITranslated>.'
 			identifier: return.type
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
@@ -2619,12 +2451,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::getDefaultTranslation() should return (Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated)|null but returns Illuminate\Database\Eloquent\Model|null.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::getTranslatableFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
 
@@ -2641,12 +2467,6 @@ parameters:
 			path: Modules/CMS/app/Models/Tag.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::locale() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::path() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
 			count: 1
@@ -2659,12 +2479,6 @@ parameters:
 			path: Modules/CMS/app/Models/Tag.php
 
 		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::setTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::translation() should return Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasOne<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Tag)>.'
 			identifier: return.type
 			count: 1
@@ -2673,12 +2487,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\CMS\Models\Tag::translations() should return Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated> but returns Illuminate\Database\Eloquent\Relations\HasMany<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, $this(Modules\CMS\Models\Tag)>.'
 			identifier: return.type
-			count: 1
-			path: Modules/CMS/app/Models/Tag.php
-
-		-
-			rawMessage: 'Method Modules\CMS\Models\Tag::updateTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/CMS/app/Models/Tag.php
 
@@ -7663,18 +7471,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::hasTranslation().'
-			identifier: method.notFound
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Call to an undefined method object::getFillable().'
 			identifier: method.notFound
 			count: 1
@@ -7701,12 +7497,6 @@ parameters:
 		-
 			rawMessage: Cannot access property $entity_id on mixed.
 			identifier: property.nonObject
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Cannot call method firstWhere() on mixed.'
-			identifier: method.nonObject
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 
@@ -7789,12 +7579,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::_internalTranslationsToArray() has parameter $parsed with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::approvalsToArray() has parameter $parsed with no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7825,8 +7609,8 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::getAllTranslations() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
+			rawMessage: 'Method Modules\Core\Models\Taxonomy::getAllTranslations() should return Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model> but returns Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Translations\TaxonomyTranslation>.'
+			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 
@@ -7837,19 +7621,7 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::getTranslatableFields() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::ids() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::locale() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
@@ -7897,12 +7669,6 @@ parameters:
 			path: Modules/Core/app/Models/Taxonomy.php
 
 		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::setTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::slugPlaceholders() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7929,12 +7695,6 @@ parameters:
 		-
 			rawMessage: 'Method Modules\Core\Models\Taxonomy::type() return type with generic class Illuminate\Database\Eloquent\Casts\Attribute does not specify its types: TGet, TSet'
 			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Models/Taxonomy.php
-
-		-
-			rawMessage: 'Method Modules\Core\Models\Taxonomy::updateTranslation() has parameter $data with no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
 			count: 1
 			path: Modules/Core/app/Models/Taxonomy.php
 

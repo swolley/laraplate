@@ -1040,6 +1040,24 @@ Final run, 2026-09-18: **5.618 passed, 0 failed, 30 skipped**, 15.858 assertions
   new error now fails the run. The 36 errors that arrived with a merge on 2026-09-18 were fixed,
   not added to the baseline.
 
+  It kept moving on 2026-09-18, down to **4.035**, and the method is worth recording because it
+  was not grinding: a trait is analysed once per class using it, so a handful of physical lines
+  produced thousands of reports, and the leverage was always in finding those. Contracts were
+  declared where traits were being named as types (a trait is not a type, and PHPStan drops the
+  whole annotation), `self` was used inside the traits themselves, and query scopes were resolved
+  through `@method scopeX` tags on the contracts rather than through an ignore rule.
+
+  Twelve runtime defects surfaced on the way, none of them the task at hand: a search parser
+  cutting accented queries on byte offsets, two table filters calling scopes that existed nowhere,
+  `keyBy()` whose result was discarded (leaving `fixedActions` inert), `getVersionUserId()` reading
+  an attribute named "attributes" so every version was stored with no author, `md5(json_encode(...))`
+  hashing `false` on failure, `Content::getEntityType()` protected while five callers outside the
+  class ask for it, and a nullable `getModel()` ahead of a `ReflectionClass`.
+
+  `composer run check:debt` now reports what the baseline still holds, broken down by identifier
+  with the number of distinct places each comes from. That second column is what says whether a
+  category is one fact repeated or real work.
+
 ---
 
 ## Execution log (2026-09-15)
