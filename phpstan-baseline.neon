@@ -1081,18 +1081,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Categories/Schemas/CategoryForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -1225,18 +1213,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Categories/Tables/CategoriesTable.php
-
-		-
 			rawMessage: 'Call to an undefined static method Filament\Resources\Pages\EditRecord<Illuminate\Database\Eloquent\Model>::mutateFormDataBeforeCreate().'
 			identifier: staticMethod.notFound
 			count: 1
@@ -1319,18 +1295,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Contents/Schemas/ContentForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -1465,18 +1429,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contents/Tables/ContentsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -1535,18 +1487,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Contributors/Schemas/ContributorForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -1681,18 +1621,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Contributors/Tables/ContributorsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
@@ -1757,18 +1685,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Entities/Schemas/EntityForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -1903,18 +1819,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Entities/Tables/EntitiesTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -1979,18 +1883,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Locations/Schemas/LocationForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -2119,18 +2011,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Locations/Tables/LocationsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -2189,18 +2069,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Presets/Schemas/PresetForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -2335,18 +2203,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Presets/Tables/PresetsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -2405,18 +2261,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Tags/Schemas/TagForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -2545,18 +2389,6 @@ parameters:
 			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Tags/Tables/TagsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -2615,18 +2447,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Templates/Schemas/TemplateForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -2757,18 +2577,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #4 $fixedActions of static method Modules\CMS\Filament\Resources\Templates\Tables\TemplatesTable::coreConfigureTable() expects list<string>, list<Filament\Actions\Action|Filament\Actions\ActionGroup> given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/CMS/app/Filament/Resources/Templates/Tables/TemplatesTable.php
 
@@ -3217,12 +3025,6 @@ parameters:
 			path: Modules/CMS/app/Models/Comment.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$embedding.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: Anonymous function with return type void returns null but should not return anything.
 			identifier: return.void
 			count: 2
@@ -3595,12 +3397,6 @@ parameters:
 			path: Modules/CMS/app/Models/Content.php
 
 		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated>::orWhere() expects array<int|model property of Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Illuminate\Database\Eloquent\Model&Modules\Core\Services\Translation\Definitions\ITranslated, ''locale'' given.'
 			identifier: argument.type
 			count: 1
@@ -3723,12 +3519,6 @@ parameters:
 		-
 			rawMessage: Property Modules\CMS\Models\Content::$valid_to_column has no type specified.
 			identifier: missingType.property
-			count: 1
-			path: Modules/CMS/app/Models/Content.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/CMS/app/Models/Content.php
 
@@ -4117,12 +3907,6 @@ parameters:
 			path: Modules/CMS/app/Models/Contributor.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$embedding.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/app/Models/Location.php
-
-		-
 			rawMessage: Anonymous function should return string|null but returns mixed.
 			identifier: return.type
 			count: 1
@@ -4237,20 +4021,8 @@ parameters:
 			path: Modules/CMS/app/Models/Location.php
 
 		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/CMS/app/Models/Location.php
-
-		-
 			rawMessage: 'Parameter #1 $name of callable passed to call_user_func() expects string, $this(Modules\CMS\Models\Location) given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/CMS/app/Models/Location.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/CMS/app/Models/Location.php
 
@@ -4825,42 +4597,6 @@ parameters:
 			path: Modules/CMS/database/factories/ContentReferenceFactory.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$components.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$entity_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$fields.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$preset_id.
-			identifier: property.notFound
-			count: 2
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$presettable_id.
-			identifier: property.notFound
-			count: 2
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$slug.
-			identifier: property.notFound
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
 			rawMessage: 'Call to an undefined static method Illuminate\Database\Eloquent\Model::getEntityType().'
 			identifier: staticMethod.notFound
 			count: 1
@@ -4941,12 +4677,6 @@ parameters:
 		-
 			rawMessage: 'Trait Modules\Core\Database\Factories\Concerns\HasDynamicContentFactory requires using class to extend Illuminate\Database\Eloquent\Model, but Modules\CMS\Database\Factories\ContributorFactory does not.'
 			identifier: class.missingExtends
-			count: 1
-			path: Modules/CMS/database/factories/ContributorFactory.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function throw_unless
-			identifier: argument.templateType
 			count: 1
 			path: Modules/CMS/database/factories/ContributorFactory.php
 
@@ -6607,18 +6337,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/ACLS/Schemas/ACLForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -6745,18 +6463,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ACLS/Tables/ACLsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
@@ -6815,18 +6521,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/CronJobs/Schemas/CronJobForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -6961,18 +6655,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/CronJobs/Tables/CronJobsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -7025,18 +6707,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Fields/Schemas/FieldForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -7165,18 +6835,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Fields/Tables/FieldsTable.php
-
-		-
 			rawMessage: 'Method Modules\Core\Filament\Resources\ImportSessions\Pages\ListImportSessions::getTableRecords() return type with generic interface Illuminate\Contracts\Pagination\CursorPaginator does not specify its types: TKey, TValue'
 			identifier: missingType.generics
 			count: 1
@@ -7187,18 +6845,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: Modules/Core/app/Filament/Resources/ImportSessions/Pages/ListImportSessions.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
 
 		-
 			rawMessage: Binary operation "." between 'import-' and mixed results in an error.
@@ -7345,18 +6991,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/ImportSessions/Tables/ImportSessionsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -7409,18 +7043,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Licenses/Schemas/LicenseForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -7549,24 +7171,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Licenses/Tables/LicensesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$modifiable_type.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Pages/ListModifications.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -7649,18 +7253,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Modifications/Schemas/ModificationForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
 
 		-
 			rawMessage: Anonymous function never returns null so it can be removed from the return type.
@@ -7807,18 +7399,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -7871,18 +7451,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Permissions/Schemas/PermissionForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -8035,18 +7603,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Permissions/Tables/PermissionsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
@@ -8105,18 +7661,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Roles/Schemas/RoleForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -8251,18 +7795,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Roles/Tables/RolesTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -8345,18 +7877,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -8521,18 +8041,6 @@ parameters:
 			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php
-
-		-
 			rawMessage: Cannot cast mixed to string.
 			identifier: cast.string
 			count: 3
@@ -8591,18 +8099,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Users/Schemas/UserForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -8745,18 +8241,6 @@ parameters:
 		-
 			rawMessage: 'Parameter $columns of static method Modules\Core\Filament\Resources\Users\Tables\UsersTable::configureTable() expects (callable(Illuminate\Support\Collection<string, Filament\Tables\Columns\Column>): void)|null, static-Closure(Illuminate\Support\Collection): Illuminate\Support\Collection<string, Filament\Tables\Columns\Column> given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/Core/app/Filament/Resources/Users/Tables/UsersTable.php
 
@@ -10855,12 +10339,6 @@ parameters:
 			path: Modules/Core/app/Models/ImportSession.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/License.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder<Modules\Core\Models\License>::withValidityFilter().'
 			identifier: method.notFound
 			count: 1
@@ -11113,12 +10591,6 @@ parameters:
 			path: Modules/Core/app/Models/License.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/Media.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
 			identifier: method.notFound
 			count: 1
@@ -11345,12 +10817,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/Notification.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/Permission.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
@@ -11597,12 +11063,6 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 1
 			path: Modules/Core/app/Models/Permission.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/Pivot/Fieldable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
@@ -11981,12 +11441,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Models/RecordOrigin.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/Role.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::getIsLockedColumn().'
@@ -12907,12 +12361,6 @@ parameters:
 			path: Modules/Core/app/Models/Translations/TaxonomyTranslation.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Models/User.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder<static(Modules\Core\Models\User)>::withValidityFilter().'
 			identifier: method.notFound
 			count: 1
@@ -13315,42 +12763,6 @@ parameters:
 			path: Modules/Core/app/Overrides/CustomSoftDeletingScope.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$components.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$entity_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$fields.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$preset_id.
-			identifier: property.notFound
-			count: 2
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$presettable_id.
-			identifier: property.notFound
-			count: 2
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$slug.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
 			rawMessage: Binary operation "." between 'Default translation…' and mixed results in an error.
 			identifier: binaryOp.invalid
 			count: 1
@@ -13489,12 +12901,6 @@ parameters:
 			path: Modules/Core/app/Overrides/Factory.php
 
 		-
-			rawMessage: Unable to resolve the template type TValue in call to function throw_unless
-			identifier: argument.templateType
-			count: 1
-			path: Modules/Core/app/Overrides/Factory.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>::modelUsesTranslationFallback().'
 			identifier: method.notFound
 			count: 1
@@ -13571,12 +12977,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Overrides/Migrator.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/Core/app/Overrides/Model.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
@@ -15919,31 +15319,13 @@ parameters:
 			path: Modules/Core/app/Services/DynamicContentsService.php
 
 		-
-			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailableEntities() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
-			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresets() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
-			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresets() should return Illuminate\Database\Eloquent\Collection&iterable<Modules\Core\Models\Preset> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>.'
+			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresets() should return Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Preset> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Services/DynamicContentsService.php
 
 		-
-			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresettables() return type with generic class Illuminate\Database\Eloquent\Collection does not specify its types: TKey, TModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/Core/app/Services/DynamicContentsService.php
-
-		-
-			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresettables() should return Illuminate\Database\Eloquent\Collection&iterable<Modules\Core\Models\Pivot\Presettable> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>.'
+			rawMessage: 'Method Modules\Core\Services\DynamicContentsService::fetchAvailablePresettables() should return Illuminate\Database\Eloquent\Collection<int, Modules\Core\Models\Pivot\Presettable> but returns Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>.'
 			identifier: return.type
 			count: 1
 			path: Modules/Core/app/Services/DynamicContentsService.php
@@ -17557,18 +16939,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Accounts/Schemas/AccountForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -17691,18 +17061,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Accounts/Tables/AccountsTable.php
 
@@ -17737,18 +17095,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/BankAccounts/Schemas/BankAccountForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -17871,18 +17217,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/BankAccounts/Tables/BankAccountsTable.php
 
@@ -17923,18 +17257,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/BankStatements/Schemas/BankStatementForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -18057,18 +17379,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/BankStatements/Tables/BankStatementsTable.php
 
@@ -18103,18 +17413,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Companies/Schemas/CompanyForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -18237,18 +17535,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Companies/Tables/CompaniesTable.php
 
@@ -18301,18 +17587,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Contacts/Schemas/ContactForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -18435,18 +17709,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Contacts/Tables/ContactsTable.php
 
@@ -18559,18 +17821,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Schemas/DeliveryNoteForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -18693,18 +17943,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/DeliveryNotes/Tables/DeliveryNotesTable.php
 
@@ -18739,18 +17977,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Schemas/DocumentSequenceForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -18873,18 +18099,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/DocumentSequences/Tables/DocumentSequencesTable.php
 
@@ -18925,18 +18139,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -19059,18 +18261,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/FiscalPeriods/Tables/FiscalPeriodsTable.php
 
@@ -19105,18 +18295,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/FiscalYears/Schemas/FiscalYearForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -19239,18 +18417,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/FiscalYears/Tables/FiscalYearsTable.php
 
@@ -19351,18 +18517,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Schemas/GoodsReceiptForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -19485,18 +18639,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/GoodsReceipts/Tables/GoodsReceiptsTable.php
 
@@ -19777,18 +18919,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Invoices/Schemas/InvoiceForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -19921,18 +19051,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Invoices/Tables/InvoicesTable.php
-
-		-
 			rawMessage: Using nullsafe property access "?->value" on left side of ?? is unnecessary. Use -> instead.
 			identifier: nullsafe.neverNull
 			count: 1
@@ -19967,18 +19085,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Items/Schemas/ItemForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -20103,18 +19209,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Items/Tables/ItemsTable.php
 
@@ -20311,18 +19405,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Schemas/JournalEntryLineSchema.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -20445,18 +19527,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/JournalEntries/Tables/JournalEntriesTable.php
 
@@ -20521,18 +19591,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Leads/Schemas/LeadForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -20655,18 +19713,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Leads/Tables/LeadsTable.php
 
@@ -20719,18 +19765,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Movements/Schemas/MovementForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -20853,18 +19887,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Movements/Tables/MovementsTable.php
 
@@ -20929,18 +19951,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Opportunities/Schemas/OpportunityForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -21065,24 +20075,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Opportunities/Tables/OpportunitiesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$company_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/RelationManagers/PriceRulesRelationManager.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::presettable().'
@@ -21115,18 +20107,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Parties/Schemas/PartyForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -21249,18 +20229,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Parties/Tables/PartiesTable.php
 
@@ -21331,18 +20299,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Schemas/PartnerPoolForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -21465,18 +20421,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PartnerPools/Tables/PartnerPoolsTable.php
 
@@ -21529,18 +20473,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Schemas/PaymentRequestForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -21663,18 +20595,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PaymentRequests/Tables/PaymentRequestsTable.php
 
@@ -21805,18 +20725,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Schemas/PaymentRunForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -21939,18 +20847,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PaymentRuns/Tables/PaymentRunsTable.php
 
@@ -21985,18 +20881,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Schemas/PaymentTermForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -22119,18 +21003,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PaymentTerms/Tables/PaymentTermsTable.php
 
@@ -22165,18 +21037,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Payments/Schemas/PaymentForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -22299,18 +21159,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Payments/Tables/PaymentsTable.php
 
@@ -22345,18 +21193,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PriceLists/Schemas/PriceListForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -22479,18 +21315,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PriceLists/Tables/PriceListsTable.php
 
@@ -22537,18 +21361,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Projects/Schemas/ProjectForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -22671,18 +21483,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Projects/Tables/ProjectsTable.php
 
@@ -22855,18 +21655,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Schemas/PurchaseOrderForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -22989,18 +21777,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/PurchaseOrders/Tables/PurchaseOrdersTable.php
 
@@ -23089,18 +21865,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Quotations/Schemas/QuotationForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -23223,18 +21987,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Quotations/Tables/QuotationsTable.php
 
@@ -23317,18 +22069,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Schemas/ReturnOrderForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -23451,18 +22191,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/ReturnOrders/Tables/ReturnOrdersTable.php
 
@@ -23761,18 +22489,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Schemas/SalesOrderForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -23895,18 +22611,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/SalesOrders/Tables/SalesOrdersTable.php
 
@@ -23941,18 +22645,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Sites/Schemas/SiteForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -24075,18 +22767,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Sites/Tables/SitesTable.php
 
@@ -24121,18 +22801,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/StockLevels/Schemas/StockLevelForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -24255,18 +22923,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/StockLevels/Tables/StockLevelsTable.php
 
@@ -24373,18 +23029,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Schemas/SupplierReturnForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -24507,18 +23151,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/SupplierReturns/Tables/SupplierReturnsTable.php
 
@@ -24553,18 +23185,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/Tasks/Schemas/TaskForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -24687,18 +23307,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Tasks/Tables/TasksTable.php
 
@@ -24733,18 +23341,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/TaxCodes/Schemas/TaxCodeForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -24871,30 +23467,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/TaxCodes/Tables/TaxCodesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -25017,18 +23589,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/VatRegister/Tables/VatRegisterTable.php
 
@@ -25043,18 +23603,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: Modules/ERP/app/Filament/Resources/VatSettlements/Pages/ListVatSettlements.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -25189,18 +23737,6 @@ parameters:
 			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/VatSettlements/Tables/VatSettlementsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::presettable().'
 			identifier: method.notFound
 			count: 2
@@ -25229,18 +23765,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Warehouses/Schemas/WarehouseForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -25365,18 +23889,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/ERP/app/Filament/Resources/Warehouses/Tables/WarehousesTable.php
 
@@ -25589,12 +24101,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: Modules/ERP/app/Models/Entity.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$version_set_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Models/FiscalPeriod.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model::revert().'
@@ -25849,12 +24355,6 @@ parameters:
 			path: Modules/ERP/app/Models/OpportunityStage.php
 
 		-
-			rawMessage: 'Method Modules\ERP\Models\PartnerPool::allocations() return type with generic class Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel, TDeclaringModel'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/PartnerPool.php
-
-		-
 			rawMessage: 'Method Modules\ERP\Models\PartnerPool::getRules() return type has no value type specified in iterable type array.'
 			identifier: missingType.iterableValue
 			count: 1
@@ -25862,12 +24362,6 @@ parameters:
 
 		-
 			rawMessage: 'Method Modules\ERP\Models\PartnerPool::members() return type with generic class Illuminate\Database\Eloquent\Relations\BelongsToMany does not specify its types: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor (2-4 required)'
-			identifier: missingType.generics
-			count: 1
-			path: Modules/ERP/app/Models/PartnerPool.php
-
-		-
-			rawMessage: 'Method Modules\ERP\Models\PartnerPool::transactions() return type with generic class Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel, TDeclaringModel'
 			identifier: missingType.generics
 			count: 1
 			path: Modules/ERP/app/Models/PartnerPool.php
@@ -26945,42 +25439,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/ERP/app/Services/Cash/MovementPostingService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$amount.
-			identifier: property.notFound
-			count: 2
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$from_user_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$owed_amount.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$paid_amount.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$to_user_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$user_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/app/Services/Cash/PartnerPoolSettlementService.php
 
 		-
 			rawMessage: Cannot cast mixed to int.
@@ -28351,24 +26809,6 @@ parameters:
 			path: Modules/ERP/database/migrations/2026_04_08_191746_create_tasks_table.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$name.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/database/seeders/DevERPDatabaseSeeder.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$qty_ordered.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/database/seeders/DevERPDatabaseSeeder.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$unit_price.
-			identifier: property.notFound
-			count: 1
-			path: Modules/ERP/database/seeders/DevERPDatabaseSeeder.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Builder<Modules\Core\Models\Translations\TaxonomyTranslation>::forceCreate() expects array<model property of Modules\Core\Models\Translations\TaxonomyTranslation, mixed>, array<string, array|int|string> given.'
 			identifier: argument.type
 			count: 2
@@ -28633,18 +27073,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Boms/Schemas/BomForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -28767,18 +27195,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/Boms/Tables/BomsTable.php
 
@@ -28813,18 +27229,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Downtimes/Schemas/DowntimeForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -28947,18 +27351,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/Downtimes/Tables/DowntimesTable.php
 
@@ -28993,18 +27385,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/NonConformances/Schemas/NonConformanceForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -29127,18 +27507,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/NonConformances/Tables/NonConformancesTable.php
 
@@ -29173,18 +27541,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/ProductionOrders/Schemas/ProductionOrderForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -29307,18 +27663,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/ProductionOrders/Tables/ProductionOrdersTable.php
 
@@ -29353,18 +27697,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/QualityChecks/Schemas/QualityCheckForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -29487,18 +27819,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/QualityChecks/Tables/QualityChecksTable.php
 
@@ -29533,18 +27853,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/QualityPlans/Schemas/QualityPlanForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -29667,18 +27975,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/QualityPlans/Tables/QualityPlansTable.php
 
@@ -29713,18 +28009,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Routings/Schemas/RoutingForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -29847,18 +28131,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/Routings/Tables/RoutingsTable.php
 
@@ -29893,18 +28165,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/Shifts/Schemas/ShiftForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -30027,18 +28287,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/Shifts/Tables/ShiftsTable.php
 
@@ -30073,18 +28321,6 @@ parameters:
 			path: Modules/MES/app/Filament/Resources/WorkCenters/Schemas/WorkCenterForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -30207,18 +28443,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/MES/app/Filament/Resources/WorkCenters/Tables/WorkCentersTable.php
 
@@ -30503,18 +28727,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/MES/app/Services/CapacityService.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$id.
-			identifier: property.notFound
-			count: 2
-			path: Modules/MES/app/Services/DomainActions/MesDomainActionRegistrar.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$item_id.
-			identifier: property.notFound
-			count: 1
-			path: Modules/MES/app/Services/DomainActions/MesDomainActionRegistrar.php
 
 		-
 			rawMessage: 'Parameter #1 $check of method Modules\MES\Services\QualityCheckService::execute() expects Modules\MES\Models\QualityCheck, Illuminate\Database\Eloquent\Model given.'
@@ -32113,18 +30325,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Pages/ListClosureAudits.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -32247,18 +30447,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/ClosureAudits/Tables/ClosureAuditsTable.php
 
@@ -32317,18 +30505,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Schemas/ClosurePolicyForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -32451,18 +30627,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/ClosurePolicies/Tables/ClosurePoliciesTable.php
 
@@ -32521,18 +30685,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Connections/Schemas/ConnectionForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -32655,18 +30807,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Connections/Tables/ConnectionsTable.php
 
@@ -32683,18 +30823,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Deployments/Pages/ListDeployments.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -32817,18 +30945,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Deployments/Tables/DeploymentsTable.php
 
@@ -32887,18 +31003,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Environments/Schemas/EnvironmentForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -33021,18 +31125,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Environments/Tables/EnvironmentsTable.php
 
@@ -33049,18 +31141,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/IngestEvents/Pages/ListIngestEvents.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -33183,18 +31263,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/IngestEvents/Tables/IngestEventsTable.php
 
@@ -33217,18 +31285,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Schemas/OwnershipSuggestionInfolist.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -33351,18 +31407,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/OwnershipSuggestions/Tables/OwnershipSuggestionsTable.php
 
@@ -33421,18 +31465,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Projects/Schemas/ProjectForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -33555,18 +31587,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Projects/Tables/ProjectsTable.php
 
@@ -33625,18 +31645,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Releases/Schemas/ReleaseForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -33763,18 +31771,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Releases/Tables/ReleasesTable.php
-
-		-
 			rawMessage: 'Method Modules\SAO\Filament\Resources\Signals\Pages\ListSignals::getTableRecords() return type with generic interface Illuminate\Contracts\Pagination\CursorPaginator does not specify its types: TKey, TValue'
 			identifier: missingType.generics
 			count: 1
@@ -33815,18 +31811,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Signals/Schemas/SignalForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -33967,18 +31951,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Signals/Tables/SignalsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -34031,18 +32003,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Schemas/SourceProfileForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -34167,18 +32127,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/SourceProfiles/Tables/SourceProfilesTable.php
 
@@ -34237,18 +32185,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Schemas/TicketStatusForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -34371,18 +32307,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/TicketStatuses/Tables/TicketStatusesTable.php
 
@@ -34441,18 +32365,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/TicketTypes/Schemas/TicketTypeForm.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
 			identifier: method.notFound
 			count: 1
@@ -34575,18 +32487,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/TicketTypes/Tables/TicketTypesTable.php
 
@@ -34661,18 +32561,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/Tickets/Schemas/TicketForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -34819,18 +32707,6 @@ parameters:
 			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
 
 		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/Tickets/Tables/TicketsTable.php
-
-		-
 			rawMessage: 'Cannot call method can() on App\Models\User|null.'
 			identifier: method.nonObject
 			count: 1
@@ -34883,18 +32759,6 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Schemas/WorkflowSchemeForm.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$locale.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
-
-		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$translations.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Builder::draft().'
@@ -35019,18 +32883,6 @@ parameters:
 		-
 			rawMessage: 'Parameter #1 $time of static method Carbon\Carbon::parse() expects Carbon\Month|Carbon\WeekDay|DateTimeInterface|float|int|string|null, mixed given.'
 			identifier: argument.type
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TKey in call to function collect
-			identifier: argument.templateType
-			count: 1
-			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
-
-		-
-			rawMessage: Unable to resolve the template type TValue in call to function collect
-			identifier: argument.templateType
 			count: 1
 			path: Modules/SAO/app/Filament/Resources/WorkflowSchemes/Tables/WorkflowSchemesTable.php
 
@@ -35383,12 +33235,6 @@ parameters:
 			path: Modules/SAO/app/Models/ProjectBinding.php
 
 		-
-			rawMessage: Access to an undefined property Illuminate\Database\Eloquent\Model::$embedding.
-			identifier: property.notFound
-			count: 1
-			path: Modules/SAO/app/Models/Ticket.php
-
-		-
 			rawMessage: Anonymous function with return type void returns null but should not return anything.
 			identifier: return.void
 			count: 2
@@ -35479,12 +33325,6 @@ parameters:
 			path: Modules/SAO/app/Models/Ticket.php
 
 		-
-			rawMessage: 'Parameter #1 $callback of method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: argument.unresolvableType
-			count: 1
-			path: Modules/SAO/app/Models/Ticket.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\SAO\Models\Ticket>::where() expects array<int|model property of Modules\SAO\Models\Ticket, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\SAO\Models\Ticket, ''due_at'' given.'
 			identifier: argument.type
 			count: 1
@@ -35529,12 +33369,6 @@ parameters:
 		-
 			rawMessage: 'Property Modules\SAO\Models\Ticket::$lock (bool) on left side of ?? is not nullable.'
 			identifier: nullCoalesce.property
-			count: 1
-			path: Modules/SAO/app/Models/Ticket.php
-
-		-
-			rawMessage: 'Return type of call to method Illuminate\Database\Eloquent\Collection<int,Illuminate\Database\Eloquent\Model>::map() contains unresolvable type.'
-			identifier: method.unresolvableReturnType
 			count: 1
 			path: Modules/SAO/app/Models/Ticket.php
 
