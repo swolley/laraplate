@@ -41,12 +41,12 @@ All paths relative to `Modules/CMS/` unless noted.
 
 ---
 
-## Task 1: `extended_type` column (C1, C3)
+## Task 1: `extended_type` column (C1, C3) — DONE
 
-- [ ] Write a migration adding `extended_type` to `contents`: nullable string, indexed. If the partitioned-table migration variant exists (`*add_partitions_to_contents_table*`), add the column there too, in the same block.
-- [ ] Add `extended_type` to `Content`'s `$fillable`/`$casts` only as far as needed; it is **not** mass-assignable by ordinary callers (it is set by the extender create-path — Task 3). Keep it out of any editorial form.
-- [ ] Migrate a fresh test DB; assert the column exists and defaults to `null`.
-- [ ] `vendor/bin/pint --dirty`; PHPStan clean on the migration.
+- [x] Write a migration adding `extended_type` to `contents`: nullable string, indexed. _Partitioned variant is `*.php.tmp` (disabled/experimental); its forward path clones via `CREATE TABLE ... (LIKE contents ...)` so it inherits the column — only its explicit rollback DDL would need it, reconciled if that migration is ever activated. Left untouched._
+- [x] Add `extended_type` to `Content`'s `$fillable`/`$casts` only as far as needed; it is **not** mass-assignable by ordinary callers (it is set by the extender create-path — Task 3). _No change needed: leaving it out of `$fillable` keeps it guarded by default; the trait's `save()` sets it directly on the instance._
+- [x] Migrate a fresh test DB; assert the column exists and defaults to `null`. _`tests/Feature/ContentExtension/ExtendedTypeColumnTest.php` (2 passed)._
+- [x] `vendor/bin/pint --dirty`; PHPStan clean on the migration. _pint passed, phpstan ok._
 
 ## Task 2: `ContentExtenderRegistry` + `ExtendsContent` contract (C2, C7, C13)
 
