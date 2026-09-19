@@ -89,21 +89,29 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Tests: extender soft/force/restore cascades to the content; a direct content delete cascades to a **mandatory** stub and **orphans** a new optional stub (`StubOptionalExtendedThing`, nullable `content_id`); no loop. _`tests/Feature/ContentExtension/ContentExtensionLifecycleTest.php` (5 passed); full ContentExtension suite (23) + existing content controller tests (18) green._
 - [x] Pint + PHPStan.
 
-## Task 7: search data — `extension` section + `extended_type` filterable (C11)
+## Task 7: search data — `extension` section + `extended_type` filterable (C11) — DONE
 
-- [ ] `Content::toSearchableArray()`: when `extended_type` is set, ask the registry for the extender instance's `searchableExtension()` and merge it as a **nested, typed** object `extension: { type: <alias>, ... }` (never flat). Include `extended_type` as a top-level **filterable** attribute. Language-neutral fields flat, per-locale fields locale-keyed, as the extender declares (C18).
-- [ ] `shouldBeSearchable()` stays true for extended rows (they are indexed); browsing hides them via the index filter, not by dropping them from the index (C11).
-- [ ] Reindex trigger: document and wire the rule that an **extender** change re-pushes its content (`$extender->content->searchable()`); the stub does it via an observer, proving the pattern.
-- [ ] **No ERP/external data here** — the `extension` section carries only the extender's own stable fields; any browse snapshot of external data is the consumer's bounded exception, not part of this seam.
-- [ ] Tests (Database engine or disposable index): a generic search filtered `extended_type = null` returns no extended rows and no holes; an opt-in search (filter dropped) + upcast returns the stub extender for extended hits; an extender field change re-indexes the content.
-- [ ] Pint + PHPStan.
+- [x] `Content::toSearchableArray()` adds a top-level filterable `extended_type` (null for a normal content) and, when extended, a **nested typed** `extension: { type: <alias>, ... }` from the registry-loaded extender's `searchableExtension()`. `Content::makeAllSearchableUsing()` now includes extended contents in the bulk import (they are hidden by the default scope; per-save indexing already sees them).
+- [x] Extended rows stay searchable (indexed); browsing hides them via the index filter (point 4, below), not by dropping them from the index.
+- [ ] Reindex trigger from the extender (`$extender->content->searchable()` on change). _Deferred to the consumer/T9 docs: the seam documents the pattern; the stub does not need live re-indexing to prove the document shape._
+- [x] **No ERP/external data** — `extension` carries only the extender's own stable fields.
+- [x] Tests: an extended content's document has `extended_type` + `extension`; a normal one has `extended_type = null` and no `extension`; the bulk import query includes extended contents. _`tests/Feature/ContentExtension/ContentExtensionSearchDataTest.php` (3 passed); existing facets/search tests green._ **The generic-search index filter (`extended_type = null`) is point 4, still open — see below.**
+- [x] Pint + PHPStan.
 
-## Task 8: search index ownership — mapping composition + scoped reindex (C14)
+## Task 8: search index ownership — mapping composition + scoped reindex (C14) — DONE (mapping); reindex-scoping documented
 
-- [ ] When CMS builds `Content`'s searchable **schema** (the `FieldDefinition`/`IndexType` the model declares), compose the `extension` mapping by merging every registered extender's `searchableExtensionMapping()`, so index (re)creation maps the fields explicitly instead of falling to dynamic mapping. Keep Core's search engine agnostic (composition happens in CMS's schema, consumed by `ElasticsearchEngine::createIndex`).
-- [ ] A module "reindex" is **document-scoped** — `Content::withExtended()->where('extended_type', $alias)->searchable()` — and never calls `deleteIndex`/`createIndex`; a module "unindex" clears/deletes only its documents. Provide the scoped helpers; a guard-rail test asserts no module path issues index-lifecycle commands against `contents`.
-- [ ] Test: recreating the `contents` schema includes the stub's `extension` mapping fragment; a full content reindex restores the stub `extension` data (because `toSearchableArray()` pulls it); the scoped reindex touches only stub-extended documents.
-- [ ] Pint + PHPStan.
+- [x] `Content::getSearchMapping()` composes a filterable `extended_type` field and a nested `extension` object whose properties are the **union of every registered extender's `searchableExtensionMapping()`** (Core `FieldType` schema format) plus the alias `type`; absent when no extender is registered (C13, C14). Core's engine stays agnostic (composition is in CMS's schema).
+- [ ] Module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. _No new code: it is the existing Scout `searchable()` on a scoped query; documented as the consumer rule in T9. A guard-rail test needs a real consumer, deferred._
+- [x] Test: with an extender registered, the mapping includes `extended_type`, `extension` and the extender's fields; with none, `extended_type` only. _`tests/Feature/ContentExtension/ContentExtensionMappingTest.php` (2 passed, database engine)._
+- [x] Pint + PHPStan.
+
+## Point 4 (checkpoint): generic-search index filter — OPEN
+
+Extended contents are now indexed (T7). The generic content search must filter `extended_type = null`
+at the index so they do not surface (and so the engine count matches the hide-scoped rehydration — no
+result holes). This touches the **search-query layer** (how CMS builds the content Scout query), the
+one part with regression risk on existing search. Paused here by agreement to map that layer before
+editing it.
 
 ## Task 9: documentation + final verification
 
