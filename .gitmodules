@@ -28,3 +28,6 @@
 	url = https://github.com/swolley/laraplate-sao.git
 	pushurl = git@github.com:swolley/laraplate-sao.git
 	branch = master
+[submodule "Modules/Shop"]
+	path = Modules/Shop
+	url = git@github.com:swolley/laraplate-shop.git
