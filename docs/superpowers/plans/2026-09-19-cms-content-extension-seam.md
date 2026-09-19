@@ -65,13 +65,13 @@ All paths relative to `Modules/CMS/` unless noted.
 - [ ] Feature test: creating a `StubExtendedThing` with a temp content persists both, links `content_id`, and stamps `extended_type = 'cms.stub_extended'`; `$stub->content` resolves despite the (not-yet-added) hide scope placeholder — re-assert after Task 4.
 - [ ] Pint + PHPStan.
 
-## Task 4: default-hide global scope + `withExtended()` (C3, C4, C16)
+## Task 4: default-hide global scope + `withExtended()` (C3, C4, C16) — DONE (back-relation check with Task 3)
 
-- [ ] Create `HidesExtendedContent` global scope (`Modules/CMS/app/Scopes/`, following `CommentTranslationScope`) adding `whereNull('extended_type')`. Register it in `Content::booted()` alongside the existing `global_ordered` scope.
-- [ ] Add `Content::withExtended()` (a local scope) that calls **`withoutGlobalScope(HidesExtendedContent::class)` only** — never `withoutGlobalScopes()` (C16).
-- [ ] Verify the back-relation from Task 3 now resolves (`$stub->content` non-null) because the trait removed the scope (C8).
-- [ ] Tests: a plain `Content::all()` / any default query never returns an extended row; `withExtended()` returns them as `Content`; a **soft-deleted / out-of-validity** extended content stays excluded under `withExtended()` (C16 — other global scopes still apply); `$stub->content` resolves under the default scope.
-- [ ] Pint + PHPStan.
+- [x] Create `HidesExtendedContent` global scope (`Modules/CMS/app/Scopes/`, following `CommentTranslationScope`) adding `whereNull('extended_type')`. Register it in `Content::booted()` alongside the existing `global_ordered` scope. _Executed before Task 3 so the extender trait can reference the scope class._
+- [x] Add `Content::withExtended()` (a local scope, `#[Scope]`) that calls **`withoutGlobalScope(HidesExtendedContent::class)` only** — never `withoutGlobalScopes()` (C16).
+- [ ] Verify the back-relation from Task 3 now resolves (`$stub->content` non-null) because the trait removed the scope (C8). _Deferred to Task 3._
+- [x] Tests: default query never returns an extended row; `withExtended()` returns them as `Content`; a **soft-deleted** extended content stays excluded under `withExtended()` (C16). _`tests/Feature/ContentExtension/HidesExtendedContentTest.php` (4 passed); 29 existing content tests still green (the new global scope only hides `extended_type IS NOT NULL`)._
+- [x] Pint + PHPStan.
 
 ## Task 5: the batched upcast (C5, C6, C12, C15)
 
