@@ -73,13 +73,13 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Tests: default query never returns an extended row; `withExtended()` returns them as `Content`; a **soft-deleted** extended content stays excluded under `withExtended()` (C16). _`tests/Feature/ContentExtension/HidesExtendedContentTest.php` (4 passed); 29 existing content tests still green (the new global scope only hides `extended_type IS NOT NULL`)._
 - [x] Pint + PHPStan.
 
-## Task 5: the batched upcast (C5, C6, C12, C15)
+## Task 5: the batched upcast (C5, C6, C12, C15) — DONE
 
-- [ ] Create `ContentExtensionResolver` with a method that takes a fetched page/collection of `Content` (loaded with `withExtended()`) and returns the mixed collection: group by `extended_type`; for each alias resolve the class from the `ContentExtenderRegistry`; one `whereIn('content_id', $ids)` per alias (allowing the extender's own eager-loads); build `content_id => extender`; swap items; `setRelation('content', $content)` on each extender; rows with `null` stay `Content`; preserve order and the paginator.
-- [ ] Expose it ergonomically (a `Collection`/`Builder` macro or a `->asExtended()` helper), but the base `Content` query is **never** mutated (C5).
-- [ ] Fail-loud (C12): an `extended_type` whose alias is absent from the registry throws (the registry's `InvalidArgumentException`) during upcast — never a silent skip or half-object.
-- [ ] Tests (with the stub): an entity-scoped extended page upcasts to stub extenders with `content` already set and **exactly two queries** (assert via query count); a mixed page (extended + plain) returns extenders and plain contents in original order; an unknown alias throws.
-- [ ] Pint + PHPStan.
+- [x] Create `ContentExtensionResolver` (`resolve(Collection $contents): Collection`): group by `extended_type`; resolve each alias from the `ContentExtenderRegistry`; one `whereIn('content_id', $ids)` per alias — **`->without('content')`** so the page's content is not reloaded (keeps it one query per alias, not two); build `content_id => extender`; swap; `setRelation('content', $content)`; `null` rows stay `Content`; order preserved.
+- [x] The base `Content` query is **never** mutated (C5): resolution operates on the fetched collection. _No macro added — callers use the resolver service; keeps PHPStan clean._
+- [x] Fail-loud (C12): an unregistered alias throws the registry's `InvalidArgumentException`; a registered alias with no owner row throws `RuntimeException` (C15).
+- [x] Tests (with the stub): an entity-scoped extended page upcasts to stub extenders with `content` pre-attached and **exactly one extender query** (asserted via query log); a mixed page returns extenders and plain contents in order; unknown alias and missing owner both fail loud. _`tests/Feature/ContentExtension/ContentExtensionResolverTest.php` (4 passed)._
+- [x] Pint + PHPStan.
 
 ## Task 6: lifecycle — cascade both ways + guard (C9, C10)
 
