@@ -48,13 +48,13 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Migrate a fresh test DB; assert the column exists and defaults to `null`. _`tests/Feature/ContentExtension/ExtendedTypeColumnTest.php` (2 passed)._
 - [x] `vendor/bin/pint --dirty`; PHPStan clean on the migration. _pint passed, phpstan ok._
 
-## Task 2: `ContentExtenderRegistry` + `ExtendsContent` contract (C2, C7, C13)
+## Task 2: `ContentExtenderRegistry` + `ExtendsContent` contract (C2, C7, C13) — DONE
 
-- [ ] Create `ExtendsContent` contract: `content(): BelongsTo`, `contentAlias(): string`, `searchableExtension(): array`, `searchableExtensionMapping(): array`.
-- [ ] Create `ContentExtenderRegistry` singleton: `register(string $alias, class-string $extender)`, `resolve(string $alias): class-string`, `has(string $alias): bool`, `aliases(): array`. Keyed by the **stable alias**, never `entity_id`. Bind it as a singleton in `CMSServiceProvider`.
-- [ ] Empty-registry invariant: with nothing registered, every accessor is a safe no-op; a resolve of an unknown alias throws a dedicated `UnknownContentExtenderException` (used by C12).
-- [ ] Unit test: register/resolve/has; unknown alias throws; registry is not seeded from any table.
-- [ ] Pint + PHPStan.
+- [x] Create `ExtendsContent` contract: `content(): BelongsTo`, `contentAlias(): string`, `searchableExtension(): array`, `searchableExtensionMapping(): array`. _`app/Contracts/ExtendsContent.php`; `content()` typed `BelongsTo<Content, Model>` (interface can't assert the implementer is a Model)._
+- [x] Create `ContentExtenderRegistry` singleton: `register`, `resolve`, `has`, `aliases`. Keyed by the **stable alias**, never `entity_id`. Bind it as a singleton in `CMSServiceProvider`. _`app/Services/ContentExtenderRegistry.php`, bound in `register()`._
+- [x] Empty-registry invariant: with nothing registered, every accessor is a safe no-op; a resolve of an unknown alias **fails loud** (used by C12). _Throws `InvalidArgumentException`, matching Core's `ModerationAdapterRegistry` precedent, to avoid a new `app/Exceptions` base folder._
+- [x] Unit test: register/resolve/has; unknown alias throws; registry is a container singleton and starts empty. _`tests/Unit/ContentExtension/ContentExtenderRegistryTest.php` (4 passed), stub `tests/Stubs/ContentExtension/FakeContentExtender.php`; `Tests\Stubs` PSR-4 mapping added to the module `composer.json`._
+- [x] Pint + PHPStan.
 
 ## Task 3: extender-side trait + the stub extender (C2, C6, C8, C15, C17)
 
@@ -77,7 +77,7 @@ All paths relative to `Modules/CMS/` unless noted.
 
 - [ ] Create `ContentExtensionResolver` with a method that takes a fetched page/collection of `Content` (loaded with `withExtended()`) and returns the mixed collection: group by `extended_type`; for each alias resolve the class from the `ContentExtenderRegistry`; one `whereIn('content_id', $ids)` per alias (allowing the extender's own eager-loads); build `content_id => extender`; swap items; `setRelation('content', $content)` on each extender; rows with `null` stay `Content`; preserve order and the paginator.
 - [ ] Expose it ergonomically (a `Collection`/`Builder` macro or a `->asExtended()` helper), but the base `Content` query is **never** mutated (C5).
-- [ ] Fail-loud (C12): an `extended_type` whose alias is absent from the registry throws `UnknownContentExtenderException` during upcast — never a silent skip or half-object.
+- [ ] Fail-loud (C12): an `extended_type` whose alias is absent from the registry throws (the registry's `InvalidArgumentException`) during upcast — never a silent skip or half-object.
 - [ ] Tests (with the stub): an entity-scoped extended page upcasts to stub extenders with `content` already set and **exactly two queries** (assert via query count); a mixed page (extended + plain) returns extenders and plain contents in original order; an unknown alias throws.
 - [ ] Pint + PHPStan.
 
