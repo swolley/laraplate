@@ -311,10 +311,10 @@ settled before (or early in) planning; the second is implementation detail that 
   Claude, or whether image input must be handled directly / the library upgraded.
 - The self-hosted Whisper transcription service (deploy/run), the external-API alternative as a registry
   entry.
-- PHP libraries for embedded-metadata / PDF, subject to the no-new-dependency-without-approval rule:
-  native `exif`/`iptcparse` for images (no dependency), `getid3` for audio/video container tags,
-  `smalot/pdfparser` for PDF text; OCR for scans via the vision model or a tesseract wrapper. Approval
-  still pending.
+- PHP libraries for embedded-metadata / PDF — **approved**: native `exif`/`iptcparse` for images (no
+  dependency), `getid3` (`james-heinrich/getid3`) for audio/video container tags, `smalot/pdfparser` for
+  PDF text (both new composer deps, user-approved). OCR for scans via the vision model or a tesseract
+  wrapper is still to confirm during implementation.
 - Chaining mechanism enforcing analysis-before-embeddings (M11): job-chained dispatch vs deferred
   embeddings dispatch on `media_analysis` completion.
 - Where `content_hash` is computed (sync small / async large) and stored in `custom_properties`; the
