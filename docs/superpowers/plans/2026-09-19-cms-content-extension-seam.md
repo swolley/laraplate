@@ -113,14 +113,35 @@ result holes). This touches the **search-query layer** (how CMS builds the conte
 one part with regression risk on existing search. Paused here by agreement to map that layer before
 editing it.
 
-## Task 9: documentation + final verification
+## Task 9: documentation + final verification — DONE
 
-- [ ] Write the seam RAG doc in `Modules/CMS/docs/` (concept, the column, registry, `withExtended`+upcast, lifecycle, search/index ownership, the two N+1-safe queries, how a module becomes a consumer). Update the CMS README if it enumerates capabilities.
-- [ ] Run the full CMS suite plus the seam tests: `php artisan test --compact Modules/CMS`. Then `vendor/bin/pint Modules/CMS` and `vendor/bin/phpstan analyse --configuration=Modules/CMS/phpstan.neon --memory-limit=2G` (or the module's config).
-- [ ] Add the `## Delivery status (date): ...` section and a `**Documented in:**` line naming the CMS doc (enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`). Tick every box that landed; record any divergence.
-- [ ] Add the plan to `docs/superpowers/plans/INDEX.md`.
+- [x] Write the seam doc in `Modules/CMS/docs/` (concept, column, registry, `withExtended`+upcast, lifecycle, search/index ownership, the N+1-safe queries, how a module becomes a consumer, the deferred point 4). _`Modules/CMS/docs/CONTENT_EXTENSION.md`._
+- [x] Verification: per-task tests green (28 `ContentExtension` tests) plus regressions (existing content controller/facets/factory tests green); `vendor/bin/pint` and PHPStan clean on every seam file. _Full-module suite not run wholesale (per repo test-scope rule); the changed behaviour and its regressions are covered._
+- [x] Add the `## Delivery status` section and a `**Documented in:**` line (below). Boxes ticked as they landed.
+- [x] Plan added to `docs/superpowers/plans/INDEX.md` (at creation).
+
+**Documented in:** `Modules/CMS/docs/CONTENT_EXTENSION.md`.
+
+## Delivery status (2026-09-19): delivered with deferrals
+
+Tasks 1–9 shipped: `extended_type` column; `ContentExtenderRegistry` + `ExtendsContent` contract;
+`ExtendsContentTrait` + test stubs; `HidesExtendedContent` scope + `withExtended()`;
+`ContentExtensionResolver` upcast; both-direction lifecycle + `ContentExtensionCascade` guard;
+search data (`extended_type` + `extension`, extended contents indexed) and composed index mapping.
+All in `Modules/CMS`, proven against test-only stub extenders, no runtime consumer created.
+
+Deliberately **not** built (deferred, not defects):
+
+- **Point 4 — generic-search index filter.** Extended contents are indexed but the generic content
+  search does not yet filter `extended_type = null` at the engine (would otherwise short-page once a
+  consumer creates extended contents). Touches shared Core `CrudService`/Scout; deferred to the first
+  consumer's integration. No impact while no extended content exists.
+- **Reindex trigger + guard-rail test.** The extender→content reindex and the "no module index-lifecycle
+  command" guard-rail are documented as consumer rules; the guard-rail test needs a real consumer.
+- **General create helper / `cms:import` handling of extended entities**, and **permissions on a mixed
+  upcast list** — open in the seam spec §9, belong to consumer/import slices.
 
 ## Notes on scope
 
 - The **create-path** is delivered only as far as the extender trait needs (setting `extended_type`/`content_id`); a general CMS create helper and `cms:import` handling of extended entities stay open (seam spec §9) and belong to the consumer/import slices.
-- **Permissions on a mixed upcast list** and the **generic optional-content extender** remain open (seam spec §9); the seam supports both, the stub proves both lifecycle policies, and the first consumer (Ecommerce) uses mandatory content.
+- **Permissions on a mixed upcast list** and the **generic optional-content extender** remain open (seam spec §9); the seam supports both, the stub proves both lifecycle policies, and the first consumer uses mandatory content.
