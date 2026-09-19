@@ -56,20 +56,20 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Unit test: register/resolve/has; unknown alias throws; registry is a container singleton and starts empty. _`tests/Unit/ContentExtension/ContentExtenderRegistryTest.php` (4 passed), stub `tests/Stubs/ContentExtension/FakeContentExtender.php`; `Tests\Stubs` PSR-4 mapping added to the module `composer.json`._
 - [x] Pint + PHPStan.
 
-## Task 3: extender-side trait + the stub extender (C2, C6, C8, C15, C17)
+## Task 3: extender-side trait + the stub extender (C2, C6, C8, C15, C17) — DONE
 
-- [ ] Create `ExtendsContentTrait` for extenders: declares `content(): BelongsTo` on `content_id` **with `->withoutGlobalScope(HidesExtendedContent::class)`** (C8); `protected $with = ['content']`; a `?Content $tempContent` holder + `setTempContent()`; a `save()` override that persists a dirty temp/loaded content first, sets `content_id` and the content's `extended_type = $this->contentAlias()`, all in one transaction. Registration helper the consumer calls at boot.
-- [ ] Enforce **one extender per content** (C15): the extender table's `content_id` is `unique`; document that consumers add the constraint (the stub does).
-- [ ] Build the **test-only stub extender** under `tests/Stubs/ContentExtension/`: `StubExtendedThing` model using `ExtendsContentTrait` (alias `cms.stub_extended`), a migration for `cms_stub_extended_things` (`id`, `content_id` unique FK, a couple of own + one translatable-style field), a factory, and a test service-provider/setup that registers the alias in the test boot. PSR-4 register the stub namespace in `autoload-dev`.
-- [ ] `extended_type` immutability (C17): assert a normal update/save on the content never changes `extended_type`; it is set once by the trait's create-path.
-- [ ] Feature test: creating a `StubExtendedThing` with a temp content persists both, links `content_id`, and stamps `extended_type = 'cms.stub_extended'`; `$stub->content` resolves despite the (not-yet-added) hide scope placeholder — re-assert after Task 4.
-- [ ] Pint + PHPStan.
+- [x] Create `ExtendsContentTrait` for extenders: `content(): BelongsTo` on `content_id` **with `->withoutGlobalScope(HidesExtendedContent::class)`** (C8); appends `content` to `$with` via `initializeExtendsContentTrait()`; a `?Content $tempContent` holder + `setTempContent()`; a `save()` override that persists the staged content stamping `extended_type = $this->contentAlias()` and links `content_id`, in one `DB::transaction`. _`@phpstan-require-extends Model` + `@phpstan-require-implements ExtendsContent`. No boot registration helper: the consumer registers its alias directly (the stub test does)._
+- [x] Enforce **one extender per content** (C15): the extender table's `content_id` is `unique` (the stub table declares it; consumers do the same).
+- [x] Build the **test-only stub extender** under `tests/Stubs/ContentExtension/`: `StubExtendedThing` (plain Eloquent model + `SoftDeletes` + the trait, alias `cms.stub_extended`). _Table `cms_stub_extended_things` is created per test via `Schema::create` in `beforeEach` (the project's stub-table pattern), not a runtime migration; `Tests\Stubs` PSR-4 mapping added in Task 2. No Core-model ACL/validation noise._
+- [x] `extended_type` immutability (C17): a normal content save never changes `extended_type`.
+- [x] Feature test: creating a `StubExtendedThing` with a temp content persists both, links `content_id`, stamps `extended_type = 'cms.stub_extended'`; `$stub->content` resolves through a fresh load (C8). _`tests/Feature/ContentExtension/StubExtendedThingTest.php` (4 passed)._
+- [x] Pint + PHPStan.
 
 ## Task 4: default-hide global scope + `withExtended()` (C3, C4, C16) — DONE (back-relation check with Task 3)
 
 - [x] Create `HidesExtendedContent` global scope (`Modules/CMS/app/Scopes/`, following `CommentTranslationScope`) adding `whereNull('extended_type')`. Register it in `Content::booted()` alongside the existing `global_ordered` scope. _Executed before Task 3 so the extender trait can reference the scope class._
 - [x] Add `Content::withExtended()` (a local scope, `#[Scope]`) that calls **`withoutGlobalScope(HidesExtendedContent::class)` only** — never `withoutGlobalScopes()` (C16).
-- [ ] Verify the back-relation from Task 3 now resolves (`$stub->content` non-null) because the trait removed the scope (C8). _Deferred to Task 3._
+- [x] Verify the back-relation from Task 3 now resolves (`$stub->content` non-null) because the trait removed the scope (C8). _Done in Task 3's `StubExtendedThingTest`._
 - [x] Tests: default query never returns an extended row; `withExtended()` returns them as `Content`; a **soft-deleted** extended content stays excluded under `withExtended()` (C16). _`tests/Feature/ContentExtension/HidesExtendedContentTest.php` (4 passed); 29 existing content tests still green (the new global scope only hides `extended_type IS NOT NULL`)._
 - [x] Pint + PHPStan.
 
