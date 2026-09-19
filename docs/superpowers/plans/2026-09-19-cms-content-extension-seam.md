@@ -81,13 +81,13 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Tests (with the stub): an entity-scoped extended page upcasts to stub extenders with `content` pre-attached and **exactly one extender query** (asserted via query log); a mixed page returns extenders and plain contents in order; unknown alias and missing owner both fail loud. _`tests/Feature/ContentExtension/ContentExtensionResolverTest.php` (4 passed)._
 - [x] Pint + PHPStan.
 
-## Task 6: lifecycle — cascade both ways + guard (C9, C10)
+## Task 6: lifecycle — cascade both ways + guard (C9, C10) — DONE
 
-- [ ] In `ExtendsContentTrait`, cascade extender → content: `deleting` (soft) soft-deletes the content, `forceDeleting` force-deletes it, `restoring` restores it — one transaction, guarded so it does not re-enter the reverse handler (C10).
-- [ ] Create `ContentExtensionObserver` (or extend the existing content observer) for the reverse: a directly deleted content runs the extender's declared policy — **mandatory → symmetric cascade** (delete the extender), **optional → orphan** (`content_id` null, a channel-off hook, a signal), decided from the extender/contract. The stub exercises the **mandatory/symmetric** policy; add a second stub or a flag to exercise **optional/orphan**.
-- [ ] Cascade guard (C10): a context flag set by the trait before it cascades makes the observer skip the reverse handler during the extender's own cascade, so the two directions never collide.
-- [ ] Tests: extender soft/force/restore cascades to the content; a direct content delete cascades to a mandatory extender and orphans an optional one (order/stock-equivalent links untouched); the guard prevents double-firing.
-- [ ] Pint + PHPStan.
+- [x] In `ExtendsContentTrait`, cascade extender → content via `deleting` (soft/force, via `isForceDeleting()`) and `restoring` — restore uses Core's **`reviveInMemory()` + `save()`** (a bare `restore()` trips Core's "cannot update a softdeleted model" guard under optimistic locking). Guarded (C10).
+- [x] Create `ContentExtensionObserver` for the reverse: a directly deleted content runs the extender's policy — **mandatory → symmetric cascade** (delete/force-delete the extender), **optional → orphan** (`content_id` nulled). Registered on `Content` in `CMSServiceProvider`. _Contract gains `contentIsMandatory()` (trait default `true`). The channel-off/signal is left to the consumer (the seam does the structural detach)._
+- [x] Cascade guard (C10): the shared static `ContentExtensionCascade` flag makes each direction skip while the other is in progress. The observer also early-returns when the flag is set, avoiding a wasted lookup.
+- [x] Tests: extender soft/force/restore cascades to the content; a direct content delete cascades to a **mandatory** stub and **orphans** a new optional stub (`StubOptionalExtendedThing`, nullable `content_id`); no loop. _`tests/Feature/ContentExtension/ContentExtensionLifecycleTest.php` (5 passed); full ContentExtension suite (23) + existing content controller tests (18) green._
+- [x] Pint + PHPStan.
 
 ## Task 7: search data — `extension` section + `extended_type` filterable (C11)
 
