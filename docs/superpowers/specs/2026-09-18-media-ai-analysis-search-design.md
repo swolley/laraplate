@@ -55,6 +55,9 @@ job), never a rewrite.
 | M12 | **AI-absent fallback.** If the AI module is inactive or the `media_analysis` feature is off, the media is still indexed by Core's existing `IndexModelFallbackListener` using only the deterministic layer (embedded metadata + filename/type). | The media table must participate in search regardless of AI availability, matching the existing content pattern. |
 | M13 | **Phase 2 is additive.** A future `media_chunk` store (`text` + `track` + `offset`/`timestamp` + embedding) and a keyframe vision job add per-point citation and the video visual track. The `track` facet and the event contract are already present in Phase 1; no Phase 1 artifact is rewritten. | Keeps the expensive, complex work (chunk store, per-frame vision) out of the first cut while guaranteeing it drops in without migration of existing documents. |
 | M14 | **A media has exactly one owner (Spatie `morphs('model')`); index and analyze on claim, cascade to that single owner.** The owner is the domain record that owns the media (CMS `Content`/article, SAO `Ticket`), or the transient `MediaDraft` while staging. Analysis/indexing fire on **claim** (real owner attached), never while owned by a `MediaDraft`. Enrichment cascades to that one owner via `media->model`; there is no multi-parent fan-out. | Spatie binds a media row to one owner; `MediaDraft` is a Core-owned (not Spatie) staging bucket. Draft media may be discarded, so analyzing them wastes compute. An owner aggregates its many media's surrogates. |
+| M16 | **Media results live in the unified result set and inherit the owner's ACL, re-authorized at rehydration through a Core registry — no ACL in the index.** Media hits rank alongside content hits in one result set. Visibility is decided per media row by its owner (`media->model`): at rehydration the hits are grouped by owner morph type and each group is re-authorized by delegating to that owner module's existing visibility (CMS ACL filter, SAO `TicketQueryService::visible()`), via a Core registry keyed by owner morph type (twin of the M4a contributor seam). A media whose owner the user cannot see is dropped. **This behaviour is switchable through a Core setting** (working name `core.media.search_visibility`, values `owner` (default, owner-ACL-filtered) vs `open` (agnostic media gallery — media rank and return on their own, ignoring owner ACL)). The default is the safe owner-filtered mode; `open` is an explicit opt-in for products that want a true owner-agnostic gallery. The registry-based owner authorization runs only in `owner` mode. | Matches the codebase security stance (index holds no ACL; re-authorize at rehydration via the owner) and reuses each module's visibility instead of reimplementing it. Per-row authorization makes the M15 hash dedup leak-safe: shared analysis never crosses a permission boundary because each duplicated media row carries its own owner. Drafts are excluded (M14), so there is no ownerless-media authorization case in Phase 1. |
+| M17 | **Raw tracks stay in the source language; the surrogate is multilingual; media belongs to the base article, not to translations.** `transcript`/`ocr_text` are kept in the spoken/source language, not translated, and embedded in that language (a faithful, citable fact). The surrogate (`caption`/`summary`, `idea`, `intent`, `keywords`, `entities`) is generated once, then translated to the supported locales through the existing translation pipeline (`TranslatedModelSaved` / `HandleModelTranslationListener`), yielding **per-locale media embeddings** (the media is findable in any UI language) and **per-locale parent enrichment** (each article translation gets the surrogate in its locale). A media is language-neutral and owned by the base article, never by a specific translation. | A transcript translated would stop being a faithful citation; the surrogate is interpretive and benefits from being reachable in every UI language. Attaching media to the base article (not per-translation) matches the current model and reuses the per-locale embedding/translation infra. Accepted for now, explicitly to evolve (per-translation/localized media is a future need). |
+| M18 | **A runtime Settings master switch enables/disables the whole media LLM analysis subsystem.** A DB-backed Core/AI setting (runtime-toggleable, not only static config) gates all LLM media work: metadata extraction, caption/OCR/transcription, idea/intent, surrogate translation, and the media-analysis pre-processing. When off, the media still gets the deterministic Core layer and is indexed via the fallback (M12); no LLM job runs and no cost is incurred. This master switch sits above the finer per-feature/per-module gates (M10/`FeatureModuleGate`) and the `core.media.search_visibility` mode (M16). | Operators must be able to turn the expensive AI media pipeline on/off at runtime (cost, incidents, rollout) without a deploy, while keeping media usable and searchable at the deterministic level. |
 | M15 | **The file may be duplicated (Spatie has no shared asset), so dedup the expensive work by `content_hash`, not the rows.** A `content_hash` (sha256) is stored in `custom_properties`; the AI analysis is keyed by it (M3b) and computed **once per distinct file** (lookup-before-work: a fresh row for the hash and model version is reused, not recomputed). Embedding **vectors** are reused by embed-text hash (the vector is deterministic for text+model), but `ModelEmbedding` rows are still written **per media** so each copy is an autonomous, rehydratable result. A human edit to a Core field is per-copy; the shared AI analysis is per-hash. A true media library (shared asset ↔ many contents, a DAM) is out of scope here and **not precluded**: analysis is already decoupled from the media row. | A gallery implies file reuse, which Spatie models only by duplication. Deduping by content hash gives reuse where it costs (LLM/transcription/vision + the embedding call) without a DAM, and honors the M8 ROI rule. Per-media embedding rows keep rehydration simple (a result is a `Media`). |
 
 ---
@@ -216,8 +219,10 @@ fields.
 
 ## 10. Feature flag and tier
 
-- `ai.features.media_analysis.enabled` plus a per-module gate consistent with the existing
-  `FeatureModuleGate`.
+- **Master switch (M18)**: a runtime Settings key enables/disables the whole media LLM subsystem. Off →
+  deterministic layer + fallback indexing only, no LLM work, no cost.
+- Below it: a per-module gate consistent with the existing `FeatureModuleGate`, and the config
+  `ai.features.media_analysis.enabled` for static defaults.
 - Tier seam: "base" (deterministic + transcription/OCR/caption/idea/intent) vs "deep" (Phase 2 keyframe
   vision). Only "base" exists in Phase 1; the deep tier is gated and unbuilt.
 
@@ -263,20 +268,12 @@ settled before (or early in) planning; the second is implementation detail that 
 
 ### 13a. Open design decisions (may change schema/flow)
 
-- **ACL / security — not yet designed.** A standalone media search result must respect who may see it.
-  The established pattern in this codebase (`2026-08-29-sao-application-content-provider-design.md`,
-  `2026-07-17-application-content-retrieval-design.md`) is: the index holds no ACL; authorization is
-  enforced by re-authorizing at rehydration through the owner's visibility. Media almost certainly
-  inherits its owner's ACL (`media->model`), but a library/ownerless case, mixed-ACL reuse of the same
-  file across owners, and how a media hit rehydrates and re-checks visibility all need a decision.
-  Decide before schema/flow freeze.
-- **Locale / multilingual — not yet designed.** In which locale are caption / transcript / idea /
-  intent produced? The embedding infra is per-locale (`prepareDataToEmbedByLocale`) and content models
-  use `HasTranslations`. Open: does analysis run once in a source language, or per target locale;
-  is caption/idea/intent translated (and if so through the existing translation pipeline —
-  `TranslatedModelSaved` / `HandleModelTranslationListener`); does the transcript keep its spoken
-  language; how do per-locale embeddings and the `content_hash` dedup interact when the same file
-  yields locale-specific text.
+- **ACL / security — decided (M16).** Unified result set; media inherits the owner's ACL, re-authorized
+  at rehydration through a Core registry keyed by owner morph type. Switchable via a Core setting
+  (`core.media.search_visibility`: `owner` default vs `open` agnostic gallery). Residual wiring in §13b.
+- **Locale / multilingual — decided (M17).** Raw tracks (transcript/OCR) stay in the source language;
+  the surrogate is translated to supported locales via the existing pipeline; media belongs to the base
+  article, not to translations. Residual mechanics in §13b.
 - **Media lifecycle beyond claim.** When a media is replaced, its file changes, it is edited, or it is
   soft-deleted / restored / force-deleted: when to re-run analysis (new `content_hash`), when to
   reindex the media, when to remove it from the index, and when to reindex the owner. Only create/claim
@@ -308,4 +305,8 @@ settled before (or early in) planning; the second is implementation detail that 
   `ThrottlesExceptions` / `RateLimited('embeddings')` pattern; a dedicated `media_analysis` limiter).
 - Filament / gallery UI for editing the `custom_properties` display fields and viewing (not editing) the
   AI analysis, including provenance so an editor sees what was AI-generated.
+- ACL wiring (M16): the `core.media.search_visibility` setting (`owner`/`open`) that gates the whole
+  path; the Core registry mapping an owner morph type to its module's authorizer; how the unified
+  retrieval groups media hits by owner type and re-authorizes each group in `owner` mode; and cross-type
+  score normalization so media and content rank together sensibly in one result set.
 - Testing depth and factories/states for an analyzed `Media` and a deduplicated (same-hash) pair.
