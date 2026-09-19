@@ -57,6 +57,7 @@ job), never a rewrite.
 | M14 | **A media has exactly one owner (Spatie `morphs('model')`); index and analyze on claim, cascade to that single owner.** The owner is the domain record that owns the media (CMS `Content`/article, SAO `Ticket`), or the transient `MediaDraft` while staging. Analysis/indexing fire on **claim** (real owner attached), never while owned by a `MediaDraft`. Enrichment cascades to that one owner via `media->model`; there is no multi-parent fan-out. | Spatie binds a media row to one owner; `MediaDraft` is a Core-owned (not Spatie) staging bucket. Draft media may be discarded, so analyzing them wastes compute. An owner aggregates its many media's surrogates. |
 | M16 | **Media results live in the unified result set and inherit the owner's ACL, re-authorized at rehydration through a Core registry — no ACL in the index.** Media hits rank alongside content hits in one result set. Visibility is decided per media row by its owner (`media->model`): at rehydration the hits are grouped by owner morph type and each group is re-authorized by delegating to that owner module's existing visibility (CMS ACL filter, SAO `TicketQueryService::visible()`), via a Core registry keyed by owner morph type (twin of the M4a contributor seam). A media whose owner the user cannot see is dropped. **This behaviour is switchable through a Core setting** (working name `core.media.search_visibility`, values `owner` (default, owner-ACL-filtered) vs `open` (agnostic media gallery — media rank and return on their own, ignoring owner ACL)). The default is the safe owner-filtered mode; `open` is an explicit opt-in for products that want a true owner-agnostic gallery. The registry-based owner authorization runs only in `owner` mode. | Matches the codebase security stance (index holds no ACL; re-authorize at rehydration via the owner) and reuses each module's visibility instead of reimplementing it. Per-row authorization makes the M15 hash dedup leak-safe: shared analysis never crosses a permission boundary because each duplicated media row carries its own owner. Drafts are excluded (M14), so there is no ownerless-media authorization case in Phase 1. |
 | M17 | **Raw tracks stay in the source language; the surrogate is multilingual; media belongs to the base article, not to translations.** `transcript`/`ocr_text` are kept in the spoken/source language, not translated, and embedded in that language (a faithful, citable fact). The surrogate (`caption`/`summary`, `idea`, `intent`, `keywords`, `entities`) is generated once, then translated to the supported locales through the existing translation pipeline (`TranslatedModelSaved` / `HandleModelTranslationListener`), yielding **per-locale media embeddings** (the media is findable in any UI language) and **per-locale parent enrichment** (each article translation gets the surrogate in its locale). A media is language-neutral and owned by the base article, never by a specific translation. | A transcript translated would stop being a faithful citation; the surrogate is interpretive and benefits from being reachable in every UI language. Attaching media to the base article (not per-translation) matches the current model and reuses the per-locale embedding/translation infra. Accepted for now, explicitly to evolve (per-translation/localized media is a future need). |
+| M20 | **Phase 1 media-type scope: start with what yields text/meaning; everything else is deterministic-only; expansion is a non-precluded future.** Image → caption + OCR; audio → transcription; document/PDF → text extraction + OCR for scans; video → **audio transcription only** (the visual "what is seen" track is Phase 2, §11). Any other type (archives, executables, generic downloads) gets only the deterministic layer (name/type/size) and is still searchable by those, with no LLM. Adding more types later (e.g. richer document formats, SVG) is an additive follow-up, not a rewrite. | Spend LLM cost only where there is text or meaning to extract (M8 ROI). Shipping the common, high-value types first keeps Phase 1 small; the fallback keeps every other file at least name/type searchable. |
 | M19 | **Media lifecycle after claim.** The owner is set once at claim (`morphs('model')` on the media row) and never changes — there is no owner-move flow, so no dual-owner reindex. Events: **metadata-only edit** (Core display fields in `custom_properties`) → re-embed + reindex the media and its owner, no LLM. **File replaced** → new `content_hash` → re-analyze (or reuse an existing analysis for the new hash) + re-embed + reindex. **Soft-delete** → remove the media from the index + reindex owner; **restore** reverses it; the shared analysis is left untouched (the media may return). **Force-delete/prune** → remove from index, delete the media's `ModelEmbedding` rows, reindex owner. The hash-keyed analysis (M15) is refcounted: it survives while ≥1 media references its `content_hash`, and is deleted (with its derived data) only when the **last** media for that hash is force-deleted. Re-analysis fires **only on hash change**, never on a metadata-only edit. | Most save/delete reindexing comes free from the `Searchable` trait; the media-specific rules are the owner-reindex cascade, re-analysis gated on hash change (no wasted LLM on metadata edits), and refcounted cleanup so a shared analysis is never dropped while another copy still uses it. |
 | M18 | **A runtime Settings master switch enables/disables the whole media LLM analysis subsystem.** A DB-backed Core/AI setting (runtime-toggleable, not only static config) gates all LLM media work: metadata extraction, caption/OCR/transcription, idea/intent, surrogate translation, and the media-analysis pre-processing. When off, the media still gets the deterministic Core layer and is indexed via the fallback (M12); no LLM job runs and no cost is incurred. This master switch sits above the finer per-feature/per-module gates (M10/`FeatureModuleGate`) and the `core.media.search_visibility` mode (M16). | Operators must be able to turn the expensive AI media pipeline on/off at runtime (cost, incidents, rollout) without a deploy, while keeping media usable and searchable at the deterministic level. |
 | M15 | **The file may be duplicated (Spatie has no shared asset), so dedup the expensive work by `content_hash`, not the rows.** A `content_hash` (sha256) is stored in `custom_properties`; the AI analysis is keyed by it (M3b) and computed **once per distinct file** (lookup-before-work: a fresh row for the hash and model version is reused, not recomputed). Embedding **vectors** are reused by embed-text hash (the vector is deterministic for text+model), but `ModelEmbedding` rows are still written **per media** so each copy is an autonomous, rehydratable result. A human edit to a Core field is per-copy; the shared AI analysis is per-hash. A true media library (shared asset ↔ many contents, a DAM) is out of scope here and **not precluded**: analysis is already decoupled from the media row. | A gallery implies file reuse, which Spatie models only by duplication. Deduping by content hash gives reuse where it costs (LLM/transcription/vision + the embedding call) without a DAM, and honors the M8 ROI rule. Per-media embedding rows keep rehydration simple (a result is a `Media`). |
@@ -229,16 +230,22 @@ fields.
 
 ---
 
-## 11. Phase 2 (designed, not built)
+## 11. Phase 2 — the visual "what is seen" track (designed, not built)
 
-Additive only:
+Phase 1 captures what is *said* (transcript) and *written* (OCR) plus a still caption. Phase 2 adds the
+**visual track**: what is actually *shown* over time, which the spoken/written layers miss (a safari
+video shows lions and elephants although the narrator never names them). Additive only:
 
 - **`media_chunk` store**: `media_id`, `track` (`transcript` | `ocr` | `visual`), `offset`/`timestamp`,
-  `text`, embedding. Enables timestamped citation and per-track retrieval.
-- **Keyframe vision job**: sample frames on scene changes (not blind 1 fps), caption each with
+  `text`, embedding. Enables timestamped citation and per-track retrieval — "find the point inside the
+  file", not just the file.
+- **Keyframe vision job (video)**: sample frames on scene changes (not blind 1 fps), caption each with
   subjects/actions + entities + timestamp, aggregate to video-level entities/keywords (surrogate) and
-  per-segment chunks. This is what serves the "video shows lions and elephants although the narrator
-  never names them" case.
+  per-segment `visual` chunks.
+- **Deeper image visual (optional, same track)**: richer per-region/scene understanding of a still
+  image beyond the Phase 1 single caption, if a need arises; same `visual` track and mechanism.
+- This is the "deep" tier of M18/§10, expensive (N frames x vision call per video), behind the master
+  switch and gated per tier.
 - Both ride the same event contract and the already-present `track` facet; no Phase 1 document is
   reindexed to adopt them beyond indexing the new chunk rows.
 
@@ -283,10 +290,10 @@ settled before (or early in) planning; the second is implementation detail that 
   stays in CMS. **Cross-spec coordination**: the content extension seam
   (`2026-09-17-cms-content-extension-seam-design.md`) should build its search-contribution on this Core
   seam rather than a CMS-local mechanism — flag when either is implemented.
-- **Phase 1 media-type scope.** Confirmed so far: image (caption + OCR), audio (transcription),
-  document/PDF (text + OCR), video (audio transcription only; visual is Phase 2). Open: which
-  `download`/generic mime types get only the deterministic layer, and whether any type is excluded from
-  Phase 1 entirely.
+- **Phase 1 media-type scope — decided (M20).** Image (caption + OCR), audio (transcription),
+  document/PDF (text + OCR), video (audio transcription only); every other type is deterministic-only
+  and still searchable by name/type; more types are an additive future. The visual "what is seen" track
+  is Phase 2 (§11).
 - **True media library / DAM (M15).** Shared asset ↔ many contents; left as a non-precluded future, but
   if the product needs a real library soon it becomes a prerequisite decision rather than a follow-up,
   and would also settle the "human edit is per-copy" reconciliation.
