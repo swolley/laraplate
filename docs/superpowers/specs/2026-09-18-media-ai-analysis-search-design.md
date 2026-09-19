@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18
 **Module:** `Modules/Core` (media Core fields, deterministic extraction, event, Searchable, contributor seam) + `Modules/AI` (analysis listener, job, and AI-owned extension table)
-**Status:** Core architecture agreed (M1-M15). Open questions still to decide are tracked in §13 (design-level: ACL, locale/multilingual, media lifecycle, seam choice, media-type scope, DAM). No implementation started.
+**Status:** Design agreed (M1-M20). All §13a design decisions are closed (ACL M16, locale M17, master switch M18, lifecycle M19, contributor seam M4a, media-type scope M20); a true DAM is a non-precluded future. Remaining §13b items are implementation details for the plan. No implementation started.
 
 ---
 
