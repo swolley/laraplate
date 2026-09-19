@@ -1,6 +1,6 @@
 # Adaptive driver-agnostic bulk indexing
 
-**Status:** proposed (draft)
+**Status:** implemented (2026-09-19) — see Delivery status
 
 **Date:** 2026-09-19
 
@@ -68,3 +68,22 @@ Out of scope: changing the real-time single-save path; reimplementing per-driver
 - `Modules/Core/app/Services/ElasticsearchService.php` — unused `bulkIndex`; home of the Elasticsearch byte-cap / per-item refinement.
 - `Modules/AI/app/Ai/Embeddings/SentenceTransformersEmbeddingsProvider.php` — fixed batch; target of the embedding adaptive layer.
 - `Modules/Core/app/Providers/RouteServiceProvider.php` — `embeddings` / `indexing` rate limiters, relevant to the real-time path.
+
+## Delivery status (2026-09-19)
+
+Shipped:
+
+- **Agnostic controller** — `Modules/Core/app/Search/AdaptiveBatchController.php`: AIMD on latency + thrown exceptions, backoff on failure, floor retries, configurable `startBatch`. Deterministic-testable via injected clock/sleeper (`Modules/Core/tests/Unit/Search/AdaptiveBatchControllerTest.php`).
+- **Bulk search path** — `Searchable::queueMakeSearchable` detects an async multi-model chunk and routes it through `bulkQueueMakeSearchable` -> `adaptiveBulkIndex`, which drives the controller over `engine->update(Collection)` (the agnostic seam, valid for Elasticsearch/Typesense/database). The per-model event fan-out is kept only for real-time single saves. Covered by `Modules/Core/tests/Integration/Search/BulkQueueMakeSearchableTest.php`.
+- **Batch pre-process** — new `ModelsRequireIndexing` event carries the whole chunk; `Modules/AI/app/Listeners/HandleBulkModelIndexingListener.php` embeds every embeddable model in one batched pass via `ModelEmbeddingSynchronizer::sync`, instead of one `GenerateEmbeddingsJob` per model.
+- **Embedding-service adaptive layer (AI-only)** — `SentenceTransformersEmbeddingsProvider` drives `/embed` through the same controller; `EmbeddingService::embedDocumentsBatch` + `ModelEmbeddingSynchronizer` collapse a chunk's texts into one provider call.
+- **Config** — `core.bulk_index_batch` (env `BULK_INDEX_BATCH`, default 100) caps the optimistic batch; embedding-service timeout/batch via `SENTENCE_TRANSFORMERS_TIMEOUT` / `_BATCH_SIZE`.
+
+Divergences from the design (deliberately not built):
+
+- **No serialized-size cap on the search path.** `AdaptiveBatchController` supports a `maxBatchBytes`/`sizeOf` argument, but `adaptiveBulkIndex` does not pass it: the count ceiling plus latency-AIMD proved enough. The byte cap remains wired on the embedding-service layer where payload size actually matters.
+- **No optional per-driver hooks / per-item bulk retry.** The Elasticsearch per-item retry and byte-cap refinement (`ElasticsearchService::bulkIndex`) were left out; the agnostic latency/exception AIMD covers the observed strain. Deferred until a real need.
+- **Reduced config surface.** Only the batch ceiling is exposed as config/env; the other AIMD parameters (`target_latency`, ramp step, backoff, floor retries) stay as controller constructor defaults rather than separate config keys.
+- **No dedicated reindex command.** Per the standing decision, the existing `scout:import` path is the bulk entry point; no new command was added.
+
+**Documented in:** `Modules/Core/README.md` (`BULK_INDEX_BATCH`), `Modules/AI/README.md` (`SENTENCE_TRANSFORMERS_*`).
