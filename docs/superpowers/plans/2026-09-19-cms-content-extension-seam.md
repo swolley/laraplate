@@ -105,13 +105,20 @@ All paths relative to `Modules/CMS/` unless noted.
 - [x] Test: with an extender registered, the mapping includes `extended_type`, `extension` and the extender's fields; with none, `extended_type` only. _`tests/Feature/ContentExtension/ContentExtensionMappingTest.php` (2 passed, database engine)._
 - [x] Pint + PHPStan.
 
-## Point 4 (checkpoint): generic-search index filter — OPEN
+## Point 4: generic-search index filter — DONE
 
-Extended contents are now indexed (T7). The generic content search must filter `extended_type = null`
-at the index so they do not surface (and so the engine count matches the hide-scoped rehydration — no
-result holes). This touches the **search-query layer** (how CMS builds the content Scout query), the
-one part with regression risk on existing search. Paused here by agreement to map that layer before
-editing it.
+- [x] New Core `Contracts\ProvidesDefaultSearchFilters`; `CrudService::searchWithScout` applies a
+  model's default filters to the Scout builder before the user filters (additive — only models
+  implementing it are affected; `CrudServiceTest` green).
+- [x] `Content` implements it, returning `['extended_type' => null]`: the generic content search
+  filters `extended_type = null`, which the query builder compiles to `IS NULL` (verified on the
+  database engine), so extended contents do not surface. On the database engine the hide global scope
+  already excludes them at the engine query; the filter is what keeps the **separate-index** engines
+  (Elasticsearch/Typesense) hole-free — `extended_type` is a real indexed field there.
+- [x] Dropped the earlier virtual `is_extended` flag (would have referenced a non-existent column on
+  the database engine) in favour of the real `extended_type` column.
+- [x] Tests: `defaultSearchFilters()` returns `['extended_type' => null]`; the filter compiles to
+  `IS NULL` and returns only the normal content. _`tests/Feature/ContentExtension/ContentExtensionSearchFilterTest.php` (2 passed); 30 ContentExtension tests + Core `CrudServiceTest` green._ _An end-to-end DB-engine `search('*')` over `Content` is blocked by a pre-existing DB-engine column-set issue (`connection`), unrelated to this change; ES/Typesense end-to-end verification belongs to the first consumer's integration._
 
 ## Task 9: documentation + final verification — DONE
 
@@ -130,12 +137,11 @@ Tasks 1–9 shipped: `extended_type` column; `ContentExtenderRegistry` + `Extend
 search data (`extended_type` + `extension`, extended contents indexed) and composed index mapping.
 All in `Modules/CMS`, proven against test-only stub extenders, no runtime consumer created.
 
+**Point 4 (generic-search filter) is now built** — see the Point 4 section above — via the Core
+`ProvidesDefaultSearchFilters` hook and `Content` filtering `extended_type = null`.
+
 Deliberately **not** built (deferred, not defects):
 
-- **Point 4 — generic-search index filter.** Extended contents are indexed but the generic content
-  search does not yet filter `extended_type = null` at the engine (would otherwise short-page once a
-  consumer creates extended contents). Touches shared Core `CrudService`/Scout; deferred to the first
-  consumer's integration. No impact while no extended content exists.
 - **Reindex trigger + guard-rail test.** The extender→content reindex and the "no module index-lifecycle
   command" guard-rail are documented as consumer rules; the guard-rail test needs a real consumer.
 - **General create helper / `cms:import` handling of extended entities**, and **permissions on a mixed
