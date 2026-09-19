@@ -344,5 +344,5 @@ _Raised in the 2026-09-19 spec review:_
 - **Currency.** Single-currency v1 is assumed; multi-currency display/settlement deferred — confirm.
 - **Minor:** the verified-purchase association need not store `product_id` (derivable
   comment→content→product); define the `variant_items.role` value set (e.g. `main` / `component`).
-- Plus the content-extension seam's own open questions (single extender + unique `content_id`, state
-  vs sale precedence, extension i18n/embeddings, import) tracked in that spec.
+- Plus the content-extension seam's own remaining open questions (import create-path, permissions on a
+  mixed upcast list) tracked in that spec.

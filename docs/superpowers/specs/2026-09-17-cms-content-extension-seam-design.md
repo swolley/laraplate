@@ -45,6 +45,9 @@ content.
 | C13 | **The `ContentExtenderRegistry` is code, keyed by the stable alias, populated at boot** by each extender's service provider — never keyed by `entity_id` and never read from a CMS table. On an install with no extender it is empty and every extension path is a no-op. The extender **seeds its own `Entity`** and resolves its id at runtime. | CMS does not and must not know extenders; the numeric `entity_id` differs per install and does not exist on a fresh app. Only a stable, code-level alias (like a Laravel morph type) survives both facts. |
 | C14 | **CMS owns the physical `contents` search index; extenders contribute, they do not manage it.** Only CMS index-lifecycle commands create/delete/recreate it. At (re)creation CMS **composes the mapping** from each registered extender's `searchableExtensionMapping()`. A module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. A module "unindex" clears the extender's `extension` section (or deletes only its documents), never drops the shared index. | A shared index has one owner. Letting a module drop or recreate it would wipe editorial content; letting mapping be implicit reintroduces the dynamic-mapping bug. A full CMS content reindex already restores the product data, because `toSearchableArray()` pulls the extender's projection at import. |
 | C15 | **One extender per content.** A content has at most one extender: a single `extended_type` value (one column) and a `unique` constraint on the extender's `content_id`. A registered alias with no owner row is a data-integrity error surfaced by the upcast's fail-loud (C12) or a reconciliation check, never a silently half-resolved row. | The upcast keys extenders by `content_id`; a second extender or a duplicate link would make the swap ambiguous. |
+| C16 | **`withExtended()` removes only `HidesExtendedContent`.** It calls `withoutGlobalScope(HidesExtendedContent::class)`, never `withoutGlobalScopes()`; soft-delete, validity and any company/tenant scope stay applied, and the back-relation (C8) does the same. Tested: a soft-deleted, out-of-validity or other-tenant extended content is still excluded under `withExtended()`. | Lifting the hide scope must never silently lift unrelated guards. |
+| C17 | **`extended_type` is an immutable structural marker, excluded from versioning.** It is set once by the extender's create-path and changed by no normal write and no `HasVersions` restore; it is excluded from the content's tracked/restorable attributes. Restoring the content's editorial fields leaves the extension pairing intact across the whole version history. | It is identity, not editorial state; a restore that nulled or flipped it would orphan the content from its extender or leak it into generic surfaces. |
+| C18 | **Extension fields may be flat or locale-keyed, declared per field by the extender; extension text does not feed content embeddings by default.** `searchableExtension()` / `searchableExtensionMapping()` return per-locale fields as locale-keyed objects and language-neutral fields as scalars, mirroring CMS's existing locale-keyed content indexing (`title:{it,en}`); the seam composes whatever the extender declares. Extension contributes to keyword/facets only; a field enters `collectEmbedText` (the agnostic embeddings) only if the extender explicitly opts it in. | The extender knows which of its fields are translatable, so the seam stays field-agnostic; embeddings stay about the editorial body unless a consumer deliberately adds semantic extension text. |
 
 ---
 
@@ -252,14 +255,7 @@ To close when the implementation plan is written; none blocks the seam's shape.
 - **Content-state precedence** (per extender). How the content's approval / validity / scheduling axes
   gate the extender's own channel; the seam leaves the rule to the extender. Ecommerce settles it in
   its spec (E18): storefront visibility = editorial public-visibility AND `is_published_in_shop`.
-- **Scope composition.** `withExtended()` must remove only `HidesExtendedContent`, leaving the
-  company, soft-delete and validity global scopes intact; verify they compose.
-- **Extension i18n and embeddings.** Which `extension` fields are per-locale vs flat, and whether the
-  extension text contributes to the content's agnostic embeddings (`collectEmbedText`) or only to
-  keyword/facets.
 - **Import.** `cms:import` creating a content of an extended entity must create the extender too (via a
   service) or be forbidden from setting `extended_type`, so imports cannot mint orphans.
-- **Versioning.** How `Content` `HasVersions` restore interacts with `extended_type` and the orphan
-  logic (a restored old version could resurrect or clear the marker).
 - **Permissions on a mixed upcast list.** Whether the governing policy is the `Content`'s (editorial)
   or the extender's (channel); tentatively the surface decides.
