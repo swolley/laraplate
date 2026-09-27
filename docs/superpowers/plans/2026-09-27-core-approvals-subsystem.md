@@ -1094,7 +1094,7 @@ and in `bootHasApprovals()`:
 
 - [ ] **Step 5: Pint and commit** (`feat(core): a pending deletion blocks the record, or hides it per model`).
 
-Note for the delivery status: the spec says Hide is applied "through the same ACL mechanism that hides unpublished contents". This plan applies it with a global scope on `Hide` models, keyed on the table's `approve`/`disapprove` permission, which gives the same audience (users who cannot decide) without seeding ACL rows per model. Record this divergence when closing the plan.
+The global scope keys on the table's `approve`/`disapprove` permission, as the spec requires: whoever has to decide always sees the record.
 
 ---
 
