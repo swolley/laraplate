@@ -92,7 +92,7 @@ Il **planner** decide quali strategie eseguire. Nella versione senza AI sono due
 ```php
 $is_short    = lunghezza query < 20 caratteri;
 $has_numbers = la query contiene una cifra;
-$use_vector  = config("search.vector_search.enabled") && ! $has_numbers;
+$use_vector  = config("core.search.vector.enabled") && ! $has_numbers;
 ```
 
 Da cui:
@@ -122,7 +122,7 @@ if (! $this->app->bound(ITextEmbedder::class)) {
 ```
 
 `ITextEmbedder` è registrato **solo** dal modulo AI. Quindi per avere la ricerca semantica servono
-due cose insieme: il setting `search.vector_search.enabled` a true **e** il modulo AI installato e attivo.
+due cose insieme: il setting `core.search.vector.enabled` a true **e** il modulo AI installato e attivo.
 
 Attenzione a non confondere: senza AI non perdi la tokenizzazione del testo (quella la fa
 Elasticsearch e il codice in Core), perdi solo la traduzione della query in numeri.
