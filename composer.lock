@@ -18460,12 +18460,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/swolley/license-compliance-checker.git",
-                "reference": "6dcc97d0f6f7026ae045888fda9a4eba019e4f42"
+                "reference": "e212000737ab6e34a82172cbdbd9d8e3a24a2df7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swolley/license-compliance-checker/zipball/6dcc97d0f6f7026ae045888fda9a4eba019e4f42",
-                "reference": "6dcc97d0f6f7026ae045888fda9a4eba019e4f42",
+                "url": "https://api.github.com/repos/swolley/license-compliance-checker/zipball/e212000737ab6e34a82172cbdbd9d8e3a24a2df7",
+                "reference": "e212000737ab6e34a82172cbdbd9d8e3a24a2df7",
                 "shasum": ""
             },
             "require": {
@@ -18508,7 +18508,7 @@
                 "issues": "https://github.com/swolley/license-compliance-checker/issues",
                 "source": "https://github.com/swolley/license-compliance-checker"
             },
-            "time": "2026-02-28T09:54:08+00:00"
+            "time": "2026-09-27T22:04:38+00:00"
         },
         {
             "name": "symfony/yaml",
