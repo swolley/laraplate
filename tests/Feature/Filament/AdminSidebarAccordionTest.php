@@ -17,3 +17,11 @@ it('patches sidebar group toggling to keep a single expanded group', function ()
         ->toContain('getSidebarGroupLabels')
         ->toContain('alpine:initialized');
 });
+
+it('on load keeps only the active page group expanded and collapses every other group', function (): void {
+    $accordion_js = file_get_contents(public_path('js/sidebar-accordion.js'));
+
+    expect($accordion_js)->toBeString()
+        ->toContain('collapseInactiveGroups')
+        ->toContain('.fi-sidebar-group.fi-active[data-group-label]');
+});

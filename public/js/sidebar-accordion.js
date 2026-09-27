@@ -11,10 +11,27 @@ const normalizeCollapsedGroups = (collapsed_groups) => {
     return collapsed_groups;
 };
 
+const collapseInactiveGroups = (sidebar_store) => {
+    const active_group_label = document.querySelector(
+        '.fi-sidebar-group.fi-active[data-group-label]',
+    )?.dataset.groupLabel;
+
+    sidebar_store.collapsedGroups = getSidebarGroupLabels().filter(
+        (group_label) => group_label !== active_group_label,
+    );
+};
+
 const patchSidebarAccordion = () => {
     const sidebar_store = window.Alpine?.store('sidebar');
 
-    if (!sidebar_store || sidebar_store.__accordionPatched) {
+    if (!sidebar_store) {
+        return;
+    }
+
+    sidebar_store.collapsedGroups = normalizeCollapsedGroups(sidebar_store.collapsedGroups);
+    collapseInactiveGroups(sidebar_store);
+
+    if (sidebar_store.__accordionPatched) {
         return;
     }
 
