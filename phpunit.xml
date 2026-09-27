@@ -51,7 +51,6 @@
             waited 30s for it to time out. The tests that need them turn them on
             themselves with Config::set, which is what they already assume.
         -->
-        <env name="VECTOR_SEARCH_ENABLED" value="false"/>
         <env name="AI_EMBEDDINGS_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="LOG_CHANNEL" value="null"/>
