@@ -63,7 +63,7 @@ provider therefore lists no module: it only declares the application's own group
 -   `MAIL_*`, `AWS_*`: mail e S3 (commentati di default).
 -   `ELASTIC_*`, `SCOUT_DRIVER`, `SCOUT_QUEUE`: ricerca avanzata (driver `elasticsearch`, indicizzazione in coda).
 -   `OPENAI_API_KEY`: chiave AI (commentata).
--   Core env toggles: `FORCE_HTTPS`. User, CRUD, retention and search toggles (`core.auth.verify_new_user`, `core.auth.enable_user_registration`, `core.auth.enable_user_2fa`, `core.auth.enable_user_licenses`, `core.auth.enable_social_login`, `core.dynamic_entities`, `core.dynamic_gridutils`, `core.expose_crud_api`, `core.soft_deletes_expiration_days`, `core.search.vector.enabled`) are runtime settings managed from Filament > Settings.
+-   Core env toggles: `FORCE_HTTPS`. User, CRUD, retention and search toggles (`auth.email_verification.enabled`, `auth.registration.enabled`, `auth.two_factor.enabled`, `auth.licenses.enabled`, `auth.social_login.enabled`, `crud.dynamic_entities`, `crud.expose_api`, `soft_deletes.expiration_days`, `search.vector.enabled`) are runtime settings managed from Filament > Settings. Settings are listed without the module prefix (the module is a column) and read from config as `core.<name>`.
 
 ### Deprecations
 

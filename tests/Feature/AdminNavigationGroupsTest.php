@@ -42,12 +42,12 @@ it('declares every navigation group used by the panel', function (): void {
     expect($undeclared)->toBeEmpty();
 });
 
-it('orders the navigation groups with Health and Documentation first', function (): void {
+it('orders the navigation groups with Health, Documentation and Core first', function (): void {
     $declared = declaredAdminNavigationGroups();
 
-    expect(array_slice($declared, 0, 2))->toBe(['Health', 'Documentation']);
+    expect(array_slice($declared, 0, 3))->toBe(['Health', 'Documentation', 'Core']);
 
-    $modules = array_slice($declared, 2);
+    $modules = array_slice($declared, 3);
     $sorted = $modules;
     usort($sorted, static fn (string $a, string $b): int => strcasecmp($a, $b));
 
