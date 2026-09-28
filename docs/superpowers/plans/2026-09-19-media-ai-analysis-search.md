@@ -51,12 +51,12 @@ Paths relative to their module.
 
 ---
 
-## Task 1: Media-analysis config + model registry (M21, M18)
+## Task 1: Media-analysis config + model registry (M21, M18) — DONE
 
-- [ ] Add a `features.media_analysis` block to `Modules/AI/config/config.php` mirroring `features.embeddings`: `enabled` default false (static default under the runtime master switch), a per-module allowlist (as embeddings has), and a `models` map per **capability** (`vision`, `transcription`) each with an `active` key and entries declaring `provider` + `capability` + `service_model`. Defaults: vision `claude-sonnet-5`, transcription self-hosted Whisper.
-- [ ] Create `MediaAnalysisModelRegistry` (twin of `EmbeddingModelRegistry`): `active(string $capability)` returns the resolved profile; validates provider/capability. LLM profiles resolve through the existing `ProviderFactory`.
-- [ ] Define the runtime **master switch** (M18) as a Core/AI Settings key readable at runtime (follow the project Settings pattern, not only config), gating all LLM media work; document precedence over the per-module gate.
-- [ ] Unit tests: registry resolves the active vision/transcription profile; unknown capability throws; master-switch-off short-circuits (asserted in Task 7/8). Pint + PHPStan.
+- [x] Add a `features.media_analysis` block to `Modules/AI/config/config.php` mirroring `features.embeddings`: `enabled` default false, a per-module allowlist, and a `capabilities` map (`vision`, `transcription`) each with an `active` key and `models` entries declaring `provider` + `service_model`. Defaults: vision `claude-sonnet-5`, transcription `whisper-local`. _Block added after the embeddings block._
+- [x] Create `MediaAnalysisModelRegistry` (twin of `EmbeddingModelRegistry`): `active(string $capability)` / `get($capability, $key)` return a `MediaAnalysisModelProfile` (capability/key/provider/serviceModel); unknown capability or key throws. LLM providers resolve later through the existing `ProviderFactory` (Task 7). _`Modules/AI/app/Ai/MediaAnalysis/{MediaAnalysisModelProfile,MediaAnalysisModelRegistry}.php`._
+- [x] Define the runtime **master switch** (M18) as `MediaAnalysisGate::enabled()`, reading the Settings row `media_analysis.enabled` (group `ai`) via Core's `PerModelSettingResolver`, falling back to the config default when no row exists; `allows(Model)` also applies the per-module `FeatureModuleGate`. _`Modules/AI/app/Ai/MediaAnalysis/MediaAnalysisGate.php`. Seeding the Settings row for Filament visibility is deferred (the gate works via config fallback until a row is created); revisit alongside Task 13._
+- [x] Unit tests: registry resolves the active vision/transcription profile, follows a config override, throws on unknown capability/key; gate falls back to config and is overridden by a runtime setting row. _`tests/Unit/Ai/MediaAnalysis/MediaAnalysisModelRegistryTest.php` (5), `tests/Feature/MediaAnalysis/MediaAnalysisGateTest.php` (2) — 7 passed. Pint + PHPStan clean._
 
 ## Task 2: `content_hash` + deterministic metadata on media create (M2, M15, M3a)
 
