@@ -91,15 +91,15 @@ Paths relative to their module.
 - [x] `AnalyzeMediaJob` skeleton: emits `ModelPreProcessingCompleted('media_analysis')` on `handle()` and degrades the same way on `failed()` so the finalize path works end-to-end now; Task 7 fills the per-mime analysis, the `MediaAnalysis` row, and embeddings chaining.
 - [x] Feature tests: claimed media → `media_analysis` registered, job dispatched, event handled; draft-owned, master-switch-off, and non-media → no-op. 4 passed. Regression: 24 existing embeddings-listener tests still green (Media skip is safe). Pint + PHPStan clean. _Bulk `ModelsRequireIndexing` media path not wired yet — noted for later._
 
-## Task 7: `AnalyzeMediaJob` (M6, M11, M15, M17, M20, M21)
+## Task 7: `AnalyzeMediaJob` (M6, M11, M15, M20, M21) — DONE
 
-- [ ] Queue-backed job with throttling/retry like `GenerateEmbeddingsJob`, on a dedicated `media_analysis` queue/limiter.
-- [ ] **Lookup-before-work** (M15): resolve `content_hash`; if a fresh `ai_media_analysis` row exists for it at the active `analysis_model_version`, reuse and skip the expensive work.
-- [ ] Per-mime dispatch (M20): image → vision caption (subjects+actions, M7) + OCR; audio → transcription; PDF/document → text + OCR for scans; video → audio transcription only. Every type also produces `idea`+`intent`. Vision via the M21 registry (neuron-ai); transcription via the Whisper backend (Task 8).
-- [ ] Locale (M17): transcript/OCR in the source language; surrogate generated once then queued for translation to supported locales via the existing translation pipeline.
-- [ ] Write AI fields to `ai_media_analysis` (by hash) with provenance; fill an empty Core `custom_properties` field only if unclaimed (M3c). On success emit `ModelPreProcessingCompleted($media,'media_analysis')`; on failure degrade (M12).
-- [ ] Chaining (M11): ensure embeddings run **after** analysis persists (job-chain `GenerateEmbeddingsJob`, or defer its dispatch to `media_analysis` completion).
-- [ ] Feature tests (fakes for the vision/transcription providers): populates fields without overwriting human values; same-hash second media reuses the analysis (no provider call); failure still finalizes. Pint + PHPStan.
+- [x] Queue-backed job (`media_analysis` queue, tries/backoff/timeout) behind the `MediaVisionAnalyzer` / `MediaTranscriber` contracts + `MediaAnalysisModelRegistry`, so it builds and tests with fakes and needs no live provider.
+- [x] **Lookup-before-work** (M15): resolves `content_hash` (from `custom_properties`, else the file); if a completed `ai_media_analysis` row exists at the active `analysis_model_version`, reuses it (fills Core keywords, chains embeddings, emits completion) without calling the analyzer.
+- [x] Per-mime dispatch (M20): image → vision (caption + entities + idea + intent + OCR); audio/video → transcription; PDF → extracted text. Vision resolved via the M21 registry (neuron-ai `NeuronVisionAnalyzer`, verified: neuron-ai 3.17 maps `ImageContent` to Claude image blocks); transcription via the `MediaTranscriber` contract (default `NullMediaTranscriber`; Whisper is Task 8).
+- [x] Writes AI fields to `ai_media_analysis` by hash with a provenance map; fills empty Core `custom_properties` (`description`←caption, `keywords`←entities) only when empty or previously AI-written (M3c). Success → `ModelPreProcessingCompleted('media_analysis')`; `failed()` degrades the same way (M12).
+- [x] Chaining (M11): dispatches `GenerateEmbeddingsJob` after the analysis persists; `HandleMediaAnalysisListener` now requires both `media_analysis` and `embeddings` so finalize indexes once. AI text reaches the media document/vector through a new `MediaAnalysisSearchContributor` (reads the analysis by the media's `content_hash`), registered into Core's contributor seam in `AIServiceProvider::boot()`.
+- [x] Feature tests (fakes): image analysis writes the row, fills Core fields, chains embeddings, emits completion; same-hash reuse skips the analyzer; audio transcribes via the contract; contributor surfaces fields + embed text (and no-ops without a row). 8 media-analysis feature tests here (16 in the group). Pint + PHPStan clean.
+- Locale/multilingual surrogate translation (M17) is deferred: transcript/OCR already stay source-language; per-locale surrogate translation rides a later pass. _Noted._
 
 ## Task 8: Transcription backend (M21)
 
