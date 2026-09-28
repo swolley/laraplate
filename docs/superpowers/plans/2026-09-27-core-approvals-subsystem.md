@@ -1094,7 +1094,7 @@ Expected: PASS.
 - Consumes: Task 5 capture.
 - Produces: `ModificationVoteService::cast(User $user, Modification $modification, bool $approval, ?string $reason = null, ?Model $modifiable = null): bool` now runs in one transaction on the modifiable model's connection and applies every operation; `ModificationVoteService::applyAuthorCredit(Modification $modification, Model $modifiable): void`, the one other way an approved operation is applied, so nothing applies one outside this service.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 <?php
@@ -1184,12 +1184,12 @@ it('leaves the request pending when applying the approved operation fails', func
 });
 ```
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Approvals/OperationApplyTest.php`
 Expected: FAIL (approving a deletion applies an empty diff and does not delete).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `HasApprovals::applyModificationChanges()`, before the diff branch:
 
@@ -1263,9 +1263,17 @@ with
     }
 ```
 
-- [ ] **Step 4: Run** the new test file and the approvals suites (Task 5 Step 5 command, plus `Modules/CMS/tests/Feature/Models/ContentModificationSoftKeepTest.php`). Expected: PASS.
+- [x] **Step 4: Run** the new test file and the approvals suites (Task 5 Step 5 command, plus `Modules/CMS/tests/Feature/Models/ContentModificationSoftKeepTest.php`). Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** (`feat(core): approving a deletion or restore runs it, in one transaction with the vote`).
+- [x] **Step 5: Pint and commit** (`feat(core): approving a deletion or restore runs it, in one transaction with the vote`).
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- The test file follows the Task 5 deviations (`HttpContext::pretendHttpRequest()`, `is_deleted` as `storedAs`), and adds the sixth case the Files list asks for: the author credit completing the quorum of a force deletion. `SoftDeletableApprovalModel` gained a static `$approvers` to raise the quorum to 2.
+- `cast()` resolves the target of a `Restore` with `modifiable()->withTrashed()`: the relation's soft-delete scope hides a trashed record, and `$modification->refresh()` after the vote reloads the relation, so a target passed in or set earlier does not survive either.
+- The non-diff branch resets the forced flag in a `finally`, so a failed application leaves the instance able to capture again.
+- `pendingModification()` is `null` after a capture whose author credit completed the quorum at once: the operation ran, and the panel and API tasks read a non-null value as "sent for approval". `captureSave()` does the same.
+- `ContentModificationSoftKeepTest`'s first case read the removed `deleteWhen*` properties by reflection; it now checks the behaviour instead (an approved modification is kept, inactive). `Content::initializeHasApprovals()` is gone entirely: without the two flags it repeated the trait's.
 
 ### Task 7: Pending deletion strategy — Block and Hide
 
