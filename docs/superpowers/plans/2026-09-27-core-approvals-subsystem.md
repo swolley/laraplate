@@ -10,10 +10,49 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-27-core-approvals-subsystem-design.md`
 
+## Settled decisions (2026-09-28)
+
+A review of this plan against the working tree found four open design questions. They are settled
+here and the tasks below already reflect them; the spec records them too.
+
+1. **The author's automatic `approve` credit applies through `ModificationVoteService`, never on its
+   own.** `applyAuthorApproveCredit()` currently calls `applyModificationChanges()` directly, so that
+   path gets no transaction, fires no event, and would run `$this->delete()` from inside the
+   `deleting` listener. The service gains `applyAuthorCredit()` and becomes the only place an
+   approved operation is applied (Task 6).
+2. **The operation reaches a model rule through its own hook, not through a fake diff.**
+   `requiresApprovalForOperation(Operation $operation): bool` replaces the `['__operation' => …]`
+   sentinel the first draft injected into `requiresApprovalWhen()`. No existing override receives an
+   array that is not a diff (Task 5).
+3. **`Hide` does not filter when nobody is authenticated.** Console, queues, jobs, search indexing
+   and exports see every record, exactly as capture is skipped in console. A pending deletion must
+   not silently change what background work sees (Task 7).
+4. **Deleting a comment stays outside approvals, and says so.** `Comment::approvalOperations()`
+   returns `[Operation::Create, Operation::Update]`. Today a comment delete escapes only because
+   `Comment::requiresApprovalWhen()` returns false when `body` is not dirty, which is a side effect,
+   not a decision (Task 5).
+5. **The three tables carry the Core prefix.** Delivered ahead of Phase 1 by Core commit `c759afe4`:
+   `CoreTables::Modifications`, `Approvals` and `Disapprovals` moved out of the "generic or vendors
+   models" block and now read `core_modifications`, `core_approvals`, `core_disapprovals`. The spec's
+   Data section already used those names while the enum still said `vend_*`; the migrations derive
+   every name from the enum, so nothing else in the schema had to change. The developer database was
+   renamed in place, indexes and foreign-key constraint names included.
+6. **One diff hook, not two.** The spec's `enrichModificationDiff(array $diff): array` is not built:
+   `CommentApprovalCapture` stays where it is, and the only thing `Comment` actually needed from a
+   diff hook — folding the pending translated `body` and `rating_score` into the change set — is
+   served by `getDirtyForApproval()`, which the trait's listener now calls (Task 2). The spec is
+   amended to match.
+
+Minor corrections folded into the tasks: the three lifecycle events all live in
+`Modules\Core\Events`; `deleteWhenApproved`/`deleteWhenDisapproved` are removed rather than
+defaulted to false; the panel action tests use `Content`, because `SettingResource` denies delete and
+force delete; `composer remove` targets `Modules/Core/composer.json`; the architecture test resolves
+paths with `dirname(__DIR__, 5)` like its siblings.
+
 ## Global Constraints
 
 - Every PHP file starts with `declare(strict_types=1);`; explicit parameter and return types; `#[Override]` on overrides; code, comments and PHPDoc in English.
-- No new migrations for existing data: change `Modules/Core/database/migrations/2024_03_30_161448_create_modifications_table.php` in place and convert the developer database by hand with the tinker snippet the task gives. The project has no other installation.
+- No new migrations for existing data: change `Modules/Core/database/migrations/2024_03_30_161448_create_modifications_table.php` in place and rebuild the developer database with `php artisan migrate:fresh --seed`. The project has no other installation and pending modifications are development data. Do not convert a live database by hand: that is what left `core_settings` without `is_internal` until 2026-09-28, because the create migrations are the only description of the schema.
 - Never declare classes, traits, interfaces or enums inside test files: test models go in `Modules/Core/tests/Stubs/` (namespace `Modules\Core\Tests\Stubs`).
 - Tests live in the module that owns the code (`Modules/Core/tests`, `Modules/CMS/tests`, `Modules/AI/tests`), use Pest, and run from the repository root: `php artisan test --compact <path>`.
 - Format with the root Pint config only, on explicit files: `vendor/bin/pint --format agent <files>`. Never run Pint from inside a module directory, never without a file list.
@@ -30,7 +69,7 @@
 | `Modules/Core/app/Approvals/Operation.php` | enum `create`/`update`/`delete`/`force_delete`/`restore` |
 | `Modules/Core/app/Approvals/PendingDeletionStrategy.php` | enum `Block`/`Hide` |
 | `Modules/Core/app/Approvals/PendingDeletionLock.php` | exception for a write on a record blocked by a pending deletion |
-| `Modules/Core/app/Approvals/Events/ModificationRejected.php`, `ModificationWithdrawn.php` | new events |
+| `Modules/Core/app/Events/ModificationRejected.php`, `ModificationWithdrawn.php` | new events, next to the existing `ModificationApproved` |
 | `Modules/Core/app/Models/Concerns/HasApprovals.php` | the only approvals trait: listeners, capture, outcome, read-only check, hooks, scope |
 | `Modules/Core/app/Models/Modification.php`, `Approval.php`, `Disapproval.php` | stand-alone models (no package base class) |
 | `Modules/Core/app/Services/ModificationVoteService.php` | vote, apply, reject, withdraw |
@@ -214,6 +253,11 @@ Search the code for `Approval\Models\` (`command grep -rn 'Approval\\\\Models' M
 
 - [ ] **Step 4: Write the attribution**
 
+Partly delivered ahead of this task by Core commit `d6874436`: `LICENSES/laravel-approval.md` and the
+README entry exist. What remains here is the per-file header line, which only makes sense once Step 3
+has made the models stand alone. The README entry carries a note saying the package is still
+required; remove that note in Task 13, not before.
+
 `Modules/Core/LICENSES/laravel-approval.md`, same layout as `LICENSES/laravel-locked.md`: title `# cloudcake/laravel-approval (published as stephenlake/laravel-approval)`, source `https://github.com/cloudcake/laravel-approval`, "Derived into Core from version 1.1.4, upstream commit e7527e1.", the list of derived files (`app/Models/Modification.php`, `app/Models/Approval.php`, `app/Models/Disapproval.php`, `app/Models/Concerns/HasApprovals.php`, `app/Services/ModificationVoteService.php`), then the license text copied verbatim from `vendor/stephenlake/laravel-approval/LICENSE.md` inside a fenced block. Add the header line from the Global Constraints to each derived file's class PHPDoc. In `Modules/Core/README.md`, add to the "derived code" list:
 
 ```markdown
@@ -238,12 +282,13 @@ git -C Modules/Core commit -m "refactor(core): approval models stand alone, attr
 **Files:**
 - Modify: `Modules/Core/app/Models/Concerns/HasApprovals.php`
 - Modify: `Modules/Core/app/Models/User.php` (drop `use ApprovesChanges;`)
+- Modify: `Modules/CMS/app/Models/Comment.php` (delete its own `bootRequiresApproval()`, `getDirtyForApproval()` becomes `protected`)
 - Modify: `Modules/AI/app/Jobs/ApproveModificationJob.php:198,216` (vote through the service)
-- Test: `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php` (add cases)
+- Test: `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php` (add cases), `Modules/CMS/tests/Feature/CommentModerationTest.php` (must stay green)
 
 **Interfaces:**
 - Consumes: Task 1 models.
-- Produces on every `HasApprovals` model: `protected int $approversRequired = 1`, `protected int $disapproversRequired = 1`, `protected bool $updateWhenApproved = true`, `isForcedApprovalUpdate(): bool`, `setForcedApprovalUpdate(bool $forced = true): void`, `modifications(): MorphMany<Modification, $this>`, `applyModificationChanges(Modification $modification, bool $approved): void`, `static captureSave(Model $item): bool`, `protected requiresApprovalWhen(array $modifications): bool` (superadmin rule included).
+- Produces on every `HasApprovals` model: `protected int $approversRequired = 1`, `protected int $disapproversRequired = 1`, `protected bool $updateWhenApproved = true`, `isForcedApprovalUpdate(): bool`, `setForcedApprovalUpdate(bool $forced = true): void`, `modifications(): MorphMany<Modification, $this>`, `applyModificationChanges(Modification $modification, bool $approved): void`, `static captureSave(Model $item): bool`, `protected requiresApprovalWhen(array $modifications): bool` (superadmin rule included), `protected getDirtyForApproval(): array` (default `getDirty()`).
 
 - [ ] **Step 1: Write the failing test** (append to `HasApprovalsTest.php`)
 
@@ -313,7 +358,7 @@ Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now dec
     public static function bootHasApprovals(): void
     {
         static::saving(static function (Model $item): ?bool {
-            if (! $item->isForcedApprovalUpdate() && $item->requiresApprovalWhen($item->getDirty()) === true) {
+            if (! $item->isForcedApprovalUpdate() && $item->requiresApprovalWhen($item->getDirtyForApproval()) === true) {
                 return static::captureSave($item);
             }
 
@@ -321,6 +366,17 @@ Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now dec
 
             return null;
         });
+    }
+
+    /**
+     * The change set a capture decides on. `getDirty()` for most models; a model whose
+     * write goes through a staging area (translations, pending scores) folds it in here.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getDirtyForApproval(): array
+    {
+        return $this->getDirty();
     }
 
     public function isForcedApprovalUpdate(): bool
@@ -366,7 +422,9 @@ Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now dec
     }
 ```
 
-`captureSave()` keeps its body; the modifier becomes `Auth::user()` (it was the package's `modifier()`), and the `config('approval.models.modification', …)` lookups become `Modification::class`. `requiresApprovalWhen()` keeps the superadmin rule already in the working tree. Change every `applyModificationChanges(\Approval\Models\Modification …)` signature in models (`Comment`) to `Modification`.
+`captureSave()` keeps its body, with `getDirtyForApproval()` in place of `getDirty()` when it builds the diff; the modifier becomes `Auth::user()` (it was the package's `modifier()`), and the `config('approval.models.modification', …)` lookups become `Modification::class`. `requiresApprovalWhen()` keeps the superadmin rule already in the working tree. Change every `applyModificationChanges(\Approval\Models\Modification …)` signature in models (`Comment`) to `Modification`.
+
+**`Comment` must lose its own boot listener in this step, or it silently stops working.** The `saving` listener comes from the package's `bootRequiresApproval()`, and `Modules/CMS/app/Models/Comment.php:252-269` overrides that method to compute `getDirtyForApproval()` (pending translated `body`, pending `rating_score`) before capturing. Renaming the trait hook to `bootHasApprovals()` leaves `Comment::bootRequiresApproval()` with nothing calling it: Laravel boots `boot{TraitName}`, and `RequiresApproval` is gone. The comment would then be captured on the bare `getDirty()`, losing the pending body — a green suite would hide it, so do not rely on the rename alone. Delete `Comment::bootRequiresApproval()` and make `getDirtyForApproval()` `protected` so it overrides the trait's version; the trait's listener then does the same work for every model. `Comment::captureSave()` keeps delegating to `CommentApprovalCapture::capture()`.
 
 In `User.php` remove `use ApprovesChanges;` and add, below `isAuthorizedToCastApprovalVote()`:
 
@@ -397,26 +455,38 @@ git -C Modules/CMS add app/Models/Comment.php && git -C Modules/CMS commit -m "r
 
 ### Task 3: Settings save through the shared write rule
 
-This is the work left uncommitted in `Modules/Core`: `Setting::requiresApprovalWhen()` checks its guarded fields, then defers to the trait; `EditSetting` reports a change sent for approval. Close it on top of Task 2.
+This closes Core commit `83e0795b`, committed as `wip` with one red test named in its message, not work left in a working tree: `Setting::requiresApprovalWhen()` checks its guarded fields, then defers to the trait; `EditSetting` reports a change sent for approval. Close it on top of Task 2. Nothing here needs to be written from scratch — read the commit first, then finish the two loose ends below.
 
 **Files:**
-- Modify: `Modules/Core/app/Models/Setting.php`, `Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php` (already in the working tree)
-- Test: `Modules/Core/tests/Integration/Models/SettingTest.php`, `Modules/Core/tests/Feature/Filament/EditSettingFormTest.php` (already in the working tree)
+- Modify: `Modules/Core/app/Models/Setting.php`, `Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php` (already committed in `83e0795b`)
+- Test: `Modules/Core/tests/Integration/Models/SettingTest.php`, `Modules/Core/tests/Feature/Filament/EditSettingFormTest.php` (already committed in `83e0795b`)
 
 - [ ] **Step 1: Switch the tests to `pretendHttpRequest()`**
 
 Replace the local helpers `settingWrittenOverHttp()` (SettingTest) and `settingFormOverHttp()` (EditSettingFormTest) with calls to `pretendHttpRequest()` and delete the two local functions. In "sends an is_public change from the form to approval", replace `editSettingActor();` with `editSettingActorWithoutApproval();` and add `->assertNotified('Change sent for approval')` after `->assertHasNoFormErrors()`: a superadmin is never captured, so only a non-approver can reach approval.
 
-- [ ] **Step 2: Diagnose "offers no create or delete actions on settings"**
+- [ ] **Step 2: Diagnose the red tests the wip left behind**
+
+The commit message names one: `EditSettingFormTest` "offers no create or delete actions on settings".
+There are three more, and they come from the same change. `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
+fails three times with `RelationNotFoundException: Call to undefined relationship [roles] on model
+[Mockery_N_Modules_Core_Models_User]`, through `Modules/Core/app/Models/User.php:233` and
+`Modules/Core/app/Authorization/ResolvingAuthorization.php:38`. The superadmin rule the wip added to
+`requiresApprovalWhen()` calls `isSuperAdmin()`, which reads the `roles` relation, on partial mocks
+that never stubbed it. Verified as pre-existing on 2026-09-28: the same three fail with the code at
+`83e0795b`. Fix the mocks (or give them a real role) as part of closing this task; the superadmin rule
+itself is correct and is covered by its own test in Task 2.
+
+- [ ] **Step 3: Diagnose "offers no create or delete actions on settings"**
 
 It fails with `SettingsTable::loadUserPermissionsForTable(): Argument #1 ($user) must be of type ?App\Models\User, Modules\Core\Models\User given`. Use superpowers:systematic-debugging. Start from `Modules/Core/app/Filament/Utils/HasTable.php:139-142` (`Auth::user()` typed as `App\Models\User`) and find which guard or provider hands back a `Modules\Core\Models\User` in that test (`Filament::setCurrentPanel('admin')` switches the guard to `admin`; compare `config('auth.guards.admin.provider')`, `config('auth.providers.*.model')` and `LockAwareUserProvider`). Fix the cause, not the test. If the cause is `HasTable` typing the application user class while guards may return the Core base class, type the parameter as `?Modules\Core\Models\User` there.
 
-- [ ] **Step 3: Run**
+- [ ] **Step 4: Run**
 
-Run: `php artisan test --compact Modules/Core/tests/Integration/Models/SettingTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php Modules/Core/tests/Feature/Filament/SettingResourceTest.php`
+Run: `php artisan test --compact Modules/Core/tests/Integration/Models/SettingTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php Modules/Core/tests/Feature/Filament/SettingResourceTest.php Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
 Expected: PASS.
 
-- [ ] **Step 4: Pint and commit**
+- [ ] **Step 5: Pint and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Models/Setting.php Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php Modules/Core/tests/Integration/Models/SettingTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php
@@ -510,17 +580,20 @@ and add after the modifier index:
 
 `Modification`: cast `'operation' => Operation::class`, replace `'is_update'` with `'operation'` in `$hidden`. `HasApprovals::captureSave()` and `CommentApprovalCapture::capture()`: replace `$modification->is_update = false;` with `$modification->operation = $item->getKey() === null ? Operation::Create : Operation::Update;` (same for `$comment`). `ModificationForm`: replace the `is_update` toggle with `TextInput::make('operation')->formatStateUsing(self::fromRecord('operation'))->disabled()`. `ModificationsTable`: add `TextColumn::make('operation')->badge()` after the modifiable column. Update the tests found by the grep: `'is_update' => true` → `'operation' => Operation::Update`, `'is_update' => false` → `'operation' => Operation::Create`.
 
-- [ ] **Step 4: Convert the developer database**
+- [ ] **Step 4: Rebuild the developer database**
 
 ```bash
-php artisan tinker --execute '
-Illuminate\Support\Facades\Schema::table("core_modifications", function ($t) { $t->string("operation", 16)->default("update")->after("active"); });
-Illuminate\Support\Facades\DB::table("core_modifications")->where("is_update", false)->update(["operation" => "create"]);
-Illuminate\Support\Facades\Schema::table("core_modifications", function ($t) { $t->dropColumn("is_update"); $t->index(["modifiable_type", "modifiable_id", "active", "operation"], "core_modifications_pending_IDX"); });
-echo Illuminate\Support\Facades\DB::table("core_modifications")->selectRaw("operation, count(*) c")->groupBy("operation")->pluck("c", "operation");'
+php artisan config:clear   # a cached config points the suite at the real MySQL database
+php artisan migrate:fresh --seed
 ```
 
-Expected: the pending rows are kept, each with `create` or `update`.
+Expected: `core_modifications` has `operation` and no `is_update`. Pending modifications are not
+preserved, and that is the decision: they are development data, and the create migrations are the
+only description of the schema. Converting the live database by hand instead is what left
+`core_settings` without `is_internal` until 2026-09-28.
+
+If a pending modification in the developer database genuinely has to survive, convert it by hand
+*before* rebuilding and re-create it after; do not make the hand conversion the normal path.
 
 - [ ] **Step 5: Run the approvals suites** (same command as Task 2 Step 4). Expected: PASS.
 
@@ -534,12 +607,13 @@ Expected: the pending rows are kept, each with `create` or `update`.
 
 **Files:**
 - Modify: `Modules/Core/app/Models/Concerns/HasApprovals.php`
+- Modify: `Modules/CMS/app/Models/Content.php` (`requiresApprovalForOperation()` override), `Modules/CMS/app/Models/Comment.php` (`approvalOperations()`)
 - Create: `Modules/Core/tests/Stubs/Approvals/SoftDeletableApprovalModel.php` (Core `SoftDeletes` + `HasApprovals`, table `approvals_soft_stub`, fillable `name`)
-- Test: `Modules/Core/tests/Integration/Approvals/OperationCaptureTest.php`
+- Test: `Modules/Core/tests/Integration/Approvals/OperationCaptureTest.php`, `Modules/CMS/tests/Feature/CommentModerationTest.php` (a comment delete is not captured), `Modules/CMS/tests/Feature/Models/ContentModificationSoftKeepTest.php` (a draft is deleted directly, a live one is captured)
 
 **Interfaces:**
 - Consumes: `Operation` (Task 4).
-- Produces: `approvalOperations(): list<Operation>` (overridable, default `Operation::cases()`), `pendingModification(): ?Modification`, `wouldRequireApproval(Operation $operation): bool`, `static captureOperation(Model $item, Operation $operation): bool`, `pendingOperationRequest(Operation $operation): ?Modification`.
+- Produces: `approvalOperations(): list<Operation>` (overridable, default `Operation::cases()`), `pendingModification(): ?Modification`, `wouldRequireApproval(Operation $operation): bool`, `static captureOperation(Model $item, Operation $operation): bool`, `pendingOperationRequest(Operation $operation): ?Modification`, `protected requiresApprovalForOperation(Operation $operation): bool` (overridable per model), `protected approvalGate(): bool` (the shared console/superadmin/approve-credit rule, extracted so both entry points share it without either faking the other's argument).
 
 - [ ] **Step 1: Write the stub**
 
@@ -681,13 +755,17 @@ Add the outcome property and extend the boot method:
         static::deleting(static function (Model $item): ?bool {
             $operation = $item->deletionOperation();
 
-            return $item->shouldCapture($operation) && $item->requiresApprovalWhen(['__operation' => $operation->value])
+            return $item->shouldCapture($operation) && $item->requiresApprovalForOperation($operation)
                 ? static::captureOperation($item, $operation)
                 : null;
         });
 
         static::restoring(static function (Model $item): ?bool {
-            return $item->shouldCapture(Operation::Restore) && $item->requiresApprovalWhen(['__operation' => Operation::Restore->value])
+            if (! $item->trashed()) {
+                return null;
+            }
+
+            return $item->shouldCapture(Operation::Restore) && $item->requiresApprovalForOperation(Operation::Restore)
                 ? static::captureOperation($item, Operation::Restore)
                 : null;
         });
@@ -708,7 +786,39 @@ Add the outcome property and extend the boot method:
 
     public function wouldRequireApproval(Operation $operation): bool
     {
-        return $this->shouldCapture($operation) && $this->requiresApprovalWhen(['__operation' => $operation->value]);
+        return $this->shouldCapture($operation) && $this->requiresApprovalForOperation($operation);
+    }
+
+    /**
+     * Whether this operation needs approval. Default: the shared rule, which knows nothing
+     * about fields, so an operation without a diff needs no special case. A model overrides
+     * this to exempt some states, as Content does for drafts.
+     */
+    protected function requiresApprovalForOperation(Operation $operation): bool
+    {
+        return $this->approvalGate();
+    }
+
+    /**
+     * The shared write rule, with no change set in it: console never needs approval, a
+     * superadmin never does, and a writer holding `approve` does not when one approval is
+     * enough. Extracted so requiresApprovalWhen() and requiresApprovalForOperation() share
+     * it without either having to fake the other's argument.
+     */
+    protected function approvalGate(): bool
+    {
+        if (App::runningInConsole()) {
+            return false;
+        }
+
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if ($user instanceof User && $user->isSuperAdmin()) {
+            return false;
+        }
+
+        return ! ($user instanceof User && $this->writerHasApproveCredit($user) && $this->approversRequired <= 1);
     }
 
     public static function captureOperation(Model $item, Operation $operation): bool
@@ -764,29 +874,74 @@ Add the outcome property and extend the boot method:
     }
 ```
 
-`captureSave()` sets `$item->pendingModification = $modification;` before returning. `requiresApprovalWhen()` treats `['__operation' => …]` as a non-empty change set, so the existing console/superadmin/approve-credit rule decides for deletes and restores too; model rules that inspect field names (`Setting`, `Taxonomy`) must defer to the shared rule for `__operation`: add at the top of each override `if (array_key_exists('__operation', $modifications)) { return $this->requiresApprovalWhenTrait($modifications); }`. `Content` keeps its rule unchanged: drafts and expired contents are written directly, so they are also deleted and restored directly; live and scheduled contents go through the shared rule.
+`captureSave()` sets `$item->pendingModification = $modification;` before returning, and `requiresApprovalWhen()` becomes `$modifications === [] ? false : $this->approvalGate()`: the two entry points now share one rule and neither invents an argument for the other.
 
-Laravel's `forceDelete()` fires `forceDeleting` and then `delete()`, which fires `deleting` with `isForceDeleting()` true: listening to `deleting` alone covers both. A restore rejected by `restoring` never reaches `save()`.
+**No model override has to change for deletes and restores, which is the point of the hook.**
+`Setting` exempts presentation-only fields: an operation carries no fields, so the default gate
+decides and the override is not consulted. `Taxonomy` requires approval only when a validity date
+moves: same reasoning, default gate. Only `Content` genuinely has per-state rules, so only `Content`
+overrides the new hook, with the aliasing pattern it already uses for `requiresApprovalWhen`:
 
-Restore only on a trashed record: in the `restoring` listener return `null` (let Laravel handle it) when `! $item->trashed()`.
+```php
+        HasApprovals::requiresApprovalForOperation as private requiresApprovalForOperationTrait;
+```
+
+```php
+    #[Override]
+    protected function requiresApprovalForOperation(Operation $operation): bool
+    {
+        // Unpublished (draft) and expired: write-through, deletes and restores included.
+        if (! $this->isPublished() && ! $this->isScheduled()) {
+            return false;
+        }
+
+        return $this->requiresApprovalForOperationTrait($operation);
+    }
+```
+
+`Comment` declares the exclusion instead of inheriting it by accident (settled decision 4):
+
+```php
+    /**
+     * A comment author deletes their own comment; only its text goes through moderation.
+     *
+     * @return list<Operation>
+     */
+    #[Override]
+    public function approvalOperations(): array
+    {
+        return [Operation::Create, Operation::Update];
+    }
+```
+
+**Delete the `$item->applyAuthorApproveCredit($modification);` line from the `captureOperation()` body
+above: in this task the credit must not run for an operation.** It ends by calling
+`applyModificationChanges()` itself when it completes the quorum, so on a deletion it would run
+`$this->delete()` from inside the `deleting` listener — a re-entrant delete whose outer call still
+returns `false`, telling the caller a record was sent for approval when it is already gone. `captureSave()`
+keeps calling it, unchanged: creates and updates have always gone through it. Task 6 routes the credit
+through `ModificationVoteService::applyAuthorCredit()` and adds the call here, once it is safe.
+
+Laravel's `forceDelete()` fires `forceDeleting` and then `delete()`, which fires `deleting` with `isForceDeleting()` true: listening to `deleting` alone covers both. A restore rejected by `restoring` never reaches `save()`. A restore on a record that is not trashed is left to Laravel (the `restoring` listener returns `null` first thing).
 
 - [ ] **Step 5: Run the capture tests and the approvals suites**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Approvals Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php Modules/Core/tests/Integration/Models Modules/Core/tests/Feature/Controllers Modules/CMS/tests/Feature Modules/Core/tests/Feature/Console/ModelSoftDeletesCommandsTest.php`
 Expected: PASS.
 
-- [ ] **Step 6: Pint and commit** (`feat(core): deletes, force deletes and restores go through approval`), including the three model rules in Core and CMS.
+- [ ] **Step 6: Pint and commit** (`feat(core): deletes, force deletes and restores go through approval`). Two commits: Core for the trait, CMS for `Content::requiresApprovalForOperation()` and `Comment::approvalOperations()`. Neither `Setting` nor `Taxonomy` is touched. Add one test per CMS model before committing: a draft `Content` is deleted directly while a live one is captured, and a comment delete runs without a modification.
 
 ### Task 6: Applying approved deletes and restores, rejecting pending updates
 
 **Files:**
 - Modify: `Modules/Core/app/Services/ModificationVoteService.php`
-- Modify: `Modules/Core/app/Models/Concerns/HasApprovals.php` (`applyModificationChanges` for non-diff operations)
-- Test: `Modules/Core/tests/Integration/Approvals/OperationApplyTest.php`
+- Modify: `Modules/Core/app/Models/Concerns/HasApprovals.php` (`applyModificationChanges` for non-diff operations, `deleteWhen*` removed, author credit delegated)
+- Modify: `Modules/CMS/app/Models/Content.php` (`initializeHasApprovals()` loses the `deleteWhen*` overrides)
+- Test: `Modules/Core/tests/Integration/Approvals/OperationApplyTest.php`, plus a case for the author credit completing the quorum on a deletion
 
 **Interfaces:**
 - Consumes: Task 5 capture.
-- Produces: `ModificationVoteService::cast(User $user, Modification $modification, bool $approval, ?string $reason = null, ?Model $modifiable = null): bool` now runs in one transaction on the modifiable model's connection and applies every operation.
+- Produces: `ModificationVoteService::cast(User $user, Modification $modification, bool $approval, ?string $reason = null, ?Model $modifiable = null): bool` now runs in one transaction on the modifiable model's connection and applies every operation; `ModificationVoteService::applyAuthorCredit(Modification $modification, Model $modifiable): void`, the one other way an approved operation is applied, so nothing applies one outside this service.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -902,7 +1057,30 @@ In `HasApprovals::applyModificationChanges()`, before the diff branch:
         }
 ```
 
-and set `$deleteWhenApproved = false` and `$deleteWhenDisapproved = false` as the trait defaults: decided modifications are kept. Remove the now redundant overrides in `Content::initializeHasApprovals()` and `HasApprovals::initializeHasApprovals()` (`$this->deleteWhenDisapproved = true;`).
+and **remove** `$deleteWhenApproved` and `$deleteWhenDisapproved` entirely, with the branch that read them: a decided modification is deactivated and kept, for every model, as the spec requires. The properties leave three call sites behind, all of which go: `HasApprovals::initializeHasApprovals()` (`$this->deleteWhenDisapproved = true;`), and `Content::initializeHasApprovals()` at `Modules/CMS/app/Models/Content.php:605-613`, which sets both to false and whose PHPDoc documents the default it was fighting. `$updateWhenApproved` stays: `Comment` reads it at `Modules/CMS/app/Models/Comment.php:154`.
+
+**The author's automatic `approve` credit routes through the service** (settled decision 1). `applyAuthorApproveCredit()` ends with `applyModificationChanges($modification, true)` when the credit completes the quorum, which skips the transaction, fires no event and, for a deletion, would delete from inside the `deleting` listener. Give the service the last word:
+
+```php
+    /**
+     * Apply a modification whose quorum was completed by the author's own approve credit.
+     * Not a vote: cast() would refuse it, because the author never votes on their own request.
+     */
+    public function applyAuthorCredit(Modification $modification, Model $modifiable): void
+    {
+        $modification->getConnection()->transaction(function () use ($modification, $modifiable): void {
+            $modifiable->applyModificationChanges($modification, true);
+
+            if ($modification->operation->isDeletion()) {
+                $this->rejectPendingUpdatesOf($modification, $modification->modifier);
+            }
+        });
+
+        event(new ModificationApproved($modification, $modifiable));
+    }
+```
+
+and in the trait replace the direct `applyModificationChanges($modification, true)` at the end of `applyAuthorApproveCredit()` with `resolve(ModificationVoteService::class)->applyAuthorCredit($modification, $this);`. Then add `$item->applyAuthorApproveCredit($modification);` back into `captureOperation()`, which Task 5 deliberately left out: with the application inside the service it is safe for every operation.
 
 In `ModificationVoteService::cast()` wrap the whole body in `$modification->getConnection()->transaction(function () use (…): bool { … })`, and after `$target->applyModificationChanges($modification, $approval);` add:
 
@@ -915,7 +1093,7 @@ In `ModificationVoteService::cast()` wrap the whole body in `$modification->getC
 with
 
 ```php
-    private function rejectPendingUpdatesOf(Modification $deletion, User $decider): void
+    private function rejectPendingUpdatesOf(Modification $deletion, Model $decider): void
     {
         $deletion->newQuery()
             ->where('modifiable_type', $deletion->modifiable_type)
@@ -962,13 +1140,24 @@ it('refuses to save a record whose deletion is pending', function (): void {
 });
 
 it('still saves the attributes the model declares writable', function (): void {
-    SoftDeletableApprovalModel::$writable = ['updated_at'];
+    SoftDeletableApprovalModel::$writable = ['name'];
     Auth::login($this->author);
     $this->record->delete();
 
-    $this->record->touch();
+    $this->record->name = 'system write';
+    $this->record->save();
 
-    expect($this->record->fresh()->updated_at)->not->toBeNull();
+    expect($this->record->fresh()->name)->toBe('system write');
+});
+
+it('blocks the same attribute when the model does not declare it writable', function (): void {
+    SoftDeletableApprovalModel::$writable = [];
+    Auth::login($this->author);
+    $this->record->delete();
+
+    $this->record->name = 'system write';
+
+    expect(fn () => $this->record->save())->toThrow(PendingDeletionLock::class);
 });
 
 it('hides a record whose deletion is pending from users who cannot decide on it', function (): void {
@@ -993,7 +1182,20 @@ it('shows the record again once the deletion is rejected', function (): void {
 });
 ```
 
+```php
+it('does not hide a pending deletion when nobody is authenticated', function (): void {
+    Auth::login($this->author);
+    $hidden = HiddenWhilePendingDeletionModel::query()->find($this->record->id);
+    $hidden->delete();
+    Auth::logout();
+
+    expect(HiddenWhilePendingDeletionModel::query()->whereKey($this->record->id)->exists())->toBeTrue();
+});
+```
+
 (`beforeEach`/`afterEach` as in Task 6; `SoftDeletableApprovalModel` gains `public static array $writable = [];` returned by `attributesWritableWhilePendingDeletion()`, reset in `beforeEach`.)
+
+Test the writable list on a real attribute, not on `updated_at`: the `Block` check subtracts `getUpdatedAtColumn()` unconditionally, so a bare `touch()` passes whatever the model declares and would prove nothing. The pair of tests above — same attribute, declared and not declared — is what pins the behaviour.
 
 - [ ] **Step 2: Run to verify they fail.** Expected: FAIL (`PendingDeletionLock` not found).
 
@@ -1076,13 +1278,22 @@ and in `bootHasApprovals()`:
 ```php
         static::addGlobalScope('hide_pending_deletion', static function (Builder $query): void {
             $model = $query->getModel();
-            $user = Auth::user();
 
             if ($model->pendingDeletionStrategy() !== PendingDeletionStrategy::Hide) {
                 return;
             }
 
-            if ($user instanceof User && ($user->isSuperAdmin() || $user->can(PermissionName::forModel($model, 'approve')) || $user->can(PermissionName::forModel($model, 'disapprove')))) {
+            $user = Auth::user();
+
+            // Nobody authenticated: console, queues, jobs, search indexing, exports. They see
+            // everything, exactly as capture is skipped in console. Hide answers "who may not
+            // see a record they cannot decide on", which is a question about a person; a
+            // pending deletion must not quietly change what background work reads.
+            if (! $user instanceof User) {
+                return;
+            }
+
+            if ($user->isSuperAdmin() || $user->can(PermissionName::forModel($model, 'approve')) || $user->can(PermissionName::forModel($model, 'disapprove'))) {
                 return;
             }
 
@@ -1103,12 +1314,12 @@ The global scope keys on the table's `approve`/`disapprove` permission, as the s
 ### Task 8: Withdrawal, `ModificationApproved`/`ModificationRejected`/`ModificationWithdrawn` fired by the service
 
 **Files:**
-- Create: `Modules/Core/app/Approvals/Events/ModificationRejected.php`, `Modules/Core/app/Approvals/Events/ModificationWithdrawn.php`
+- Create: `Modules/Core/app/Events/ModificationRejected.php`, `Modules/Core/app/Events/ModificationWithdrawn.php` (next to the existing `Modules/Core/app/Events/ModificationApproved.php`: one lifecycle, one namespace)
 - Modify: `Modules/Core/app/Services/ModificationVoteService.php`, `Modules/CMS/app/Models/Comment.php:196` (stop firing `ModificationApproved` itself)
 - Test: `Modules/Core/tests/Integration/Approvals/WithdrawalTest.php`, `Modules/Core/tests/Integration/Approvals/DecisionEventsTest.php`
 
 **Interfaces:**
-- Produces: `ModificationVoteService::withdraw(User $user, Modification $modification): void` throwing `AuthorizationException` (not the author) or `LogicException` (not active); `final readonly class ModificationRejected { public function __construct(public Modification $modification, public Model $modifiable) {} }`, same shape for `ModificationWithdrawn` (modifiable may be `null` for a create) — `ModificationApproved` stays `Modules\Core\Events\ModificationApproved` and is now fired by the service for every model.
+- Produces: `ModificationVoteService::withdraw(User $user, Modification $modification): void` throwing `AuthorizationException` (not the author) or `LogicException` (not active); `final readonly class ModificationRejected { public function __construct(public Modification $modification, public ?Model $modifiable) {} }` in `Modules\Core\Events`, same shape for `ModificationWithdrawn` (`modifiable` is null for a create) — `ModificationApproved` stays `Modules\Core\Events\ModificationApproved` and is now fired by the service for every model, from `cast()` and from `applyAuthorCredit()`.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1211,7 +1422,9 @@ In `cast()`, after applying: `event($approval ? new ModificationApproved($modifi
 - Create: `Modules/Core/app/Filament/Concerns/ReportsApprovalOutcome.php`
 - Modify: `Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php` (use the concern, drop its own notification code), the edit pages of `ContentResource`, `CommentResource`, `PresetResource`, `FieldResource`, `SettingResource`
 - Modify: `Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php` (withdraw action)
-- Test: `Modules/Core/tests/Feature/Filament/ApprovalOutcomeTest.php`
+- Test: `Modules/Core/tests/Feature/Filament/ApprovalOutcomeTest.php` (save path, `Block`, withdraw action), `Modules/CMS/tests/Feature/Filament/ContentApprovalOutcomeTest.php` (delete, force delete and restore actions)
+
+`EditSetting` gets the trait and the save notification only: it has no delete action to make approval-aware, because `SettingResource` denies delete and force delete outright. The action builders go on the edit pages of `ContentResource`, `CommentResource`, `PresetResource` and `FieldResource`.
 
 **Interfaces:**
 - Consumes: `pendingModification()`, `wouldRequireApproval()`, `PendingDeletionLock`, `ModificationVoteService::withdraw()`.
@@ -1245,18 +1458,26 @@ it('hides the withdraw action from anybody but the author', function (): void {
 });
 ```
 
+The delete, force delete and restore actions cannot be tested on `Setting`: `SettingResource`
+answers `Response::deny(…)` to `getDeleteAuthorizationResponse()`, `getDeleteAnyAuthorizationResponse()`,
+`getForceDeleteAuthorizationResponse()` and `getForceDeleteAnyAuthorizationResponse()` (settings
+belong to seeders), and `getPages()` exposes only index and edit. Use `Content`, which has approvals,
+soft deletes and a per-state rule, and keep `Setting` for the save path and the `Block` case above.
+Put this one in `Modules/CMS/tests/Feature/Filament/ContentApprovalOutcomeTest.php`, with a live
+content (a draft is written through and would not be captured):
+
 ```php
 it('labels and reports a deletion that needs approval', function (): void {
-    editSettingActorWithoutApproval();
-    $setting = Setting::factory()->persistedWithoutApprovalCapture()->create(['type' => 'string', 'value' => 'x', 'choices' => null]);
+    $actor = contentActorWithoutApproval();
+    $content = Content::factory()->published()->create();
 
-    Livewire::test(EditSetting::class, ['record' => $setting->getKey()])
+    Livewire::test(EditContent::class, ['record' => $content->getKey()])
         ->assertActionHasLabel(DeleteAction::class, 'Request deletion')
         ->callAction(DeleteAction::class)
         ->assertNotified('Deletion sent for approval');
 
-    expect($setting->fresh())->not->toBeNull()
-        ->and($setting->modifications()->activeOnly()->sole()->operation)->toBe(Operation::Delete);
+    expect($content->fresh()->trashed())->toBeFalse()
+        ->and($content->modifications()->activeOnly()->sole()->operation)->toBe(Operation::Delete);
 });
 
 it('offers the author a withdraw action in Modifications', function (): void {
@@ -1489,7 +1710,7 @@ and update the tool descriptions for `create`/`update`/`delete` (`CrudToolProvid
 **Files:**
 - Delete: `Modules/Core/config/approval.php`
 - Modify: any file still importing `Approval\` (`command grep -rn "Approval\\\\" Modules app config --include=*.php | command grep -v "Modules\\\\Core\\\\Approvals"` must print nothing)
-- Test: `Modules/Core/tests/Unit/Architecture/NoApprovalPackageTest.php`
+- Test: `Modules/Core/tests/Unit/Architecture/NoApprovalPackageTest.php`. Resolve the path with `dirname(__DIR__, 5)`, as `ModelFinalClassTest` and `LongLivedWorkerSafetyTest` do: `Modules/Core/tests/Pest.php` binds `tests/Unit` to `Modules\Core\Tests\TestCase`, a plain PHPUnit case with a minimal environment, so `base_path()` is not available there.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1502,8 +1723,9 @@ use Symfony\Component\Finder\Finder;
 
 it('references nothing from the laravel-approval package', function (): void {
     $offenders = [];
+    $project_root = dirname(__DIR__, 5);
 
-    foreach ((new Finder)->files()->in(base_path('Modules'))->name('*.php')->exclude(['vendor', 'node_modules']) as $file) {
+    foreach ((new Finder)->files()->in($project_root . '/Modules')->name('*.php')->exclude(['vendor', 'node_modules']) as $file) {
         if (preg_match('/\\bApproval\\\\(Models|Traits)\\\\/', $file->getContents()) === 1) {
             $offenders[] = $file->getRelativePathname();
         }
@@ -1519,10 +1741,12 @@ it('references nothing from the laravel-approval package', function (): void {
 
 ### Task 13: Remove the Composer dependency — ask first
 
-- [ ] **Step 1: Ask the user** for explicit approval to run `composer remove stephenlake/laravel-approval`. Stop here until they say yes.
-- [ ] **Step 2:** `composer remove stephenlake/laravel-approval --no-interaction`
+The requirement lives in **`Modules/Core/composer.json:45`**, not in the root `composer.json`, which never mentions it: the root merges `Modules/*/composer.json` through `wikimedia/composer-merge-plugin` (`extra.merge-plugin.include`). So `composer remove` at the root does nothing, and the edit belongs to the Core submodule.
+
+- [ ] **Step 1: Ask the user** for explicit approval to drop the requirement. Stop here until they say yes.
+- [ ] **Step 2:** remove the `"stephenlake/laravel-approval": "^1.1.4"` line from `Modules/Core/composer.json`, then refresh the root lock: `composer update --lock --no-interaction` (a plain `composer remove` cannot target a merged requirement). Check that `vendor/stephenlake` is gone.
 - [ ] **Step 3: Run the full suites** of Core, CMS, AI and the root `tests` (`php artisan test --compact Modules/Core/tests` etc.). Expected: only the failures already known before this plan (`RouteServiceProviderTest`, `ElasticsearchServiceTest`, `DatabaseConnectionAffinityTest`).
-- [ ] **Step 4: Commit** `composer.json`, `composer.lock` in the root repository (`chore: drop stephenlake/laravel-approval, now part of Core`).
+- [ ] **Step 4: Commit** `composer.json` in the Core submodule (`chore(core): drop the laravel-approval requirement, the code is ours`), then `composer.lock` in the root repository (`chore: drop stephenlake/laravel-approval, now part of Core`), then bump the submodule pointer. Remove the "still required" note from the README's third-party entry in the Core commit.
 
 ---
 
