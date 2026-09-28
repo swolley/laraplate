@@ -1286,7 +1286,7 @@ with
 **Interfaces:**
 - Produces: `enum PendingDeletionStrategy { case Block; case Hide; }`, `final class PendingDeletionLock extends RuntimeException`, on models `pendingDeletionStrategy(): PendingDeletionStrategy` (default `Block`), `attributesWritableWhilePendingDeletion(): list<string>` (default `[]`), local scope `withoutPendingDeletion()`, global scope applied to `Hide` models for users without the table's `approve` or `disapprove` permission.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 it('refuses to save a record whose deletion is pending', function (): void {
@@ -1356,9 +1356,9 @@ it('does not hide a pending deletion when nobody is authenticated', function ():
 
 Test the writable list on a real attribute, not on `updated_at`: the `Block` check subtracts `getUpdatedAtColumn()` unconditionally, so a bare `touch()` passes whatever the model declares and would prove nothing. The pair of tests above — same attribute, declared and not declared — is what pins the behaviour.
 
-- [ ] **Step 2: Run to verify they fail.** Expected: FAIL (`PendingDeletionLock` not found).
+- [x] **Step 2: Run to verify they fail.** Expected: FAIL (`PendingDeletionLock` not found).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```php
 <?php
@@ -1460,11 +1460,19 @@ and in `bootHasApprovals()`:
         });
 ```
 
-- [ ] **Step 4: Run** the strategy tests and the approvals suites. Expected: PASS.
+- [x] **Step 4: Run** the strategy tests and the approvals suites. Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** (`feat(core): a pending deletion blocks the record, or hides it per model`).
+- [x] **Step 5: Pint and commit** (`feat(core): a pending deletion blocks the record, or hides it per model`).
 
 The global scope keys on the table's `approve`/`disapprove` permission, as the spec requires: whoever has to decide always sees the record.
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- The two writable-list tests make the "system write" as the superadmin approver, after the author's delete. As the author, the save passes the `Block` check and is then captured as an update, so the attribute never reaches the row and the declared case failed for the wrong reason. The superadmin is still blocked on an undeclared attribute: `Block` exempts nobody.
+- The scope name is `PendingDeletionStrategy::HIDE_SCOPE`, since two places need it.
+- `ModificationVoteService::cast()` resolves its target with `withoutGlobalScope(PendingDeletionStrategy::HIDE_SCOPE)`, plus `withTrashed()` for a restore. The scope reads the authenticated user, who is not always the voter (a job, or a test casting for another user), and the voter must always reach the record they decide on. "shows the record again once the deletion is rejected" failed without it.
+- Test setup follows the Task 5 deviations; `beforeEach` also resets `SoftDeletableApprovalModel::$writable`.
+
 
 ---
 
