@@ -77,12 +77,12 @@ Paths relative to their module.
 - [x] Wired generically into the `Searchable` trait: `toSearchableArray()` merges `fieldsFor($this)` (base keys win via `+`), and `getSchemaDefinition()` adds `mappingFor(static::class)` field definitions. No-op until a contributor registers, so every searchable model gains the seam without opting in and nothing changes today.
 - [x] Unit tests (registry + stub model/contributor in `tests/Stubs/Search/`): empty registry yields nothing; a registered contributor's fields/mapping merge; no leak to unrelated classes; subclass targets match — 5 passed. Regression: `SearchableEmbeddingsArrayTest` (Core `toSearchableArray`) still green. Pint clean; PHPStan clean on the introduced code (a pre-existing `larastan.octaneCompatibility` note on the unrelated `registerCacheManager` `'cache'` singleton is not from this change).
 
-## Task 5: `Media` becomes Searchable + IEmbeddableModel (M5, M6, M9, M14)
+## Task 5: `Media` becomes Searchable + IEmbeddableModel (M5, M6, M9, M14) — DONE
 
-- [ ] Add `Searchable` + implement `IEmbeddableModel` on `Media` (`prepareDataToEmbed`/`prepareDataToEmbedByLocale`, `embeddings()`), reusing the `ModelEmbedding` morph.
-- [ ] `prepareDataToEmbed*` composes the Core surrogate text (description/keywords) + AI-contributed text via the Task 4 seam; `toSearchableArray()` emits facets from day one (M9): media id/type, `mime`, `track='media'`, `locale`, `keywords`.
-- [ ] Gate indexing on **claim** (M14): a draft-owned media (owner is a `MediaDraft`) is not indexed/embedded; `isEmbeddable()` also honors the master switch/feature.
-- [ ] Feature tests: a claimed media indexes with facets and the deterministic surrogate; a draft-owned media does not index; with AI off it still indexes on the deterministic layer (fallback). Pint + PHPStan.
+- [x] `Media` now `use Searchable` (aliasing `toSearchableArray`) and implements `IEmbeddableModel` + `ISearchableModel`; `embeddings()`/`isEmbeddable()`/`prepareDataToEmbed*` come from the trait via a `$embed = ['searchable_embed_text']` computed accessor over the `ModelEmbedding` morph.
+- [x] `searchable_embed_text` composes the Core surrogate (description + keywords from `custom_properties`) + AI-contributed text through the contributor seam (extended in Task 4's `ISearchableContributor` with `embeddableText()` + registry `embeddableTextFor()`); `toSearchableArray()` adds facets from day one (M9): `mime`, `track='media'`, `collection`, `keywords`, `description` (id/entity from the base).
+- [x] Indexing gated on **claim** (M14): `shouldBeSearchable()` returns false while the owner morph is a `MediaDraft`. (Deterministic-layer indexing stays independent of the AI master switch — M12; the AI gate lives on the analysis path, Task 6.)
+- [x] Feature tests: draft-owned media not searchable, claimed media searchable; embed text composes surrogate and picks up a registered AI contributor; facets present; embed-field list exposed — 6 passed. Task 4 registry tests + `SearchableEmbeddingsArrayTest` regression still green (14 total). Pint + PHPStan clean.
 
 ## Task 6: Event + AI listener + Core fallback (M11, M12, M14, M18)
 
