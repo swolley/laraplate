@@ -756,7 +756,7 @@ If a pending modification in the developer database genuinely has to survive, co
 - Consumes: `Operation` (Task 4).
 - Produces: `approvalOperations(): list<Operation>` (overridable, default `Operation::cases()`), `pendingModification(): ?Modification`, `wouldRequireApproval(Operation $operation): bool`, `static captureOperation(Model $item, Operation $operation): bool`, `pendingOperationRequest(Operation $operation): ?Modification`, `protected requiresApprovalForOperation(Operation $operation): bool` (overridable per model), `protected approvalGate(): bool` (the shared console/superadmin/approve-credit rule, extracted so both entry points share it without either faking the other's argument).
 
-- [ ] **Step 1: Write the stub**
+- [x] **Step 1: Write the stub**
 
 ```php
 <?php
@@ -791,7 +791,7 @@ final class SoftDeletableApprovalModel extends Model
 }
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 ```php
 <?php
@@ -869,12 +869,12 @@ it('answers in advance whether an operation needs approval', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run to verify they fail**
+- [x] **Step 3: Run to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Approvals/OperationCaptureTest.php`
 Expected: FAIL (`pendingModification` undefined, deletes run).
 
-- [ ] **Step 4: Implement in `HasApprovals`**
+- [x] **Step 4: Implement in `HasApprovals`**
 
 Add the outcome property and extend the boot method:
 
@@ -1065,12 +1065,22 @@ through `ModificationVoteService::applyAuthorCredit()` and adds the call here, o
 
 Laravel's `forceDelete()` fires `forceDeleting` and then `delete()`, which fires `deleting` with `isForceDeleting()` true: listening to `deleting` alone covers both. A restore rejected by `restoring` never reaches `save()`. A restore on a record that is not trashed is left to Laravel (the `restoring` listener returns `null` first thing).
 
-- [ ] **Step 5: Run the capture tests and the approvals suites**
+- [x] **Step 5: Run the capture tests and the approvals suites**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Approvals Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php Modules/Core/tests/Integration/Models Modules/Core/tests/Feature/Controllers Modules/CMS/tests/Feature Modules/Core/tests/Feature/Console/ModelSoftDeletesCommandsTest.php`
 Expected: PASS.
 
-- [ ] **Step 6: Pint and commit** (`feat(core): deletes, force deletes and restores go through approval`). Two commits: Core for the trait, CMS for `Content::requiresApprovalForOperation()` and `Comment::approvalOperations()`. Neither `Setting` nor `Taxonomy` is touched. Add one test per CMS model before committing: a draft `Content` is deleted directly while a live one is captured, and a comment delete runs without a modification.
+- [x] **Step 6: Pint and commit** (`feat(core): deletes, force deletes and restores go through approval`). Two commits: Core for the trait, CMS for `Content::requiresApprovalForOperation()` and `Comment::approvalOperations()`. Neither `Setting` nor `Taxonomy` is touched. Add one test per CMS model before committing: a draft `Content` is deleted directly while a live one is captured, and a comment delete runs without a modification.
+
+**Executed 2026-09-28. Differences from the steps above, all in the tests or in details the steps did not pin:**
+
+- The helper is `Modules\Core\Tests\Support\HttpContext::pretendHttpRequest()` (a static method, since Task 3), not a global `pretendHttpRequest()`. The same holds for every later task that calls it.
+- The stub table declares `is_deleted` as `storedAs('deleted_at IS NOT NULL')`, as `MigrateUtils` does: a plain `default(false)` column makes Core `SoftDeletes::trashed()` read `false` after a soft delete. Every later task creating `approvals_soft_stub` needs the same line.
+- "captures a restore of a trashed record" trashes the record as a superadmin, not after `Auth::logout()`: outside the console an anonymous writer cannot approve, so the setup delete was itself captured and the record never trashed.
+- The `saving` listener checks `shouldCapture()` against `Create` for a new model and `Update` for an existing one, so a model can exclude creations too; the step's code checked `Update` only.
+- `Content::requiresApprovalForOperation()` and `Comment::approvalOperations()` carry no `#[Override]`: PHP rejects the attribute on a method that replaces a trait method, since there is no parent method.
+- The credit line is not in `captureOperation()`, as the step requires; the CMS tests the step asked for are in `CommentModerationTest` and `ContentModificationSoftKeepTest`.
+- The `restoring` listener is registered only when the model has a `restoring()` method: a model with `HasApprovals` and no soft deletes (the Core stubs, for one) has no restore, and calling `static::restoring()` on it throws `BadMethodCallException`.
 
 ### Task 6: Applying approved deletes and restores, rejecting pending updates
 
