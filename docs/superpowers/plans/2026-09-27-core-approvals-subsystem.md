@@ -1933,10 +1933,12 @@ it('references nothing from the laravel-approval package', function (): void {
 
 The requirement lives in **`Modules/Core/composer.json:45`**, not in the root `composer.json`, which never mentions it: the root merges `Modules/*/composer.json` through `wikimedia/composer-merge-plugin` (`extra.merge-plugin.include`). So `composer remove` at the root does nothing, and the edit belongs to the Core submodule.
 
-- [ ] **Step 1: Ask the user** for explicit approval to drop the requirement. Stop here until they say yes.
-- [ ] **Step 2:** remove the `"stephenlake/laravel-approval": "^1.1.4"` line from `Modules/Core/composer.json`, then refresh the root lock: `composer update --lock --no-interaction` (a plain `composer remove` cannot target a merged requirement). Check that `vendor/stephenlake` is gone.
-- [ ] **Step 3: Run the full suites** of Core, CMS, AI and the root `tests` (`php artisan test --compact Modules/Core/tests` etc.). Expected: only the failures already known before this plan (`RouteServiceProviderTest`, `ElasticsearchServiceTest`, `DatabaseConnectionAffinityTest`).
-- [ ] **Step 4: Commit** `composer.json` in the Core submodule (`chore(core): drop the laravel-approval requirement, the code is ours`), then `composer.lock` in the root repository (`chore: drop stephenlake/laravel-approval, now part of Core`), then bump the submodule pointer. Remove the "still required" note from the README's third-party entry in the Core commit.
+- [x] **Step 1: Ask the user** for explicit approval to drop the requirement. Stop here until they say yes.
+- [x] **Step 2:** remove the `"stephenlake/laravel-approval": "^1.1.4"` line from `Modules/Core/composer.json`, then refresh the root lock: `composer update --lock --no-interaction` (a plain `composer remove` cannot target a merged requirement). Check that `vendor/stephenlake` is gone.
+- [x] **Step 3: Run the full suites** of Core, CMS, AI and the root `tests` (`php artisan test --compact Modules/Core/tests` etc.). Expected: only the failures already known before this plan (`RouteServiceProviderTest`, `ElasticsearchServiceTest`, `DatabaseConnectionAffinityTest`).
+- [x] **Step 4: Commit** `composer.json` in the Core submodule (`chore(core): drop the laravel-approval requirement, the code is ours`), then `composer.lock` in the root repository (`chore: drop stephenlake/laravel-approval, now part of Core`), then bump the submodule pointer. Remove the "still required" note from the README's third-party entry in the Core commit.
+
+**Executed 2026-09-28.** The user approved the removal on 2026-09-28. The lock was refreshed with `composer update stephenlake/laravel-approval --no-interaction`, not `--lock`: naming the package lets the solver drop it once nothing requires it, and the lock diff is that package's entry alone. `vendor/stephenlake` is gone. The README also loses the package from its "User Management" dependency list, besides the "still required" note. Full suites after the removal: Core 2982 passed (20 skipped), CMS 648 passed (1 skipped), AI 768 passed (8 skipped), root `tests` 24 passed; none of the known failures showed up.
 
 ---
 
