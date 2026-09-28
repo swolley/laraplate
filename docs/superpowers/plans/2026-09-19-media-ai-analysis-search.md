@@ -84,11 +84,12 @@ Paths relative to their module.
 - [x] Indexing gated on **claim** (M14): `shouldBeSearchable()` returns false while the owner morph is a `MediaDraft`. (Deterministic-layer indexing stays independent of the AI master switch — M12; the AI gate lives on the analysis path, Task 6.)
 - [x] Feature tests: draft-owned media not searchable, claimed media searchable; embed text composes surrogate and picks up a registered AI contributor; facets present; embed-field list exposed — 6 passed. Task 4 registry tests + `SearchableEmbeddingsArrayTest` regression still green (14 total). Pint + PHPStan clean.
 
-## Task 6: Event + AI listener + Core fallback (M11, M12, M14, M18)
+## Task 6: Event + AI listener + Core fallback (M11, M12, M14, M18) — DONE
 
-- [ ] Add `MediaAnalysisRequested` (Core), fired on claim. Media save already emits `ModelRequiresIndexing` via `Searchable`; the AI listener attaches to that (as `HandleModelIndexingListener` does) for `Media`.
-- [ ] `HandleMediaAnalysisListener` (AI, registered first): if the master switch + feature/module gate allow and the model is a claimed `Media`, `addRequiredPreProcessing('media_analysis')` and dispatch `AnalyzeMediaJob`; else no-op so Core's `IndexModelFallbackListener` indexes the deterministic layer (M12).
-- [ ] Feature tests: AI on → `media_analysis` is registered and the job dispatched; AI off / master switch off → not registered, media still finalizes via fallback. Pint + PHPStan.
+- [x] Reused the existing `ModelRequiresIndexing` event (Media emits it as a `Searchable` model on save/claim) instead of adding a redundant `MediaAnalysisRequested` — the AI listener attaches to it exactly as `HandleModelIndexingListener` does.
+- [x] `HandleMediaAnalysisListener` (AI, registered **before** `HandleModelIndexingListener`): for a claimed `Media` (`shouldBeSearchable()`) with `MediaAnalysisGate::allows()` on, it `addRequiredPreProcessing('media_analysis')`, caches the event (finalize coordination), dispatches `AnalyzeMediaJob`, and `markAsHandled()` so Core's `IndexModelFallbackListener` stands down; otherwise no-op → fallback indexes the deterministic layer (M12). `HandleModelIndexingListener` now **skips `Media`** so the generic embeddings path does not race the media pipeline (embeddings chained after analysis in Task 7).
+- [x] `AnalyzeMediaJob` skeleton: emits `ModelPreProcessingCompleted('media_analysis')` on `handle()` and degrades the same way on `failed()` so the finalize path works end-to-end now; Task 7 fills the per-mime analysis, the `MediaAnalysis` row, and embeddings chaining.
+- [x] Feature tests: claimed media → `media_analysis` registered, job dispatched, event handled; draft-owned, master-switch-off, and non-media → no-op. 4 passed. Regression: 24 existing embeddings-listener tests still green (Media skip is safe). Pint + PHPStan clean. _Bulk `ModelsRequireIndexing` media path not wired yet — noted for later._
 
 ## Task 7: `AnalyzeMediaJob` (M6, M11, M15, M17, M20, M21)
 
