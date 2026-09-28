@@ -84,6 +84,26 @@ paths with `dirname(__DIR__, 5)` like its siblings.
 
 ### Task 1: Attribution and stand-alone approval models
 
+**Delivered 2026-09-28.** Three things had to come up from Task 2, because the moment the Core models
+stop extending the package's the suite cannot be green without them:
+
+- `HasApprovals::applyModificationChanges()`. The package's version type-hints
+  `\Approval\Models\Modification`, and `ModificationVoteService` passes a Core one. Brought over
+  faithfully (with `settleModification()` extracted for the delete-or-deactivate branch); the
+  `deleteWhen*` behaviour is unchanged here and goes in Task 6.
+- `User::approve()` and `User::disapprove()`, delegating to `ModificationVoteService`. Same type-hint
+  problem in `ApprovesChanges`, reached from `ApproveModificationJob::castApproval()` and
+  `castDisapproval()`. `use ApprovesChanges;` itself stays until Task 2, now shadowed.
+- `HasApprovals::modifications()` drops the `config('approval.models.modification')` lookup. It
+  guarded the configured class with `is_a(…, ApprovalModification::class)`, which is now false, so it
+  would have silently fallen back to the package model and its non-existent `modifications` table.
+
+Two test updates the plan did not foresee: the stub in `CrudServiceRequestScenariosTest` type-hinted
+the package model in its own `applyModificationChanges()`, and two assertions there read
+`Modification::query()->…->value('active')` expecting `1`. Eloquent's `value()` hydrates the model, so
+the new `active` boolean cast makes that `true`; the raw query-builder assertions next to them
+correctly still expect `1`.
+
 **Files:**
 - Create: `Modules/Core/LICENSES/laravel-approval.md`
 - Modify: `Modules/Core/app/Models/Modification.php`, `Modules/Core/app/Models/Approval.php`, `Modules/Core/app/Models/Disapproval.php`
@@ -93,7 +113,7 @@ paths with `dirname(__DIR__, 5)` like its siblings.
 **Interfaces:**
 - Produces: `Modification::approvals(): HasMany`, `Modification::disapprovals(): HasMany`, `Modification::modifiable(): MorphTo`, `Modification::modifier(): MorphTo`, accessors `approversRemaining`, `disapproversRemaining`, scopes `activeOnly()`, `inactiveOnly()`; `Approval::modification()`, `Approval::approver()`; `Disapproval::modification()`, `Disapproval::disapprover()`. None of them extends an `Approval\Models\*` class any more.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -133,12 +153,12 @@ it('counts the approvals and disapprovals still needed', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Models/ModificationModelTest.php`
 Expected: FAIL on the first test (`get_parent_class` is `Approval\Models\Modification`).
 
-- [ ] **Step 3: Make the three models stand alone**
+- [x] **Step 3: Make the three models stand alone**
 
 In `Modification.php` replace `use Approval\Models\Modification as ApprovalModification;` and `extends ApprovalModification` with `use Illuminate\Database\Eloquent\Model;` / `extends Model`, keep everything already there, and add (class PHPDoc gains the derived-from line):
 
@@ -251,7 +271,7 @@ In `Approval.php` and `Disapproval.php` extend `Illuminate\Database\Eloquent\Mod
 
 Search the code for `Approval\Models\` (`command grep -rn 'Approval\\\\Models' Modules --include=*.php`) and replace every remaining type hint or `instanceof` with the Core class.
 
-- [ ] **Step 4: Write the attribution**
+- [x] **Step 4: Write the attribution**
 
 Partly delivered ahead of this task by Core commit `d6874436`: `LICENSES/laravel-approval.md` and the
 README entry exist. What remains here is the per-file header line, which only makes sense once Step 3
@@ -264,12 +284,12 @@ required; remove that note in Task 13, not before.
 -   [cloudcake/laravel-approval](https://github.com/cloudcake/laravel-approval): approvals (`HasApprovals`, `Modification`, `ModificationVoteService`), see [`LICENSES/laravel-approval.md`](LICENSES/laravel-approval.md)
 ```
 
-- [ ] **Step 5: Run the new test and the approvals suite**
+- [x] **Step 5: Run the new test and the approvals suite**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Models/ModificationModelTest.php Modules/Core/tests/Integration/Models Modules/Core/tests/Feature/Filament/ModificationResourceTest.php Modules/Core/tests/Feature/Controllers/CrudPendingApprovalsTest.php Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ApproveModificationJobTest.php`
 Expected: PASS.
 
-- [ ] **Step 6: Pint and commit**
+- [x] **Step 6: Pint and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Models/Modification.php Modules/Core/app/Models/Approval.php Modules/Core/app/Models/Disapproval.php Modules/Core/tests/Integration/Models/ModificationModelTest.php
@@ -468,12 +488,14 @@ Replace the local helpers `settingWrittenOverHttp()` (SettingTest) and `settingF
 - [ ] **Step 2: Diagnose the red tests the wip left behind**
 
 The commit message names one: `EditSettingFormTest` "offers no create or delete actions on settings".
-There are three more, and they come from the same change. `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
-fails three times with `RelationNotFoundException: Call to undefined relationship [roles] on model
+There are four more, and they come from the same change. `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
+fails three times, and `Modules/Core/tests/Integration/Models/ApproveQuorumOnWriteTest.php` once ("it
+still requires approval when writer lacks approve credit even if…"), all with
+`RelationNotFoundException: Call to undefined relationship [roles] on model
 [Mockery_N_Modules_Core_Models_User]`, through `Modules/Core/app/Models/User.php:233` and
 `Modules/Core/app/Authorization/ResolvingAuthorization.php:38`. The superadmin rule the wip added to
 `requiresApprovalWhen()` calls `isSuperAdmin()`, which reads the `roles` relation, on partial mocks
-that never stubbed it. Verified as pre-existing on 2026-09-28: the same three fail with the code at
+that never stubbed it. Verified as pre-existing on 2026-09-28: the same four fail with the code at
 `83e0795b`. Fix the mocks (or give them a real role) as part of closing this task; the superadmin rule
 itself is correct and is covered by its own test in Task 2.
 
