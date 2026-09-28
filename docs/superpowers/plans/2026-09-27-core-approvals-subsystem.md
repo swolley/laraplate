@@ -1488,7 +1488,7 @@ The global scope keys on the table's `approve`/`disapprove` permission, as the s
 **Interfaces:**
 - Produces: `ModificationVoteService::withdraw(User $user, Modification $modification): void` throwing `AuthorizationException` (not the author) or `LogicException` (not active); `final readonly class ModificationRejected { public function __construct(public Modification $modification, public ?Model $modifiable) {} }` in `Modules\Core\Events`, same shape for `ModificationWithdrawn` (`modifiable` is null for a create) — `ModificationApproved` stays `Modules\Core\Events\ModificationApproved` and is now fired by the service for every model, from `cast()` and from `applyAuthorCredit()`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```php
 it('lets the author withdraw a request with votes already cast', function (): void {
@@ -1547,9 +1547,9 @@ it('fires one event per decision', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run to verify they fail.** Expected: FAIL (`withdraw` undefined).
+- [x] **Step 2: Run to verify they fail.** Expected: FAIL (`withdraw` undefined).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```php
     public function withdraw(User $user, Modification $modification): void
@@ -1575,9 +1575,16 @@ it('fires one event per decision', function (): void {
 
 In `cast()`, after applying: `event($approval ? new ModificationApproved($modification, $target) : new ModificationRejected($modification, $target));`. Remove `event(new ModificationApproved($modification, $this));` from `Comment::applyModificationChanges()`.
 
-- [ ] **Step 4: Run** the new tests, `Modules/CMS/tests/Feature/CommentModerationTest.php`, `Modules/AI/tests/Feature` and the approvals suites. Expected: PASS.
+- [x] **Step 4: Run** the new tests, `Modules/CMS/tests/Feature/CommentModerationTest.php`, `Modules/AI/tests/Feature` and the approvals suites. Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** in Core and CMS (`feat(core): authors withdraw their requests; decisions fire approved, rejected and withdrawn events`).
+- [x] **Step 5: Pint and commit** in Core and CMS (`feat(core): authors withdraw their requests; decisions fire approved, rejected and withdrawn events`).
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- Every decision event fires through `afterCommit()` on the modification's connection, not inline: `cast()` now runs inside a transaction, and a listener such as AI's translation one dispatches a job that must not see the record before the commit. Outside a transaction `afterCommit()` runs the callback at once.
+- `ModificationRejected` carries the record, or `null` for a rejected create, whose target is only a blank instance; `ModificationApproved` keeps its non-null `Model`.
+- `withdraw()` and `cast()` find the record through one private `recordOf()`, past the soft-delete scope for a restore and past `PendingDeletionStrategy::HIDE_SCOPE` always.
+- `Comment.php` also loses its `ModificationApproved` import.
 
 ---
 
