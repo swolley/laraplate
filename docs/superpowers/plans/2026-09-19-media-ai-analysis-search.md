@@ -101,11 +101,12 @@ Paths relative to their module.
 - [x] Feature tests (fakes): image analysis writes the row, fills Core fields, chains embeddings, emits completion; same-hash reuse skips the analyzer; audio transcribes via the contract; contributor surfaces fields + embed text (and no-ops without a row). 8 media-analysis feature tests here (16 in the group). Pint + PHPStan clean.
 - Locale/multilingual surrogate translation (M17) is deferred: transcript/OCR already stay source-language; per-locale surrogate translation rides a later pass. _Noted._
 
-## Task 8: Transcription backend (M21)
+## Task 8: Transcription backend (M21) — DONE
 
-- [ ] A `Transcription` contract with a **self-hosted Whisper** implementation (default) and an external-API entry, selected by the M21 registry. Follow the self-hosted `sentence_transformers` embedding-service pattern for service config/HTTP.
-- [ ] Deployment note in module docs for the self-hosted service (out-of-band infra); tests use a fake transcriber.
-- [ ] Unit test: the registry returns the configured transcription backend; the fake returns text. Pint + PHPStan.
+- [x] `WhisperTranscriber` implements `MediaTranscriber` by POSTing the media file to the self-hosted Whisper service (`ai.providers.whisper.url`/`api_key`/`timeout`, mirroring the sentence-transformers service pattern), bound over the null default in `AIServiceProvider`. No-op when `WHISPER_URL` is unset and on any HTTP error (M12); returns the source-language transcript (M17).
+- [x] **Self-hosted service** created at `whisper-service/` (stack root, standalone infra — not the AGPL backend): faster-whisper + FastAPI (`app.py`), `Dockerfile`, `requirements.txt`, `README.md`. Runs locally on CPU (`docker run -p 9000:9000`), GPU optional; `/health` + `/transcribe` with optional Bearer auth; model cached on a volume.
+- [x] Feature tests with `Http::fake`: posts the file with the bearer token and returns the transcript; no-op without a configured URL; null on a non-2xx response. 3 passed. Pint + PHPStan clean.
+- Config env documented in the service README; the `ai.providers.whisper` block added to `Modules/AI/config/config.php`. _`NullMediaTranscriber` retained as an explicit "disabled" implementation._
 
 ## Task 9: Embedding dedup + per-media rows (M15)
 
