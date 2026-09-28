@@ -1900,7 +1900,7 @@ and update the tool descriptions for `create`/`update`/`delete` (`CrudToolProvid
 - Modify: any file still importing `Approval\` (`command grep -rn "Approval\\\\" Modules app config --include=*.php | command grep -v "Modules\\\\Core\\\\Approvals"` must print nothing)
 - Test: `Modules/Core/tests/Unit/Architecture/NoApprovalPackageTest.php`. Resolve the path with `dirname(__DIR__, 5)`, as `ModelFinalClassTest` and `LongLivedWorkerSafetyTest` do: `Modules/Core/tests/Pest.php` binds `tests/Unit` to `Modules\Core\Tests\TestCase`, a plain PHPUnit case with a minimal environment, so `base_path()` is not available there.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1923,9 +1923,11 @@ it('references nothing from the laravel-approval package', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run, fix what it lists, delete `config/approval.php`, rerun.** Expected: PASS.
+- [x] **Step 2: Run, fix what it lists, delete `config/approval.php`, rerun.** Expected: PASS.
 
-- [ ] **Step 3: Commit** (`chore(core): nothing references the laravel-approval package any more`).
+- [x] **Step 3: Commit** (`chore(core): nothing references the laravel-approval package any more`).
+
+**Executed 2026-09-28.** The test listed one file, `HasApprovalsTest.php`, whose check that no package trait is used named the traits by their namespace; it now filters the used traits for the `Approval\` prefix, which also covers any other trait of the package. `CommentApprovalCapture` read `config('approval.models.modification')` and now builds a `Modification` directly. `SettingFactory::persistedWithoutApprovalCapture()` described the interception as the package's. The `CoreTables` comment on the schema's origin and the `LICENSES/laravel-approval.md` attributions stay: they record where the code came from, not a dependency.
 
 ### Task 13: Remove the Composer dependency — ask first
 
