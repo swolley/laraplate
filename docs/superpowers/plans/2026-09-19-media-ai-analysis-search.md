@@ -104,7 +104,7 @@ Paths relative to their module.
 ## Task 8: Transcription backend (M21) — DONE
 
 - [x] `WhisperTranscriber` implements `MediaTranscriber` by POSTing the media file to the self-hosted Whisper service (`ai.providers.whisper.url`/`api_key`/`timeout`, mirroring the sentence-transformers service pattern), bound over the null default in `AIServiceProvider`. No-op when `WHISPER_URL` is unset and on any HTTP error (M12); returns the source-language transcript (M17).
-- [x] **Self-hosted service** created at `whisper-service/` (stack root, standalone infra — not the AGPL backend): faster-whisper + FastAPI (`app.py`), `Dockerfile`, `requirements.txt`, `README.md`. Runs locally on CPU (`docker run -p 9000:9000`), GPU optional; `/health` + `/transcribe` with optional Bearer auth; model cached on a volume.
+- [x] **Self-hosted service documented, not vendored** (like sentence-transformers): `Modules/AI/docs/WHISPER_INSTALLATION.md` gives the HTTP contract, a reference faster-whisper + FastAPI implementation, and Docker/systemd install steps for a Proxmox guest (CPU default, GPU optional). The operator stands the service up on their own host; no service code lives in the repo.
 - [x] Feature tests with `Http::fake`: posts the file with the bearer token and returns the transcript; no-op without a configured URL; null on a non-2xx response. 3 passed. Pint + PHPStan clean.
 - Config env documented in the service README; the `ai.providers.whisper` block added to `Modules/AI/config/config.php`. _`NullMediaTranscriber` retained as an explicit "disabled" implementation._
 
