@@ -30,4 +30,6 @@
 	branch = master
 [submodule "Modules/Shop"]
 	path = Modules/Shop
-	url = git@github.com:swolley/laraplate-shop.git
+	url = https://github.com/swolley/laraplate-shop.git
+	pushurl = git@github.com:swolley/laraplate-shop.git
+	branch = master
