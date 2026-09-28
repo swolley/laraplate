@@ -49,6 +49,22 @@ defaulted to false; the panel action tests use `Content`, because `SettingResour
 force delete; `composer remove` targets `Modules/Core/composer.json`; the architecture test resolves
 paths with `dirname(__DIR__, 5)` like its siblings.
 
+## Known pre-existing failures
+
+Verified on 2026-09-28 by running each one with the code at `83e0795b` or at the commit before the
+change under test. None of them is caused by this plan's work, and none should be read as a
+regression while executing it. **Run a full suite before Task 4** to catalogue the rest: this list grew
+twice, both times because a narrower run had never covered the file.
+
+| Test | Failure | Owner |
+|---|---|---|
+| `Modules/Core/tests/Feature/Console/CheckPendingApprovalsCommandTest.php` | `NOT NULL constraint failed: core_settings.description` inserting `notifications.threshold.users` | the settings work, not this plan |
+| `Modules/AI/tests/Feature/ChatTest.php` (3 tests) | `404` instead of `201`/`422`/`200` — routing, not approvals | unrelated |
+| `tests/Feature/RouteServiceProviderTest.php`, `ElasticsearchServiceTest`, `Unit/Architecture/DatabaseConnectionAffinityTest` | named as already-failing when the plan was written | unrelated |
+
+Closed since: the five of commit `83e0795b` (four Mockery `User` partials without the `roles`
+relation, plus the `HasTable` argument type), fixed in Task 3 steps 2 and 3.
+
 ## Global Constraints
 
 - Every PHP file starts with `declare(strict_types=1);`; explicit parameter and return types; `#[Override]` on overrides; code, comments and PHPDoc in English.
@@ -311,7 +327,7 @@ git -C Modules/Core commit -m "refactor(core): approval models stand alone, attr
 - Consumes: Task 1 models.
 - Produces on every `HasApprovals` model: `protected int $approversRequired = 1`, `protected int $disapproversRequired = 1`, `protected bool $updateWhenApproved = true`, `isForcedApprovalUpdate(): bool`, `setForcedApprovalUpdate(bool $forced = true): void`, `modifications(): MorphMany<Modification, $this>`, `applyModificationChanges(Modification $modification, bool $approved): void`, `static captureSave(Model $item): bool`, `protected requiresApprovalWhen(array $modifications): bool` (superadmin rule included), `protected getDirtyForApproval(): array` (default `getDirty()`).
 
-- [ ] **Step 1: Write the failing test** (append to `HasApprovalsTest.php`)
+- [x] **Step 1: Write the failing test** (append to `HasApprovalsTest.php`)
 
 ```php
 it('no longer relies on the laravel-approval trait', function (): void {
@@ -334,7 +350,13 @@ it('never captures what a superadmin writes', function (): void {
 });
 ```
 
-and create the helper `Modules/Core/tests/Support/HttpContext.php`, autoloaded as a file from `Modules/Core/tests/Pest.php` (`require_once __DIR__ . '/Support/HttpContext.php';`):
+**Delivered 2026-09-28 as a PSR-4 class, not a global function.** `Modules/Core/tests/Support/` is
+already `Modules\Core\Tests\Support\` in Core's `autoload-dev`, which the merge plugin makes
+reachable from the CMS and AI suites too, so `HttpContext::pretendHttpRequest()` needs no `require` in
+any module's `Pest.php` and adds no global. Later tasks call it as
+`Modules\Core\Tests\Support\HttpContext::pretendHttpRequest()`, not `pretendHttpRequest()`.
+
+The body is the one the plan drafted:
 
 ```php
 <?php
@@ -354,12 +376,12 @@ function pretendHttpRequest(): void
 }
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
 Expected: FAIL on "no longer relies on the laravel-approval trait".
 
-- [ ] **Step 3: Bring the package behaviour into `HasApprovals`**
+- [x] **Step 3: Bring the package behaviour into `HasApprovals`**
 
 Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now declares what the package trait provided:
 
@@ -372,7 +394,7 @@ Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now dec
 
     protected bool $deleteWhenApproved = true;
 
-    protected bool $deleteWhenDisapproved = true;
+    protected bool $deleteWhenDisapproved = false;
 
     private bool $forcedApprovalUpdate = false;
 
@@ -463,6 +485,20 @@ tests exercise without failing them.
 
 **`Comment` must lose its own boot listener in this step, or it silently stops working.** The `saving` listener comes from the package's `bootRequiresApproval()`, and `Modules/CMS/app/Models/Comment.php:252-269` overrides that method to compute `getDirtyForApproval()` (pending translated `body`, pending `rating_score`) before capturing. Renaming the trait hook to `bootHasApprovals()` leaves `Comment::bootRequiresApproval()` with nothing calling it: Laravel boots `boot{TraitName}`, and `RequiresApproval` is gone. The comment would then be captured on the bare `getDirty()`, losing the pending body — a green suite would hide it, so do not rely on the rename alone. Delete `Comment::bootRequiresApproval()` and make `getDirtyForApproval()` `protected` so it overrides the trait's version; the trait's listener then does the same work for every model. `Comment::captureSave()` keeps delegating to `CommentApprovalCapture::capture()`.
 
+Two things found while doing it (2026-09-28):
+
+- `Comment::booted()` called `self::bootRequiresApproval()` **by hand**, on top of the automatic call
+  Laravel makes for every `boot{TraitName}`, so the capture listener was registered twice. Deleting the
+  override without deleting `booted()` is a fatal call to an undefined method; deleting both is also
+  the fix for the double registration. `Comment` now has no `booted()`.
+- `#[Override]` does not belong on `getDirtyForApproval()`. PHP validates that attribute against parent
+  classes and interfaces only, never against a trait the same class uses, so it is a compile-time
+  fatal there. The house style agrees: `Comment::requiresApprovalWhen()` and
+  `Content::requiresApprovalWhen()` override trait methods and carry no `#[Override]`.
+
+`Modules/Core/tests/Integration/Models/UserTest.php` asserted `ApprovesChanges` among the user's
+traits. It now asserts the two methods that replaced it, `approve()` and `disapprove()`.
+
 In `User.php` remove `use ApprovesChanges;` and add, below `isAuthorizedToCastApprovalVote()`:
 
 ```php
@@ -477,12 +513,12 @@ In `User.php` remove `use ApprovesChanges;` and add, below `isAuthorizedToCastAp
     }
 ```
 
-- [ ] **Step 4: Run the approvals suites**
+- [x] **Step 4: Run the approvals suites**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php Modules/Core/tests/Integration/Models Modules/Core/tests/Feature/Models Modules/Core/tests/Feature/Controllers Modules/Core/tests/Feature/Filament/ModificationResourceTest.php Modules/CMS/tests/Feature Modules/AI/tests/Feature/Jobs Modules/AI/tests/Feature/ApproveModificationJobTest.php Modules/AI/tests/Feature/ModificationModerationListenerTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** (Core, then CMS for `Comment`, then AI if the job changed)
+- [x] **Step 5: Pint and commit** (Core, then CMS for `Comment`, then AI if the job changed)
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Models/Concerns/HasApprovals.php Modules/Core/app/Models/User.php Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php Modules/Core/tests/Support/HttpContext.php Modules/CMS/app/Models/Comment.php
