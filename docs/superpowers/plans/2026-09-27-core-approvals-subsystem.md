@@ -1778,7 +1778,7 @@ In `ModificationsTable`, next to approve/disapprove:
 **Interfaces:**
 - Produces: a captured write answers `CrudResult(data: ['modification' => $modification->id, 'operation' => $operation->value], statusCode: Response::HTTP_ACCEPTED)`; `CrudService::withdraw(ModifyRequestData $requestData): CrudResult`.
 
-- [ ] **Step 1: Write the failing tests** (follow the setup of `Modules/Core/tests/Feature/Controllers/CrudPendingApprovalsTest.php` for routes, `CrudApiExposure::runEnabled()` and a non-approver with `update`/`delete` on the entity):
+- [x] **Step 1: Write the failing tests** (follow the setup of `Modules/Core/tests/Feature/Controllers/CrudPendingApprovalsTest.php` for routes, `CrudApiExposure::runEnabled()` and a non-approver with `update`/`delete` on the entity):
 
 ```php
 it('answers 202 with the modification when an update is captured', function (): void {
@@ -1813,9 +1813,9 @@ it('lets only the author withdraw through the API', function (): void {
 
 `beforeEach` creates `$this->author` and `$this->other_writer`, both with `select`, `update`, `delete` on taxonomies and without `approve`, acts as `$this->author`, and calls `pretendHttpRequest()`.
 
-- [ ] **Step 2: Run to verify they fail.**
+- [x] **Step 2: Run to verify they fail.**
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 A private helper in `CrudService`:
 
@@ -1833,9 +1833,18 @@ A private helper in `CrudService`:
 
 `insert()`: build with `$created = $model->newInstance($changes); $created->save();` then `if ($captured = $this->capturedResult($created)) { return $captured; }`. `update()`, `delete()`, `doActivateOperation()`: after each single-record write, when the write returned false, return the captured result for that record (for multi-record requests collect the captured modifications into `data['modifications']`, status 202 when at least one was captured). `withdraw()`: same lookup as `doApproveOperation()` for the modification, then `resolve(ModificationVoteService::class)->withdraw($user, $modification)`, returning `new CrudResult(data: ['withdrawn' => $modification->getKey()])`. In `CrudController::handleServiceCall()` add `catch (PendingDeletionLock $ex)` → `Response::HTTP_CONFLICT`, and `catch (LogicException $ex)` for "A decided request cannot be withdrawn." → `HTTP_CONFLICT` (catch it in `withdraw()` only, not globally).
 
-- [ ] **Step 4: Run** the new test and `Modules/Core/tests/Feature/Controllers`, `Modules/Core/tests/Integration/Services/CrudServiceRequestScenariosTest.php`. Expected: PASS.
+- [x] **Step 4: Run** the new test and `Modules/Core/tests/Feature/Controllers`, `Modules/Core/tests/Integration/Services/CrudServiceRequestScenariosTest.php`. Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** (`feat(core): the CRUD API answers 202 for writes sent to approval`).
+- [x] **Step 5: Pint and commit** (`feat(core): the CRUD API answers 202 for writes sent to approval`).
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- The tests use `core/settings`, not `core/taxonomies`: `Taxonomy` is abstract and its concrete subclasses live in CMS and ERP. The update route is named `core.crud.replace`, not `core.crud.update`. The field written is `is_public`: `Setting::$value` has no validation rule, so the API drops it from `validated()` and the update changes nothing.
+- A refused withdrawal answers 401, not 403: `CrudController::handleServiceCall()` already maps every `AuthorizationException` to 401, and this task does not change that mapping. The author and the other writer are two tests: switching users between two requests of one test trips the session middleware (`AuthenticateSession`), so the non-author case captures the request through the model and makes a single HTTP call.
+- `ModifyRequest` validates `modification` as `required|integer` on `/withdraw/` and skips the model's own rules there, as it does on `/delete/`: without it the request was refused for the model's required fields, and `modification` never reached `changes`.
+- `CrudService::withdraw()` requires `select` on the entity and finds the modification by type and key only, so the author can also withdraw a create, which has no record. `capturedResult()` takes the list of captured requests: one request answers `{modification, operation}`, several answer `{modifications, applied}`. `doActivateOperation()` answers 202 instead of throwing when `restore()` or `delete()` is captured.
+- The controller's `withdraw()` maps only a bare `LogicException` (the decided-request refusal) to 409; its subclasses keep the answers `handleServiceCall()` gives them.
+- Added case: withdrawing a decided request answers 409.
 
 ### Task 11: AI tools report writes sent for approval
 
@@ -1843,7 +1852,7 @@ A private helper in `CrudService`:
 - Modify: `Modules/AI/app/Services/Tools/CrudToolProvider.php:757,775,793` (`present()` carries the status)
 - Test: `Modules/AI/tests/Feature/Tools/CrudToolProviderApprovalTest.php`
 
-- [ ] **Step 1: Write the failing test** (setup as in `Modules/AI/tests/Feature/Tools/CrudToolProviderTest.php` for building the provider and exposing `core.taxonomy` with `update`; the acting user has `select` and `update` on taxonomies, not `approve`; call `pretendHttpRequest()`):
+- [x] **Step 1: Write the failing test** (setup as in `Modules/AI/tests/Feature/Tools/CrudToolProviderTest.php` for building the provider and exposing `core.taxonomy` with `update`; the acting user has `select` and `update` on taxonomies, not `approve`; call `pretendHttpRequest()`):
 
 ```php
 it('reports an update sent for approval instead of the updated record', function (): void {
@@ -1859,9 +1868,9 @@ it('reports an update sent for approval instead of the updated record', function
 
 If the existing test file names the tool closure differently, use its name; the assertions stay the same.
 
-- [ ] **Step 2: Run to verify it fails.**
+- [x] **Step 2: Run to verify it fails.**
 
-- [ ] **Step 3: Implement** in `present()`:
+- [x] **Step 3: Implement** in `present()`:
 
 ```php
         if ($result->statusCode === Response::HTTP_ACCEPTED && is_array($result->data)) {
@@ -1871,9 +1880,14 @@ If the existing test file names the tool closure differently, use its name; the 
 
 and update the tool descriptions for `create`/`update`/`delete` (`CrudToolProvider.php:264` area) with: "When the entity requires approval the change is not applied: the result has status pending_approval and the id of the request."
 
-- [ ] **Step 4: Run** the new test and `Modules/AI/tests/Feature/Tools`. Expected: PASS.
+- [x] **Step 4: Run** the new test and `Modules/AI/tests/Feature/Tools`. Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** in AI (`feat(ai): CRUD tools report writes sent for approval`).
+- [x] **Step 5: Pint and commit** in AI (`feat(ai): CRUD tools report writes sent for approval`).
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- The test exposes `core.setting`, as `CrudToolProviderTest` does, and writes `is_public` (see Task 10: `Taxonomy` is abstract, `Setting::$value` has no rule). Its helpers are inlined under other names: the ones in `CrudToolProviderTest` are global functions defined only when that file loads.
+- The three descriptions replace their old "captured for approval instead of applied immediately" sentence with the step's, rather than carrying both.
 
 ---
 
