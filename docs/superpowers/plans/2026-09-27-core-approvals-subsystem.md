@@ -530,8 +530,11 @@ git -C Modules/CMS add app/Models/Comment.php && git -C Modules/CMS commit -m "r
 
 **Steps 2 and 3 were done on 2026-09-28, before Task 2**, to get a green baseline: Task 2 removes the
 package trait and the superadmin rule these very tests exercise, and with a red baseline a new break
-would be indistinguishable from the old one. Step 1 stays open, because it depends on
-`pretendHttpRequest()` from Task 2.
+would be indistinguishable from the old one. Step 1 followed Task 2, since it needs the helper that
+task introduces. The whole task is closed: the two local helpers
+(`settingWrittenOverHttp()` in `SettingTest`, `settingFormOverHttp()` in `EditSettingFormTest`) are
+gone, replaced by `HttpContext::pretendHttpRequest()`, and the now-unused `App` facade imports went
+with them. 33 passed, 2 skipped.
 
 This closes Core commit `83e0795b`, committed as `wip` with one red test named in its message, not work left in a working tree: `Setting::requiresApprovalWhen()` checks its guarded fields, then defers to the trait; `EditSetting` reports a change sent for approval. Close it on top of Task 2. Nothing here needs to be written from scratch — read the commit first, then finish the two loose ends below.
 
@@ -539,7 +542,7 @@ This closes Core commit `83e0795b`, committed as `wip` with one red test named i
 - Modify: `Modules/Core/app/Models/Setting.php`, `Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php` (already committed in `83e0795b`)
 - Test: `Modules/Core/tests/Integration/Models/SettingTest.php`, `Modules/Core/tests/Feature/Filament/EditSettingFormTest.php` (already committed in `83e0795b`)
 
-- [ ] **Step 1: Switch the tests to `pretendHttpRequest()`**
+- [x] **Step 1: Switch the tests to `pretendHttpRequest()`**
 
 Replace the local helpers `settingWrittenOverHttp()` (SettingTest) and `settingFormOverHttp()` (EditSettingFormTest) with calls to `pretendHttpRequest()` and delete the two local functions. In "sends an is_public change from the form to approval", replace `editSettingActor();` with `editSettingActorWithoutApproval();` and add `->assertNotified('Change sent for approval')` after `->assertHasNoFormErrors()`: a superadmin is never captured, so only a non-approver can reach approval.
 
@@ -577,12 +580,12 @@ captured, so `modifications()->activeOnly()->sole()` found nothing. It now uses
 `editSettingActorWithoutApproval()` (which already existed and already fakes an HTTP request), asserts
 the "Change sent for approval" notification, and checks the setting kept its old value.
 
-- [ ] **Step 4: Run**
+- [x] **Step 4: Run**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Models/SettingTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php Modules/Core/tests/Feature/Filament/SettingResourceTest.php Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Pint and commit**
+- [x] **Step 5: Pint and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Models/Setting.php Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php Modules/Core/tests/Integration/Models/SettingTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php
