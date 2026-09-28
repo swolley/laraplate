@@ -51,19 +51,37 @@ paths with `dirname(__DIR__, 5)` like its siblings.
 
 ## Known pre-existing failures
 
-Verified on 2026-09-28 by running each one with the code at `83e0795b` or at the commit before the
-change under test. None of them is caused by this plan's work, and none should be read as a
-regression while executing it. **Run a full suite before Task 4** to catalogue the rest: this list grew
-twice, both times because a narrower run had never covered the file.
+Measured 2026-09-28, per module, after Task 3: **5783 passed, 28 skipped, 2 failed**, neither caused by
+this plan.
 
-| Test | Failure | Owner |
-|---|---|---|
-| `Modules/Core/tests/Feature/Console/CheckPendingApprovalsCommandTest.php` | `NOT NULL constraint failed: core_settings.description` inserting `notifications.threshold.users` | the settings work, not this plan |
-| `Modules/AI/tests/Feature/ChatTest.php` (3 tests) | `404` instead of `201`/`422`/`200` — routing, not approvals | unrelated |
-| `tests/Feature/RouteServiceProviderTest.php`, `ElasticsearchServiceTest`, `Unit/Architecture/DatabaseConnectionAffinityTest` | named as already-failing when the plan was written | unrelated |
+| Suite | Result |
+|---|---|
+| `tests` (root) | 23 passed |
+| `Modules/Core/tests` | green |
+| `Modules/CMS/tests` | 644 passed, 1 skipped |
+| `Modules/AI/tests` | **3 failed**, 755 passed — `ChatTest` answers 404 where 201/422/200 are expected. Routing, nothing to do with approvals |
+| `Modules/ERP/tests` | **1 failed**, 644 passed — `ERPFilamentRouteSmokeTest` answers 500 |
+| `Modules/MES/tests` | 127 passed |
+| `Modules/SAO/tests` | 675 passed, 1 skipped |
 
-Closed since: the five of commit `83e0795b` (four Mockery `User` partials without the `roles`
-relation, plus the `HasTable` argument type), fixed in Task 3 steps 2 and 3.
+**The whole suite does not fit in one process.** `php artisan test` with no argument dies with
+`Allowed memory size of 2147483648 bytes exhausted` inside `vendor/dg/bypass-finals/src/NativeWrapper.php`,
+around `CMS/tests/Feature/Models/CategoryTest`, after some 1400 tests. Run it per module, one process
+each, or there is no full result to read. This matters for Task 13, whose expected outcome is phrased
+as if a single full run existed.
+
+Closed while executing Tasks 1 to 3, all pre-existing, none of them regressions:
+
+- **six** Mockery `User` partials that never stubbed `isSuperAdmin()`, so the superadmin rule commit
+  `83e0795b` added resolved the `roles` relation on a never-persisted model:
+  `HasApprovalsTest` (3), `ApproveQuorumOnWriteTest` (1), `FieldApprovalTest` (2). The house pattern was
+  already there to copy — `HasValidationsBehaviorTest` and `EnvironmentIndicatorPluginTest` stub it;
+- the `HasTable` argument type error, fixed at its cause (a Core module importing `App\Models\User`);
+- two `NOT NULL constraint failed: core_settings.description`, in `ListAndSelectRequestDataTest` and
+  `CheckPendingApprovalsCommandTest`. `Setting::$attributes` defaults five of the six NOT NULL columns
+  and not `description`, so any `Setting::create()` that omits it fails. Fixed in the tests, which now
+  pass one. **The model-level gap is left open on purpose**: giving `description` a default there is a
+  decision about settings, not about approvals.
 
 ## Global Constraints
 
