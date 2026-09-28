@@ -616,6 +616,30 @@ git -C Modules/Core add -A app tests && git -C Modules/Core commit -m "fix(core)
 
 ### Task 4: `Operation` enum and column
 
+**Delivered 2026-09-28.** Two things the plan could not have known:
+
+- **`migrate:fresh` was already broken, project-wide.**
+  `Modules/SAO/database/migrations/2026_08_16_100100_create_sao_signal_occurrences_table.php`
+  declares a foreign key on `sao_releases`, created two hours later in migration order:
+  `SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'sao_releases'`. Nothing
+  could be migrated from scratch, which is how a developer database drifts from the create migrations
+  in the first place — the missing `is_internal` column of the same morning was the visible symptom.
+  Fixed by moving `create_sao_releases_table` to `2026_08_16_100050`, between the signals table and
+  the occurrences that reference both (SAO commit `96a3abe`). It only ever depended on `sao_projects`.
+  **Run `migrate:fresh` on a throwaway database before running it on a developer one**: this one was
+  left wiped and half-migrated between the two attempts.
+- **The enum lives in `app/Approvals/`, not where `module:make-enum` puts it.** The generator writes
+  `app/Enums/<path>` with a `Modules\Core\Enums\…` namespace; the spec asks for
+  `Modules\Core\Approvals\Operation`, which is also how the module is actually laid out — Core keeps a
+  subsystem's types inside it (`app/Locking/Exceptions/`, `app/Versioning/Data/`,
+  `app/Inspector/Types/DoctrineTypeEnum.php`, itself an enum).
+
+After the rebuild: `core_modifications` carries `operation` and no `is_update`, 322 settings seeded,
+321 of them internal. The one that is not is `modules.active`, written by `ModuleDatabaseActivator`
+through `DB::table()` so it works during boot — it bypasses the seeder, so `module` is null and
+`is_internal` false, which is what those two columns are documented to mean.
+
+
 **Files:**
 - Create: `Modules/Core/app/Approvals/Operation.php`
 - Modify: `Modules/Core/database/migrations/2024_03_30_161448_create_modifications_table.php`
@@ -626,7 +650,7 @@ git -C Modules/Core add -A app tests && git -C Modules/Core commit -m "fix(core)
 **Interfaces:**
 - Produces: `enum Operation: string { Create = 'create'; Update = 'update'; Delete = 'delete'; ForceDelete = 'force_delete'; Restore = 'restore' }` with `isDeletion(): bool` (Delete, ForceDelete) and `carriesDiff(): bool` (Create, Update); `Modification::$operation` cast to `Operation`.
 
-- [ ] **Step 1: Write the failing test** (append to `ModificationModelTest.php`)
+- [x] **Step 1: Write the failing test** (append to `ModificationModelTest.php`)
 
 ```php
 it('stores the operation it carries', function (): void {
@@ -649,12 +673,12 @@ it('stores the operation it carries', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Models/ModificationModelTest.php`
 Expected: FAIL (`Operation` class not found).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```php
 <?php
@@ -697,7 +721,7 @@ and add after the modifier index:
 
 `Modification`: cast `'operation' => Operation::class`, replace `'is_update'` with `'operation'` in `$hidden`. `HasApprovals::captureSave()` and `CommentApprovalCapture::capture()`: replace `$modification->is_update = false;` with `$modification->operation = $item->getKey() === null ? Operation::Create : Operation::Update;` (same for `$comment`). `ModificationForm`: replace the `is_update` toggle with `TextInput::make('operation')->formatStateUsing(self::fromRecord('operation'))->disabled()`. `ModificationsTable`: add `TextColumn::make('operation')->badge()` after the modifiable column. Update the tests found by the grep: `'is_update' => true` → `'operation' => Operation::Update`, `'is_update' => false` → `'operation' => Operation::Create`.
 
-- [ ] **Step 4: Rebuild the developer database**
+- [x] **Step 4: Rebuild the developer database**
 
 ```bash
 php artisan config:clear   # a cached config points the suite at the real MySQL database
@@ -712,9 +736,9 @@ only description of the schema. Converting the live database by hand instead is 
 If a pending modification in the developer database genuinely has to survive, convert it by hand
 *before* rebuilding and re-create it after; do not make the hand conversion the normal path.
 
-- [ ] **Step 5: Run the approvals suites** (same command as Task 2 Step 4). Expected: PASS.
+- [x] **Step 5: Run the approvals suites** (same command as Task 2 Step 4). Expected: PASS.
 
-- [ ] **Step 6: Pint and commit** in Core and CMS, message `refactor(core): modifications carry an operation instead of is_update`.
+- [x] **Step 6: Pint and commit** in Core and CMS, message `refactor(core): modifications carry an operation instead of is_update`.
 
 ---
 
