@@ -71,11 +71,11 @@ Paths relative to their module.
 - [x] `MediaAnalysis` model (extends `Core\Overrides\Model`) with fillable/casts (`analysis_status` → `MediaAnalysisStatus` enum, json casts, `@property` block for larastan) + `MediaAnalysisFactory` (`pending`/`failed` states). **Soft deletes forced off** (`$softDeletesEnabled = false`), not the dynamic per-model setting: the table is a dedup cache uniquely keyed by `content_hash`, and a soft-deleted row would keep the unique index occupied and break the next `firstOrCreate` for the same hash — refcount cleanup (M19) purges outright. AI-owned; Core never references it.
 - [x] Feature tests: status/json casts; one row per `content_hash` (unique enforced); `firstOrCreate` dedups; hard-delete frees the unique index so a purged hash can be re-analyzed; pending/failed states — 5 passed. Pint + PHPStan clean.
 
-## Task 4: Generic Core searchable-contributor seam (M4a)
+## Task 4: Generic Core searchable-contributor seam (M4a) — DONE
 
-- [ ] Create `ISearchableContributor` (contribute fields + a mapping section for a given searchable model) and `SearchableContributorRegistry` (Core singleton) keyed by target model type; empty-registry is a safe no-op.
-- [ ] Expose the hook so a Core searchable model's `toSearchableArray()` merges registered contributors' sections, and the index mapping composition includes them. Follow the existing Core search schema/mapping composition.
-- [ ] Unit tests: register/resolve by model type; empty registry yields the base document unchanged; a contributor's fields appear in the composed document/mapping. Pint + PHPStan.
+- [x] Create `ISearchableContributor` (`contributesTo()` + `searchableFields(Model)` + `searchableMapping()`) and `SearchableContributorRegistry` (Core singleton, keyed by target model class, matches subclasses via `is_subclass_of`); empty-registry is a safe no-op. Bound in `CoreServiceProvider::register()`.
+- [x] Wired generically into the `Searchable` trait: `toSearchableArray()` merges `fieldsFor($this)` (base keys win via `+`), and `getSchemaDefinition()` adds `mappingFor(static::class)` field definitions. No-op until a contributor registers, so every searchable model gains the seam without opting in and nothing changes today.
+- [x] Unit tests (registry + stub model/contributor in `tests/Stubs/Search/`): empty registry yields nothing; a registered contributor's fields/mapping merge; no leak to unrelated classes; subclass targets match — 5 passed. Regression: `SearchableEmbeddingsArrayTest` (Core `toSearchableArray`) still green. Pint clean; PHPStan clean on the introduced code (a pre-existing `larastan.octaneCompatibility` note on the unrelated `registerCacheManager` `'cache'` singleton is not from this change).
 
 ## Task 5: `Media` becomes Searchable + IEmbeddableModel (M5, M6, M9, M14)
 
