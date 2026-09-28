@@ -65,11 +65,11 @@ Paths relative to their module.
 - [x] `MediaMetadataService::writeFor(Media)` runs the extractor via `$media->getPath()` and merges into `custom_properties` — **no new columns** (M3a) — with a `_provenance` map so it overwrites only values it previously wrote (`iptc`/`exif`/`id3`/`pdf`/`xmp`), never a human edit (M3c, Core side); `content_hash` + technical always refreshed. Wired via `#[ObservedBy(MediaMetadataObserver::class)]` on `Media` (`created`, `saveQuietly`).
 - [x] Tests (unit, robust — no fragile Spatie add-flow): `MetadataExtractorTest` (IPTC caption/keywords/dimensions/hash from a generated JPEG; hash-only for unsupported type; never throws on a corrupt file) and `MediaMetadataServiceTest` (merge fills empty, preserves human, overwrites own-sourced, always refreshes hash) — 6 passed. Pint + PHPStan clean. _Observer→custom_properties integration is exercised end-to-end at claim in Task 6._
 
-## Task 3: AI-owned `ai_media_analysis` table + model (M3b, M15)
+## Task 3: AI-owned `ai_media_analysis` table + model (M3b, M15) — DONE
 
-- [ ] Migration (in `Modules/AI`) for `ai_media_analysis` keyed by `content_hash` (unique): `entities`, `idea`, `intent`, `ocr_text`, `transcript`, `analysis` (json, default empty), `provenance` (json), `analysis_status`, `analyzed_at`, `analysis_model_version`. `MigrateUtils` for timestamps/soft-deletes as siblings do. No `sentiment`.
-- [ ] `MediaAnalysis` model + factory/states (analyzed, per-status). It is AI-owned; Core never references it.
-- [ ] Unit/feature test: a row is uniquely keyed by hash; two media with the same hash resolve the same analysis row. Pint + PHPStan.
+- [x] Migration (in `Modules/AI`, table `ai_media_analyses` via `AITables::MediaAnalyses`) keyed by unique `content_hash`: `entities`/`analysis`/`provenance` (json), `idea`/`intent` (text), `ocr_text`/`transcript` (longtext), `analysis_status` (string, default `pending`), `analysis_model_version`, `analyzed_at`. `MigrateUtils::timestamps(hasSoftDelete: true)` — the soft-delete column must exist because `Overrides\Model` always registers the scope. No `sentiment`.
+- [x] `MediaAnalysis` model (extends `Core\Overrides\Model`) with fillable/casts (`analysis_status` → `MediaAnalysisStatus` enum, json casts, `@property` block for larastan) + `MediaAnalysisFactory` (`pending`/`failed` states). **Soft deletes forced off** (`$softDeletesEnabled = false`), not the dynamic per-model setting: the table is a dedup cache uniquely keyed by `content_hash`, and a soft-deleted row would keep the unique index occupied and break the next `firstOrCreate` for the same hash — refcount cleanup (M19) purges outright. AI-owned; Core never references it.
+- [x] Feature tests: status/json casts; one row per `content_hash` (unique enforced); `firstOrCreate` dedups; hard-delete frees the unique index so a purged hash can be re-analyzed; pending/failed states — 5 passed. Pint + PHPStan clean.
 
 ## Task 4: Generic Core searchable-contributor seam (M4a)
 
