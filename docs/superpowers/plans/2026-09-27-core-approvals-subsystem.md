@@ -10,6 +10,21 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-27-core-approvals-subsystem-design.md`
 
+## Delivery status (2026-09-28): shipped
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md` (approvals section), `Modules/Core/docs/CRUD_SYSTEM.md` (API outcome and withdraw), `Modules/Core/docs/EVENT_ORCHESTRATION.md` and `Modules/Core/docs/rag/EVENT_ORCHESTRATION.md` (decision events), `Modules/Core/docs/GLOSSARY.md` and `Modules/Core/docs/rag/GLOSSARY.md`, `Modules/CMS/docs/rag/COMMENT_MODERATION.md` (comment deletions, withdrawal), `Modules/AI/docs/MODERATION.md` (events, CRUD tools).
+
+Every task shipped. Each task carries an "Executed" note listing where the code differs from its steps; the ones a reader of this plan would trip on:
+
+- The panel concern is `Modules/Core/app/Filament/Utils/ReportsApprovalOutcome.php`, not `Filament/Concerns/` (Task 9).
+- `pendingModification()` is `null` when the author's credit completes the quorum at once, since the operation ran (Task 6).
+- Decision events fire through `afterCommit()`, and `ModificationRejected` carries `null` for a rejected create (Task 8).
+- The API answers `401`, not `403`, to a withdrawal by anybody but the author: the controller maps every `AuthorizationException` to 401 (Task 10).
+- `ModificationVoteService` reaches its target past the soft-delete and `Hide` scopes (Tasks 6 and 7).
+- The root `docs/rag/` has no approvals page, so nothing was written there.
+
+Found along the way and left as they were, outside this plan: `Setting::$value` has no validation rule, so the CRUD API drops it from an update; approve and disapprove lose the `modification` parameter to validation, so a vote on one specific request falls back to every active request of the record; an author needs `select` on `core_modifications` to reach Modifications and withdraw.
+
 ## Settled decisions (2026-09-28)
 
 A review of this plan against the working tree found four open design questions. They are settled
@@ -1961,7 +1976,7 @@ The requirement lives in **`Modules/Core/composer.json:45`**, not in the root `c
 - Modify: `docs/superpowers/specs/INDEX.md` (status **Implemented**), `docs/superpowers/plans/INDEX.md` (entry), this plan (`## Delivery status (YYYY-MM-DD): …` and `**Documented in:**`)
 - Test: `tests/Unit/ClosedPlansPointToDocumentationTest.php` (existing)
 
-- [ ] **Step 1: Write the module documentation** — what each operation does when captured, Block/Hide, writable attributes, withdrawal, the outcome on panel/API/tools, and the documented limit (mass query updates bypass approvals).
-- [ ] **Step 2: Close the plan** with the delivery status (record any divergence from this plan there) and the `**Documented in:**` line naming the files of Step 1.
-- [ ] **Step 3: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`. Expected: PASS.
-- [ ] **Step 4: Commit** docs in each module and the root (`docs: approvals cover deletes and restores`).
+- [x] **Step 1: Write the module documentation** — what each operation does when captured, Block/Hide, writable attributes, withdrawal, the outcome on panel/API/tools, and the documented limit (mass query updates bypass approvals).
+- [x] **Step 2: Close the plan** with the delivery status (record any divergence from this plan there) and the `**Documented in:**` line naming the files of Step 1.
+- [x] **Step 3: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`. Expected: PASS.
+- [x] **Step 4: Commit** docs in each module and the root (`docs: approvals cover deletes and restores`).

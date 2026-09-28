@@ -3,7 +3,7 @@
 **Date:** 2026-09-27
 **Module:** `Modules/Core` (`app/Approvals`), with the per-model rules of CMS, ERP and Core models that use approvals
 **Related:** `2026-05-15-modification-moderation-design.md` (moderation events and AI voting, unchanged), `2026-09-12-mcp-server-design.md` (writes wait for this)
-**Status:** Design agreed. No implementation started, beyond the attribution and the table names (Core commits `d6874436`, `c759afe4`). Amended 2026-09-28 with five decisions a review of the plan forced: the author's approve credit applies through the vote service, the operation reaches a model rule through its own hook, `Hide` does not filter when nobody is authenticated, comment deletions are excluded explicitly, and the diff hook is `getDirtyForApproval()` rather than a second `enrichModificationDiff()`.
+**Status:** Implemented 2026-09-28 by `docs/superpowers/plans/2026-09-27-core-approvals-subsystem.md`, whose delivery status lists where the code differs from this design. Design agreed before any implementation, beyond the attribution and the table names (Core commits `d6874436`, `c759afe4`). Amended 2026-09-28 with five decisions a review of the plan forced: the author's approve credit applies through the vote service, the operation reaches a model rule through its own hook, `Hide` does not filter when nobody is authenticated, comment deletions are excluded explicitly, and the diff hook is `getDirtyForApproval()` rather than a second `enrichModificationDiff()`.
 
 ---
 
