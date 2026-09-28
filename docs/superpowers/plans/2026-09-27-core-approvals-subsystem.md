@@ -1604,7 +1604,7 @@ In `cast()`, after applying: `event($approval ? new ModificationApproved($modifi
 - Consumes: `pendingModification()`, `wouldRequireApproval()`, `PendingDeletionLock`, `ModificationVoteService::withdraw()`.
 - Produces: trait `ReportsApprovalOutcome` for `EditRecord` pages with `handleRecordUpdate()`, `getSavedNotification()`, and a static `approvalAwareDeleteAction(): DeleteAction` / `approvalAwareForceDeleteAction(): ForceDeleteAction` / `approvalAwareRestoreAction(): RestoreAction` builder.
 
-- [ ] **Step 1: Write the failing tests** — move `editSettingActorWithoutApproval()` from `EditSettingFormTest.php` into `Modules/Core/tests/Support/HttpContext.php` (give it a `list<string> $actions = ['select', 'update', 'delete']` parameter and grant each `PermissionName::forModel(new Setting, $action)`), then:
+- [x] **Step 1: Write the failing tests** — move `editSettingActorWithoutApproval()` from `EditSettingFormTest.php` into `Modules/Core/tests/Support/HttpContext.php` (give it a `list<string> $actions = ['select', 'update', 'delete']` parameter and grant each `PermissionName::forModel(new Setting, $action)`), then:
 
 ```php
 it('reports a save blocked by a pending deletion', function (): void {
@@ -1668,9 +1668,9 @@ it('offers the author a withdraw action in Modifications', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run to verify they fail.**
+- [x] **Step 2: Run to verify they fail.**
 
-- [ ] **Step 3: Implement the concern**
+- [x] **Step 3: Implement the concern**
 
 ```php
 <?php
@@ -1763,9 +1763,19 @@ In `ModificationsTable`, next to approve/disapprove:
                 ->action(static fn (Modification $record) => resolve(ModificationVoteService::class)->withdraw(Auth::user(), $record)),
 ```
 
-- [ ] **Step 4: Run** the new tests and `Modules/Core/tests/Feature/Filament`, `Modules/CMS/tests/Feature/Filament`. Expected: PASS.
+- [x] **Step 4: Run** the new tests and `Modules/Core/tests/Feature/Filament`, `Modules/CMS/tests/Feature/Filament`. Expected: PASS.
 
-- [ ] **Step 5: Pint and commit** in Core and CMS (`feat(core): the panel reports captured writes and lets authors withdraw them`).
+- [x] **Step 5: Pint and commit** in Core and CMS (`feat(core): the panel reports captured writes and lets authors withdraw them`).
+
+**Executed 2026-09-28. Differences from the steps above:**
+
+- The concern is `Modules/Core/app/Filament/Utils/ReportsApprovalOutcome.php`, next to `HasCloseOrCancelFormAction` and the other page traits: `app/Filament/Concerns/` does not exist, and the traits of Filament pages live in `Utils`.
+- `EditComment` keeps its own `handleRecordUpdate()` (the body is a translation, not a column) and calls the concern's `saveReportingApprovalOutcome()` from it; `EditSetting`, `EditField`, `EditContent` and `EditPreset` use the concern's `handleRecordUpdate()`. The save no longer checks `isDirty()` first: a clean model's `save()` answers true, and a comment's pending body is not an attribute `isDirty()` sees.
+- A captured delete, force delete or restore sends its warning and calls `cancel()`, not `halt()`: the confirmation modal closes instead of staying open over a request already recorded.
+- The actor helper is `HttpContext::panelActorWithoutApproval(Model $model, array $actions = ['select', 'update', 'delete'])`, for any model: the Content test uses it too, so `contentActorWithoutApproval()` was never needed. `HttpContext::pretendHttpRequest()` now does nothing when the container is already the partial mock, since a test logging in two actors called it twice and Mockery refused to mock the mock.
+- The author needs `select` on `core_modifications` to open Modifications; the tests grant it. Whether every author should reach their own requests without that permission is a product question this plan does not settle.
+- "offers the author a withdraw action in Modifications" uses `Setting` and `ListModifications`, so it lives in the Core `ApprovalOutcomeTest`, not in the CMS file. The CMS test binds `Modules\CMS\Tests\TestCase` with `RefreshDatabase`, as its siblings do, and builds the live content with `createMinimalTestContentForComments()`. The save and `Block` cases write `is_public` (see Task 10).
+- The withdraw action is listed in `fixedActions` beside approve and disapprove.
 
 ### Task 10: CRUD API — `202` for captured writes, `409` for blocked records, withdraw endpoint
 
