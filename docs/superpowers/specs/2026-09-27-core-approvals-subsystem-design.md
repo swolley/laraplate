@@ -53,7 +53,7 @@ All under `Modules\Core\Approvals` unless noted.
 
 - **`Operation`** enum; **`PendingDeletionStrategy`** enum (`Block`, `Hide`).
 - **`PendingDeletionLock`** exception: a write on a record blocked by a pending deletion.
-- **`Modules\Core\Models\Concerns\HasApprovals`** becomes the only trait (it no longer uses the package's `RequiresApproval`):
+- **`Modules\Core\Models\Concerns\HasApprovals`** becomes the only trait (it no longer uses the package's `RequiresApproval`). **Whatever asks "does this model have approvals?" must ask about this trait.** Two places name the package trait instead and answer through `class_uses_trait()`, which is recursive and therefore true today only because `HasApprovals` uses `RequiresApproval`: `PermissionsRefreshCommand` (whether the `approve` permission belongs in a model's vocabulary) and `CrudService` (whether a write can be captured). Dropping the package trait without moving them turns both silently false — a permission that stops being registered and an API that reports writes that did not happen, with no exception either way:
   - registers the listeners on `saving`, `deleting`, `forceDeleting`, `restoring`;
   - `pendingModification(): ?Modification`, the request captured by the last operation;
   - `wouldRequireApproval(Operation $operation): bool`, the read-only check;

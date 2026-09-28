@@ -303,7 +303,8 @@ git -C Modules/Core commit -m "refactor(core): approval models stand alone, attr
 - Modify: `Modules/Core/app/Models/Concerns/HasApprovals.php`
 - Modify: `Modules/Core/app/Models/User.php` (drop `use ApprovesChanges;`)
 - Modify: `Modules/CMS/app/Models/Comment.php` (delete its own `bootRequiresApproval()`, `getDirtyForApproval()` becomes `protected`)
-- Modify: `Modules/AI/app/Jobs/ApproveModificationJob.php:198,216` (vote through the service)
+- Modify: `Modules/Core/app/Console/PermissionsRefreshCommand.php:12,199` and `Modules/Core/app/Services/Crud/CrudService.php:7,2171` (the trait both of them test for), plus the stubs in `Modules/Core/tests/Integration/Services/CrudServiceRequestScenariosTest.php:6` and `CrudServiceTest.php:5`
+- Modify: `Modules/AI/app/Jobs/ApproveModificationJob.php:198,216` (nothing to do: Task 1 made `User::approve()`/`disapprove()` delegate to the service, so the job already votes through it — check and move on)
 - Test: `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php` (add cases), `Modules/CMS/tests/Feature/CommentModerationTest.php` (must stay green)
 
 **Interfaces:**
@@ -444,6 +445,22 @@ Remove `use RequiresApproval;` and the `Approval\...` imports; the trait now dec
 
 `captureSave()` keeps its body, with `getDirtyForApproval()` in place of `getDirty()` when it builds the diff; the modifier becomes `Auth::user()` (it was the package's `modifier()`), and the `config('approval.models.modification', …)` lookups become `Modification::class`. `requiresApprovalWhen()` keeps the superadmin rule already in the working tree. Change every `applyModificationChanges(\Approval\Models\Modification …)` signature in models (`Comment`) to `Modification`.
 
+**Two runtime checks ask whether a model has approvals by naming the package trait, and both go
+silently false in this step.** `class_uses_trait()` (`Modules/Core/app/Helpers/helpers.php:646`) is
+recursive by default, so today a model using `HasApprovals` matches `RequiresApproval::class` because
+`HasApprovals` uses it. Remove `use RequiresApproval;` and nothing matches any more:
+
+- `Modules/Core/app/Console/PermissionsRefreshCommand.php:199` stops registering the `approve`
+  permission for every model with approvals, so the permission vocabulary silently loses it;
+- `Modules/Core/app/Services/Crud/CrudService.php:2171` stops recognising a model as approval-bearing,
+  so the CRUD API stops treating captured writes as captured.
+
+Both must switch to `HasApprovals::class`. Neither failure raises anything: no exception, no type
+error, just permissions that stop existing and an API that reports writes that did not happen. Convert
+the two anonymous stub models that use `RequiresApproval` directly in the same step
+(`CrudServiceRequestScenariosTest.php:6`, `CrudServiceTest.php:5`), or the switch changes what those
+tests exercise without failing them.
+
 **`Comment` must lose its own boot listener in this step, or it silently stops working.** The `saving` listener comes from the package's `bootRequiresApproval()`, and `Modules/CMS/app/Models/Comment.php:252-269` overrides that method to compute `getDirtyForApproval()` (pending translated `body`, pending `rating_score`) before capturing. Renaming the trait hook to `bootHasApprovals()` leaves `Comment::bootRequiresApproval()` with nothing calling it: Laravel boots `boot{TraitName}`, and `RequiresApproval` is gone. The comment would then be captured on the bare `getDirty()`, losing the pending body — a green suite would hide it, so do not rely on the rename alone. Delete `Comment::bootRequiresApproval()` and make `getDirtyForApproval()` `protected` so it overrides the trait's version; the trait's listener then does the same work for every model. `Comment::captureSave()` keeps delegating to `CommentApprovalCapture::capture()`.
 
 In `User.php` remove `use ApprovesChanges;` and add, below `isAuthorizedToCastApprovalVote()`:
@@ -475,6 +492,11 @@ git -C Modules/CMS add app/Models/Comment.php && git -C Modules/CMS commit -m "r
 
 ### Task 3: Settings save through the shared write rule
 
+**Steps 2 and 3 were done on 2026-09-28, before Task 2**, to get a green baseline: Task 2 removes the
+package trait and the superadmin rule these very tests exercise, and with a red baseline a new break
+would be indistinguishable from the old one. Step 1 stays open, because it depends on
+`pretendHttpRequest()` from Task 2.
+
 This closes Core commit `83e0795b`, committed as `wip` with one red test named in its message, not work left in a working tree: `Setting::requiresApprovalWhen()` checks its guarded fields, then defers to the trait; `EditSetting` reports a change sent for approval. Close it on top of Task 2. Nothing here needs to be written from scratch — read the commit first, then finish the two loose ends below.
 
 **Files:**
@@ -485,7 +507,7 @@ This closes Core commit `83e0795b`, committed as `wip` with one red test named i
 
 Replace the local helpers `settingWrittenOverHttp()` (SettingTest) and `settingFormOverHttp()` (EditSettingFormTest) with calls to `pretendHttpRequest()` and delete the two local functions. In "sends an is_public change from the form to approval", replace `editSettingActor();` with `editSettingActorWithoutApproval();` and add `->assertNotified('Change sent for approval')` after `->assertHasNoFormErrors()`: a superadmin is never captured, so only a non-approver can reach approval.
 
-- [ ] **Step 2: Diagnose the red tests the wip left behind**
+- [x] **Step 2: Diagnose the red tests the wip left behind**
 
 The commit message names one: `EditSettingFormTest` "offers no create or delete actions on settings".
 There are four more, and they come from the same change. `Modules/Core/tests/Integration/Helpers/HasApprovalsTest.php`
@@ -496,12 +518,28 @@ still requires approval when writer lacks approve credit even if…"), all with
 `Modules/Core/app/Authorization/ResolvingAuthorization.php:38`. The superadmin rule the wip added to
 `requiresApprovalWhen()` calls `isSuperAdmin()`, which reads the `roles` relation, on partial mocks
 that never stubbed it. Verified as pre-existing on 2026-09-28: the same four fail with the code at
-`83e0795b`. Fix the mocks (or give them a real role) as part of closing this task; the superadmin rule
-itself is correct and is covered by its own test in Task 2.
+`83e0795b`.
 
-- [ ] **Step 3: Diagnose "offers no create or delete actions on settings"**
+**Done.** Each mock now declares `$user->shouldReceive('isSuperAdmin')->andReturn(false);` next to its
+`can` expectation. That is what each of those tests means — an actor who is not a superadmin and whose
+approve credit is the thing under test — and it keeps them unit tests of `requiresApprovalWhen()`
+instead of tests of role resolution, which a Mockery partial of a never-persisted Eloquent model
+cannot do. The superadmin rule gets its own test, on a real user with a real role, in Task 2.
+
+- [x] **Step 3: Diagnose "offers no create or delete actions on settings"**
 
 It fails with `SettingsTable::loadUserPermissionsForTable(): Argument #1 ($user) must be of type ?App\Models\User, Modules\Core\Models\User given`. Use superpowers:systematic-debugging. Start from `Modules/Core/app/Filament/Utils/HasTable.php:139-142` (`Auth::user()` typed as `App\Models\User`) and find which guard or provider hands back a `Modules\Core\Models\User` in that test (`Filament::setCurrentPanel('admin')` switches the guard to `admin`; compare `config('auth.guards.admin.provider')`, `config('auth.providers.*.model')` and `LockAwareUserProvider`). Fix the cause, not the test. If the cause is `HasTable` typing the application user class while guards may return the Core base class, type the parameter as `?Modules\Core\Models\User` there.
+
+**Done, and that was the cause.** `Modules/Core/app/Filament/Utils/HasTable.php` imported
+`App\Models\User`: a Core module requiring the application's user class, while `Auth::user()` can
+hand back the Core base class it extends. The import now points at `Modules\Core\Models\User`, which
+accepts both and removes the Core to App dependency; no test was touched for this one.
+
+`EditSettingFormTest` had a second red the wip message mentions only in passing: "sends an is_public
+change from the form to approval" used `editSettingActor()`, a superadmin, whose writes are never
+captured, so `modifications()->activeOnly()->sole()` found nothing. It now uses
+`editSettingActorWithoutApproval()` (which already existed and already fakes an HTTP request), asserts
+the "Change sent for approval" notification, and checks the setting kept its old value.
 
 - [ ] **Step 4: Run**
 
