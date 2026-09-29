@@ -133,10 +133,31 @@ Paths relative to their module.
 - [x] Hash refcount / orphan sweep: delete a shared `ai_media_analysis` row (and derived data) only when the last media for its hash is force-deleted. Re-analysis fires only on hash change. _`Modules/AI/app/Observers/MediaAnalysisRefcountObserver.php`, registered on `Media` by `AIServiceProvider`; a soft-deleted media still counts._
 - [x] Feature tests: each transition does the right index/owner action; the shared analysis survives while another media references the hash and is removed with the last one. _`Modules/Core/tests/Feature/Media/MediaLifecycleTest.php`, `Modules/AI/tests/Feature/MediaAnalysis/MediaAnalysisRefcountTest.php`. Pint clean; PHPStan not run in this session._
 
-## Task 13: Filament / gallery surface (implementation detail)
+## Task 13: Filament media surface — owner curation + read-only gallery + AI analysis panel (M22)
 
-- [ ] Editable `custom_properties` display fields (description/alt_text/keywords) in the media Filament surface (the master switch and the model settings already appear in Filament > Settings since the 2026-09-29 amendment; nothing to add here for them); read-only view of the AI analysis with provenance so an editor sees what was AI-generated vs human/embedded.
-- [ ] Feature/Livewire test for the edit + provenance display. Pint + PHPStan.
+**Design:** decided on 2026-09-29 as M22 in the spec. Owner-scoped curation section (editable Core display fields, owner ACL) + a read-only autonomous `Media` gallery resource (`MediaPolicy`) + an AI read-only analysis panel with a "Re-analyze" action, injected through a new generic Core `IResourceSchemaContributor` seam (a UI twin of the M4a search-contributor seam). The master switch and model settings already appear in Filament > Settings since the 2026-09-29 amendment; nothing to add here for them. Committed as four separable sub-tasks (13a-13d).
+
+**Carried fix (from Task 7):** `AnalyzeMediaJob` passes the **vision** profile to the transcriber on the audio/video branch; resolve the **transcription** profile there instead. Harmless today (`WhisperTranscriber` ignores the profile) but wrong and a trap once a real transcription model is selectable. Fix with a regression test asserting the transcriber receives the transcription profile.
+
+### Task 13a: Core resource-schema contributor seam (M22)
+
+- [ ] `IResourceSchemaContributor` (`contributesTo(): class-string`, `infolistSections(Model): array`, `recordActions(Model): array`) + `ResourceSchemaContributorRegistry` (Core singleton keyed by target model class, subclass match via `is_subclass_of`, empty = safe no-op), bound in `CoreServiceProvider::register()`. Twin of `SearchableContributorRegistry`; returns Filament schema components/actions (Core is already Filament-aware; AI is never referenced).
+- [ ] Unit tests (registry + stub contributor/model in Core `tests/Stubs/`): empty registry yields nothing; a registered contributor's sections/actions are returned for the target class and subclasses; no leak to unrelated classes. Pint + PHPStan.
+
+### Task 13b: Owner-scoped media curation section (M22, M3a, M3c)
+
+- [ ] In the owner Filament forms that carry media (CMS `ContentResource`, SAO `TicketForm`), expose per attached media the editable Core display fields (`description`/`alt_text`/`keywords` in `custom_properties`), guarded by the owner's own edit ACL — no new permission. Reuse the existing `SpatieMediaLibraryFileUpload`/custom-properties mechanism; confirm the exact per-file editing seam at build. A human edit stays a plain Core write the AI provenance then leaves alone (M3c).
+- [ ] Feature test: an owner editor edits a media's description/keywords; the write lands in `custom_properties` and does not clobber `_provenance`. Pint + PHPStan.
+
+### Task 13c: Read-only autonomous `Media` gallery resource (M22, M16)
+
+- [ ] A Core `MediaResource` (Filament, under `Modules/Core/app/Filament/Resources/`): list with filters (`mime`, `track`, `collection`, `keywords`) + a View page showing Core display and technical `custom_properties`. **No create** (media are born from an owner's upload); edit limited to the display fields. Access gated by a `MediaPolicy` (backoffice permission via the existing `PermissionName` convention). Realizes the `open` gallery mode of M16; not a DAM.
+- [ ] Feature test: the resource lists and filters media, exposes no create action, and the policy gates access. Pint + PHPStan.
+
+### Task 13d: AI analysis panel + re-analyze action (M22, M18)
+
+- [ ] An AI `MediaAnalysisSchemaContributor` implementing `IResourceSchemaContributor` for `Media`: a **read-only** infolist section (idea/intent/entities/transcript/OCR/status + provenance so an editor sees what was AI-generated vs human/embedded) and a **"Re-analyze"** record action that re-dispatches `AnalyzeMediaJob`, both gated by the M18 master switch (`MediaAnalysisGate::enabled()`); registered into the Core registry in `AIServiceProvider::boot()`. Consumed by the gallery View page (13c) and the owner section (13b).
+- [ ] Feature test: switch on → the section renders the analysis and the action dispatches the job (`Bus::fake`); switch off → neither the section nor the action appears. Pint + PHPStan.
 
 ## Task 14: Docs + closeout
 
