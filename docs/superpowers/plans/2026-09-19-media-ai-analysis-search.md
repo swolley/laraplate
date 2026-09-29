@@ -139,10 +139,10 @@ Paths relative to their module.
 
 **Carried fix (from Task 7):** `AnalyzeMediaJob` passes the **vision** profile to the transcriber on the audio/video branch; resolve the **transcription** profile there instead. Harmless today (`WhisperTranscriber` ignores the profile) but wrong and a trap once a real transcription model is selectable. Fix with a regression test asserting the transcriber receives the transcription profile.
 
-### Task 13a: Core resource-schema contributor seam (M22)
+### Task 13a: Core resource-schema contributor seam (M22) — DONE
 
-- [ ] `IResourceSchemaContributor` (`contributesTo(): class-string`, `infolistSections(Model): array`, `recordActions(Model): array`) + `ResourceSchemaContributorRegistry` (Core singleton keyed by target model class, subclass match via `is_subclass_of`, empty = safe no-op), bound in `CoreServiceProvider::register()`. Twin of `SearchableContributorRegistry`; returns Filament schema components/actions (Core is already Filament-aware; AI is never referenced).
-- [ ] Unit tests (registry + stub contributor/model in Core `tests/Stubs/`): empty registry yields nothing; a registered contributor's sections/actions are returned for the target class and subclasses; no leak to unrelated classes. Pint + PHPStan.
+- [x] `IResourceSchemaContributor` (`contributesTo(): class-string`, `infolistSections(Model): array`, `recordActions(Model): array`) + `ResourceSchemaContributorRegistry` (Core singleton keyed by target model class, subclass match via `is_subclass_of`, empty = safe no-op), bound in `CoreServiceProvider::register()`. Twin of `SearchableContributorRegistry`; returns Filament schema components/actions (Core is already Filament-aware; AI is never referenced). _`Modules/Core/app/Filament/Contracts/IResourceSchemaContributor.php` + `Modules/Core/app/Filament/ResourceSchemaContributorRegistry.php`; Core commit `5346cfa1`._
+- [x] Unit tests (registry + stub contributor in `tests/Stubs/Filament/`, reusing the Search model stubs): empty registry yields nothing; a registered contributor's sections/actions return for the target class and subclasses; no leak to unrelated classes — 4 passed (7 assertions). Pint clean; PHPStan clean on the new files (3 pre-existing errors in `CoreServiceProvider` from an unrelated in-flight `PostgresConnection` change, not introduced here).
 
 ### Task 13b: Owner-scoped media curation section (M22, M3a, M3c)
 
