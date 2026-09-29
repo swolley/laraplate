@@ -127,6 +127,8 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            // One round trip per query instead of prepare + execute; see Modules\Core\Overrides\PostgresConnection.
+            'options' => extension_loaded('pdo_pgsql') ? [PDO::ATTR_EMULATE_PREPARES => (bool) env('DB_EMULATE_PREPARES', false)] : [],
         ],
 
         'sqlsrv' => [
