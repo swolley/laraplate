@@ -111,10 +111,10 @@ Paths relative to their module.
 - [x] Feature tests with `Http::fake`: posts the file with the bearer token and returns the transcript; no-op without a configured URL; null on a non-2xx response. 3 passed. Pint + PHPStan clean.
 - Config env documented in the service README; the `ai.providers.whisper` block added to `Modules/AI/config/config.php`. _`NullMediaTranscriber` retained as an explicit "disabled" implementation._
 
-## Task 9: Embedding dedup + per-media rows (M15)
+## Task 9: Embedding dedup + per-media rows (M15) — DONE
 
-- [ ] Reuse the embedding vector by embed-text hash (deterministic for text+model) to avoid a second embeddings-service call for a duplicated file; still write `ModelEmbedding` rows **per media** (morph → each copy).
-- [ ] Feature test: two media with identical embed-text produce per-media embedding rows but only one embeddings-service call. Pint + PHPStan.
+- [x] Reuse the embedding vector by embed-text hash (deterministic for text+model) to avoid a second embeddings-service call for a duplicated file; still write `ModelEmbedding` rows **per media** (morph → each copy). _`ModelEmbeddingSynchronizer` copies the vectors of any other model embedded with the same `content_hash` and `model_key` (one source, chunk order), and embeds a text shared by several models of one run once. Generic, not media-only: the vector depends only on text and embedding model. Core index `core_model_embeddings (content_hash, model_key)` added to the create migration._
+- [x] Feature test: two media with identical embed-text produce per-media embedding rows but only one embeddings-service call. _`Modules/AI/tests/Feature/EmbeddingVectorReuseTest.php` (reuse across runs, once per run, never across embedding models, on the stub embeddable model) + `Modules/Core/tests/Feature/Database/ModelEmbeddingsReuseIndexTest.php`. Pint clean; PHPStan not run in this session._
 
 ## Task 10: ACL — unified result set, owner-inherited, switchable (M16)
 
