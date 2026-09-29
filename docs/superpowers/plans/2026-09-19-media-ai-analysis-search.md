@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-18-media-ai-analysis-search-design.md`. Decisions are numbered M1–M21 there; tasks reference them.
 
+**Amended 2026-09-29:** the M21 static model registry and the M18 master switch built in Task 1 are replaced by Task 13 of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md` (planned in; spec `docs/superpowers/specs/2026-09-29-ai-model-selection-and-setting-actions-design.md`): model settings `features.media_analysis.{vision,transcription}.model`, provider `whisper`, seeded switch `features.media_analysis.enabled` without env. Tasks 9 to 14 below build on that state.
+
 **Coordination:** The media search-document contributor seam (M4a) is a **generic Core** seam; the CMS content extension seam (`docs/superpowers/plans/2026-09-19-cms-content-extension-seam.md`) should build its search-contribution on it rather than a CMS-local mechanism. Align if both are in flight.
 
 **Out of scope (Phase 2 / future):** timestamped `media_chunk` store, keyframe vision / video visual track, true shared-asset DAM.
@@ -56,6 +58,7 @@ Paths relative to their module.
 - [x] Add a `features.media_analysis` block to `Modules/AI/config/config.php` mirroring `features.embeddings`: `enabled` default false, a per-module allowlist, and a `capabilities` map (`vision`, `transcription`) each with an `active` key and `models` entries declaring `provider` + `service_model`. Defaults: vision `claude-sonnet-5`, transcription `whisper-local`. _Block added after the embeddings block._
 - [x] Create `MediaAnalysisModelRegistry` (twin of `EmbeddingModelRegistry`): `active(string $capability)` / `get($capability, $key)` return a `MediaAnalysisModelProfile` (capability/key/provider/serviceModel); unknown capability or key throws. LLM providers resolve later through the existing `ProviderFactory` (Task 7). _`Modules/AI/app/Ai/MediaAnalysis/{MediaAnalysisModelProfile,MediaAnalysisModelRegistry}.php`._
 - [x] Define the runtime **master switch** (M18) as `MediaAnalysisGate::enabled()`, reading the Settings row `media_analysis.enabled` (group `ai`) via Core's `PerModelSettingResolver`, falling back to the config default when no row exists; `allows(Model)` also applies the per-module `FeatureModuleGate`. _`Modules/AI/app/Ai/MediaAnalysis/MediaAnalysisGate.php`. Seeding the Settings row for Filament visibility is deferred (the gate works via config fallback until a row is created); revisit alongside Task 13._
+- **Amended 2026-09-29:** superseded by Task 13 of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md` (planned in). The registry reads the model settings `features.media_analysis.{vision,transcription}.model` and `get()` goes; the gate reads the seeded setting `features.media_analysis.enabled` through config and loses `SETTING_NAME` / `SETTING_GROUP` and its `PerModelSettingResolver` lookup; `AI_MEDIA_ANALYSIS_ENABLED`, `AI_MEDIA_VISION_MODEL`, `AI_MEDIA_VISION_OLLAMA_MODEL`, `AI_MEDIA_TRANSCRIPTION_MODEL` and `AI_MEDIA_WHISPER_LOCAL_MODEL` are removed. The deferred seeding above is resolved there, not in Task 13 of this plan.
 - [x] Unit tests: registry resolves the active vision/transcription profile, follows a config override, throws on unknown capability/key; gate falls back to config and is overridden by a runtime setting row. _`tests/Unit/Ai/MediaAnalysis/MediaAnalysisModelRegistryTest.php` (5), `tests/Feature/MediaAnalysis/MediaAnalysisGateTest.php` (2) — 7 passed. Pint + PHPStan clean._
 
 ## Task 2: `content_hash` + deterministic metadata on media create (M2, M15, M3a) — DONE
@@ -132,11 +135,11 @@ Paths relative to their module.
 
 ## Task 13: Filament / gallery surface (implementation detail)
 
-- [ ] Editable `custom_properties` display fields (description/alt_text/keywords) in the media Filament surface; read-only view of the AI analysis with provenance so an editor sees what was AI-generated vs human/embedded.
+- [ ] Editable `custom_properties` display fields (description/alt_text/keywords) in the media Filament surface (the master switch and the model settings already appear in Filament > Settings since the 2026-09-29 amendment; nothing to add here for them); read-only view of the AI analysis with provenance so an editor sees what was AI-generated vs human/embedded.
 - [ ] Feature/Livewire test for the edit + provenance display. Pint + PHPStan.
 
 ## Task 14: Docs + closeout
 
-- [ ] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem, master switch, model registry, whisper), plus any new env/config in the module READMEs.
+- [ ] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem and whisper; the master switch and the model settings are documented by the AI model selection pages of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`, link them instead of repeating them), plus any new env/config in the module READMEs.
 - [ ] Add a `## Delivery status (date): ...` section here and a `**Documented in:**` line naming the module docs (enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
 - [ ] Ask the user to run the full suite (`php artisan test --compact`) after the feature tests pass.
