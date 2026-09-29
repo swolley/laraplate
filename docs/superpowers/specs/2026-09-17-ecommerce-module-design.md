@@ -77,6 +77,7 @@ grows to where a large share of Magento's features would actually be used.
 | E22 | **Attributes have a single writer per concern; storefront classification is CMS, ERP taxonomy stays independent.** The platform has one attribute mechanism (Core `Entity` → `Preset` → `components`/`shared_components`) and one classification mechanism (Core `Taxonomy`, abstract, with per-module subclasses on the shared `core_taxonomies` table). A product spans `Content` + `ProductVariant` + ERP `Item`, so each concern gets exactly one writer: **(a) physical / transactional / producible truth → ERP `Item`** (SKU, UoM, costing, `tracing_type`, stock, and any item-level structured attribute ERP/MES need, via the Item's own taxonomy/preset). Shared with MES/ERP; Ecommerce never writes it. **(b) purchase-selection axis (the variant picker: size/colour) → `ProductVariant.attributes` JSON**, held as **label/projection only**; the identity of "which SKU I sell" is the `variant_items` composition (E7b), and if ERP ever models that axis structurally on the `Item`, the variant mirrors it read-only. **(c) editorial / merchandising → the `Content` preset `components` + `Product` `metadata`.** Storefront-only. **Classification:** storefront categories are CMS `Category` (a `Taxonomy` subclass) under the product content-**entity** (Categories are entity-scoped, so they do not mix with editorial-article categories); the E20 per-category `Preset` lives on the `Category` itself. ERP keeps its own item taxonomy (today `Item.taxonomy_id` is a latent generic `exists:core_taxonomies` pointer with no wired relation and no product tree); **Ecommerce ignores it — no mapping table.** The only ERP link is `variant_items` → `Item`; classification never crosses modules. | Assigning each concern a single writer and keeping the customer-facing category on CMS `Category` while ERP's accounting/production taxonomy stays independent prevents modelling the same attribute or category twice and avoids coupling Ecommerce to ERP's internal taxonomy. The category a customer browses and the classification ERP/MES use answer different questions and have no reason to coincide; forcing them equal would couple the storefront to ERP internals. |
 | E23 | **`company_id` placement: products and carts carry it via ERP `BelongsToCompany`; variants derive it.** `ecommerce_products` and `ecommerce_carts` use ERP's `BelongsToCompany` trait (global company scope + `creating` auto-fill from `current_company_id()`). `ProductVariant` carries **no** `company_id` column — it derives it from its `product`. `ecommerce_payment_reconciliations` carries none either: it correlates to the ERP order, which already holds the company. This **supersedes E11's looser "products/variants/carts" phrasing** — E11 stated the tenancy intent, E23 fixes the placement. | A variant's company is functionally dependent on its product; a `company_id` column there would be a denormalised duplicate that `BelongsToCompany` would redundantly auto-fill and scope. Reconciliation keys on the order, so it needs no own company column. |
 | E24 | **Active-vendor resolution reuses ERP tenancy through one storefront resolver; v1 = config, v2 = domain.** The storefront's active vendor `Company` is fed into ERP's existing resolver chain, not re-invented: a single Shop storefront middleware, via one `StorefrontVendorResolver`, sets the container binding `erp.current_company_id` for the request lifecycle; everything downstream reads only `current_company_id()` / `BelongsToCompany` and is unaware of how the company was resolved. The binding is **required** because a public/anonymous visitor has no authenticated user carrying `company_id` (ERP resolver step 2 fails on the public storefront). **v1 = a single configured company** (`config('shop.company_id')`), read **once** in that resolver. **v2 = host→company resolution** for multi-store, which replaces only the resolver's body — the binding seam and all downstream scoping are identical. Resolution MUST be centralised in the one resolver (no scattered `config('shop.company_id')` reads), so the v1→v2 swap stays a one-file change. | Reuse of ERP's `current_company_id()` binding avoids a parallel tenancy mechanism; centralising the strategy behind one resolver keeps the config→domain evolution (E12 phase 2) localised and safe rather than impossible. |
+| E25 | **Price display is a presentation setting over the net ERP price; the browse index stores net.** Displayed prices are **configurable per storefront audience, default B2C gross** (VAT-inclusive); a B2B storefront shows net (VAT-exclusive). The stored and indexed value (the E21 snapshot) is always the **net** price from `PriceResolverService`; the gross figure is computed **at render time** by applying the resolved VAT rate — never a second stored price. The display VAT rate is read from ERP's **standard** VAT `TaxCode` for the vendor company's `fiscal_country` (v1: one standard rate, no per-product tax class). The **authoritative** tax on the order/invoice is always ERP's, computed at document-build time (as today via `InvoiceLine.tax_code`), not the browse-time display rate. **Prerequisite: ERP-2** (a deterministic way to designate the standard VAT `TaxCode`, §8a). Reduced/zero per-product rates and destination-country VAT are **deferred** — they need an Item tax class plus a resolver, both ERP-side. | Keeping net as the single stored truth honours E7/E21 (no second price source); display inclusive-vs-exclusive is an audience presentation concern, not a new price; reusing ERP's `TaxCode` data avoids a parallel tax engine in Ecommerce. |
 
 ---
 
@@ -247,6 +248,34 @@ code. `Product` declares the inverse `content(): BelongsTo` to `contents`.
 
 ---
 
+## 8a. ERP prerequisites and findings
+
+Surfaced while designing Ecommerce against ERP. Each is **ERP-owned** work, recorded here so this
+design does not silently depend on a gap; each needs its own ERP task before the Ecommerce slice that
+relies on it ships. These are findings about the current ERP code, not Ecommerce decisions.
+
+- **ERP-1 — the Item taxonomy is a half-built, unconstrained classification (correctness).**
+  `Item.taxonomy_id` and `PriceListItem.taxonomy_id` are raw FKs to the shared `core_taxonomies` table,
+  consumed by `PriceResolverService` for the taxonomy-level price fallback and by `PartyPriceRule`
+  matching (tested: `PartyPriceRuleTest`, "requires exactly one of item_id or taxonomy_id") — yet there
+  is **no item taxonomy behind them**: no `EntityType` case for items/products (only `Activities`,
+  `OpportunityStages`), no `Taxonomy` subclass for items, no `taxonomy()` relation on `Item`, and
+  neither `ItemFactory` nor `ItemImporter` populates the column. An item can therefore point at an
+  `OpportunityStage`, `Activity` or CMS `Category` row and silently mis-resolve its price. Recommended
+  ERP fix: add `EntityType::Items`, an `ItemCategory extends Taxonomy` subclass, a `taxonomy()` relation
+  on `Item`, and constrain both `taxonomy_id` FKs to that subclass. **Not an Ecommerce blocker** — an
+  unclassified item simply skips the fallback and uses its direct price. Independent of the storefront
+  category (E22), which is a CMS `Category` Ecommerce owns and ERP ignores.
+- **ERP-2 — no deterministic standard VAT rate (blocks E25).** `TaxKind` has only `Vat`/`Withholding`;
+  a company may hold several `kind=vat` `TaxCode`s for one country (e.g. 22/10/4%) with **nothing marking
+  which is standard**, and there is no rate resolver (`InvoiceLine.tax_code_id` is chosen manually at
+  document-build time). E25's browse-time display rate cannot pick one deterministically. Recommended
+  ERP fix: an `is_standard` marker on `TaxCode` with a single active standard per `(company, country,
+  kind)`, plus a small `standardVat(company, country)` resolver. **Prerequisite for the E25 tax-display
+  slice.**
+
+---
+
 ## 9. Constraints and traps
 
 - No price or stock copy in `Product`/variants (E7, E8). Frontend never queries stock directly; only
@@ -326,9 +355,10 @@ To settle when the relevant slice is planned; none blocks the module's shape.
   idempotency, before choosing beyond the Stripe/PayPal references.
 _Raised in the 2026-09-19 spec review:_
 
-- **Tax/VAT display.** Whether shown prices are VAT-inclusive (B2C) or -exclusive (B2B), how the rate
-  is resolved (ERP tax) and shown per customer type/country. Absent so far and load-bearing for "what
-  the user sees"; the browse snapshot (E21) must state which of the two it stores.
+- ~~Tax/VAT display~~ **decided (E25)**: display is a presentation setting over the **net** ERP price —
+  configurable per audience, default B2C gross; the E21 snapshot stores net, gross is a render-time
+  multiply by the resolved standard VAT rate; authoritative tax stays ERP's at document build. Blocked
+  on **ERP-2** (§8a). Reduced/per-product rates and destination-country VAT deferred.
 - ~~Attribute taxonomy~~ **decided (E22)**: single writer per concern — ERP `Item` owns physical /
   transactional / producible truth (shared with MES/ERP, never written by Ecommerce); `ProductVariant.attributes`
   JSON holds the purchase-selection axis as label/projection only (identity is the `variant_items`
