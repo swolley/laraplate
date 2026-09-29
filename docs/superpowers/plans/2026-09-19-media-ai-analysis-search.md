@@ -161,6 +161,16 @@ Paths relative to their module.
 
 ## Task 14: Docs + closeout
 
-- [x] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem and whisper; the master switch and the model settings are documented by the AI model selection pages of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`, link them instead of repeating them), plus any new env/config in the module READMEs. _Done 2026-09-29 for Tasks 1-12: `Modules/Core/docs/rag/MODULE.md` (Media search), `Modules/AI/docs/rag/MEDIA_ANALYSIS_DEVELOPER.md`, `Modules/AI/docs/rag/MEDIA_ANALYSIS_USER.md`; Task 13 still to document when it ships._
-- [ ] Add a `## Delivery status (date): ...` section here and a `**Documented in:**` line naming the module docs (enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
+- [x] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem and whisper; the master switch and the model settings are documented by the AI model selection pages of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`, link them instead of repeating them), plus any new env/config in the module READMEs. _Done 2026-09-29 for Tasks 1-12; the Task 13 Filament surface documented on completion: `Modules/Core/docs/rag/MODULE.md` ("Media gallery and curation (Filament)"), `Modules/AI/docs/rag/MEDIA_ANALYSIS_DEVELOPER.md` + `MEDIA_ANALYSIS_USER.md` ("Filament surface")._
+- [x] Add a `## Delivery status (date): ...` section here and a `**Documented in:**` line naming the module docs (enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
 - [ ] Ask the user to run the full suite (`php artisan test --compact`) after the feature tests pass.
+
+## Delivery status (2026-09-29)
+
+All 14 tasks delivered. Tasks 1-12 (deterministic metadata, AI analysis pipeline, contributor + owner-authorizer seams, embedding dedup, lifecycle) landed earlier; Task 13 (Filament surface, M22) and this closeout landed 2026-09-29.
+
+Task 13 shipped as four sub-tasks: **13a** Core resource-schema contributor seam (`IResourceSchemaContributor` + `ResourceSchemaContributorRegistry`); **13b** reusable Core `MediaRelationManager` attached to CMS `Content` and SAO `Ticket` for owner-scoped display-field curation; **13c** read-only Core `MediaResource` gallery; **13d** AI `MediaAnalysisSchemaContributor` (read-only analysis panel + "Re-analyze" action, gated by the M18 switch).
+
+Divergences from the plan (recorded on each sub-task above): the gallery is fully read-only (editing consolidated in the owner relation manager); no bespoke `MediaPolicy` — media resources use the standard seeded `core.media.*` permission gating, since policies here are reserved for domain actions; the owner curation is a relation manager rather than fields inside `SpatieMediaLibraryFileUpload` (which cannot edit per-file metadata inline); the `track` facet (constant `media` in Phase 1) and media thumbnails are not offered (thumbnails deferred). Pre-existing note: `HasTable`'s filters-callback type was widened to `BaseFilter` (the type its default-filters collection holds).
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md` (Media search; Media gallery and curation), `Modules/AI/docs/rag/MEDIA_ANALYSIS_DEVELOPER.md` and `Modules/AI/docs/rag/MEDIA_ANALYSIS_USER.md` (media analysis subsystem and its Filament surface).
