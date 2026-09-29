@@ -23,7 +23,7 @@ Every task shipped. Each task carries an "Executed" note listing where the code 
 - `ModificationVoteService` reaches its target past the soft-delete and `Hide` scopes (Tasks 6 and 7).
 - The root `docs/rag/` has no approvals page, so nothing was written there.
 
-Found along the way and left as they were, outside this plan: `Setting::$value` has no validation rule, so the CRUD API drops it from an update; approve and disapprove lose the `modification` parameter to validation, so a vote on one specific request falls back to every active request of the record; an author needs `select` on `core_modifications` to reach Modifications and withdraw.
+Found along the way and left as they were, outside this plan: `Setting::$value` has no validation rule, so the CRUD API drops it from an update; approve and disapprove lose the `modification` parameter to validation, so a vote on one specific request falls back to every active request of the record; panel access (`User::canAccessPanel()`) admits only superadmins and holders of `*`, so authors reach their requests through the API, where they can withdraw but not list them (corrected 2026-09-30).
 
 ## Settled decisions (2026-09-28)
 
@@ -1788,7 +1788,7 @@ In `ModificationsTable`, next to approve/disapprove:
 - `EditComment` keeps its own `handleRecordUpdate()` (the body is a translation, not a column) and calls the concern's `saveReportingApprovalOutcome()` from it; `EditSetting`, `EditField`, `EditContent` and `EditPreset` use the concern's `handleRecordUpdate()`. The save no longer checks `isDirty()` first: a clean model's `save()` answers true, and a comment's pending body is not an attribute `isDirty()` sees.
 - A captured delete, force delete or restore sends its warning and calls `cancel()`, not `halt()`: the confirmation modal closes instead of staying open over a request already recorded.
 - The actor helper is `HttpContext::panelActorWithoutApproval(Model $model, array $actions = ['select', 'update', 'delete'])`, for any model: the Content test uses it too, so `contentActorWithoutApproval()` was never needed. `HttpContext::pretendHttpRequest()` now does nothing when the container is already the partial mock, since a test logging in two actors called it twice and Mockery refused to mock the mock.
-- The author needs `select` on `core_modifications` to open Modifications; the tests grant it. Whether every author should reach their own requests without that permission is a product question this plan does not settle.
+- Corrected 2026-09-30: the Modifications resource does not require `select` on `core_modifications`; an earlier version of the test granted it without need. What limits authors is panel access itself: `User::canAccessPanel()` admits only superadmins and holders of `*`.
 - "offers the author a withdraw action in Modifications" uses `Setting` and `ListModifications`, so it lives in the Core `ApprovalOutcomeTest`, not in the CMS file. The CMS test binds `Modules\CMS\Tests\TestCase` with `RefreshDatabase`, as its siblings do, and builds the live content with `createMinimalTestContentForComments()`. The save and `Block` cases write `is_public` (see Task 10).
 - The withdraw action is listed in `fixedActions` beside approve and disapprove.
 
