@@ -140,6 +140,6 @@ Paths relative to their module.
 
 ## Task 14: Docs + closeout
 
-- [ ] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem and whisper; the master switch and the model settings are documented by the AI model selection pages of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`, link them instead of repeating them), plus any new env/config in the module READMEs.
+- [x] RAG docs: `Modules/Core/docs/` (media searchable, custom_properties fields, contributor + owner-authorizer seams, `core.media.search_visibility`), `Modules/AI/docs/` (media analysis subsystem and whisper; the master switch and the model settings are documented by the AI model selection pages of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`, link them instead of repeating them), plus any new env/config in the module READMEs. _Done 2026-09-29 for Tasks 1-12: `Modules/Core/docs/rag/MODULE.md` (Media search), `Modules/AI/docs/rag/MEDIA_ANALYSIS_DEVELOPER.md`, `Modules/AI/docs/rag/MEDIA_ANALYSIS_USER.md`; Task 13 still to document when it ships._
 - [ ] Add a `## Delivery status (date): ...` section here and a `**Documented in:**` line naming the module docs (enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
 - [ ] Ask the user to run the full suite (`php artisan test --compact`) after the feature tests pass.
