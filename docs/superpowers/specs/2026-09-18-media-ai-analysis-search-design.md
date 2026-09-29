@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18
 **Module:** `Modules/Core` (media Core fields, deterministic extraction, event, Searchable, contributor seam) + `Modules/AI` (analysis listener, job, and AI-owned extension table)
-**Status:** Design agreed (M1-M20). All §13a design decisions are closed (ACL M16, locale M17, master switch M18, lifecycle M19, contributor seam M4a, media-type scope M20); a true DAM is a non-precluded future. Remaining §13b items are implementation details for the plan. No implementation started. **Amended 2026-09-29 (M18, M21)** by `docs/superpowers/specs/2026-09-29-ai-model-selection-and-setting-actions-design.md`: the master switch becomes a seeded setting without env, and the static model registry becomes per-capability model settings; planned in Task 13 of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`.
+**Status:** Design agreed (M1-M20). All §13a design decisions are closed (ACL M16, locale M17, master switch M18, lifecycle M19, contributor seam M4a, media-type scope M20); a true DAM is a non-precluded future. Remaining §13b items are implementation details for the plan. No implementation started. **Amended 2026-09-29 (M18, M21)** by `docs/superpowers/specs/2026-09-29-ai-model-selection-and-setting-actions-design.md`: the master switch becomes a seeded setting without env, and the static model registry becomes per-capability model settings; delivered on 2026-09-29 by Task 13 of `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`.
 
 ---
 

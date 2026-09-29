@@ -10,6 +10,22 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-29-ai-model-selection-and-setting-actions-design.md`
 
+## Delivery status (2026-09-29): shipped
+
+**Documented in:** `Modules/Core/docs/rag/SETTING_ACTIONS_USER.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_DEVELOPER.md`, `Modules/AI/docs/rag/AI_MODEL_SELECTION_USER.md`, `Modules/AI/docs/rag/AI_MODEL_SELECTION_DEVELOPER.md`, `Modules/AI/README.md`, `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, `Modules/AI/docs/WHISPER_INSTALLATION.md`.
+
+Every task shipped, executed inline with one commit per task in `laraplate-core` and `laraplate-ai`, each pushed. Divergences from the steps:
+
+- **Model refresh actions are seeded queued** (`action_queued = true`, spec said `false`): a synchronous refresh calls up to five providers in turn plus one Ollama request per installed model and can outlast a web request's time limit, which is a fatal error nothing catches. The grid reports "Command queued".
+- **Ollama base URL:** `OLLAMA_API_URL` is the server base; chat now appends `/api` like embeddings and the lister. Before, chat received the bare base and called `/chat` (pre-existing bug found by the final review).
+- **Malformed provider answers fail the provider** (an answer without a model list no longer counts as an empty listing), and `ModelCatalog` contains any provider error instead of only HTTP ones.
+- **Translation completion on give-up:** `TranslateModelJob` signals `ModelPreProcessingCompleted('translation')` from `failed()` instead of on the last attempt inside `handle()`; the `--sync` translate commands report a failing model and continue.
+- **Translation cache key** includes the chosen provider and model.
+- **Overlay listener skips the `sync` queue connection:** such jobs run inside the request whose middleware already applied the overlay.
+- `ModelSoftDeletesCommandsTest` builds its own `core_settings` table; it gained the two action columns.
+- Environment: `php artisan event:clear` was run (a stale `bootstrap/cache/events.php` hid new listeners). `bootstrap/cache/routes-v7.php` is stale too and 404s `Modules/AI/tests/Feature/ChatTest` (unrelated to this plan); suites were run with `APP_ROUTES_CACHE` pointing to a missing file, and the cache was left in place.
+- Deferred minors from the final review: the `choices` approval exemption also applies to CRUD API writes; Anthropic `has_more` without a cursor returns a partial list reported as listed; option values containing `''`/`""` are altered by Symfony's `StringInput`; the media transcription setting has no caller (`AnalyzeMediaJob` passes the vision profile to the transcriber, pre-existing); media analyses re-run once on the new `provider:model` version key.
+
 ## Global Constraints
 
 - Every PHP file starts with `declare(strict_types=1);`. Braces on every control structure, explicit parameter and return types, `#[Override]` on overridden members, `final` / `readonly` where the siblings use them. PHPDoc over inline comments. Code, comments and docs in English.
@@ -43,7 +59,7 @@
 **Interfaces:**
 - Produces: `Setting::$action_command` (`?string`), `Setting::$action_queued` (`bool`, cast), both outside `$fillable` and in `$hidden`; `choices` exempt from approval.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -106,12 +122,12 @@ it('still captures a value change from the same writer', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Models/SettingActionColumnsTest.php`
 Expected: FAIL. `action_queued` is null, the factory cannot write the unknown `action_command` column, and the choices-only change is captured for approval.
 
-- [ ] **Step 3: Add the columns to the create migration**
+- [x] **Step 3: Add the columns to the create migration**
 
 In `2024_03_30_170824_create_settings_table.php`, right after the `seeded_value` column and before `MigrateUtils::timestamps(...)`:
 
@@ -125,7 +141,7 @@ In `2024_03_30_170824_create_settings_table.php`, right after the `seeded_value`
                 ->comment('Queue the action command instead of running it inside the request');
 ```
 
-- [ ] **Step 4: Update the model**
+- [x] **Step 4: Update the model**
 
 In `Modules/Core/app/Models/Setting.php`:
 
@@ -171,17 +187,17 @@ Replace `requiresApprovalWhen()` and its docblock with:
     }
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Models/SettingActionColumnsTest.php`
 Expected: PASS (5 tests).
 
-- [ ] **Step 6: Run the neighbouring settings tests**
+- [x] **Step 6: Run the neighbouring settings tests**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Filament/EditSettingFormTest.php Modules/Core/tests/Feature/Filament/ApprovalOutcomeTest.php`
 Expected: PASS.
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/database/migrations/2024_03_30_170824_create_settings_table.php Modules/Core/app/Models/Setting.php Modules/Core/tests/Feature/Models/SettingActionColumnsTest.php
@@ -201,7 +217,7 @@ git -C Modules/Core commit -m "feat(settings): add seeded-only action columns an
 - Consumes: Task 1 columns.
 - Produces: `Seeder::internalSettingsDefinition(string $module, array $rows): SeedDefinition` (structural now includes `action_command`, `action_queued`); `Seeder::commandManagedChoicesSettingsDefinition(string $module, array $rows): SeedDefinition` (same, minus `choices`). Both fill missing `action_command` / `action_queued` with `null` / `false`, so every upserted row has the same keys.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `InternalSettingsDefinitionTest.php` (add `use Modules\Core\Casts\SettingTypeEnum;` and `use Modules\Core\Seeding\SeedReconciler;` to the imports):
 
@@ -272,12 +288,12 @@ it('still realigns the choices of ordinary settings', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/InternalSettingsDefinitionTest.php`
 Expected: FAIL: `commandManagedChoicesSettingsDefinition` does not exist and `structural` lacks the action columns.
 
-- [ ] **Step 3: Implement the definitions**
+- [x] **Step 3: Implement the definitions**
 
 In `Modules/Core/app/Overrides/Seeder.php`, replace `internalSettingsDefinition()` with the three methods below (keep its existing docblock on the first one, adding the sentence about actions):
 
@@ -350,12 +366,12 @@ In `Modules/Core/app/Overrides/Seeder.php`, replace `internalSettingsDefinition(
     }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Seeding/InternalSettingsDefinitionTest.php Modules/Core/tests/Feature/Seeding/CoreSettingsReconciliationTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Overrides/Seeder.php Modules/Core/tests/Feature/Seeding/InternalSettingsDefinitionTest.php
@@ -381,7 +397,7 @@ git -C Modules/Core commit -m "feat(seeding): realign setting actions and add co
   - `SettingActionResult` readonly: `string $commandLine`, `bool $queued`, `int $exitCode`, `string $output`, `succeeded(): bool`.
   - Test stub command `laraplate:setting-action-probe {name} {--flag=} {--fail}` recording calls in `SettingActionProbeCommand::$calls` (`list<array{name: string, flag: ?string}>`).
 
-- [ ] **Step 1: Write the probe stub command**
+- [x] **Step 1: Write the probe stub command**
 
 ```php
 <?php
@@ -423,7 +439,7 @@ final class SettingActionProbeCommand extends Command
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```php
 <?php
@@ -537,12 +553,12 @@ it('queues the command when action_queued is set', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Services/SettingActionRunnerTest.php`
 Expected: FAIL with "Class Modules\Core\Services\SettingActionRunner not found".
 
-- [ ] **Step 4: Write the exception**
+- [x] **Step 4: Write the exception**
 
 ```php
 <?php
@@ -581,7 +597,7 @@ final class InvalidSettingActionException extends RuntimeException
 }
 ```
 
-- [ ] **Step 5: Write the result**
+- [x] **Step 5: Write the result**
 
 ```php
 <?php
@@ -620,7 +636,7 @@ final readonly class SettingActionResult
 }
 ```
 
-- [ ] **Step 6: Write the runner**
+- [x] **Step 6: Write the runner**
 
 ```php
 <?php
@@ -720,12 +736,12 @@ final readonly class SettingActionRunner
 }
 ```
 
-- [ ] **Step 7: Run the test to verify it passes**
+- [x] **Step 7: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Services/SettingActionRunnerTest.php`
 Expected: PASS (9 tests).
 
-- [ ] **Step 8: Format and commit**
+- [x] **Step 8: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Services/SettingActionRunner.php Modules/Core/app/Services/SettingActionResult.php Modules/Core/app/Exceptions/InvalidSettingActionException.php Modules/Core/tests/Stubs/Console/SettingActionProbeCommand.php Modules/Core/tests/Feature/Services/SettingActionRunnerTest.php
@@ -747,7 +763,7 @@ git -C Modules/Core commit -m "feat(settings): run a setting's action command wi
 - Consumes: `SettingActionRunner::run()`, `SettingActionResult`, `InvalidSettingActionException` (Task 3); `SettingActionProbeCommand` stub (Task 3).
 - Produces: table action named `runSettingAction`; form fields `action_command`, `action_queued` (disabled, not dehydrated, visible only when the setting has an action).
 
-- [ ] **Step 1: Write the failing grid test**
+- [x] **Step 1: Write the failing grid test**
 
 ```php
 <?php
@@ -841,7 +857,7 @@ it('queues the command when the setting asks for it', function (): void {
 });
 ```
 
-- [ ] **Step 2: Add the failing form test**
+- [x] **Step 2: Add the failing form test**
 
 Append to `EditSettingFormTest.php`:
 
@@ -883,12 +899,12 @@ it('hides the action fields when the setting has no action', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Filament/SettingActionTableTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php`
 Expected: FAIL: action `runSettingAction` and fields `action_command` / `action_queued` do not exist.
 
-- [ ] **Step 4: Add the row action to `SettingsTable`**
+- [x] **Step 4: Add the row action to `SettingsTable`**
 
 Add imports:
 
@@ -977,7 +993,7 @@ Add the private methods:
     }
 ```
 
-- [ ] **Step 5: Add the read-only fields to `SettingForm`**
+- [x] **Step 5: Add the read-only fields to `SettingForm`**
 
 In `configure()`, append after the `description` `TextInput` inside `->components([...])`:
 
@@ -1007,12 +1023,12 @@ In `configure()`, append after the `description` `TextInput` inside `->component
 
 Update the class docblock: "Settings are seeded: only the group, the value and the description can be edited. The value input follows the setting type, which is itself read-only. The action a setting runs is shown read-only; `$hidden` keeps it out of the fill data, so the fields read it from the record."
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Filament/SettingActionTableTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php`
 Expected: PASS. The existing "lays out the edit form in rows" test still passes because the action row is hidden for a setting without an action. If `assertFormSet` or `assertFormFieldHidden` are not the Filament 5 names, look them up with Boost `search-docs` (`testing forms state`) and use the documented ones.
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php Modules/Core/tests/Feature/Filament/SettingActionTableTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php
@@ -1034,7 +1050,7 @@ git -C Modules/Core commit -m "feat(settings): run a setting's action from the s
 **Interfaces:**
 - Produces: `Setting::isValueOutsideChoices(): bool`. True only for a scalar value missing from a non-empty choice list.
 
-- [ ] **Step 1: Write the failing model test**
+- [x] **Step 1: Write the failing model test**
 
 ```php
 <?php
@@ -1061,7 +1077,7 @@ it('flags only a scalar value missing from a non-empty choice list', function (m
 ]);
 ```
 
-- [ ] **Step 2: Add the failing form test**
+- [x] **Step 2: Add the failing form test**
 
 Append to `EditSettingFormTest.php`:
 
@@ -1102,12 +1118,12 @@ it('marks a value no longer offered in the settings grid', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Models/SettingChoicesAnomalyTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php`
 Expected: FAIL: `isValueOutsideChoices()` is undefined; the select is not searchable and lacks the unavailable option.
 
-- [ ] **Step 4: Add the model method**
+- [x] **Step 4: Add the model method**
 
 In `Setting.php`, add after `getRules()`:
 
@@ -1131,7 +1147,7 @@ In `Setting.php`, add after `getRules()`:
     }
 ```
 
-- [ ] **Step 5: Make the form select searchable and keep an unavailable value**
+- [x] **Step 5: Make the form select searchable and keep an unavailable value**
 
 In `SettingForm::valueField()`, replace the `default` arm:
 
@@ -1167,7 +1183,7 @@ Add the private method:
     }
 ```
 
-- [ ] **Step 6: Mark the grid cell**
+- [x] **Step 6: Mark the grid cell**
 
 In `SettingsTable`, on `TextColumn::make('value')`, add after `->alignCenter()`:
 
@@ -1179,12 +1195,12 @@ In `SettingsTable`, on `TextColumn::make('value')`, add after `->alignCenter()`:
                             : null)
 ```
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Models/SettingChoicesAnomalyTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php`
 Expected: PASS.
 
-- [ ] **Step 8: Format and commit**
+- [x] **Step 8: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Models/Setting.php Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php Modules/Core/app/Filament/Resources/Settings/Tables/SettingsTable.php Modules/Core/tests/Feature/Models/SettingChoicesAnomalyTest.php Modules/Core/tests/Feature/Filament/EditSettingFormTest.php
@@ -1207,7 +1223,7 @@ git -C Modules/Core commit -m "feat(settings): flag and keep values no longer am
 
 The queue worker calls `forgetScopedInstances()` before each job (`Illuminate\Queue\QueueServiceProvider`, reset scope), and `PerModelSettingResolver` is scoped, so the resolver built for the listener is new and reads the persistent cache the saving process invalidated.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1246,12 +1262,12 @@ it('applies a setting changed by another process before the next job runs', func
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Listeners/ApplySettingsOverlayBeforeJobTest.php`
 Expected: FAIL: the last expectation reads `before`.
 
-- [ ] **Step 3: Write the listener**
+- [x] **Step 3: Write the listener**
 
 ```php
 <?php
@@ -1286,7 +1302,7 @@ final readonly class ApplySettingsOverlayBeforeJob
 }
 ```
 
-- [ ] **Step 4: Register it**
+- [x] **Step 4: Register it**
 
 In `Modules/Core/app/Providers/EventServiceProvider.php`, add to `$listen` (and `use Illuminate\Queue\Events\JobProcessing;`):
 
@@ -1296,17 +1312,17 @@ In `Modules/Core/app/Providers/EventServiceProvider.php`, add to `$listen` (and 
         ],
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Feature/Listeners/ApplySettingsOverlayBeforeJobTest.php`
 Expected: PASS.
 
-- [ ] **Step 6: Run the Core suite**
+- [x] **Step 6: Run the Core suite**
 
 Run: `php artisan test --compact Modules/Core/tests`
 Expected: PASS. Every sync-queue dispatch in the suite now re-applies the overlay; a failure here means a test relied on config set by hand being kept across a queued job, which must be set as a setting or through `config()` after dispatch instead.
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/Core/app/Listeners/ApplySettingsOverlayBeforeJob.php Modules/Core/app/Providers/EventServiceProvider.php Modules/Core/tests/Feature/Listeners/ApplySettingsOverlayBeforeJobTest.php
@@ -1329,7 +1345,7 @@ git -C Modules/Core commit -m "fix(settings): re-apply the settings overlay befo
 **Interfaces:**
 - Produces: an empty `ai.providers.ollama.api_url` means "Ollama not configured"; both factories throw `ConfigurationException('Ollama API URL is not configured')`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `ProviderFactoryTest.php`:
 
@@ -1351,12 +1367,12 @@ it('throws when the Ollama URL is missing for embeddings', function (): void {
 })->throws(Modules\Core\Exceptions\ConfigurationException::class, 'Ollama API URL is not configured');
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/ProviderFactoryTest.php Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php`
 Expected: FAIL: the factories fall back to `localhost`.
 
-- [ ] **Step 3: Remove the defaults**
+- [x] **Step 3: Remove the defaults**
 
 `config.php`: `'api_url' => env('OLLAMA_API_URL'),` (no default).
 
@@ -1396,12 +1412,12 @@ Expected: FAIL: the factories fall back to `localhost`.
 OLLAMA_API_URL=                      # Ollama API URL, e.g. http://localhost:11434. Required to use Ollama: unset means not configured
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/ProviderFactoryTest.php Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/config/config.php Modules/AI/app/Ai/Providers/ProviderFactory.php Modules/AI/app/Ai/Embeddings/EmbeddingsProviderFactory.php Modules/AI/tests/Integration/ProviderFactoryTest.php Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php
@@ -1429,7 +1445,7 @@ git -C Modules/AI commit -m "fix(ai): an unset Ollama URL means Ollama is not co
   - `final readonly class AiModelChoice(string $provider, ?string $model = null)` with `static parse(string $value): self`, `static forFeature(AiModelFeature $feature): self` (reads `ai.{settingName}`, falls back to `defaultChoice()`), `value(): string`.
   - No config entry and no env variable for any model setting: the default lives in `defaultChoice()`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1498,12 +1514,12 @@ it('declares providers and capabilities per feature', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/AiModelChoiceTest.php`
 Expected: FAIL with "Class Modules\AI\Ai\Providers\AiModelChoice not found".
 
-- [ ] **Step 3: Write `ModelCapability`**
+- [x] **Step 3: Write `ModelCapability`**
 
 ```php
 <?php
@@ -1523,7 +1539,7 @@ enum ModelCapability: string
 }
 ```
 
-- [ ] **Step 4: Write `AiModelFeature`**
+- [x] **Step 4: Write `AiModelFeature`**
 
 ```php
 <?php
@@ -1643,7 +1659,7 @@ enum AiModelFeature: string
 }
 ```
 
-- [ ] **Step 5: Write `AiModelChoice`**
+- [x] **Step 5: Write `AiModelChoice`**
 
 ```php
 <?php
@@ -1702,11 +1718,11 @@ final readonly class AiModelChoice
 }
 ```
 
-- [ ] **Step 6: Remove the text-generation provider and model from config**
+- [x] **Step 6: Remove the text-generation provider and model from config**
 
 In `Modules/AI/config/config.php`, inside `features.text_generation`, delete the `'default_provider' => env('AI_TEXT_GENERATION_PROVIDER', env('AI_CHAT_PROVIDER', 'ollama')),` entry and the `'model' => env('AI_TEXT_GENERATION_MODEL'),` entry with its comment. The setting `features.text_generation.model` takes that name with a `provider:model` value, so a leftover config key holding a bare model id would be read as a provider.
 
-- [ ] **Step 7: Switch the text-generation listener to its choice**
+- [x] **Step 7: Switch the text-generation listener to its choice**
 
 In `HandleAiTextGenerationListener` (imports `Modules\AI\Ai\Providers\AiModelChoice`, `Modules\AI\Enums\AiModelFeature`), replace the body of `makeChatAgent()` after the factory check with:
 
@@ -1725,12 +1741,12 @@ and in `log()` use `'provider' => AiModelChoice::forFeature(AiModelFeature::Text
 
 In `Modules/AI/tests/Integration/AiTextGenerationModelBindingTest.php`: "builds the text-generation chat agent on the configured model" sets only `config()->set('ai.features.text_generation.model', 'ollama:phi3');` (drop the `default_provider` line) and still expects `phi3`; "leaves the chat agent model null when the feature configures none" sets only `config()->set('ai.features.text_generation.model', 'ollama');` and still expects `null`.
 
-- [ ] **Step 8: Run the tests to verify they pass**
+- [x] **Step 8: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/AiModelChoiceTest.php Modules/AI/tests/Integration/AiTextGenerationModelBindingTest.php Modules/AI/tests/Integration/HandleAiTextGenerationListenerTest.php`
 Expected: PASS.
 
-- [ ] **Step 9: Format and commit**
+- [x] **Step 9: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Enums/ModelCapability.php Modules/AI/app/Enums/AiModelFeature.php Modules/AI/app/Ai/Providers/AiModelChoice.php Modules/AI/config/config.php Modules/AI/app/Listeners/HandleAiTextGenerationListener.php Modules/AI/tests/Unit/Ai/Providers/AiModelChoiceTest.php Modules/AI/tests/Integration/AiTextGenerationModelBindingTest.php
@@ -1760,7 +1776,7 @@ git -C Modules/AI commit -m "feat(ai): per-feature model choice with defaults in
 
 Endpoints verified 2026-09-29: OpenAI `GET https://api.openai.com/v1/models` (Bearer, `data[].id`, no capabilities). Anthropic `GET https://api.anthropic.com/v1/models` (`x-api-key`, `anthropic-version: 2023-06-01`, `limit` up to 1000, `after_id`, response `data[].id`, `data[].capabilities.image_input.supported`, `has_more`, `last_id`). Mistral `GET https://api.mistral.ai/v1/models` (Bearer, `data[].capabilities.{completion_chat,function_calling,vision}`, `data[].archived`). Ollama `GET {url}/api/tags` (`models[].name`), `POST {url}/api/show` body `{"model": name}` (`capabilities` list: `completion`, `tools`, `vision`, `embedding`, `insert`, `thinking`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -1889,12 +1905,12 @@ it('treats unknown capabilities as satisfying any requirement', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/Models/ModelListersTest.php`
 Expected: FAIL with "Class ... not found".
 
-- [ ] **Step 3: Write `ListedModel` and `ModelLister`**
+- [x] **Step 3: Write `ListedModel` and `ModelLister`**
 
 ```php
 <?php
@@ -1964,7 +1980,7 @@ interface ModelLister
 }
 ```
 
-- [ ] **Step 4: Write the OpenAI lister**
+- [x] **Step 4: Write the OpenAI lister**
 
 ```php
 <?php
@@ -2019,7 +2035,7 @@ final readonly class OpenAiModelLister implements ModelLister
 }
 ```
 
-- [ ] **Step 5: Write the Anthropic lister**
+- [x] **Step 5: Write the Anthropic lister**
 
 ```php
 <?php
@@ -2088,7 +2104,7 @@ final readonly class AnthropicModelLister implements ModelLister
 }
 ```
 
-- [ ] **Step 6: Write the Mistral lister**
+- [x] **Step 6: Write the Mistral lister**
 
 ```php
 <?php
@@ -2157,7 +2173,7 @@ final readonly class MistralModelLister implements ModelLister
 }
 ```
 
-- [ ] **Step 7: Write the Ollama lister**
+- [x] **Step 7: Write the Ollama lister**
 
 ```php
 <?php
@@ -2245,12 +2261,12 @@ final readonly class OllamaModelLister implements ModelLister
 }
 ```
 
-- [ ] **Step 8: Run the test to verify it passes**
+- [x] **Step 8: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/Models/ModelListersTest.php`
 Expected: PASS.
 
-- [ ] **Step 9: Format and commit**
+- [x] **Step 9: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Ai/Providers/Models/ListedModel.php Modules/AI/app/Ai/Providers/Models/ModelLister.php Modules/AI/app/Ai/Providers/Models/OpenAiModelLister.php Modules/AI/app/Ai/Providers/Models/AnthropicModelLister.php Modules/AI/app/Ai/Providers/Models/MistralModelLister.php Modules/AI/app/Ai/Providers/Models/OllamaModelLister.php Modules/AI/tests/Unit/Ai/Providers/Models/ModelListersTest.php
@@ -2279,7 +2295,7 @@ git -C Modules/AI commit -m "feat(ai): list the models of OpenAI, Anthropic, Mis
   - `CatalogResult(array<string, list<string>> $choices, array<string, ProviderOutcome> $outcomes)` with `hasFailures(): bool`; `choices` keyed by setting name.
   - `ModelCatalog::build(list<AiModelFeature> $features, array<string, list<string>> $currentChoices): CatalogResult`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -2383,12 +2399,12 @@ it('offers providers without a catalogue by name when configured', function (): 
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/Models/ModelCatalogTest.php`
 Expected: FAIL with "Class ... ModelCatalog not found".
 
-- [ ] **Step 3: Write `ProviderConfiguration`**
+- [x] **Step 3: Write `ProviderConfiguration`**
 
 ```php
 <?php
@@ -2433,7 +2449,7 @@ final readonly class ProviderConfiguration
 }
 ```
 
-- [ ] **Step 4: Write the outcome types**
+- [x] **Step 4: Write the outcome types**
 
 ```php
 <?php
@@ -2497,7 +2513,7 @@ final readonly class CatalogResult
 }
 ```
 
-- [ ] **Step 5: Write `ModelCatalog`**
+- [x] **Step 5: Write `ModelCatalog`**
 
 ```php
 <?php
@@ -2626,12 +2642,12 @@ final readonly class ModelCatalog
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/Providers/Models/ModelCatalogTest.php`
 Expected: PASS.
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Ai/Providers/Models/ProviderConfiguration.php Modules/AI/app/Enums/ProviderListingStatus.php Modules/AI/app/Ai/Providers/Models/ProviderOutcome.php Modules/AI/app/Ai/Providers/Models/CatalogResult.php Modules/AI/app/Ai/Providers/Models/ModelCatalog.php Modules/AI/tests/Unit/Ai/Providers/Models/ModelCatalogTest.php
@@ -2654,7 +2670,7 @@ git -C Modules/AI commit -m "feat(ai): build per-feature model choices from the 
 - Consumes: `Seeder::commandManagedChoicesSettingsDefinition()` (Task 2); `Setting::isValueOutsideChoices()` (Task 5); `AiModelFeature`, `AiModelChoice` (Task 8); `ModelCatalog` (Task 10).
 - Produces: `AIDatabaseSeeder::modelSettingDefinitions(): list<array<string,mixed>>`; command `ai:models:refresh {--setting=}`, exit `0` or `1`; schedule daily at 03:00.
 
-- [ ] **Step 1: Write the failing seeder test**
+- [x] **Step 1: Write the failing seeder test**
 
 Append to `AIDatabaseSeederTest.php` (add `use Modules\AI\Enums\AiModelFeature;`):
 
@@ -2687,7 +2703,7 @@ it('keeps refreshed model choices across a re-seed', function (): void {
 });
 ```
 
-- [ ] **Step 2: Write the failing command test**
+- [x] **Step 2: Write the failing command test**
 
 ```php
 <?php
@@ -2782,12 +2798,12 @@ it('is scheduled every night at 03:00', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/Seeders/AIDatabaseSeederTest.php Modules/AI/tests/Feature/Console/RefreshAiModelsCommandTest.php`
 Expected: FAIL: no model settings are seeded, the command does not exist.
 
-- [ ] **Step 4: Seed the model settings**
+- [x] **Step 4: Seed the model settings**
 
 In `AIDatabaseSeeder.php` add the import `use Modules\AI\Enums\AiModelFeature;`. Add:
 
@@ -2842,7 +2858,7 @@ Replace `run()` with:
     }
 ```
 
-- [ ] **Step 5: Write the command**
+- [x] **Step 5: Write the command**
 
 ```php
 <?php
@@ -2952,7 +2968,7 @@ final class RefreshAiModelsCommand extends Command
 }
 ```
 
-- [ ] **Step 6: Schedule it**
+- [x] **Step 6: Schedule it**
 
 In `AIServiceProvider.php` add imports `use Illuminate\Console\Scheduling\Schedule;` and `use Modules\AI\Console\RefreshAiModelsCommand;`, and:
 
@@ -2971,12 +2987,12 @@ In `AIServiceProvider.php` add imports `use Illuminate\Console\Scheduling\Schedu
 
 Check first that `Modules\Core\Overrides\ModuleServiceProvider::boot()` calls `registerCommandSchedules()` (`rtk proxy grep -n "registerCommandSchedules" Modules/Core/app/Overrides/ModuleServiceProvider.php`); if it does not, call it from `AIServiceProvider::boot()`.
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Feature/Seeders/AIDatabaseSeederTest.php Modules/AI/tests/Feature/Console/RefreshAiModelsCommandTest.php`
 Expected: PASS.
 
-- [ ] **Step 8: Format and commit**
+- [x] **Step 8: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/database/seeders/AIDatabaseSeeder.php Modules/AI/app/Console/RefreshAiModelsCommand.php Modules/AI/app/Providers/AIServiceProvider.php Modules/AI/tests/Feature/Seeders/AIDatabaseSeederTest.php Modules/AI/tests/Feature/Console/RefreshAiModelsCommandTest.php
@@ -3007,7 +3023,7 @@ git -C Modules/AI commit -m "feat(ai): seed model settings and refresh their cho
 - Consumes: `AiModelFeature`, `AiModelChoice` (Task 8).
 - Produces: `ChatAgent::forFeature(AiModelFeature $feature, ?string $systemPrompt = null): static`; `ProviderFactory::make(null, ...)` takes both provider and model from the chat choice.
 
-- [ ] **Step 1: Write the failing wiring test**
+- [x] **Step 1: Write the failing wiring test**
 
 ```php
 <?php
@@ -3098,12 +3114,12 @@ it('falls back to the chat choice when no provider is named', function (): void 
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/AiModelFeatureWiringTest.php`
 Expected: FAIL: `ChatAgent::forFeature()` does not exist.
 
-- [ ] **Step 3: Add `ChatAgent::forFeature()` and the factory default**
+- [x] **Step 3: Add `ChatAgent::forFeature()` and the factory default**
 
 `ChatAgent.php` (imports `Modules\AI\Ai\Providers\AiModelChoice`, `Modules\AI\Enums\AiModelFeature`):
 
@@ -3131,7 +3147,7 @@ Expected: FAIL: `ChatAgent::forFeature()` does not exist.
 
 and update its docblock: "Without a provider, provider and model come from the chat choice in Settings."
 
-- [ ] **Step 4: Switch each consumer**
+- [x] **Step 4: Switch each consumer**
 
 - `ChatService::buildProtectedAgent()`: `return $provider === null ? ChatAgent::forFeature(AiModelFeature::Chat, $system_prompt) : ChatAgent::make($provider, $system_prompt);`
 - `HandleAiTextGenerationListener::makeChatAgent()`: after the factory check, replace the Task 8 body with `return ChatAgent::forFeature(AiModelFeature::TextGeneration, self::SYSTEM_PROMPT); // @codeCoverageIgnore`.
@@ -3169,29 +3185,29 @@ and update its docblock: "Without a provider, provider and model come from the c
 
 Add the `AiModelFeature` / `AiModelChoice` / `Closure` imports where used; drop `ai_config_string` imports that become unused.
 
-- [ ] **Step 5: Remove the replaced config keys**
+- [x] **Step 5: Remove the replaced config keys**
 
 In `config.php` remove `chat.default_provider` (`AI_CHAT_PROVIDER`), `moderation.provider` (`AI_MODERATION_PROVIDER`, `AI_COMMENT_MOD_PROVIDER`), `search_orchestration.default_provider` (`AI_SEARCH_ORCHESTRATION_PROVIDER`) and `providers.anthropic.model` (`ANTHROPIC_MODEL`). Keep `search_orchestration.enabled`, `moderation.queue`, `text_generation.enabled` and the other tuning keys, and keep `providers.{openai,ollama,mistral}.model`: the embeddings factory reads them.
 
 In `ProviderFactory::createAnthropic()`, the model fallback becomes a constant: `model: $model ?? self::ANTHROPIC_DEFAULT_MODEL,` with `private const string ANTHROPIC_DEFAULT_MODEL = 'claude-sonnet-4-20250514';` on the class. In `ProviderFactoryTest.php`, "creates an Anthropic provider when configured" drops its `config()->set('ai.providers.anthropic.model', ...)` line.
 
-- [ ] **Step 6: Update the existing tests to the new keys**
+- [x] **Step 6: Update the existing tests to the new keys**
 
 - `ProviderFactoryTest.php`, "uses default provider from config when none specified": replace `config()->set('ai.features.chat.default_provider', 'ollama');` with `config()->set('ai.features.chat.model', 'ollama:llama3.2:3b');`.
 - `ChatAgentTest.php`, `ChatServiceFullTest.php`: every `config()->set('ai.features.chat.default_provider', 'ollama');` becomes `config()->set('ai.features.chat.model', 'ollama:llama3.2:3b');`.
 - `DocumentationAgentTest.php`: `config()->set('ai.features.chat.default_provider', 'ollama');` becomes `config()->set('ai.features.faq.model', 'ollama:llama3.2:3b');`.
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/AiModelFeatureWiringTest.php Modules/AI/tests/Integration/ProviderFactoryTest.php Modules/AI/tests/Integration/ChatAgentTest.php Modules/AI/tests/Integration/ChatServiceFullTest.php Modules/AI/tests/Integration/DocumentationAgentTest.php Modules/AI/tests/Integration/AiTextGenerationModelBindingTest.php Modules/AI/tests/Integration/HandleAiTextGenerationListenerTest.php Modules/AI/tests/Integration/GuardrailsServiceTest.php Modules/AI/tests/Integration/GuardrailsServiceFullTest.php Modules/AI/tests/Integration/MemoryServiceFullTest.php Modules/AI/tests/Integration/ContextualSuggestionServiceTest.php Modules/AI/tests/Integration/LlmSearchServiceTest.php Modules/AI/tests/Integration/Services/ModerationServiceTest.php`
 Expected: PASS.
 
-- [ ] **Step 8: Check no reader of the removed keys is left**
+- [x] **Step 8: Check no reader of the removed keys is left**
 
 Run: `rtk proxy grep -rnE "features\.(chat\.default_provider|text_generation\.default_provider|moderation\.provider|search_orchestration\.default_provider)" Modules/*/app Modules/*/tests Modules/*/config`
 Expected: no output.
 
-- [ ] **Step 9: Format and commit**
+- [x] **Step 9: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Ai/Agents/ChatAgent.php Modules/AI/app/Ai/Providers/ProviderFactory.php Modules/AI/app/Services/ChatService.php Modules/AI/app/Listeners/HandleAiTextGenerationListener.php Modules/AI/app/Services/ModerationService.php Modules/AI/app/Services/LlmSearchService.php Modules/AI/app/Ai/Agents/DocumentationAgent.php Modules/AI/app/Services/ContextualSuggestionService.php Modules/AI/app/Services/MemoryService.php Modules/AI/app/Services/GuardrailsService.php Modules/AI/config/config.php Modules/AI/tests/Integration/AiModelFeatureWiringTest.php Modules/AI/tests/Integration/ProviderFactoryTest.php Modules/AI/tests/Integration/ChatAgentTest.php Modules/AI/tests/Integration/ChatServiceFullTest.php Modules/AI/tests/Integration/DocumentationAgentTest.php
@@ -3225,7 +3241,7 @@ Amends M18 and M21 of `docs/superpowers/specs/2026-09-18-media-ai-analysis-searc
 
 `AnalyzeMediaJob` stores `$profile->key` as `analysis_model_version`: existing analyses carry `claude-sonnet-5` and will be redone once on the new key. Accepted: developer data, rebuilt with `migrate:fresh --seed`.
 
-- [ ] **Step 1: Rewrite the registry test**
+- [x] **Step 1: Rewrite the registry test**
 
 ```php
 <?php
@@ -3270,7 +3286,7 @@ In `WhisperTranscriberTest.php` line 11: `return new MediaAnalysisModelProfile('
 
 In `AnalyzeMediaJobTest.php` lines 69 and 84: `'claude-sonnet-5'` becomes `'anthropic:claude-sonnet-5'` (the default vision choice).
 
-- [ ] **Step 2: Rewrite the gate test**
+- [x] **Step 2: Rewrite the gate test**
 
 ```php
 <?php
@@ -3305,12 +3321,12 @@ it('follows the seeded setting, which starts off', function (): void {
 
 `HandleMediaAnalysisListenerTest.php` keeps working: it sets `ai.features.media_analysis.enabled` through `config()->set()`, which is what the overlay writes.
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/MediaAnalysis/MediaAnalysisModelRegistryTest.php Modules/AI/tests/Feature/MediaAnalysis`
 Expected: FAIL: the registry reads `capabilities.*.active`, and no `features.media_analysis.enabled` row is seeded.
 
-- [ ] **Step 4: Rewrite the registry**
+- [x] **Step 4: Rewrite the registry**
 
 ```php
 <?php
@@ -3350,7 +3366,7 @@ final class MediaAnalysisModelRegistry
 }
 ```
 
-- [ ] **Step 5: Rewrite the gate**
+- [x] **Step 5: Rewrite the gate**
 
 ```php
 <?php
@@ -3389,7 +3405,7 @@ final readonly class MediaAnalysisGate
 }
 ```
 
-- [ ] **Step 6: Seed the switch and clean the config**
+- [x] **Step 6: Seed the switch and clean the config**
 
 In `AIDatabaseSeeder::runtimeSettingDefinitions()`, after the `features.translation.enabled` row:
 
@@ -3401,17 +3417,17 @@ In `config.php`, under `media_analysis`, delete `'enabled' => env('AI_MEDIA_ANAL
 
 In `WHISPER_INSTALLATION.md`: the table row at line 22 becomes ``| `features.media_analysis.transcription.model` | Which transcription provider runs | `whisper` |``; delete the `AI_MEDIA_TRANSCRIPTION_MODEL=whisper-local` line (103) and any `AI_MEDIA_WHISPER_LOCAL_MODEL` or `AI_MEDIA_ANALYSIS_ENABLED` mention, noting that the Whisper model is chosen on the Whisper host with `WHISPER_MODEL` and that media analysis is switched on from Settings (`features.media_analysis.enabled`).
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Unit/Ai/MediaAnalysis/MediaAnalysisModelRegistryTest.php Modules/AI/tests/Feature/MediaAnalysis Modules/AI/tests/Feature/Seeders/AIDatabaseSeederTest.php Modules/Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php`
 Expected: PASS.
 
-- [ ] **Step 8: Check no old name is left**
+- [x] **Step 8: Check no old name is left**
 
 Run: `rtk proxy grep -rnE "whisper_local|whisper-local|capabilities\.(vision|transcription)|AI_MEDIA_(ANALYSIS_ENABLED|TRANSCRIPTION_MODEL|WHISPER_LOCAL_MODEL|VISION_OLLAMA_MODEL|VISION_MODEL)|MediaAnalysisGate::SETTING" Modules/AI --include=*.php --include=*.md`
 Expected: no output.
 
-- [ ] **Step 9: Format and commit**
+- [x] **Step 9: Format and commit**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Ai/MediaAnalysis/MediaAnalysisModelRegistry.php Modules/AI/app/Ai/MediaAnalysis/MediaAnalysisGate.php Modules/AI/database/seeders/AIDatabaseSeeder.php Modules/AI/config/config.php Modules/AI/tests/Unit/Ai/MediaAnalysis/MediaAnalysisModelRegistryTest.php Modules/AI/tests/Feature/MediaAnalysis/MediaAnalysisGateTest.php Modules/AI/tests/Feature/MediaAnalysis/WhisperTranscriberTest.php Modules/AI/tests/Feature/MediaAnalysis/AnalyzeMediaJobTest.php
@@ -3438,7 +3454,7 @@ git -C Modules/AI commit -m "feat(ai): media analysis reads its settings; seeded
 - Consumes: `AiModelFeature::Translation`, `AiModelChoice` (Task 8).
 - Produces: `new AiTranslationService(?Closure $chatAgentFactory = null, ?string $provider = null, ?string $model = null)`; the factory closure still receives `?string $provider`. `TranslationService` has no fallback and never returns the source text on failure.
 
-- [ ] **Step 1: Rewrite the service tests**
+- [x] **Step 1: Rewrite the service tests**
 
 `TranslationServiceCoreTest.php`: replace every `config()->set('core.translations.provider', 'deepl');` with `config()->set('ai.features.translation.model', 'deepl');`. Delete the tests "constructor initializes with ai provider", "constructor throws on unsupported provider", "translate returns original when primary fails and fallback is disabled" and "translate returns original text when both primary and fallback fail". Add:
 
@@ -3522,12 +3538,12 @@ it('translates the other locales and rethrows the first failure', function (): v
 
 `ApplicationSettingDefinitionsTest.php`: in "defines core runtime settings with current defaults and choices", replace the two `translations.provider` expectations with `->and($definitions->has('translations.provider'))->toBeFalse()->and($definitions->has('translations.fallback_to_ai'))->toBeFalse()`.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/TranslationServiceCoreTest.php Modules/AI/tests/Integration/AiTranslationServiceTest.php Modules/AI/tests/Integration/TranslateModelJobTest.php Modules/Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php`
 Expected: FAIL.
 
-- [ ] **Step 3: Rewrite `TranslationService`**
+- [x] **Step 3: Rewrite `TranslationService`**
 
 Replace the properties, constructor and `performTranslation()`; keep `translate()`, `translateBatch()` and `getCacheKey()`:
 
@@ -3567,7 +3583,7 @@ Replace the properties, constructor and `performTranslation()`; keep `translate(
 
 Drop the `fallback_service` property, the `Exception` / `Log` / `ai_config_string` imports if unused; add `Modules\AI\Ai\Providers\AiModelChoice` and `Modules\AI\Enums\AiModelFeature`. `Cache::remember()` stores nothing when its callback throws.
 
-- [ ] **Step 4: Rewrite `AiTranslationService`**
+- [x] **Step 4: Rewrite `AiTranslationService`**
 
 Constructor:
 
@@ -3601,7 +3617,7 @@ In `translate()`, delete `$provider = ai_config_nullable_string(...)`, build the
     }
 ```
 
-- [ ] **Step 5: Rethrow from `TranslateModelJob`**
+- [x] **Step 5: Rethrow from `TranslateModelJob`**
 
 In `handle()`, replace the locale loop and the completion event with:
 
@@ -3640,21 +3656,21 @@ In `handle()`, replace the locale loop and the completion event with:
 
 Keep the `event(...)` argument exactly as the current code passes it; only the condition around it changes.
 
-- [ ] **Step 6: Remove the Core settings and the AI config key**
+- [x] **Step 6: Remove the Core settings and the AI config key**
 
 `CoreDatabaseSeeder::runtimeSettingDefinitions()`: delete the `translations.fallback_to_ai` and `translations.provider` rows. `Modules/AI/config/config.php`: delete `translation.default_provider`.
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/AI/tests/Integration/TranslationServiceCoreTest.php Modules/AI/tests/Integration/AiTranslationServiceTest.php Modules/AI/tests/Integration/TranslateModelJobTest.php Modules/AI/tests/Integration/Jobs/TranslateModelJobCommentSourceTest.php Modules/AI/tests/Integration/DeepLTranslationServiceTest.php Modules/Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php`
 Expected: PASS.
 
-- [ ] **Step 8: Check no old key is left**
+- [x] **Step 8: Check no old key is left**
 
 Run: `rtk proxy grep -rnE "translations\.(provider|fallback_to_ai)|translation\.default_provider|fallback_service" Modules --include=*.php`
 Expected: no output.
 
-- [ ] **Step 9: Format and commit (two repositories)**
+- [x] **Step 9: Format and commit (two repositories)**
 
 ```bash
 vendor/bin/pint --format agent Modules/AI/app/Services/Translation/TranslationService.php Modules/AI/app/Services/Translation/AiTranslationService.php Modules/AI/app/Jobs/TranslateModelJob.php Modules/AI/config/config.php Modules/AI/tests/Integration/TranslationServiceCoreTest.php Modules/AI/tests/Integration/AiTranslationServiceTest.php Modules/AI/tests/Integration/TranslateModelJobTest.php Modules/Core/database/seeders/CoreDatabaseSeeder.php Modules/Core/tests/Unit/Settings/ApplicationSettingDefinitionsTest.php
@@ -3677,7 +3693,7 @@ git -C Modules/Core commit -m "chore(settings): drop translation provider settin
 - Modify: `Modules/AI/docs/SEARCH_AND_TRANSLATION.md` (sections "2. Automatic translation → Configuration" and "4. Fallback behaviour")
 - Modify: this plan (delivery status), the spec (status), `docs/superpowers/specs/INDEX.md`, `docs/superpowers/plans/INDEX.md`
 
-- [ ] **Step 1: Write the Core user page**
+- [x] **Step 1: Write the Core user page**
 
 `SETTING_ACTIONS_USER.md`, with the same front matter as `RECORD_LOCKING_USER.md` (`module: core`, `audience: user`, `cross_cutting_user: true`). Content, in English:
   - some settings show a play icon in the Settings grid. It runs the command the setting was shipped with, for example refreshing the list of AI models;
@@ -3687,7 +3703,7 @@ git -C Modules/Core commit -m "chore(settings): drop translation provider settin
   - nobody can change the command from the panel;
   - a value shown with a warning icon is no longer among the available choices. It stays saved, and the edit form still offers it, labelled "(no longer available)".
 
-- [ ] **Step 2: Write the Core developer page**
+- [x] **Step 2: Write the Core developer page**
 
 `SETTING_ACTIONS_DEVELOPER.md`:
   - the two columns and why they are outside `$fillable` and inside `$hidden`;
@@ -3699,7 +3715,7 @@ git -C Modules/Core commit -m "chore(settings): drop translation provider settin
   - `Setting::isValueOutsideChoices()`;
   - the `JobProcessing` overlay listener (why queue workers now see setting changes without a restart).
 
-- [ ] **Step 3: Write the AI pages**
+- [x] **Step 3: Write the AI pages**
 
 `AI_MODEL_SELECTION_USER.md` (front matter `module: ai`, `audience: user`):
   - the list of AI features with their setting names;
@@ -3718,7 +3734,7 @@ git -C Modules/Core commit -m "chore(settings): drop translation provider settin
   - defaults in `AiModelFeature::defaultChoice()`: no config entry and no env variable for a value managed by a setting, and why (the seeder writes it once);
   - how to add a feature (enum case with its default choice, consumer calls `forFeature()`).
 
-- [ ] **Step 4: Update the README and translation doc**
+- [x] **Step 4: Update the README and translation doc**
 
 `Modules/AI/README.md`:
   - **Configuration paragraph:** add to the list of runtime settings each feature's model `features.*.model` (refreshed by `ai:models:refresh`) and `features.media_analysis.enabled`.
@@ -3731,17 +3747,17 @@ git -C Modules/Core commit -m "chore(settings): drop translation provider settin
   - **"Configuration" under section 2:** the provider is the `features.translation.model` setting (`deepl` or `provider:model`); `DEEPL_API_KEY` configures DeepL.
   - **"4. Fallback behaviour" table:** add a row "Translation provider fails: nothing is saved or cached for that locale; the job retries (3 tries, backoff 30/60/120 s); indexing proceeds when the job succeeds or gives up".
 
-- [ ] **Step 5: Run the full suites of both modules and the root checks**
+- [x] **Step 5: Run the full suites of both modules and the root checks**
 
 Run: `php artisan test --compact Modules/Core/tests Modules/AI/tests tests/Unit/ClosedPlansPointToDocumentationTest.php`
 Expected: PASS. Then ask the user to run the complete suite with `php artisan test --compact`.
 
-- [ ] **Step 6: Rebuild the developer database and smoke the command**
+- [x] **Step 6: Rebuild the developer database and smoke the command**
 
 Run: `php artisan migrate:fresh --seed` then `php artisan ai:models:refresh`
 Expected: the migration and seed succeed; the command prints one line per provider (configured or not) and one per setting. A non-zero exit here only means a configured provider was unreachable on this machine; read the output.
 
-- [ ] **Step 7: Commit the module docs**
+- [x] **Step 7: Commit the module docs**
 
 ```bash
 git -C Modules/Core add docs/rag/SETTING_ACTIONS_USER.md docs/rag/SETTING_ACTIONS_DEVELOPER.md
@@ -3750,7 +3766,7 @@ git -C Modules/AI add docs/rag/AI_MODEL_SELECTION_USER.md docs/rag/AI_MODEL_SELE
 git -C Modules/AI commit -m "docs(ai): per-feature model selection and translation without fallback" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 8: Close the plan and the spec**
+- [x] **Step 8: Close the plan and the spec**
 
 - **Plan:** add below the header of this plan a `## Delivery status (YYYY-MM-DD): shipped` section. It gets a `**Documented in:**` line naming the four `docs/rag` pages, `Modules/AI/README.md` and `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, and it lists every divergence from these steps.
 - **Spec:** set its status to "Implemented YYYY-MM-DD by `docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md`".
@@ -3758,7 +3774,7 @@ git -C Modules/AI commit -m "docs(ai): per-feature model selection and translati
 - **Specs index:** update the entry in `docs/superpowers/specs/INDEX.md`.
 - **Plans index:** mark the plan's entry in `docs/superpowers/plans/INDEX.md` as shipped, in the style of its neighbours.
 
-- [ ] **Step 9: Commit the root repository**
+- [x] **Step 9: Commit the root repository**
 
 ```bash
 git add Modules/Core Modules/AI docs/superpowers/specs/2026-09-29-ai-model-selection-and-setting-actions-design.md docs/superpowers/specs/INDEX.md docs/superpowers/plans/2026-09-29-ai-model-selection-and-setting-actions.md docs/superpowers/plans/INDEX.md
