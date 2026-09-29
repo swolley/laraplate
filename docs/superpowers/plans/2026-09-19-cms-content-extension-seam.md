@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Give CMS a generic seam that lets another module attach a richer domain model to a `Content` — without CMS knowing that model and without extended rows leaking into generic CMS surfaces. Deliver it standalone, exercised by a **test-only stub extender**, so it ships and is proven before the first real consumer (`Modules/Ecommerce` `Product`) exists.
+**Goal:** Give CMS a generic seam that lets another module attach a richer domain model to a `Content` — without CMS knowing that model and without extended rows leaking into generic CMS surfaces. Deliver it standalone, exercised by a **test-only stub extender**, so it ships and is proven before the first real consumer (`Modules/Shop` `Product`) exists.
 
 **Architecture:** A nullable `contents.extended_type` morph-alias column makes each content self-describing. A default global scope hides extended rows everywhere; an opt-in `withExtended()` scope plus a batched **upcast** returns the extender in place of the content (two queries per entity-scoped page, no N+1). The alias→class map lives in a dedicated in-memory `ContentExtenderRegistry` (not Laravel's global morph map), populated at boot. The extender owns its content's lifecycle (mandatory→symmetric cascade, optional→orphan) with a cascade guard. Search keeps one physical `contents` index the extender enriches with a nested, typed `extension` section; `extended_type` is a filterable attribute; CMS owns the index and composes each extender's mapping fragment.
 
@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-17-cms-content-extension-seam-design.md`. Decisions are numbered C1–C18 there; tasks reference them.
 
-**First consumer (out of scope here):** `docs/superpowers/specs/2026-09-17-ecommerce-module-design.md`.
+**First consumer (out of scope here):** `docs/superpowers/specs/2026-09-17-shop-module-design.md`.
 
 ## Global Constraints
 

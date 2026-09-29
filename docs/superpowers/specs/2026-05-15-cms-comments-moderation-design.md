@@ -552,6 +552,6 @@ Promotes the v1 non-goal "Media attachments on comments" to a defined, still-gen
   per surface (e.g. the CMS admin form omits them; a consumer's review form shows them). No subclass,
   no per-consumer model.
 - **Out of scope here:** allowed types/size limits, conversions/thumbnails, and per-surface UI are
-  implementation detail; consumer-specific rules (e.g. an ecommerce verified-purchase gate on who may
+  implementation detail; consumer-specific rules (e.g. an shop verified-purchase gate on who may
   attach) belong to the consumer, which cites this addendum. First consumer:
-  `docs/superpowers/specs/2026-09-17-ecommerce-module-design.md` (product reviews).
+  `docs/superpowers/specs/2026-09-17-shop-module-design.md` (product reviews).
