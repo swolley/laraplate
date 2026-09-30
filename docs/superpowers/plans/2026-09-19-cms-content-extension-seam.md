@@ -93,7 +93,7 @@ All paths relative to `Modules/CMS/` unless noted.
 
 - [x] `Content::toSearchableArray()` adds a top-level filterable `extended_type` (null for a normal content) and, when extended, a **nested typed** `extension: { type: <alias>, ... }` from the registry-loaded extender's `searchableExtension()`. `Content::makeAllSearchableUsing()` now includes extended contents in the bulk import (they are hidden by the default scope; per-save indexing already sees them).
 - [x] Extended rows stay searchable (indexed); browsing hides them via the index filter (point 4, below), not by dropping them from the index.
-- [ ] Reindex trigger from the extender (`$extender->content->searchable()` on change). _Deferred to the consumer/T9 docs: the seam documents the pattern; the stub does not need live re-indexing to prove the document shape._
+- [x] Reindex trigger from the extender (`$extender->content->searchable()` on change). Built 2026-09-30 in `ExtendsContentTrait` (a `saved` listener), not left to each consumer: the content is saved and indexed before its extender, so without the trigger an extended content's document lags behind its `extension` section. Tested in `ContentExtensionSearchDataTest`.
 - [x] **No ERP/external data** — `extension` carries only the extender's own stable fields.
 - [x] Tests: an extended content's document has `extended_type` + `extension`; a normal one has `extended_type = null` and no `extension`; the bulk import query includes extended contents. _`tests/Feature/ContentExtension/ContentExtensionSearchDataTest.php` (3 passed); existing facets/search tests green._ **The generic-search index filter (`extended_type = null`) is point 4, still open — see below.**
 - [x] Pint + PHPStan.
@@ -101,7 +101,7 @@ All paths relative to `Modules/CMS/` unless noted.
 ## Task 8: search index ownership — mapping composition + scoped reindex (C14) — DONE (mapping); reindex-scoping documented
 
 - [x] `Content::getSearchMapping()` composes a filterable `extended_type` field and a nested `extension` object whose properties are the **union of every registered extender's `searchableExtensionMapping()`** (Core `FieldType` schema format) plus the alias `type`; absent when no extender is registered (C13, C14). Core's engine stays agnostic (composition is in CMS's schema).
-- [ ] Module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. _No new code: it is the existing Scout `searchable()` on a scoped query; documented as the consumer rule in T9. A guard-rail test needs a real consumer, deferred._
+- [x] Module "reindex" is **document-scoped** (`Content::withExtended()->where('extended_type', $alias)->searchable()`), never `deleteIndex`/`createIndex`. Guard-rail built 2026-09-30 without waiting for a consumer: `Modules/Core/tests/Unit/Architecture/SearchIndexLifecycleOwnershipTest.php` fails on any `createIndex`/`deleteIndex` call outside Core's search engines and commands (and AI's own RAG index).
 - [x] Test: with an extender registered, the mapping includes `extended_type`, `extension` and the extender's fields; with none, `extended_type` only. _`tests/Feature/ContentExtension/ContentExtensionMappingTest.php` (2 passed, database engine)._
 - [x] Pint + PHPStan.
 
@@ -142,8 +142,9 @@ All in `Modules/CMS`, proven against test-only stub extenders, no runtime consum
 
 Deliberately **not** built (deferred, not defects):
 
-- **Reindex trigger + guard-rail test.** The extender→content reindex and the "no module index-lifecycle
-  command" guard-rail are documented as consumer rules; the guard-rail test needs a real consumer.
+- ~~**Reindex trigger + guard-rail test.**~~ Built 2026-09-30: `ExtendsContentTrait` reindexes the
+  content after every extender save, and `SearchIndexLifecycleOwnershipTest` keeps index creation and
+  deletion inside Core search.
 - **General create helper / `cms:import` handling of extended entities**, and **permissions on a mixed
   upcast list** — open in the seam spec §9, belong to consumer/import slices.
 
