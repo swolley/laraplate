@@ -99,7 +99,7 @@ Tasks are ordered simplest-first; each is independently shippable.
 
 - Extend the Ticket Filament resource with labels, watchers, attachments (media plugin), due date, and a relations manager; add a saved-filter picker on the ticket list.
 - Create: `tests/Feature/Filament/TicketEnrichmentUiTest.php`.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): filament surfaces for ticket enrichment`). **(deferred: optional UI; models + services ship and are fully tested)**
+- [x] Red → implement → green; Pint + commit (`feat(sao): filament surfaces for ticket enrichment`). Done except the saved-filter picker (reconciled 2026-09-30): labels, watchers, attachments, due date, the relations manager and the table filters ship in Filament, covered by `TicketEnrichmentUiTest`. The saved-filter picker is left to the SAO application in `laraplate-ui`: saved filters are a user's own working views, not a backoffice feature, and `SavedFilter` with `TicketSearchService` is what the application builds on.
 
 ---
 
@@ -115,10 +115,12 @@ Tasks are ordered simplest-first; each is independently shippable.
 - The kanban board (1c).
 - External sync of labels/relations/attachments (phase 3+).
 
-## Delivery status (2026-09-15): shipped, one step deferred on purpose
+## Delivery status (2026-09-15, corrected 2026-09-30): shipped, saved-filter picker left to the application
 
 **Documented in:** `Modules/SAO/docs/rag/MODULE.md`.
 
-Models and services ship and are fully tested. The one open box is the optional Filament
-surface, deferred deliberately rather than left undone; the step says so itself. Nothing here
-is waiting on anybody.
+Models and services ship and are fully tested. The Filament surface, which this status first
+described as deferred, had shipped too: labels, watchers, attachments, due date, the relations
+manager and the table filters, covered by `TicketEnrichmentUiTest`. Only the saved-filter picker is
+not in Filament, on purpose: saved filters are a user's working views and belong to the SAO
+application in `laraplate-ui`, built on `SavedFilter` and `TicketSearchService`.

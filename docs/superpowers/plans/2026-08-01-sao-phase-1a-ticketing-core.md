@@ -8,11 +8,17 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Filament 5 (via `Coolsam\Modules\Resource`), Pest 4, PHPStan/Larastan 3, Pint.
 
+## Delivery status (2026-09-30): shipped, ticket work moved to the application
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`.
+
+Tasks 1-11 shipped as planned. Task 12 closed on 2026-09-30: the ticket list gained the `status_category` filter, and the view page shows type and status by name, the timeline read-only and the workflow-allowed transitions. The plan's comment composer was not built in Filament and its unused `postComment()` was removed: Filament is the configuration, monitoring and maintenance backoffice, and commenting is a feature of the SAO application in `laraplate-ui`, which posts through `TicketComment::postFor()`.
+
 ## Reconciliation (2026-09-30)
 
-Reconciled task by task against the code. Tasks 1-11 are delivered and ticked; the complete SAO suite passes (678 passed, 1 skipped). Task 12 is partly delivered: the ticket resource, ACL-aware query, creation through the opening status, transition actions, documentation and the spec marker exist, but the `status_category` filter and the timeline and comment composer on the view page do not (see the note under Task 12). The plan therefore stays open and carries no delivery status.
+Reconciled task by task against the code. Tasks 1-11 are delivered and ticked; the complete SAO suite passes (678 passed, 1 skipped). Task 12 was completed on 2026-09-30 (see the delivery status).
 
-Exit criteria as they stand: 1 (SAO tests) met; 2 and 3 (Pint, PHPStan) are no longer module concerns, the toolchain belongs to the application; 4 (end-to-end in Filament) not met, commenting is not possible; 5 and 6 are superseded by later phases, which deliberately reference `Modules\AI` and add drivers and connections under `app/`; 7 met only through the recorded SQLite skip.
+Exit criteria as they stand: 1 (SAO tests) met; 2 and 3 (Pint, PHPStan) are no longer module concerns, the toolchain belongs to the application; 4 (end-to-end in Filament) reinterpreted: tickets are worked in the SAO application, Filament keeps configuration, monitoring and maintenance; 5 and 6 are superseded by later phases, which deliberately reference `Modules\AI` and add drivers and connections under `app/`; 7 met only through the recorded SQLite skip.
 
 ## Global Constraints
 
@@ -3772,7 +3778,7 @@ cd ../..
 
 ## Task 12: The ticket surface, and closing the slice
 
-> **Partly open (2026-09-30):** Steps 3 and 5 stay unticked. The `status_category` filter of Step 3 was not built (`TicketsTable` filters only priority, labels and overdue), and the view page of Step 5 has `timeline()` and `postComment()` but no view renders the timeline or a comment composer, so a ticket cannot be commented on from the Filament panel. Both still need building, with tests.
+> **Closed 2026-09-30:** Steps 3 and 5 are done (see their notes). The original note read: The `status_category` filter of Step 3 was not built (`TicketsTable` filters only priority, labels and overdue), and the view page of Step 5 has `timeline()` and `postComment()` but no view renders the timeline or a comment composer, so a ticket cannot be commented on from the Filament panel. Both still need building, with tests.
 
 **Files:**
 - Create: `Modules/SAO/app/Filament/Resources/Tickets/*`
@@ -3828,7 +3834,7 @@ php artisan test --filter=TicketResourceTest
 
 Expected: FAIL — `Modules\SAO\Filament\Resources\Tickets\TicketResource` does not exist.
 
-- [ ] **Step 3: Generate and shape the ticket resource**
+- [x] **Step 3: Generate and shape the ticket resource** (the `status_category` filter was added on 2026-09-30, tested on the list)
 
 ```bash
 php artisan make:filament-resource Ticket --model-namespace='Modules\SAO\Models' --view --no-interaction
@@ -3874,7 +3880,7 @@ This is the only place a ticket's initial status is decided, and it decides it b
 scheme** rather than by defaulting to something. A scheme with no creation transition throws here,
 loudly, which is the correct moment to find out.
 
-- [ ] **Step 5: Build the view page**
+- [x] **Step 5: Build the view page** Done on 2026-09-30 as a backoffice page, not a working surface: header with type and status by name, the timeline read-only, the workflow-allowed transitions. The comment composer is cancelled here and `postComment()` removed: Filament is the configuration and maintenance backoffice, and working a ticket (commenting) belongs to the SAO application in `laraplate-ui`, which posts through `TicketComment::postFor()`.
 
 The view page shows, in order: the ticket header (key, title, type, status, priority, assignee), the
 merged timeline from `TicketTimelineService::for()`, and a comment composer.

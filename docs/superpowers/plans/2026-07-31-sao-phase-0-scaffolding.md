@@ -8,9 +8,15 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Pest 4, PHPStan/Larastan 3, Pint, Rector 2, Peck, git-cliff.
 
+## Delivery status (2026-09-30): shipped
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`.
+
+SAO is a registered, active submodule with the Laraplate module structure and its own test harness. The tooling and release-script work of Tasks 2, 4 and 5 moved to the application by the decision recorded in `c935944`. The full-suite proof of Task 7 is the per-module run of 2026-09-30, every module green with SAO active.
+
 ## Reconciliation (2026-09-30)
 
-Reconciled task by task against the code. The module exists as a registered submodule and the complete SAO suite passes (678 passed, 1 skipped). Tasks 1, 2, 3, 3b and 6 are delivered; the tooling and release-script work in Tasks 2, 4 and 5 was cancelled by the decision recorded in `c935944` that the toolchain belongs to the application, and is ticked with a note. Two items remain open: Task 7 Step 5 (the full application suite, never recorded) and the module-level Pint and PHPStan runs, which are no longer a module concern. No delivery status is added until Step 5 is settled.
+Reconciled task by task against the code. The module exists as a registered submodule and the complete SAO suite passes (678 passed, 1 skipped). Tasks 1, 2, 3, 3b and 6 are delivered; the tooling and release-script work in Tasks 2, 4 and 5 was cancelled by the decision recorded in `c935944` that the toolchain belongs to the application, and is ticked with a note. Task 7 Step 5 was settled on 2026-09-30 with the per-module suite runs; the module-level Pint and PHPStan runs are no longer a module concern. See the delivery status.
 
 ## Global Constraints
 
@@ -1524,7 +1530,7 @@ php artisan test --testsuite=Feature --filter=ModuleRegistration
 
 Expected: all green, zero failures, zero skipped.
 
-- [ ] **Step 5: Run the full application suite to prove nothing regressed**
+- [x] **Step 5: Run the full application suite to prove nothing regressed** Recorded 2026-09-30: the complete suites of every module passed with SAO registered and active (Core 3078, CMS 660, AI 851, ERP 645, MES 127, SAO 677, run per module since the whole suite does not fit one process).
 
 ```bash
 php artisan test
