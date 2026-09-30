@@ -230,6 +230,29 @@ test_tasks_are_reported_per_plan() {
     assert_output_contains '"tasks_open": 3'
 }
 
+# Checkboxes under a plain "##" section after the last task belong to that section, not to
+# the task above it: a finished task must not turn open because a checklist follows it.
+test_a_section_after_the_last_task_does_not_leak_into_it() {
+    local ws="$WORK_DIR/${FUNCNAME[0]}"
+    mkdir -p "$ws/docs/superpowers/plans"
+    cat > "$ws/docs/superpowers/plans/2026-01-01-leak.md" <<'PLAN'
+# Leak
+
+## Task 1: finished work
+
+- [x] first step
+- [x] second step
+
+## Release gates
+
+- [ ] run the suite
+PLAN
+    run_plan_status "$ws"
+    assert_status 0
+    [[ "$OUTPUT" =~ Task\ 1:\ finished\ work\ +2/2 ]] || fail "Task 1 should read 2/2"
+    [[ "$OUTPUT" =~ Release\ gates\ +0/1 ]] || fail "Release gates should read 0/1 on its own"
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

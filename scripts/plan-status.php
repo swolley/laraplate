@@ -232,6 +232,18 @@ final class PlanParser
                 continue;
             }
 
+            // Any other top-level section ends the task above it: a checklist that follows
+            // the last task (release gates, review notes) is its own block, not that task's.
+            if (preg_match('/^##\s+(.+)$/', $line, $m) === 1) {
+                if ($current['total'] > 0) {
+                    $tasks[] = $current;
+                }
+
+                $current = $this->newTask(mb_trim($m[1]), $index + 1);
+
+                continue;
+            }
+
             if (preg_match('/^\s*[-*] \[([ xX])\]\s*(.*)$/', $line, $m) === 1) {
                 $current['total']++;
 
