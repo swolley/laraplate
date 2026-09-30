@@ -8,6 +8,17 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Filament 5, Pest 4, PHPStan/Larastan 3, Pint. HTTP client work (Laravel `Http`) only in the Redmine slice.
 
+## Delivery status (2026-10-01): shipped
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/DRIVERS_USER.md`, `Modules/SAO/docs/rag/GLOSSARY.md`.
+
+All tasks are done; the Phase 3 exit criterion is proven by `tests/Feature/Services/RedmineIssueSyncTest.php`. Divergences from this plan:
+
+- Task 4: the binding's connection relation is `remoteConnection()`, not `connection()`, to avoid Eloquent's `$connection` property.
+- Task 7: `Bidirectional` enables the inbound and outbound paths independently; no last-writer-wins conflict resolver was built. The test double is `tests/Support/Drivers/RecordingIssuesDriver.php`, not the internal driver.
+- Task 8: shipped as `Drivers/External/RedmineDriver.php`; no recorded fixture files, the driver is proven by an in-memory stateful `Http::fake()` of the Redmine REST API; no default status map is proposed. Live-instance validation stays a manual follow-up.
+- Task 10: bindings are a `BindingsRelationManager` on `ProjectResource`, not a standalone resource.
+
 ## Global Constraints
 
 - **Spec:** `docs/superpowers/specs/2026-08-15-sao-phase-3b-issues-sync-design.md` (decisions G1–G9), rooted in `docs/superpowers/specs/2026-07-31-sao-module-design.md` §4/§5/§8/§12 and building on 3a.
@@ -139,7 +150,7 @@
 ## Task 9 (3b-redmine): register Redmine and close the exit criterion
 
 - Edit: config `sao.drivers.registered` docs to show enabling `redmine`; wire an end-to-end feature test that binds a project to a Redmine connection and runs `IssueSyncService` Outbound, asserting the (faked) remote received exactly one idempotent write.
-- [ ] Red → implement → green; Pint + commit (`test(sao): end-to-end redmine issue sync in a configurable direction`). Open: `RedmineDriver` is registered by default (`config('sao.drivers.registered')`, asserted by `tests/Feature/Drivers/DriverFrameworkWiringTest.php`), but no test binds a project to a Redmine connection and runs `IssueSyncService::push()` against the faked Redmine.
+- [x] Red → implement → green; Pint + commit (`test(sao): end-to-end redmine issue sync in a configurable direction`). `RedmineDriver` is registered by default (`config('sao.drivers.registered')`, asserted by `tests/Feature/Drivers/DriverFrameworkWiringTest.php`; documented in `Modules/SAO/docs/rag/MODULE.md`). `tests/Feature/Services/RedmineIssueSyncTest.php` binds a project to a `redmine` connection and runs `IssueSyncService` against a stateful `Http::fake()` Redmine (`tests/Support/Drivers/FakeRedmineApi.php`): a repeated `push()` creates exactly one remote issue, a changed ticket updates it instead of creating a second, an inbound `pull()` creates a linked SAO ticket, and the binding's `SyncDirection` gates each path.
 
 ---
 

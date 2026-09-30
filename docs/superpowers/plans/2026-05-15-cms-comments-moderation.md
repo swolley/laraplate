@@ -59,12 +59,16 @@ Known gaps (found 2026-09-30, not decisions):
 
 - **Moderation defaults changed.** The plan set moderation on; the seeder sets
   `features.moderation.enabled` and the `cms_comments` entity to false.
-- **`ModerationService` is thinly tested** (no `analyze()` run for approve, reject, uncertain or retry).
+- ~~**`ModerationService` is thinly tested**~~ covered 2026-10-01: `analyze()` for approve, reject, uncertain, retry and the unreachable-model fallback.
 - ~~**The Filament `meta` column**~~ fixed 2026-09-30: it shows `meta.status` with the colour map
   working, verdict/confidence/reason in the tooltip, and an empty cell when no AI voted (tested).
 - **Spec status** is still "Approved direction"; it was never set to **Implemented**.
-- **End-to-end coverage** does not go through the CRUD API, and comments CRUD over HTTP is claimed by
-  the docs but asserted by no CMS test.
+- **End-to-end coverage** does not go through the CRUD API, and on 2026-10-01 it turned out a comment
+  cannot be created through the generic CRUD API at all: `content_id` has no validation rule, so it is
+  dropped from the validated input and the insert fails, and `body` is a translation, not a fillable
+  column. How the SAO/CMS applications create comments over HTTP is an open design decision (Task 15
+  Steps 1-2). A captured comment now carries its request in `pendingModification()`, so the API will
+  answer 202 once creation works.
 
 ---
 
@@ -437,7 +441,7 @@ Comment text:
 
 - [x] **Step 3: Parse JSON via `GuardrailsService::validateJsonOutput()` + retry once on invalid JSON** — done in `ModerationService::analyze()` / `retryJson()` (retry gated by `ai.features.guardrails.retry_on_failure`), unparseable output maps to `uncertain`
 
-- [ ] **Step 4: Unit tests** with mocked agent returning sample JSON for approve, reject, uncertain — still missing: `Modules/AI/tests/Integration/Services/ModerationServiceTest.php` covers empty subject and `mapResponse()` only; no test drives `analyze()` through the `chatAgentFactory` seam, nor the retry
+- [x] **Step 4: Unit tests** with mocked agent returning sample JSON for approve, reject, uncertain — done 2026-10-01 in `Modules/AI/tests/Integration/Services/ModerationServiceTest.php`: `analyze()` driven through the `chatAgentFactory` for approve/reject/uncertain, the JSON retry, and the unreachable-model fallback
 
 - [x] **Step 5:** Commit — shipped in the AI and CMS module history (e.g. AI `4974314`, `bd100e3`)
 
@@ -630,7 +634,7 @@ if ($operation === 'approve') {
 
 - [ ] **Step 2:** Human `approve` via CRUD → comment visible — covered at model level ("publishes comment after human approval", `$user->approve()`); not through the CRUD approve endpoint
 
-- [ ] **Step 3:** Human `disapprove` after preliminary AI disapprove → comment never published — missing: `ApproveModificationJobTest` asserts the AI preliminary disapproval (`disapprovers_required` 2), `CommentModerationTest` a single human disapproval; no test chains the two
+- [x] **Step 3:** Human `disapprove` after preliminary AI disapprove → comment never published — done 2026-10-01 in `Modules/AI/tests/Feature/Jobs/ApproveModificationJobTest.php` ("never publishes a comment a human rejects after the AI preliminary disapproval")
 
 - [x] **Step 4:** Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php` — passed 2026-09-30 (with the adapter, job, listener and service tests, 76 tests)
 
