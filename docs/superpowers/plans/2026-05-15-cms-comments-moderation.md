@@ -22,7 +22,7 @@ Moderated comments work for human review. Reconciled task by task against the co
 2026-09-30 (the comment, adapter, vote-job, listener and approval-vote tests pass together, 41 tests):
 the architecture stated above was deliberately widened during implementation, so several steps name
 artifacts that were replaced by platform-wide ones, and those tasks are ticked as replaced. Moderation
-is inherited from `HasApprovals` rather than rebuilt for comments. Tasks 8, 10, 13, 15 and 16 stay
+is inherited from `HasApprovals` rather than rebuilt for comments. Tasks 10, 13, 15 and 16 stay
 open, see "Known gaps".
 
 | This plan specified | What was built instead | Where |
@@ -46,12 +46,13 @@ The explicit `comments` entry in `defaultEntities()` is not needed: `Comment` is
 (only contents, contributors and categories are), and its permissions come from Core's
 `PermissionRefreshSeeder` and are granted in `CMSDatabaseSeeder`.
 
+Resolved 2026-09-30: AI voting was inert because `ai.features.moderation.system_user_id` was defined
+nowhere. The job and listener now resolve the seeded system user (`permission.users.system`) through
+`ModerationSystemUser`, and `disapprove` is governed by the `approve` permission as documented.
+`ModerationSystemUserAuthorizationTest` runs the real seed and proves that user can vote.
+
 Known gaps (found 2026-09-30, not decisions):
 
-- **AI voting is inert by default.** `ai.features.moderation.system_user_id` is defined nowhere, so
-  `ApproveModificationJob` returns at once; the listener gates on a different key,
-  `permission.users.system`, which does exist, so the job is queued and then does nothing.
-  `AI_MODERATOR_USER_ID` in the AI docs is read by no code.
 - **Moderation defaults changed.** The plan set moderation on; the seeder sets
   `features.moderation.enabled` and the `cms_comments` entity to false.
 - **`ModerationService` is thinly tested** (no `analyze()` run for approve, reject, uncertain or retry).
@@ -288,14 +289,14 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 
 ### Task 8: AI config + system moderator user
 
-> **Open (2026-09-30):** `ai.features.moderation.system_user_id` is never defined, so `ApproveModificationJob` returns immediately and AI votes never happen outside the tests; `AI_MODERATOR_USER_ID` appears only in documentation and no code reads it. The seeded defaults also turn moderation off (`features.moderation.enabled` false) where this task set it on.
+> **Replaced and resolved (2026-09-30):** there is no `ai-moderator` account and no `system_user_id` key. AI votes as the platform system user, the one Core seeds under `permission.users.system` (env `SYSTEM_USER`), resolved through `ModerationSystemUser` using the application's user model. Decision: the vote is a system-level operation, so the existing system user is reused; a dedicated least-privilege account stays possible by changing that one class. The seeded defaults still turn moderation off (`features.moderation.enabled` false), which is a behaviour change from this task.
 
 **Files:**
 
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/database/seeders/AIDatabaseSeeder.php` (or Core seeder)
 
-- [ ] **Step 1: `CommentApprovalMode` enum + config block** (document `AI_COMMENT_APPROVAL_MODE=threshold|dual`)
+- [x] **Step 1: `CommentApprovalMode` enum + config block** (document `AI_COMMENT_APPROVAL_MODE=threshold|dual`)
 
 ```php
 enum CommentApprovalMode: string
@@ -311,7 +312,7 @@ enum CommentApprovalMode: string
 }
 ```
 
-- [ ] **Step 2: Config array**
+- [x] **Step 2: Config array**
 
 ```php
 'comment_moderation' => [
@@ -326,9 +327,9 @@ enum CommentApprovalMode: string
 ],
 ```
 
-- [ ] **Step 2:** Seeder creates user `ai-moderator` (no login), stores id in env example comment
+- [x] **Step 2:** Seeder creates user `ai-moderator` (no login), stores id in env example comment
 
-- [ ] **Step 3:** Commit
+- [x] **Step 3:** Commit
 
 ---
 
