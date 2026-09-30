@@ -41,6 +41,31 @@ D9 (DIFF versioning of `ProductionOrder`, `Bom` and `Routing`) is delivered thro
 
 The "Current Truth" table below describes the code on 2026-07-09 and is historical; the later sections and these notes override it.
 
+## Progress (2026-10-01)
+
+Done and ticked after verifying the code (MES suite: 230 tests, 607 assertions; phpstan clean on `Modules/MES/app`):
+
+- Task 3: `WorkCenterCrudTest`; `WorkCenter::getRules()` carries a `unique` rule on `code` scoped to the company and ignoring the record itself, so a duplicate is refused at save and the generic CRUD answers 422. `HasActivation::deactivate()` is tested. The unused `Http/Requests/WorkCenterRequest.php` is deleted.
+- Task 6: `ProductionOrderService::complete()` refuses (`DomainException`, as the other guards) while an operation is `in_progress`; `ProductionOrder` gains `operations`, `materialConsumptions`, `qualityChecks` and `lotNumbers` relations. The sales-order steps are ticked as replaced by the ERP event `SalesOrderConfirmed` and the queued `CreateProductionOrdersForSalesOrder` / `SalesOrderProductionPlanner`.
+- Task 7: ticked, the observer replaced by inline calls in `ProductionOrderOperationService::complete()`.
+- Task 12: `DowntimeService::unplannedMinutesWithin()` (every cause but planned maintenance, as OEE availability; clipped to the window; an open downtime runs until now) is subtracted from the now public `CapacityService::availableMinutes(work_center, from, to)`, which `checkOverload()` uses.
+- Task 14: ticked as replaced by Core's generic CRUD plus `MesDomainActionRegistrar`, `MesModelPolicy` and `MESPermissions`; `MesModelPolicyTest` covers the gate wiring, every state guard, the permission paths and the seeded domain permissions.
+- Task 15: work-center calendar and BOM lines as relationship repeaters (a line edited through the form is versioned); read-only relation managers on production orders; list-page render tests for all nine resources as a superadmin (`MesFilamentPagesTest`). The render tests found `mes_work_centers` without the generated `is_deleted` column: its create migration now uses `MigrateUtils::timestamps(hasSoftDelete: true)` like the other headers, so an existing database needs the migration re-run.
+- Task 16: `Feature/Invariants/ProductionOrderInvariantsTest.php` (snapshots, numbering, completion against running operations, OEE bounds, non-negative capacity, lot trace symmetry).
+- Task 17: glossaries, README status/roadmap/scripts, `MES_GUIDA_SEMPLICE.md` ("Dove si vede") and `rag/MODULE.md` aligned with the code.
+
+Awaiting a decision (the plan stays open):
+
+- Typed domain events for order and operation transitions (Task 6 Step 4).
+- The order state machine: when an order becomes `in_progress`, and what cancelling does to its operations; beyond the `complete()` guard nothing is enforced.
+- Backoffice transitions on production orders (Task 15 Step 3).
+- Capacity warning on operation start and its channel (Task 7 Step 3).
+- Capacity algorithms (Task 11 Step 2): `estimateCompletionDate()`, operation-level planned dates, calendar-based available minutes; the plan's `checkOverload(work_center, at)` and `rescheduleOperation(..., planned_start_at)` signatures diverge from the code.
+- Whether planned maintenance should reduce capacity available minutes (it mirrors OEE today and does not).
+- Downtime `open` as a domain action rather than the generic insert.
+- D10 KPI materialisation (job + cache) for OEE and capacity, and where they are shown.
+- Finished-goods stock-in and valuation on order completion (Task 16 Step 3).
+
 ## Current Truth (stato codice al 2026-07-09)
 
 | Task piano | Stato reale nel codice | Gap principale |
@@ -434,13 +459,13 @@ cd Modules/MES && git commit -am "test(mes): cover ERP item tracing_type reads"
 
 ### Task 3: Completare T3 Work Center
 
-> **Open (2026-09-30):** the unique `(company_id, code)` rule exists, but `WorkCenterCrudTest` does not, so nothing asserts a duplicate code is rejected, and no test deactivates a work center.
+> **Done (2026-10-01):** `WorkCenterCrudTest` covers the per-company unique code (model save, other company, update ignoring itself, 422 from the generic CRUD insert) and `deactivate()`. The rule lives in `WorkCenter::getRules()`; `WorkCenterRequest` was unused and is deleted.
 
 **Files:**
 - Create: `Modules/MES/tests/Feature/WorkCenterCrudTest.php`
-- Modify: `Modules/MES/app/Http/Requests/WorkCenterRequest.php` (se manca unique per company)
+- Modify: `Modules/MES/app/Http/Requests/WorkCenterRequest.php` (se manca unique per company) — deleted 2026-10-01: unused; the rule lives in `WorkCenter::getRules()`
 
-- [ ] **Step 1: Scrivere test unicità codice per company**
+- [x] **Step 1: Scrivere test unicità codice per company** — duplicates raise `ValidationException` from the model rule, not `QueryException`.
 
 ```php
 <?php
@@ -495,7 +520,7 @@ it('deactivates work center', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test**
+- [x] **Step 2: Run test**
 
 Run:
 
@@ -505,7 +530,7 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/WorkCenterC
 
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m "test(mes): work center uniqueness and deactivation"
@@ -823,7 +848,7 @@ php artisan test Modules/MES/tests/Feature/RoutingResolverServiceTest.php --comp
 
 ### Task 6: Ordini di produzione — T6
 
-> **Open (2026-09-30):** create, release, complete and cancel exist, and the sales-order path is delivered as the ERP event `SalesOrderConfirmed` with `CreateProductionOrdersForSalesOrder` and `SalesOrderProductionPlanner` (no Job class). Step 4 was not built: there is no `ProductionOrderObserver` and no typed `ProductionOrderReleased` events (`app/Events` holds only `MaterialShortageDetected`).
+> **Open (2026-10-01):** create, release, complete and cancel exist; `complete()` now refuses while an operation is `in_progress`. The sales-order path is delivered as the ERP event `SalesOrderConfirmed` with `CreateProductionOrdersForSalesOrder` and `SalesOrderProductionPlanner` (no Job class). Step 4 awaits a decision: there is no `ProductionOrderObserver` and no typed `ProductionOrderReleased` events (`app/Events` holds only `MaterialShortageDetected`). The rest of the state machine (when an order becomes `in_progress`, what cancel does to its operations) is also left to a decision.
 
 **Files:**
 - Modify: `Modules/ERP/app/Casts/DocumentType.php` (add `ProductionOrder`)
@@ -838,7 +863,7 @@ php artisan test Modules/MES/tests/Feature/RoutingResolverServiceTest.php --comp
 - Modify: `Modules/MES/app/Providers/EventServiceProvider.php`
 - Create: `Modules/MES/tests/Feature/ProductionOrderServiceTest.php`
 
-- [ ] **Step 1: Aggiungere DocumentType ProductionOrder in ERP**
+- [x] **Step 1: Aggiungere DocumentType ProductionOrder in ERP**
 
 ```php
 // In Modules/ERP/app/Casts/DocumentType.php add case:
@@ -848,7 +873,7 @@ case ProductionOrder = 'production_order';
 self::ProductionOrder => true,
 ```
 
-- [ ] **Step 2: Test snapshot immutabile**
+- [x] **Step 2: Test snapshot immutabile**
 
 ```php
 it('freezes bom and routing snapshots on create', function (): void {
@@ -874,7 +899,7 @@ it('freezes bom and routing snapshots on create', function (): void {
 });
 ```
 
-- [ ] **Step 3: Implementare ProductionOrderService**
+- [x] **Step 3: Implementare ProductionOrderService** — the `complete()` guard on in-progress operations landed on 2026-10-01 (`DomainException`).
 
 Metodi richiesti:
 
@@ -892,9 +917,9 @@ Regole implementative:
 - `complete()`: verifica operazioni non `in_progress`; aggiorna qty; lot handling in Task 9
 - `cancel()`: solo da `draft|released`
 
-- [ ] **Step 4: Observer transizioni stato** — log/eventi dominio tipizzati (`ProductionOrderReleased`, ecc.)
+- [ ] **Step 4: Observer transizioni stato** — log/eventi dominio tipizzati (`ProductionOrderReleased`, ecc.) — open, awaits a decision on typed events and the order state machine.
 
-- [ ] **Step 5: SalesOrderConfirmed pipeline**
+- [x] **Step 5: SalesOrderConfirmed pipeline** — replaced: ERP `SalesOrderConfirmed` event + MES queued listener `CreateProductionOrdersForSalesOrder` → `SalesOrderProductionPlanner`, no job class.
 
 ```php
 // Modules/ERP/app/Events/SalesOrderConfirmed.php
@@ -906,15 +931,15 @@ final class SalesOrderConfirmed
 // Listener dispatches CreateProductionOrderFromSalesOrderJob on config flag
 ```
 
-- [ ] **Step 6: Test release genera operazioni + unicità numero**
+- [x] **Step 6: Test release genera operazioni + unicità numero**
 
-- [ ] **Step 7: Commit (MES + ERP DocumentType/event)**
+- [x] **Step 7: Commit (MES + ERP DocumentType/event)**
 
 ---
 
 ### Task 7: Esecuzione operazioni — T7
 
-> **Open (2026-09-30):** start, complete and skip are delivered with efficiency clamping, the observer replaced by inline calls in `complete()`. Step 3 was not built: `start()` never consults `CapacityService`, so there is no non-blocking capacity warning.
+> **Open (2026-10-01):** start, complete and skip are delivered with efficiency clamping, the observer replaced by inline calls in `complete()`. Step 3 awaits a decision: `start()` never consults `CapacityService`, so there is no non-blocking capacity warning, and its channel is undecided.
 
 **Files:**
 - Create: migration `mes_production_order_operations`
@@ -923,9 +948,9 @@ final class SalesOrderConfirmed
 - Create: `ProductionOrderOperationObserver`
 - Create: `Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php`
 
-- [ ] **Step 1: Migration** (schema design.md righe 235–251)
+- [x] **Step 1: Migration** (schema design.md righe 235–251)
 
-- [ ] **Step 2: Test efficienza**
+- [x] **Step 2: Test efficienza**
 
 ```php
 it('calculates efficiency as actual over standard percent', function (): void {
@@ -935,11 +960,11 @@ it('calculates efficiency as actual over standard percent', function (): void {
 
 Formula: `(standard_minutes / actual_minutes) * 100`, clamp 0–999.99.
 
-- [ ] **Step 3: Implementare start/complete con warning capacità non bloccante**
+- [ ] **Step 3: Implementare start/complete con warning capacità non bloccante** — start/complete done; the capacity warning and its channel await a decision.
 
-- [ ] **Step 4: Observer on completed** — dispatch `BackflushMaterialsJob` (Task 8), crea QualityCheck pending se piano (Task 10)
+- [x] **Step 4: Observer on completed** — dispatch `BackflushMaterialsJob` (Task 8), crea QualityCheck pending se piano (Task 10) — replaced by inline calls in `ProductionOrderOperationService::complete()`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ---
 
@@ -1038,15 +1063,15 @@ it('forward and backward traces are symmetric', function (): void {
 
 ### Task 11: Scheduling e capacità — T9
 
-> **Open (2026-09-30):** the five capacity methods exist with tests, but their signatures differ from the plan (`checkOverload(from, to)`, `rescheduleOperation` without a date) and `estimateCompletionDate` only returns `planned_end_at`.
+> **Open (2026-10-01):** the five capacity methods exist with tests; available minutes now subtract unplanned downtime (Task 12). Step 2 awaits a decision on the algorithms: `estimateCompletionDate` only returns `planned_end_at`, operations carry no planned dates of their own, the work-center calendar is not read, and the signatures diverge from the plan (`checkOverload(work_center, from, to, ?available)` instead of `(work_center, at)`, `rescheduleOperation` without a date).
 
 **Files:**
 - Create: `Modules/MES/app/Services/CapacityService.php`
 - Create: `Modules/MES/tests/Feature/CapacityServiceTest.php`
 
-- [ ] **Step 1: Test CapacityLoad >= 0**
+- [x] **Step 1: Test CapacityLoad >= 0**
 
-- [ ] **Step 2: Implementare metodi**
+- [ ] **Step 2: Implementare metodi** — open: methods exist, the completion estimate, operation dates and calendar capacity await a decision; signatures diverge (see note).
 
 ```php
 public function getCapacityLoad(int $work_center_id, \DateTimeInterface $from, \DateTimeInterface $to): float;
@@ -1056,31 +1081,31 @@ public function checkOverload(int $work_center_id, \DateTimeInterface $at): bool
 public function rescheduleOperation(ProductionOrderOperation $operation, int $work_center_id, \DateTimeInterface $planned_start_at): ProductionOrderOperation;
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ---
 
 ### Task 12: Fermi macchina e OEE — T11
 
-> **Open (2026-09-30):** downtime and OEE are delivered and clamped to [0,1]. Step 3 was not built: `CapacityService` does not use the downtime flag (`isWorkCenterDown` is called only from tests).
+> **Done (2026-10-01):** downtime and OEE are delivered and clamped to [0,1]. `CapacityService::availableMinutes()` subtracts the unplanned downtime overlapping the window (`DowntimeService::unplannedMinutesWithin()`, planned maintenance excluded as in OEE availability) and `checkOverload()` uses it.
 
 **Files:**
 - Create: migration `mes_downtimes`, model, enum cause
 - Create: `OeeCalculatorService`
 - Create: `Modules/MES/tests/Feature/OeeCalculatorServiceTest.php`
 
-- [ ] **Step 1: Test OEE in [0,1] con dati noti**
+- [x] **Step 1: Test OEE in [0,1] con dati noti**
 
 ```php
 // Availability=0.9, Performance=0.8, Quality=0.95 => OEE=0.684
 expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
 ```
 
-- [ ] **Step 2: Downtime close calcola duration_minutes**
+- [x] **Step 2: Downtime close calcola duration_minutes**
 
-- [ ] **Step 3: Active downtime flag su WorkCenter per CapacityService**
+- [x] **Step 3: Active downtime flag su WorkCenter per CapacityService** — as downtime minutes subtracted from available minutes rather than a boolean flag; tests in `CapacityServiceTest`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
@@ -1105,7 +1130,7 @@ expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
 
 ### Task 14: API REST — T13/R13
 
-> **Replaced by design, with gaps (2026-09-30):** no custom controllers; the module uses Core's generic CRUD plus `MesDomainActionRegistrar`, `MesModelPolicy` and `MESPermissions` (see the section "API — architettura rivista"). Not registered: Downtime `open` and QualityCheck `disposition`. `MesModelPolicy` has no tests.
+> **Replaced by design, with gaps (2026-09-30):** no custom controllers; the module uses Core's generic CRUD plus `MesDomainActionRegistrar`, `MesModelPolicy` and `MESPermissions` (see the section "API — architettura rivista"). Not registered: Downtime `open` (opened through the generic insert; a domain action awaits a decision) and QualityCheck `disposition`. `MesModelPolicyTest` (2026-10-01) covers the policy and the seeded domain permissions.
 
 > **⚠️ RIVISTO 2026-08-13 — leggere prima la sezione «API — architettura rivista».**
 > Niente controller/resources/rotte custom: si usano le rotte generiche di Core (CRUD + domain-action registry). Il vero lavoro di questo task è: `MesDomainActionRegistrar`, `MesModelPolicy`, wiring in `MESServiceProvider::boot()`, seeding permessi domain in `MESDatabaseSeeder`, verifica esposizione entità. Il blocco «Files/Step» sottostante (controller REST) è **obsoleto** e va ignorato; resta come storia della stima originaria.
@@ -1119,7 +1144,7 @@ expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
 - Create: `Modules/MES/app/Http/Requests/*Request.php` per write endpoints
 - Create: `Modules/MES/tests/Feature/Api/WorkCenterApiTest.php` (+ uno per controller principale)
 
-- [ ] **Step 1: Base JsonResource envelope**
+- [x] **Step 1: Base JsonResource envelope** — superseded by Core generic CRUD `/app/crud` + `MesDomainActionRegistrar`/`MesModelPolicy`/`MESPermissions`.
 
 ```php
 <?php
@@ -1149,7 +1174,7 @@ final class WorkCenterResource extends JsonResource
 }
 ```
 
-- [ ] **Step 2: Routes (estratto)**
+- [x] **Step 2: Routes (estratto)** — superseded by Core generic CRUD `/app/crud` + `MesDomainActionRegistrar`/`MesModelPolicy`/`MESPermissions`.
 
 ```php
 Route::prefix('v1/mes')->middleware(['auth:sanctum', 'throttle:mes'])->group(function (): void {
@@ -1161,7 +1186,7 @@ Route::prefix('v1/mes')->middleware(['auth:sanctum', 'throttle:mes'])->group(fun
 });
 ```
 
-- [ ] **Step 3: Test 401/403/422/200 per WorkCenter**
+- [x] **Step 3: Test 401/403/422/200 per WorkCenter** — superseded by Core generic CRUD `/app/crud` + `MesDomainActionRegistrar`/`MesModelPolicy`/`MESPermissions`.
 
 ```php
 it('returns 401 without token', function (): void {
@@ -1169,15 +1194,15 @@ it('returns 401 without token', function (): void {
 });
 ```
 
-- [ ] **Step 4: Replicare pattern per tutti i controller design.md**
+- [x] **Step 4: Replicare pattern per tutti i controller design.md** — superseded by Core generic CRUD `/app/crud` + `MesDomainActionRegistrar`/`MesModelPolicy`/`MESPermissions`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit** — superseded by Core generic CRUD `/app/crud` + `MesDomainActionRegistrar`/`MesModelPolicy`/`MESPermissions`.
 
 ---
 
 ### Task 15: Pannello Filament — T14/R14
 
-> **Open (2026-09-30):** nine resources and the widget exist, but there is no `Repeater` anywhere in `app/` (no WorkCenter calendar, no BOM lines), `ProductionOrder` has no relation managers and no Release/Complete/Cancel actions, and the smoke test checks only bindings and form/table configuration.
+> **Open (2026-10-01):** nine resources and the widget exist. The work-center form edits the calendar and the BOM form its lines (relationship repeaters, edited lines versioned), production orders show read-only relation managers for operations, material consumptions, quality checks and lots, and `MesFilamentPagesTest` renders every list page as a superadmin. Step 3 stays open: Release/Complete/Cancel actions await a decision (Filament is the backoffice; transitions belong to the application unless kept as fix-up actions).
 
 **Files:**
 - Create: `Modules/MES/app/Filament/Resources/WorkCenters/WorkCenterResource.php` (+ Pages, Schemas, Tables)
@@ -1186,7 +1211,7 @@ it('returns 401 without token', function (): void {
 - Modify: `Modules/MES/app/Providers/MESServiceProvider.php` (registra panel namespace se richiesto dal pattern moduli)
 - Create: `Modules/MES/tests/Feature/Filament/WorkCenterResourceTest.php`
 
-- [ ] **Step 1: WorkCenterResource** — CRUD + repeater calendario inline (relation `calendar`)
+- [x] **Step 1: WorkCenterResource** — CRUD + repeater calendario inline (relation `calendar`)
 
 Seguire struttura:
 
@@ -1198,23 +1223,23 @@ Modules/MES/app/Filament/Resources/WorkCenters/
   Tables/WorkCentersTable.php
 ```
 
-- [ ] **Step 2: BomResource** — Select `item_id` da ERP Item, Repeater bom lines
+- [x] **Step 2: BomResource** — Select `item_id` da ERP Item, Repeater bom lines — relationship repeater with `orderColumn('sort_order')`; lines edited through the form are versioned (`MesFilamentPagesTest`).
 
-- [ ] **Step 3: ProductionOrderResource** — View page con tabs (RelationManagers: Operations, MaterialConsumptions, QualityChecks, LotNumbers); actions Release/Complete/Cancel che chiamano `ProductionOrderService`
+- [ ] **Step 3: ProductionOrderResource** — View page con tabs (RelationManagers: Operations, MaterialConsumptions, QualityChecks, LotNumbers); actions Release/Complete/Cancel che chiamano `ProductionOrderService` — open: the four read-only relation managers exist on the edit page; the transition actions await a decision.
 
-- [ ] **Step 4: ProductionDashboardWidget** — 4 stat cards da query aggregate
+- [x] **Step 4: ProductionDashboardWidget** — 4 stat cards da query aggregate
 
-- [ ] **Step 5: Policy Core** — usare permessi tabella `mes_*` generati da Core seeder; altrimenti creare `MESDatabaseSeeder` permissions block
+- [x] **Step 5: Policy Core** — usare permessi tabella `mes_*` generati da Core seeder; altrimenti creare `MESDatabaseSeeder` permissions block
 
-- [ ] **Step 6: Test render list page authenticated admin**
+- [x] **Step 6: Test render list page authenticated admin** — `MesFilamentPagesTest`, all nine list pages.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ---
 
 ### Task 16: Test suite e quality gates — T16
 
-> **Open (2026-09-30):** factories, `ProductionCycleEndToEndTest` and a snapshot dataset exist; `Feature/Invariants/ProductionOrderInvariantsTest.php` and a state-coherence invariant do not.
+> **Open (2026-10-01):** factories, `ProductionCycleEndToEndTest` and `Feature/Invariants/ProductionOrderInvariantsTest.php` exist; the MES suite passes and phpstan is clean on `Modules/MES/app`. Step 3 stays open: the end-to-end cycle stops before the finished-goods stock-in, whose posting and valuation await a decision.
 
 **Files:**
 - Create: factories per ogni modello MES mancante
@@ -1222,11 +1247,11 @@ Modules/MES/app/Filament/Resources/WorkCenters/
 - Create: `Modules/MES/tests/Feature/Invariants/ProductionOrderInvariantsTest.php`
 - Modify: `Modules/MES/composer.json` scripts se presenti
 
-- [ ] **Step 1: Factory coverage checklist**
+- [x] **Step 1: Factory coverage checklist**
 
 Ogni modello in `app/Models/` deve avere factory in `database/factories/`.
 
-- [ ] **Step 2: Invariant tests (Pest datasets)**
+- [x] **Step 2: Invariant tests (Pest datasets)** — `ProductionOrderInvariantsTest`: snapshots, numbering, OEE bounds, capacity >= 0, lot trace symmetry; state coherence only as far as the `complete()` guard, the rest of the state machine awaits a decision.
 
 ```php
 it('keeps bom snapshot immutable after release', function (int $i): void {
@@ -1236,11 +1261,11 @@ it('keeps bom snapshot immutable after release', function (int $i): void {
 
 Coprire invarianti design.md: snapshot, OEE bounds, order number uniqueness, state coherence, capacity >= 0, lot trace symmetry.
 
-- [ ] **Step 3: E2E ciclo produzione**
+- [ ] **Step 3: E2E ciclo produzione** — open: the cycle runs through complete PO and lot; finished-goods stock-in and valuation await a decision.
 
 Flusso: create PO → release → start/complete operations → backflush → complete PO → stock in.
 
-- [ ] **Step 4: Quality gates**
+- [x] **Step 4: Quality gates** — the `composer test:*` scripts do not exist in the module; run from the root (`php artisan test --compact Modules/MES/tests`, `vendor/bin/phpstan analyse Modules/MES/app`).
 
 Run:
 
@@ -1251,13 +1276,13 @@ cd Modules/MES && composer test:type-coverage 2>/dev/null || echo "run if script
 cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Commit** — with Step 3.
 
 ---
 
 ### Task 17: Documentazione — T17
 
-> **Open (2026-09-30):** `MES_GUIDA_SEMPLICE.md` and `rag/MODULE.md` exist. Both glossaries still label BOM, Routing, Traceability, Quality and Planning "(planned)" and lack the OEE and lineage entries, and the README roadmap is still all "planned".
+> **Done (2026-10-01):** `MES_GUIDA_SEMPLICE.md` and `rag/MODULE.md` exist and match the code (orders are not advanced from the panel, the widget shows four counts, OEE and capacity are not materialised or shown). Both glossaries drop "(planned)" and add OEE, downtime, capacity, lineage and snapshot entries; the README carries the current status, the open roadmap and root-level commands.
 
 **Files:**
 - Verify: `Modules/MES/docs/GLOSSARY.md`, `Modules/MES/docs/rag/GLOSSARY.md`
@@ -1265,13 +1290,13 @@ cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 - Create: `Modules/MES/docs/rag/MODULE.md`
 - Modify: `Modules/MES/README.md` (roadmap → current status)
 
-- [ ] **Step 1: MES_GUIDA_SEMPLICE.md** — flussi utente: creare WC, BOM, routing, ordine, avanzamento, OEE (italiano, no tecnicismi)
+- [x] **Step 1: MES_GUIDA_SEMPLICE.md** — flussi utente: creare WC, BOM, routing, ordine, avanzamento, OEE (italiano, no tecnicismi)
 
-- [ ] **Step 2: rag/MODULE.md** — scopo, entità, flussi, integrazione ERP/ERPBridge (breve, RAG-friendly)
+- [x] **Step 2: rag/MODULE.md** — scopo, entità, flussi, integrazione ERP/ERPBridge (breve, RAG-friendly)
 
-- [ ] **Step 3: Allineare GLOSSARY con entità implementate**
+- [x] **Step 3: Allineare GLOSSARY con entità implementate**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
