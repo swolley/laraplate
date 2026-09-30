@@ -1,7 +1,7 @@
 # Measured Retrieval Tuning (L1) — Design
 
 
-**Status:** draft for review
+**Status:** Implemented 2026-10-01 (mechanism shipped with an L0-equivalent profile; the switch is the `search.adaptive_tuning` setting and the blend the `search.reranker.weight` setting; see the plan's delivery status for divergences). The measured profile is still to be produced manually with `ai:tune-retrieval`.
 **Date:** 2026-09-15
 **Author:** swolley + Claude
 **Related:**

@@ -183,6 +183,9 @@ dà a ognuno un voto da 0 a 1. Il punteggio finale è una miscela:
 finale = (punteggio_fuso × 0.4) + (voto_reranker × max_punteggio × 0.6)
 ```
 
+Lo 0.6 è l'impostazione `search.reranker.weight` (gruppo `search` in Filament > Settings): 0 tiene
+l'ordine fuso, 1 lascia decidere solo il reranker.
+
 Due dettagli:
 
 - il reranker lavora sulla lista **già fusa**, non sulle tre liste separate. Non decide lui quale
@@ -253,8 +256,6 @@ Verificate leggendo il codice. Utile saperle, perché girarle non produce effett
 
 | Chiave | Stato reale |
 |--------|-------------|
-| `SEARCH_ENSEMBLE_ENABLED` | dichiarata in `config/search.php`, nessun codice la legge |
-| `SEARCH_RERANKER_WEIGHT` | dichiarata, nessun codice la legge: la miscela 0.4/0.6 è scritta nel codice |
 | `plan.retry_policy` | prodotta da entrambi i planner, validata da quello AI, consumata da nessuno |
 
 ---
@@ -301,8 +302,8 @@ Utile per non confondere le parole.
 
 | Livello | Si adatta a | Dove stanno i parametri | Cosa serve |
 |---------|-------------|-------------------------|------------|
-| **L0**, quello attuale | forma della query | costanti nel codice | niente |
-| **L1** | al tuo corpus | configurazione, committata | l'harness di valutazione |
+| **L0**, il default | forma della query | costanti nel codice | niente |
+| **L1**, dietro un interruttore | al tuo corpus, per classe di query | configurazione, committata | l'harness di valutazione |
 | **L2** | comportamento degli utenti | store aggiornato a runtime | telemetria e volume |
 
 Il sistema attuale è **già** adattivo: guarda la query e cambia comportamento (cifre presenti
@@ -310,8 +311,24 @@ spegne il vettoriale, query corta alza il peso del vettore, stopword rilassano l
 adattività a regole scritte da un umano. La domanda vera non è "vogliamo un sistema adattivo", è
 "da dove vengono le regole".
 
-L1 è il passo consigliato: si cercano i parametri migliori girando l'harness di valutazione offline
-e si committa il risultato. Riproducibile, revisionabile, protetto dal gate in CI.
+L1 esiste: si cercano i parametri migliori girando l'harness di valutazione offline e si committa
+il risultato. Riproducibile, revisionabile, protetto dal gate in CI. In pratica:
+
+- l'interruttore è l'impostazione `search.adaptive_tuning` (gruppo `search`), spenta di default.
+  Spenta, il piano è identico a L0, byte per byte;
+- accesa, ogni query viene classificata riusando l'analisi che già si fa per il text matching:
+  `identifier` (contiene un codice, un numero, una email, un UUID), `short_keyword` (una o due
+  parole), `multi_term` (da tre a cinque), `natural_language` (una frase);
+- per quella classe si applicano i parametri di `Modules/Core/config/search_tuning.php`: pesi,
+  RRF, bonus accordo, top-K e miscela del reranker. Mai la scelta delle strategie: se il vettoriale
+  gira resta una questione di capacità, non di tuning;
+- ogni risposta dice cosa è successo in `meta.tuning` (versione del profilo e classe della query);
+- i numeri li produce `php artisan ai:tune-retrieval`, che rigioca la fusione su una griglia di
+  parametri senza rieseguire le query sul motore e stampa il blocco da incollare. Non scrive mai la
+  configurazione: la committa un umano.
+
+Il profilo spedito ripete le costanti L0, quindi accendere l'interruttore oggi cambia solo
+`meta.tuning`. Il giro di tuning vero va fatto a mano, con Elasticsearch e gli embedding attivi.
 
 L2 richiede di registrare cosa fanno gli utenti, e oggi in Laraplate non viene registrato nulla:
 nessuna tabella di query, nessun click. Senza quel dato un sistema che "impara" imparerebbe dal

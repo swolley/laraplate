@@ -1,5 +1,5 @@
 ---
-status: open
+status: completed
 created_on: 2026-09-15
 ---
 # Measured Retrieval Tuning (L1) — Implementation Plan
@@ -47,16 +47,16 @@ recorded per-strategy orderings without re-querying the engine.
 - Consumes: `SearchQueryAnalysis` (meaningful token count, protected token count, stopword signal).
 - Produces: `QueryClass::{Identifier, ShortKeyword, MultiTerm, NaturalLanguage}`.
 
-- [ ] **Step 1: Failing test.** One case per class, using the analyzer on real strings:
+- [x] **Step 1: Failing test.** One case per class, using the analyzer on real strings:
       `INV-1042 fattura` → `Identifier`; `Mario Rossi` → `ShortKeyword`;
       `fatture fornitori scadute` → `MultiTerm`;
       `come faccio ad annullare una fattura già inviata` → `NaturalLanguage`.
       Add the precedence case: a protected token wins even in a long query.
-- [ ] **Step 2: Run, confirm fail** (enum absent).
-- [ ] **Step 3: Implement** the enum with `fromAnalysis()`, in the precedence order of the spec.
+- [x] **Step 2: Run, confirm fail** (enum absent).
+- [x] **Step 3: Implement** the enum with `fromAnalysis()`, in the precedence order of the spec.
       Do not add a second tokenizer: read what the analyzer already produced.
-- [ ] **Step 4: Run, confirm pass.**
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+- [x] **Step 4: Run, confirm pass.**
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -70,13 +70,15 @@ recorded per-strategy orderings without re-querying the engine.
 - Produces: a `Setting` row `{name: 'search_adaptive_tuning', value: false, type: Boolean,
   group_name: 'search'}`, read via `PerModelSettingResolver::boolean('search_adaptive_tuning', false)`.
 
-- [ ] **Step 1: Failing test.** After seeding, the resolver returns `false`; after flipping the row
+- [x] **Step 1: Failing test.** After seeding, the resolver returns `false`; after flipping the row
       and clearing the group cache, it returns `true`.
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement** the seeder entry following the existing `seedSoftDeletedModel()` shape
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement** the seeder entry following the existing `seedSoftDeletedModel()` shape
       (name, value, encrypted false, choices null, `SettingTypeEnum::Boolean`, group, description).
-- [ ] **Step 4: Run, confirm pass**, and confirm the seeder suite is still green.
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+      Diverged: seeded as runtime setting `search.adaptive_tuning` in `runtimeSettingDefinitions()`,
+      read as `config('core.search.adaptive_tuning')` through the settings overlay (Core c3bfeec4 rule).
+- [x] **Step 4: Run, confirm pass**, and confirm the seeder suite is still green.
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -92,17 +94,17 @@ recorded per-strategy orderings without re-querying the engine.
 - Produces: `apply(array $plan, QueryClass $class): array` returning the plan with `ensemble` and
   `ranking` merged, plus `meta.tuning = {applied, profile_version, query_class}`.
 
-- [ ] **Step 1: Failing test.** Cover: setting off → returned plan `===` input plan; setting on →
+- [x] **Step 1: Failing test.** Cover: setting off → returned plan `===` input plan; setting on →
       only `ensemble`, `ranking` and `meta.tuning` differ, `retrieval` untouched; unknown class →
       `default` entry; invalid profile (weight 1.7) → input plan returned, warning logged once;
       missing config → input plan returned.
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement.** The config ships with the L0 values in `default` so the first commit
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement.** The config ships with the L0 values in `default` so the first commit
       is a no-op by construction; per-class entries start empty and are filled by Task 7's report.
       Validation exactly as the spec lists. Keep the class `final readonly` with the resolver and
       a config repository injected.
-- [ ] **Step 4: Run, confirm pass.**
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+- [x] **Step 4: Run, confirm pass.**
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -118,15 +120,17 @@ recorded per-strategy orderings without re-querying the engine.
 **Interfaces:**
 - Produces: `AdvancedSearchResult->meta['tuning']`.
 
-- [ ] **Step 1: Failing test.** With the setting off, assert the plan handed to a spy
+- [x] **Step 1: Failing test.** With the setting off, assert the plan handed to a spy
       `EnsembleSearchService` is **equal to** the plan `FallbackSearchPlanner` produced (the
       anti-drift assertion). With it on, assert the ensemble weights match the profile and that
       `meta['tuning']['query_class']` is the expected class.
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement** the single call site plus the meta passthrough.
-- [ ] **Step 4: Run, confirm pass**, and run the whole `tests/Integration/Search` directory: no
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement** the single call site plus the meta passthrough.
+      The text-match resolution moved before `resolveVector()` so the class is derived from the
+      analysis it already carries (`ResolvedTextMatch->analysis`), with no second analyzer pass.
+- [x] **Step 4: Run, confirm pass**, and run the whole `tests/Integration/Search` directory: no
       existing assertion may change.
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -142,14 +146,17 @@ recorded per-strategy orderings without re-querying the engine.
 - Produces: `RankFusion::fuse(array $perStrategy, array $weights, float $agreementBoost, int $rrfK,
   float $rrfWeight): list<array{id, score, ...}>` — pure, no model, no engine, no container.
 
-- [ ] **Step 1: Failing test.** Hand-computed fusion for two strategies and three ids, including
+- [x] **Step 1: Failing test.** Hand-computed fusion for two strategies and three ids, including
       the agreement bonus and the weight renormalization when one strategy is absent.
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement** by lifting the existing methods verbatim. No formula change.
-- [ ] **Step 4: Run** the new test **and** the full `EnsembleSearchServiceTest`: every pre-existing
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement** by lifting the existing methods verbatim. No formula change.
+- [x] **Step 4: Run** the new test **and** the full `EnsembleSearchServiceTest`: every pre-existing
       assertion must pass untouched. Then run both application-content baseline gates: the
-      artifacts must stay byte-identical.
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+      artifacts must stay byte-identical. Added before the refactor: two characterization tests
+      pinning the exact fused and reranked order and scores over a three-strategy fixture
+      (`FusionFixtureSearchModel`), since the baseline gates run on the `collection` Scout driver
+      and so exercise the lexical fallback, not fusion.
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -168,14 +175,17 @@ recorded per-strategy orderings without re-querying the engine.
 - Behaviour: blend `score = fused * (1 - blend) + rerank * max * blend`, where `blend` defaults to
   `0.60`, reproducing today's hardcoded `0.4 / 0.6` exactly.
 
-- [ ] **Step 1: Failing test.** Default blend reproduces the current scores (assert against the
+- [x] **Step 1: Failing test.** Default blend reproduces the current scores (assert against the
       existing expected values); an explicit `ranking.rerank_blend = 0.0` returns the fused order.
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement**, and delete `search.features.ensemble` together with every mention of
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement**, and delete `search.features.ensemble` together with every mention of
       `SEARCH_ENSEMBLE_ENABLED` (config, README, `SEARCH_MATCHING_DEVELOPER.md`,
-      `SEARCH_RETRIEVAL_PIPELINE.md`).
-- [ ] **Step 4: Run, confirm pass**; re-run both baseline gates, byte-identical.
-- [ ] **Step 5: Pint + commit** in `Modules/Core`.
+      `SEARCH_RETRIEVAL_PIPELINE.md`). Diverged: the default is the seeded runtime setting
+      `search.reranker.weight` (Float 0.6, read as `config('core.search.reranker.weight')`), not an
+      env var; `features.ensemble` / `reranker.weight` had already left `config/search.php` and the
+      README in Core c3bfeec4, so only the stack explainer mention remained (fixed in Task 9).
+- [x] **Step 4: Run, confirm pass**; re-run both baseline gates, byte-identical.
+- [x] **Step 5: Pint + commit** in `Modules/Core`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -193,30 +203,35 @@ recorded per-strategy orderings without re-querying the engine.
 - Produces: a JSON report `{version, source, dataset, metric, candidates: [{params, metrics,
   per_class_metrics, delta_vs_committed}], winner}` plus a printed PHP profile block.
 
-- [ ] **Step 1: Failing unit test** for `RetrievalTuningService`: given canned per-strategy
+- [x] **Step 1: Failing unit test** for `RetrievalTuningService`: given canned per-strategy
       orderings for three cases and a two-point grid, assert the candidate ranking by `ndcg_at_5`
       and that each case was retrieved **once** (the grid re-fuses, it does not re-query).
-- [ ] **Step 2: Run, confirm fail.**
-- [ ] **Step 3: Implement the service.** Per case: retrieve once (reranker off) to get
+- [x] **Step 2: Run, confirm fail.**
+- [x] **Step 3: Implement the service.** Per case: retrieve once (reranker off) to get
       `meta['per_strategy']`; for every candidate parameter set call `RankFusion::fuse()`, then
       `IrMetrics::atK()` against `expected_hit_ids`; aggregate overall and per `QueryClass`.
       Reranking is scored separately with one reranker-on pass, since its blend cannot be
-      re-computed offline from fused scores alone.
-- [ ] **Step 4: Failing feature test** for the command: invalid `--source` fails; a run writes the
+      re-computed offline from fused scores alone. Candidates are partial fusion parameter sets
+      (only `ensemble.*`; ranking keys are rejected as not replayable) merged over the L0
+      planner values per case; the committed baseline is the same merge with the committed
+      profile. Query class comes from `TextMatchOptionsResolver` analysis, as at runtime.
+- [x] **Step 4: Failing feature test** for the command: invalid `--source` fails; a run writes the
       report and prints a profile block; assert no other file was touched.
-- [ ] **Step 5: Implement the command** — `ai:tune-retrieval {--source=} {--dataset=} {--grid=}
+- [x] **Step 5: Implement the command** — `ai:tune-retrieval {--source=} {--dataset=} {--grid=}
       {--metric=ndcg_at_5} {--output=} {--force}`, mirroring `EvaluateApplicationContentCommand`
       (strict dataset load, atomic write, `JSON_PRESERVE_ZERO_FRACTION`, no overwrite without
       `--force`).
-- [ ] **Step 6: Run both tests, confirm pass.**
-- [ ] **Step 7: Pint + commit** in `Modules/AI`.
+- [x] **Step 6: Run both tests, confirm pass.**
+- [x] **Step 7: Pint + commit** in `Modules/AI`. (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
 ### Task 8: Profile regression gate
 
 **Files:**
-- Create: `Modules/AI/tests/Feature/RetrievalTuningProfileGateTest.php`
+- Modify: `Modules/CMS/tests/Feature/ApplicationContent/CmsApplicationContentEvaluationBaselineTest.php`
+- Modify: `Modules/SAO/tests/Feature/ApplicationContent/SaoApplicationContentEvaluationBaselineTest.php`
+  (the gate was first planned as a new AI feature test; see the delivery status)
 - Test: reuses `Modules/CMS/tests/Fixtures/application-content/cms-contents.json` and the SAO fixture
 
 **Interfaces:**
@@ -225,11 +240,17 @@ recorded per-strategy orderings without re-querying the engine.
   source, within a stated tolerance; and with the setting **off**, the baseline artifacts stay
   byte-identical.
 
-- [ ] **Step 1: Write the gate** driving the same seam the baseline tests use.
-- [ ] **Step 2: Run it** against the shipped L0-equivalent profile: it must pass as a no-op.
-- [ ] **Step 3: Document the regeneration procedure** in the test docblock, mirroring
+- [x] **Step 1: Write the gate** driving the same seam the baseline tests use. Diverged: written
+      as a second case inside each baseline test (`CmsApplicationContentEvaluationBaselineTest`,
+      `SaoApplicationContentEvaluationBaselineTest`), sharing their corpus seeding, instead of an
+      AI test depending on CMS and SAO test helpers. Tolerance: one rounding unit (0.0001).
+      Honest limit: the suite runs Scout on `collection`, so both providers answer through their
+      lexical fallback and no profile can move these numbers in CI; the gate guards the wiring,
+      `ai:tune-retrieval` on a real engine is the measurement.
+- [x] **Step 2: Run it** against the shipped L0-equivalent profile: it must pass as a no-op.
+- [x] **Step 3: Document the regeneration procedure** in the test docblock, mirroring
       `APP_CONTENT_BASELINE_REGEN`.
-- [ ] **Step 4: Pint + commit** in `Modules/AI`.
+- [x] **Step 4: Pint + commit** in `Modules/CMS` and `Modules/SAO` (where the gate lives). (Pint run on the explicit file list; the commit is made by the session that owns git.)
 
 ---
 
@@ -244,12 +265,13 @@ recorded per-strategy orderings without re-querying the engine.
 - Modify: `Modules/AI/docs/rag/MODULE.md` (`ai:tune-retrieval` next to the evaluate commands)
 - Modify: `docs/ricerca-spiegazione-semplice.md` (L0/L1 section: what the switch now does)
 
-- [ ] **Step 1: Update each file**, keeping the existing voice (English in the module docs, Italian
-      in the stack explainer).
-- [ ] **Step 2: Re-run** `php artisan ai:index-rag-docs` so the assistant corpus picks up the
-      changes.
-- [ ] **Step 3: Commit** in each owning submodule, then update this plan's front-matter to
-      `status: completed`.
+- [x] **Step 1: Update each file**, keeping the existing voice (English in the module docs, Italian
+      in the stack explainer). Also `SEARCH_MATCHING_DEVELOPER.md` (the hardcoded-blend sentence) and
+      the explainer's "dead knobs" table (both rows removed: one key is gone, the other is live).
+- [-] **Step 2: Re-run** `php artisan ai:index-rag-docs` so the assistant corpus picks up the
+      changes. Needs live Elasticsearch and embeddings: run manually after deploy.
+- [x] **Step 3: Commit** in each owning submodule, then update this plan's front-matter to
+      `status: completed`. (Front matter updated; the commits are made by the session that owns git.)
 
 ---
 
@@ -276,3 +298,20 @@ separate, deliberate act:
   preserving by construction and guarded by two baseline gates.
 - Nothing here reads user behaviour. L2 stays blocked on telemetry that does not exist yet, and the
   spec says so explicitly so the next reader does not mistake L1 for learning.
+
+## Delivery status (2026-10-01): shipped, profile not yet measured
+
+**Documented in:** `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (tuning step, query classes, profile rules, `meta['tuning']`, rerank blend, configuration table), `Modules/Core/docs/rag/SEARCH_MATCHING_USER.md` and `Modules/Core/docs/rag/SEARCH_MATCHING_DEVELOPER.md` (blend setting, tuning vs `matching`), `Modules/Core/README.md` (the `search` settings group and the retrieval tuning profile), `Modules/AI/docs/rag/MODULE.md` (`ai:tune-retrieval`), and the stack explainer `docs/ricerca-spiegazione-semplice.md`.
+
+The mechanism ships with an L0-equivalent profile; the measured tuning run is manual (see "Post-implementation" above) and needs Elasticsearch plus embeddings. Divergences from the steps, all deliberate:
+
+- **Settings, not env vars or `PerModelSettingResolver`.** Since Core c3bfeec4 switches and tuning values are seeded runtime settings read through the config overlay. The switch is `search.adaptive_tuning` (Boolean, off, group `search`, read as `config('core.search.adaptive_tuning')`), not `search_adaptive_tuning`; the rerank blend default is the new setting `search.reranker.weight` (Float `0.6`, read as `config('core.search.reranker.weight')`), not `config('search.reranker.weight')` / `SEARCH_RERANKER_WEIGHT`. `features.ensemble` and `reranker.weight` had already left `config/search.php` and the README, so Task 6 only had the stack explainer mention left to remove.
+- **Profile semantics: partial sets over the planner.** A parameter the profile omits keeps the planner value. The spec's `default` block restating 0.35/0.35/0.30 would not be a no-op (L0 uses 0.30/0.40/0.30 for short queries, and settings own `rerank_top_k` and the blend), so the shipped profile carries only the constant L0 values (`rrf_k` 60, `rrf_weight` 0.25, `agreement_boost` 0.15) and empty class sets: switched on, it changes only `meta['tuning']`. Validation also rejects unknown parameters and unknown classes.
+- **Query classes.** `identifier` means a significant numeric, UUID, email or structured-identifier token; short words and acronyms (protected from fuzziness by text matching) do not count, or `ad` in a sentence would make it an identifier. Stopwords are derived as tokens minus significant tokens. With at most two significant tokens a query is `short_keyword` whatever its stopwords (table precedence).
+- **One analysis.** `AdvancedSearchService` resolves the text match before `resolveVector()` and classifies from `ResolvedTextMatch->analysis`; `RetrievalTuningProfile::apply()` takes the `QueryClass`, as the plan's interface says, rather than the analysis the spec sketched.
+- **Task 5 proof.** `RankFusion` has static methods (pure math, like `IrMetrics`) plus `fuseExecuted()` for recorded rankings. Byte-identity is proven by characterization tests written before the refactor over a three-strategy fixture (`FusionFixtureSearchModel`), because the CMS/SAO baseline gates run Scout on `collection` and so never reach fusion.
+- **Tuner.** Candidates are fusion-only parameter sets merged over each case's L0 planner values; ranking keys are rejected because the blend cannot be replayed offline, and the reranked ordering is reported from one reranker-on pass. The report adds `class_winners`, which the printed block uses for per-class entries.
+- **Task 8 location.** The gate is a second case in each existing baseline test (CMS and SAO), not `Modules/AI/tests/Feature/RetrievalTuningProfileGateTest.php`, to reuse their corpus seeding without an AI test depending on CMS/SAO helpers. In CI it guards the wiring only: the lexical fallback cannot be moved by a profile.
+- **Not done:** `ai:index-rag-docs` (needs live Elasticsearch, run manually); the actual tuning run and a measured `config/search_tuning.php` (manual by design).
+- This plan and its spec already live in `laraplate/docs/superpowers/`, so the move announced at the top was not needed.
+
