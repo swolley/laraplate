@@ -3,7 +3,7 @@
 > **Navigation:** **Completed.** Open follow-ups →
 > [`specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`](../specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md).
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Status:** Completed (2026-06-30). Post-implementation code review completed same day.
 
@@ -35,11 +35,24 @@
 | 5 lineTax | Fix 4b | ERP | `d882aaf` | 2 tests pass |
 | 6 Money math refactor | Fix 4c | ERP | `51cba65` | 45 regression tests pass; golden values unchanged |
 | 7 Test gaps | Fix 5 | ERP | `e332542` | 7 tests (3WM + bank CSV) |
-| 8 CRUD write guard | Fix 6 | Core + ERP | `354299c` + `f6ed9fd` | 3 guard tests; full ERP suite 240 pass |
+| 8 CRUD write guard | Fix 6 | Core + ERP | `354299c` + `1ede917` | 3 guard tests; full ERP suite 240 pass |
 
 **Base SHAs:** ERP `db841e1`, Core `cd4d5dc`.
 
 **Not done (by design):** module version bumps — awaiting user confirmation.
+
+---
+
+## Delivery status (2026-09-30): delivered, reconciled against the code
+
+Reconciled task by task against the code on 2026-09-30: every commit named in the table above exists, every file a task declares is on
+disk, and the nine test files the plan introduced pass together (56 tests, 207 assertions). The 51 checkboxes left unticked after the
+2026-06-30 execution were ticked in this pass. The Task 8 ERP commit in the table was corrected from `f6ed9fd`, which exists in no
+repository, to `1ede917`.
+
+**Documented in:** `Modules/ERP/README.md`, `Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md`, `Modules/ERP/docs/rag/MODULE.md` (closed-period
+posting block, `force_post`, models restricted from generic writes), `Modules/ERP/docs/STATUS.md`, `Modules/Core/docs/CRUD_SYSTEM.md`
+(the `RestrictsCrudWrites` guard).
 
 ---
 
@@ -51,7 +64,7 @@
 - Modify: `Modules/ERP/app/Database/Seeders/ERPDatabaseSeeder.php` (the file lives at `Modules/ERP/database/seeders/ERPDatabaseSeeder.php`), method `domainPermissions()` at lines 224-246
 - Test: `Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php` (new)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`:
 
@@ -83,12 +96,12 @@ it('does not seed e-invoice permissions for non-invoice models', function (): vo
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`
 Expected: FAIL — `default.erp_invoices.submitEInvoice` does not exist.
 
-- [ ] **Step 3: Fix the seeder**
+- [x] **Step 3: Fix the seeder**
 
 In `Modules/ERP/database/seeders/ERPDatabaseSeeder.php`, replace the `domainPermissions()` body (lines 224-246) with:
 
@@ -119,12 +132,12 @@ In `Modules/ERP/database/seeders/ERPDatabaseSeeder.php`, replace the `domainPerm
 
 This renames `$sntities` → `$entities`, replaces the broken `is_a(...)` check with a direct class-string comparison `$model === Invoice::class`, and removes the unrelated `$model::flushEventListeners();` side effect from the permission-name builder.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`
 Expected: PASS (both tests).
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -141,7 +154,7 @@ git commit -m "fix(erp): seed e-invoice domain permissions for invoices"
 **Files:**
 - Test: `Modules/ERP/tests/Feature/ErpModelPolicyTest.php` (new)
 
-- [ ] **Step 1: Write the test**
+- [x] **Step 1: Write the test**
 
 Create `Modules/ERP/tests/Feature/ErpModelPolicyTest.php`:
 
@@ -218,12 +231,12 @@ it('denies (fail-closed) when the permission row is absent', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it passes**
+- [x] **Step 2: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php`
 Expected: PASS (4 tests). These document the intended, already-correct fail-closed contract.
 
-- [ ] **Step 3: Format and commit**
+- [x] **Step 3: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -241,7 +254,7 @@ git commit -m "test(erp): pin ERPModelPolicy authorization semantics"
 - Modify: `Modules/ERP/app/Services/Accounting/InvoicePostingService.php` (imports; the `post()` call at lines 95-104; add a `resolveFiscalPeriod()` helper)
 - Test: `Modules/ERP/tests/Feature/InvoicePostingServiceTest.php` (append cases; reuse `createInvoicePostingCompany()`)
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`. First add the model imports near the top of the file (after the existing `use Modules\ERP\Models\FiscalYear;` line):
 
@@ -315,12 +328,12 @@ it('posts a sale invoice into an open fiscal period', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`
 Expected: the "blocks posting … closed fiscal period" test FAILS (posting currently succeeds and `journal_entry_id` is set). The "open period" test passes already.
 
-- [ ] **Step 3: Resolve and pass the fiscal period**
+- [x] **Step 3: Resolve and pass the fiscal period**
 
 In `Modules/ERP/app/Services/Accounting/InvoicePostingService.php`, add the import (with the other `use Modules\ERP\Models\...` lines):
 
@@ -362,17 +375,17 @@ Add this private method next to `postedAtForPosting()` (after line 349):
     }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`
 Expected: PASS (all cases, old and new).
 
-- [ ] **Step 5: Regression — full posting/golden suites**
+- [x] **Step 5: Regression — full posting/golden suites**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php Modules/ERP/tests/Feature/AccountingSequencesAndPostingTest.php`
 Expected: PASS — no covering periods exist in those fixtures, so posting behavior is unchanged.
 
-- [ ] **Step 6: Format and commit**
+- [x] **Step 6: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -390,7 +403,7 @@ Add a single decimal primitive so all money math is exact. It wraps `Brick\Math\
 - Create: `Modules/ERP/app/Support/Decimal.php`
 - Test: `Modules/ERP/tests/Feature/Support/DecimalTest.php` (new)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/ERP/tests/Feature/Support/DecimalTest.php`:
 
@@ -429,12 +442,12 @@ it('negates, takes absolute value, and reports sign/zero', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Support/DecimalTest.php`
 Expected: FAIL — class `Modules\ERP\Support\Decimal` not found.
 
-- [ ] **Step 3: Implement the helper**
+- [x] **Step 3: Implement the helper**
 
 Create `Modules/ERP/app/Support/Decimal.php`:
 
@@ -512,12 +525,12 @@ final class Decimal
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Support/DecimalTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -535,7 +548,7 @@ Add one decimal `lineTax(net, rate)` method so invoice posting and the VAT regis
 - Modify: `Modules/ERP/app/Services/Taxation/TaxLineCalculator.php`
 - Test: `Modules/ERP/tests/Feature/Services/TaxLineCalculatorTest.php` (new)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/ERP/tests/Feature/Services/TaxLineCalculatorTest.php`:
 
@@ -584,12 +597,12 @@ it('matches computeVatFromNet tax for VAT codes', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Services/TaxLineCalculatorTest.php`
 Expected: FAIL — method `lineTax()` does not exist.
 
-- [ ] **Step 3: Add the method**
+- [x] **Step 3: Add the method**
 
 In `Modules/ERP/app/Services/Taxation/TaxLineCalculator.php`, add this public method (e.g. after `computeWithholdingFromGross()`):
 
@@ -611,12 +624,12 @@ In `Modules/ERP/app/Services/Taxation/TaxLineCalculator.php`, add this public me
 
 `BigDecimal` and `RoundingMode` are already imported in this file.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Services/TaxLineCalculatorTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -637,7 +650,7 @@ Replace the float helpers (`round4`/`add`/`mul`/`neg`/`asFloat`) and the duplica
 - Modify: `Modules/ERP/app/Services/Pricing/PriceResolverService.php`
 - Test: `Modules/ERP/tests/Feature/MoneyMathDecimalPostingTest.php` (new)
 
-- [ ] **Step 1: Write the fractional-posting test**
+- [x] **Step 1: Write the fractional-posting test**
 
 Create `Modules/ERP/tests/Feature/MoneyMathDecimalPostingTest.php`:
 
@@ -725,12 +738,12 @@ it('posts a fractional sale invoice with decimal-exact, balanced journal totals'
 });
 ```
 
-- [ ] **Step 2: Run it against the current float code**
+- [x] **Step 2: Run it against the current float code**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/MoneyMathDecimalPostingTest.php`
 Expected: record the result. It MAY fail now if the float pipeline drifts on these values; if it already passes, keep it as a regression guard. Either way it must be green after Step 7.
 
-- [ ] **Step 3: Refactor `InvoicePostingService`**
+- [x] **Step 3: Refactor `InvoicePostingService`**
 
 In `Modules/ERP/app/Services/Accounting/InvoicePostingService.php`:
 
@@ -811,7 +824,7 @@ Replace the `$this->neg(...)` calls inside `buildJournalLines()` (lines 208, 212
 
 Delete the now-unused float helpers `round4()`, `add()`, `mul()`, `neg()`, and `asFloat()` (lines 375-378 and 385-403). Keep `modelId()`.
 
-- [ ] **Step 4: Refactor `VatRegisterService`**
+- [x] **Step 4: Refactor `VatRegisterService`**
 
 In `Modules/ERP/app/Services/Accounting/VatRegisterService.php`:
 
@@ -846,7 +859,7 @@ Replace the per-line tax loop (lines 59-70) with:
 
 Delete the now-unused float helpers `round4()`, `add()`, and `neg()` (lines 108-121).
 
-- [ ] **Step 5: Refactor `VatSettlementService`**
+- [x] **Step 5: Refactor `VatSettlementService`**
 
 In `Modules/ERP/app/Services/Accounting/VatSettlementService.php`:
 
@@ -879,7 +892,7 @@ Replace the persisted rounded aggregates (lines 84-85):
 
 Delete the now-unused `round4()` helper (lines 109-111).
 
-- [ ] **Step 6: Refactor `PriceResolverService::applyRule()`**
+- [x] **Step 6: Refactor `PriceResolverService::applyRule()`**
 
 In `Modules/ERP/app/Services/Pricing/PriceResolverService.php`, add the import:
 
@@ -908,12 +921,12 @@ Replace `applyRule()` (lines 114-130) with:
     }
 ```
 
-- [ ] **Step 7: Run the new test and the full regression suites**
+- [x] **Step 7: Run the new test and the full regression suites**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/MoneyMathDecimalPostingTest.php Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php Modules/ERP/tests/Feature/InventoryAccountingGoldenMasterTest.php Modules/ERP/tests/Feature/InvoicePostingServiceTest.php Modules/ERP/tests/Feature/VatRegisterServiceTest.php Modules/ERP/tests/Feature/Services/PriceResolverServiceTest.php Modules/ERP/tests/Feature/Services/InvoiceLinePricingServiceTest.php Modules/ERP/tests/Feature/FinancialStatementsTest.php`
 Expected: PASS. If a golden value changed, treat it as a corrected float defect (do NOT relax assertions); confirm the new value is the decimal-exact one before updating any golden expectation.
 
-- [ ] **Step 8: Format and commit**
+- [x] **Step 8: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -934,7 +947,7 @@ Two gaps: `ThreeWayMatchService` is only tested on `PurchaseOrderLine` (no GR-li
 
 ### 7a — Three-way match GR and unmatched coverage
 
-- [ ] **Step 1: Write the tests**
+- [x] **Step 1: Write the tests**
 
 Append the imports to the top of `Modules/ERP/tests/Feature/ThreeWayMatchServiceTest.php` (after the existing `use` block):
 
@@ -1028,14 +1041,14 @@ it('returns unmatched when the invoice line has no PO or GR link', function (): 
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they pass**
+- [x] **Step 2: Run the tests to verify they pass**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ThreeWayMatchServiceTest.php`
 Expected: PASS (existing 3 + 2 new). These document already-correct behavior (`gr_qty` discrepancy path and the `Unmatched` early return).
 
 ### 7b — Bank CSV per-row validation
 
-- [ ] **Step 3: Write the failing test**
+- [x] **Step 3: Write the failing test**
 
 Append the import to `Modules/ERP/tests/Feature/Services/BankStatementImportServiceTest.php` if not present:
 
@@ -1081,12 +1094,12 @@ it('rejects a CSV row missing the required date or amount', function (): void {
 });
 ```
 
-- [ ] **Step 4: Run the test to verify it fails**
+- [x] **Step 4: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementImportServiceTest.php`
 Expected: FAIL — the importer currently parses the empty `booked_at` (`CarbonImmutable::parse('')`) and/or persists rows instead of throwing a `ValidationException`.
 
-- [ ] **Step 5: Add per-row validation to the importer**
+- [x] **Step 5: Add per-row validation to the importer**
 
 In `Modules/ERP/app/Services/Banking/BankStatementCsvImporter.php`, inside the `DB::transaction` loop in `import()`, validate each row before creating the line. Replace the `foreach ($rows as $row) {` block (lines 38-56) with:
 
@@ -1149,12 +1162,12 @@ Add this private method (after `import()`, before `readRows()`):
     }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/Services/BankStatementImportServiceTest.php`
 Expected: PASS (existing import test + the new bad-row test).
 
-- [ ] **Step 7: Format and commit**
+- [x] **Step 7: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1177,7 +1190,7 @@ The Core dynamic CRUD has no structural model-exposure control: `CrudService::in
 - Modify: `Modules/ERP/app/Models/JournalEntry.php`, `JournalEntryLine.php`, `VatRegisterEntry.php`, `StockMovement.php`, `StockCostLayer.php`, `StockLevel.php`
 - Test: `Modules/ERP/tests/Feature/CrudWriteGuardTest.php` (new)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/ERP/tests/Feature/CrudWriteGuardTest.php`:
 
@@ -1249,12 +1262,12 @@ it('returns 403 and persists nothing when inserting a journal entry via generic 
 - Route name: the dynamic CRUD routes live in `Modules/Core/routes/crud.php` and are registered under the Core name prefix, so the insert route is `core.api.insert` with `module`/`entity` as parameters (mirroring `Modules/Core/tests/Feature/Api/CrudApiTest.php`). Confirm with `php artisan route:list --path=insert`.
 - Entity resolution: ERP model resolution requires the model registry/HelpersCache that the application test case populates (see the note at the top of `CrudApiTest.php`). If this test returns `400` with "Dynamic tables mapping is not enabled" instead of `403`, the request never resolved the ERP model — that is an *entity-resolution* concern, separate from the write guard. In that case rely on the two deterministic contract tests above as the proof of Fix 6 and raise the resolution gap as a Spec 3 routing/exposure item; do not weaken the guard. The guard itself (Steps 6-7) is correct by construction: it runs in `CrudService::insert/update/delete` before the permission check, for every caller.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/CrudWriteGuardTest.php`
 Expected: FAIL — `RestrictsCrudWrites` interface does not exist; the journal insert currently does not return 403.
 
-- [ ] **Step 3: Create the Core contract**
+- [x] **Step 3: Create the Core contract**
 
 Create `Modules/Core/app/Contracts/RestrictsCrudWrites.php`:
 
@@ -1283,7 +1296,7 @@ interface RestrictsCrudWrites
 }
 ```
 
-- [ ] **Step 4: Create the convenience trait**
+- [x] **Step 4: Create the convenience trait**
 
 Create `Modules/Core/app/Models/Concerns/DeniesGenericCrudWrites.php`:
 
@@ -1310,7 +1323,7 @@ trait DeniesGenericCrudWrites
 }
 ```
 
-- [ ] **Step 5: Create the exception**
+- [x] **Step 5: Create the exception**
 
 Create `Modules/Core/app/Exceptions/CrudWriteNotAllowedException.php`:
 
@@ -1341,7 +1354,7 @@ final class CrudWriteNotAllowedException extends RuntimeException
 }
 ```
 
-- [ ] **Step 6: Enforce the guard in `CrudService`**
+- [x] **Step 6: Enforce the guard in `CrudService`**
 
 In `Modules/Core/app/Services/Crud/CrudService.php`, add the imports (with the other `use` statements):
 
@@ -1380,7 +1393,7 @@ Add this private method to the class:
 
 (`Illuminate\Database\Eloquent\Model` is already imported in this file.)
 
-- [ ] **Step 7: Map the exception to HTTP 403 in `CrudController`**
+- [x] **Step 7: Map the exception to HTTP 403 in `CrudController`**
 
 In `Modules/Core/app/Http/Controllers/CrudController.php`, add the import:
 
@@ -1402,7 +1415,7 @@ Add a dedicated catch in `handleServiceCall()` — place it before the `catch (L
             );
 ```
 
-- [ ] **Step 8: Apply the trait to the six ERP models**
+- [x] **Step 8: Apply the trait to the six ERP models**
 
 For each of the following files, add the two imports and change the class declaration so it implements the contract and uses the trait. Each model currently declares `final class <Name> extends Model`.
 
@@ -1430,17 +1443,17 @@ Repeat the exact same change in each of:
 
 Each file gets the same two `use` imports at the top and the same `use DeniesGenericCrudWrites;` inside the class body.
 
-- [ ] **Step 9: Run the test to verify it passes**
+- [x] **Step 9: Run the test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/CrudWriteGuardTest.php`
 Expected: PASS (3 tests).
 
-- [ ] **Step 10: Regression — service paths and Core CRUD still work**
+- [x] **Step 10: Regression — service paths and Core CRUD still work**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php Modules/ERP/tests/Feature/InventoryAccountingGoldenMasterTest.php Modules/Core/tests/Feature/Api/CrudApiTest.php`
 Expected: PASS — service-layer creation (which does not go through `CrudService`) is unaffected, and the Core CRUD on non-restricted models still works.
 
-- [ ] **Step 11: Format and commit**
+- [x] **Step 11: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty

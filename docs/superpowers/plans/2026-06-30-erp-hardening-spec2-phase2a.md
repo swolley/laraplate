@@ -25,6 +25,17 @@
 
 ---
 
+## Delivery status (2026-09-30): delivered, reconciled against the code
+
+Reconciled task by task against the code on 2026-09-30: all nine tasks have their files on disk and wired into the Filament pages,
+the seeded abilities are asserted by `ErpDomainPermissionsSeederTest`, and the recorded subset now runs at 48 tests, 193 assertions
+(38 when first executed). The 39 checkboxes were ticked in this pass. The spec backlog entry `DONE-S2-2A` already records the closure.
+
+**Documented in:** `Modules/ERP/docs/STATUS.md`, `Modules/ERP/docs/rag/MODULE.md` (domain-action table),
+`Modules/ERP/docs/ERP_GUIDA_SEMPLICE.md`, `Modules/ERP/README.md` (`force_post` and the closed-period block).
+
+---
+
 ## File map (created / modified)
 
 | File | Responsibility |
@@ -76,10 +87,10 @@ Superadmin must **not** bypass these. Permission check runs only when state allo
 ## Task 1: Seed domain permissions (2A-01)
 
 **Files:**
-- Modify: `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` — method `domainPermissions()`
+- Modify: `Modules/ERP/database/seeders/ERPDatabaseSeeder.php` — as delivered the abilities were declared in `ERPPermissions::operations()` and seeded from `PermissionManifest` (centralized later as `3-04`)
 - Modify: `Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `ErpDomainPermissionsSeederTest.php`:
 
@@ -103,12 +114,12 @@ it('does not seed force_post on non-invoice models', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`  
 Expected: FAIL — `default.erp_fiscal_periods.close` does not exist.
 
-- [ ] **Step 3: Extend `domainPermissions()`**
+- [x] **Step 3: Extend `domainPermissions()`**
 
 Replace the method body with:
 
@@ -164,12 +175,12 @@ Replace the method body with:
 
 Add `use Modules\ERP\Models\FiscalYear;` at the top of the seeder if missing.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpDomainPermissionsSeederTest.php`  
 Expected: PASS (4 tests).
 
-- [ ] **Step 5: Format and commit (ERP submodule)**
+- [x] **Step 5: Format and commit (ERP submodule)**
 
 ```bash
 vendor/bin/pint --dirty
@@ -185,7 +196,7 @@ git commit -m "feat(erp): seed Phase 2A domain permissions"
 - Modify: `Modules/ERP/app/Policies/ERPModelPolicy.php`
 - Create: `Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php`:
 
@@ -403,12 +414,12 @@ it('denies delivery note post when already posted', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php`  
 Expected: FAIL — superadmin can post already-posted invoice (no state guard yet).
 
-- [ ] **Step 3: Implement state-aware policy**
+- [x] **Step 3: Implement state-aware policy**
 
 Refactor `ERPModelPolicy.php`:
 
@@ -483,12 +494,12 @@ State callables (examples):
 
 Implement analogous guards for `unpost`, `close`, `reopen`, `amend` per the matrix above.
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php Modules/ERP/tests/Feature/ErpModelPolicyTest.php`  
 Expected: all PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -505,9 +516,9 @@ git commit -m "feat(erp): add state-aware domain policy guards"
 - Modify: `Modules/ERP/app/Filament/Resources/Invoices/Pages/EditInvoice.php`
 - Modify: `Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php` (optional assertion that unauthorized user cannot `forcePost`)
 
-- [ ] **Step 1: Write failing test** — covered by Task 2 `forcePost` tests; add one Filament-oriented test in `ErpDomainActionsSmokeTest.php` (Task 9) for checkbox visibility. For Task 3, manual verification: user without `force_post` must not see checkbox.
+- [x] **Step 1: Write failing test** — covered by Task 2 `forcePost` tests; add one Filament-oriented test in `ErpDomainActionsSmokeTest.php` (Task 9) for checkbox visibility. For Task 3, manual verification: user without `force_post` must not see checkbox.
 
-- [ ] **Step 2: Gate checkbox in `InvoicePostingActions::post()`**
+- [x] **Step 2: Gate checkbox in `InvoicePostingActions::post()`**
 
 Change the purchase-invoice form closure:
 
@@ -522,14 +533,14 @@ Change the purchase-invoice form closure:
                 : [])
 ```
 
-- [ ] **Step 3: Mirror the same gate in `EditInvoice::getHeaderActions()`** — the page duplicates the post action inline (lines 106–128); apply the identical `form(fn (): array => ...)` condition.
+- [x] **Step 3: Mirror the same gate in `EditInvoice::getHeaderActions()`** — the page duplicates the post action inline (lines 106–128); apply the identical `form(fn (): array => ...)` condition.
 
-- [ ] **Step 4: Run regression**
+- [x] **Step 4: Run regression**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php`  
 Expected: PASS.
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -547,7 +558,7 @@ git commit -m "feat(erp): gate force 3-way match checkbox on force_post permissi
 - Modify: `Modules/ERP/app/Filament/Resources/FiscalPeriods/Schemas/FiscalPeriodForm.php`
 - Modify: `Modules/ERP/tests/Integration/Services/Accounting/FiscalPeriodCloserTest.php` (add reopen test if missing)
 
-- [ ] **Step 1: Add reopen integration test (if absent)**
+- [x] **Step 1: Add reopen integration test (if absent)**
 
 Append to `FiscalPeriodCloserTest.php`:
 
@@ -566,7 +577,7 @@ it('reopens a closed fiscal period', function (): void {
 
 Run: `php artisan test --compact Modules/ERP/tests/Integration/Services/Accounting/FiscalPeriodCloserTest.php`
 
-- [ ] **Step 2: Create `FiscalPeriodActions`**
+- [x] **Step 2: Create `FiscalPeriodActions`**
 
 ```php
 <?php
@@ -617,7 +628,7 @@ final class FiscalPeriodActions
 }
 ```
 
-- [ ] **Step 3: Wire `EditFiscalPeriod`**
+- [x] **Step 3: Wire `EditFiscalPeriod`**
 
 ```php
     protected function getHeaderActions(): array
@@ -632,7 +643,7 @@ final class FiscalPeriodActions
 
 Add required imports (`DeleteAction`, `FiscalPeriodActions`).
 
-- [ ] **Step 4: Harden form — read-only `is_closed`**
+- [x] **Step 4: Harden form — read-only `is_closed`**
 
 In `FiscalPeriodForm.php`, replace the toggle:
 
@@ -643,7 +654,7 @@ In `FiscalPeriodForm.php`, replace the toggle:
                     ->dehydrated(false),
 ```
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -662,7 +673,7 @@ git commit -m "feat(erp): fiscal period close/reopen Filament actions"
 - Modify: `Modules/ERP/app/Providers/ERPServiceProvider.php`
 - Modify: `Modules/ERP/app/Policies/ERPModelPolicy.php` — `close()` must handle `FiscalYear`
 
-- [ ] **Step 1: Register `FiscalYear` on policy map**
+- [x] **Step 1: Register `FiscalYear` on policy map**
 
 In `ERPServiceProvider::policyModels()` add `FiscalYear::class` and import.
 
@@ -674,7 +685,7 @@ Ensure `ERPModelPolicy::close()` state guard includes:
             }
 ```
 
-- [ ] **Step 2: Create `FiscalYearActions`**
+- [x] **Step 2: Create `FiscalYearActions`**
 
 ```php
 <?php
@@ -710,13 +721,13 @@ final class FiscalYearActions
 }
 ```
 
-- [ ] **Step 3: Wire `EditFiscalYear` + read-only `is_closed` on form** (same `disabled()->dehydrated(false)` pattern as Task 4).
+- [x] **Step 3: Wire `EditFiscalYear` + read-only `is_closed` on form** (same `disabled()->dehydrated(false)` pattern as Task 4).
 
-- [ ] **Step 4: Run policy tests**
+- [x] **Step 4: Run policy tests**
 
 Run: `php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyStateTest.php`
 
-- [ ] **Step 5: Format and commit**
+- [x] **Step 5: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -732,7 +743,7 @@ git commit -m "feat(erp): fiscal year close Filament action and policy registrat
 - Create: `Modules/ERP/app/Filament/Resources/DeliveryNotes/Actions/DeliveryNotePostingActions.php`
 - Modify: `Modules/ERP/app/Filament/Resources/DeliveryNotes/Pages/EditDeliveryNote.php`
 
-- [ ] **Step 1: Create `DeliveryNotePostingActions`**
+- [x] **Step 1: Create `DeliveryNotePostingActions`**
 
 Mirror `InvoicePostingActions` but set/clear `posted_at` (observer handles inventory):
 
@@ -784,9 +795,9 @@ final class DeliveryNotePostingActions
 }
 ```
 
-- [ ] **Step 2: Wire `EditDeliveryNote::getHeaderActions()`** — prepend `DeliveryNotePostingActions::post()` and `::unpost()` before delete actions.
+- [x] **Step 2: Wire `EditDeliveryNote::getHeaderActions()`** — prepend `DeliveryNotePostingActions::post()` and `::unpost()` before delete actions.
 
-- [ ] **Step 3: Format and commit**
+- [x] **Step 3: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -802,7 +813,7 @@ git commit -m "feat(erp): delivery note post/unpost Filament actions"
 - Create: `Modules/ERP/app/Filament/Resources/JournalEntries/Actions/JournalEntryActions.php`
 - Modify: `Modules/ERP/app/Filament/Resources/JournalEntries/Pages/ViewJournalEntry.php`
 
-- [ ] **Step 1: Create `JournalEntryActions::reverse()`**
+- [x] **Step 1: Create `JournalEntryActions::reverse()`**
 
 ```php
 <?php
@@ -857,7 +868,7 @@ final class JournalEntryActions
 }
 ```
 
-- [ ] **Step 2: Add `getHeaderActions()` to `ViewJournalEntry`**
+- [x] **Step 2: Add `getHeaderActions()` to `ViewJournalEntry`**
 
 ```php
     protected function getHeaderActions(): array
@@ -868,7 +879,7 @@ final class JournalEntryActions
     }
 ```
 
-- [ ] **Step 3: Format and commit**
+- [x] **Step 3: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -884,7 +895,7 @@ git commit -m "feat(erp): journal reverse Filament action"
 - Create: `Modules/ERP/app/Filament/Resources/SalesOrders/Actions/SalesOrderAmendmentActions.php`
 - Modify: `Modules/ERP/app/Filament/Resources/SalesOrders/Pages/EditSalesOrder.php`
 
-- [ ] **Step 1: Create `SalesOrderAmendmentActions`**
+- [x] **Step 1: Create `SalesOrderAmendmentActions`**
 
 ```php
 <?php
@@ -932,9 +943,9 @@ final class SalesOrderAmendmentActions
 
 Add `use Filament\Actions\Action;` import.
 
-- [ ] **Step 2: Wire `EditSalesOrder::getHeaderActions()`** — prepend `SalesOrderAmendmentActions::amend()` before any delete actions.
+- [x] **Step 2: Wire `EditSalesOrder::getHeaderActions()`** — prepend `SalesOrderAmendmentActions::amend()` before any delete actions.
 
-- [ ] **Step 3: Format and commit**
+- [x] **Step 3: Format and commit**
 
 ```bash
 vendor/bin/pint --dirty
@@ -950,7 +961,7 @@ git commit -m "feat(erp): sales order amend Filament action"
 - Create: `Modules/ERP/tests/Feature/Filament/ErpDomainActionsSmokeTest.php`
 - Modify: `docs/superpowers/specs/2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md` — move `2A-01`…`2A-09` to § Completed with commit SHAs
 
-- [ ] **Step 1: Create smoke test**
+- [x] **Step 1: Create smoke test**
 
 ```php
 <?php
@@ -974,7 +985,7 @@ it('exposes Phase 2A Filament domain action factories', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run full Phase 2A test subset**
+- [x] **Step 2: Run full Phase 2A test subset**
 
 ```bash
 php artisan test --compact \
@@ -987,7 +998,7 @@ php artisan test --compact \
 
 Expected: all PASS.
 
-- [ ] **Step 3: Run full ERP feature suite**
+- [x] **Step 3: Run full ERP feature suite**
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature
@@ -995,7 +1006,7 @@ php artisan test --compact Modules/ERP/tests/Feature
 
 Expected: no regressions (baseline `299 passed, 1 skipped`).
 
-- [ ] **Step 4: Format, commit, update spec backlog**
+- [x] **Step 4: Format, commit, update spec backlog**
 
 ```bash
 vendor/bin/pint --dirty
@@ -1005,7 +1016,7 @@ git commit -m "test(erp): Phase 2A domain action wiring smoke"
 
 In parent repo, update Spec 2 § Open → § Completed for `2A-01`…`2A-09` and PART-01…04.
 
-- [ ] **Step 5: Version bump (ask user)**
+- [x] **Step 5: Version bump (ask user)**
 
 Per `08-versioning.mdc`: propose `composer version:patch` inside `Modules/ERP` after user confirmation.
 
