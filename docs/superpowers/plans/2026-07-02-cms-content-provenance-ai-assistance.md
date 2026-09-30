@@ -16,7 +16,7 @@
 
 **Documented in:** `Modules/CMS/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/GLOSSARY.md`.
 
-Reconciled task by task against the code on 2026-09-30 (the provenance, references and `ai_assistance` tests pass together, 21 tests). Everything this plan asked for exists except one item, listed under "Not carried over". Tasks 1 and 3-7 are ticked; Task 2 stays open because of that item.
+Reconciled task by task against the code on 2026-09-30 (the provenance, references and `ai_assistance` tests pass together, 21 tests). Everything this plan asked for exists. Task 2's migration steps are cancelled (`- [-]`) because origin metadata is not columns (see below).
 
 The bibliography and the disclosure landed as designed: the `AiAssistance` enum, the
 `ContentReference` model and its factory, the `cms_contents_references` table, the
@@ -32,11 +32,13 @@ Two things were done differently:
   `create_contents_translations_table`, where the project puts schema changes while the database is
   still rebuilt with `migrate:fresh` rather than patched with corrective migrations.
 
-Not carried over:
+Carried over late (2026-09-30):
 
-- **Origin URL validation (Task 2).** The plan asked `Content` to reject a malformed `origin_url`
-  (`not-a-url`). Neither `Content::getRules()` nor `RecordOrigin` validates the URL, and no test
-  covers it. This was not a recorded decision; it is an open item.
+- **Origin URL validation (Task 2).** `RecordOrigin` validates `url` through `HasValidations`
+  (`nullable|url|max:2048`), so a manual attribution with a malformed link is rejected. Imports
+  write through `RecordOriginRegistry` with the query builder; there a malformed link from the
+  source is dropped (stored as `null`) rather than failing the imported record. Covered by
+  `ContentOriginTest` and `RecordOriginRegistryTest`.
 
 Only the references table needed a migration of its own, so one of the plan's three additive
 migrations exists and the other two were folded into the tables they belong to.
@@ -138,14 +140,14 @@ git commit -m "feat(cms): add AiAssistance enum and ContentsReferences table con
 
 ### Task 2: Origin columns migration + `Content` rules
 
-> **Reconciliation (2026-09-30):** replaced by `Core\Models\RecordOrigin` reached through `Content::origin()`; there are no `origin_label`/`origin_url` columns and no migration. The persistence and reverse-lookup tests exist (`ContentOriginTest`, `ImportOriginProvenanceTest`). **Open:** the origin URL format validation this task asked for was not carried over. Steps stay unticked until that is decided.
+> **Reconciliation (2026-09-30):** replaced by `Core\Models\RecordOrigin` reached through `Content::origin()`; there are no `origin_label`/`origin_url` columns and no migration. The persistence and reverse-lookup tests exist (`ContentOriginTest`, `ImportOriginProvenanceTest`). **Closed 2026-09-30:** the origin URL validation is carried over to `RecordOrigin`; the migration steps are cancelled since there are no columns.
 
 **Files:**
 - Create: `Modules/CMS/database/migrations/2026_07_02_100000_add_origin_columns_to_cms_contents_table.php`
 - Modify: `Modules/CMS/app/Models/Content.php`
 - Create: `Modules/CMS/tests/Feature/Models/ContentOriginTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test** (`ContentOriginTest` covers persistence through `Content::origin()` and, since 2026-09-30, the malformed-URL rejection)
 
 ```php
 <?php
@@ -199,12 +201,12 @@ it('validates origin url format on create', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentOriginTest.php`
 Expected: FAIL — unknown columns or mass-assignment / validation missing
 
-- [ ] **Step 3: Create migration**
+- [-] **Step 3: Create migration** Cancelled: origin is a `Core\Models\RecordOrigin` row on `core_record_origins`, not columns on `cms_contents`, so there is no migration to add.
 
 ```php
 <?php
@@ -239,11 +241,11 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Run migration**
+- [-] **Step 4: Run migration** Cancelled with Step 3.
 
 Run: `php artisan migrate --path=Modules/CMS/database/migrations/2026_07_02_100000_add_origin_columns_to_cms_contents_table.php --no-interaction`
 
-- [ ] **Step 5: Update `Content` model**
+- [x] **Step 5: Update `Content` model** Done differently: `Content::origin()` reaches `RecordOrigin`, which validates its `url` through `HasValidations` (`nullable|url|max:2048`); imports going through `RecordOriginRegistry` drop a malformed link instead of failing the record.
 
 Add near other property declarations in `Modules/CMS/app/Models/Content.php`:
 
@@ -271,12 +273,12 @@ Add PHPDoc properties on the class docblock:
  * @property string|null $origin_url
 ```
 
-- [ ] **Step 6: Run test to verify it passes**
+- [x] **Step 6: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentOriginTest.php`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add Modules/CMS/database/migrations/2026_07_02_100000_add_origin_columns_to_cms_contents_table.php Modules/CMS/app/Models/Content.php Modules/CMS/tests/Feature/Models/ContentOriginTest.php
