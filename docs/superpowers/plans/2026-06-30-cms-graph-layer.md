@@ -10,6 +10,30 @@
 
 ---
 
+## Delivery status (2026-09-30): shipped, Phase 5 cancelled
+
+**Documented in:** `Modules/Core/docs/GRAPH_SYSTEM.md` (API, providers and the Performance Boundary that records this decision), `Modules/Core/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/MODULE.md` and `Modules/CMS/README.md` (the runtime benchmark).
+
+Phases 1 to 4 and the Point 0 documentation checkpoint shipped. Phase 5, materialized edges, was measured and cancelled: its steps are marked `- [-]`, each with its reason. The plan made Phase 5 conditional on evidence that runtime traversal is too expensive, and the evidence says it is not.
+
+Evidence, 2026-09-30, from `Modules/CMS/tests/Benchmark/CmsGraphRuntimeBenchmarkTest.php` (SQLite in memory, averages) and from HTTP requests against the development database (PostgreSQL in a small remote container, 543 contents, medians of 5, most connected content: 4 tags, 7 categories, 1 contributor):
+
+| Scenario | Benchmark, 40 contents | Benchmark, 250 contents | Development database |
+|---|---|---|---|
+| detail of the same content (baseline) | – | – | 146 ms, 5-6 queries |
+| expand, provider defaults | 240 ms, 32 queries | 203 ms, 30 queries | 509 ms, 26-32 queries |
+| expand, 2 relations | 105 ms, 16 queries | 111 ms, 16 queries | 377 ms, 16 queries |
+| expand, 4 relations | 167 ms, 28 queries | 211 ms, 28 queries | 483 ms, 26 queries |
+| stats, 2 relations | 127 ms, 16 queries | 107 ms, 16 queries | 350 ms, 16 queries |
+| search + expand | 1125 ms, 91 queries | 5382 ms, 301 queries | 883 ms, 28 queries |
+
+- Expand and stats cost the same with 40 or 250 contents: traversal does not grow with the graph, which is the condition materialization was meant to answer.
+- On the development database a graph request costs its baseline plus roughly 12 to 14 ms per query, the round trip to the database. The cost is the number of queries (16 for 12 nodes), which batching the traversal's reads can reduce with no new table, no invalidation and no staleness to guard against.
+- Search grows with the dataset only in the benchmark, whose test Scout driver (`collection`) scans every record; on the development database, with the real search engine, it takes 10 to 28 queries.
+- `depth=2` returned the same nodes as `depth=1` on the development database, most likely capped by the CMS provider rules. Not investigated here.
+
+If query batching in the traversal is wanted, it is new work for its own plan, not a continuation of Phase 5.
+
 ## Source Spec
 
 - `docs/superpowers/specs/2026-06-30-cms-graph-layer-design.md`
@@ -35,7 +59,7 @@ The roadmap phases remain mandatory:
 - [x] Phase 2 hardening: search error propagation, expanded search aggregation, cross-result node dedupe, and graph/search metadata covered.
 - [x] Phase 3 MVP: Core Graph Stats and Analytics over authorized expand output.
 - [x] Phase 4 MVP: Provider Rules and Regulation Layer.
-- [ ] Phase 5: Materialized Edges and Performance Layer, deferred until measured performance need and invalidation strategy exist.
+- [-] Phase 5: Materialized Edges and Performance Layer. Cancelled 2026-09-30: measured, no need found (see Delivery status).
 - [x] Point 0 documentation checkpoint: stable Core/CMS README and module RAG docs describe the implemented generic Graph behavior and the Phase 5 gate.
 
 ## Recent Graph Commits
@@ -190,17 +214,17 @@ The harness creates evidence; it does not by itself justify materialized storage
 
 ### Phase 5 Future Task 1: Performance Evidence And Invalidation Design
 
-- [ ] Capture benchmark evidence for at least one graph workflow where runtime traversal is too expensive.
-- [ ] Define the exact relation paths to materialize.
-- [ ] Define invalidation rules per module/entity/relation.
-- [ ] Update this plan with concrete file paths only after the invalidation strategy is accepted.
+- [-] Capture benchmark evidence for at least one graph workflow where runtime traversal is too expensive. Cancelled: the evidence was captured and shows no such workflow. Expand costs the same 16 to 32 queries with 40 or 250 contents, so traversal does not grow with the graph.
+- [-] Define the exact relation paths to materialize. Cancelled: no path is expensive enough to need it; the costliest, provider defaults on the most connected content, is 32 queries.
+- [-] Define invalidation rules per module/entity/relation. Cancelled: with nothing to materialize there is nothing to invalidate.
+- [-] Update this plan with concrete file paths only after the invalidation strategy is accepted. Cancelled with the three steps above.
 
 ### Phase 5 Future Task 2: Edge Store Implementation
 
-- [ ] Add storage only after Future Task 1 is complete.
-- [ ] Keep runtime traversal as fallback.
-- [ ] Prove response equivalence with tests comparing runtime traversal and materialized reads.
-- [ ] Prove stale edges are never served when invalidation cannot guarantee freshness.
+- [-] Add storage only after Future Task 1 is complete. Cancelled: Future Task 1 concluded against storage.
+- [-] Keep runtime traversal as fallback. Cancelled: runtime traversal stays the only implementation, so there is no fallback to keep.
+- [-] Prove response equivalence with tests comparing runtime traversal and materialized reads. Cancelled: there are no materialized reads to compare.
+- [-] Prove stale edges are never served when invalidation cannot guarantee freshness. Cancelled: no edges are stored, so none can be stale.
 
 ## Shared Test Commands
 

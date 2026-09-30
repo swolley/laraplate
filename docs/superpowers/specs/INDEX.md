@@ -10,7 +10,7 @@ Navigation aid only. Use this file to find the relevant spec, then open only tha
 - `2026-05-25-erp-m36-m4-m6-m7-design.md`: ERP pending milestone alignment for M3.6, M4, M6, and M7.
 - `2026-06-30-erp-hardening-bugs-money-math-design.md`: ERP v1 hardening — **implemented** P0/P1 fixes + post-review patch (`971851d` ERP, `15b11c8` Core).
 - `2026-06-30-erp-hardening-spec2-filament-domain-actions-design.md`: ERP Point 0 master — mandatory non-API work and internal `/app` actions complete; external `/api/v1` deferred, Gantt/mobile optional, importers excluded and tracked separately.
-- `2026-06-30-cms-graph-layer-design.md`: Core Graph Framework for CRUD-aligned graph expand/search/stats; CMS is the first consumer/provider, not the owner of the graph engine.
+- `2026-06-30-cms-graph-layer-design.md`: **Implemented** (2026-09-30, without the materialized edges of Phase 5) — Core Graph Framework for CRUD-aligned graph expand/search/stats; CMS is the first consumer/provider, not the owner of the graph engine.
 - `2026-07-02-cms-content-provenance-ai-assistance-design.md`: CMS content origin, references bibliography (`cms_contents_references`), and per-translation `ai_assistance` enum for EU AI Act Article 50 disclosure.
 - `2026-07-09-mes-module-decisions-design.md`: MES locked product/architecture decisions (scope, numbering, backflush, ERP linkage).
 - `2026-07-09-large-dataset-query-patterns-design.md`: Eloquent iteration rules (`get`/`lazy`/`chunk`/`cursor`), Core query/memory backlog, Filament table/widget performance checklist.

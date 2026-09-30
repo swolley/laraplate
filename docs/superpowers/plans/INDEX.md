@@ -19,7 +19,7 @@ Navigation aid only. Use this file to find the relevant plan, then open only tha
 - `2026-06-30-erp-hardening-spec2-phase2a.md`: ERP Spec 2 Phase 2A — Filament domain actions + state-aware policies (**completed**, ERP `300f9ef`).
 - `2026-06-30-erp-hardening-spec2-phase2b.md`: ERP Spec 2 Phase 2B — commercial/banking UX, returns automation, and reporting polish (**completed**; deferred ideas moved to the master backlog).
 - `2026-06-30-erp-hardening-spec2-phase3-remaining.md`: ERP Point 0 history — mandatory non-API work and internal `/app` domain actions complete; external `/api/v1` deferred, Gantt/mobile optional, importers tracked separately.
-- `2026-06-30-cms-graph-layer.md`: Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider, Phase 5 materialized edges gated by benchmarks and invalidation design.
+- `2026-06-30-cms-graph-layer.md` (**shipped 2026-09-30**, Phase 5 cancelled): Core Graph Framework — CRUD-aligned expand/search/stats in Core, CMS as first provider. Phase 5 materialized edges were measured and cancelled: request cost tracks query count, not graph size.
 - `2026-07-02-cms-content-provenance-ai-assistance.md` (**shipped 2026-09-15**, provenance generalized): CMS content origin, references bibliography, and per-translation `ai_assistance` enum.
 - `2026-07-09-query-memory-filament-performance.md`: Core query batching (DatabaseEngine SQLite, licenses list, closure rebuild) and Filament widget/cache follow-ups.
 - `2026-07-14-portable-search-matching.md` (**shipped 2026-09-15**): Portable short-name, acronym, identifier and natural-language matching across Elasticsearch, Typesense, PostgreSQL and Oracle. Moved here from the stack repository on delivery.

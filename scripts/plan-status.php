@@ -24,6 +24,10 @@ declare(strict_types=1);
  * present; checkbox counts are reported alongside and any disagreement between
  * the two is surfaced as an inconsistency. The tool never edits a plan.
  *
+ * A step is open `- [ ]`, done `- [x]` or cancelled `- [-]`. A cancelled step is
+ * resolved without being done: it counts towards the resolved steps, and a task
+ * whose steps are all cancelled reads as cancelled. The plan says why next to it.
+ *
  * Usage: composer run plan-status [-- options]
  *        php scripts/plan-status.php [--root=<path>] [options]
  */
@@ -244,11 +248,16 @@ final class PlanParser
                 continue;
             }
 
-            if (preg_match('/^\s*[-*] \[([ xX])\]\s*(.*)$/', $line, $m) === 1) {
+            if (preg_match('/^\s*[-*] \[([ xX-])\]\s*(.*)$/', $line, $m) === 1) {
                 $current['total']++;
 
                 if (mb_strtolower($m[1]) === 'x') {
                     $current['checked']++;
+                }
+
+                if ($m[1] === '-') {
+                    $current['checked']++;
+                    $current['cancelled']++;
                 }
 
                 continue;
@@ -278,7 +287,9 @@ final class PlanParser
             $total += $task['total'];
             $checked += $task['checked'];
 
-            $tasks[$i]['state'] = $this->state($task['checked'], $task['total']);
+            $tasks[$i]['state'] = $task['cancelled'] > 0 && $task['cancelled'] === $task['total']
+                ? 'cancelled'
+                : $this->state($task['checked'], $task['total']);
             $tasks[$i]['files'] = array_values(array_unique($task['files']));
             [$found, $missing] = $with_evidence
                 ? $this->evidence($tasks[$i]['files'], $repo_relative)
@@ -415,7 +426,7 @@ final class PlanParser
 
     private function newTask(string $name, int $line): array
     {
-        return ['name' => $name, 'line' => $line, 'checked' => 0, 'total' => 0, 'files' => [], 'created' => 0];
+        return ['name' => $name, 'line' => $line, 'checked' => 0, 'cancelled' => 0, 'total' => 0, 'files' => [], 'created' => 0];
     }
 
     private function state(int $checked, int $total): string
@@ -747,6 +758,7 @@ final class Renderer
         'partial' => 'PARTIAL',
         'open' => 'OPEN',
         'superseded' => 'SUPERSED',
+        'cancelled' => 'CANCELLED',
         'empty' => 'NO BOXES',
         'planned' => 'PLANNED',
         'unplanned' => 'NO PLAN',
@@ -758,6 +770,7 @@ final class Renderer
         'partial' => "\033[33m",
         'open' => "\033[31m",
         'superseded' => "\033[90m",
+        'cancelled' => "\033[90m",
         'empty' => "\033[90m",
         'planned' => "\033[90m",
         'unplanned' => "\033[35m",
@@ -874,7 +887,7 @@ final class Renderer
 
         $totals = $report['totals'];
         $out[] = sprintf(
-            'Plans %d (%d done, %d partial, %d open, %d superseded) | tasks %d done, %d partial, %d open | specs: %d with no plan, %d with an uncited plan | code markers %d',
+            'Plans %d (%d done, %d partial, %d open, %d superseded) | tasks %d done, %d partial, %d open, %d cancelled | specs: %d with no plan, %d with an uncited plan | code markers %d',
             $totals['plans'],
             $totals['plans_done'],
             $totals['plans_partial'],
@@ -883,6 +896,7 @@ final class Renderer
             $totals['tasks_done'],
             $totals['tasks_partial'],
             $totals['tasks_open'],
+            $totals['tasks_cancelled'],
             $totals['specs_unplanned'],
             $totals['specs_plan_uncited'],
             $totals['todos'],
@@ -1030,7 +1044,7 @@ td.num { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums
 .done .pill{color:var(--done)} .partial .pill{color:var(--partial)} .open .pill{color:var(--open)}
 .box { display:inline-flex; align-items:center; }
 .ico { width:16px; height:16px; display:block; }
-.done .ico{color:var(--done)} .partial .ico{color:var(--partial)} .open .ico{color:var(--open)} .empty .ico{color:var(--muted)}
+.done .ico{color:var(--done)} .partial .ico{color:var(--partial)} .open .ico{color:var(--open)} .empty .ico,.cancelled .ico{color:var(--muted)}
 .unplanned .pill,.superseded .pill{color:var(--other)}
 .warn { color:var(--partial); font-size:12px; }
 [hidden]{display:none!important}
@@ -1096,6 +1110,7 @@ HTML;
             'done' => '<polyline points="3.5,8.5 6.8,11.8 12.5,4.8"/>',
             'partial' => '<path d="M3.5 9.2c1.2-2.6 2.5-2.6 3.7 0s2.5 2.6 3.7 0"/><circle cx="8" cy="8" r="6.2" opacity=".35"/>',
             'empty' => '<path d="M4 8h8" opacity=".6"/>',
+            'cancelled' => '<path d="M4.5 4.5l7 7M11.5 4.5l-7 7" opacity=".6"/>',
             default => '<circle cx="8" cy="8" r="5.6"/>',
         };
 
@@ -1131,6 +1146,7 @@ HTML;
         return match ($state) {
             'done' => 'x',
             'partial' => '~',
+            'cancelled' => '-',
             'empty' => '-',
             default => ' ',
         };
@@ -1145,6 +1161,7 @@ HTML;
         return match ($state) {
             'done' => '✓',
             'partial' => '~',
+            'cancelled' => '✗',
             'empty' => '–',
             default => '○',
         };
@@ -1276,7 +1293,8 @@ Repositories are discovered: every directory under the root holding plans or spe
 is one. Sources are docs/superpowers/{plans,specs}, .cursor/{plans,specs} and
 Modules/*/docs/plans. A plan's YAML front-matter `status:` (completed|in-progress|
 open|superseded) overrides its checkbox counts; disagreements between the two are
-reported. The tool never edits a plan.
+reported. Steps are `- [ ]` open, `- [x]` done, `- [-]` cancelled (resolved, not
+done; say why in the plan). The tool never edits a plan.
 
 TXT;
 }
@@ -1366,6 +1384,7 @@ $inconsistent_plans = 0;
 $tasks_done = 0;
 $tasks_partial = 0;
 $tasks_open = 0;
+$tasks_cancelled = 0;
 
 foreach ($plans as $plan) {
     if (is_string($plan['inconsistency'])) {
@@ -1376,6 +1395,7 @@ foreach ($plans as $plan) {
         match ($task['state']) {
             'done' => $tasks_done++,
             'partial' => $tasks_partial++,
+            'cancelled' => $tasks_cancelled++,
             default => $tasks_open++,
         };
 
@@ -1394,6 +1414,7 @@ $totals = [
     'tasks_done' => $tasks_done,
     'tasks_partial' => $tasks_partial,
     'tasks_open' => $tasks_open,
+    'tasks_cancelled' => $tasks_cancelled,
     'stale_tasks' => $stale_tasks,
     'inconsistent_plans' => $inconsistent_plans,
     'specs_unplanned' => count(array_filter($specs, static fn (array $s): bool => $s['state'] === 'unplanned')),
@@ -1410,7 +1431,7 @@ if ($only_open || $only_stale) {
         }
 
         $tasks = array_values(array_filter($plan['tasks'], static function (array $task) use ($only_stale): bool {
-            if ($task['state'] === 'done') {
+            if ($task['state'] === 'done' || $task['state'] === 'cancelled') {
                 return false;
             }
 
