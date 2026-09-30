@@ -253,6 +253,35 @@ PLAN
     [[ "$OUTPUT" =~ Release\ gates\ +0/1 ]] || fail "Release gates should read 0/1 on its own"
 }
 
+# A task that only modifies files proves nothing by their presence: they existed before the
+# task did. Only a file the task creates (or a migration, or a new test) is evidence of it.
+test_a_modify_only_task_is_not_flagged_as_probably_done() {
+    local ws="$WORK_DIR/${FUNCNAME[0]}"
+    mkdir -p "$ws/docs/superpowers/plans" "$ws/src"
+    printf '<?php\n' > "$ws/src/existing.php"
+    printf '<?php\n' > "$ws/src/created.php"
+    cat > "$ws/docs/superpowers/plans/2026-01-01-evidence.md" <<'PLAN'
+# Evidence
+
+## Task 1: only edits what was already there
+
+- Modify: `src/existing.php`
+
+- [ ] change it
+
+## Task 2: brings a file into existence
+
+- Create: `src/created.php`
+
+- [ ] add it
+PLAN
+    run_plan_status "$ws" --stale
+    assert_status 0
+    assert_output_contains "1 unflagged task(s) have every declared file on disk"
+    assert_output_lacks "Task 1: only edits"
+    assert_output_contains "Task 2: brings a file"
+}
+
 # --- runner ------------------------------------------------------------------------------------
 
 run_tests() {

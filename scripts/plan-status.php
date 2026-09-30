@@ -255,8 +255,14 @@ final class PlanParser
             }
 
             if (preg_match('/^\s*[-*] (Create|Modify|Test|Migration|File):\s*(.+)$/i', $line, $m) === 1) {
+                $brings_file_into_existence = $this->bringsFileIntoExistence($m[1], $m[2]);
+
                 foreach ($this->paths($m[2]) as $path) {
                     $current['files'][] = $path;
+
+                    if ($brings_file_into_existence) {
+                        $current['created']++;
+                    }
                 }
             }
         }
@@ -282,6 +288,7 @@ final class PlanParser
             $tasks[$i]['files_missing'] = $missing;
             $tasks[$i]['stale'] = $tasks[$i]['state'] !== 'done'
                 && $tasks[$i]['files_total'] > 0
+                && $task['created'] > 0
                 && $found === $tasks[$i]['files_total'];
         }
 
@@ -393,9 +400,22 @@ final class PlanParser
     /**
      * @return array<string, mixed>
      */
+    /**
+     * Whether a declared file is one the task itself would have made. A file the task only
+     * modifies existed before it, so its presence says nothing about whether the task ran.
+     */
+    private function bringsFileIntoExistence(string $kind, string $text): bool
+    {
+        return match (mb_strtolower($kind)) {
+            'create', 'migration' => true,
+            'test' => preg_match('/\b(append|extend|modify|existing)\b/i', $text) !== 1,
+            default => false,
+        };
+    }
+
     private function newTask(string $name, int $line): array
     {
-        return ['name' => $name, 'line' => $line, 'checked' => 0, 'total' => 0, 'files' => []];
+        return ['name' => $name, 'line' => $line, 'checked' => 0, 'total' => 0, 'files' => [], 'created' => 0];
     }
 
     private function state(int $checked, int $total): string
@@ -1239,7 +1259,7 @@ Usage: composer run plan-status [-- options]
   --format=table|json|html   output format (default: table)
   --kind=plans,specs,todos   which sources to scan (default: plans,specs)
   --open                     only work that is not done
-  --stale                    only unflagged tasks whose declared files all exist
+  --stale                    only unflagged tasks that create files, all of which exist
   --plan=<substring>         filter plans by file name
   --repo=<name>              limit to one repository; a unique substring is enough
   --sort=date|repo|progress  order plans: oldest first (default), grouped by repo,
