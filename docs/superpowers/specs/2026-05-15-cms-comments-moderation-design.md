@@ -1,6 +1,6 @@
 # CMS content comments with AI-assisted moderation (design)
 
-**Status:** Approved direction (v5 — HasTranslations + comment locale overrides)  
+**Status:** Implemented 2026-10-01 (generalized: moderation through Core `HasApprovals` and the `ModerationAdapterRegistry`; see the plan's delivery status). Was: approved direction (v5 — HasTranslations + comment locale overrides)  
 **Date:** 2026-05-15
 
 ## Problem

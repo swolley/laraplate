@@ -62,13 +62,13 @@ Known gaps (found 2026-09-30, not decisions):
 - ~~**`ModerationService` is thinly tested**~~ covered 2026-10-01: `analyze()` for approve, reject, uncertain, retry and the unreachable-model fallback.
 - ~~**The Filament `meta` column**~~ fixed 2026-09-30: it shows `meta.status` with the colour map
   working, verdict/confidence/reason in the tooltip, and an empty cell when no AI voted (tested).
-- **Spec status** is still "Approved direction"; it was never set to **Implemented**.
-- **End-to-end coverage** does not go through the CRUD API, and on 2026-10-01 it turned out a comment
-  cannot be created through the generic CRUD API at all: `content_id` has no validation rule, so it is
-  dropped from the validated input and the insert fails, and `body` is a translation, not a fillable
-  column. How the SAO/CMS applications create comments over HTTP is an open design decision (Task 15
-  Steps 1-2). A captured comment now carries its request in `pendingModification()`, so the API will
-  answer 202 once creation works.
+- ~~**Spec status**~~ set to **Implemented** on 2026-10-01.
+- ~~**End-to-end coverage**~~ closed 2026-10-01. A comment could not be created through the CRUD API
+  at all (`content_id` had no validation rule and `body` was not accepted); `Comment` now declares its
+  rules and accepts `body`, `rating_score` and `parent_id`, a captured comment carries its request,
+  the vote endpoints approve a pending create by its modification alone, and every approval model now
+  validates a write before capturing it (Core `HasApprovals`), so a pending request never holds data
+  the model would refuse.
 
 ---
 
@@ -630,9 +630,9 @@ if ($operation === 'approve') {
 
 - Create: `Modules/CMS/tests/Feature/CommentModerationTest.php`
 
-- [ ] **Step 1:** User inserts comment via CRUD → not in `comments` list → modification active — behaviour covered at model level by `CommentModerationTest` ("does not list pending comments until approved"); the CRUD API path is still untested
+- [x] **Step 1:** User inserts comment via CRUD → not in `comments` list → modification active — done 2026-10-01: `POST /app/crud/insert/cms/comments` answers 202 with the create request ("moderates a comment end to end through the CRUD API" in `CommentModerationTest`). It needed `Comment` validation rules, `body`/`rating_score`/`parent_id` accepted on insert, the author defaulted to the caller, and the captured comment carrying its request in `pendingModification()`.
 
-- [ ] **Step 2:** Human `approve` via CRUD → comment visible — covered at model level ("publishes comment after human approval", `$user->approve()`); not through the CRUD approve endpoint
+- [x] **Step 2:** Human `approve` via CRUD → comment visible — done 2026-10-01 in the same test: `PATCH /app/crud/approve/cms/comments` with only `modification` (a pending create has no record id yet, so the vote endpoints now accept a modification without `id`).
 
 - [x] **Step 3:** Human `disapprove` after preliminary AI disapprove → comment never published — done 2026-10-01 in `Modules/AI/tests/Feature/Jobs/ApproveModificationJobTest.php` ("never publishes a comment a human rejects after the AI preliminary disapproval")
 
@@ -648,7 +648,7 @@ if ($operation === 'approve') {
 
 - [x] Run `vendor/bin/pint --dirty` — 2026-09-30: working tree clean; `vendor/bin/pint --test` on `ModerationService`, `ApproveModificationJob`, `CommentModerationPrompt`, `CommentModerationAdapter` and `ModificationsTable` reports ok
 - [x] Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php` — the named files never existed; run 2026-09-30 on their equivalents (`CommentModerationTest`, `CommentModerationAdapterTest`, `CommentApprovalCaptureTest`, both `ApproveModificationJobTest`, `ModificationModerationListenerTest`, `ModerationSystemUserAuthorizationTest`, `ModerationServiceTest`, Core `TablesTest`): 76 passed. Full per-module suites passed the same day (Core 3078, CMS 660, AI 851, ERP 645, MES 127, SAO 677)
-- [ ] Update spec status to **Implemented** when merging — not done: `docs/superpowers/specs/2026-05-15-cms-comments-moderation-design.md` still reads "Approved direction"
+- [x] Update spec status to **Implemented** when merging — done 2026-10-01.
 
 ---
 

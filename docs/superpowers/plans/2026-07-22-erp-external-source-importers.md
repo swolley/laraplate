@@ -236,7 +236,7 @@ php artisan erp:import \
 - [ ] Update `laraplate-importers` README, RAG/docs, spec, plan, fixture provenance, and source-specific troubleshooting.
 - [ ] Run focused ERP import tests and importer-package tests after every task.
 - [ ] Run `vendor/bin/pint --dirty` in each changed code repository.
-- [ ] Confirm `php artisan list` exposes `erp:import` and `cms:import`, but no `core:import`.
+- [x] Confirm `php artisan list` exposes `erp:import` and `cms:import`, but no `core:import`.
 - [ ] Run each importer in dry-run against approved anonymized fixtures.
 - [ ] Run approved persistent imports into a disposable database, then rerun unchanged inputs and verify zero duplicate aggregates.
 - [ ] Reconcile every source-specific control total before declaring an importer complete.
