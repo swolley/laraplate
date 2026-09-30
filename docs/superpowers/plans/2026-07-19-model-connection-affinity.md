@@ -12,11 +12,20 @@
 
 ---
 
+## Delivery status (2026-09-30): shipped as code discipline, not relocation
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md` (section "Database connection affinity"); the decision and its rationale are in `docs/database-connection-affinity-audit.md`.
+
+Every query and transaction in application code derives its connection from the owning model, and `DatabaseConnectionAffinityTest` guards it with an empty baseline. After the 2026-09-04 decision the goal is code discipline, not moving a module to another database: the native modules share one schema and one connection.
+
+- Task 2 closed with the missing proof: `PresetVersioningService` writes its versions on the preset's connection, tested like the other three services.
+- Task 7, Step 1 is cancelled (`- [-]`): converting the tests' direct `DB::` calls protects nothing under a single connection.
+
 ## Reconciliation (2026-09-30)
 
 Reconciled task by task against the code. The runtime behaviour is delivered across Core, CMS, ERP and the seeders, and the architecture guard passes with an empty baseline. Tasks 1, 3, 4, 5, 6 and 8 are ticked; Tasks 2 and 7 keep one step open each (see their notes).
 
-**Direction change, decided 2026-09-04** (`docs/database-connection-affinity-audit.md`, `AGENTS.md`): the native modules share one schema and one connection, `core.model_connections` and `erp.model_connections` are frozen with no new entries, and `ConnectionScoped*` and `ErpConnectionContext` are not to be used by new code. The premise of this plan, that a model can move to another connection, is therefore code discipline and not a supported relocation. The plan is not closed and carries no delivery status until the two open steps are settled.
+**Direction change, decided 2026-09-04** (`docs/database-connection-affinity-audit.md`, `AGENTS.md`): the native modules share one schema and one connection, `core.model_connections` and `erp.model_connections` are frozen with no new entries, and `ConnectionScoped*` and `ErpConnectionContext` are not to be used by new code. The premise of this plan, that a model can move to another connection, is therefore code discipline and not a supported relocation. The two steps left open by the reconciliation were settled on 2026-09-30; see the delivery status.
 
 ### Task 1: Project Rule and Runtime Guard
 
@@ -92,7 +101,7 @@ git commit -m "test: guard model connection affinity"
 
 ### Task 2: Core Model Traits and Shared Query Services
 
-> **Partly open (2026-09-30):** Step 1 stays unticked. `HasClosureTable`, `AclResolverService` and `CrudService` have non-default-connection tests, but `PresetVersioningService` has none; the code is connection-derived and unproven.
+> **Closed 2026-09-30:** `PresetVersioningService` now has its non-default-connection test too (`PresetVersioningServiceTest`, "writes the new version on the preset connection"), next to `HasClosureTable`, `AclResolverService` and `CrudService`.
 
 **Files:**
 - Modify: `Modules/Core/app/Models/Concerns/HasClosureTable.php`
@@ -105,7 +114,7 @@ git commit -m "test: guard model connection affinity"
 - Modify: `Modules/Core/tests/Feature/Services/PresetVersioningServiceTest.php`
 - Modify: `Modules/Core/tests/Integration/Services/CrudServiceRequestScenariosTest.php`
 
-- [ ] **Step 1: Add failing non-default connection tests**
+- [x] **Step 1: Add failing non-default connection tests**
 
 In each affected suite, configure a second SQLite connection, create the minimal tables on `Schema::connection('affinity')`, and set the aggregate model connection before invoking the behavior:
 
@@ -446,7 +455,7 @@ git commit -m "fix: preserve active connection in migration sql"
 
 ### Task 7: Seeders, Tests, Benchmarks, and Diagnostic Queries
 
-> **Partly open (2026-09-30):** Step 1 stays unticked. Seeders and benchmarks are connection-derived, but about 50 implicit `DB::table/select/insert/update/delete` calls remain in `Modules/*/tests` (more counting `DB::listen` and query-log calls); the guard does not scan tests, and the audit document classes them as intentional default-connection tests where the plan asked for an explicit `DB::connection(config('database.default'))`.
+> **Closed 2026-09-30:** Step 1 is cancelled. Seeders and benchmarks are connection-derived, but about 50 implicit `DB::table/select/insert/update/delete` calls remain in `Modules/*/tests` (more counting `DB::listen` and query-log calls); the guard does not scan tests, and the audit document classes them as intentional default-connection tests where the plan asked for an explicit `DB::connection(config('database.default'))`.
 
 **Files:**
 - Modify: `Modules/Core/database/seeders/CoreDatabaseSeeder.php`
@@ -487,7 +496,7 @@ git commit -m "fix: preserve active connection in migration sql"
 - Modify: `Modules/Core/tests/Integration/Models/VersionModelTest.php`
 - Modify: `Modules/Core/tests/Integration/Models/PlaceVersionableAttributesTest.php`
 
-- [ ] **Step 1: Convert model-owned test setup and assertions**
+- [-] **Step 1: Convert model-owned test setup and assertions** Cancelled after the 2026-09-04 decision that the native modules share one schema and one connection: with a single connection, rewriting about 50 `DB::` calls in tests to name the owning model's connection protects nothing, the architecture guard scans application code and not tests, and those calls are default-connection tests on purpose.
 
 For each reported test operation, instantiate or reuse the owning model and query through its connection:
 
