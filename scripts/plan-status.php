@@ -625,7 +625,20 @@ final class SpecScanner
 
 final class TodoScanner
 {
-    private const PATTERN = '/\b(TODO|FIXME|@todo|XXX)\b:?\s*(.*)$/i';
+    /**
+     * A marker counts only in its conventional spelling (upper case, or a `@todo` tag) and only
+     * as the first word of a comment (`//`, `#`, `/*`, a docblock `*`, `<!--`, `{{--`).
+     * Case-insensitive, anywhere-in-the-line matching reported `$todo` variables, `'To do'`
+     * labels, translation keys and prose that merely mentions a TODO as work left.
+     */
+    private const PATTERN = '~(?://|#|/\*+|^\s*\*|<!--|\{\{--)\s*(TODO|FIXME|XXX|@todo)\b:?\s*(.*)$~';
+
+    /**
+     * The scanner and its test mention the markers as data; they are not work left.
+     *
+     * @var list<string>
+     */
+    private const SELF = ['scripts/plan-status.php', 'scripts/tests/plan-status-test.sh'];
 
     public function __construct(private readonly Workspace $workspace) {}
 
@@ -660,6 +673,10 @@ final class TodoScanner
             }
 
             foreach ($this->sourceFiles($base, $nested) as $file) {
+                if (array_filter(self::SELF, static fn (string $self): bool => str_ends_with(str_replace('\\', '/', $file), '/' . $self)) !== []) {
+                    continue;
+                }
+
                 $handle = fopen($file, 'r');
 
                 if ($handle === false) {

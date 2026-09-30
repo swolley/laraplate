@@ -222,6 +222,47 @@ test_a_marker_in_the_root_itself_is_still_reported() {
     assert_output_contains "root marker"
 }
 
+test_only_uppercase_markers_inside_comments_are_reported() {
+    local ws=$WORK_DIR/case-comments
+    make_plan "$ws/child-alpha/docs/superpowers/plans/2026-01-01-plan.md" "Plan"
+    mkdir -p "$ws/child-alpha/app"
+    cat > "$ws/child-alpha/app/Board.php" <<'SRC'
+<?php
+// TODO: a real marker
+/* FIXME: another real one */
+# XXX: a hash comment
+$todo = 'To do';
+$columns = ['todo' => $todo, 'label' => 'TODO list'];
+/** @todo document this */
+/**
+ * The scope is an unimplemented TODO elsewhere, so this prose is not a marker.
+ */
+SRC
+    run_plan_status "$ws" --repo=child-alpha --kind=todos
+    assert_status 0
+    assert_output_contains "a real marker"
+    assert_output_contains "another real one"
+    assert_output_contains "a hash comment"
+    assert_output_contains "document this"
+    assert_output_lacks "Board.php:5"
+    assert_output_lacks "Board.php:6"
+    assert_output_lacks "Board.php:9"
+}
+
+test_the_scanner_does_not_report_its_own_source() {
+    local ws=$WORK_DIR/self-scan
+    make_plan "$ws/child-alpha/docs/superpowers/plans/2026-01-01-plan.md" "Plan"
+    mkdir -p "$ws/child-alpha/scripts/tests"
+    cp "$PLAN_STATUS" "$ws/child-alpha/scripts/plan-status.php"
+    cp "$SCRIPTS_DIR/tests/plan-status-test.sh" "$ws/child-alpha/scripts/tests/plan-status-test.sh"
+    make_todo "$ws/child-alpha/app/Real.php" "genuine marker"
+    run_plan_status "$ws" --repo=child-alpha --kind=todos
+    assert_status 0
+    assert_output_contains "genuine marker"
+    assert_output_lacks "scripts/plan-status.php:"
+    assert_output_lacks "scripts/tests/plan-status-test.sh:"
+}
+
 test_tasks_are_reported_per_plan() {
     local ws="$WORK_DIR/${FUNCNAME[0]}"
     make_workspace "$ws"
