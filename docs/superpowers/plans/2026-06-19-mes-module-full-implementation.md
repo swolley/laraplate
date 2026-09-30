@@ -35,7 +35,9 @@ Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (
 
 ## Reconciliation (2026-09-30)
 
-Reconciled task by task against the code. The domain services and their tests are largely delivered (the MES suite passes: 127 tests). Tasks 0, 1, 2, 8, 9, 10 and 13 are ticked (Tasks 2 and 8 as replaced). Every other task keeps its boxes and carries a note naming exactly what is missing; the main gaps are the BOM and routing lock (`assertNotLocked` is never called), the `ProductionOrder` observer and typed events, the capacity and downtime integration, the Filament calendar, BOM lines, relation managers and actions, the invariants test and the stale glossaries and README. The plan is not closed and carries no delivery status.
+Reconciled task by task against the code. The domain services and their tests are largely delivered (the MES suite passes: 127 tests). Tasks 0, 1, 2, 4, 5, 8, 9, 10 and 13 are ticked (Tasks 2 and 8 as replaced, Tasks 4 and 5 with their lock guard cancelled by D11). Every other task keeps its boxes and carries a note naming exactly what is missing; the main gaps are the `ProductionOrder` observer and typed events, the capacity and downtime integration, the Filament calendar, BOM lines, relation managers and actions, the invariants test and the stale glossaries and README. The plan is not closed and carries no delivery status.
+
+D9 (DIFF versioning of `ProductionOrder`, `Bom` and `Routing`) is delivered through Core's `HasVersions` and the seeded per-table settings, and is covered by `MasterDataVersioningTest`. `BomLine` and `RoutingOperation` are covered as well: they keep the plain Eloquent model and take `HasVersions`, `HasValidations` (with rules, tested by `MasterDataValidationTest`) and `HasPrefixedTableName`, but no soft delete; edits are versioned and a deleted row leaves a version holding its whole image.
 
 The "Current Truth" table below describes the code on 2026-07-09 and is historical; the later sections and these notes override it.
 
@@ -513,7 +515,7 @@ cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m 
 
 ### Task 4: Distinta base (BOM)
 
-> **Open (2026-09-30):** models, `ConsumptionMethod`, `routing_operation_id` and `BomExplosionService` with multi-level tests exist, but `BomExplosionService::assertNotLocked` is called nowhere in `app/` or the tests: the lock is defined, not enforced.
+> **Delivered, lock cancelled (2026-09-30):** models, `ConsumptionMethod`, `routing_operation_id`, `BomExplosionService` and the multi-level tests exist. The lock guard (`assertNotLocked`, `BomLockedException`) was never called, and is cancelled and removed by decision D11: orders run from their own snapshot, so the BOM stays editable. Its steps are ticked as cancelled.
 
 **Files:**
 - Modify: `Modules/MES/app/Enums/MESTables.php`
@@ -529,7 +531,7 @@ cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m 
 
 **Decision D5:** `mes_bom_lines.routing_operation_id` nullable FK → `mes_routing_operations` (migration in this task; FK enforced after Task 5 creates routing operations table — use deferred FK or add column in Task 5 if ordering requires).
 
-- [ ] **Step 1: Migration `routing_operation_id` on bom lines**
+- [x] **Step 1: Migration `routing_operation_id` on bom lines**
 
 ```php
 Schema::table(MESTables::BomLines->value, function (Blueprint $table): void {
@@ -543,7 +545,7 @@ Schema::table(MESTables::BomLines->value, function (Blueprint $table): void {
 
 > **Ordering note:** if `mes_routing_operations` does not exist yet, add this column in Task 5 instead, or create routing_operations migration before this ALTER.
 
-- [ ] **Step 2: Espandere MESTables e ConsumptionMethod**
+- [x] **Step 2: Espandere MESTables e ConsumptionMethod**
 
 ```php
 // Modules/MES/app/Enums/ConsumptionMethod.php
@@ -567,7 +569,7 @@ enum ConsumptionMethod: string
 
 Aggiungere a `MESTables.php` i case già usati dalle migration (`Boms`, `BomLines` già presenti).
 
-- [ ] **Step 3: Scrivere test fallente esplosione multi-livello**
+- [x] **Step 3: Scrivere test fallente esplosione multi-livello**
 
 ```php
 <?php
@@ -620,7 +622,7 @@ it('explodes multi-level bom quantities', function (): void {
 });
 ```
 
-- [ ] **Step 4: Run test → FAIL**
+- [x] **Step 4: Run test → FAIL**
 
 Run:
 
@@ -630,7 +632,7 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/BomExplosio
 
 Expected: FAIL (class not found).
 
-- [ ] **Step 5: Implementare modelli Bom e BomLine**
+- [x] **Step 5: Implementare modelli Bom e BomLine**
 
 Seguire pattern `WorkCenter.php`:
 
@@ -639,7 +641,7 @@ Seguire pattern `WorkCenter.php`:
 - `BomLine` → `bom()`, `item()`, `routingOperation()` BelongsTo nullable
 - `getRules()` con validazione version, date, quantity > 0
 
-- [ ] **Step 6: Implementare BomExplosionService**
+- [x] **Step 6: Implementare BomExplosionService**
 
 ```php
 <?php
@@ -714,9 +716,9 @@ final class BomExplosionService
 
 Nota: `ProductionOrder` e campo snapshot arrivano in Task 6; fino ad allora stubbare test lock in Task 6.
 
-- [ ] **Step 7: Factory Bom/BomLine + run test PASS**
+- [x] **Step 7: Factory Bom/BomLine + run test PASS**
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd Modules/MES && git add app/Models/Bom.php app/Models/BomLine.php app/Services/BomExplosionService.php app/Enums/ConsumptionMethod.php database/factories/BomFactory.php database/factories/BomLineFactory.php tests/Feature/BomExplosionServiceTest.php
@@ -727,7 +729,7 @@ git commit -m "feat(mes): add BOM models and multi-level explosion service"
 
 ### Task 5: Routing e operazioni — T5
 
-> **Open (2026-09-30):** `RoutingResolverService` and its tests exist, but `assertNotLocked` is unused and untested, as for the BOM.
+> **Delivered, lock cancelled (2026-09-30):** `RoutingResolverService` and its tests exist. The lock guard (`assertNotLocked`, `RoutingLockedException`) is cancelled and removed by decision D11, as for the BOM. Its steps are ticked as cancelled.
 
 **Files:**
 - Create: `Modules/MES/database/migrations/2026_05_08_000006_create_mes_routing_operations_table.php`
@@ -738,7 +740,7 @@ git commit -m "feat(mes): add BOM models and multi-level explosion service"
 - Create: `Modules/MES/app/Exceptions/RoutingLockedException.php`
 - Create: factories + `Modules/MES/tests/Feature/RoutingResolverServiceTest.php`
 
-- [ ] **Step 1: Migration routing operations**
+- [x] **Step 1: Migration routing operations**
 
 ```php
 <?php
@@ -775,7 +777,7 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 2: Test risoluzione versione attiva + operazioni parallele**
+- [x] **Step 2: Test risoluzione versione attiva + operazioni parallele**
 
 ```php
 it('resolves active routing by date', function (): void {
@@ -804,9 +806,9 @@ it('resolves active routing by date', function (): void {
 });
 ```
 
-- [ ] **Step 3: Implementare modelli + RoutingResolverService** (stesso pattern BOM: `getActiveRouting()`, `assertNotLocked()`)
+- [x] **Step 3: Implementare modelli + RoutingResolverService** (stesso pattern BOM: `getActiveRouting()`, `assertNotLocked()`)
 
-- [ ] **Step 4: Run migrate + test**
+- [x] **Step 4: Run migrate + test**
 
 Run:
 
@@ -815,7 +817,7 @@ cd /srv/http/laraplate && php artisan migrate --path=Modules/MES/database/migrat
 php artisan test Modules/MES/tests/Feature/RoutingResolverServiceTest.php --compact
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ---
 

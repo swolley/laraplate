@@ -77,9 +77,21 @@ Commit in `Modules/MES` submodule; bump monorepo submodule pointer when releasin
 
 Apply Core DIFF versioning on high-value models: `ProductionOrder`, `Bom`, `Routing`.
 
+Delivered through Core's `HasVersions`, which these models inherit from `Core\Overrides\Model`: Core seeds the per-table setting `versioning.strategy.{table}` (group `versioning`) with `DIFF` for `mes_production_orders`, `mes_boms` and `mes_routings`, and an administrator can change or disable it. The models do not declare `versionStrategy` themselves, because that would force `DIFF` and hide the setting. `MasterDataVersioningTest` seeds and checks that a save records the change.
+
+The lines that carry the substance of a BOM or routing are covered too: `BomLine` and `RoutingOperation` keep the plain Eloquent model and take the Core traits that fit (`HasVersions`, `HasValidations` with rules on every field, `HasPrefixedTableName`) but not `SoftDeletes`. They are deleted for good, because `(routing_id, sequence)` is unique and a soft-deleted operation would block re-creating it, and the version rows keep the whole image of a row deleted for good, so the history of a removed line or operation survives. Adding the traits creates no new permissions. Validation now runs on every create and update of a line or operation, from any path; the unique `(routing_id, sequence)` pair stays with the database constraint.
+
 ### D10 — KPI materialization
 
 Capacity load and OEE aggregates are materialized via jobs + cache, not recomputed on every API request.
+
+### D11 — Bill of materials and routing are not locked by use (decided 2026-09-30)
+
+A production order freezes the active BOM and routing into `bom_snapshot` and `routing_snapshot` when it is created, and everything downstream (backflush, operations, quality planning per operation) runs from the snapshot. Editing a BOM or routing therefore never changes an order that already exists, and the master data stays freely editable.
+
+The earlier idea of a guard that forbids editing a BOM or routing once a released order froze it (`assertNotLocked`, `BomLockedException`, `RoutingLockedException`) is **cancelled and removed**: it duplicated what the snapshot already guarantees, it also fired for completed and cancelled orders so a BOM used once could never be edited again, and it contradicted the user guide ("if you change the BOM or the routing, the existing order does not change").
+
+History of changes is D9's job (DIFF versioning on `Bom` and `Routing`), not a lock. A stricter, opt-in revision control for customers who need it (released revisions immutable, every change a new dated revision) is **deferred** and would be its own plan; nothing here forecloses it.
 
 ---
 
