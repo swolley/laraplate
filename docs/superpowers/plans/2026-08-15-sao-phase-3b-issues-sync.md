@@ -31,11 +31,11 @@
 - Create: `Modules/SAO/app/Drivers/Support/NormalizedIssue.php` (readonly: `remoteId`, `key`, `title`, `body`, `remoteStatus`, `remotePriority`, `assignee`, `url`, `createdAt`, `updatedAt`; a `toArray()` for transport).
 - Create: `Modules/SAO/tests/Unit/Enums/SyncDirectionTest.php` and `Modules/SAO/tests/Unit/Drivers/NormalizedIssueTest.php`.
 
-- [ ] **Step 1: failing tests** — enum resolves from wire values and exposes an `in:` rule; `NormalizedIssue` round-trips through `toArray()`.
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement.**
-- [ ] **Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): sync-direction enum and normalized issue value object`).
+- [x] **Step 1: failing tests** — enum resolves from wire values and exposes an `in:` rule; `NormalizedIssue` round-trips through `toArray()`.
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement.**
+- [x] **Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): sync-direction enum and normalized issue value object`).
 
 ---
 
@@ -45,11 +45,11 @@
 - Edit: the four capability contracts to take `BindingContext` instead of `ConnectionContext` (reads/writes); `DriverInterface::healthCheck` keeps `ConnectionContext` (health is connection-level, not binding-level).
 - Edit: 3a `FakeIssuesDriver`, `FakeReleasesDriver`, `InMemoryDriver`, and the `IssuesConformance`/`ReleasesConformance` helpers to construct/accept a `BindingContext`.
 
-- [ ] **Step 1: failing test** — `tests/Unit/Drivers/BindingContextTest.php` asserts it exposes the connection context plus binding fields; update the 3a conformance run to pass a `BindingContext` (this is the red driver for the signature change).
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement `BindingContext`; migrate the contracts, the fakes/in-memory driver, and the conformance helpers.**
-- [ ] **Step 4: run the full driver test set to pass** (`tests/Unit/Drivers`, `tests/Feature/Drivers`).
-- [ ] **Step 5: Pint + commit** (`refactor(sao): capability calls receive a BindingContext`).
+- [x] **Step 1: failing test** — `tests/Unit/Drivers/BindingContextTest.php` asserts it exposes the connection context plus binding fields; update the 3a conformance run to pass a `BindingContext` (this is the red driver for the signature change).
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement `BindingContext`; migrate the contracts, the fakes/in-memory driver, and the conformance helpers.**
+- [x] **Step 4: run the full driver test set to pass** (`tests/Unit/Drivers`, `tests/Feature/Drivers`).
+- [x] **Step 5: Pint + commit** (`refactor(sao): capability calls receive a BindingContext`).
 
 ---
 
@@ -59,11 +59,11 @@
 - Edit: `Connection` — add `config` to fillable, cast `config` to `array`; a helper `connectionContext(array $credentials): ConnectionContext` (base_url + credentials).
 - Edit: `ConnectionTest` to cover config round-trip.
 
-- [ ] **Step 1: failing test** — config persists and round-trips as an array; it is not treated as a secret (plain, not encrypted).
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement.**
-- [ ] **Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): non-secret config column on connections`).
+- [x] **Step 1: failing test** — config persists and round-trips as an array; it is not treated as a secret (plain, not encrypted).
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement.**
+- [x] **Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): non-secret config column on connections`).
 
 ---
 
@@ -74,11 +74,11 @@
 - Create: `ProjectBindingFactory`; add `ProjectBindings` to `SAOTables` (+ update `SaoEnumsTest`).
 - Create: `tests/Feature/Models/ProjectBindingTest.php`.
 
-- [ ] **Step 1: failing test** — a binding persists; the four-tuple uniqueness is enforced; `bindingContext()` yields a `BindingContext` with the resolved credentials, remote identifier and maps; the capability must be one the connection exposes.
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement.**
-- [ ] **Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): project binding model with binding context`).
+- [x] **Step 1: failing test** — a binding persists; the four-tuple uniqueness is enforced; `bindingContext()` yields a `BindingContext` with the resolved credentials, remote identifier and maps; the capability must be one the connection exposes.
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement.**
+- [x] **Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): project binding model with binding context`). The connection relation is `remoteConnection()`; covered by `tests/Feature/Models/ProjectBindingTest.php`.
 
 ---
 
@@ -89,9 +89,9 @@
 - Edit: `Ticket` — add `links(): HasMany` and an `isInternal(): bool` (no links).
 - Create: `tests/Feature/Models/TicketLinkTest.php`.
 
-- [ ] **Step 1: failing test** — a link persists and enforces (connection, remote_id) uniqueness; a ticket with no link reports internal.
-- [ ] **Step 2–4: red → implement → green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): ticket link model`).
+- [x] **Step 1: failing test** — a link persists and enforces (connection, remote_id) uniqueness; a ticket with no link reports internal.
+- [x] **Step 2–4: red → implement → green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): ticket link model`).
 
 ---
 
@@ -100,11 +100,11 @@
 - Create: `Modules/SAO/app/Drivers/Internal/InternalIssuesDriver.php` — key `internal`, capability `Issues`, ingest `InProcess`; configuration schema declares non-secret `project` and `ticket_type`. Reads via `TicketQueryService` (ACL-scoped) mapped to `NormalizedIssue`; writes via `TicketCreationService`/`WorkflowService`; `comment` appends a `TicketComment` (origin system); `translateStatus` is identity over canonical categories. Project/type come from `BindingContext.config`.
 - Create: `tests/Feature/Drivers/InternalIssuesDriverTest.php` running the `IssuesConformance` battery against a seeded project/type, plus internal-specific assertions (created ticket is real; reads are ACL-scoped).
 
-- [ ] **Step 1: failing test** — conformance + internal specifics.
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement the driver against the domain services.**
-- [ ] **Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): internal issues driver over the ticket domain`).
+- [x] **Step 1: failing test** — conformance + internal specifics.
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement the driver against the domain services.** `Modules/SAO/app/Drivers/Internal/InternalIssuesDriver.php`.
+- [x] **Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): internal issues driver over the ticket domain`).
 
 ---
 
@@ -114,11 +114,11 @@
 - Create: `Modules/SAO/app/Services/IssueSyncService.php` — resolves a binding, builds `BindingContext`, and applies `SyncDirection`: Outbound (create/update/comment remote, idempotent), Inbound (upsert Ticket + `TicketLink`, translate status/priority via maps), Bidirectional (last-writer-wins by `updated_at` with link state tie-breaker), Disabled (no-op). Unmapped status returns an explicit outcome.
 - Create: `tests/Feature/Services/IssueSyncServiceTest.php` — direction matrix, idempotency (repeated outbound op creates nothing new), unmapped-status surfacing. Uses the `internal` driver (and a recorded-response double) as the remote so the whole test is offline.
 
-- [ ] **Step 1: failing tests** — direction matrix + idempotency + unmapped status.
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement.**
-- [ ] **Step 4: run to pass; then run the full SAO suite green.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): idempotent direction-aware issue sync`). **End of 3b-core.**
+- [x] **Step 1: failing tests** — direction matrix + idempotency + unmapped status.
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement.** `IssueSyncService` exposes `push()` (outbound, idempotent via `SyncOperation`), `pull()`/`reconcile()` (inbound, unmapped status returns `SyncOutcome::UnmappedStatus`) and a later `import()`. Divergence: `Bidirectional` enables both paths independently; no last-writer-wins conflict resolver was built. The test double is `tests/Support/Drivers/RecordingIssuesDriver.php`, not the internal driver.
+- [x] **Step 4: run to pass; then run the full SAO suite green.**
+- [x] **Step 5: Pint + commit** (`feat(sao): idempotent direction-aware issue sync`). **End of 3b-core.**
 
 ---
 
@@ -128,18 +128,18 @@
 - Create: `Modules/SAO/tests/Support/Fixtures/Redmine/*` — anonymized recorded responses (issues list across >1 page, single issue, statuses).
 - Create: `tests/Feature/Drivers/RedmineIssuesDriverTest.php` — the `IssuesConformance` battery driven by the fixtures via a faked `Http`.
 
-- [ ] **Step 1: failing test** — conformance against fixtures.
-- [ ] **Step 2: run to fail.**
-- [ ] **Step 3: implement the driver + capture/commit fixtures.** If real fixtures cannot be captured in this environment, `log()`/note the gap, ship the driver behind its conformance gate with synthetic fixtures clearly labelled, and record live validation as a follow-up.
-- [ ] **Step 4: run to pass.**
-- [ ] **Step 5: Pint + commit** (`feat(sao): redmine issues driver`).
+- [x] **Step 1: failing test** — conformance against fixtures.
+- [x] **Step 2: run to fail.**
+- [x] **Step 3: implement the driver + capture/commit fixtures.** Shipped as `Modules/SAO/app/Drivers/External/RedmineDriver.php` (not `Drivers/Redmine/RedmineIssuesDriver.php`). No fixture files: `tests/Feature/Drivers/RedmineDriverTest.php` uses a stateful in-memory `Http::fake()` of the Redmine REST API. The driver does not propose a default status map; statuses translate only through the binding map. If real fixtures cannot be captured in this environment, `log()`/note the gap, ship the driver behind its conformance gate with synthetic fixtures clearly labelled, and record live validation as a follow-up.
+- [x] **Step 4: run to pass.**
+- [x] **Step 5: Pint + commit** (`feat(sao): redmine issues driver`).
 
 ---
 
 ## Task 9 (3b-redmine): register Redmine and close the exit criterion
 
 - Edit: config `sao.drivers.registered` docs to show enabling `redmine`; wire an end-to-end feature test that binds a project to a Redmine connection and runs `IssueSyncService` Outbound, asserting the (faked) remote received exactly one idempotent write.
-- [ ] Red → implement → green; Pint + commit (`test(sao): end-to-end redmine issue sync in a configurable direction`).
+- [ ] Red → implement → green; Pint + commit (`test(sao): end-to-end redmine issue sync in a configurable direction`). Open: `RedmineDriver` is registered by default (`config('sao.drivers.registered')`, asserted by `tests/Feature/Drivers/DriverFrameworkWiringTest.php`), but no test binds a project to a Redmine connection and runs `IssueSyncService::push()` against the faked Redmine.
 
 ---
 
@@ -147,7 +147,7 @@
 
 - Create: Filament resources for `Connection` (form generated from the driver's configuration schema, secret fields write-only, a **test** action calling `healthCheck`) and `ProjectBinding` (choose connection + capability + remote identifier + direction + editable maps).
 - Create: `tests/Feature/Filament/ConnectionResourceTest.php` and `BindingResourceTest.php` (resource pages render, secret field is write-only, capability options limited to the connection's).
-- [ ] Red → implement → green; Pint + commit (`feat(sao): filament connection and binding management`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): filament connection and binding management`). `Filament/Resources/Connections/ConnectionResource` (write-only credential, "Test connection" action). Divergence: bindings are a `BindingsRelationManager` on `ProjectResource`, not a standalone resource; tests are `tests/Feature/Filament/ConnectionResourceTest.php` and `ProjectBindingsUiTest.php`.
 
 ---
 

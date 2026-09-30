@@ -19,11 +19,15 @@
 **Documented in:** `Modules/CMS/docs/COMMENT_MODERATION.md`, `Modules/CMS/docs/rag/COMMENT_MODERATION.md`.
 
 Moderated comments work for human review. Reconciled task by task against the code on
-2026-09-30 (the comment, adapter, vote-job, listener and approval-vote tests pass together, 41 tests):
-the architecture stated above was deliberately widened during implementation, so several steps name
-artifacts that were replaced by platform-wide ones, and those tasks are ticked as replaced. Moderation
-is inherited from `HasApprovals` rather than rebuilt for comments. Tasks 10, 13, 15 and 16 stay
-open, see "Known gaps".
+2026-09-30: the architecture stated above was deliberately widened during implementation, so several
+steps name artifacts that were replaced by platform-wide ones, and those tasks are ticked as replaced.
+Moderation is inherited from `HasApprovals` rather than rebuilt for comments.
+
+The remaining boxes of Tasks 10, 13, 15 and 16 were reconciled on 2026-09-30: `- [x]` names what
+implements a step, `- [-]` names the replacement or why it was not built, and the boxes still `- [ ]`
+are the real gaps listed under "Known gaps". On that date the comment, adapter, capture, vote-job,
+listener, system-user, `ModerationService` and Filament table tests passed together (76 tests), and
+the complete per-module suites passed (Core 3078, CMS 660, AI 851, ERP 645, MES 127, SAO 677).
 
 | This plan specified | What was built instead | Where |
 |---|---|---|
@@ -56,7 +60,9 @@ Known gaps (found 2026-09-30, not decisions):
 - **Moderation defaults changed.** The plan set moderation on; the seeder sets
   `features.moderation.enabled` and the `cms_comments` entity to false.
 - **`ModerationService` is thinly tested** (no `analyze()` run for approve, reject, uncertain or retry).
-- **The Filament vote columns** in Core's `ModificationsTable` are untested and the badge map cannot match.
+- ~~**The Filament `meta` column**~~ fixed 2026-09-30: it shows `meta.status` with the colour map
+  working, verdict/confidence/reason in the tooltip, and an empty cell when no AI voted (tested).
+- **Spec status** is still "Approved direction"; it was never set to **Implemented**.
 - **End-to-end coverage** does not go through the CRUD API, and comments CRUD over HTTP is claimed by
   the docs but asserted by no CMS test.
 
@@ -385,7 +391,7 @@ final readonly class CommentModerationContextBuilder
 - Create: `Modules/AI/app/Services/CommentModerationService.php`
 - Create: `Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php`
 
-- [ ] **Step 1: Prompt class (English)** — static `system(): string` and `user(CommentModerationContext $ctx): string`
+- [x] **Step 1: Prompt class (English)** — done as `Modules/CMS/app/Ai/Prompts/CommentModerationPrompt.php` (CMS owns it, fed through `CommentModerationAdapter`); the system prompt is the text below, extended for reply threads, and `user()` takes Core's `ModerationInput` — static `system(): string` and `user(CommentModerationContext $ctx): string`
 
 **System prompt (implement verbatim in class):**
 
@@ -427,13 +433,13 @@ Comment text:
 {commentBody}
 ```
 
-- [ ] **Step 2: Service calls `ChatAgent::make()` with moderation provider from config (default `ai.features.chat.default_provider` or dedicated `comment_moderation.provider` if added)
+- [x] **Step 2: Service calls `ChatAgent::make()` with moderation provider from config (default `ai.features.chat.default_provider` or dedicated `comment_moderation.provider` if added)** — done by `Modules/AI/app/Services/ModerationService.php`, `ChatAgent::forFeature(AiModelFeature::Moderation, ...)` (dedicated moderation model setting)
 
-- [ ] **Step 3: Parse JSON via `GuardrailsService::validateJsonOutput()` + retry once on invalid JSON
+- [x] **Step 3: Parse JSON via `GuardrailsService::validateJsonOutput()` + retry once on invalid JSON** — done in `ModerationService::analyze()` / `retryJson()` (retry gated by `ai.features.guardrails.retry_on_failure`), unparseable output maps to `uncertain`
 
-- [ ] **Step 4: Unit tests** with mocked agent returning sample JSON for approve, reject, uncertain
+- [ ] **Step 4: Unit tests** with mocked agent returning sample JSON for approve, reject, uncertain — still missing: `Modules/AI/tests/Integration/Services/ModerationServiceTest.php` covers empty subject and `mapResponse()` only; no test drives `analyze()` through the `chatAgentFactory` seam, nor the retry
 
-- [ ] **Step 5:** Commit
+- [x] **Step 5:** Commit — shipped in the AI and CMS module history (e.g. AI `4974314`, `bd100e3`)
 
 ---
 
@@ -567,15 +573,15 @@ On `CommentRequiresModeration`:
 
 - Modify: `Modules/Core/app/Filament/Resources/Modifications/Tables/ModificationsTable.php`
 
-- [ ] **Step 1: Eager-load** `CommentModerationLog` when modifiable_type is Comment (subquery or conditional with)
+- [-] **Step 1: Eager-load** `CommentModerationLog` when modifiable_type is Comment (subquery or conditional with) — replaced: there is no log model; the AI verdict lives in the vote's `meta`, read per row by `Modification::latestAutomatedVoteMeta()`
 
-- [ ] **Step 2: Add columns** (only meaningful for comments):
+- [-] **Step 2: Add columns** (only meaningful for comments): — replaced by one `meta` badge column (all AI meta keys: status, verdict, confidence, reason) and a `disapprovers_required` column, both visible only for `Comment` rows in `ModificationsTable`; no separate reason or disapprovals-count column
 
 - `moderationLog.status` badge
 - `moderationLog.reason` limit 80
 - `disapprovals_count` / `disapprovers_remaining` from modification accessors
 
-- [ ] **Step 3: Badge color map**
+- [x] **Step 3: Badge color map** — fixed 2026-09-30: the `meta` column ("AI moderation") shows `meta.status` of the latest automated vote, so the colour map matches `auto_approved`/`auto_rejected`/`requires_human_review`; verdict, confidence and reason moved to the tooltip; a comment with no AI vote shows an empty cell instead of failing. Covered in `Modules/Core/tests/Feature/Filament/TablesTest.php`.
 
 | status | color |
 |--------|-------|
@@ -584,7 +590,7 @@ On `CommentRequiresModeration`:
 | auto_approved | success |
 | auto_rejected | danger |
 
-- [ ] **Step 4:** Manual smoke in Filament optional + commit
+- [-] **Step 4:** Manual smoke in Filament optional + commit — optional smoke not recorded; the columns shipped in Core (`9a6d9019`, `4dc1c883`), visibility asserted by `Modules/Core/tests/Feature/Filament/TablesTest.php`
 
 ---
 
@@ -620,25 +626,25 @@ if ($operation === 'approve') {
 
 - Create: `Modules/CMS/tests/Feature/CommentModerationTest.php`
 
-- [ ] **Step 1:** User inserts comment via CRUD → not in `comments` list → modification active
+- [ ] **Step 1:** User inserts comment via CRUD → not in `comments` list → modification active — behaviour covered at model level by `CommentModerationTest` ("does not list pending comments until approved"); the CRUD API path is still untested
 
-- [ ] **Step 2:** Human `approve` via CRUD → comment visible
+- [ ] **Step 2:** Human `approve` via CRUD → comment visible — covered at model level ("publishes comment after human approval", `$user->approve()`); not through the CRUD approve endpoint
 
-- [ ] **Step 3:** Human `disapprove` after preliminary AI disapprove → comment never published
+- [ ] **Step 3:** Human `disapprove` after preliminary AI disapprove → comment never published — missing: `ApproveModificationJobTest` asserts the AI preliminary disapproval (`disapprovers_required` 2), `CommentModerationTest` a single human disapproval; no test chains the two
 
-- [ ] **Step 4:** Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php`
+- [x] **Step 4:** Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php` — passed 2026-09-30 (with the adapter, job, listener and service tests, 76 tests)
 
-- [ ] **Step 5:** Commit
+- [x] **Step 5:** Commit — `CommentModerationTest` is in CMS history (latest `c147322`)
 
 ---
 
 ### Task 16: Final verification
 
-> **Open (2026-09-30):** final verification (Pint, full run, spec status) was not recorded.
+> **Reconciled (2026-09-30):** Pint and the test run are recorded below; the spec status update is still open.
 
-- [ ] Run `vendor/bin/pint --dirty`
-- [ ] Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php`
-- [ ] Update spec status to **Implemented** when merging
+- [x] Run `vendor/bin/pint --dirty` — 2026-09-30: working tree clean; `vendor/bin/pint --test` on `ModerationService`, `ApproveModificationJob`, `CommentModerationPrompt`, `CommentModerationAdapter` and `ModificationsTable` reports ok
+- [x] Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php` — the named files never existed; run 2026-09-30 on their equivalents (`CommentModerationTest`, `CommentModerationAdapterTest`, `CommentApprovalCaptureTest`, both `ApproveModificationJobTest`, `ModificationModerationListenerTest`, `ModerationSystemUserAuthorizationTest`, `ModerationServiceTest`, Core `TablesTest`): 76 passed. Full per-module suites passed the same day (Core 3078, CMS 660, AI 851, ERP 645, MES 127, SAO 677)
+- [ ] Update spec status to **Implemented** when merging — not done: `docs/superpowers/specs/2026-05-15-cms-comments-moderation-design.md` still reads "Approved direction"
 
 ---
 

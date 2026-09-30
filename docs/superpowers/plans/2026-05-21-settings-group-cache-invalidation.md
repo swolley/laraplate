@@ -10,20 +10,33 @@
 
 ---
 
-## Delivery status (2026-09-15): shipped as designed
+## Delivery status (2026-09-30): shipped 2026-09-15, checkboxes reconciled against code
 
 **Documented in:** `Modules/Core/docs/rag/MODULE.md`.
 
-Built as written, unusually for these plans, and the empty checkboxes below are not
-outstanding work.
+Every step is done; boxes were ticked on 2026-09-30 by reading the code, not the plan's names.
 
-`PerModelSettingResolver` caches per group and keeps the lightweight `name => group_name`
-index the plan called for. `SettingsCacheCoordinator` exposes `flushGroup()`,
-`flushGroups()` and `registerGroupInvalidator()` alongside the wholesale `flushAll()`.
-`SettingObserver` calls `flushSetting()` on both save and delete, so an ordinary Eloquent
-change no longer flushes every group.
+`PerModelSettingResolver` caches per group (`groupCacheKey()`) plus a `name => group_name`
+index (`nameIndexCacheKey()`), with `flushGroup()`, `flushGroups()`, `flushNameIndex()` and
+`legacyTableCacheKey()`. `SettingsCacheCoordinator` exposes `flushSetting()`, `flushGroup()`,
+`flushGroups()`, `registerGroupInvalidator()` and the wholesale `flushAll()`. `SettingObserver`
+calls `flushSetting()` on save and delete, so an ordinary edit no longer flushes every group.
 
-Covered by `SettingsCacheCoordinatorTest` and `PerModelSettingResolverTest`.
+Divergences from the plan:
+
+- Tests live in `Modules/Core/tests/Integration/` (`Services/PerModelSettingResolverTest.php`,
+  `Services/SettingsCacheCoordinatorTest.php`, `Helpers/HasVersionsTest.php`) and
+  `Modules/Core/tests/Feature/Console/WarmCacheCommandTest.php`, not the `tests/Unit/` paths
+  the plan names.
+- `group()` and the name index do not use `Cache::rememberForever()`: they `Cache::get()`,
+  discard a payload of the wrong type (not a `Collection` / not an array) and rebuild from the
+  database, then `Cache::forever()`. Two extra resolver tests cover that recovery.
+- `flushSetting()` takes a second argument `bool $sync_runtime_config = false`;
+  `SettingObserver::saved()` passes `true` so `DatabaseConfigOverlay::applySetting()` refreshes
+  runtime config after the flush. `deleted()` does not sync.
+- `HasVersions` is `Modules\Core\Models\Concerns\HasVersions`, not `Modules\Core\Helpers\HasVersions`.
+- The versioning test is named "resets versioning caches when the versioning group is affected"
+  (plan: "...only when...").
 
 ---
 
@@ -52,11 +65,13 @@ Covered by `SettingsCacheCoordinatorTest` and `PerModelSettingResolverTest`.
 
 ### Task 1: Resolver Group Cache API
 
+> Built in `PerModelSettingResolver`. `group()` and `nameIndex()` use `Cache::get()` + type check + `Cache::forever()` instead of `rememberForever()`, so a corrupt cached payload is dropped and rebuilt. Tests are in `Modules/Core/tests/Integration/Services/PerModelSettingResolverTest.php`.
+
 **Files:**
 - Modify: `Modules/Core/tests/Unit/Services/PerModelSettingResolverTest.php`
 - Modify: `Modules/Core/app/Services/PerModelSettingResolver.php`
 
-- [ ] **Step 1: Add failing resolver tests for grouped persistent keys**
+- [x] **Step 1: Add failing resolver tests for grouped persistent keys**
 
 Append these tests to `Modules/Core/tests/Unit/Services/PerModelSettingResolverTest.php`:
 
@@ -137,7 +152,7 @@ it('flushes one group without clearing another loaded group', function (): void 
 });
 ```
 
-- [ ] **Step 2: Run resolver tests to verify failure**
+- [x] **Step 2: Run resolver tests to verify failure**
 
 Run:
 
@@ -147,7 +162,7 @@ php artisan test --compact Modules/Core/tests/Unit/Services/PerModelSettingResol
 
 Expected: failure because `groupCacheKey()`, `nameIndexCacheKey()`, and `flushGroup()` do not exist yet.
 
-- [ ] **Step 3: Replace resolver implementation with grouped cache support**
+- [x] **Step 3: Replace resolver implementation with grouped cache support**
 
 Edit `Modules/Core/app/Services/PerModelSettingResolver.php`.
 
@@ -283,7 +298,7 @@ private function nameIndex(): array
 
 Keep the existing `cacheKey()` method returning `CacheManager::key('settings', 'by_name')` for legacy compatibility.
 
-- [ ] **Step 4: Run resolver tests**
+- [x] **Step 4: Run resolver tests**
 
 Run:
 
@@ -297,11 +312,13 @@ Expected: PASS.
 
 ### Task 2: Coordinator Group Invalidation
 
+> Built in `SettingsCacheCoordinator` as planned, with `flushSetting(Setting $setting, bool $sync_runtime_config = false)`. `HasVersions` is imported from `Modules\Core\Models\Concerns`. Tests are in `Modules/Core/tests/Integration/Services/SettingsCacheCoordinatorTest.php`.
+
 **Files:**
 - Modify: `Modules/Core/tests/Unit/Services/SettingsCacheCoordinatorTest.php`
 - Modify: `Modules/Core/app/Services/SettingsCacheCoordinator.php`
 
-- [ ] **Step 1: Add failing coordinator tests**
+- [x] **Step 1: Add failing coordinator tests**
 
 Append these tests to `Modules/Core/tests/Unit/Services/SettingsCacheCoordinatorTest.php`:
 
@@ -399,7 +416,7 @@ it('resets versioning caches only when the versioning group is affected', functi
 });
 ```
 
-- [ ] **Step 2: Run coordinator tests to verify failure**
+- [x] **Step 2: Run coordinator tests to verify failure**
 
 Run:
 
@@ -409,7 +426,7 @@ php artisan test --compact Modules/Core/tests/Unit/Services/SettingsCacheCoordin
 
 Expected: failure because `flushSetting()` and `legacyTableCacheKey()` are not fully wired yet.
 
-- [ ] **Step 3: Implement coordinator group methods**
+- [x] **Step 3: Implement coordinator group methods**
 
 Edit `Modules/Core/app/Services/SettingsCacheCoordinator.php`.
 
@@ -503,7 +520,7 @@ private function flushDerivedSettingsCaches(): void
 
 Update `flushAll()` so it calls resolver `flush()`, `flushVersioningCaches()`, `flushDerivedSettingsCaches()`, `(new Setting())->invalidateCache()`, and then all global invalidators. Keep existing global `registerInvalidator()` behavior.
 
-- [ ] **Step 4: Run coordinator tests**
+- [x] **Step 4: Run coordinator tests**
 
 Run:
 
@@ -517,11 +534,13 @@ Expected: PASS.
 
 ### Task 3: Observer Uses Surgical Invalidation
 
+> `SettingObserver::saved()` calls `flushSetting($setting, sync_runtime_config: true)` (also re-applies the row through `DatabaseConfigOverlay`); `deleted()` calls `flushSetting($setting)`.
+
 **Files:**
 - Modify: `Modules/Core/app/Observers/SettingObserver.php`
 - Modify: `Modules/Core/tests/Unit/Services/SettingsCacheCoordinatorTest.php`
 
-- [ ] **Step 1: Add observer test that proves unrelated group survives**
+- [x] **Step 1: Add observer test that proves unrelated group survives**
 
 Append to `Modules/Core/tests/Unit/Services/SettingsCacheCoordinatorTest.php`:
 
@@ -558,7 +577,7 @@ it('setting observer invalidates only the saved setting group', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run coordinator tests to verify failure**
+- [x] **Step 2: Run coordinator tests to verify failure**
 
 Run:
 
@@ -568,7 +587,7 @@ php artisan test --compact Modules/Core/tests/Unit/Services/SettingsCacheCoordin
 
 Expected: failure because observer still calls `flushAll()`, clearing the `erp` group.
 
-- [ ] **Step 3: Update SettingObserver**
+- [x] **Step 3: Update SettingObserver**
 
 Change `Modules/Core/app/Observers/SettingObserver.php` to:
 
@@ -586,7 +605,7 @@ public function deleted(Setting $setting): void
 
 Keep the existing `saving()` normalization for empty string values.
 
-- [ ] **Step 4: Run coordinator tests**
+- [x] **Step 4: Run coordinator tests**
 
 Run:
 
@@ -600,10 +619,12 @@ Expected: PASS.
 
 ### Task 4: Update Existing Versioning Expectations
 
+> Done in `Modules/Core/tests/Integration/Helpers/HasVersionsTest.php` (grouped `versioning` and `base` keys).
+
 **Files:**
 - Modify: `Modules/Core/tests/Unit/Helpers/HasVersionsTest.php`
 
-- [ ] **Step 1: Update global-cache invalidation tests to group-cache expectations**
+- [x] **Step 1: Update global-cache invalidation tests to group-cache expectations**
 
 In `Modules/Core/tests/Unit/Helpers/HasVersionsTest.php`, replace expectations that saving/deleting any setting clears `PerModelSettingResolver::cacheKey()` with expectations around:
 
@@ -619,7 +640,7 @@ $cache_key = PerModelSettingResolver::groupCacheKey('base');
 
 Keep the test intent: saving/deleting a setting invalidates the affected group. Do not assert that unrelated groups are flushed there; that is covered by coordinator tests.
 
-- [ ] **Step 2: Run HasVersions tests**
+- [x] **Step 2: Run HasVersions tests**
 
 Run:
 
@@ -633,10 +654,12 @@ Expected: PASS.
 
 ### Task 5: Run Focused Regression Suite
 
+> Actual paths: `Modules/Core/tests/Integration/...` for resolver, coordinator and HasVersions tests; `Modules/Core/tests/Feature/Console/WarmCacheCommandTest.php` for warm cache. All pass (76 tests, 2026-09-30).
+
 **Files:**
 - No code edits unless a focused test exposes a real compatibility failure.
 
-- [ ] **Step 1: Run resolver tests**
+- [x] **Step 1: Run resolver tests**
 
 Run:
 
@@ -646,7 +669,7 @@ php artisan test --compact Modules/Core/tests/Unit/Services/PerModelSettingResol
 
 Expected: PASS.
 
-- [ ] **Step 2: Run coordinator tests**
+- [x] **Step 2: Run coordinator tests**
 
 Run:
 
@@ -656,7 +679,7 @@ php artisan test --compact Modules/Core/tests/Unit/Services/SettingsCacheCoordin
 
 Expected: PASS.
 
-- [ ] **Step 3: Run versioning tests**
+- [x] **Step 3: Run versioning tests**
 
 Run:
 
@@ -666,7 +689,7 @@ php artisan test --compact Modules/Core/tests/Unit/Helpers/HasVersionsTest.php
 
 Expected: PASS.
 
-- [ ] **Step 4: Run Filament settings table tests**
+- [x] **Step 4: Run Filament settings table tests**
 
 Run:
 
@@ -676,7 +699,7 @@ php artisan test --compact Modules/Core/tests/Feature/Filament/TablesTest.php
 
 Expected: PASS.
 
-- [ ] **Step 5: Run warm cache tests**
+- [x] **Step 5: Run warm cache tests**
 
 Run:
 
@@ -693,7 +716,7 @@ Expected: PASS or a clear failure around the legacy `{app}:settings` warm key. I
 **Files:**
 - Format changed PHP files only through Pint dirty mode.
 
-- [ ] **Step 1: Run Pint**
+- [x] **Step 1: Run Pint**
 
 Run:
 
@@ -703,7 +726,7 @@ vendor/bin/pint --dirty
 
 Expected: completes successfully and formats only dirty PHP files.
 
-- [ ] **Step 2: Re-run focused tests after formatting**
+- [x] **Step 2: Re-run focused tests after formatting**
 
 Run:
 
@@ -717,7 +740,7 @@ php artisan test --compact Modules/Core/tests/Unit/Console/WarmCacheCommandTest.
 
 Expected: all pass.
 
-- [ ] **Step 3: Review git diff**
+- [x] **Step 3: Review git diff**
 
 Run:
 

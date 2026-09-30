@@ -6,6 +6,13 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12 (`Http`), Pest 4, Pint, PHPStan.
 
+
+## Delivery status (2026-09-30): shipped
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/GLOSSARY.md`.
+
+Reconciled against the code on 2026-09-30; the four tasks shipped as planned, all under `Modules/SAO/app/Drivers/External/`. The `firstTagContaining` first-page bound is documented in each driver's PHPDoc and as "bounded first-tag-containing" in the module docs. Beyond this plan, GitHub also passes `BlameConformance`, and commits carry the `author`/`author_name`/`author_email` shape. Code-to-work correlation and version census landed in phase 5b; live-instance verification stays a manual step. The complete SAO suite passed on 2026-09-30 (679 passed, 1 skipped).
+
 ## Global Constraints
 
 - `declare(strict_types=1);`; `final`; explicit types; `#[Override]`; no new dependencies.
@@ -21,23 +28,23 @@
 - Create: `tests/Support/Conformance/VcsConformance.php` (commits pagination + sha items; compare array; fileAtRef string/null; openPullRequest array with remote_id/url).
 - Edit: `GitHubDriver` — add `VcsCapability`, `ReleasesCapability`; grow `capabilities()`; implement commits/compare/fileAtRef/openPullRequest/tags/firstTagContaining.
 - Edit: `GitHubDriverTest` — extend the fake; run `VcsConformance` + `ReleasesConformance`.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): github vcs and releases capabilities`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): github vcs and releases capabilities`). `Drivers/External/GitHubDriver.php`, `tests/Support/Conformance/VcsConformance.php`, `tests/Feature/Drivers/GitHubDriverTest.php`.
 
 ## Task 2: GitLab vcs + releases
 
 - Edit: `GitLabDriver` + `GitLabDriverTest` (same shape, GitLab endpoints/pagination).
-- [ ] Red → implement → green; Pint + commit (`feat(sao): gitlab vcs and releases capabilities`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): gitlab vcs and releases capabilities`). `Drivers/External/GitLabDriver.php` + `tests/Feature/Drivers/GitLabDriverTest.php`.
 
 ## Task 3: Bitbucket vcs + releases
 
 - Edit: `BitbucketDriver` + `BitbucketDriverTest` (Bitbucket endpoints; diffstat compare; src file).
-- [ ] Red → implement → green; Pint + commit (`feat(sao): bitbucket vcs and releases capabilities`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): bitbucket vcs and releases capabilities`). `Drivers/External/BitbucketDriver.php` (diffstat compare, `src` file) + `tests/Feature/Drivers/BitbucketDriverTest.php`.
 
 ## Task 4: Docs + gate + parent bump
 
 - Update the module RAG docs/glossary (Git hosts now serve issues+vcs+releases) and the spec/plan indexes.
 - Full SAO suite green; Pint clean. Commit (module) + parent bump.
-- [ ] `docs(sao): document vcs/releases on the git-host drivers` + `chore: bump SAO with phase 5 vcs/releases`.
+- [x] `docs(sao): document vcs/releases on the git-host drivers` + `chore: bump SAO with phase 5 vcs/releases`. Driver framework and Phase 5 sections of `Modules/SAO/docs/rag/MODULE.md`.
 
 ## Exit criteria
 

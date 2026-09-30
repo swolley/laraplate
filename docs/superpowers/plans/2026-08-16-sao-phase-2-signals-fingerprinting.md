@@ -6,6 +6,13 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, Pest 4, Pint, PHPStan. No new dependencies.
 
+
+## Delivery status (2026-09-30): shipped
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/GLOSSARY.md`.
+
+Reconciled task by task against the code on 2026-09-30; all seven tasks shipped as planned (Core side documented in `Modules/Core/README.md`, which has no RAG page for logging). Divergence: the Core fingerprint test is one `FingerprintChainTest.php` covering the rules, the chain and `Fingerprinter`, not one test per rule. The carried-forward gaps have since partly landed: real webhook transport (phase 4) and ticket auto-open from a signal (`SignalTicketOpener`, `sao:signals:auto-open`). The complete SAO suite passed on 2026-09-30 (679 passed, 1 skipped).
+
 ## Global Constraints
 
 - `declare(strict_types=1);`; `final`; explicit types; `#[Override]`; PHPDoc over inline comments.
@@ -19,42 +26,42 @@
 
 - Create `Modules/Core/app/Logging/Fingerprint/`: `Rule` interface; rules `StripStackTraces`, `CollapseVolatilePayloads`, `CollapseSqlState`, `SubstituteUuidIpHex`, `SubstituteNumbersInValuePosition`; `FingerprintNormalizer` (ordered chain); `Fingerprinter` (S2 parts, line excluded).
 - Tests: each rule in isolation + normalizer chain + `Fingerprinter` (line change → same key; 404 vs 500 → different keys).
-- [ ] Red → implement → green; Pint + commit (`feat(core): shared fingerprint normalization chain`).
+- [x] Red → implement → green; Pint + commit (`feat(core): shared fingerprint normalization chain`). Implemented in `Modules/Core/app/Logging/Fingerprint/` (the five rules, `FingerprintNormalizer`, `Fingerprinter`), covered by `Modules/Core/tests/Unit/Logging/Fingerprint/FingerprintChainTest.php`.
 
 ## Task 2 (Core): refactor the in-process resolver onto the chain
 
 - Edit `GelfErrorFingerprintResolver` to build parts and call `Fingerprinter`; drop line from the hash (keep as metadata); keep module/class/file recovery and caller-frame fallback.
 - Update its existing test for the new hash and the value-position numeric rule.
-- [ ] Red → implement → green; Pint + commit (`refactor(core): resolve fingerprints through the shared chain`).
+- [x] Red → implement → green; Pint + commit (`refactor(core): resolve fingerprints through the shared chain`). `GelfErrorFingerprintResolver` hashes through `Fingerprinter`, line kept as metadata; test in `Modules/Core/tests/Feature/Logging/GelfErrorFingerprintResolverTest.php`.
 
 ## Task 3 (SAO): payload frame resolver
 
 - Create `PayloadFrameResolver` — recover `{kind,module,class,file,function,message}` from a flattened payload; hash via Core `Fingerprinter`.
 - Test: a payload whose fields match an in-process error yields the same key; a missing-file payload still yields a stable key.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): payload frame resolver for received errors`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): payload frame resolver for received errors`). `Modules/SAO/app/Ingest/PayloadFrameResolver.php` + `tests/Feature/Ingest/PayloadFrameResolverTest.php`.
 
 ## Task 4 (SAO): signal models + migrations
 
 - `SignalState` enum; `Signal` (`sao_signals`: project_id, group_key, algo_version, state, counters, first/last seen), `SignalOccurrence` (`sao_signal_occurrences`), `SignalAlias` (`sao_signal_aliases`); factories; `SAOTables` cases + `SaoEnumsTest`.
 - Tests: signal persists with algo_version; occurrences relate; alias maps a superseded key.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): signal, occurrence and alias models`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): signal, occurrence and alias models`). `SignalState`, `Signal`/`SignalOccurrence`/`SignalAlias` + factories, `SAOTables` cases; `tests/Feature/Models/SignalTest.php`.
 
 ## Task 5 (SAO): group-key resolution + ingest service
 
 - `GroupKeyResolver` (native namespaced key if present, else computed) and `SignalIngestService::ingest(Project, payload)` — open or recur a signal, record an occurrence.
 - Tests: native key wins and is namespaced; two matching payloads recur one signal and count two occurrences; the same bug in two projects makes two signals with the same group_key.
-- [ ] Red → implement → green; Pint + commit (`feat(sao): group-key resolution and signal ingest`).
+- [x] Red → implement → green; Pint + commit (`feat(sao): group-key resolution and signal ingest`). `Ingest/GroupKeyResolver.php` + `Ingest/SignalIngestService.php`; `tests/Feature/Ingest/SignalIngestServiceTest.php`.
 
 ## Task 6 (SAO): loop protection
 
 - `PipelineContext` (set/read the origin marker); an internal log-source reader that discards marked records regardless of module; a per-group rate limiter in `SignalIngestService`.
 - Tests: a marked record is discarded with a recorded reason; an unmarked one ingests; past N occurrences in the window the signal stops counting.
-- [ ] Red → implement → green; then full SAO + Core suites green; Pint + commit (`feat(sao): loop protection via pipeline marker and rate limit`).
+- [x] Red → implement → green; then full SAO + Core suites green; Pint + commit (`feat(sao): loop protection via pipeline marker and rate limit`). `Ingest/PipelineContext.php`, `Ingest/InternalLogSource.php`, per-group rate limiter in `SignalIngestService`; `tests/Feature/Ingest/LoopProtectionTest.php`.
 
 ## Task 7: docs + parent bump
 
 - Update Core + SAO RAG docs/glossaries (fingerprint chain, signals, loop protection) and the spec/plan indexes.
-- [ ] Commit (Core), commit (SAO), bump parent.
+- [x] Commit (Core), commit (SAO), bump parent. Core documents the chain in `Modules/Core/README.md` (Error fingerprinting); SAO in `Modules/SAO/docs/rag/MODULE.md` and `Modules/SAO/docs/rag/GLOSSARY.md`.
 
 ## Exit criteria
 
