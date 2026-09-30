@@ -147,7 +147,7 @@ meant to work: read `AdvancedSearchService`, not this.
 
 - [ ] **Step 4:** run the tests (PASS), pint, commit in both submodules separately: `feat(search): quality-driven retries` in Core, `refactor(ai): retire IntelligentSearchAction` in AI.
 
-- [ ] **Step 5: delete the orphaned SentenceTransformers pair in Core.** Same area, same
+- [x] **Step 5: delete the orphaned SentenceTransformers pair in Core.** Same area, same
   kind of leftover, found on 2026-09-17.
 
   `Modules/Core/app/Search/Ai/SentenceTransformersEmbeddingGenerator.php` implements
