@@ -145,7 +145,7 @@ Do not start ERP or AI tasks until the Core and Filament tasks in this plan have
 - Read: `.cursor/rules/03-performance-optimization.mdc`
 - Read: `.cursor/rules/09-database-guidelines.mdc`
 
-- [ ] **Step 1: Confirm dirty workspace state**
+- [-] **Step 1: Confirm dirty workspace state** The baseline cannot be captured after the work landed; the plan was closed from an audit on 2026-10-01.
 
 Run:
 
@@ -156,7 +156,7 @@ rtk git submodule status --recursive
 
 Expected: command succeeds. Record which files are already modified before implementation. Do not revert unrelated changes.
 
-- [ ] **Step 2: Run targeted preflight tests**
+- [-] **Step 2: Run targeted preflight tests** The baseline cannot be captured after the work landed; the plan was closed from an audit on 2026-10-01.
 
 Run:
 
@@ -171,7 +171,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/TranslateContentComm
 
 Expected: PASS or pre-existing failures documented before any code edit. If a preflight test fails, investigate and decide whether the failure blocks the related task.
 
-- [ ] **Step 3: Confirm no dependency changes are needed**
+- [-] **Step 3: Confirm no dependency changes are needed** The baseline cannot be captured after the work landed; the plan was closed from an audit on 2026-10-01.
 
 Run:
 
@@ -181,7 +181,7 @@ rtk git diff -- composer.json composer.lock Modules/Core/composer.json Modules/E
 
 Expected: no dependency change is required for this plan.
 
-- [ ] **Step 4: Capture timing and memory baseline for focused suites**
+- [-] **Step 4: Capture timing and memory baseline for focused suites** The baseline cannot be captured after the work landed; the plan was closed from an audit on 2026-10-01.
 
 Run each command before any code edit and keep the output in the task execution notes:
 
@@ -204,7 +204,7 @@ Expected: each command either passes or has a documented pre-existing failure. T
 - Modify: `Modules/Core/app/Search/Engines/DatabaseEngine.php`
 - Create: `Modules/Core/tests/Integration/Search/DatabaseEngineSQLiteVectorSearchTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/Core/tests/Integration/Search/DatabaseEngineSQLiteVectorSearchTest.php`:
 
@@ -263,7 +263,7 @@ it('keeps sqlite vector search implementation off full collection map pipelines'
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -273,7 +273,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Search/DatabaseEng
 
 Expected: FAIL on the source assertion because the current SQLite path uses `get()->map()`.
 
-- [ ] **Step 3: Replace the SQLite full collection pipeline**
+- [x] **Step 3: Replace the SQLite full collection pipeline**
 
 In `Modules/Core/app/Search/Engines/DatabaseEngine.php`, replace `performSQLiteVectorSearch()` with:
 
@@ -322,7 +322,7 @@ private function performSQLiteVectorSearch(array $queryVector, Model $model, Bui
 }
 ```
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 Run:
 
@@ -333,7 +333,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Search/SearchEngin
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -350,7 +350,7 @@ git commit -m "perf(core): stream sqlite vector search results"
 - Modify: `Modules/Core/app/Models/Concerns/HasClosureTable.php`
 - Modify: `Modules/Core/tests/Integration/Helpers/HasClosureTableTest.php`
 
-- [ ] **Step 1: Add a large-tree rebuild regression test**
+- [x] **Step 1: Add a large-tree rebuild regression test**
 
 Append this test to `Modules/Core/tests/Integration/Helpers/HasClosureTableTest.php`:
 
@@ -375,7 +375,7 @@ it('rebuilds a larger closure tree without eager loading recursive children', fu
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -385,7 +385,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Helpers/HasClosure
 
 Expected: FAIL because `rebuildClosure()` and `insertClosures()` currently eager load children.
 
-- [ ] **Step 3: Remove recursive eager loading**
+- [x] **Step 3: Remove recursive eager loading**
 
 In `Modules/Core/app/Models/Concerns/HasClosureTable.php`, change `rebuildClosure()` root loading to:
 
@@ -414,7 +414,7 @@ $children = $model->children()->orderBy('id')->get();
 
 Keep the existing public method names and closure table row shape unchanged.
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 Run:
 
@@ -424,7 +424,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Helpers/HasClosure
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -441,7 +441,7 @@ git commit -m "perf(core): rebuild closure tables without recursive eager loadin
 - Modify: `Modules/Core/app/Services/DynamicContentsService.php`
 - Create: `Modules/Core/tests/Integration/Services/DynamicContentsServiceCacheTest.php`
 
-- [ ] **Step 1: Write behavior and invalidation tests**
+- [x] **Step 1: Write behavior and invalidation tests**
 
 Create `Modules/Core/tests/Integration/Services/DynamicContentsServiceCacheTest.php`:
 
@@ -473,7 +473,7 @@ it('registers namespaced presettable memo keys for later invalidation', function
 });
 ```
 
-- [ ] **Step 2: Run tests before editing**
+- [x] **Step 2: Run tests before editing**
 
 Run:
 
@@ -483,7 +483,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Services/DynamicCo
 
 Expected: PASS for current invariants. This task is a refactor guarded by existing behavior, not a red test.
 
-- [ ] **Step 3: Add per-type in-memory cache buckets**
+- [x] **Step 3: Add per-type in-memory cache buckets**
 
 In `Modules/Core/app/Services/DynamicContentsService.php`, replace the three single cache properties with keyed arrays:
 
@@ -507,7 +507,7 @@ private function typeCacheKey(IDynamicEntityTypable $type): string
 }
 ```
 
-- [ ] **Step 4: Filter in the database for entities**
+- [x] **Step 4: Filter in the database for entities**
 
 In `fetchAvailableEntities()`, use the type cache key and add a database `where('type', $type->value)` before `get()`:
 
@@ -531,11 +531,11 @@ $this->entities_cache[$type_cache_key] = Cache::memo()->rememberForever(
 return $this->entities_cache[$type_cache_key];
 ```
 
-- [ ] **Step 5: Filter presets and presettables in the database**
+- [x] **Step 5: Filter presets and presettables in the database**
 
 Apply the same type-keyed pattern to `fetchAvailablePresets()` and `fetchAvailablePresettables()`. Keep the existing returned `Collection` type. Use `where("{$entities_table}.type", $type->value)` for the joined presettable query.
 
-- [ ] **Step 6: Keep invalidation complete**
+- [x] **Step 6: Keep invalidation complete**
 
 Update `clearEntitiesCache()`, `clearPresetsCache()`, `clearPresettablesCache()`, and `clearAllCaches()` so each method resets the keyed arrays:
 
@@ -545,7 +545,7 @@ $this->presets_cache = [];
 $this->presettables_cache = [];
 ```
 
-- [ ] **Step 7: Run focused tests**
+- [x] **Step 7: Run focused tests**
 
 Run:
 
@@ -556,7 +556,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Services/PerModelS
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Run:
 
@@ -573,7 +573,7 @@ git commit -m "perf(core): scope dynamic contents caches by type"
 - Modify: `Modules/Core/app/Console/HandleLicensesCommand.php`
 - Modify: `Modules/Core/tests/Feature/Console/HandleLicensesCommandTest.php`
 
-- [ ] **Step 1: Add source-level guard test**
+- [x] **Step 1: Add source-level guard test**
 
 Append this assertion to the existing `covers listLicenses private method output path` test in `Modules/Core/tests/Feature/Console/HandleLicensesCommandTest.php`:
 
@@ -583,7 +583,7 @@ expect($source)->toContain("License::with('user')->lazy(100)")
     ->and($source)->not->toContain("License::with('user')->get()");
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -593,7 +593,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Console/HandleLicenses
 
 Expected: FAIL because `listLicenses()` still uses `get()`.
 
-- [ ] **Step 3: Change listLicenses to lazy iteration**
+- [x] **Step 3: Change listLicenses to lazy iteration**
 
 In `Modules/Core/app/Console/HandleLicensesCommand.php`, replace:
 
@@ -609,7 +609,7 @@ $licenses = License::with('user')->lazy(100);
 
 Keep the `$remapped` array because Laravel Prompts `table()` needs all rows for display.
 
-- [ ] **Step 4: Run focused test**
+- [x] **Step 4: Run focused test**
 
 Run:
 
@@ -619,7 +619,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Console/HandleLicenses
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -638,7 +638,7 @@ git commit -m "perf(core): lazily list licenses"
 - Modify: `Modules/Core/tests/Feature/Filament/WidgetsTest.php`
 - Test: `Modules/CMS/tests/Feature/Filament/ResourceConfigurationTest.php`
 
-- [ ] **Step 1: Add Core widget cache expectations**
+- [x] **Step 1: Add Core widget cache expectations**
 
 In `Modules/Core/tests/Feature/Filament/WidgetsTest.php`, update `builds core stats widget data` to assert the widget is lazy:
 
@@ -648,7 +648,7 @@ $property->setAccessible(true);
 expect($property->getValue())->toBeTrue();
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -658,7 +658,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Filament/WidgetsTest.p
 
 Expected: FAIL because `CoreStatsWidget` does not currently define `$isLazy`.
 
-- [ ] **Step 3: Add lazy and cache to CoreStatsWidget**
+- [x] **Step 3: Add lazy and cache to CoreStatsWidget**
 
 In `Modules/Core/app/Filament/Widgets/CoreStatsWidget.php`, add:
 
@@ -701,7 +701,7 @@ return Cache::remember('filament.dashboard.core_stats', 60, function () use ($li
 });
 ```
 
-- [ ] **Step 4: Apply same pattern to CMSStatsWidget**
+- [x] **Step 4: Apply same pattern to CMSStatsWidget**
 
 In `Modules/CMS/app/Filament/Widgets/CMSStatsWidget.php`, add `Cache`, add `protected static bool $isLazy = true;`, and wrap the returned stats in:
 
@@ -718,7 +718,7 @@ return Cache::remember('filament.dashboard.cms_stats', 60, static fn (): array =
 ]);
 ```
 
-- [ ] **Step 5: Run focused tests**
+- [x] **Step 5: Run focused tests**
 
 Run:
 
@@ -729,7 +729,7 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/Filament/ResourceConfig
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -746,7 +746,7 @@ git commit -m "perf(filament): lazily cache dashboard stats"
 - Modify: `Modules/ERP/app/Services/Accounting/InvoicePostingService.php`
 - Modify: `Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`
 
-- [ ] **Step 1: Add query-count regression test**
+- [x] **Step 1: Add query-count regression test**
 
 Append this test to `Modules/ERP/tests/Feature/InvoicePostingServiceTest.php`:
 
@@ -812,7 +812,7 @@ it('preloads tax codes while posting invoices with repeated tax codes', function
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -822,7 +822,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/InvoicePostingServiceTe
 
 Expected: FAIL because `resolveAndSnapshotTaxes()` currently fetches the tax code inside the line loop.
 
-- [ ] **Step 3: Preload tax codes once**
+- [x] **Step 3: Preload tax codes once**
 
 In `Modules/ERP/app/Services/Accounting/InvoicePostingService.php`, replace the tax-code lookup inside `resolveAndSnapshotTaxes()` with a keyed collection loaded before the loop:
 
@@ -846,7 +846,7 @@ if (! $tax_code instanceof TaxCode) {
 }
 ```
 
-- [ ] **Step 4: Run accounting tests**
+- [x] **Step 4: Run accounting tests**
 
 Run:
 
@@ -857,7 +857,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/InventoryAccountingGold
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -874,7 +874,7 @@ git commit -m "perf(erp): preload invoice posting tax codes"
 - Modify: `Modules/ERP/app/Services/Inventory/StockMovementService.php`
 - Modify: `Modules/ERP/tests/Feature/StockMovementServiceTest.php`
 
-- [ ] **Step 1: Add FIFO behavior guard for many layers**
+- [x] **Step 1: Add FIFO behavior guard for many layers**
 
 Append this test to `Modules/ERP/tests/Feature/StockMovementServiceTest.php`:
 
@@ -924,7 +924,7 @@ it('consumes only required fifo layers while preserving costing', function (): v
 });
 ```
 
-- [ ] **Step 2: Run current stock tests**
+- [x] **Step 2: Run current stock tests**
 
 Run:
 
@@ -934,7 +934,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/StockMovementServiceTes
 
 Expected: PASS before implementation. This is a behavior guard for a sensitive optimization.
 
-- [ ] **Step 3: Split FIFO availability from layer consumption**
+- [x] **Step 3: Split FIFO availability from layer consumption** Regression fixed 2026-10-01: the layer loop used offset `lazy(100)` over a `qty_remaining > 0` filter it mutates, so past 100 open layers it skipped layers (wrong FIFO order and unit cost). Now `lazyById(100)`; guarded by the 150-layer test in `StockMovementServiceTest`.
 
 In `consumeFifoLayersAndComputeUnitCost()`, compute availability with a SQL aggregate:
 
@@ -949,7 +949,7 @@ $available = (string) StockCostLayer::query()
 
 Then fetch locked layers with the existing query, but break immediately when `$remaining_to_take` reaches zero. Keep `lockForUpdate()` on the row query.
 
-- [ ] **Step 4: Optimize FIFO display average with SQL aggregate**
+- [x] **Step 4: Optimize FIFO display average with SQL aggregate**
 
 In `syncFifoDisplayAverage()`, replace the full layer `get()` loop with:
 
@@ -968,7 +968,7 @@ $value = (string) ($aggregate?->value_sum ?? '0.0000');
 
 Keep the existing zero-quantity branch and `divideDecimal()` assignment.
 
-- [ ] **Step 5: Run stock and inventory accounting tests**
+- [x] **Step 5: Run stock and inventory accounting tests**
 
 Run:
 
@@ -979,7 +979,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/InventoryAccountingGold
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -997,7 +997,7 @@ git commit -m "perf(erp): aggregate fifo stock layer calculations"
 - Modify: `Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
 - Modify: `Modules/ERP/tests/Feature/Services/SalesPipelineServiceTest.php`
 
-- [ ] **Step 1: Add behavior guard for open pipeline with won-date filters**
+- [x] **Step 1: Add behavior guard for open pipeline with won-date filters**
 
 Ensure `Modules/ERP/tests/Feature/OperationalReportingServicesTest.php` keeps this existing expectation:
 
@@ -1007,7 +1007,7 @@ expect($result['by_status'][OpportunityStatus::Open->value]['count'])->toBe(1);
 
 inside the won-date filter test. This prevents accidentally filtering the whole pipeline by won date.
 
-- [ ] **Step 2: Add source guard against full opportunity loading**
+- [x] **Step 2: Add source guard against full opportunity loading**
 
 Add this test to `Modules/ERP/tests/Feature/Services/SalesPipelineServiceTest.php`:
 
@@ -1020,7 +1020,7 @@ it('streams opportunity rows for pipeline aggregation', function (): void {
 });
 ```
 
-- [ ] **Step 3: Run test to verify it fails**
+- [x] **Step 3: Run test to verify it fails**
 
 Run:
 
@@ -1030,7 +1030,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/Services/SalesPipelineS
 
 Expected: FAIL because `loadOpportunities()` currently uses `get([...])`.
 
-- [ ] **Step 4: Change the loader to return an Enumerable stream**
+- [x] **Step 4: Change the loader to return an Enumerable stream**
 
 In `Modules/ERP/app/Services/Reporting/SalesPipelineService.php`, add:
 
@@ -1055,7 +1055,7 @@ protected function loadOpportunities(int $company_id): Enumerable
 
 Keep the existing `generate()` aggregation loop unchanged. This first optimization removes full collection loading while preserving support for injected legacy rows in `SalesPipelineServiceStub`.
 
-- [ ] **Step 5: Update SalesPipelineServiceStub signature**
+- [-] **Step 5: Update SalesPipelineServiceStub signature** Replaced: `SalesPipelineService` takes an injected `?Closure` opportunity provider, so the test double `SalesPipelineOpportunityRowDouble` feeds rows without subclassing the service; no `SalesPipelineServiceStub` exists.
 
 In `Modules/ERP/tests/Stubs/SalesPipelineServiceStub.php`, keep the current injected collection and change the method return type to:
 
@@ -1066,7 +1066,7 @@ protected function loadOpportunities(int $company_id): \Illuminate\Support\Enume
 }
 ```
 
-- [ ] **Step 6: Run reporting tests**
+- [x] **Step 6: Run reporting tests**
 
 Run:
 
@@ -1077,7 +1077,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/Services/SalesPipelineS
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 Run:
 
@@ -1094,7 +1094,7 @@ git commit -m "perf(erp): stream sales pipeline opportunity rows"
 - Modify: `Modules/ERP/app/Services/Reporting/StockValuationService.php`
 - Modify: `Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`
 
-- [ ] **Step 1: Add ordering and totals regression test**
+- [x] **Step 1: Add ordering and totals regression test**
 
 Append to `Modules/ERP/tests/Feature/OperationalReportingServicesTest.php`:
 
@@ -1117,7 +1117,7 @@ it('orders stock valuation by item sku and warehouse code while preserving total
 });
 ```
 
-- [ ] **Step 2: Run test before implementation**
+- [x] **Step 2: Run test before implementation**
 
 Run:
 
@@ -1127,7 +1127,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingSer
 
 Expected: PASS. This guards behavior before moving ordering and totals into the query.
 
-- [ ] **Step 3: Move ordering into the query**
+- [x] **Step 3: Move ordering into the query**
 
 In `StockValuationService::generate()`, add table-name variables from `ERPTables`:
 
@@ -1152,7 +1152,7 @@ $stock_levels = StockLevel::query()
     ->get();
 ```
 
-- [ ] **Step 4: Compute totals with SQL aggregate**
+- [x] **Step 4: Compute totals with SQL aggregate**
 
 Before loading rows, add:
 
@@ -1166,7 +1166,7 @@ $totals = StockLevel::query()
 
 Use `$totals` for returned totals and keep per-row value formatting unchanged.
 
-- [ ] **Step 5: Run reporting tests**
+- [x] **Step 5: Run reporting tests**
 
 Run:
 
@@ -1176,7 +1176,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/OperationalReportingSer
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -1193,7 +1193,7 @@ git commit -m "perf(erp): order and total stock valuation in database"
 - Modify: `Modules/AI/app/Console/TranslateContentCommand.php`
 - Modify: `Modules/AI/tests/Integration/TranslateContentCommandTest.php`
 
-- [ ] **Step 1: Add source guard test**
+- [x] **Step 1: Add source guard test**
 
 Append this test to `Modules/AI/tests/Integration/TranslateContentCommandTest.php`:
 
@@ -1206,7 +1206,7 @@ it('streams translate command models instead of loading them all', function (): 
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1216,7 +1216,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/TranslateContentComm
 
 Expected: FAIL because the command currently calls `$query->get()`.
 
-- [ ] **Step 3: Count first, then lazy iterate**
+- [x] **Step 3: Count first, then lazy iterate**
 
 In `TranslateContentCommand::handle()`, replace:
 
@@ -1245,7 +1245,7 @@ foreach ($query->orderBy($model_class::query()->getModel()->getKeyName())->lazyB
 
 Keep the sync and queued branches unchanged.
 
-- [ ] **Step 4: Run AI command tests**
+- [x] **Step 4: Run AI command tests**
 
 Run:
 
@@ -1255,7 +1255,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/TranslateContentComm
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1272,7 +1272,7 @@ git commit -m "perf(ai): stream translate command models"
 - Modify: `Modules/AI/app/Console/TranslateMissingCommand.php`
 - Modify: `Modules/AI/tests/Integration/TranslateMissingCommandTest.php`
 
-- [ ] **Step 1: Add source guard test**
+- [x] **Step 1: Add source guard test**
 
 Append this test to `Modules/AI/tests/Integration/TranslateMissingCommandTest.php`:
 
@@ -1289,7 +1289,7 @@ it('streams missing translation command models instead of loading each locale fu
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1299,7 +1299,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/TranslateMissingComm
 
 Expected: FAIL because the command currently calls `$query->get()` per locale.
 
-- [ ] **Step 3: Replace per-locale collection loading**
+- [x] **Step 3: Replace per-locale collection loading**
 
 In `TranslateMissingCommand::handle()`, replace:
 
@@ -1317,7 +1317,7 @@ foreach ($query->orderBy($model_class::query()->getModel()->getKeyName())->lazyB
 
 Keep `$models_to_translate[$model->id]` aggregation so one model still receives all missing locales in one job.
 
-- [ ] **Step 4: Run focused test**
+- [x] **Step 4: Run focused test**
 
 Run:
 
@@ -1327,7 +1327,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/TranslateMissingComm
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1344,7 +1344,7 @@ git commit -m "perf(ai): stream missing translation discovery"
 - Modify: `Modules/AI/app/Services/DocumentationService.php`
 - Modify: `Modules/AI/tests/Integration/DocumentationServiceTest.php`
 
-- [ ] **Step 1: Add source guard test**
+- [x] **Step 1: Add source guard test** Replaced 2026-10-01 by a behavioural test (`never splits one source across two reindexBySource batches`): the source guard asserted the very `array_chunk` that caused the regression below.
 
 Append this test to `Modules/AI/tests/Integration/DocumentationServiceTest.php`:
 
@@ -1357,7 +1357,7 @@ it('indexes documentation chunks in bounded batches', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run:
 
@@ -1367,7 +1367,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/DocumentationService
 
 Expected: FAIL because `indexFromRoots()` sends the full split document array to the agent.
 
-- [ ] **Step 3: Batch addDocuments and reindexBySource**
+- [x] **Step 3: Batch addDocuments and reindexBySource** Regression fixed 2026-10-01: `array_chunk($split_documents, 100)` + NeuronAI `reindexBySource()` (delete by source, then add) let a later batch delete an earlier batch's chunks of the same source. Batches now pack whole sources (`batchBySource()`), about 100 documents each; a larger source is one batch.
 
 In `DocumentationService::indexFromRoots()`, replace:
 
@@ -1395,7 +1395,7 @@ foreach (array_chunk($split_documents, 100) as $batch) {
 
 Keep the method return value as `count($split_documents)`.
 
-- [ ] **Step 4: Run documentation tests**
+- [x] **Step 4: Run documentation tests**
 
 Run:
 
@@ -1406,7 +1406,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/IndexDocumentationCo
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -1423,7 +1423,7 @@ git commit -m "perf(ai): batch documentation rag indexing"
 - No code edits.
 - Verify changed modules only.
 
-- [ ] **Step 1: Run dirty-file formatter**
+- [x] **Step 1: Run dirty-file formatter** Ran `vendor/bin/pint --format agent <files>` on the explicit touched files: `--dirty` from the root does not see files changed inside module submodules.
 
 Run:
 
@@ -1433,7 +1433,7 @@ rtk vendor/bin/pint --dirty
 
 Expected: PASS and only touched files are formatted.
 
-- [ ] **Step 2: Run focused regression suites**
+- [x] **Step 2: Run focused regression suites**
 
 Run:
 
@@ -1452,7 +1452,7 @@ rtk php artisan test --compact Modules/AI/tests/Integration/DocumentationService
 
 Expected: PASS.
 
-- [ ] **Step 3: Review the evidence matrix**
+- [-] **Step 3: Review the evidence matrix** No per-task evidence summaries were kept while the work landed; behaviour and query-count guards live in the tests named per task.
 
 Before inspecting the final diff, confirm every executed task has a completed evidence summary:
 
@@ -1471,7 +1471,7 @@ Decision: keep | revise | revert
 
 Expected: every executed task has `Decision: keep`. If any task is missing behavior evidence or performance evidence, do not proceed to the final diff; return to that task and add the missing test or measurement.
 
-- [ ] **Step 4: Inspect final diff**
+- [x] **Step 4: Inspect final diff**
 
 Run:
 
@@ -1482,7 +1482,7 @@ rtk git diff -- Modules/Core Modules/ERP Modules/CMS Modules/AI
 
 Expected: only planned files changed. No dependency files changed.
 
-- [ ] **Step 5: Commit final formatting-only changes if Pint changed files after previous commits**
+- [-] **Step 5: Commit final formatting-only changes if Pint changed files after previous commits** No formatting-only commit: Pint ran on the touched files before they were committed.
 
 Run:
 
@@ -1515,3 +1515,18 @@ Then manually inspect:
 - RAG indexing with a large docs corpus.
 
 Do not enable Octane as part of this plan. Octane requires a separate statefulness audit of singleton services and static caches.
+
+## Delivery status (2026-10-01): shipped
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md` (FIFO layer consumption), `Modules/AI/docs/rag/MODULE.md` (RAG indexing batches by source), `Modules/Core/docs/ACL_SYSTEM.md` (superadmin permissions from the registrar cache), `Modules/Core/docs/rag/PERFORMANCE_TOOLKIT.md` (measuring query count and memory).
+
+Tasks 2-13 landed in earlier sessions and were never ticked. On 2026-10-01 they were checked against the code. Two of them had regressions, fixed the same day.
+
+- Task 1: dropped. A pre-optimization baseline cannot be taken after the optimizations shipped.
+- Task 8: the FIFO loop's offset `lazy(100)` paged over the `qty_remaining > 0` filter the loop itself changes. Past 100 open layers, whole pages were skipped, so an outbound took layers out of order and with the wrong unit cost. Fixed with `lazyById(100)`. Guard: 150 layers costing 1..150, outbound 120 across the page boundary, unit cost 60.5 and 30 open layers left.
+- Task 9: the plan's `SalesPipelineServiceStub` override was replaced by an injected `?Closure` opportunity provider on `SalesPipelineService`.
+- Task 13: `array_chunk($split_documents, 100)` split one source's chunks across batches. NeuronAI `reindexBySource()` deletes each source it receives before adding it, so the second batch of a large source deleted the first batch's chunks. `DocumentationService::batchBySource()` now packs whole sources into batches of about 100. A source with more than 100 chunks is sent as one batch: the evidence-matrix cap "batches of 100" is kept per source, not per call. The source-string guard test that pinned `array_chunk` was replaced by a behavioural test.
+- Task 7 follow-up: posting also wrote the tax snapshot with one `UPDATE` per invoice line and loaded the linked sales-order line with one query per invoice line. Both are batched now (one `UPDATE` per distinct tax code, one `whereIn` for sales-order lines), guarded by a query-count test in `InvoicePostingServiceTest`. `SalesOrderEvasionService::applyQuantities()` still finds and saves one sales-order line at a time; left as is.
+- Task 14: formatter and focused suites run; the evidence matrix was not kept (see step 3).
+
+Still open: `CrudService` bulk `update()`, `delete()` and lock/unlock (`Modules/Core/app/Services/Crud/CrudService.php`) still page with offset `lazy(100)` over a query their own loop changes. A bulk delete of more than 100 keys skips the rows after the first page. Switching to `lazyById()` needs a decision for composite-key models, so it was not changed here.
