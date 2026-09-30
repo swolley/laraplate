@@ -1083,24 +1083,24 @@ Verification: `php artisan test --compact Modules/ERP/tests/Feature/Support/Mone
 
 ## Future release verification
 
-These commands are release gates, not open ERP feature tasks. Run them after any newly approved implementation slice.
+These commands are recurring release gates, not open ERP feature tasks, so they carry no checkboxes: they are not counted as pending work. Run them after any newly approved implementation slice. Last run 2026-09-30: `Modules/ERP/tests/Feature` 583 passed, 1 skipped, golden master included.
 
-- [ ] **Run targeted suites**
+- **Run targeted suites**
 
 ```bash
 php artisan test --compact Modules/Core/tests/Feature
 php artisan test --compact Modules/ERP/tests/Feature
 ```
 
-- [ ] **Accounting golden master** — must stay green after Waves 4–5:
+- **Accounting golden master** — must stay green after Waves 4–5:
 
 ```bash
 php artisan test --compact Modules/ERP/tests/Feature/AccountingGoldenMasterTest.php
 ```
 
-- [ ] **Update spec master** — move completed IDs from § Open to § Completed with commit SHAs
+- **Update spec master** — move completed IDs from § Open to § Completed with commit SHAs
 
-- [ ] **Version bumps** — evaluate Core + ERP per `08-versioning.mdc`; ask user before `composer version:*`
+- **Version bumps** — evaluate Core + ERP per `08-versioning.mdc`; ask user before `composer version:*`
 
 ---
 
