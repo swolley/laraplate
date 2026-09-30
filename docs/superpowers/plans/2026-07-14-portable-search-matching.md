@@ -12,9 +12,10 @@
 
 **Documented in:** `Modules/Core/docs/rag/SEARCH_MATCHING_USER.md`, `Modules/Core/docs/rag/SEARCH_MATCHING_DEVELOPER.md`.
 
-Seventy of seventy-one steps are ticked. The one open box is a forward note rather than
-outstanding work: it parks the `search:indexes:plan|status|apply|rebuild|sync` commands as a
-later operational task on the same `MigrateUtils` API.
+Seventy of seventy-one steps are ticked. The seventy-first is marked cancelled (`- [-]`,
+2026-09-30): it was a forward note rather than outstanding work, parking the
+`search:indexes:plan|status|apply|rebuild|sync` commands as a later operational task on the same
+`MigrateUtils` API. Those commands were not built and need their own plan.
 
 This plan and its spec were written at the stack root and moved into `laraplate` on delivery,
 because the subject names only backend files. See `Where specs and plans live` in the stack
@@ -240,7 +241,7 @@ Metadata must not expose sensitive values beyond the query already supplied by t
 - [x] Replace repeated search-index driver branches in existing Core and CMS migrations.
 - [x] Initial field policy: fuzzy for short human labels/names; full-text only for prose/search-text; prefix/B-tree for slugs and identifiers.
 - [x] Add schema translation/unit tests plus SQLite specialized-index and `migrate:fresh` proof; run PostgreSQL/Oracle DDL integration checks in their CI matrices.
-- [ ] Leave future `search:indexes:plan|status|apply|rebuild|sync` commands as a subsequent operational task built on the same `MigrateUtils` API.
+- [-] Leave future `search:indexes:plan|status|apply|rebuild|sync` commands as a subsequent operational task built on the same `MigrateUtils` API. Cancelled here by design: the step parks the commands outside this plan. They do not exist; building them needs its own spec and plan, since indexes are declared per field in migrations and the commands would have to plan, apply and resync them per database driver.
 
 ### Task 7 — Verification
 
