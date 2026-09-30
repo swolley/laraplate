@@ -16,7 +16,7 @@
 
 **Documented in:** `Modules/CMS/docs/rag/MODULE.md`, `Modules/CMS/docs/rag/GLOSSARY.md`.
 
-Everything this plan asked for exists. The empty checkboxes below are not outstanding work.
+Reconciled task by task against the code on 2026-09-30 (the provenance, references and `ai_assistance` tests pass together, 21 tests). Everything this plan asked for exists except one item, listed under "Not carried over". Tasks 1 and 3-7 are ticked; Task 2 stays open because of that item.
 
 The bibliography and the disclosure landed as designed: the `AiAssistance` enum, the
 `ContentReference` model and its factory, the `cms_contents_references` table, the
@@ -31,6 +31,12 @@ Two things were done differently:
 - **`ai_assistance` is not an additive migration.** The column is declared in
   `create_contents_translations_table`, where the project puts schema changes while the database is
   still rebuilt with `migrate:fresh` rather than patched with corrective migrations.
+
+Not carried over:
+
+- **Origin URL validation (Task 2).** The plan asked `Content` to reject a malformed `origin_url`
+  (`not-a-url`). Neither `Content::getRules()` nor `RecordOrigin` validates the URL, and no test
+  covers it. This was not a recorded decision; it is an open item.
 
 Only the references table needed a migration of its own, so one of the plan's three additive
 migrations exists and the other two were folded into the tables they belong to.
@@ -65,7 +71,7 @@ migrations exists and the other two were folded into the tables they belong to.
 - Create: `Modules/CMS/app/Enums/AiAssistance.php`
 - Create: `Modules/CMS/tests/Unit/Enums/AiAssistanceTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -84,12 +90,12 @@ it('defines all ai assistance cases', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/CMS/tests/Unit/Enums/AiAssistanceTest.php`
 Expected: FAIL — class `AiAssistance` not found
 
-- [ ] **Step 3: Add enum case to `CMSTables`**
+- [x] **Step 3: Add enum case to `CMSTables`**
 
 In `Modules/CMS/app/Enums/CMSTables.php`, after `ContentRatings`:
 
@@ -97,7 +103,7 @@ In `Modules/CMS/app/Enums/CMSTables.php`, after `ContentRatings`:
 case ContentsReferences = 'cms_contents_references';
 ```
 
-- [ ] **Step 4: Create `AiAssistance` enum**
+- [x] **Step 4: Create `AiAssistance` enum**
 
 ```php
 <?php
@@ -116,12 +122,12 @@ enum AiAssistance: string
 }
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/CMS/tests/Unit/Enums/AiAssistanceTest.php`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Modules/CMS/app/Enums/CMSTables.php Modules/CMS/app/Enums/AiAssistance.php Modules/CMS/tests/Unit/Enums/AiAssistanceTest.php
@@ -131,6 +137,8 @@ git commit -m "feat(cms): add AiAssistance enum and ContentsReferences table con
 ---
 
 ### Task 2: Origin columns migration + `Content` rules
+
+> **Reconciliation (2026-09-30):** replaced by `Core\Models\RecordOrigin` reached through `Content::origin()`; there are no `origin_label`/`origin_url` columns and no migration. The persistence and reverse-lookup tests exist (`ContentOriginTest`, `ImportOriginProvenanceTest`). **Open:** the origin URL format validation this task asked for was not carried over. Steps stay unticked until that is decided.
 
 **Files:**
 - Create: `Modules/CMS/database/migrations/2026_07_02_100000_add_origin_columns_to_cms_contents_table.php`
@@ -285,7 +293,7 @@ git commit -m "feat(cms): add origin columns on contents"
 - Modify: `Modules/CMS/app/Models/Content.php` (`getRules()` translation rules)
 - Create: `Modules/CMS/tests/Feature/Models/ContentTranslationAiAssistanceTest.php`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -371,12 +379,12 @@ it('filters translations by ai assistance', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentTranslationAiAssistanceTest.php`
 Expected: SKIP or FAIL
 
-- [ ] **Step 3: Create migration**
+- [x] **Step 3: Create migration**
 
 ```php
 <?php
@@ -412,11 +420,11 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Run migration**
+- [x] **Step 4: Run migration**
 
 Run: `php artisan migrate --path=Modules/CMS/database/migrations/2026_07_02_100001_add_ai_assistance_to_cms_contents_translations_table.php --no-interaction`
 
-- [ ] **Step 5: Update `ContentTranslation`**
+- [x] **Step 5: Update `ContentTranslation`**
 
 Add import: `use Modules\CMS\Enums\AiAssistance;`
 
@@ -456,7 +464,7 @@ protected function casts(): array
 
 Add PHPDoc: `@property AiAssistance $ai_assistance`
 
-- [ ] **Step 6: Extend `Content::getRules()` translation rules**
+- [x] **Step 6: Extend `Content::getRules()` translation rules**
 
 In both `create` and `update` rule arrays:
 
@@ -464,12 +472,12 @@ In both `create` and `update` rule arrays:
 'translations.*.ai_assistance' => 'sometimes|string|in:none,generated,translated,edited,summarized',
 ```
 
-- [ ] **Step 7: Run test to verify it passes**
+- [x] **Step 7: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentTranslationAiAssistanceTest.php`
 Expected: PASS
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add Modules/CMS/database/migrations/2026_07_02_100001_add_ai_assistance_to_cms_contents_translations_table.php Modules/CMS/app/Models/Translations/ContentTranslation.php Modules/CMS/app/Models/Content.php Modules/CMS/tests/Feature/Models/ContentTranslationAiAssistanceTest.php
@@ -483,7 +491,7 @@ git commit -m "feat(cms): add ai_assistance enum column on content translations"
 **Files:**
 - Create: `Modules/CMS/database/migrations/2026_07_02_100002_create_cms_contents_references_table.php`
 
-- [ ] **Step 1: Create migration**
+- [x] **Step 1: Create migration**
 
 ```php
 <?php
@@ -531,11 +539,11 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 2: Run migration**
+- [x] **Step 2: Run migration**
 
 Run: `php artisan migrate --path=Modules/CMS/database/migrations/2026_07_02_100002_create_cms_contents_references_table.php --no-interaction`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add Modules/CMS/database/migrations/2026_07_02_100002_create_cms_contents_references_table.php
@@ -551,7 +559,7 @@ git commit -m "feat(cms): create cms_contents_references table"
 - Create: `Modules/CMS/database/factories/ContentReferenceFactory.php`
 - Create: `Modules/CMS/tests/Unit/Models/ContentReferenceTest.php`
 
-- [ ] **Step 1: Write the failing unit test**
+- [x] **Step 1: Write the failing unit test**
 
 ```php
 <?php
@@ -590,12 +598,12 @@ it('scopes build sort query by content id', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/CMS/tests/Unit/Models/ContentReferenceTest.php`
 Expected: FAIL — class not found
 
-- [ ] **Step 3: Create model**
+- [x] **Step 3: Create model**
 
 ```php
 <?php
@@ -705,7 +713,7 @@ final class ContentReference extends Model implements Sortable
 }
 ```
 
-- [ ] **Step 4: Create factory**
+- [x] **Step 4: Create factory**
 
 ```php
 <?php
@@ -747,12 +755,12 @@ final class ContentReferenceFactory extends Factory
 }
 ```
 
-- [ ] **Step 5: Run unit test to verify it passes**
+- [x] **Step 5: Run unit test to verify it passes**
 
 Run: `php artisan test --compact Modules/CMS/tests/Unit/Models/ContentReferenceTest.php`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Modules/CMS/app/Models/ContentReference.php Modules/CMS/database/factories/ContentReferenceFactory.php Modules/CMS/tests/Unit/Models/ContentReferenceTest.php
@@ -767,7 +775,7 @@ git commit -m "feat(cms): add ContentReference model and factory"
 - Modify: `Modules/CMS/app/Models/Content.php`
 - Create: `Modules/CMS/tests/Feature/Models/ContentReferenceTest.php`
 
-- [ ] **Step 1: Write the failing feature test**
+- [x] **Step 1: Write the failing feature test**
 
 ```php
 <?php
@@ -838,12 +846,12 @@ it('soft deletes a reference', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentReferenceTest.php`
 Expected: FAIL — `references()` missing
 
-- [ ] **Step 3: Add relation to `Content`**
+- [x] **Step 3: Add relation to `Content`**
 
 Add import: `use Modules\CMS\Models\ContentReference;` (if not same namespace, only `ContentReference` is fine since same namespace).
 
@@ -861,12 +869,12 @@ public function references(): HasMany
 }
 ```
 
-- [ ] **Step 4: Run feature test to verify it passes**
+- [x] **Step 4: Run feature test to verify it passes**
 
 Run: `php artisan test --compact Modules/CMS/tests/Feature/Models/ContentReferenceTest.php`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Modules/CMS/app/Models/Content.php Modules/CMS/tests/Feature/Models/ContentReferenceTest.php
@@ -880,20 +888,20 @@ git commit -m "feat(cms): add references relation on content"
 **Files:**
 - Modify: `docs/superpowers/plans/INDEX.md` (already updated when plan is saved)
 
-- [ ] **Step 1: Run Pint on dirty files**
+- [x] **Step 1: Run Pint on dirty files**
 
 Run: `vendor/bin/pint --dirty`
 
-- [ ] **Step 2: Run all new CMS tests**
+- [x] **Step 2: Run all new CMS tests**
 
 Run: `php artisan test --compact Modules/CMS/tests/Unit/Enums/AiAssistanceTest.php Modules/CMS/tests/Unit/Models/ContentReferenceTest.php Modules/CMS/tests/Feature/Models/ContentOriginTest.php Modules/CMS/tests/Feature/Models/ContentReferenceTest.php Modules/CMS/tests/Feature/Models/ContentTranslationAiAssistanceTest.php`
 Expected: all PASS
 
-- [ ] **Step 3: Ask user about CMS version bump**
+- [x] **Step 3: Ask user about CMS version bump**
 
 Per `.cursor/rules/08-versioning.mdc`, propose `composer version:minor` inside `Modules/CMS` (new backward-compatible feature). **Do not run without explicit user confirmation.**
 
-- [ ] **Step 4: Final commit if Pint changed files**
+- [x] **Step 4: Final commit if Pint changed files**
 
 ```bash
 git add -A

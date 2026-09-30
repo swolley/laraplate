@@ -8,6 +8,12 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Filament 5 (via `Coolsam\Modules\Resource`), Pest 4, PHPStan/Larastan 3, Pint.
 
+## Reconciliation (2026-09-30)
+
+Reconciled task by task against the code. Tasks 1-11 are delivered and ticked; the complete SAO suite passes (678 passed, 1 skipped). Task 12 is partly delivered: the ticket resource, ACL-aware query, creation through the opening status, transition actions, documentation and the spec marker exist, but the `status_category` filter and the timeline and comment composer on the view page do not (see the note under Task 12). The plan therefore stays open and carries no delivery status.
+
+Exit criteria as they stand: 1 (SAO tests) met; 2 and 3 (Pint, PHPStan) are no longer module concerns, the toolchain belongs to the application; 4 (end-to-end in Filament) not met, commenting is not possible; 5 and 6 are superseded by later phases, which deliberately reference `Modules\AI` and add drivers and connections under `app/`; 7 met only through the recorded SQLite skip.
+
 ## Global Constraints
 
 - **Spec:** `docs/superpowers/specs/2026-08-01-sao-phase-1a-ticketing-core-design.md`. Decisions are numbered E1–E12 there; tasks reference them.
@@ -75,7 +81,7 @@ All paths relative to `Modules/SAO/`.
 **Interfaces:**
 - Produces: `SAOTables` cases `Projects`, `TicketStatuses`, `WorkflowSchemes`, `WorkflowTransitions`, `TicketTypes`, `ProjectTicketTypes`, `Tickets`, `TicketComments` — every later task reads table names from here. `StatusCategory::Open|InProgress|Resolved|Closed|Rejected`, `TicketPriority::Low|Normal|High|Urgent`, `CommentOrigin::Human|System`, each with `validationRule(): string` and `values(): array`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Unit/Enums/SaoEnumsTest.php`:
 
@@ -147,7 +153,7 @@ test('every enum exposes an in: validation rule', function (string $rule): void 
 
 `isTerminal()` matters beyond tidiness: phase 6's closure policies ask "is this ticket finished", and the answer must come from the category rather than from a status name. `Resolved` is deliberately **not** terminal — resolved means fixed but not yet confirmed, which is exactly the state phase 6 watches before closing.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=SaoEnumsTest
@@ -155,7 +161,7 @@ php artisan test --filter=SaoEnumsTest
 
 Expected: FAIL — `Modules\SAO\Enums\SAOTables` does not exist.
 
-- [ ] **Step 3: Create the table registry**
+- [x] **Step 3: Create the table registry**
 
 Create `Modules/SAO/app/Enums/SAOTables.php`:
 
@@ -183,7 +189,7 @@ enum SAOTables: string
 }
 ```
 
-- [ ] **Step 4: Create the canonical status category**
+- [x] **Step 4: Create the canonical status category**
 
 Create `Modules/SAO/app/Enums/StatusCategory.php`:
 
@@ -234,7 +240,7 @@ enum StatusCategory: string
 }
 ```
 
-- [ ] **Step 5: Create the priority and comment-origin enums**
+- [x] **Step 5: Create the priority and comment-origin enums**
 
 Create `Modules/SAO/app/Enums/TicketPriority.php`:
 
@@ -306,7 +312,7 @@ enum CommentOrigin: string
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=SaoEnumsTest
@@ -314,7 +320,7 @@ php artisan test --filter=SaoEnumsTest
 
 Expected: PASS, 9 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -339,7 +345,7 @@ cd ../..
 - Consumes: `SAOTables::Projects` from Task 1.
 - Produces: `Project` with `$fillable` `['name', 'key_prefix', 'description', 'is_active']`, a `next_ticket_number` column managed by the allocator in Task 6 (never mass-assignable), and `ProjectFactory::new()`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Models/ProjectTest.php`:
 
@@ -390,7 +396,7 @@ test('the create rules require a name and a prefix of two to ten uppercase chara
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=ProjectTest
@@ -398,7 +404,7 @@ php artisan test --filter=ProjectTest
 
 Expected: FAIL — `Modules\SAO\Models\Project` does not exist.
 
-- [ ] **Step 3: Create the migration**
+- [x] **Step 3: Create the migration**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100000_create_sao_projects_table.php`:
 
@@ -440,7 +446,7 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Create the model**
+- [x] **Step 4: Create the model**
 
 Create `Modules/SAO/app/Models/Project.php`:
 
@@ -551,7 +557,7 @@ final class Project extends Model
 
 Note that `key_prefix` appears in the create rules but **not** in the update rules: that is where E7's immutability begins. Task 6 adds the model-level guard that closes the direct-assignment path.
 
-- [ ] **Step 5: Create the factory**
+- [x] **Step 5: Create the factory**
 
 Create `Modules/SAO/database/factories/ProjectFactory.php`:
 
@@ -595,7 +601,7 @@ final class ProjectFactory extends Factory
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=ProjectTest
@@ -605,7 +611,7 @@ Expected: PASS, 4 tests.
 
 If the counter test fails because `next_ticket_number` is null rather than `0`, the migration default did not apply — confirm the column was created with `->default(0)`.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -620,6 +626,8 @@ cd ../..
 
 ## Task 3: Ticket statuses
 
+> **Divergence (2026-09-30):** `TicketStatus` orders through Core's `SortableTrait` with `order_column`, not a hand-rolled `sort_order`, as the plan told the implementer to prefer.
+
 **Files:**
 - Create: `Modules/SAO/database/migrations/2026_08_01_100100_create_sao_ticket_statuses_table.php`
 - Create: `Modules/SAO/app/Models/TicketStatus.php`
@@ -630,7 +638,7 @@ cd ../..
 - Consumes: `SAOTables::TicketStatuses` and `StatusCategory` from Task 1.
 - Produces: `TicketStatus` with `$fillable` `['name', 'category', 'colour', 'sort_order']`, `category` cast to `StatusCategory`, and `TicketStatusFactory::new()` plus a `category(StatusCategory $category)` state.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Models/TicketStatusTest.php`:
 
@@ -676,7 +684,7 @@ test('the create rules constrain the category to the canonical set', function ()
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketStatusTest
@@ -684,7 +692,7 @@ php artisan test --filter=TicketStatusTest
 
 Expected: FAIL — `Modules\SAO\Models\TicketStatus` does not exist.
 
-- [ ] **Step 3: Create the migration**
+- [x] **Step 3: Create the migration**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100100_create_sao_ticket_statuses_table.php`:
 
@@ -727,7 +735,7 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Create the model**
+- [x] **Step 4: Create the model**
 
 Create `Modules/SAO/app/Models/TicketStatus.php`:
 
@@ -832,7 +840,7 @@ rather than keeping a parallel hand-rolled ordering. Also add
 `protected $attributes = ['colour' => 'gray', 'sort_order' => 0];` so a freshly created status
 reports the same values the migration defaults give it.
 
-- [ ] **Step 5: Create the factory**
+- [x] **Step 5: Create the factory**
 
 Create `Modules/SAO/database/factories/TicketStatusFactory.php`:
 
@@ -877,7 +885,7 @@ final class TicketStatusFactory extends Factory
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketStatusTest
@@ -885,7 +893,7 @@ php artisan test --filter=TicketStatusTest
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -914,7 +922,7 @@ cd ../..
 - Consumes: `TicketStatus` from Task 3.
 - Produces: `WorkflowScheme` with `transitions(): HasMany`, `initialTransition(): ?WorkflowTransition`, and a static `default(): ?WorkflowScheme`. `WorkflowTransition` with `$fillable` `['workflow_scheme_id', 'from_status_id', 'to_status_id', 'label', 'required_permission']`, where a null `from_status_id` is the creation transition. Task 7's `WorkflowService` consumes both.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Models/WorkflowSchemeTest.php`:
 
@@ -987,7 +995,7 @@ test('exactly one scheme is the default', function (): void {
 
 The last test encodes a real rule: setting a new default must clear the previous one. Two defaults is a state from which the system cannot answer "which scheme applies", and it is far cheaper to make unrepresentable than to detect later.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=WorkflowSchemeTest
@@ -995,7 +1003,7 @@ php artisan test --filter=WorkflowSchemeTest
 
 Expected: FAIL — `Modules\SAO\Models\WorkflowScheme` does not exist.
 
-- [ ] **Step 3: Create both migrations**
+- [x] **Step 3: Create both migrations**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100200_create_sao_workflow_schemes_table.php`:
 
@@ -1089,7 +1097,7 @@ return new class extends Migration
 
 The unique index over `(scheme, from, to)` is what makes a second creation transition impossible: with `from_status_id` null, MySQL and PostgreSQL both treat two rows differing only in `to_status_id` as distinct, so the guard needs help — Step 5 adds it in the model.
 
-- [ ] **Step 4: Create the domain exception**
+- [x] **Step 4: Create the domain exception**
 
 Create `Modules/SAO/app/Exceptions/DuplicateCreationTransitionException.php`:
 
@@ -1116,7 +1124,7 @@ final class DuplicateCreationTransitionException extends RuntimeException
 }
 ```
 
-- [ ] **Step 5: Create the transition model**
+- [x] **Step 5: Create the transition model**
 
 Create `Modules/SAO/app/Models/WorkflowTransition.php`:
 
@@ -1206,7 +1214,7 @@ final class WorkflowTransition extends Model
 }
 ```
 
-- [ ] **Step 6: Create the scheme model with its two invariants**
+- [x] **Step 6: Create the scheme model with its two invariants**
 
 Create `Modules/SAO/app/Models/WorkflowScheme.php`:
 
@@ -1326,7 +1334,7 @@ final class WorkflowScheme extends Model
 }
 ```
 
-- [ ] **Step 7: Create both factories**
+- [x] **Step 7: Create both factories**
 
 Create `Modules/SAO/database/factories/WorkflowSchemeFactory.php`:
 
@@ -1404,7 +1412,7 @@ final class WorkflowTransitionFactory extends Factory
 }
 ```
 
-- [ ] **Step 8: Run the test to verify it passes**
+- [x] **Step 8: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=WorkflowSchemeTest
@@ -1412,7 +1420,7 @@ php artisan test --filter=WorkflowSchemeTest
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 9: Format, analyse and commit**
+- [x] **Step 9: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -1440,7 +1448,7 @@ cd ../..
 - Consumes: `WorkflowScheme` from Task 4, `Project` from Task 2.
 - Produces: `TicketType` with `$fillable` `['name', 'slug', 'icon', 'colour', 'workflow_scheme_id', 'is_defect']`; `Project::ticketTypes(): BelongsToMany` using the `ProjectTicketType` pivot with `is_default` and `workflow_scheme_id` columns. Task 7's `WorkflowService::schemeFor(Project $project, TicketType $type): WorkflowScheme` reads the override from this pivot.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Models/TicketTypeTest.php`:
 
@@ -1506,7 +1514,7 @@ test('the pivot may override the workflow scheme for one project', function (): 
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketTypeTest
@@ -1514,7 +1522,7 @@ php artisan test --filter=TicketTypeTest
 
 Expected: FAIL — `Modules\SAO\Models\TicketType` does not exist.
 
-- [ ] **Step 3: Create both migrations**
+- [x] **Step 3: Create both migrations**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100400_create_sao_ticket_types_table.php`:
 
@@ -1607,7 +1615,7 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Create the pivot and type models**
+- [x] **Step 4: Create the pivot and type models**
 
 Create `Modules/SAO/app/Models/Pivot/ProjectTicketType.php`:
 
@@ -1731,7 +1739,7 @@ final class TicketType extends Model
 }
 ```
 
-- [ ] **Step 5: Create the type factory**
+- [x] **Step 5: Create the type factory**
 
 Create `Modules/SAO/database/factories/TicketTypeFactory.php`:
 
@@ -1780,7 +1788,7 @@ final class TicketTypeFactory extends Factory
 }
 ```
 
-- [ ] **Step 6: Wire the relation onto Project**
+- [x] **Step 6: Wire the relation onto Project**
 
 In `Modules/SAO/app/Models/Project.php`, add these imports:
 
@@ -1809,7 +1817,7 @@ and add these two methods after `getRules()`:
     }
 ```
 
-- [ ] **Step 7: Run the test to verify it passes**
+- [x] **Step 7: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketTypeTest
@@ -1817,7 +1825,7 @@ php artisan test --filter=TicketTypeTest
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 8: Format, analyse and commit**
+- [x] **Step 8: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -1831,6 +1839,8 @@ cd ../..
 ---
 
 ## Task 6: The ticket and its key allocator
+
+> **Verification note (2026-09-30):** the two-process concurrency test exists and is skipped on SQLite; commit `9fd6176` records "CONCURRENCY NOT VERIFIED". Exit criterion 7 is met only through that recorded skip: the allocator has not been run against MySQL or PostgreSQL.
 
 This is the task with the only genuine correctness hazard in 1a: two concurrent creations must not produce the same key.
 
@@ -1846,7 +1856,7 @@ This is the task with the only genuine correctness hazard in 1a: two concurrent 
 - Consumes: `Project`, `TicketType`, `TicketStatus`.
 - Produces: `TicketKeyAllocator::allocate(Project $project): array{number: int, key: string}`, and `Ticket` with `$fillable` `['project_id', 'ticket_type_id', 'ticket_status_id', 'priority', 'title', 'description', 'reporter_id', 'assignee_id']`. Task 7 sets `ticket_status_id` only through `WorkflowService`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Services/TicketKeyAllocatorTest.php`:
 
@@ -1918,7 +1928,7 @@ test('the prefix may still be corrected before the first ticket', function (): v
 
 Note what the immutability test asserts: the guard triggers on **an allocated number**, not on the existence of a `Ticket` row. That is deliberate — a number handed out and then rolled back still appears in someone's browser history, and the prefix that produced it must stay meaningful.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketKeyAllocatorTest
@@ -1926,7 +1936,7 @@ php artisan test --filter=TicketKeyAllocatorTest
 
 Expected: FAIL — `Modules\SAO\Services\TicketKeyAllocator` does not exist.
 
-- [ ] **Step 3: Create the exception and the immutability guard**
+- [x] **Step 3: Create the exception and the immutability guard**
 
 Create `Modules/SAO/app/Exceptions/ImmutableKeyPrefixException.php`:
 
@@ -1977,7 +1987,7 @@ and add this method:
     }
 ```
 
-- [ ] **Step 4: Create the allocator**
+- [x] **Step 4: Create the allocator**
 
 Create `Modules/SAO/app/Services/TicketKeyAllocator.php`:
 
@@ -2032,7 +2042,7 @@ final class TicketKeyAllocator
 }
 ```
 
-- [ ] **Step 5: Create the ticket migration**
+- [x] **Step 5: Create the ticket migration**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100600_create_sao_tickets_table.php`:
 
@@ -2106,7 +2116,7 @@ most concurrently edited object in the system, so this is not optional.
 person can claim a ticket while editing, but it was not specified for 1a and is a candidate for 1b.
 Adding it here would ship an unrequested feature and three unused columns.
 
-- [ ] **Step 6: Create the ticket model and factory**
+- [x] **Step 6: Create the ticket model and factory**
 
 Create `Modules/SAO/app/Models/Ticket.php`:
 
@@ -2317,7 +2327,7 @@ final class TicketFactory extends Factory
 }
 ```
 
-- [ ] **Step 7: Run the test to verify it passes**
+- [x] **Step 7: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketKeyAllocatorTest
@@ -2325,7 +2335,7 @@ php artisan test --filter=TicketKeyAllocatorTest
 
 Expected: PASS, 5 tests.
 
-- [ ] **Step 8: Prove the allocator under real concurrency**
+- [x] **Step 8: Prove the allocator under real concurrency**
 
 The sequential test above proves arithmetic, not safety. Add this test to the same file:
 
@@ -2379,7 +2389,7 @@ DB_CONNECTION=mysql php artisan test --filter="two concurrent allocations"
 
 If no such database is available, record in the task's commit message that the concurrency test was skipped, rather than reporting the allocator as verified.
 
-- [ ] **Step 9: Format, analyse and commit**
+- [x] **Step 9: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -2404,7 +2414,7 @@ cd ../..
 - Consumes: `Ticket`, `Project`, `TicketType`, `WorkflowScheme`, `WorkflowTransition`, `TicketStatus`.
 - Produces: `ChangeContext::forUser(User $user)`, `ChangeContext::forAutomation(string $source_key)`; `WorkflowService::schemeFor(Project $project, TicketType $type): WorkflowScheme`, `availableTransitions(Ticket $ticket): Collection<int, WorkflowTransition>`, `transition(Ticket $ticket, TicketStatus $to, ChangeContext $context): Ticket`, `openingStatusFor(Project $project, TicketType $type): TicketStatus`. Tasks 8, 11 and 12 consume these.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Services/WorkflowServiceTest.php`:
 
@@ -2553,7 +2563,7 @@ test('a context built for a user carries that user as the actor', function (): v
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=WorkflowServiceTest
@@ -2561,7 +2571,7 @@ php artisan test --filter=WorkflowServiceTest
 
 Expected: FAIL — `Modules\SAO\Data\ChangeContext` does not exist.
 
-- [ ] **Step 3: Create the change context**
+- [x] **Step 3: Create the change context**
 
 Create `Modules/SAO/app/Data/ChangeContext.php`:
 
@@ -2621,7 +2631,7 @@ final readonly class ChangeContext
 }
 ```
 
-- [ ] **Step 4: Create the exception**
+- [x] **Step 4: Create the exception**
 
 Create `Modules/SAO/app/Exceptions/TransitionNotAllowedException.php`:
 
@@ -2647,7 +2657,7 @@ final class TransitionNotAllowedException extends RuntimeException
 }
 ```
 
-- [ ] **Step 5: Create the workflow service**
+- [x] **Step 5: Create the workflow service**
 
 Create `Modules/SAO/app/Services/WorkflowService.php`:
 
@@ -2741,7 +2751,7 @@ final class WorkflowService
 
 The permission checks that `WorkflowTransition::$required_permission` and the override imply are wired in Task 10, once the permission names exist. The service already reads `hasOverride()` from the context, so Task 10 adds the authorization lookup without changing this signature.
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=WorkflowServiceTest
@@ -2749,7 +2759,7 @@ php artisan test --filter=WorkflowServiceTest
 
 Expected: PASS, 8 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -2774,7 +2784,7 @@ cd ../..
 - Consumes: `Ticket` from Task 6, `CommentOrigin` from Task 1, `ChangeContext` from Task 7.
 - Produces: `TicketComment::postFor(Ticket $ticket, string $body, ChangeContext $context): self` — the single creation path, which derives origin and authorship from the context. Task 9's timeline consumes `TicketComment`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Models/TicketCommentTest.php`:
 
@@ -2845,7 +2855,7 @@ test('comments belong to their ticket', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketCommentTest
@@ -2853,7 +2863,7 @@ php artisan test --filter=TicketCommentTest
 
 Expected: FAIL — `Modules\SAO\Models\TicketComment` does not exist.
 
-- [ ] **Step 3: Create the migration**
+- [x] **Step 3: Create the migration**
 
 Create `Modules/SAO/database/migrations/2026_08_01_100700_create_sao_ticket_comments_table.php`:
 
@@ -2902,7 +2912,7 @@ return new class extends Migration
 };
 ```
 
-- [ ] **Step 4: Create the immutability exception**
+- [x] **Step 4: Create the immutability exception**
 
 Create `Modules/SAO/app/Exceptions/ImmutableSystemCommentException.php`:
 
@@ -2929,7 +2939,7 @@ final class ImmutableSystemCommentException extends RuntimeException
 }
 ```
 
-- [ ] **Step 5: Create the model and factory**
+- [x] **Step 5: Create the model and factory**
 
 Create `Modules/SAO/app/Models/TicketComment.php`:
 
@@ -3093,7 +3103,7 @@ final class TicketCommentFactory extends Factory
 }
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketCommentTest
@@ -3101,7 +3111,7 @@ php artisan test --filter=TicketCommentTest
 
 Expected: PASS, 5 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -3125,7 +3135,7 @@ cd ../..
 - Consumes: `Ticket`, `TicketComment`, and Core's `HasVersions`.
 - Produces: `TicketTimelineService::for(Ticket $ticket): Collection<int, TimelineEntry>`, entries ordered oldest first, each exposing `occurredAt(): CarbonInterface`, `kind(): string` (`comment` or `change`), `authorId(): ?int`, `sourceKey(): ?string`, `body(): ?string`, `changes(): array<string, mixed>`. Task 11's ticket page renders this.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Services/TicketTimelineServiceTest.php`:
 
@@ -3200,7 +3210,7 @@ test('comments and changes are merged into one ordered stream', function (): voi
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketTimelineServiceTest
@@ -3208,7 +3218,7 @@ php artisan test --filter=TicketTimelineServiceTest
 
 Expected: FAIL — `Modules\SAO\Services\TicketTimelineService` does not exist.
 
-- [ ] **Step 3: Inspect what Core versioning actually returns**
+- [x] **Step 3: Inspect what Core versioning actually returns**
 
 Before writing the service, confirm the shape of a version row for a SAO ticket:
 
@@ -3223,7 +3233,7 @@ echo $v === null ? "no versions" : json_encode(array_keys($v->getAttributes()));
 
 Use the actual column that holds the changed attributes when writing Step 4. Core's `HasVersions` supports both a diff and a snapshot strategy, and the diff strategy is what makes a timeline possible — if this returns a full snapshot, set the ticket's strategy to diff via `getVersionStrategy()` on the model before continuing, and note it in the commit.
 
-- [ ] **Step 4: Create the timeline entry**
+- [x] **Step 4: Create the timeline entry**
 
 Create `Modules/SAO/app/Data/TimelineEntry.php`:
 
@@ -3308,7 +3318,7 @@ final readonly class TimelineEntry
 }
 ```
 
-- [ ] **Step 5: Create the service**
+- [x] **Step 5: Create the service**
 
 Create `Modules/SAO/app/Services/TicketTimelineService.php`:
 
@@ -3372,7 +3382,7 @@ final class TicketTimelineService
 
 If Step 3 showed different column names on the version row, adjust `versionable_attributes` and `user_id` here to match — those two names are the only coupling between this service and Core's versioning.
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketTimelineServiceTest
@@ -3380,7 +3390,7 @@ php artisan test --filter=TicketTimelineServiceTest
 
 Expected: PASS, 4 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -3395,6 +3405,8 @@ cd ../..
 
 ## Task 10: Permissions and the ACL read-path rule
 
+> **Divergence (2026-09-30), recorded here because no other document records it:** the read path uses the `select` verb, not `view`. The `view`, `create` and `assign` verbs were retired: the CRUD verbs come from `permission:refresh`, and `SAOPermissions` declares only the domain verbs (`transition`, `transition_override`, `close` and others). `TicketAuthorizationTest` asserts that the retired verbs are gone and `TicketVisibilityTest` proves an ACL hides rows.
+
 **Files:**
 - Create: `Modules/SAO/database/seeders/SAOPermissionSeeder.php`
 - Modify: `Modules/SAO/database/seeders/SAODatabaseSeeder.php`
@@ -3406,7 +3418,7 @@ cd ../..
 - Consumes: `Core\Support\PermissionName`, `Core\Services\Authorization\AuthorizationService`.
 - Produces: `TicketQueryService::visible(): Builder<Ticket>` — the **only** sanctioned way to read tickets; `WorkflowService::transition()` now enforces `required_permission` and the override permission.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Authorization/TicketAuthorizationTest.php`:
 
@@ -3467,7 +3479,7 @@ test('the ticket query service applies ACL filters rather than raw Eloquent', fu
 
 The third test is deliberately modest about what it can prove. A stronger assertion — that a restricting ACL actually hides rows — requires a seeded role, permission and ACL, and belongs with the Filament work in Task 11 where a real authenticated user exists. What this test locks is that **a service exists** whose job is to be the read path, so that a future reviewer can grep for raw `Ticket::query()` outside it.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketAuthorizationTest
@@ -3475,7 +3487,7 @@ php artisan test --filter=TicketAuthorizationTest
 
 Expected: FAIL — `Modules\SAO\Database\Seeders\SAOPermissionSeeder` does not exist.
 
-- [ ] **Step 3: Create the permission seeder**
+- [x] **Step 3: Create the permission seeder**
 
 Create `Modules/SAO/database/seeders/SAOPermissionSeeder.php`:
 
@@ -3522,7 +3534,7 @@ final class SAOPermissionSeeder extends Seeder
 }
 ```
 
-- [ ] **Step 4: Register the seeder**
+- [x] **Step 4: Register the seeder**
 
 Replace the body of `Modules/SAO/database/seeders/SAODatabaseSeeder.php`'s `run()` with:
 
@@ -3535,7 +3547,7 @@ Replace the body of `Modules/SAO/database/seeders/SAODatabaseSeeder.php`'s `run(
 
 Keep the existing class declaration, namespace and `declare(strict_types=1);` line as they are.
 
-- [ ] **Step 5: Create the ticket query service**
+- [x] **Step 5: Create the ticket query service**
 
 Create `Modules/SAO/app/Services/TicketQueryService.php`:
 
@@ -3580,7 +3592,7 @@ final readonly class TicketQueryService
 }
 ```
 
-- [ ] **Step 6: Enforce transition permissions in the workflow service**
+- [x] **Step 6: Enforce transition permissions in the workflow service**
 
 In `Modules/SAO/app/Services/WorkflowService.php`, add these imports:
 
@@ -3618,7 +3630,7 @@ and replace the body of `transition()` with:
 
 This changes the behaviour asserted in Task 7's override test: `withOverride()` alone no longer suffices without the permission. Update that test to authenticate a user holding `default.sao_tickets.transition_override` — the intent of the test is unchanged, but the bar it asserts is now the real one.
 
-- [ ] **Step 7: Run both affected test files**
+- [x] **Step 7: Run both affected test files**
 
 ```bash
 php artisan test --filter=TicketAuthorizationTest
@@ -3627,7 +3639,7 @@ php artisan test --filter=WorkflowServiceTest
 
 Expected: both PASS. If the override test in `WorkflowServiceTest` fails, apply the Step 6 note before continuing — a failing test here means the enforcement works and the test predates it.
 
-- [ ] **Step 8: Format, analyse and commit**
+- [x] **Step 8: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -3653,7 +3665,7 @@ cd ../..
 - Consumes: the models from Tasks 2–5.
 - Produces: Filament resources reachable in the admin panel. Task 12's ticket page sits beside them.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Filament/ConfigurationResourcesTest.php`:
 
@@ -3689,7 +3701,7 @@ test('every SAO resource lives under the SAO navigation group', function (string
 ]);
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=ConfigurationResourcesTest
@@ -3697,7 +3709,7 @@ php artisan test --filter=ConfigurationResourcesTest
 
 Expected: FAIL — the resource classes do not exist.
 
-- [ ] **Step 3: Generate the resources**
+- [x] **Step 3: Generate the resources**
 
 ```bash
 php artisan filament:make-resources --no-interaction
@@ -3716,7 +3728,7 @@ php artisan make:filament-resource WorkflowScheme --model-namespace='Modules\SAO
 
 Then move the generated classes under `Modules/SAO/app/Filament/Resources/<Plural>/` and fix their namespaces to `Modules\SAO\Filament\Resources\<Plural>`, matching `Modules/ERP/app/Filament/Resources/Accounts/AccountResource.php`.
 
-- [ ] **Step 4: Align each resource with the sibling convention**
+- [x] **Step 4: Align each resource with the sibling convention**
 
 For every generated resource, make it match `AccountResource`: `final class ... extends Coolsam\Modules\Resource`, `#[Override]` on the static properties, `protected static string|UnitEnum|null $navigationGroup = 'SAO';`, a `Heroicon` navigation icon, and `getSlug()` returning a stable path. Use these slugs:
 
@@ -3727,7 +3739,7 @@ For every generated resource, make it match `AccountResource`: `final class ... 
 | `TicketTypeResource` | `sao/ticket-types` | 30 |
 | `WorkflowSchemeResource` | `sao/workflow-schemes` | 40 |
 
-- [ ] **Step 5: Add the transitions relation manager**
+- [x] **Step 5: Add the transitions relation manager**
 
 Generate it and attach it to `WorkflowSchemeResource::getRelations()`:
 
@@ -3737,7 +3749,7 @@ php artisan make:filament-relation-manager WorkflowSchemeResource transitions la
 
 The transitions table shows the source status, the target status and the action label, with the creation transition rendered as "(new ticket)" where the source is null — otherwise an empty cell reads as missing data rather than as the deliberate marker it is.
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=ConfigurationResourcesTest
@@ -3745,7 +3757,7 @@ php artisan test --filter=ConfigurationResourcesTest
 
 Expected: PASS, 8 tests.
 
-- [ ] **Step 7: Format, analyse and commit**
+- [x] **Step 7: Format, analyse and commit**
 
 ```bash
 vendor/bin/pint Modules/SAO
@@ -3760,6 +3772,8 @@ cd ../..
 
 ## Task 12: The ticket surface, and closing the slice
 
+> **Partly open (2026-09-30):** Steps 3 and 5 stay unticked. The `status_category` filter of Step 3 was not built (`TicketsTable` filters only priority, labels and overdue), and the view page of Step 5 has `timeline()` and `postComment()` but no view renders the timeline or a comment composer, so a ticket cannot be commented on from the Filament panel. Both still need building, with tests.
+
 **Files:**
 - Create: `Modules/SAO/app/Filament/Resources/Tickets/*`
 - Create: `Modules/SAO/tests/Feature/Filament/TicketResourceTest.php`
@@ -3771,7 +3785,7 @@ cd ../..
 - Consumes: everything from Tasks 1–11.
 - Produces: the working tracker.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/Filament/TicketResourceTest.php`:
 
@@ -3806,7 +3820,7 @@ test('the ticket table can be filtered by status category', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --filter=TicketResourceTest
@@ -3833,7 +3847,7 @@ Override the base query so the list honours ACL:
 
 Add a `status_category` filter over `StatusCategory::values()`, joining through the status relation. Filtering by category rather than by status name is what keeps the filter meaningful across projects that name their statuses differently.
 
-- [ ] **Step 4: Wire ticket creation to the opening status**
+- [x] **Step 4: Wire ticket creation to the opening status**
 
 Nothing so far connects a new ticket to its scheme's creation transition — the factory sets a status
 directly, which is fine for tests but wrong for the real path. In the generated
@@ -3900,7 +3914,7 @@ The comment composer calls the single sanctioned creation path:
 System comments render with a distinct background and no edit action, showing their `source_key`
 where a human comment shows its author.
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --filter=TicketResourceTest
@@ -3908,7 +3922,7 @@ php artisan test --filter=TicketResourceTest
 
 Expected: PASS, 3 tests.
 
-- [ ] **Step 7: Prove that a restricting ACL actually hides tickets**
+- [x] **Step 7: Prove that a restricting ACL actually hides tickets**
 
 Task 10 could only assert that a read-path service exists. This is the test that proves it works,
 and it is the one the spec's §10 asks for. Create
@@ -3982,7 +3996,7 @@ php artisan test --filter=TicketVisibilityTest
 
 Expected: PASS, 1 test.
 
-- [ ] **Step 8: Run every SAO test together**
+- [x] **Step 8: Run every SAO test together**
 
 ```bash
 php artisan test --filter='Sao|SAO|Ticket|Project|Workflow|Scaffolding|StrictTypes|ModuleMetadata|ModuleRegistration'
@@ -3990,7 +4004,7 @@ php artisan test --filter='Sao|SAO|Ticket|Project|Workflow|Scaffolding|StrictTyp
 
 Expected: all green. This is the full 1a suite plus the phase 0 tests. Do **not** run the whole application suite.
 
-- [ ] **Step 9: Update the module documentation**
+- [x] **Step 9: Update the module documentation**
 
 In `Modules/SAO/README.md`, replace the "Current Bootstrap Status" list with what now exists: projects with immutable key prefixes, global statuses with canonical categories, shareable workflow schemes with enforced transitions, ticket types with per-project association and scheme override, tickets with row-locked key allocation, comments with human and system origins, a timeline read model, domain permissions, and Filament surfaces. State plainly that no external integration exists yet.
 
@@ -4002,7 +4016,7 @@ Add to `Modules/SAO/CHANGELOG.md` under `## [unreleased]`:
 - Phase 1a — internal ticketing core: projects, per-project ticket keys, ticket types with shareable workflow schemes, enforced transitions, comments, timeline, permissions and Filament surfaces.
 ```
 
-- [ ] **Step 10: Commit the module and bump the gitlink**
+- [x] **Step 10: Commit the module and bump the gitlink**
 
 ```bash
 cd Modules/SAO
@@ -4014,7 +4028,7 @@ git add Modules/SAO
 git commit -m "chore(sao): bump SAO to the phase 1a ticketing core"
 ```
 
-- [ ] **Step 11: Record slice completion**
+- [x] **Step 11: Record slice completion**
 
 In `docs/superpowers/specs/2026-07-31-sao-module-design.md`, append `— **done YYYY-MM-DD**` to the phase **1a** row of the §13 table, using the actual date. Commit:
 

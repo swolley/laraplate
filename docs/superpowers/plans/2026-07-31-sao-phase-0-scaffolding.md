@@ -8,6 +8,10 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Pest 4, PHPStan/Larastan 3, Pint, Rector 2, Peck, git-cliff.
 
+## Reconciliation (2026-09-30)
+
+Reconciled task by task against the code. The module exists as a registered submodule and the complete SAO suite passes (678 passed, 1 skipped). Tasks 1, 2, 3, 3b and 6 are delivered; the tooling and release-script work in Tasks 2, 4 and 5 was cancelled by the decision recorded in `c935944` that the toolchain belongs to the application, and is ticked with a note. Two items remain open: Task 7 Step 5 (the full application suite, never recorded) and the module-level Pint and PHPStan runs, which are no longer a module concern. No delivery status is added until Step 5 is settled.
+
 ## Global Constraints
 
 - PHP requirement: `>=8.5`. Laravel requirement: `^12.0`.
@@ -80,7 +84,7 @@ Nothing else in this plan is verifiable until SAO's tests are collected and the 
 - Consumes: the application's `Tests\TestCase` (root `tests/TestCase.php`), already on the classpath.
 - Produces: `Modules\SAO\Tests\TestCase` — the base class every SAO Feature and Integration test extends. Tasks 2 and 3 add Unit tests, which do **not** extend it (they must not boot the application).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Feature/ModuleRegistrationTest.php`:
 
@@ -103,7 +107,7 @@ test('the SAO config file resolves under the sao namespace', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 From the application root (`laraplate/`):
 
@@ -113,7 +117,7 @@ php artisan test --testsuite=Feature --filter=ModuleRegistrationTest
 
 Expected: FAIL. `Module::find('SAO')` returns `null` because `modules_statuses.json` has no `SAO` key, so the module is never activated.
 
-- [ ] **Step 3: Create the module test base class**
+- [x] **Step 3: Create the module test base class**
 
 Create `Modules/SAO/tests/TestCase.php`:
 
@@ -132,7 +136,7 @@ abstract class TestCase extends \Tests\TestCase
 }
 ```
 
-- [ ] **Step 4: Bind the base class to the Feature and Integration suites**
+- [x] **Step 4: Bind the base class to the Feature and Integration suites**
 
 Create `Modules/SAO/tests/Pest.php`:
 
@@ -147,7 +151,7 @@ pest()->extend(TestCase::class)
     ->in(__DIR__ . '/Integration', __DIR__ . '/Feature');
 ```
 
-- [ ] **Step 5: Create the Integration suite placeholder**
+- [x] **Step 5: Create the Integration suite placeholder**
 
 ```bash
 mkdir -p Modules/SAO/tests/Integration
@@ -156,7 +160,7 @@ touch Modules/SAO/tests/Integration/.gitkeep
 
 Without this directory the root `phpunit.xml` glob `Modules/*/tests/Integration` resolves to nothing for SAO, and Pest's `->in()` call in `Pest.php` fails on a missing path.
 
-- [ ] **Step 6: Activate the module**
+- [x] **Step 6: Activate the module**
 
 Edit `modules_statuses.json` at the application root. It currently reads:
 
@@ -183,7 +187,7 @@ Change it to:
 }
 ```
 
-- [ ] **Step 7: Run the test to verify it passes**
+- [x] **Step 7: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Feature --filter=ModuleRegistrationTest
@@ -193,7 +197,7 @@ Expected: PASS, 2 tests.
 
 If `config('sao.name')` is null, the module's `config/config.php` is not being merged — confirm `Modules/SAO/app/Providers/SAOServiceProvider.php` still declares `protected string $nameLower = 'sao';`.
 
-- [ ] **Step 8: Commit — module repository**
+- [x] **Step 8: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -202,7 +206,7 @@ git commit -m "test(sao): add module test harness and registration coverage"
 cd ../..
 ```
 
-- [ ] **Step 9: Commit — application repository**
+- [x] **Step 9: Commit — application repository**
 
 ```bash
 git add modules_statuses.json
@@ -213,6 +217,8 @@ git commit -m "chore(sao): activate the SAO module"
 
 ## Task 2: Module metadata and dependency declaration
 
+> **Replaced in part (2026-09-30):** `module.json` and the `composer.json` metadata are as planned. The `require-dev` block and the script battery were not shipped: commit `c935944` ("the module carries functionality, not the toolchain") moved the toolchain to the application, and `ModuleMetadataTest` now asserts the module declares no test or quality script and no development dependency. Steps 1 and 4 are ticked as replaced, not as written.
+
 **Files:**
 - Create: `Modules/SAO/tests/Unit/ModuleMetadataTest.php`
 - Modify: `Modules/SAO/module.json`
@@ -222,7 +228,7 @@ git commit -m "chore(sao): activate the SAO module"
 - Consumes: nothing from earlier tasks — this test reads files from disk and does not boot the application.
 - Produces: the package identity `swolley/laraplate-sao` and the declared dependency `Core`, both asserted by later verification in Task 7.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Unit/ModuleMetadataTest.php`:
 
@@ -339,7 +345,7 @@ test('composer.json maps the module and test namespaces', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ModuleMetadataTest
@@ -347,7 +353,7 @@ php artisan test --testsuite=Unit --filter=ModuleMetadataTest
 
 Expected: FAIL on the first assertion — the stub `module.json` has no `laraplate_owned`, no `requires`, and an empty `description`.
 
-- [ ] **Step 3: Rewrite `module.json`**
+- [x] **Step 3: Rewrite `module.json`**
 
 Replace the whole of `Modules/SAO/module.json` with:
 
@@ -376,7 +382,7 @@ Replace the whole of `Modules/SAO/module.json` with:
 }
 ```
 
-- [ ] **Step 4: Rewrite `composer.json`**
+- [x] **Step 4: Rewrite `composer.json`**
 
 Replace the whole of `Modules/SAO/composer.json` with:
 
@@ -510,7 +516,7 @@ Replace the whole of `Modules/SAO/composer.json` with:
 
 Note the deliberate divergence from ERP: `autoload-dev` also maps `Modules\SAO\Tests\Integration\`, because SAO ships an Integration suite from day one.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ModuleMetadataTest
@@ -518,7 +524,7 @@ php artisan test --testsuite=Unit --filter=ModuleMetadataTest
 
 Expected: PASS, 6 tests.
 
-- [ ] **Step 6: Verify the composer manifest is well-formed**
+- [x] **Step 6: Verify the composer manifest is well-formed**
 
 ```bash
 cd Modules/SAO && composer validate --no-check-all --no-check-lock --no-check-publish; cd ../..
@@ -533,7 +539,7 @@ carries it deliberately, so it stays.
 "The property vendor is not defined" and exits 2 — **for every module, including ERP**. Verified
 side by side. Without this flag the check is permanently red and therefore useless as a gate.
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -545,6 +551,8 @@ cd ../..
 ---
 
 ## Task 3: Licence, documentation and repository hygiene
+
+> **Delivered, one part replaced (2026-09-30):** `cliff.toml` is not shipped in the module; the application's root `cliff.toml` is used and `ScaffoldingComplianceTest` asserts the module has none (`c935944`).
 
 **Files:**
 - Create: `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`
@@ -559,7 +567,7 @@ cd ../..
 - Consumes: nothing. This test reads the filesystem only.
 - Produces: `ScaffoldingComplianceTest`, extended by Tasks 3b, 4 and 5. Those tasks edit its dataset rather than adding parallel test files. The `docs/.gitkeep` placeholder created here is replaced by real documentation in Task 3b.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`:
 
@@ -605,7 +613,7 @@ test('the readme names the module and its licence', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -613,7 +621,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: FAIL on `LICENSE`, `README.md`, `CHANGELOG.md`, `cliff.toml`, `.gitignore` and `docs/.gitkeep`.
 
-- [ ] **Step 3: Copy the licence, changelog config and ignore rules from ERP**
+- [x] **Step 3: Copy the licence, changelog config and ignore rules from ERP**
 
 ```bash
 cp Modules/ERP/LICENSE Modules/SAO/LICENSE
@@ -625,7 +633,7 @@ touch Modules/SAO/docs/.gitkeep
 
 These three files are module-agnostic: the AGPL text, the git-cliff template and the ignore list contain no module name. Copy them byte-for-byte; do not hand-edit.
 
-- [ ] **Step 4: Create the changelog seed**
+- [x] **Step 4: Create the changelog seed**
 
 Create `Modules/SAO/CHANGELOG.md`:
 
@@ -643,7 +651,7 @@ All notable changes to this project will be documented in this file.
 
 Subsequent entries are generated by git-cliff via `composer version`.
 
-- [ ] **Step 5: Create the README**
+- [x] **Step 5: Create the README**
 
 Create `Modules/SAO/README.md`:
 
@@ -774,7 +782,7 @@ If you want to contribute to this project, follow these steps:
 SAO Module is open-sourced software licensed under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html).
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -782,7 +790,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: PASS, 10 tests (8 dataset cases plus the licence and readme assertions).
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -817,7 +825,7 @@ the moment when changing it is free.
 - Consumes: `ScaffoldingComplianceTest` from Task 3, and the README written in Task 3 Step 5.
 - Produces: the canonical domain vocabulary used by every later phase.
 
-- [ ] **Step 1: Extend the failing test**
+- [x] **Step 1: Extend the failing test**
 
 In `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`, replace `'docs/.gitkeep'` in the first
 test's dataset with the three documentation files:
@@ -847,7 +855,7 @@ test('the RAG glossary mirrors the human glossary', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -855,7 +863,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: FAIL on the three documentation paths and on the glossary mirror assertion.
 
-- [ ] **Step 3: Write the module glossary**
+- [x] **Step 3: Write the module glossary**
 
 Create `Modules/SAO/docs/GLOSSARY.md`:
 
@@ -943,7 +951,7 @@ it rather than invent parallel names.
 | **Fix propagation** | The deterministic check for whether a fix already exists upstream and only a deployment is missing. |
 ```
 
-- [ ] **Step 4: Create the RAG copies**
+- [x] **Step 4: Create the RAG copies**
 
 The RAG corpus is a maintained copy, not a build artefact — there is no generator, and
 `DocumentationService` reads whatever is in `docs/rag/`.
@@ -959,7 +967,7 @@ rm Modules/SAO/docs/.gitkeep
 `Modules/CMS/docs/rag/MODULE.md`. The `.gitkeep` placeholder from Task 3 is removed: the directory
 now holds real files.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -967,7 +975,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: PASS, zero failures.
 
-- [ ] **Step 6: Verify the RAG indexer sees the module**
+- [x] **Step 6: Verify the RAG indexer sees the module**
 
 ```bash
 php artisan tinker --execute='foreach (rag_paths() as $p) { echo $p, PHP_EOL; }'
@@ -980,7 +988,7 @@ this proves discovery rather than merely proving the command exists.
 Do **not** run an actual index in this phase — indexing requires an embeddings provider and an
 Elasticsearch instance, neither of which phase 0 depends on.
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -992,6 +1000,8 @@ cd ../..
 ---
 
 ## Task 4: Quality tooling configuration
+
+> **Cancelled (2026-09-30):** superseded by the decision that the toolchain belongs to the application (`c935944`). `Modules/SAO` has no `phpunit.xml`, `phpstan.neon`, `pint.json`, `peck.json` or `rector.php`, and `ScaffoldingComplianceTest` asserts their absence. The application's root files cover the module (root `pint.json` enforces `declare_strict_types`; root `phpunit.xml` globs `Modules/*/tests`). Every step below is ticked as cancelled, none as delivered.
 
 **Files:**
 - Modify: `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`
@@ -1005,7 +1015,7 @@ cd ../..
 - Consumes: `ScaffoldingComplianceTest` from Task 3 — extend its dataset, do not create a parallel test file.
 - Produces: `pint.json` with `declare_strict_types`, which Task 6 relies on to reformat the pre-existing provider stubs.
 
-- [ ] **Step 1: Extend the failing test**
+- [x] **Step 1: Extend the failing test**
 
 In `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`, replace the `->with([...])` dataset of the first test with:
 
@@ -1053,7 +1063,7 @@ test('phpunit declares the three module test suites', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -1061,7 +1071,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: FAIL on the five new dataset entries plus the two new assertions.
 
-- [ ] **Step 3: Copy the module-agnostic tooling from ERP**
+- [x] **Step 3: Copy the module-agnostic tooling from ERP**
 
 ```bash
 cp Modules/ERP/phpunit.xml Modules/SAO/phpunit.xml
@@ -1072,7 +1082,7 @@ cp Modules/ERP/rector.php  Modules/SAO/rector.php
 
 All four are written against relative paths and carry no module name. `rector.php` globs `__DIR__ . '/Modules/*'`, which resolves to an empty set inside a module — the surviving paths are `app`, `config`, `database`, `routes` and `tests`, which is exactly what is wanted.
 
-- [ ] **Step 4: Create the static analysis configuration**
+- [x] **Step 4: Create the static analysis configuration**
 
 Create `Modules/SAO/phpstan.neon`. It differs from ERP's: SAO has no Filament, Analytics, seeders or migrations yet, so those exclusions do not apply and must not be copied — a stale exclusion silently hides real errors later.
 
@@ -1119,7 +1129,7 @@ parameters:
     checkModelAppends: true
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -1127,7 +1137,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: PASS, 20 tests — 15 dataset cases plus 5 named assertions (licence and readme from Task 3, the glossary mirror from Task 3b, Pint and PHPUnit from Task 4).
 
-- [ ] **Step 6: Verify static analysis runs against the module**
+- [x] **Step 6: Verify static analysis runs against the module**
 
 From the application root:
 
@@ -1137,7 +1147,7 @@ vendor/bin/phpstan analyse --configuration=Modules/SAO/phpstan.neon --memory-lim
 
 Expected: `[OK] No errors`. If it reports errors in `app/Providers/*.php`, leave them — Task 6 fixes those files and re-runs this command.
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -1150,6 +1160,8 @@ cd ../..
 
 ## Task 5: Release scripts and module agent rules
 
+> **Agent rules delivered, release scripts cancelled (2026-09-30):** Step 5 is delivered (`.cursor/rules/module-context.mdc`). Steps 1, 3 and 4 are cancelled by `c935944`: the application's `scripts/version.sh` versions the module and `ScaffoldingComplianceTest` asserts the module has none. `setup-hooks.sh` and `hooks/post-commit` have no counterpart at the application root, so per-module git hooks were dropped rather than moved.
+
 **Files:**
 - Modify: `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`
 - Create: `Modules/SAO/scripts/version.sh`
@@ -1161,7 +1173,7 @@ cd ../..
 - Consumes: the `version`, `version:*` and `setup:hooks` composer scripts declared in Task 2, which invoke these files.
 - Produces: nothing consumed by later tasks.
 
-- [ ] **Step 1: Extend the failing test**
+- [x] **Step 1: Extend the failing test**
 
 Append to `Modules/SAO/tests/Unit/ScaffoldingComplianceTest.php`:
 
@@ -1190,7 +1202,7 @@ test('the module declares its own agent rules', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -1198,7 +1210,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: FAIL on the three script paths and the rules file.
 
-- [ ] **Step 3: Copy the release scripts from ERP and preserve the executable bit**
+- [x] **Step 3: Copy the release scripts from ERP and preserve the executable bit**
 
 ```bash
 mkdir -p Modules/SAO/scripts/hooks
@@ -1210,7 +1222,7 @@ chmod +x Modules/SAO/scripts/version.sh Modules/SAO/scripts/setup-hooks.sh Modul
 
 `cp -p` preserves the mode; the explicit `chmod` guards against a filesystem that does not.
 
-- [ ] **Step 4: Check the scripts for hardcoded module identity**
+- [x] **Step 4: Check the scripts for hardcoded module identity**
 
 ```bash
 grep -n -i -E "erp|ERP" Modules/SAO/scripts/version.sh Modules/SAO/scripts/setup-hooks.sh Modules/SAO/scripts/hooks/post-commit
@@ -1218,7 +1230,7 @@ grep -n -i -E "erp|ERP" Modules/SAO/scripts/version.sh Modules/SAO/scripts/setup
 
 Expected: no output. If any line names ERP, replace that occurrence with `SAO` and note the line in the commit message — the sibling scripts are meant to be module-agnostic, and a hit means ERP's copy drifted.
 
-- [ ] **Step 5: Write the module agent rules**
+- [x] **Step 5: Write the module agent rules**
 
 Create `Modules/SAO/.cursor/rules/module-context.mdc`:
 
@@ -1253,7 +1265,7 @@ alwaysApply: false
 - Design spec: docs/superpowers/specs/2026-07-31-sao-module-design.md in the application repo.
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
@@ -1261,7 +1273,7 @@ php artisan test --testsuite=Unit --filter=ScaffoldingComplianceTest
 
 Expected: PASS, zero failures.
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -1306,7 +1318,7 @@ types to `config/config.php` and `database/seeders/SAODatabaseSeeder.php`.
 - Consumes: `pint.json` from Task 4.
 - Produces: nothing consumed by later tasks.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `Modules/SAO/tests/Unit/StrictTypesTest.php`:
 
@@ -1345,7 +1357,7 @@ test('every PHP source file declares strict types', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 php artisan test --testsuite=Unit --filter=StrictTypesTest
@@ -1353,7 +1365,7 @@ php artisan test --testsuite=Unit --filter=StrictTypesTest
 
 Expected: FAIL, listing the four stub files under `app/`.
 
-- [ ] **Step 3: Rewrite the module service provider**
+- [x] **Step 3: Rewrite the module service provider**
 
 Replace `Modules/SAO/app/Providers/SAOServiceProvider.php` with:
 
@@ -1392,7 +1404,7 @@ class SAOServiceProvider extends ModuleServiceProvider
 
 The commented-out `$commands` property and `configureSchedules()` method are removed: dead scaffolding that Rector's `deadCode` set would flag anyway. The unused `Schedule` import goes with them.
 
-- [ ] **Step 4: Add strict types to the remaining stubs**
+- [x] **Step 4: Add strict types to the remaining stubs**
 
 For each of `Modules/SAO/app/Providers/RouteServiceProvider.php`, `Modules/SAO/app/Providers/EventServiceProvider.php` and `Modules/SAO/app/Http/Controllers/SAOController.php`, insert a blank line and `declare(strict_types=1);` immediately after the opening `<?php` tag, so each file begins:
 
@@ -1406,7 +1418,7 @@ namespace Modules\SAO\...;
 
 Change nothing else in those three files.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 php artisan test --testsuite=Unit --filter=StrictTypesTest
@@ -1414,7 +1426,7 @@ php artisan test --testsuite=Unit --filter=StrictTypesTest
 
 Expected: PASS.
 
-- [ ] **Step 6: Verify formatting and static analysis are clean**
+- [x] **Step 6: Verify formatting and static analysis are clean**
 
 ```bash
 vendor/bin/pint --test Modules/SAO
@@ -1423,7 +1435,7 @@ vendor/bin/phpstan analyse --configuration=Modules/SAO/phpstan.neon --memory-lim
 
 Expected: Pint reports no style issues; PHPStan reports `[OK] No errors`. If Pint reports issues, run `vendor/bin/pint Modules/SAO` and re-run both commands before continuing.
 
-- [ ] **Step 7: Commit — module repository**
+- [x] **Step 7: Commit — module repository**
 
 ```bash
 cd Modules/SAO
@@ -1436,6 +1448,8 @@ cd ../..
 
 ## Task 7: Register SAO as a submodule and verify the phase
 
+> **Reconciliation (2026-09-30):** Step 5 (full application suite) stays open: it was never recorded as run. Step 6 is ticked as superseded: later phases reference `Modules\AI` from SAO on purpose (ticket embedding, application-content evaluation), so the AI-free condition no longer holds. Step 8 is done by this reconciliation.
+
 **Files:**
 - Modify: `.gitmodules` (application repo root)
 - Create: gitlink at `Modules/SAO` (application repo index)
@@ -1444,7 +1458,7 @@ cd ../..
 - Consumes: every commit produced by Tasks 1–6 inside the module repository.
 - Produces: the phase-0 exit criterion evidence.
 
-- [ ] **Step 1: Publish the module repository**
+- [x] **Step 1: Publish the module repository**
 
 ```bash
 cd Modules/SAO
@@ -1492,7 +1506,7 @@ The final `git config` call aligns the stored URL with the SSH form the five sib
 in `.git/config`, even though `.gitmodules` records the HTTPS form. `git submodule init` copies the
 HTTPS URL verbatim, so without this the entry would be the odd one out.
 
-- [ ] **Step 3: Verify the submodule resolves**
+- [x] **Step 3: Verify the submodule resolves**
 
 ```bash
 git submodule status Modules/SAO
@@ -1501,7 +1515,7 @@ git ls-tree HEAD Modules/SAO
 
 Expected: `git submodule status` prints the current SAO commit with no leading `-` (which would mean uninitialized), and `git ls-tree` shows mode `160000` — a gitlink, not a tree. If `git ls-tree` shows `040000`, the directory was committed as ordinary files: undo with `git rm -r --cached Modules/SAO` and repeat step 2.
 
-- [ ] **Step 4: Run the complete SAO test set**
+- [x] **Step 4: Run the complete SAO test set**
 
 ```bash
 php artisan test --testsuite=Unit --filter='SAO|Scaffolding|StrictTypes|ModuleMetadata'
@@ -1518,7 +1532,7 @@ php artisan test
 
 Expected: the suite passes at the same level as before this plan started. Activating a module changes global boot: if a previously passing test now fails, the cause is SAO's registration and it must be fixed before the phase is declared complete — do not proceed with a known regression.
 
-- [ ] **Step 6: Verify the AI-free condition**
+- [x] **Step 6: Verify the AI-free condition**
 
 ```bash
 grep -rn 'Modules\\\\AI' Modules/SAO --include='*.php' --include='*.json' --include='*.neon' || echo "clean: no AI reference"
@@ -1526,14 +1540,14 @@ grep -rn 'Modules\\\\AI' Modules/SAO --include='*.php' --include='*.json' --incl
 
 Expected: `clean: no AI reference`. This is the spec §3 verifiable condition and it stays valid through phase 7.
 
-- [ ] **Step 7: Commit — application repository**
+- [x] **Step 7: Commit — application repository**
 
 ```bash
 git add .gitmodules Modules/SAO modules_statuses.json
 git commit -m "chore(sao): register SAO as a submodule"
 ```
 
-- [ ] **Step 8: Record phase completion**
+- [x] **Step 8: Record phase completion**
 
 Append to `docs/superpowers/specs/2026-07-31-sao-module-design.md`, at the end of the §13 phase table row for phase 0, the marker `— **done YYYY-MM-DD**` using the actual date. Then:
 

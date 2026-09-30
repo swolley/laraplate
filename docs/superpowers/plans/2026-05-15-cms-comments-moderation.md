@@ -18,10 +18,12 @@
 
 **Documented in:** `Modules/CMS/docs/COMMENT_MODERATION.md`, `Modules/CMS/docs/rag/COMMENT_MODERATION.md`.
 
-Moderated comments work. The checkboxes below were never ticked and should not be read as
-outstanding work: the architecture stated above was deliberately widened during implementation, so
-several steps name artifacts that were replaced by platform-wide ones. Moderation is inherited from
-`HasApprovals` rather than rebuilt for comments.
+Moderated comments work for human review. Reconciled task by task against the code on
+2026-09-30 (the comment, adapter, vote-job, listener and approval-vote tests pass together, 41 tests):
+the architecture stated above was deliberately widened during implementation, so several steps name
+artifacts that were replaced by platform-wide ones, and those tasks are ticked as replaced. Moderation
+is inherited from `HasApprovals` rather than rebuilt for comments. Tasks 8, 10, 13, 15 and 16 stay
+open, see "Known gaps".
 
 | This plan specified | What was built instead | Where |
 |---|---|---|
@@ -40,9 +42,22 @@ Two smaller divergences: both tables are created by the single `create_cms_comme
 migration rather than two, and the commented-out keys in the AI moderation config are documentation
 of what can be overridden, not gaps, since the helpers carry the defaults.
 
-One item was not confirmed while auditing: an explicit `comments` entry in the seeder's
-`defaultEntities()`. The permissions are seeded against `table_name = cms_comments` and the CRUD
-surface works, so this may simply be a step the implementation did not need.
+The explicit `comments` entry in `defaultEntities()` is not needed: `Comment` is not an `EntityType`
+(only contents, contributors and categories are), and its permissions come from Core's
+`PermissionRefreshSeeder` and are granted in `CMSDatabaseSeeder`.
+
+Known gaps (found 2026-09-30, not decisions):
+
+- **AI voting is inert by default.** `ai.features.moderation.system_user_id` is defined nowhere, so
+  `ApproveModificationJob` returns at once; the listener gates on a different key,
+  `permission.users.system`, which does exist, so the job is queued and then does nothing.
+  `AI_MODERATOR_USER_ID` in the AI docs is read by no code.
+- **Moderation defaults changed.** The plan set moderation on; the seeder sets
+  `features.moderation.enabled` and the `cms_comments` entity to false.
+- **`ModerationService` is thinly tested** (no `analyze()` run for approve, reject, uncertain or retry).
+- **The Filament vote columns** in Core's `ModificationsTable` are untested and the badge map cannot match.
+- **End-to-end coverage** does not go through the CRUD API, and comments CRUD over HTTP is claimed by
+  the docs but asserted by no CMS test.
 
 ---
 
@@ -53,7 +68,7 @@ surface works, so this may simply be a step the implementation did not need.
 - Modify: `Modules/CMS/app/Enums/CMSTables.php`
 - Create: `Modules/CMS/database/migrations/2026_05_15_100000_create_cms_comments_table.php`
 
-- [ ] **Step 1: Add enum cases**
+- [x] **Step 1: Add enum cases**
 
 ```php
 case Comments = 'cms_comments';
@@ -61,7 +76,7 @@ case CommentsTranslations = 'cms_comments_translations';
 case CommentModerationLogs = 'cms_comment_moderation_logs';
 ```
 
-- [ ] **Step 2: Parent table migration** (`cms_comments` — no `body` column)
+- [x] **Step 2: Parent table migration** (`cms_comments` — no `body` column)
 
 ```php
 $table_name = CMSTables::Comments->value;
@@ -78,7 +93,7 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
 });
 ```
 
-- [ ] **Step 3: Translations table migration**
+- [x] **Step 3: Translations table migration**
 
 ```php
 $table_name = CMSTables::CommentsTranslations->value;
@@ -95,9 +110,9 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
 });
 ```
 
-- [ ] **Step 4:** Run both migrations
+- [x] **Step 4:** Run both migrations
 
-- [ ] **Step 4:** Commit
+- [x] **Step 4:** Commit
 
 ```bash
 git add Modules/CMS/app/Enums/CMSTables.php Modules/CMS/database/migrations/2026_05_15_100000_create_cms_comments_table.php
@@ -112,7 +127,7 @@ git commit -m "feat(cms): add cms_comments table and CMSTables enum"
 
 - Create: `Modules/CMS/database/migrations/2026_05_15_100001_create_cms_comment_moderation_logs_table.php`
 
-- [ ] **Step 1: Create table**
+- [x] **Step 1: Create table**
 
 ```php
 $table_name = CMSTables::CommentModerationLogs->value;
@@ -134,7 +149,7 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
 });
 ```
 
-- [ ] **Step 2:** Migrate + commit
+- [x] **Step 2:** Migrate + commit
 
 ---
 
@@ -147,7 +162,7 @@ Schema::create($table_name, function (Blueprint $table) use ($table_name): void 
 - Create: `Modules/CMS/app/Scopes/CommentTranslationScope.php`
 - Create: `Modules/CMS/tests/Unit/Helpers/HasCommentTranslationsTest.php`
 
-- [ ] **Step 1: Failing tests**
+- [x] **Step 1: Failing tests**
 
 ```php
 it('returns current locale body when translation exists', function (): void { ... });
@@ -157,15 +172,15 @@ it('falls back to oldest created translation when current locale missing', funct
 it('does not fall back to config app.locale when older original is another locale', function (): void { ... });
 ```
 
-- [ ] **Step 2: `CommentTranslation` model** (mirror `TagTranslation` pattern, fillable `comment_id`, `locale`, `body`)
+- [x] **Step 2: `CommentTranslation` model** (mirror `TagTranslation` pattern, fillable `comment_id`, `locale`, `body`)
 
-- [ ] **Step 3: `HasCommentTranslations`** — alias `HasTranslations` methods; override `getTranslatableFieldValue`, `getTranslation`, `translation()`; `getOriginalTranslation()` ordered by `created_at`, `id`
+- [x] **Step 3: `HasCommentTranslations`** — alias `HasTranslations` methods; override `getTranslatableFieldValue`, `getTranslation`, `translation()`; `getOriginalTranslation()` ordered by `created_at`, `id`
 
-- [ ] **Step 4: `CommentTranslationScope`** — `whereHas('translations')` (any locale) + eager load via overridden `translation()`
+- [x] **Step 4: `CommentTranslationScope`** — `whereHas('translations')` (any locale) + eager load via overridden `translation()`
 
-- [ ] **Step 5: `bootHasTranslations` on Comment** — use `CommentTranslationScope`, **omit** `TranslatedModelSaved` dispatches (v1)
+- [x] **Step 5: `bootHasTranslations` on Comment** — use `CommentTranslationScope`, **omit** `TranslatedModelSaved` dispatches (v1)
 
-- [ ] **Step 6:** Tests green + commit
+- [x] **Step 6:** Tests green + commit
 
 ---
 
@@ -179,7 +194,7 @@ it('does not fall back to config app.locale when older original is another local
 - Modify: `Modules/CMS/app/Models/Content.php`
 - Create: `Modules/CMS/tests/Unit/Models/CommentTest.php`
 
-- [ ] **Step 1: `Comment` uses `HasApprovals`, `HasCommentTranslations`**
+- [x] **Step 1: `Comment` uses `HasApprovals`, `HasCommentTranslations`**
 
 - `fillable: content_id, user_id` only (body via translation)
 
@@ -197,13 +212,13 @@ protected function requiresApprovalWhen($modifications): bool
 
 - **Saving hook** (before approval trait): if pending body and empty dirty, build synthetic diff or call `CommentApprovalCapture::capture($this)` so `Modification` stores `body` + `locale` + `content_id`
 
-- [ ] **Step 2: Factory** creates approved comment with translation row
+- [x] **Step 2: Factory** creates approved comment with translation row
 
-- [ ] **Step 3: `Content::comments()` HasMany**
+- [x] **Step 3: `Content::comments()` HasMany**
 
-- [ ] **Step 4:** Feature test insert via CRUD → modification contains `body` in JSON
+- [x] **Step 4:** Feature test insert via CRUD → modification contains `body` in JSON
 
-- [ ] **Step 5:** Commit
+- [x] **Step 5:** Commit
 
 ---
 
@@ -214,11 +229,11 @@ protected function requiresApprovalWhen($modifications): bool
 - Create: `Modules/CMS/app/Models/CommentModerationLog.php`
 - Modify: `Modules/Core/app/Models/Modification.php` — optional `moderationLog()` morph helper only if Comment-specific relation lives on log model (`belongsTo Modification`)
 
-- [ ] **Step 1:** Model with casts (`categories` → array, booleans, `confidence` → float)
+- [x] **Step 1:** Model with casts (`categories` → array, booleans, `confidence` → float)
 
-- [ ] **Step 2:** `Modification` helper — add method on CMS side via `CommentModerationLog::modification()` only (avoid Core coupling)
+- [x] **Step 2:** `Modification` helper — add method on CMS side via `CommentModerationLog::modification()` only (avoid Core coupling)
 
-- [ ] **Step 3:** Commit
+- [x] **Step 3:** Commit
 
 ---
 
@@ -228,11 +243,11 @@ protected function requiresApprovalWhen($modifications): bool
 
 - Modify: `Modules/CMS/database/seeders/CMSDatabaseSeeder.php` (or dedicated seeder invoked from CMS seeder)
 
-- [ ] **Step 1:** Register `comments` entity in `defaultEntities()` following existing `tags`/`contributors` pattern (name `comments`, type appropriate for CMS module)
+- [x] **Step 1:** Register `comments` entity in `defaultEntities()` following existing `tags`/`contributors` pattern (name `comments`, type appropriate for CMS module)
 
-- [ ] **Step 2:** Seed permissions via Core role seeder pattern: `approve.cms_comments`, `disapprove.cms_comments` (align `User::authorizedToApprove` — verify permission string matches `approve.{table}`)
+- [x] **Step 2:** Seed permissions via Core role seeder pattern: `approve.cms_comments`, `disapprove.cms_comments` (align `User::authorizedToApprove` — verify permission string matches `approve.{table}`)
 
-- [ ] **Step 3:** Re-run CMS seeder in dev + commit
+- [x] **Step 3:** Re-run CMS seeder in dev + commit
 
 ---
 
@@ -243,7 +258,7 @@ protected function requiresApprovalWhen($modifications): bool
 - Create: `Modules/CMS/app/Events/CommentRequiresModeration.php`
 - Modify: `Modules/CMS/app/Providers/EventServiceProvider.php`
 
-- [ ] **Step 1: Event class**
+- [x] **Step 1: Event class**
 
 ```php
 final class CommentRequiresModeration
@@ -254,7 +269,7 @@ final class CommentRequiresModeration
 }
 ```
 
-- [ ] **Step 2: Register listener in `boot()`**
+- [x] **Step 2: Register listener in `boot()`**
 
 ```php
 Event::listen('eloquent.created: ' . Modification::class, function (Modification $modification): void {
@@ -265,13 +280,15 @@ Event::listen('eloquent.created: ' . Modification::class, function (Modification
 });
 ```
 
-- [ ] **Step 3: Feature test** — insert comment via CRUD → `Modification` exists with `modifiable_type = Comment::class`
+- [x] **Step 3: Feature test** — insert comment via CRUD → `Modification` exists with `modifiable_type = Comment::class`
 
-- [ ] **Step 4:** Commit
+- [x] **Step 4:** Commit
 
 ---
 
 ### Task 8: AI config + system moderator user
+
+> **Open (2026-09-30):** `ai.features.moderation.system_user_id` is never defined, so `ApproveModificationJob` returns immediately and AI votes never happen outside the tests; `AI_MODERATOR_USER_ID` appears only in documentation and no code reads it. The seeded defaults also turn moderation off (`features.moderation.enabled` false) where this task set it on.
 
 **Files:**
 
@@ -322,9 +339,9 @@ enum CommentApprovalMode: string
 - Create: `Modules/AI/app/Services/CommentModerationContextBuilder.php`
 - Create: `Modules/AI/tests/Unit/Services/CommentModerationContextBuilderTest.php`
 
-- [ ] **Step 1: Failing test** — given modification with `content_id` + `body` in JSON, builder returns DTO with title + excerpt + comment body
+- [x] **Step 1: Failing test** — given modification with `content_id` + `body` in JSON, builder returns DTO with title + excerpt + comment body
 
-- [ ] **Step 2: Implement**
+- [x] **Step 2: Implement**
 
 ```php
 final readonly class CommentModerationContextBuilder
@@ -349,13 +366,15 @@ final readonly class CommentModerationContextBuilder
 }
 ```
 
-- [ ] **Step 3:** `plainTextExcerpt()` strips HTML/markdown noise from main content field
+- [x] **Step 3:** `plainTextExcerpt()` strips HTML/markdown noise from main content field
 
-- [ ] **Step 4:** Run tests + commit
+- [x] **Step 4:** Run tests + commit
 
 ---
 
 ### Task 10: Prompt + `CommentModerationService` (classifier)
+
+> **Partly open (2026-09-30):** the prompt, `ModerationService` (retry once, uncertain fallback) and result types exist, but the tests are thin: no test runs `analyze()` with a mocked agent for approve, reject and uncertain, and none covers the retry path.
 
 **Files:**
 
@@ -424,7 +443,7 @@ Comment text:
 - Create: `Modules/AI/app/Jobs/ModerateCommentJob.php`
 - Create: `Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php`
 
-- [ ] **Step 1: Failing feature test — uncertain path**
+- [x] **Step 1: Failing feature test — uncertain path**
 
 ```php
 it('casts preliminary disapprove when uncertain', function (): void {
@@ -434,7 +453,7 @@ it('casts preliminary disapprove when uncertain', function (): void {
 });
 ```
 
-- [ ] **Step 2: Implement `handle()`**
+- [x] **Step 2: Implement `handle()`**
 
 ```php
 public function handle(
@@ -510,9 +529,9 @@ public function handle(
 }
 ```
 
-- [ ] **Step 3: Tests for auto-approve and auto-reject paths**
+- [x] **Step 3: Tests for auto-approve and auto-reject paths**
 
-- [ ] **Step 4:** `vendor/bin/pint --dirty` + commit
+- [x] **Step 4:** `vendor/bin/pint --dirty` + commit
 
 ---
 
@@ -523,7 +542,7 @@ public function handle(
 - Create: `Modules/AI/app/Listeners/HandleCommentModerationListener.php`
 - Modify: `Modules/AI/app/Providers/EventServiceProvider.php`
 
-- [ ] **Step 1: Listener**
+- [x] **Step 1: Listener**
 
 On `CommentRequiresModeration`:
 
@@ -531,15 +550,17 @@ On `CommentRequiresModeration`:
 2. Create log `status = queued`
 3. `dispatch(new ModerateCommentJob($event->modification))->onQueue(config(...))`
 
-- [ ] **Step 2: Register** in `$listen` array
+- [x] **Step 2: Register** in `$listen` array
 
-- [ ] **Step 3: Feature test** — event dispatched → job pushed (use `Queue::fake()`)
+- [x] **Step 3: Feature test** — event dispatched → job pushed (use `Queue::fake()`)
 
-- [ ] **Step 4:** Commit
+- [x] **Step 4:** Commit
 
 ---
 
 ### Task 13: Filament — show AI state on Comment modifications
+
+> **Partly open (2026-09-30):** the Modifications table has the `meta` and `disapprovers_required` columns for comments, but no separate status badge, reason column or disapprovals count. The badge colour map compares a concatenated `key: value<br>` string, so it can never match `requires_human_review`, and the callback iterates `latestAutomatedVoteMeta()`, which returns null when no AI vote exists. No test renders these columns.
 
 **Files:**
 
@@ -573,9 +594,9 @@ On `CommentRequiresModeration`:
 - Modify: `Modules/Core/app/Services/Crud/CrudService.php` (`doApproveOperation`)
 - Create: `Modules/Core/tests/Unit/Services/CrudServiceApproveReasonTest.php`
 
-- [ ] **Step 1: Test** — approve with `changes.reason` persists on `Approval.reason`
+- [x] **Step 1: Test** — approve with `changes.reason` persists on `Approval.reason`
 
-- [ ] **Step 2: Change**
+- [x] **Step 2: Change**
 
 ```php
 $reason = $requestData->changes['reason'] ?? null;
@@ -586,11 +607,13 @@ if ($operation === 'approve') {
 }
 ```
 
-- [ ] **Step 3:** Commit
+- [x] **Step 3:** Commit
 
 ---
 
 ### Task 15: End-to-end CMS feature tests
+
+> **Partly open (2026-09-30):** `CommentModerationTest` covers pending-not-listed, human approve, disapprove and rating, but drives the model directly and not the CRUD API, and no test covers a human disapprove following an AI preliminary disapprove.
 
 **Files:**
 
@@ -609,6 +632,8 @@ if ($operation === 'approve') {
 ---
 
 ### Task 16: Final verification
+
+> **Open (2026-09-30):** final verification (Pint, full run, spec status) was not recorded.
 
 - [ ] Run `vendor/bin/pint --dirty`
 - [ ] Run `php artisan test --compact Modules/CMS/tests/Feature/CommentModerationTest.php Modules/AI/tests/Feature/Jobs/ModerateCommentJobTest.php Modules/AI/tests/Unit/Services/CommentModerationServiceTest.php`

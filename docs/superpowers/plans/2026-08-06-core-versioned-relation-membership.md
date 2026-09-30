@@ -8,6 +8,17 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `overtrue/laravel-versionable`, Pest. Module: `Modules/Core`.
 
+## Delivery status (2026-09-30): delivered, reconciled against the code
+
+Milestone-1 scope is delivered: descriptors and ownership, `attachVersioned`/`detachVersioned` writing normalized version rows, membership reconstruction by replay, and the RAG documentation. Reconciled task by task against the code on 2026-09-30; the Core versioning tests (relation descriptor, declaration, capture, membership read, sync, restore) pass together, 62 tests. The unticked boxes left after the 2026-08-06 execution were ticked in this pass.
+
+Divergences and extras:
+- `attachVersioned` is idempotent (it uses `syncWithoutDetaching`), after fix `35e7b8f2`, so Task 3 is stronger than written.
+- `syncVersioned` (`80b40c8d`) and reference-only `restoreToRevision` (`19e86c1c`) were built afterwards, as the Deferred list records.
+- Still deferred, unchanged: owned children (`subject_version_id`), transparent `BelongsToMany` adapters, shared-subject `uuid`, and the CMS pilot.
+
+**Documented in:** `Modules/Core/docs/rag/MODULE.md`.
+
 ## Global Constraints
 
 - Every PHP file starts with `declare(strict_types=1);`.
@@ -42,7 +53,7 @@
 - Produces: `enum RelationOwnership: string { case Reference = 'reference'; case Owned = 'owned'; }`
 - Produces: `final readonly class RelationDescriptor { public function __construct(public string $relation, public RelationOwnership $ownership) {} public function isOwned(): bool; }`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -67,12 +78,12 @@ it('describes an owned relation as owned', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Versioning/RelationDescriptorTest.php`
 Expected: FAIL — `RelationOwnership` / `RelationDescriptor` not found.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 <?php
@@ -111,12 +122,12 @@ final readonly class RelationDescriptor
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Unit/Versioning/RelationDescriptorTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Modules/Core/app/Enums/RelationOwnership.php Modules/Core/app/Versioning/Data/RelationDescriptor.php Modules/Core/tests/Unit/Versioning/RelationDescriptorTest.php
@@ -140,7 +151,7 @@ git commit -m "feat(core): add versioned relation descriptor and ownership enum"
   - `public function versionedRelationDescriptor(string $relation): ?RelationDescriptor` — lookup by relation name.
 - Produces stubs: `VersionedRelationRoot` (uses `HasVersions` + `HasVersionedRelations`, `versionStrategy = DIFF`, `categories(): BelongsToMany`, declares `categories` as `Reference`); `VersionedRelationSubject` (plain model). Pivot table `core_test_versioned_relation_pivot` with `root_id`, `subject_id`, `position`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -165,12 +176,12 @@ it('returns null for an undeclared relation', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationsDeclarationTest.php`
 Expected: FAIL — trait/stubs missing.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Trait:
 
@@ -208,12 +219,12 @@ trait HasVersionedRelations
 
 Stubs (`VersionedRelationRoot`): uses `HasVersions`, `HasVersionedRelations`; `protected VersionStrategy $versionStrategy = VersionStrategy::DIFF;`; `protected array $versionable = ['title'];`; `categories(): BelongsToMany` to `VersionedRelationSubject` on `core_test_versioned_relation_pivot` with pivot `position`; `versionedRelations()` returns `[new RelationDescriptor('categories', RelationOwnership::Reference)]`. `VersionedRelationSubject` is a plain `Model` with `$guarded = []`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationsDeclarationTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Modules/Core/app/Models/Concerns/HasVersionedRelations.php Modules/Core/tests/Stubs/Versioning/Relations Modules/Core/tests/Integration/Versioning/VersionedRelationsDeclarationTest.php
@@ -240,7 +251,7 @@ git commit -m "feat(core): declare versioned relations via HasVersionedRelations
 - A membership version row's `versionable` is the root itself; the subject is identified only by `subjectKey`. Use `VersionStrategy::SNAPSHOT` so each membership event is self-contained.
 - Guard: if `versionedRelationDescriptor($relation)` is null, throw `InvalidArgumentException` (undeclared relation is not versioned).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -319,12 +330,12 @@ it('rejects an undeclared relation', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationCaptureTest.php`
 Expected: FAIL — `attachVersioned`/`detachVersioned` not defined.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Add to `HasVersionedRelations` (imports: `InvalidArgumentException`, `VersionSetManagerInterface`, `VersionSetRoot`, `VersionSetOptions`, `VersionWriterInterface`, `VersionChange`, `VersionChangeType`, `VersionStrategy`):
 
@@ -369,12 +380,12 @@ private function recordRelationMembership(string $relation, int|string $subjectI
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationCaptureTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Modules/Core/app/Models/Concerns/HasVersionedRelations.php Modules/Core/tests/Integration/Versioning/VersionedRelationCaptureTest.php
@@ -395,7 +406,7 @@ git commit -m "feat(core): capture reference-relation membership as version rows
 
 **Design notes:** query `$this->versions()->where('relation_path', $relation)->orderBy('version_set_id')->orderBy('sequence')->get()`, fold into a keyed map, return `array_values`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```php
 <?php
@@ -450,12 +461,12 @@ it('reconstructs membership by replaying attach and detach events', function ():
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationMembershipReadTest.php`
 Expected: FAIL — `versionedRelationMembership` not defined.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```php
 public function versionedRelationMembership(string $relation): array
@@ -488,12 +499,12 @@ public function versionedRelationMembership(string $relation): array
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `php artisan test --compact Modules/Core/tests/Integration/Versioning/VersionedRelationMembershipReadTest.php`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Modules/Core/app/Models/Concerns/HasVersionedRelations.php Modules/Core/tests/Integration/Versioning/VersionedRelationMembershipReadTest.php
@@ -509,11 +520,11 @@ git commit -m "feat(core): reconstruct versioned relation membership from histor
 
 **Interfaces:** none (docs).
 
-- [ ] **Step 1: Add a paragraph after the versioning-flow description**
+- [x] **Step 1: Add a paragraph after the versioning-flow description**
 
 Document: `HasVersionedRelations` declares versioned relations with `RelationOwnership` (`reference`/`owned`); `attachVersioned`/`detachVersioned` write one membership version row per subject inside a version set (`relation_path` + `subject_key` + `contents` = pivot, `change_type` `Created`/`Deleted`, `SNAPSHOT`); `versionedRelationMembership()` reconstructs current membership by replaying those events. Note that owned children (`subject_version_id`), restore, transparent relation adapters, and shared-subject `uuid` are not yet implemented.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add Modules/Core/docs/rag/MODULE.md

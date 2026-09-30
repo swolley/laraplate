@@ -8,6 +8,20 @@
 
 **Tech Stack:** PHP 8.5, Laravel 12, `nwidart/laravel-modules` 12, Pest 4, PHPStan/Larastan 3, Pint. No HTTP client work in this phase.
 
+## Delivery status (2026-09-30): delivered, reconciled against the code
+
+All seven tasks are delivered and the SAO driver, enum and connection tests pass together (151 tests). Reconciled task by task against the code on 2026-09-30; the boxes left unticked after execution were ticked in this pass.
+
+Divergences from the plan as written:
+- The in-memory driver and the conformance suite live in `tests/Support/` (`Modules\SAO\Tests\Support\`), not `tests/Stubs/`.
+- `DriverInterface::healthCheck` takes a `ConnectionContext`, not a `Connection`, and operations take a `BindingContext`, which keeps `app/Drivers` free of persistence.
+- `Capability` has grown from four to six cases (`deploy`, `code`), with the matching contracts, and the registry ships 23 drivers by default, not an empty list.
+- `ConnectionCredentialResolverTest` sits in `tests/Feature/Drivers`; the `Connection` factory is in `database/factories`.
+
+The "Known gaps" below were closed by later phases (see that section).
+
+**Documented in:** `Modules/SAO/docs/rag/MODULE.md`, `Modules/SAO/docs/rag/DRIVERS_USER.md`.
+
 ## Global Constraints
 
 - **Spec:** `docs/superpowers/specs/2026-08-15-sao-phase-3a-driver-framework-foundation-design.md` (phase-3a design, decisions F1–F8), rooted in `docs/superpowers/specs/2026-07-31-sao-module-design.md` §4/§5/§12. This plan implements slice 3a; the Redmine driver and sync direction (the spec's phase-3 `3b` row) are deferred.
@@ -35,11 +49,11 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 `Capability`: `Vcs='vcs'`, `Issues='issues'`, `Releases='releases'`, `Logs='logs'`. `IngestMode`: `Push='push'`, `Pull='pull'`, `InProcess='in_process'`.
 
-- [ ] **Step 1: Write the failing test** — assert each enum resolves from its wire string (`Capability::from('issues')`), that `Capability::cases()` has exactly the four families, and that a bogus value throws.
-- [ ] **Step 2: Run the test to verify it fails** (enums do not exist yet).
-- [ ] **Step 3: Create the two enums** with the backing values above.
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): capability and ingest-mode enums`).
+- [x] **Step 1: Write the failing test** — assert each enum resolves from its wire string (`Capability::from('issues')`), that `Capability::cases()` has exactly the four families, and that a bogus value throws.
+- [x] **Step 2: Run the test to verify it fails** (enums do not exist yet).
+- [x] **Step 3: Create the two enums** with the backing values above.
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Format, analyse and commit** (`feat(sao): capability and ingest-mode enums`).
 
 ---
 
@@ -56,11 +70,11 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 `DriverInterface` declares: `key(): string`, `capabilities(): list<Capability>`, `ingestModes(): list<IngestMode>`, `configurationSchema(): DriverConfigurationSchema`, `healthCheck(Connection $connection): HealthCheckResult`. Per-capability contracts declare only method signatures returning `Page` for list operations (e.g. `IssuesCapability::lookup`, `create`, `update`, `comment`, `translateStatus`; `VcsCapability::commits(): Page`, `compare`, `fileAtRef`, `openPullRequest`; `LogsCapability::verifySignature`, `unpack(): Page`, `carriesNativeGroupKey(): bool`; `ReleasesCapability::tags(): Page`, `firstTagContaining`).
 
-- [ ] **Step 1: Write the failing test** — in `tests/Unit/Drivers/DriverContractTest.php`, create a fake driver in `tests/Stubs/Drivers/` implementing `DriverInterface` + `IssuesCapability`; assert it advertises `Capability::Issues`, exposes a configuration schema whose secret fields are flagged, and that `instanceof` checks per capability work.
-- [ ] **Step 2: Run the test to verify it fails.**
-- [ ] **Step 3: Create the contracts and value objects.**
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): driver base and per-capability contracts`).
+- [x] **Step 1: Write the failing test** — in `tests/Unit/Drivers/DriverContractTest.php`, create a fake driver in `tests/Stubs/Drivers/` implementing `DriverInterface` + `IssuesCapability`; assert it advertises `Capability::Issues`, exposes a configuration schema whose secret fields are flagged, and that `instanceof` checks per capability work.
+- [x] **Step 2: Run the test to verify it fails.**
+- [x] **Step 3: Create the contracts and value objects.**
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Format, analyse and commit** (`feat(sao): driver base and per-capability contracts`).
 
 ---
 
@@ -72,11 +86,11 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 `DriverRegistry`: `register(DriverInterface $driver): void` (keyed by `key()`, last registration wins with a documented rule or throws on duplicate — pick throw-on-duplicate to catch collisions early), `has(string $key): bool`, `get(string $key): DriverInterface` (throws `UnknownDriverException` when absent), `all(): list<DriverInterface>`, `withCapability(Capability $c): list<DriverInterface>`. Registered as a singleton so any provider can contribute.
 
-- [ ] **Step 1: Write the failing test** — register a stub driver, resolve it, filter by capability, and assert `get('nope')` throws `UnknownDriverException` and duplicate registration throws.
-- [ ] **Step 2: Run the test to verify it fails.**
-- [ ] **Step 3: Create the registry and exception.**
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): open driver registry`).
+- [x] **Step 1: Write the failing test** — register a stub driver, resolve it, filter by capability, and assert `get('nope')` throws `UnknownDriverException` and duplicate registration throws.
+- [x] **Step 2: Run the test to verify it fails.**
+- [x] **Step 3: Create the registry and exception.**
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Format, analyse and commit** (`feat(sao): open driver registry`).
 
 ---
 
@@ -92,11 +106,11 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 `sao_connections` columns: `id`, `driver_key` (string, indexed), `name` (string), `base_url` (string, nullable), `credential` (text, nullable — Laravel `encrypted` cast; JSON payload for multi-field secrets; **write-only**, never rendered back), `credential_ref` (string, nullable — an env/config key that, when set, overrides `credential`), `capabilities` (json — a subset of the driver's declared capabilities), `health_state` (string enum-backed: `unknown`/`healthy`/`unhealthy`, default `unknown`), `last_checked_at` (nullable), Core timestamps + soft deletes. `Connection` casts `capabilities` to `list<Capability>` and `credential` to `encrypted:array`, and exposes `driver(DriverRegistry): DriverInterface`. A model invariant rejects a `capabilities` value not ⊆ the driver's `capabilities()`.
 
-- [ ] **Step 1: Write the failing test** — a factory-made connection persists; `capabilities` round-trips as `Capability` instances; the **raw DB value of `credential` is ciphertext** (assert the stored column does not contain the plaintext secret) while the model attribute decrypts to the array; declaring a capability the driver does not expose is rejected.
-- [ ] **Step 2: Run the test to verify it fails.**
-- [ ] **Step 3: Create the migration, model, factory, and `SAOTables` entry.**
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): connection model with encrypted credentials and env override`).
+- [x] **Step 1: Write the failing test** — a factory-made connection persists; `capabilities` round-trips as `Capability` instances; the **raw DB value of `credential` is ciphertext** (assert the stored column does not contain the plaintext secret) while the model attribute decrypts to the array; declaring a capability the driver does not expose is rejected.
+- [x] **Step 2: Run the test to verify it fails.**
+- [x] **Step 3: Create the migration, model, factory, and `SAOTables` entry.**
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Format, analyse and commit** (`feat(sao): connection model with encrypted credentials and env override`).
 
 ---
 
@@ -108,11 +122,11 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 `ConnectionCredentialResolver::resolve(Connection $connection): array` is the single sanctioned path from a `Connection` to its secret. Resolution order: if `credential_ref` is set, read from `config()`/env by that key; otherwise return the decrypted `credential` array. It returns the value for in-memory use and **never** writes it back or logs it. A connection with neither source throws `MissingCredentialException`.
 
-- [ ] **Step 1: Write the failing test** — (a) with `credential_ref` set, a config value is returned and the column is ignored; (b) with only `credential` set, the decrypted array is returned; (c) with neither, `MissingCredentialException` is thrown; assert the resolver never mutates the connection.
-- [ ] **Step 2: Run the test to verify it fails.**
-- [ ] **Step 3: Create the resolver and exception.**
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Format, analyse and commit** (`feat(sao): environment credential resolver for connections`).
+- [x] **Step 1: Write the failing test** — (a) with `credential_ref` set, a config value is returned and the column is ignored; (b) with only `credential` set, the decrypted array is returned; (c) with neither, `MissingCredentialException` is thrown; assert the resolver never mutates the connection.
+- [x] **Step 2: Run the test to verify it fails.**
+- [x] **Step 3: Create the resolver and exception.**
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Format, analyse and commit** (`feat(sao): environment credential resolver for connections`).
 
 ---
 
@@ -126,12 +140,12 @@ The parent spec is internally in tension: §4 says `Connection` holds "encrypted
 
 The conformance helpers assert: capability list operations return a `Page`; requesting beyond one page follows `nextCursor` to completion (the fixture holds more items than the page size, proving no first-page-only bug); lookups by key behave; status translation is driven by the binding-provided map, not hardcoded (the map is passed in, defaults proposed by the driver). The `InMemoryDriver` exists **only** in test support and proves the whole stack — registry → connection → credential resolver → capability calls — runs offline.
 
-- [ ] **Step 1: Write the failing test** — `InMemoryDriverConformanceTest` runs the `issues` and `releases` conformance batteries against `InMemoryDriver`, including the multi-page fixture.
-- [ ] **Step 2: Run the test to verify it fails.**
-- [ ] **Step 3: Create the conformance helpers and the in-memory driver.**
-- [ ] **Step 4: Run the test to verify it passes.**
-- [ ] **Step 5: Register the autoload-dev namespaces** in `Modules/SAO/composer.json` for the new `Stubs`/`Support` paths if not already covered; `composer dump-autoload`.
-- [ ] **Step 6: Format, analyse and commit** (`test(sao): per-capability conformance suite with in-memory driver`).
+- [x] **Step 1: Write the failing test** — `InMemoryDriverConformanceTest` runs the `issues` and `releases` conformance batteries against `InMemoryDriver`, including the multi-page fixture.
+- [x] **Step 2: Run the test to verify it fails.**
+- [x] **Step 3: Create the conformance helpers and the in-memory driver.**
+- [x] **Step 4: Run the test to verify it passes.**
+- [x] **Step 5: Register the autoload-dev namespaces** in `Modules/SAO/composer.json` for the new `Stubs`/`Support` paths if not already covered; `composer dump-autoload`.
+- [x] **Step 6: Format, analyse and commit** (`test(sao): per-capability conformance suite with in-memory driver`).
 
 ---
 
@@ -142,10 +156,10 @@ The conformance helpers assert: capability list operations return a `Page`; requ
 - Edit: `Modules/SAO/docs/rag/MODULE.md` (add a "Driver framework" developer section: the open registry, capability contracts, the `Connection` = configured instance rule, env-referenced credentials per §5, and the conformance-suite contract that a driver "is done when it passes conformance")
 - Create: `Modules/SAO/docs/rag/DRIVERS_USER.md` (audience: user, cross_cutting_user: false — a short operator-facing note that external connections do not exist yet and that configuring one will, in a later phase, generate its form from the driver's schema; secrets come from the environment, product settings from the UI)
 
-- [ ] **Step 1** — wire the registry singleton and the registration extension point; assert via a small feature test that the container resolves `DriverRegistry` and that registering a stub through the provider hook makes it resolvable.
-- [ ] **Step 2** — add the config section and both doc updates.
-- [ ] **Step 3: Run the full SAO suite** (`php artisan test --compact Modules/SAO`) and confirm green.
-- [ ] **Step 4: Format, analyse and commit** (`feat(sao): register driver framework and document it`).
+- [x] **Step 1** — wire the registry singleton and the registration extension point; assert via a small feature test that the container resolves `DriverRegistry` and that registering a stub through the provider hook makes it resolvable.
+- [x] **Step 2** — add the config section and both doc updates.
+- [x] **Step 3: Run the full SAO suite** (`php artisan test --compact Modules/SAO`) and confirm green.
+- [x] **Step 4: Format, analyse and commit** (`feat(sao): register driver framework and document it`).
 
 ---
 
@@ -158,6 +172,8 @@ The conformance helpers assert: capability list operations return a `Page`; requ
 5. `php artisan test --compact Modules/SAO` is green; Pint and PHPStan clean; RAG docs updated.
 
 ## Known gaps carried into Phase 3b
+
+> **Resolved by later phases (checked 2026-09-30):** a Redmine driver and 22 more external drivers exist under `app/Drivers/External/`; `ProjectBinding`, `TicketLink` and `IssueSyncService` (phase 3b) provide synchronization; a Filament `ConnectionResource` exists. The `vcs`/`logs` conformance batteries and the remaining items below are as originally written.
 
 - No concrete external driver (Redmine is the spec's phase-3 first driver) and no HTTP client, signature verification, or real credential rotation.
 - No ticket synchronization / sync direction, no `ProjectBinding`, no status-map persistence UI — the conformance suite exercises the map as passed-in data only.

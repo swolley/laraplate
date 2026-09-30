@@ -12,7 +12,15 @@
 
 ---
 
+## Reconciliation (2026-09-30)
+
+Reconciled task by task against the code. The runtime behaviour is delivered across Core, CMS, ERP and the seeders, and the architecture guard passes with an empty baseline. Tasks 1, 3, 4, 5, 6 and 8 are ticked; Tasks 2 and 7 keep one step open each (see their notes).
+
+**Direction change, decided 2026-09-04** (`docs/database-connection-affinity-audit.md`, `AGENTS.md`): the native modules share one schema and one connection, `core.model_connections` and `erp.model_connections` are frozen with no new entries, and `ConnectionScoped*` and `ErpConnectionContext` are not to be used by new code. The premise of this plan, that a model can move to another connection, is therefore code discipline and not a supported relocation. The plan is not closed and carries no delivery status until the two open steps are settled.
+
 ### Task 1: Project Rule and Runtime Guard
+
+> **Divergence (2026-09-30):** the rule lives in `.cursor/rules/09-database-guidelines.mdc` and the invariant in `AGENTS.md` ("derive queries and transactions from the owning model"); the `CLAUDE.md` mirror the task described was not kept. The guard is an AST detector (`DatabaseConnectionAffinityTest`) with an empty baseline.
 
 **Files:**
 - Modify: `.cursor/rules/09-database-guidelines.mdc`
@@ -21,7 +29,7 @@
 - Create: `Modules/Core/tests/Unit/Architecture/DatabaseConnectionAffinityTest.php`
 - Create: `Modules/Core/tests/Fixtures/Architecture/database-connection-affinity-baseline.php`
 
-- [ ] **Step 1: Write the architecture test with a self-checking detector**
+- [x] **Step 1: Write the architecture test with a self-checking detector**
 
 Create a Pest test that tokenizes PHP files under `Modules/*/app` and `app`, records executable static calls to `DB::table`, `DB::transaction`, `DB::beginTransaction`, `DB::commit`, and `DB::rollBack`, and ignores comments and strings. Prove the detector itself with these fixtures before scanning the repository:
 
@@ -51,13 +59,13 @@ it('does not add unscoped runtime database operations', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run the detector fixture and capture the runtime baseline**
+- [x] **Step 2: Run the detector fixture and capture the runtime baseline**
 
 Run: `rtk php artisan test --compact Modules/Core/tests/Unit/Architecture/DatabaseConnectionAffinityTest.php`
 
 Expected: the detector fixture proves violations are recognized. Store the current repository violations in `Modules/Core/tests/Fixtures/Architecture/database-connection-affinity-baseline.php`, make the repository assertion fail on any addition to that baseline, and require subsequent tasks to shrink it as calls are corrected.
 
-- [ ] **Step 3: Add the connection-affinity rule**
+- [x] **Step 3: Add the connection-affinity rule**
 
 Broaden the rule glob to runtime PHP and add these requirements in English:
 
@@ -75,7 +83,7 @@ Broaden the rule glob to runtime PHP and add these requirements in English:
 
 Mirror the short invariant in `CLAUDE.md` after “Avoid `DB::`; prefer `Model::query()`,” and update the rule index description to mention multiple configured connections.
 
-- [ ] **Step 4: Commit the passing guard, baseline, and documentation**
+- [x] **Step 4: Commit the passing guard, baseline, and documentation**
 
 ```bash
 git add .cursor/rules/09-database-guidelines.mdc .cursor/rules/README.md CLAUDE.md Modules/Core/tests/Unit/Architecture/DatabaseConnectionAffinityTest.php Modules/Core/tests/Fixtures/Architecture/database-connection-affinity-baseline.php
@@ -83,6 +91,8 @@ git commit -m "test: guard model connection affinity"
 ```
 
 ### Task 2: Core Model Traits and Shared Query Services
+
+> **Partly open (2026-09-30):** Step 1 stays unticked. `HasClosureTable`, `AclResolverService` and `CrudService` have non-default-connection tests, but `PresetVersioningService` has none; the code is connection-derived and unproven.
 
 **Files:**
 - Modify: `Modules/Core/app/Models/Concerns/HasClosureTable.php`
@@ -119,7 +129,7 @@ afterEach(function (): void {
 
 Assert that closure rows, ACL pivots, preset versions, and CRUD mutations are written on `affinity` and absent from the default connection.
 
-- [ ] **Step 2: Run the four focused suites and verify connection failures**
+- [x] **Step 2: Run the four focused suites and verify connection failures**
 
 Run:
 
@@ -132,7 +142,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Services/CrudServi
 
 Expected: new affinity cases fail because current direct builders or transaction boundaries still use the default connection.
 
-- [ ] **Step 3: Route direct builders through the owning model**
+- [x] **Step 3: Route direct builders through the owning model**
 
 Use the model instance as the common source for connection and table:
 
@@ -148,7 +158,7 @@ $this->getConnection()->table($this->getClosureTable());
 
 For ACL tables, resolve the permission/user model once and reuse its connection for every related pivot query. Do not introduce `DB::connection(config('database.default'))`.
 
-- [ ] **Step 4: Route transaction boundaries through the aggregate root**
+- [x] **Step 4: Route transaction boundaries through the aggregate root**
 
 Replace facade transactions with the resolved model connection:
 
@@ -160,13 +170,13 @@ $model->getConnection()->transaction(function () use ($model): void {
 
 When a collection is the input, obtain the connection from its first model and reject mixed connection names before entering the transaction.
 
-- [ ] **Step 5: Re-run focused suites and Core static analysis**
+- [x] **Step 5: Re-run focused suites and Core static analysis**
 
 Run the four test commands from Step 2, followed by `rtk composer analyse`.
 
 Expected: all focused tests pass and PHPStan reports no new errors.
 
-- [ ] **Step 6: Commit Core shared behavior**
+- [x] **Step 6: Commit Core shared behavior**
 
 ```bash
 git add Modules/Core/app/Models/Concerns/HasClosureTable.php Modules/Core/app/Observers/FieldObserver.php Modules/Core/app/Services/AclResolverService.php Modules/Core/app/Services/PresetVersioningService.php Modules/Core/app/Services/Crud/CrudService.php Modules/Core/tests
@@ -174,6 +184,8 @@ git commit -m "fix: preserve model connections in core queries"
 ```
 
 ### Task 3: Core Commands, Widgets, Seed Infrastructure, and Utilities
+
+> **Note (2026-09-30):** `Grid.php` and `HasGridUtils.php` no longer exist (the grid surface was removed in `663a1129`), so their steps are moot.
 
 **Files:**
 - Modify: `Modules/Core/app/Console/CompactVersions.php`
@@ -195,11 +207,11 @@ git commit -m "fix: preserve model connections in core queries"
 - Modify: `Modules/Core/tests/Integration/Helpers/HasSeedersUtilsTest.php`
 - Modify: `Modules/Core/tests/Stubs/Benchmark/BenchmarkHarness.php`
 
-- [ ] **Step 1: Add failing affinity cases for commands, seeders, and benchmarks**
+- [x] **Step 1: Add failing affinity cases for commands, seeders, and benchmarks**
 
 Extend the existing tests so the selected model is assigned to `affinity`, then assert command mutations, seeded rows, and query-log measurements occur on that connection. Use `DB::connection('affinity')->getQueryLog()` only when the test is intentionally inspecting the named connection.
 
-- [ ] **Step 2: Verify the new cases fail on the default-connection implementations**
+- [x] **Step 2: Verify the new cases fail on the default-connection implementations**
 
 Run:
 
@@ -210,7 +222,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Helpers/HasSeeders
 
 Expected: affinity assertions fail before implementation.
 
-- [ ] **Step 3: Make every utility accept or derive a connection**
+- [x] **Step 3: Make every utility accept or derive a connection**
 
 Use a model instance where available. For model-less infrastructure helpers, add an `Illuminate\Database\ConnectionInterface` or trusted connection-name parameter and pass it from the caller. Query logs and PDO calls must use that same connection object:
 
@@ -222,7 +234,7 @@ $connection->getPdo()->lastInsertId();
 
 Remove dead commented examples of unscoped facade transactions from Grid code so the architecture guard describes executable policy without stale counterexamples.
 
-- [ ] **Step 4: Re-run affected tests**
+- [x] **Step 4: Re-run affected tests**
 
 Run the commands from Step 2 and these existing focused suites:
 
@@ -236,7 +248,7 @@ rtk php artisan test --compact Modules/Core/tests/Integration/Grids/HasGridUtils
 
 Expected: all discovered focused suites pass.
 
-- [ ] **Step 5: Commit Core infrastructure changes**
+- [x] **Step 5: Commit Core infrastructure changes**
 
 ```bash
 git add Modules/Core/app Modules/Core/tests
@@ -255,25 +267,25 @@ git commit -m "fix: scope core infrastructure database operations"
 - Modify: `Modules/CMS/tests/Feature/Import/ImportCommandTest.php`
 - Modify: `Modules/CMS/tests/Feature/Import/Stubs/FakeBulkImporter.php`
 
-- [ ] **Step 1: Add failing import tests using a non-default connection**
+- [x] **Step 1: Add failing import tests using a non-default connection**
 
 Give the fake importer and CMS models an `affinity` connection. Assert imported rows, origin records, contributor matches, location matches, and rollback behavior all operate there. Add an explicit failure case for an import graph that reports mixed connection names; it must fail before mutations begin rather than claiming cross-database atomicity.
 
-- [ ] **Step 2: Run the import suite and verify expected failures**
+- [x] **Step 2: Run the import suite and verify expected failures**
 
 Run: `rtk php artisan test --compact Modules/CMS/tests/Feature/Import/ImportCommandTest.php`
 
 Expected: the affinity and mixed-connection cases fail under default `DB` transactions/builders.
 
-- [ ] **Step 3: Pass the target connection through the import pipeline**
+- [x] **Step 3: Pass the target connection through the import pipeline**
 
 Resolve one connection from the import target model, pass its `ConnectionInterface` through runner and matcher constructors/methods, and use `$connection->table(...)`. Validate every model participating in a transactional import has the same resolved connection name before calling `$connection->transaction(...)`.
 
-- [ ] **Step 4: Make the CMS seeder model-bound**
+- [x] **Step 4: Make the CMS seeder model-bound**
 
 Resolve the seeded model connection once and wrap seeding transactions with that connection. Keep `DB::raw()` expressions unchanged when they are attached to an already scoped builder.
 
-- [ ] **Step 5: Re-run CMS import and model suites**
+- [x] **Step 5: Re-run CMS import and model suites**
 
 Run:
 
@@ -285,7 +297,7 @@ rtk php artisan test --compact Modules/CMS/tests/Feature/Models/TagTest.php
 
 Expected: all pass.
 
-- [ ] **Step 6: Commit CMS connection affinity**
+- [x] **Step 6: Commit CMS connection affinity**
 
 ```bash
 git add Modules/CMS/app/Import Modules/CMS/database/seeders Modules/CMS/tests/Feature/Import
@@ -293,6 +305,8 @@ git commit -m "fix: preserve model connections during cms imports"
 ```
 
 ### Task 5: ERP Aggregate Transactions and Installers
+
+> **Replaced (2026-09-30):** the 27 services use `ConnectionScopedTransaction::run` (it rejects mixed connections) instead of `$aggregate->getConnection()->transaction`. Per the 2026-09-04 decision that abstraction is frozen (`AGENTS.md`, `docs/database-connection-affinity-audit.md`): no new use. Affinity tests exist for the main families; dedicated ones for `SalesOrderAmendment`, `BankReconciliation`, `FxRevaluation` and `PaymentRunBuilder` do not.
 
 **Files:**
 - Modify: `Modules/ERP/app/Services/Accounting/ChartOfAccountsInstaller.php`
@@ -324,11 +338,11 @@ git commit -m "fix: preserve model connections during cms imports"
 - Modify: `Modules/ERP/app/Services/Taxation/TaxCodeSupersessionService.php`
 - Test: closest corresponding files under `Modules/ERP/tests/Feature/Services`
 
-- [ ] **Step 1: Add representative failing affinity tests by aggregate family**
+- [x] **Step 1: Add representative failing affinity tests by aggregate family**
 
 Add one non-default connection case for accounting, banking, inventory, payments, returns, and sales orders. Each case must pass an aggregate root on `affinity`, perform one mutation, and assert both the row location and transaction connection. Add a mixed-connection rejection case wherever a service accepts two independently resolved aggregates.
 
-- [ ] **Step 2: Run the representative suites and confirm failures**
+- [x] **Step 2: Run the representative suites and confirm failures**
 
 Run:
 
@@ -344,7 +358,7 @@ rtk php artisan test --compact Modules/ERP/tests/Feature/Services/FxRevaluationS
 
 Expected: new affinity assertions fail before refactoring.
 
-- [ ] **Step 3: Convert each transaction to its aggregate connection**
+- [x] **Step 3: Convert each transaction to its aggregate connection**
 
 For every listed service, identify the aggregate root already passed to the public method and replace the facade boundary with:
 
@@ -356,13 +370,13 @@ $aggregate->getConnection()->transaction(
 
 For installer services that receive a model class or company identifier, instantiate/resolve the owning model first and reuse its connection. Do not silently choose the first connection when multiple participating models disagree; throw `LogicException` before opening the transaction.
 
-- [ ] **Step 4: Re-run all ERP service tests**
+- [x] **Step 4: Re-run all ERP service tests**
 
 Run: `rtk php artisan test --compact Modules/ERP/tests/Feature/Services`
 
 Expected: all ERP service tests pass.
 
-- [ ] **Step 5: Commit ERP runtime changes**
+- [x] **Step 5: Commit ERP runtime changes**
 
 ```bash
 git add Modules/ERP/app/Services Modules/ERP/tests/Feature/Services
@@ -370,6 +384,8 @@ git commit -m "fix: bind erp transactions to aggregate connections"
 ```
 
 ### Task 6: Migration and Schema Connection Context
+
+> **Note (2026-09-30):** six of the listed migrations no longer exist; their changes were folded into the create migrations, as this repository does while the schema is rebuilt with `migrate:fresh`.
 
 **Files:**
 - Modify: `Modules/Core/app/Helpers/MigrateUtils.php`
@@ -387,17 +403,17 @@ git commit -m "fix: bind erp transactions to aggregate connections"
 - Modify: `Modules/ERP/database/migrations/2026_07_11_140257_add_unit_price_to_return_lines_tables.php`
 - Modify: `Modules/Core/tests/Feature/Inspector/SchemaInspectorTest.php`
 
-- [ ] **Step 1: Add a failing migration-context test**
+- [x] **Step 1: Add a failing migration-context test**
 
 Configure `affinity` SQLite, run a representative anonymous migration or helper against `Schema::connection('affinity')`, and assert all raw statements and driver detection use `affinity` while the default schema remains unchanged.
 
-- [ ] **Step 2: Run the focused migration test and verify default leakage**
+- [x] **Step 2: Run the focused migration test and verify default leakage**
 
 Run: `rtk php artisan test --compact Modules/Core/tests/Feature/Inspector/SchemaInspectorTest.php`
 
 Expected: the new case fails because helper `DB::statement()`/driver calls resolve the default connection.
 
-- [ ] **Step 3: Pass the active schema connection into helpers**
+- [x] **Step 3: Pass the active schema connection into helpers**
 
 Change migration helpers to accept the active `ConnectionInterface` or derive it from the supplied Blueprint/Schema builder. Use:
 
@@ -410,7 +426,7 @@ $connection->afterCommit($callback);
 
 Update every listed migration call site. Preserve existing driver branches and SQLite-safe fallbacks.
 
-- [ ] **Step 4: Verify migrations from a clean SQLite database**
+- [x] **Step 4: Verify migrations from a clean SQLite database**
 
 Run:
 
@@ -421,7 +437,7 @@ rtk php artisan test --compact Modules/Core/tests/Feature/Inspector/SchemaInspec
 
 Expected: migrations complete and the focused test passes.
 
-- [ ] **Step 5: Commit migration context changes**
+- [x] **Step 5: Commit migration context changes**
 
 ```bash
 git add Modules/Core/app/Helpers/MigrateUtils.php Modules/ERP/app/Helpers/ERPMigrateUtils.php Modules/Core/database/migrations Modules/ERP/database/migrations Modules/Core/tests/Feature/Inspector/SchemaInspectorTest.php
@@ -429,6 +445,8 @@ git commit -m "fix: preserve active connection in migration sql"
 ```
 
 ### Task 7: Seeders, Tests, Benchmarks, and Diagnostic Queries
+
+> **Partly open (2026-09-30):** Step 1 stays unticked. Seeders and benchmarks are connection-derived, but about 50 implicit `DB::table/select/insert/update/delete` calls remain in `Modules/*/tests` (more counting `DB::listen` and query-log calls); the guard does not scan tests, and the audit document classes them as intentional default-connection tests where the plan asked for an explicit `DB::connection(config('database.default'))`.
 
 **Files:**
 - Modify: `Modules/Core/database/seeders/CoreDatabaseSeeder.php`
@@ -479,15 +497,15 @@ $model->getConnection()->table($model->getTable());
 
 For pivot and translation tables, use the connection of the parent model whose relation owns the table. For intentional default-connection tests, use `DB::connection(config('database.default'))` and make the intent explicit in the test name.
 
-- [ ] **Step 2: Scope seeder transactions and direct writes**
+- [x] **Step 2: Scope seeder transactions and direct writes**
 
 Resolve the seeded root model connection once per seeder and use its transaction/builder. If a seeder intentionally spans connections, split it into one transaction per connection and do not promise atomic rollback between them.
 
-- [ ] **Step 3: Scope benchmark and diagnostic state**
+- [x] **Step 3: Scope benchmark and diagnostic state**
 
 Replace facade-global query-log calls with the measured model connection. Ensure `enableQueryLog`, `getQueryLog`, `flushQueryLog`, and `disableQueryLog` all execute on the same connection object.
 
-- [ ] **Step 4: Run all directly affected test files**
+- [x] **Step 4: Run all directly affected test files**
 
 Run:
 
@@ -499,7 +517,7 @@ rtk php artisan test --compact Modules/ERP/tests
 
 Expected: all suites pass.
 
-- [ ] **Step 5: Commit test and seeder consistency**
+- [x] **Step 5: Commit test and seeder consistency**
 
 ```bash
 git add Modules/Core/database/seeders Modules/CMS/database/seeders Modules/ERP/database/seeders Modules/Core/tests Modules/CMS/tests Modules/ERP/tests
@@ -513,7 +531,7 @@ git commit -m "test: use owning model database connections"
 - Modify: `Modules/Core/tests/Fixtures/Architecture/database-connection-affinity-baseline.php`
 - Create: `docs/database-connection-affinity-audit.md`
 
-- [ ] **Step 1: Re-scan every facade operation**
+- [x] **Step 1: Re-scan every facade operation**
 
 Run:
 
@@ -523,13 +541,13 @@ rtk rg -n "DB::" app Modules database tests --glob '*.php'
 
 Classify each remainder in the audit document as one of: connection-neutral expression, explicit connection lifecycle/diagnostic operation, migration-context operation, or intentional default-connection test. The document must contain no unexplained occurrence.
 
-- [ ] **Step 2: Run the architecture guard and make it green**
+- [x] **Step 2: Run the architecture guard and make it green**
 
 Run: `rtk php artisan test --compact Modules/Core/tests/Unit/Architecture/DatabaseConnectionAffinityTest.php`
 
 Expected: detector fixtures and repository assertion pass with an empty baseline. If a legitimate runtime operation remains, require an explicit connection at the call site instead of adding a broad file allowlist.
 
-- [ ] **Step 3: Format and analyze changed PHP**
+- [x] **Step 3: Format and analyze changed PHP**
 
 Run:
 
@@ -540,7 +558,7 @@ rtk composer analyse
 
 Expected: Pint completes and PHPStan reports no errors.
 
-- [ ] **Step 4: Run the complete backend verification**
+- [x] **Step 4: Run the complete backend verification**
 
 Run:
 
@@ -551,7 +569,7 @@ rtk php artisan test --compact
 
 Expected: clean SQLite migration and all Pest tests pass.
 
-- [ ] **Step 5: Verify scope and preserve the existing user change**
+- [x] **Step 5: Verify scope and preserve the existing user change**
 
 Run:
 
@@ -563,7 +581,7 @@ rtk git diff --submodule=short
 
 Expected: no whitespace errors; the pre-existing modified `Modules/AI` submodule remains untouched and is not staged.
 
-- [ ] **Step 6: Commit the final guard and audit**
+- [x] **Step 6: Commit the final guard and audit**
 
 ```bash
 git add Modules/Core/tests/Unit/Architecture/DatabaseConnectionAffinityTest.php Modules/Core/tests/Fixtures/Architecture/database-connection-affinity-baseline.php docs/database-connection-affinity-audit.md

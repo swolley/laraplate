@@ -33,6 +33,12 @@ Ordine di consegna tecnico: dominio + test (Task 0–13) prima di API/Filament (
 
 ---
 
+## Reconciliation (2026-09-30)
+
+Reconciled task by task against the code. The domain services and their tests are largely delivered (the MES suite passes: 127 tests). Tasks 0, 1, 2, 8, 9, 10 and 13 are ticked (Tasks 2 and 8 as replaced). Every other task keeps its boxes and carries a note naming exactly what is missing; the main gaps are the BOM and routing lock (`assertNotLocked` is never called), the `ProductionOrder` observer and typed events, the capacity and downtime integration, the Filament calendar, BOM lines, relation managers and actions, the invariants test and the stale glossaries and README. The plan is not closed and carries no delivery status.
+
+The "Current Truth" table below describes the code on 2026-07-09 and is historical; the later sections and these notes override it.
+
 ## Current Truth (stato codice al 2026-07-09)
 
 | Task piano | Stato reale nel codice | Gap principale |
@@ -264,7 +270,7 @@ Task 0 (baseline)
 - Modify: `Modules/MES/tests/Feature/WorkCenterCalendarModelTest.php`
 - Modify: `Modules/MES/tests/Pest.php`
 
-- [ ] **Step 1: Creare helper con slug bounded**
+- [x] **Step 1: Creare helper con slug bounded**
 
 ```php
 <?php
@@ -311,7 +317,7 @@ final class MesTestHelpers
 }
 ```
 
-- [ ] **Step 2: Correggere import TracingType**
+- [x] **Step 2: Correggere import TracingType**
 
 In `ItemTracingTypeTest.php` sostituire:
 
@@ -325,7 +331,7 @@ con:
 use Modules\ERP\Casts\TracingType;
 ```
 
-- [ ] **Step 3: Usare helper nei test Feature**
+- [x] **Step 3: Usare helper nei test Feature**
 
 In `WorkCenterModelTest.php`, `WorkCenterCalendarModelTest.php`, `ItemTracingTypeTest.php` sostituire helper locali con `MesTestHelpers::makeCompany()` e aggiungere in `Pest.php`:
 
@@ -335,7 +341,7 @@ uses(Modules\MES\Tests\Support\MesTestHelpers::class);
 
 (opzionale: funzioni globali `mesCompany()` che delegano al helper)
 
-- [ ] **Step 4: Eseguire test baseline**
+- [x] **Step 4: Eseguire test baseline**
 
 Run:
 
@@ -345,7 +351,7 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests --compact
 
 Expected: 0 failures.
 
-- [ ] **Step 5: Commit (submodule MES)**
+- [x] **Step 5: Commit (submodule MES)**
 
 ```bash
 cd Modules/MES && git add tests/Support/MesTestHelpers.php tests/Feature/ItemTracingTypeTest.php tests/Feature/WorkCenterModelTest.php tests/Feature/WorkCenterCalendarModelTest.php tests/Pest.php
@@ -360,7 +366,7 @@ git commit -m "test(mes): fix tracing type import and bounded company slug helpe
 - Verify: `Modules/MES/module.json`, `composer.json`, `app/Providers/*`, `app/Contracts/StockMovementRecorder.php`, `app/Services/ErpStockMovementRecorder.php`
 - Verify root: `modules_statuses.json` contiene `"MES": true`
 
-- [ ] **Step 1: Verificare modulo abilitato**
+- [x] **Step 1: Verificare modulo abilitato**
 
 Run:
 
@@ -370,7 +376,7 @@ cd /srv/http/laraplate && php artisan module:list | rg MES
 
 Expected: MES enabled.
 
-- [ ] **Step 2: Verificare binding contratto**
+- [x] **Step 2: Verificare binding contratto**
 
 Run:
 
@@ -380,17 +386,19 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/ServiceProv
 
 Expected: PASS.
 
-- [ ] **Step 3: Commit solo se mancano file (già presenti → skip)**
+- [x] **Step 3: Commit solo se mancano file (già presenti → skip)**
 
 ---
 
 ### Task 2: Completare T2 tracing_type
 
+> **Replaced (2026-09-30):** the patch migration was dropped (`cc71a16`) and `tracing_type` is folded into ERP's `create_items_table`; `ItemTracingTypeTest` asserts the cast for every case.
+
 **Files:**
 - Modify: `Modules/MES/tests/Feature/ItemTracingTypeTest.php` (copertura relazione MES→Item)
 - Verify: `Modules/MES/database/migrations/2026_05_08_000000_add_tracing_type_to_items_table.php`
 
-- [ ] **Step 1: Aggiungere test relazione Eloquent**
+- [x] **Step 1: Aggiungere test relazione Eloquent**
 
 ```php
 it('reads tracing_type from ERP item via Eloquent', function (): void {
@@ -404,7 +412,7 @@ it('reads tracing_type from ERP item via Eloquent', function (): void {
 });
 ```
 
-- [ ] **Step 2: Run test file**
+- [x] **Step 2: Run test file**
 
 Run:
 
@@ -414,7 +422,7 @@ cd /srv/http/laraplate && php artisan test Modules/MES/tests/Feature/ItemTracing
 
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd Modules/MES && git commit -am "test(mes): cover ERP item tracing_type reads"
@@ -423,6 +431,8 @@ cd Modules/MES && git commit -am "test(mes): cover ERP item tracing_type reads"
 ---
 
 ### Task 3: Completare T3 Work Center
+
+> **Open (2026-09-30):** the unique `(company_id, code)` rule exists, but `WorkCenterCrudTest` does not, so nothing asserts a duplicate code is rejected, and no test deactivates a work center.
 
 **Files:**
 - Create: `Modules/MES/tests/Feature/WorkCenterCrudTest.php`
@@ -502,6 +512,8 @@ cd Modules/MES && git add tests/Feature/WorkCenterCrudTest.php && git commit -m 
 ---
 
 ### Task 4: Distinta base (BOM)
+
+> **Open (2026-09-30):** models, `ConsumptionMethod`, `routing_operation_id` and `BomExplosionService` with multi-level tests exist, but `BomExplosionService::assertNotLocked` is called nowhere in `app/` or the tests: the lock is defined, not enforced.
 
 **Files:**
 - Modify: `Modules/MES/app/Enums/MESTables.php`
@@ -715,6 +727,8 @@ git commit -m "feat(mes): add BOM models and multi-level explosion service"
 
 ### Task 5: Routing e operazioni — T5
 
+> **Open (2026-09-30):** `RoutingResolverService` and its tests exist, but `assertNotLocked` is unused and untested, as for the BOM.
+
 **Files:**
 - Create: `Modules/MES/database/migrations/2026_05_08_000006_create_mes_routing_operations_table.php`
 - Modify: `Modules/MES/app/Enums/MESTables.php` (add `RoutingOperations`)
@@ -807,6 +821,8 @@ php artisan test Modules/MES/tests/Feature/RoutingResolverServiceTest.php --comp
 
 ### Task 6: Ordini di produzione — T6
 
+> **Open (2026-09-30):** create, release, complete and cancel exist, and the sales-order path is delivered as the ERP event `SalesOrderConfirmed` with `CreateProductionOrdersForSalesOrder` and `SalesOrderProductionPlanner` (no Job class). Step 4 was not built: there is no `ProductionOrderObserver` and no typed `ProductionOrderReleased` events (`app/Events` holds only `MaterialShortageDetected`).
+
 **Files:**
 - Modify: `Modules/ERP/app/Casts/DocumentType.php` (add `ProductionOrder`)
 - Create: `Modules/MES/database/migrations/2026_05_10_000002_add_sales_order_line_id_to_mes_production_orders_table.php`
@@ -896,6 +912,8 @@ final class SalesOrderConfirmed
 
 ### Task 7: Esecuzione operazioni — T7
 
+> **Open (2026-09-30):** start, complete and skip are delivered with efficiency clamping, the observer replaced by inline calls in `complete()`. Step 3 was not built: `start()` never consults `CapacityService`, so there is no non-blocking capacity warning.
+
 **Files:**
 - Create: migration `mes_production_order_operations`
 - Create: `ProductionOrderOperation` model + enum status
@@ -925,6 +943,8 @@ Formula: `(standard_minutes / actual_minutes) * 100`, clamp 0–999.99.
 
 ### Task 8: Consumo materiali — T8
 
+> **Replaced (2026-09-30):** consumption is a domain action (`record_consumption`) plus `MaterialConsumptionService::recordManual`, not a `MaterialConsumptionRequest`; `BackflushMaterialsJob` also raises a partial-consumption shortage event.
+
 **Files:**
 - Create: migration `mes_material_consumptions`
 - Create: `MaterialConsumption` model
@@ -932,11 +952,11 @@ Formula: `(standard_minutes / actual_minutes) * 100`, clamp 0–999.99.
 - Create: `Modules/MES/app/Http/Requests/MaterialConsumptionRequest.php`
 - Create: `Modules/MES/tests/Feature/BackflushMaterialsJobTest.php`
 
-- [ ] **Step 1: Test backflush crea consumption + invoca recorder**
+- [x] **Step 1: Test backflush crea consumption + invoca recorder**
 
 Mock `StockMovementRecorder` con `Mockery::mock` e assert `record()` chiamato con `direction=out`.
 
-- [ ] **Step 2: Implementare job**
+- [x] **Step 2: Implementare job**
 
 ```php
 final class BackflushMaterialsJob implements ShouldQueue
@@ -960,9 +980,9 @@ Queue: `config('mes.queue.connection')`, `config('mes.queue.name')`.
 
 See decision D5 in `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`.
 
-- [ ] **Step 3: Consumo manuale via Form Request + service method**
+- [x] **Step 3: Consumo manuale via Form Request + service method**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
@@ -975,7 +995,7 @@ See decision D5 in `docs/superpowers/specs/2026-07-09-mes-module-decisions-desig
 - Modify: `ProductionOrderService::complete()` per generazione lotto
 - Create: `Modules/MES/tests/Feature/LotTracingServiceTest.php`
 
-- [ ] **Step 1: Test forward/backward trace simmetrico**
+- [x] **Step 1: Test forward/backward trace simmetrico**
 
 ```php
 it('forward and backward traces are symmetric', function (): void {
@@ -987,11 +1007,11 @@ it('forward and backward traces are symmetric', function (): void {
 });
 ```
 
-- [ ] **Step 2: `generateLotCode()` usando `config('mes.lot_number_format')`** — uncomment keys in `config/config.php`
+- [x] **Step 2: `generateLotCode()` usando `config('mes.lot_number_format')`** — uncomment keys in `config/config.php`
 
-- [ ] **Step 3: Integrate complete() when Item.tracing_type = lot|serial**
+- [x] **Step 3: Integrate complete() when Item.tracing_type = lot|serial**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
@@ -1004,17 +1024,19 @@ it('forward and backward traces are symmetric', function (): void {
 - Create: `NonConformanceService` con creazione PO rilavorazione
 - Create: `Modules/MES/tests/Feature/QualityCheckFlowTest.php`
 
-- [ ] **Step 1: Test failed check → NonConformance**
+- [x] **Step 1: Test failed check → NonConformance**
 
-- [ ] **Step 2: Implementare execute check con measurements + limits**
+- [x] **Step 2: Implementare execute check con measurements + limits**
 
-- [ ] **Step 3: Rework production order when disposition=rework**
+- [x] **Step 3: Rework production order when disposition=rework**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
 ### Task 11: Scheduling e capacità — T9
+
+> **Open (2026-09-30):** the five capacity methods exist with tests, but their signatures differ from the plan (`checkOverload(from, to)`, `rescheduleOperation` without a date) and `estimateCompletionDate` only returns `planned_end_at`.
 
 **Files:**
 - Create: `Modules/MES/app/Services/CapacityService.php`
@@ -1037,6 +1059,8 @@ public function rescheduleOperation(ProductionOrderOperation $operation, int $wo
 ---
 
 ### Task 12: Fermi macchina e OEE — T11
+
+> **Open (2026-09-30):** downtime and OEE are delivered and clamped to [0,1]. Step 3 was not built: `CapacityService` does not use the downtime flag (`isWorkCenterDown` is called only from tests).
 
 **Files:**
 - Create: migration `mes_downtimes`, model, enum cause
@@ -1067,17 +1091,19 @@ expect($service->calculate($wc_id, $from, $to))->toBeBetween(0.0, 1.0);
 - Modify: `ProductionOrderOperationService` per log automatico
 - Create: `Modules/MES/tests/Feature/ShiftOperatorTest.php`
 
-- [ ] **Step 1: Test OperatorLog on start/complete**
+- [x] **Step 1: Test OperatorLog on start/complete**
 
-- [ ] **Step 2: ShiftInstance warning (non blocking) se assente**
+- [x] **Step 2: ShiftInstance warning (non blocking) se assente**
 
-- [ ] **Step 3: Efficienza media per operatore/turno**
+- [x] **Step 3: Efficienza media per operatore/turno**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ---
 
 ### Task 14: API REST — T13/R13
+
+> **Replaced by design, with gaps (2026-09-30):** no custom controllers; the module uses Core's generic CRUD plus `MesDomainActionRegistrar`, `MesModelPolicy` and `MESPermissions` (see the section "API — architettura rivista"). Not registered: Downtime `open` and QualityCheck `disposition`. `MesModelPolicy` has no tests.
 
 > **⚠️ RIVISTO 2026-08-13 — leggere prima la sezione «API — architettura rivista».**
 > Niente controller/resources/rotte custom: si usano le rotte generiche di Core (CRUD + domain-action registry). Il vero lavoro di questo task è: `MesDomainActionRegistrar`, `MesModelPolicy`, wiring in `MESServiceProvider::boot()`, seeding permessi domain in `MESDatabaseSeeder`, verifica esposizione entità. Il blocco «Files/Step» sottostante (controller REST) è **obsoleto** e va ignorato; resta come storia della stima originaria.
@@ -1149,6 +1175,8 @@ it('returns 401 without token', function (): void {
 
 ### Task 15: Pannello Filament — T14/R14
 
+> **Open (2026-09-30):** nine resources and the widget exist, but there is no `Repeater` anywhere in `app/` (no WorkCenter calendar, no BOM lines), `ProductionOrder` has no relation managers and no Release/Complete/Cancel actions, and the smoke test checks only bindings and form/table configuration.
+
 **Files:**
 - Create: `Modules/MES/app/Filament/Resources/WorkCenters/WorkCenterResource.php` (+ Pages, Schemas, Tables)
 - Create: resources per Bom, Routing, ProductionOrder, QualityCheck, NonConformance, Downtime, Shift
@@ -1183,6 +1211,8 @@ Modules/MES/app/Filament/Resources/WorkCenters/
 ---
 
 ### Task 16: Test suite e quality gates — T16
+
+> **Open (2026-09-30):** factories, `ProductionCycleEndToEndTest` and a snapshot dataset exist; `Feature/Invariants/ProductionOrderInvariantsTest.php` and a state-coherence invariant do not.
 
 **Files:**
 - Create: factories per ogni modello MES mancante
@@ -1224,6 +1254,8 @@ cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 ---
 
 ### Task 17: Documentazione — T17
+
+> **Open (2026-09-30):** `MES_GUIDA_SEMPLICE.md` and `rag/MODULE.md` exist. Both glossaries still label BOM, Routing, Traceability, Quality and Planning "(planned)" and lack the OEE and lineage entries, and the README roadmap is still all "planned".
 
 **Files:**
 - Verify: `Modules/MES/docs/GLOSSARY.md`, `Modules/MES/docs/rag/GLOSSARY.md`

@@ -27,19 +27,19 @@
 - Create: `Modules/Core/tests/Feature/Filament/HasFormDynamicContentsTest.php`
 - Modify: `Modules/Core/tests/Stubs/Filament/HasFormHarness.php`
 
-- [ ] **Step 1: Update harness to new API**
+- [x] **Step 1: Update harness to new API**
 
 Harness exposes `run(Schema $schema, ?array $components = null): Schema` calling `configureForm`.
 
-- [ ] **Step 2: Replace permission smoke with non-dynamic assertion**
+- [x] **Step 2: Replace permission smoke with non-dynamic assertion**
 
 `User` model + `configureForm($schema, [Toggle::make('x')])` → components must not include `dynamic_entity_id` / `presettable_id`.
 
-- [ ] **Step 3: Write CMS-backed dynamic test**
+- [x] **Step 3: Write CMS-backed dynamic test**
 
 Use `Content` + `setupCMSEntities` pattern (same as CMS HasTable tests, or Core skip if CMS unavailable): assert component names include `dynamic_entity_id`, `dynamic_preset_id`, `presettable_id`; entity/preset dehydrated false; `presettable_id` present.
 
-- [ ] **Step 4: Run tests — expect RED**
+- [x] **Step 4: Run tests — expect RED**
 
 ```bash
 cd laraplate && php artisan test --compact Modules/Core/tests/Feature/Filament/UtilsTest.php Modules/Core/tests/Feature/Filament/HasFormDynamicContentsTest.php
@@ -52,7 +52,7 @@ cd laraplate && php artisan test --compact Modules/Core/tests/Feature/Filament/U
 **Files:**
 - Modify: `Modules/Core/app/Filament/Utils/HasForm.php`
 
-- [ ] **Step 1: Implement `configureForm`**
+- [x] **Step 1: Implement `configureForm`**
 
 ```php
 protected static function configureForm(Schema $schema, ?array $components = null): Schema
@@ -67,11 +67,11 @@ protected static function configureForm(Schema $schema, ?array $components = nul
 }
 ```
 
-- [ ] **Step 2: Build Select Entity / Select Preset / Hidden presettable_id**
+- [x] **Step 2: Build Select Entity / Select Preset / Hidden presettable_id**
 
 Resolve active via `Preset::activePresettable()`; clear on entity change; hydrate UI from record presettable on edit; required `presettable_id` when dynamic.
 
-- [ ] **Step 3: Run tests — expect GREEN**
+- [x] **Step 3: Run tests — expect GREEN**
 
 ---
 
@@ -82,30 +82,32 @@ Resolve active via `Preset::activePresettable()`; clear on entity change; hydrat
 - Modify: `Modules/Core/app/Filament/Generators/LaraplateResourceFormSchemaClassGenerator.php`
 - Modify: generator smoke test if body shape changes
 
-- [ ] **Step 1: Content/Category/Contributor** — `return self::configureForm($schema, [...])` without `entity_id` / raw `presettable_id` relationship selects.
+- [x] **Step 1: Content/Category/Contributor** — `return self::configureForm($schema, [...])` without `entity_id` / raw `presettable_id` relationship selects.
 
-- [ ] **Step 2: Generator emits** `return self::configureForm($schema->components([...]));` or array form matching Task 2 API.
+- [x] **Step 2: Generator emits** `return self::configureForm($schema->components([...]));` or array form matching Task 2 API.
 
-- [ ] **Step 3: Run Core Filament generator + HasForm tests**
+- [x] **Step 3: Run Core Filament generator + HasForm tests**
 
 ---
 
 ### Task 4: Format and verify
 
-- [ ] `vendor/bin/pint --dirty`
-- [ ] Targeted Pest suite green
-- [ ] Spec status note if needed (plan checkboxes)
+- [x] `vendor/bin/pint --dirty`
+- [x] Targeted Pest suite green
+- [x] Spec status note if needed (plan checkboxes)
 
-## Delivery status (2026-09-15): shipped, with a simpler signature
+## Delivery status (2026-09-30): shipped, with a simpler signature
 
 **Documented in:** `Modules/Core/docs/rag/MODULE.md`.
 
-`HasForm::configureForm()` prepends the Entity and Preset selects and the hidden
-`presettable_id`, gated on the schema model using `HasDynamicContents`, and CMS resources call
+`HasForm::configureForm()` prepends the Entity and Preset selects and the hidden required
+`presettable_id`, for schema models that implement `IDynamicContentModel`, and CMS resources call
 it. `LaraplateResourceFormSchemaClassGenerator` emits `return self::configureForm(...)`, which
-was the plan's last step.
+was the plan's last step. Reconciled task by task against the code on 2026-09-30; the Core and CMS
+HasForm and generator tests pass together (19 tests) and every box is ticked.
 
-One divergence: the signature is `configureForm(Schema $schema): Schema`, without the
-`?array $components` the architecture line describes. It turned out not to be needed, because
-callers compose the schema first and pass it in, which is the second shape the plan itself
-proposed for the generator. The empty checkboxes below are not outstanding work.
+Divergences from the plan as written:
+- The signature is `configureForm(Schema $schema): Schema`, without the `?array $components` the architecture line describes. Callers compose the schema first and pass it in, which is the second shape the plan itself proposed for the generator.
+- The gate is the `IDynamicContentModel` contract, not a `HasDynamicContents` trait check.
+- The dynamic-wiring test lives in CMS (`Modules/CMS/tests/Feature/Filament/HasFormDynamicContentsTest.php`), not in Core, because it needs a CMS `Content`; the Core `UtilsTest` keeps the non-dynamic assertion and the harness keeps the `run(Schema)` shape.
+- `configureForm()` also strips the entity and presettable fields the model trait already owns and appends the optimistic-lock hidden field, neither of which the plan described.
