@@ -9,7 +9,6 @@
     "mcp": true,
     "nightwatch": false,
     "packages": [
-        "spatie/laravel-medialibrary",
         "filament/filament"
     ],
     "sail": false,
@@ -21,9 +20,7 @@
         "configuring-horizon",
         "scout-development",
         "socialite-development",
-        "livewire-development",
         "tailwindcss-development",
-        "filament-development",
-        "medialibrary-development"
+        "filament-development"
     ]
 }
