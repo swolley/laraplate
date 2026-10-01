@@ -185,7 +185,7 @@ covered by the existing ensemble tests.
 | Risk | Mitigation |
 |------|-----------|
 | A bad profile degrades production search | the Setting flips it off without a deploy; the baseline gate blocks the commit in CI |
-| Tuned values overfit the curated datasets | the tuner reports per-class metrics *and* the aggregate; a profile that wins on one class and loses overall is rejected by the gate |
+| Tuned values overfit the curated datasets | the tuner keeps a deterministic share of the cases out of the selection (`--holdout`, 0.3 by default) and declares no winner when the best candidate loses to the committed profile on them; a class gets its own override only with enough selection cases (`--min-class-cases`) and a margin over the overall winner (`--class-margin`); the report carries the per-class and aggregate metrics and what was withheld. The CI baseline gate is only a wiring check: the suite runs Scout on the `collection` driver, where a profile cannot move the numbers (amended 2026-10-01; the first version of this row promised a gate that rejects a one-class win) |
 | Silent drift between L0 and "tuning off" | a test asserts the emitted plan with tuning off equals the L0 plan exactly |
 | Unexplainable ranking | `meta['tuning']` names the profile version and the query class on every response |
 | Profile file missing in a deployment | load failure falls back to L0 and logs once |

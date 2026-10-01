@@ -325,7 +325,11 @@ il risultato. Riproducibile, revisionabile, protetto dal gate in CI. In pratica:
 - ogni risposta dice cosa è successo in `meta.tuning` (versione del profilo e classe della query);
 - i numeri li produce `php artisan ai:tune-retrieval`, che rigioca la fusione su una griglia di
   parametri senza rieseguire le query sul motore e stampa il blocco da incollare. Non scrive mai la
-  configurazione: la committa un umano.
+  configurazione: la committa un umano;
+- per non scegliere valori che funzionano solo sui casi di prova, il tuner tiene da parte una quota
+  dei casi (il 30% di default) e il vincitore non deve perdere, su quelli, contro il profilo attuale:
+  altrimenti non c'è vincitore e si tiene il profilo com'è. Una classe di query riceve parametri
+  propri solo se ha abbastanza casi (8 di default) e se batte il vincitore generale di un margine.
 
 Il profilo spedito ripete le costanti L0, quindi accendere l'interruttore oggi cambia solo
 `meta.tuning`. Il giro di tuning vero va fatto a mano, con Elasticsearch e gli embedding attivi.
