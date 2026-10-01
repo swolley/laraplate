@@ -329,10 +329,20 @@ il risultato. Riproducibile, revisionabile, protetto dal gate in CI. In pratica:
 - per non scegliere valori che funzionano solo sui casi di prova, il tuner tiene da parte una quota
   dei casi (il 30% di default) e il vincitore non deve perdere, su quelli, contro il profilo attuale:
   altrimenti non c'è vincitore e si tiene il profilo com'è. Una classe di query riceve parametri
-  propri solo se ha abbastanza casi (8 di default) e se batte il vincitore generale di un margine.
+  propri solo se ha abbastanza casi (8 di default) e se batte il vincitore generale di un margine;
+- un miglioramento piccolo come quello che farebbe un solo caso che cambia esito non è un
+  risultato: il vincitore deve battere il profilo attuale di più di questo "margine di rumore"
+  (di default un caso del campione, mai sotto 0,01), altrimenti non c'è vincitore. Lo stesso vale,
+  sui casi della singola classe, per gli override di classe;
+- un profilo con valori misurati deve citare il report da cui viene (chiave `report`, nella
+  cartella `docs/evaluations/retrieval-tuning/` di Core): un test fallisce se il report manca, se non
+  ha passato né la validazione sui casi tenuti da parte né il controllo del rumore, o se contiene
+  valori diversi da quelli del profilo. Il report ha solo metriche e parametri, non il testo delle
+  query né dei contenuti.
 
 Il profilo spedito ripete le costanti L0, quindi accendere l'interruttore oggi cambia solo
-`meta.tuning`. Il giro di tuning vero va fatto a mano, con Elasticsearch e gli embedding attivi.
+`meta.tuning`, e non deve citare nessun report. Il giro di tuning vero va fatto a mano, con
+Elasticsearch e gli embedding attivi.
 
 L2 richiede di registrare cosa fanno gli utenti, e oggi in Laraplate non viene registrato nulla:
 nessuna tabella di query, nessun click. Senza quel dato un sistema che "impara" imparerebbe dal
