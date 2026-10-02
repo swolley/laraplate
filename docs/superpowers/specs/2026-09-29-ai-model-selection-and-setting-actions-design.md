@@ -248,5 +248,5 @@ Three repositories: `laraplate-core` (`Modules/Core`), `laraplate-ai` (`Modules/
 - `OPENAI_API_URL`: present in config, read by no factory.
 - `OPENAI_MODEL`, `OLLAMA_MODEL`, `MISTRAL_MODEL` are shared by the chat factory fallback and the embeddings factory: `OPENAI_MODEL` defaults to `gpt-4o-mini` for one and `text-embedding-3-small` for the other, so setting it for either breaks the other. Once no feature reads them, they belong to embeddings; moving them to the embeddings profile registry is a separate change.
 - User- or tenant-selectable provider (the TODO at the top of `Modules/AI/config/config.php`).
-- `Modules/AI/docs/WHISPER_INSTALLATION.md` puts Whisper on port `8001`, the default port of `providers.cross_encoder.endpoint`: they conflict on a shared host.
+- `Modules/AI/docs/WHISPER_INSTALLATION.md` puts Whisper on port `8001`, the default port of `providers.cross_encoder.url`: they conflict on a shared host.
 - Grouping the select options by provider.
