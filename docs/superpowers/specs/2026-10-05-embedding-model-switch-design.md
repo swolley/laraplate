@@ -31,6 +31,7 @@ Facts read from the code on 2026-10-05.
 5. **A change of model needs a full re-embed even when the dimensions are equal**, because the vector spaces differ. Only a change of dimensions also needs the index mapping rebuilt.
 6. **A guard is always on**, outside any switch: a mismatch between profile, stored vectors and index disables vector search with a reason.
 7. **A user is warned before it happens**, with the numbers that apply to their corpus.
+8. **A model is named `provider:model`**, the convention of the 2026-09-29 spec (`ollama:llama3.2:3b`, split on the first colon). The setting values, the profile keys, the Core setting `search.vector.model` and the `model_key` stamped on every vector are all that one string, so the Core can filter by it with no translation. Embeddings stamped with the old alias keys are not migrated: they are stale and are re-created.
 
 ## 4. Components
 
@@ -42,7 +43,7 @@ Each profile in config gains `dimensions` (and keeps `similarity` optional, defa
 
 `ai:embeddings:probe {profile}` prints the measured length. This is how a new profile is added: run it, put the number in config. The service needs no change, since measuring works for any provider. For a hosted provider that lets the caller choose the dimension (the OpenAI embedding models do, as far as documented; not verified here), the profile declares the dimension it asks for and the probe verifies it.
 
-The profile's `provider` field becomes the provider used for that profile, replacing `AI_EMBEDDINGS_PROVIDER`; a profile that names an unconfigured provider is not offered.
+A profile is keyed by `provider:service_model`, for example `sentence_transformers:intfloat/multilingual-e5-small`; its provider and service model are the two parts of the key, split at the first colon, and the config blocks no longer carry them. The provider replaces `AI_EMBEDDINGS_PROVIDER`; a profile whose provider is not configured is not offered.
 
 ### 4.2 Settings (Core and AI)
 
@@ -50,11 +51,12 @@ New command-managed settings, group `ai`, in the sense of the 2026-09-29 spec (w
 
 | Setting | Meaning | Written by |
 |---|---|---|
-| `features.embeddings.model` | the profile the operator chose (the **target**) | the dropdown, through the confirmation of 4.3 |
-| `features.embeddings.active` | the profile whose vectors serve search | the switch procedure at activation |
+| `features.embeddings.model` | the `provider:model` the operator chose (the **target**) | the dropdown, through the confirmation of 4.3 |
+| `features.embeddings.active` | the `provider:model` whose vectors serve search | the switch procedure at activation |
+| `search.vector.model` (Core) | the `provider:model` whose vectors the Core queries: the filter of `DatabaseEngine` and the value stamped in `core_model_embeddings.model_key` | the switch procedure at activation |
 | `features.embeddings.switch` | state of a switch: status, phase, target, counts, error, timestamps | the switch procedure |
 
-`search.vector.dimensions` and `search.vector.similarity` become command-managed, written together with `active`. `search.vector.suspended_reason` (Core, string or null) is set when a switch starts and cleared when it ends; the guard reads it.
+`search.vector.dimensions` and `search.vector.similarity` become command-managed, written together with `active` and `search.vector.model`. `search.vector.suspended_reason` (Core, string or null) is set when a switch starts and cleared when it ends; the guard reads it.
 
 The dropdown's choices are the profile keys that are configured and probe-able; no remote listing is needed. A fresh installation seeds `active` from the first profile in code, as the 2026-09-29 spec prescribes (default in code, no environment variable). `AI_EMBEDDINGS_MODEL` and `AI_EMBEDDINGS_PROVIDER` are removed. This is a breaking change with a known footprint, all of it to be updated by the plan: the readers of `ai.features.embeddings.active` and `default_provider` (`EmbeddingModelRegistry`, `EmbeddingsProviderFactory`), the tests that set those config keys (embedding, prefix and documentation-retrieval tests), and the documents that name the variables (the AI README, `SEARCH_AND_TRANSLATION.md`, `SENTENCE_TRANSFORMERS_INSTALLATION.md`, and the Core README).
 
@@ -68,18 +70,18 @@ Choosing a different profile in the dropdown opens a confirmation, not a save. I
 - what happens meanwhile: vector search is off and search uses keywords only, until the switch ends;
 - that going back is the same procedure and costs the same.
 
-Confirm sets the target and starts `ai:embeddings:switch` queued. Cancel leaves everything as it was. Choosing the active profile does nothing. While a switch is running or failed, the Settings page shows a persistent banner with the phase and counts, and the dropdown is disabled.
+Confirm sets the target and starts `ai:embeddings:switch` queued. Cancel leaves everything as it was. Choosing the active profile does nothing. While a switch is running or failed, the Settings page shows a persistent banner with the phase and counts, and the dropdown is disabled. The confirmation is a generic Core hook, `ISettingChangeConfirmation`, which the AI module registers for `features.embeddings.model`; the same hook locks the field while a switch runs.
 
 ### 4.4 The switch procedure (AI)
 
 `ai:embeddings:switch {profile} [--resume|--abandon]`, run by an orchestrating job that advances one phase at a time and re-dispatches itself, so a worker restart loses nothing.
 
 1. **Preflight.** Take a lock so only one switch runs. Check the service answers `/health`, that the model it reports is the profile's (the check `ai:embeddings:repair` already does), and that the probe measures the declared dimensions. Set `search.vector.suspended_reason` and the state. Nothing has changed for a user except that vector search is off.
-2. **Embeddings.** Re-embed every embeddable record with the **target** profile, stamping the target `model_key`. `GenerateEmbeddingsJob` gains an explicit profile argument; it uses the active one when none is given. Rows of the old model are kept. A row whose `content_hash` and `model_key` already match is skipped, which makes a return to a recent model cheap. A vector whose length differs from the profile's is rejected when stored, not only when probed.
+2. **Embeddings.** Re-embed every embeddable record with the **target** profile, stamping the target `model_key`. `GenerateEmbeddingsJob` gains an explicit profile argument; it uses the active one when none is given. Rows of the previous model are kept until activation, so a switch that fails leaves the serving model intact. A row whose `content_hash` and `model_key` already match is skipped, which lets a resumed switch continue where it stopped. A vector whose length differs from the profile's is rejected when stored, not only when probed.
 3. **Indexes.** For each searchable embeddable model, recreate the index with the target dimensions and import it; recreate the RAG indexes (`ai:create-rag-index`, `ai:index-rag-docs --full`) with the same dimensions, derived from the profile instead of `faq.elasticsearch.embedding_dims`. When the dimensions are equal the mapping is left alone and the documents are reimported. On PostgreSQL with pgvector the partial index of the target profile is created here (section 5).
 4. **Verify.** For every index: the document count equals the number of searchable records; every record has a row stamped with the target key (`ai:embeddings:repair --stale` finds none); the mapping's dimensions equal the target's; a smoke vector query succeeds.
-5. **Activate**, in one step: write `active`, `search.vector.dimensions`, `search.vector.similarity`, clear the state and `suspended_reason`, invalidate the settings cache and the guard's cache. This is the first moment the new model serves anything.
-6. **Cleanup** is not automatic. `ai:embeddings:prune --model-key=<key>` removes the rows of a model no longer wanted, and on PostgreSQL the index of that model, after the operator has decided.
+5. **Activate**, in one step: write `active`, `search.vector.dimensions`, `search.vector.similarity` and `search.vector.model`, clear the state and `suspended_reason`, invalidate the settings cache and the guard's cache, then delete the rows of the previous model (and, on PostgreSQL, its index). This is the first moment the new model serves anything.
+6. **Cleanup of the previous model is part of activation** (step 5). Going back to it is a new switch and re-embeds everything, which for a corpus of a few hundred records takes minutes. `ai:embeddings:prune --model-key=<key>` remains as a manual command for rows nobody uses (a model removed from config, an abandoned switch) and refuses the active key.
 
 Records created or edited during phases 2 to 4 are embedded with the target, because the old index is being rebuilt and is not serving vectors anyway. A rollback after such a window re-embeds those records.
 
@@ -103,15 +105,15 @@ The operator's question was how to know a model's vector length. The answer in t
 
 ## 5. Data and migrations
 
-No change to `core_model_embeddings`: `model_key` exists and rows coexist. The three new settings and the two command-managed variants are seeded by the AI and Core seeders. The environment variables of 4.2 are removed.
+No change to the shape of `core_model_embeddings`: `model_key` exists and rows coexist; it now holds the `provider:model` string, and rows stamped with the old alias keys are not migrated (they are stale, and `ai:embeddings:repair --all --stale` or `migrate:fresh` re-creates them; nothing in production depends on them). The three new settings and the two command-managed variants are seeded by the AI and Core seeders. The environment variables of 4.2 are removed.
 
 **PostgreSQL with pgvector.** The column is `vector(N)` and N was fixed when the migration ran, which would forbid two models of different dimensions in one table. A migration removes the dimension from the column, leaving the plain `vector` type, which pgvector documents as able to hold vectors of different lengths. After it, PostgreSQL behaves like MySQL: rows of two models coexist, stamped by `model_key`, and the procedure of 4.4 is the same on every database.
 
 What changes with it:
 
 - **The index becomes one per profile.** pgvector indexes only vectors of one length, so the index is an expression and partial index, as its documentation prescribes: `USING hnsw ((embedding::vector(N)) vector_cosine_ops) WHERE model_key = '<profile>'`. The index of the target profile is created in phase 3 of the switch, and the one of a model that is pruned is dropped with its rows.
-- **The query of `DatabaseEngine`** (`embedding <=> ?::vector` today) casts and filters the same way, `embedding::vector(N) <=> ?::vector` with `model_key = '<active profile>'`, with N and the key taken from the active profile; otherwise PostgreSQL would not use the index, and rows of another model would be compared with a vector of a different length.
-- **An existing installation** is migrated by the same migration: the type loses its dimension and its current index is replaced by the partial one for the active profile.
+- **The query of `DatabaseEngine`** (`embedding <=> ?::vector` today) casts and filters the same way, `embedding::vector(N) <=> ?::vector` with `model_key = '<core.search.vector.model>'`, with N from `core.search.vector.dimensions` and the key from `core.search.vector.model`; otherwise PostgreSQL would not use the index, and rows of another model would be compared with a vector of a different length.
+- **The change is made in the create migration** of `core_model_embeddings` (the project is pre-stable, so `migrate:fresh`), not as a migration of existing installations.
 
 The other databases keep their JSON column; nothing changes for them.
 
@@ -143,6 +145,5 @@ Module docs of AI (`docs/rag/MODULE.md`, the installation guide for the service)
 
 - **PostgreSQL is not verified.** Three things come from the pgvector documentation or from reasoning and have not been run: that removing the dimension from an existing `vector(N)` column with `ALTER` is accepted without rewriting the data, the exact index syntax on the pgvector version in use, and that the planner uses the partial index for the cast query. They are to be confirmed on a real PostgreSQL before the part is called done.
 
-- Whether `ai:embeddings:prune` should become automatic after a retention period.
 - The estimate shown in the alert is a rough one; it can be refined with a real run once the procedure exists.
 - Whether a hosted provider's dimension parameter (see 4.1) is read from the profile or from the provider's own setting; to settle when the first hosted profile is added.
