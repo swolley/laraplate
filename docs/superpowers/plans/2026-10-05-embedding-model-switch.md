@@ -25,7 +25,7 @@
 
 **Decisions made while planning** (all now in the spec): a model is named `provider:model` everywhere, and the Core gets a managed setting `search.vector.model` with that value, because `DatabaseEngine` must filter by the active model and cannot read the AI registry; the PostgreSQL change is made in the create migration, not as a migration of existing installations; the confirmation is a generic Core hook (`ISettingChangeConfirmation`) that the AI module registers for its setting.
 
-**Proposal R17 (2026-10-05, on hold):** remove `features.embeddings.active`. Reported by another session as the user's decision; it has not been confirmed by the user in the session executing this plan, so it is not applied. The setting holds the same value as Core's `search.vector.model`, written by the same procedure at the same moment, so it is a duplicate that can drift. The AI reads the serving model from `config('core.search.vector.model')` (AI depends on Core, so the direction is allowed); `features.embeddings.model` (the target) and `features.embeddings.switch` stay. The Global Constraints above still name `active` because Tasks 1-12 were built against them; Task 13 would remove it and is on hold until the proposal is confirmed. The documentation written in Task 11 describes the current state, with `active` in place.
+**Ruling R17 (2026-10-05, user, in chat):** remove `features.embeddings.active`, no duplicates. The setting held the same value as Core's `search.vector.model`, written by the same procedure at the same moment, so it was a duplicate that could drift. The AI reads the serving model from `config('core.search.vector.model')` (AI depends on Core, so the direction is allowed); `features.embeddings.model` (the target) and `features.embeddings.switch` stay. The fresh-install default stays Core's fixed `sentence_transformers:intfloat/multilingual-e5-small`; the AI seeder defaults `features.embeddings.model` to the stored Core value. The Global Constraints above still name `active` because Tasks 1-12 were built against them; Task 13 removed it.
 
 ## Review Focus
 
@@ -254,7 +254,7 @@
 
 ### Task 13: The serving model is Core's `search.vector.model` only (AI)
 
-**Added during execution** (Proposal R17). **On hold** until the proposal is confirmed; Tasks 10 and 11 ran without it. Planned order was right after Task 9. Task 9 is built as planned (activation writes `active` together with the Core settings); this task removes the AI copy.
+**Added during execution** (Ruling R17, confirmed by the user on 2026-10-05). It ran after Task 11, since Tasks 10 and 11 had run while R17 waited for confirmation; the planned order was right after Task 9. Task 9 was built as planned (activation wrote `active` together with the Core settings); this task removed the AI copy. Open point settled: the serving model of a fresh installation is Core's seeded default; the AI seeder reads the stored `search.vector.model` (the seed reconciler upserts without model events, so the runtime config does not hold it yet) and defaults `features.embeddings.model` to it, adding it to the choices when its provider is not configured. It does not write `search.vector.model`.
 
 **Files:**
 - Modify: `Modules/AI/app/Ai/Embeddings/EmbeddingModelRegistry.php` (`activeKey()` reads `config('core.search.vector.model')`, keeping the fallback to the first configured profile, then the first declared one), `Modules/AI/database/seeders/AIDatabaseSeeder.php` (drop the `features.embeddings.active` definition), `Modules/AI/app/Ai/Embeddings/Switching/EmbeddingSwitchOrchestrator.php` (activation no longer writes `features.embeddings.active`), `Modules/AI/config/config.php` (the comment naming `active`), every docblock that names the setting.
@@ -267,8 +267,8 @@
 
 **Open point to settle in the task:** the Core seeds `search.vector.model` with a fixed `sentence_transformers:intfloat/multilingual-e5-small`, while the AI seeded `active` from the first *configured* profile. Decide how a fresh installation whose first configured profile differs gets a coherent serving model (for example the AI seeder writing `search.vector.model` through `Setting::writeManaged()` when the Core default is not a configured profile), record the choice in the delivery status, and cover it with a seed test. Existing rows of `features.embeddings.active` are not migrated (pre-stable, `migrate:fresh`).
 
-- [ ] **Step 1: Write the failing tests.** The registry returns `core.search.vector.model` when set and falls back to the first configured profile when empty; seeding no longer creates `features.embeddings.active`; a full switch leaves `search.vector.model` on the target and creates no `features.embeddings.active` row; the fresh-install case of the open point.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement** the changes above and update the tests that set the old key.
-- [ ] **Step 4: Run** `Modules/AI/tests/Unit/Embeddings`, `Modules/AI/tests/Feature/Embedding*`, the switch tests of Task 9 and every file touched by the key rename; all pass. Pint on the touched files.
-- [ ] **Step 5: Commit** in `Modules/AI`: `refactor(ai): the serving embedding model is Core's search.vector.model; drop features.embeddings.active`.
+- [x] **Step 1: Write the failing tests.** The registry returns `core.search.vector.model` when set and falls back to the first configured profile when empty; seeding no longer creates `features.embeddings.active`; a full switch leaves `search.vector.model` on the target and creates no `features.embeddings.active` row; the fresh-install case of the open point.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement** the changes above and update the tests that set the old key.
+- [x] **Step 4: Run** `Modules/AI/tests/Unit/Embeddings`, `Modules/AI/tests/Feature/Embedding*`, the switch tests of Task 9 and every file touched by the key rename; all pass. Pint on the touched files.
+- [x] **Step 5: Commit** in `Modules/AI`: `refactor(ai): the serving embedding model is Core's search.vector.model; drop features.embeddings.active`.
