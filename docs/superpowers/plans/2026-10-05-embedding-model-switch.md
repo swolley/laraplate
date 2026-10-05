@@ -229,9 +229,9 @@
 
 - [x] **Step 1: Write** the user and developer pages: the settings, the confirmation, `ai:embeddings:probe|switch|status|prune`, the guard reasons and `meta.vector_disabled`, the PostgreSQL partial indexes, and how to add a profile (run the probe, declare the number).
 - [x] **Step 2: Update the spec:** status becomes **Implemented** with the date, and any divergence found while building is recorded in it.
-- [ ] **Step 3: Close this plan:** tick every box, add a `## Delivery status (date): ...` section with a `**Documented in:**` line naming the pages above and the divergences, update both indexes.
-- [ ] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status` from the stack root; the plan shows complete.
-- [ ] **Step 5: Commit** in `laraplate`, then the submodule references in `laraplate` and the stack root: `docs: embedding model switch delivered; update the AI and Core references`.
+- [x] **Step 3: Close this plan:** tick every box, add a `## Delivery status (date): ...` section with a `**Documented in:**` line naming the pages above and the divergences, update both indexes.
+- [x] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status` from the stack root; the plan shows complete.
+- [x] **Step 5: Commit** in `laraplate`, then the submodule references in `laraplate` and the stack root: `docs: embedding model switch delivered; update the AI and Core references`.
 
 ### Task 12: Index documents carry the vectors of one model (Core)
 
@@ -272,3 +272,14 @@
 - [x] **Step 3: Implement** the changes above and update the tests that set the old key.
 - [x] **Step 4: Run** `Modules/AI/tests/Unit/Embeddings`, `Modules/AI/tests/Feature/Embedding*`, the switch tests of Task 9 and every file touched by the key rename; all pass. Pint on the touched files.
 - [x] **Step 5: Commit** in `Modules/AI`: `refactor(ai): the serving embedding model is Core's search.vector.model; drop features.embeddings.active`.
+
+## Delivery status (2026-10-05): shipped
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/README.md`, `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, `Modules/AI/docs/SENTENCE_TRANSFORMERS_INSTALLATION.md`, `Modules/Core/README.md`, `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_DEVELOPER.md`, `Modules/Core/docs/rag/SETTING_ACTIONS_USER.md`.
+
+Divergences from the plan, all recorded in the spec (sections 4, 10 and 11):
+- Ruling R17 (user, in chat): `features.embeddings.active` was removed (Task 13); the serving model is Core's `search.vector.model` only. The write that the plan placed in the orchestrator lived in `EmbeddingSwitchActivation`. Existing rows of the removed setting are not deleted.
+- The DTO lives in `app/Data`, not a new `app/DTOs` folder; settings and profile keys are `provider:model` strings.
+- The final review added a dedicated `embeddings-switch` queue with its own Horizon supervisor, resumed a failed `indexes` or `verify` at `embeddings`, passed the profile's service model to hosted providers, and made `--abandon` check the return model. Not built, left as open points in the spec: abandoning while the `embeddings` supervisor is down, and starting a switch from a change that went through approval.
+
+Not verified on a real server: every PostgreSQL branch (pgvector column, partial indexes, `vector_dims` guard, non-concurrent `CREATE INDEX` blocking writes) and the Elasticsearch branches (document count, `--force` RAG index, forced `createIndex`, bulk update, `flush`). The gated pgvector test has never run. Redis `retry_after` must be at least 1000 s for whoever runs a switch.
