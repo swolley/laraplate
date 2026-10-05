@@ -113,6 +113,9 @@
 - Never declare classes, traits, interfaces, or enums inside test files; put them in that module's `Modules/{Module}/tests/Stubs/` (or module equivalent like `tests/Support/`) with PSR-4 namespaces registered in that module's `composer.json` `autoload-dev`.
 - Run minimal relevant tests:
   - `php artisan test --compact path/or/filter`
+- `tests/bootstrap.php` runs `Tests\Support\TestEnvironmentGuard`: the suite aborts if `bootstrap/cache/config.php` exists (a cached config makes tests use the `.env` database; fix with `php artisan config:clear`) or if the database is not sqlite or a local host (127.0.0.1, localhost, ::1).
+- Opt out of the remote-database check only knowingly with `ALLOW_REMOTE_TEST_DATABASE=1`.
+- Never leave `php artisan optimize` or `config:cache` on a machine that runs tests.
 - Before done after code changes:
   - `vendor/bin/pint --dirty`
 
