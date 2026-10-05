@@ -25,6 +25,8 @@
 
 **Decisions made while planning** (all now in the spec): a model is named `provider:model` everywhere, and the Core gets a managed setting `search.vector.model` with that value, because `DatabaseEngine` must filter by the active model and cannot read the AI registry; the PostgreSQL change is made in the create migration, not as a migration of existing installations; the confirmation is a generic Core hook (`ISettingChangeConfirmation`) that the AI module registers for its setting.
 
+**Proposal R17 (2026-10-05, on hold):** remove `features.embeddings.active`. Reported by another session as the user's decision; it has not been confirmed by the user in the session executing this plan, so it is not applied. The setting holds the same value as Core's `search.vector.model`, written by the same procedure at the same moment, so it is a duplicate that can drift. The AI reads the serving model from `config('core.search.vector.model')` (AI depends on Core, so the direction is allowed); `features.embeddings.model` (the target) and `features.embeddings.switch` stay. The Global Constraints above still name `active` because Tasks 1-12 were built against them; Task 13 would remove it and is on hold until the proposal is confirmed. The documentation written in Task 11 describes the current state, with `active` in place.
+
 ## Review Focus
 
 1. The target service is unreachable, reports another model, or measures other dimensions: the switch does not start and nothing changed. Task 8.
@@ -56,11 +58,11 @@
 - Produces: `EmbeddingModelRegistry::keys(): list<string>`; `::withActive(string $key, Closure $callback): mixed` (while the closure runs, `active()` returns that profile, and the previous override is restored even if it throws); `get()` takes `dimensions` and `similarity` (default `'cosine'`) from the profile block and throws `InvalidArgumentException` when `dimensions` is missing or below 1. A profile key is `provider:service_model`; `EmbeddingModelProfile::$provider` and `$serviceModel` are the two parts split at the first colon; the two existing profiles become `sentence_transformers:intfloat/multilingual-e5-small` and `sentence_transformers:all-MiniLM-L6-v2`.
 - Produces: `EmbeddingsProviderFactory::make(?string $provider = null)` and its per-request service model resolve the active profile through `EmbeddingModelRegistry`, not through `config('ai.features.embeddings.active')`; `make()` with no argument uses `active()->provider`.
 
-- [ ] **Step 1: Write the failing tests.** `it('takes dimensions and similarity from the profile, not from Core')` (set `core.search.vector.dimensions` to 999, expect the profile's 384); `it('rejects a profile with no dimensions')`; `it('lists the configured profile keys')`; `it('derives provider and service model from the key, splitting on the first colon')` (keys `sentence_transformers:intfloat/multilingual-e5-small` and `ollama:nomic-embed-text:latest`); `it('returns the overridden profile while a callback runs and restores the previous one after, also when it throws')`; `it('resolves the provider and service model of the overridden profile in the factory')` (override to `all-MiniLM-L6-v2`, expect its `service_model` in the request the sentence-transformers provider builds).
-- [ ] **Step 2: Run** `php artisan test --compact Modules/AI/tests/Unit/Embeddings/EmbeddingModelRegistryTest.php` and see them fail.
-- [ ] **Step 3: Implement** the signatures above. The override is a private nullable key on the registry, which is a singleton; read `activeServiceModel()` in the factory from `app(EmbeddingModelRegistry::class)->active()->serviceModel`.
-- [ ] **Step 4: Run** the new file and `Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php`; all pass. Pint the touched files.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): embedding profiles declare their dimensions and can be overridden for one call`.
+- [x] **Step 1: Write the failing tests.** `it('takes dimensions and similarity from the profile, not from Core')` (set `core.search.vector.dimensions` to 999, expect the profile's 384); `it('rejects a profile with no dimensions')`; `it('lists the configured profile keys')`; `it('derives provider and service model from the key, splitting on the first colon')` (keys `sentence_transformers:intfloat/multilingual-e5-small` and `ollama:nomic-embed-text:latest`); `it('returns the overridden profile while a callback runs and restores the previous one after, also when it throws')`; `it('resolves the provider and service model of the overridden profile in the factory')` (override to `all-MiniLM-L6-v2`, expect its `service_model` in the request the sentence-transformers provider builds).
+- [x] **Step 2: Run** `php artisan test --compact Modules/AI/tests/Unit/Embeddings/EmbeddingModelRegistryTest.php` and see them fail.
+- [x] **Step 3: Implement** the signatures above. The override is a private nullable key on the registry, which is a singleton; read `activeServiceModel()` in the factory from `app(EmbeddingModelRegistry::class)->active()->serviceModel`.
+- [x] **Step 4: Run** the new file and `Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php`; all pass. Pint the touched files.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): embedding profiles declare their dimensions and can be overridden for one call`.
 
 ### Task 2: The dimension probe and `ai:embeddings:probe`
 
@@ -74,11 +76,11 @@
 - Produces: `EmbeddingDimensionProbe::measure(EmbeddingModelProfile $profile): int` embeds the fixed text `embedding service probe` with that profile's provider and service model and returns the vector length; `::verify(EmbeddingModelProfile $profile): int` returns it and throws `EmbeddingDimensionMismatch` (extends `RuntimeException`, message names profile, declared and measured) when it differs from `$profile->dimensions`. An empty or missing vector throws too.
 - Produces: `php artisan ai:embeddings:probe {profile}` prints `profile, model, measured dimensions` and exits `FAILURE` with the mismatch message when declared and measured differ.
 
-- [ ] **Step 1: Write the failing tests.** Probe: returns the length of a fake provider's vector; throws `EmbeddingDimensionMismatch` for 768 against a declared 384; throws on an empty vector; uses the overridden profile's service model (assert on the faked HTTP request body). Command: prints the measured value; fails with the mismatch text; unknown profile fails.
-- [ ] **Step 2: Run** the two files and see them fail.
-- [ ] **Step 3: Implement** the probe over `withActive`, and the command; replace the inline length check in the repair command by `verify()` and keep its messages and the model-identity check.
-- [ ] **Step 4: Run** the two new files plus `Modules/AI/tests/Integration/RepairMissingEmbeddingsCommandTest.php` and `Modules/AI/tests/Feature/Console/RepairEmbeddingsTest.php`; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): measure a profile's vector length with a probe, and expose it as ai:embeddings:probe`.
+- [x] **Step 1: Write the failing tests.** Probe: returns the length of a fake provider's vector; throws `EmbeddingDimensionMismatch` for 768 against a declared 384; throws on an empty vector; uses the overridden profile's service model (assert on the faked HTTP request body). Command: prints the measured value; fails with the mismatch text; unknown profile fails.
+- [x] **Step 2: Run** the two files and see them fail.
+- [x] **Step 3: Implement** the probe over `withActive`, and the command; replace the inline length check in the repair command by `verify()` and keep its messages and the model-identity check.
+- [x] **Step 4: Run** the two new files plus `Modules/AI/tests/Integration/RepairMissingEmbeddingsCommandTest.php` and `Modules/AI/tests/Feature/Console/RepairEmbeddingsTest.php`; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): measure a profile's vector length with a probe, and expose it as ai:embeddings:probe`.
 
 ### Task 3: Stored vectors are checked, and the embedding job takes a profile
 
@@ -90,11 +92,11 @@
 - Consumes: Task 1.
 - Produces: `GenerateEmbeddingsJob::__construct(Model $model, ?string $locale = null, ?string $profile = null)`; with a profile, `handle()` runs the synchronizer inside `registry->withActive($profile, ...)`, so rows are stamped with that key. `ModelEmbeddingSynchronizer` throws `EmbeddingDimensionMismatch` instead of storing a vector whose length differs from the profile in use.
 
-- [ ] **Step 1: Write the failing tests.** Job with `profile: 'sentence_transformers:all-MiniLM-L6-v2'` while the active is `sentence_transformers:intfloat/multilingual-e5-small` stamps `model_key = 'sentence_transformers:all-MiniLM-L6-v2'` and leaves the active profile's rows untouched; without a profile it stamps the active one (existing behavior); a fake provider returning 5 floats for a 384 profile makes the sync throw and stores no row; a row whose `content_hash` and `model_key` already match is skipped.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement** the argument and the length check in `writePlan()`. Pass `$profile` through the job's serialization.
-- [ ] **Step 4: Run** the three embedding test files above and `Modules/AI/tests/Unit/Services/ModelEmbeddingSynchronizerTest.php` if present; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): embed with an explicit profile, and refuse to store a vector of the wrong length`.
+- [x] **Step 1: Write the failing tests.** Job with `profile: 'sentence_transformers:all-MiniLM-L6-v2'` while the active is `sentence_transformers:intfloat/multilingual-e5-small` stamps `model_key = 'sentence_transformers:all-MiniLM-L6-v2'` and leaves the active profile's rows untouched; without a profile it stamps the active one (existing behavior); a fake provider returning 5 floats for a 384 profile makes the sync throw and stores no row; a row whose `content_hash` and `model_key` already match is skipped.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement** the argument and the length check in `writePlan()`. Pass `$profile` through the job's serialization.
+- [x] **Step 4: Run** the three embedding test files above and `Modules/AI/tests/Unit/Services/ModelEmbeddingSynchronizerTest.php` if present; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): embed with an explicit profile, and refuse to store a vector of the wrong length`.
 
 ### Task 4: Command-managed settings (Core)
 
@@ -106,11 +108,11 @@
 - Produces: `Setting::$managed` (bool cast, not mass-assignable); `Setting::writeManaged(string $name, mixed $value): void` updates the row's value without creating a pending approval and refreshes the settings overlay, and throws `InvalidArgumentException` for a setting that is not managed. The form shows a managed setting's value read-only.
 - Produces: seeded managed settings `search.vector.dimensions` (384), `search.vector.similarity` (`cosine`), `search.vector.model` (`sentence_transformers:intfloat/multilingual-e5-small`), and `search.vector.suspended_reason` (null, string), group `search`.
 
-- [ ] **Step 1: Write the failing tests.** `writeManaged` changes the value and `config('core.search.vector.dimensions')` follows after the overlay refresh; it throws for an unmanaged setting; it does not create a pending approval (copy how `RefreshAiModelsCommand` writes `choices` and assert the same); the edit form disables `value` for a managed row and not for an unmanaged one; the four settings are seeded with `managed = true`.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement** the column in the create migration, the cast and `writeManaged()`, the disabled field, and the seed definitions (extend `setting()` with a `managed` argument). Remove `search.vector.dimensions` and `search.vector.similarity` from the user-editable seed block they live in now.
-- [ ] **Step 4: Run** the three new files and `Modules/Core/tests/Feature/Filament`. All pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/Core`: `feat(settings): a setting can be managed by a command and read-only in the form`.
+- [x] **Step 1: Write the failing tests.** `writeManaged` changes the value and `config('core.search.vector.dimensions')` follows after the overlay refresh; it throws for an unmanaged setting; it does not create a pending approval (copy how `RefreshAiModelsCommand` writes `choices` and assert the same); the edit form disables `value` for a managed row and not for an unmanaged one; the four settings are seeded with `managed = true`.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement** the column in the create migration, the cast and `writeManaged()`, the disabled field, and the seed definitions (extend `setting()` with a `managed` argument). Remove `search.vector.dimensions` and `search.vector.similarity` from the user-editable seed block they live in now.
+- [x] **Step 4: Run** the three new files and `Modules/Core/tests/Feature/Filament`. All pass. Pint.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(settings): a setting can be managed by a command and read-only in the form`.
 
 ### Task 5: The vector availability guard (Core)
 
@@ -123,11 +125,11 @@
 - Produces: `VectorAvailability` (readonly: `bool $available`, `?string $reason`, `static yes(): self`, `static no(string $reason): self`); `IVectorSearchAvailability::check(Model $model): VectorAvailability`; `IReportsVectorDimensions::indexedVectorDimensions(Model $model): ?int` implemented by `ElasticsearchEngine` (reads `embeddings.properties.vector.dims` of the model's index mapping, null when the index or field is absent).
 - Produces: `VectorSearchAvailability` answers `disabled` when `core.search.vector.enabled` is false, `suspended` when `core.search.vector.suspended_reason` is non-empty, `dimension_mismatch` when the engine reports dimensions different from `core.search.vector.dimensions` (cached 60 seconds per model class; skipped for an engine that does not implement the interface), else `yes()`. `AdvancedSearchService` asks it before embedding the query: when unavailable, the vector is `null` and the result's `meta['vector_disabled']` is the reason.
 
-- [ ] **Step 1: Write the failing tests.** Unit: one test per reason with config set accordingly, plus the cache (engine called once for two checks within the window) and the order (`disabled` before `suspended` before `dimension_mismatch`). Integration: with `suspended_reason` set and a plan asking for vectors, the search returns keyword hits, `meta['vector_disabled'] === 'suspended'`, the embedder is never called and no engine error is raised; with a dimension mismatch the same with `dimension_mismatch`. ES-gated: an index created with 384 reports 384, a missing index reports null.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement.** Read the mapping through the engine's existing client in the style of `checkIndexStructure()`.
-- [ ] **Step 4: Run** the unit and integration files and `Modules/Core/tests/Integration/Search`; all pass; the gated file is skipped without Elasticsearch. Pint.
-- [ ] **Step 5: Commit** in `Modules/Core`: `feat(search): vector search is guarded: suspended, mismatching or disabled searches fall back to keywords with a reason`.
+- [x] **Step 1: Write the failing tests.** Unit: one test per reason with config set accordingly, plus the cache (engine called once for two checks within the window) and the order (`disabled` before `suspended` before `dimension_mismatch`). Integration: with `suspended_reason` set and a plan asking for vectors, the search returns keyword hits, `meta['vector_disabled'] === 'suspended'`, the embedder is never called and no engine error is raised; with a dimension mismatch the same with `dimension_mismatch`. ES-gated: an index created with 384 reports 384, a missing index reports null.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement.** Read the mapping through the engine's existing client in the style of `checkIndexStructure()`.
+- [x] **Step 4: Run** the unit and integration files and `Modules/Core/tests/Integration/Search`; all pass; the gated file is skipped without Elasticsearch. Pint.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(search): vector search is guarded: suspended, mismatching or disabled searches fall back to keywords with a reason`.
 
 ### Task 6: The embedding settings, the active profile from a setting, and the AI side of the guard
 
@@ -142,27 +144,27 @@
 - Produces: `EmbeddingVectorSearchAvailability implements IVectorSearchAvailability` decorating Core's: delegates first, then answers `no_vectors` when no `core_model_embeddings` row stamped with the active key exists. Bound over Core's with `singleton`, as `IReranker` is.
 - Consumes: Task 4 (`writeManaged`), Task 5 (the interface).
 
-- [ ] **Step 1: Write the failing tests.** State round-trips JSON and degrades to idle on null and on garbage; the store writes through the managed setting and the lock refuses a second holder and can be released; seeding creates the three settings with the right `managed` flags and choices equal to the profile keys; the registry reads `active` from `config('ai.features.embeddings.active')` fed by the setting; the AI guard returns `no_vectors` for an empty table and delegates otherwise; a profile whose provider has no key or URL is not among the choices.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement.** The AI settings seeder follows `runtimeSettingDefinitions()`; the choices of `features.embeddings.model` are written at seed time from `EmbeddingModelRegistry::keys()`, leaving out the profiles whose `provider` is not configured (`ProviderConfiguration::isConfigured()`), and the active profile is always among them.
-- [ ] **Step 4: Run** the new files and `Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php Modules/AI/tests/Integration/EmbeddingServiceTest.php`; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): the embedding model is a setting, with a managed active profile and switch state`.
+- [x] **Step 1: Write the failing tests.** State round-trips JSON and degrades to idle on null and on garbage; the store writes through the managed setting and the lock refuses a second holder and can be released; seeding creates the three settings with the right `managed` flags and choices equal to the profile keys; the registry reads `active` from `config('ai.features.embeddings.active')` fed by the setting; the AI guard returns `no_vectors` for an empty table and delegates otherwise; a profile whose provider has no key or URL is not among the choices.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement.** The AI settings seeder follows `runtimeSettingDefinitions()`; the choices of `features.embeddings.model` are written at seed time from `EmbeddingModelRegistry::keys()`, leaving out the profiles whose `provider` is not configured (`ProviderConfiguration::isConfigured()`), and the active profile is always among them.
+- [x] **Step 4: Run** the new files and `Modules/AI/tests/Unit/Embeddings Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php Modules/AI/tests/Integration/EmbeddingServiceTest.php`; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): the embedding model is a setting, with a managed active profile and switch state`.
 
 ### Task 7: The setting-change confirmation hook (Core)
 
 **Files:**
-- Create: `Modules/Core/app/Contracts/ISettingChangeConfirmation.php`, `Modules/Core/app/DTOs/SettingChangeWarning.php`, `Modules/Core/app/Services/SettingChangeConfirmations.php`
+- Create: `Modules/Core/app/Contracts/ISettingChangeConfirmation.php`, `Modules/Core/app/Data/SettingChangeWarning.php`, `Modules/Core/app/Services/SettingChangeConfirmations.php`
 - Modify: `Modules/Core/app/Filament/Resources/Settings/Pages/EditSetting.php`, `Modules/Core/app/Filament/Resources/Settings/Schemas/SettingForm.php`, the Core service provider (bind the registry as a singleton)
 - Test: `Modules/Core/tests/Feature/Filament/SettingChangeConfirmationTest.php`
 
 **Interfaces:**
 - Produces: `SettingChangeWarning` (readonly: `string $title`, `list<string> $lines`); `ISettingChangeConfirmation`: `supports(string $settingName): bool`, `warn(Setting $setting, mixed $newValue): ?SettingChangeWarning` (null means no confirmation needed), `confirmed(Setting $setting, mixed $newValue): void` (runs after the value is saved), `lockedReason(Setting $setting): ?string` (a non-null reason disables the field and shows the reason); `SettingChangeConfirmations::register(ISettingChangeConfirmation $confirmation): void` and `::for(string $settingName): ?ISettingChangeConfirmation`.
 
-- [ ] **Step 1: Write the failing tests** with a stub confirmation in `Modules/Core/tests/Stubs/`: saving a changed value of a supported setting does not save and opens a confirmation showing the title and lines; confirming saves and calls `confirmed()` once; cancelling saves nothing; an unchanged value saves without a confirmation; a setting with no registered confirmation saves as before; a non-null `lockedReason` disables the field and shows the reason.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement** the interception in `EditSetting` with Filament's confirmation modal (read the `filament-development` skill for the Filament 5 API before writing it).
-- [ ] **Step 4: Run** the new file and `Modules/Core/tests/Feature/Filament`; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/Core`: `feat(settings): a module can ask for a confirmation, or lock a setting, when its value changes`.
+- [x] **Step 1: Write the failing tests** with a stub confirmation in `Modules/Core/tests/Stubs/`: saving a changed value of a supported setting does not save and opens a confirmation showing the title and lines; confirming saves and calls `confirmed()` once; cancelling saves nothing; an unchanged value saves without a confirmation; a setting with no registered confirmation saves as before; a non-null `lockedReason` disables the field and shows the reason.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement** the interception in `EditSetting` with Filament's confirmation modal (read the `filament-development` skill for the Filament 5 API before writing it).
+- [x] **Step 4: Run** the new file and `Modules/Core/tests/Feature/Filament`; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(settings): a module can ask for a confirmation, or lock a setting, when its value changes`.
 
 ### Task 8: The alert, the switch start and its preflight
 
@@ -178,11 +180,11 @@
 - Produces: `ai:embeddings:switch {profile}`: refuses when the lock is held, when the profile is unknown, equals the active one, or the probe cannot verify it, and in each case changes nothing; otherwise stores `running`/`preflight`, sets `search.vector.suspended_reason = 'switching'` and dispatches `SwitchEmbeddingModelJob`. `ai:embeddings:status` prints the state and counts.
 - The preflight reuses the model-identity check of `ai:embeddings:repair` (`/health` and the model named by the probe answer): another model reported means the switch does not start.
 
-- [ ] **Step 1: Write the failing tests.** Preview: equal dimensions give `dimensionsDiffer = false`; the counts match seeded translated records. Start: an unreachable service, a service reporting another model, and a probe measuring other dimensions each leave state `idle`, `suspended_reason` empty and no job dispatched; a held lock refuses a second start; a valid start records state, sets `suspended_reason`, dispatches the job. Confirmation: not shown for the active profile, shows both dimensions and the record count for another, locks the field while running, cancel changes nothing, confirm starts the switch. Records created during the embeddings phase get the target key: dispatch a `GenerateEmbeddingsJob` for a new record while the state is `running` and expect `model_key` equal to the target.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement.** For the last test, `GenerateEmbeddingsJob` resolves its profile from the store when state is `running` and no profile was given.
-- [ ] **Step 4: Run** the three files; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): changing the embedding model asks for confirmation and starts a guarded switch`.
+- [x] **Step 1: Write the failing tests.** Preview: equal dimensions give `dimensionsDiffer = false`; the counts match seeded translated records. Start: an unreachable service, a service reporting another model, and a probe measuring other dimensions each leave state `idle`, `suspended_reason` empty and no job dispatched; a held lock refuses a second start; a valid start records state, sets `suspended_reason`, dispatches the job. Confirmation: not shown for the active profile, shows both dimensions and the record count for another, locks the field while running, cancel changes nothing, confirm starts the switch. Records created during the embeddings phase get the target key: dispatch a `GenerateEmbeddingsJob` for a new record while the state is `running` and expect `model_key` equal to the target.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement.** For the last test, `GenerateEmbeddingsJob` resolves its profile from the store when state is `running` and no profile was given.
+- [x] **Step 4: Run** the three files; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): changing the embedding model asks for confirmation and starts a guarded switch`.
 
 ### Task 9: Embeddings, indexes, verification and activation
 
@@ -193,14 +195,14 @@
 
 **Interfaces:**
 - Consumes: Task 8.
-- Produces: `EmbeddingSwitchOrchestrator::advance(): EmbeddingSwitchState` runs the current phase and moves to the next, persisting state after each. Phases, in order: `embeddings` (dispatch `GenerateEmbeddingsJob` with the target for every embeddable record, record `total` and `done`, finish when `ai:embeddings:repair --stale` logic finds none stale against the target), `indexes` (for each searchable embeddable model: when the dimensions differ recreate the index with the target dimensions through the engine's `createIndex(..., force: true)`, in every case import; recreate the RAG indexes with the target dimensions), `verify` (per index: document count equals the searchable record count, every record has a target-stamped row, the mapping reports the target dimensions, a smoke vector query of the embedded text `test` succeeds), `activate` (one step: `writeManaged` for `features.embeddings.active`, `search.vector.dimensions`, `search.vector.similarity`, `search.vector.model`, then clear `suspended_reason`, set state `idle`, invalidate the settings and guard caches, then delete the `core_model_embeddings` rows of the previous model and, on PostgreSQL, drop its partial index).
+- Produces: `EmbeddingSwitchOrchestrator::advance(): EmbeddingSwitchState` runs the current phase and moves to the next, persisting state after each. Phases, in order: `embeddings` (dispatch `GenerateEmbeddingsJob` with the target for every embeddable record, record `total` and `done`, finish when every embeddable record has a row with the target `model_key` for each of its locales), `indexes` (run inside `VectorModelContext::using($targetKey, ...)` of Task 12, so the documents carry only the target's vectors; for each searchable embeddable model: when the dimensions differ recreate the index with the target dimensions through the engine's `createIndex(..., force: true)`, in every case import; recreate the RAG indexes with the target dimensions), `verify` (per index: document count equals the searchable record count, every record has a target-stamped row, the mapping reports the target dimensions, a smoke vector query of the embedded text `test` succeeds), `activate` (one step: `writeManaged` for `features.embeddings.active`, `search.vector.dimensions`, `search.vector.similarity`, `search.vector.model`, then clear `suspended_reason`, set state `idle`, invalidate the settings and guard caches, then delete the `core_model_embeddings` rows of the previous model and, on PostgreSQL, drop its partial index).
 - Failure: the failing phase and error are stored, state `failed`, `active` unchanged, `suspended_reason` stays. `--resume` continues from the stored phase; repeating `activate` after a failed settings write is harmless (same values). `--abandon` runs the switch with `previous` as the target. `ai:embeddings:prune --model-key=<key>` deletes the `core_model_embeddings` rows of that key and refuses the active key; it is a manual cleanup for rows nobody uses, since activation already removes the previous model's.
 
-- [ ] **Step 1: Write the failing tests.** With fake provider and the database engine: a full switch from 384 to 384 (equal dimensions) re-embeds every record, does not call `createIndex` with force, verifies and activates, and afterwards only target-stamped rows remain; a switch to 768 recreates the index with 768 (assert on the engine call), then activates and `core.search.vector.dimensions` reads 768; verify fails when one record has no target row, stays in `failed/verify` with `active` unchanged, the previous model's rows still present and vector search still suspended; `--resume` after fixing it completes; an activation whose settings write throws once leaves state `activate` and `--resume` completes it; `--abandon` returns to the previous model; prune removes only the named key and refuses the active one.
-- [ ] **Step 2: Run** and see them fail.
-- [ ] **Step 3: Implement.** `SwitchEmbeddingModelJob` calls `advance()` and re-dispatches itself with a delay while the state is `running`, releasing the lock on idle or failed. Index recreation and import use the engine and `scout:import` programmatically, not by shelling out.
-- [ ] **Step 4: Run** the three files and `Modules/AI/tests/Feature/CreateRagElasticsearchIndex*` tests if present; all pass. Pint.
-- [ ] **Step 5: Commit** in `Modules/AI`: `feat(ai): ai:embeddings:switch re-embeds, rebuilds the indexes, verifies and activates the new model`.
+- [x] **Step 1: Write the failing tests.** With fake provider and the database engine: a full switch from 384 to 384 (equal dimensions) re-embeds every record, does not call `createIndex` with force, verifies and activates, and afterwards only target-stamped rows remain; a switch to 768 recreates the index with 768 (assert on the engine call), then activates and `core.search.vector.dimensions` reads 768; verify fails when one record has no target row, stays in `failed/verify` with `active` unchanged, the previous model's rows still present and vector search still suspended; `--resume` after fixing it completes; an activation whose settings write throws once leaves state `activate` and `--resume` completes it; `--abandon` returns to the previous model; prune removes only the named key and refuses the active one.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement.** `SwitchEmbeddingModelJob` calls `advance()` and re-dispatches itself with a delay while the state is `running`, releasing the lock on idle or failed. Index recreation and import use the engine and `scout:import` programmatically, not by shelling out.
+- [x] **Step 4: Run** the three files and `Modules/AI/tests/Feature/CreateRagElasticsearchIndex*` tests if present; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/AI`: `feat(ai): ai:embeddings:switch re-embeds, rebuilds the indexes, verifies and activates the new model`.
 
 ### Task 10: PostgreSQL with pgvector
 
@@ -213,11 +215,11 @@
 **Interfaces:**
 - Produces: the `embedding` column is created as plain `vector` (no dimension) on pgvector, with no index at migration time; `PgvectorProfileIndex::ensure(Connection $connection, string $modelKey, int $dimensions, string $similarity): void` creates `USING hnsw ((embedding::vector(N)) <ops>) WHERE model_key = '<key>'` named from the key (idempotent), `::drop(Connection $connection, string $modelKey): void`, and `::statements(string $table, string $modelKey, int $dimensions, string $similarity): list<string>` returns the SQL for tests. `DatabaseEngine` orders by `embedding::vector(N) <=> ?::vector` filtered by `model_key = core.search.vector.model`, N from `core.search.vector.dimensions`.
 
-- [ ] **Step 1: Write the failing tests.** Unit: the generated SQL has the cast, the ops class for each similarity (`cosine`, `l2`, `ip`), the partial `WHERE`, a name that differs per key and quotes a key with unusual characters; `drop` targets the same name. Gated: with pgvector, two models of different lengths in the table, the engine query returns only the active model's rows and uses the index (`EXPLAIN` mentions it).
-- [ ] **Step 2: Run** and see the unit file fail; the gated file is skipped without pgvector.
-- [ ] **Step 3: Implement** the three changes. Confirm the `Blueprint::vector()` call without a dimension in the Laravel version installed; if it does not accept `null`, create the column with a raw statement.
-- [ ] **Step 4: Run** the unit file and `Modules/Core/tests/Integration/Search`; pass. On a PostgreSQL with pgvector, run the gated file; if none is available, say so in the commit message and leave Open point 1 of the spec standing. Pint.
-- [ ] **Step 5: Commit** in `Modules/Core` and `Modules/AI`: `feat(search): PostgreSQL stores vectors of any length, with one partial index per embedding profile`.
+- [x] **Step 1: Write the failing tests.** Unit: the generated SQL has the cast, the ops class for each similarity (`cosine`, `l2`, `ip`), the partial `WHERE`, a name that differs per key and quotes a key with unusual characters; `drop` targets the same name. Gated: with pgvector, two models of different lengths in the table, the engine query returns only the active model's rows and uses the index (`EXPLAIN` mentions it).
+- [x] **Step 2: Run** and see the unit file fail; the gated file is skipped without pgvector.
+- [x] **Step 3: Implement** the three changes. Confirm the `Blueprint::vector()` call without a dimension in the Laravel version installed; if it does not accept `null`, create the column with a raw statement.
+- [x] **Step 4: Run** the unit file and `Modules/Core/tests/Integration/Search`; pass. On a PostgreSQL with pgvector, run the gated file; if none is available, say so in the commit message and leave Open point 1 of the spec standing. Pint.
+- [x] **Step 5: Commit** in `Modules/Core` and `Modules/AI`: `feat(search): PostgreSQL stores vectors of any length, with one partial index per embedding profile`.
 
 ### Task 11: Documentation, spec amendments and closing
 
@@ -225,8 +227,48 @@
 - Modify: `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/README.md` (remove the two variables), `Modules/AI/docs/SEARCH_AND_TRANSLATION.md`, `Modules/AI/docs/SENTENCE_TRANSFORMERS_INSTALLATION.md`, `Modules/Core/README.md`, `Modules/Core/docs/rag/SEARCH_RETRIEVAL_PIPELINE.md` (the guard and its reasons), `docs/superpowers/specs/2026-10-05-embedding-model-switch-design.md`, `docs/superpowers/specs/INDEX.md`, `docs/superpowers/plans/INDEX.md`, this plan
 - Test: `tests/Unit/ClosedPlansPointToDocumentationTest.php`
 
-- [ ] **Step 1: Write** the user and developer pages: the settings, the confirmation, `ai:embeddings:probe|switch|status|prune`, the guard reasons and `meta.vector_disabled`, the PostgreSQL partial indexes, and how to add a profile (run the probe, declare the number).
-- [ ] **Step 2: Update the spec:** status becomes **Implemented** with the date, and any divergence found while building is recorded in it.
+- [x] **Step 1: Write** the user and developer pages: the settings, the confirmation, `ai:embeddings:probe|switch|status|prune`, the guard reasons and `meta.vector_disabled`, the PostgreSQL partial indexes, and how to add a profile (run the probe, declare the number).
+- [x] **Step 2: Update the spec:** status becomes **Implemented** with the date, and any divergence found while building is recorded in it.
 - [ ] **Step 3: Close this plan:** tick every box, add a `## Delivery status (date): ...` section with a `**Documented in:**` line naming the pages above and the divergences, update both indexes.
 - [ ] **Step 4: Run** `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php` and `bash plan-status` from the stack root; the plan shows complete.
 - [ ] **Step 5: Commit** in `laraplate`, then the submodule references in `laraplate` and the stack root: `docs: embedding model switch delivered; update the AI and Core references`.
+
+### Task 12: Index documents carry the vectors of one model (Core)
+
+**Added during execution** (review of Task 3): rows of two models coexist until activation, and `Searchable::toSearchableArray()` serializes every embedding row of a model, so a document would carry vectors of two lengths while a switch runs. **Execution order: right after Task 5; Task 9 consumes it.**
+
+**Files:**
+- Create: `Modules/Core/app/Search/Support/VectorModelContext.php`
+- Modify: `Modules/Core/app/Search/Traits/Searchable.php` (the embeddings serialization, around lines 267-272)
+- Test: `Modules/Core/tests/Unit/Search/VectorModelContextTest.php`, `Modules/Core/tests/Feature/Search/SearchableEmbeddingsModelKeyTest.php`
+
+**Interfaces:**
+- Consumes: `search.vector.model` (Task 4).
+- Produces: `VectorModelContext::get(): ?string` (the override while inside `using`, else `config('core.search.vector.model')`, null when empty); `VectorModelContext::using(string $modelKey, Closure $callback): mixed` (restores the previous override, also when the callback throws). `Searchable::toSearchableArray()` includes only the embedding rows whose `model_key` equals `VectorModelContext::get()`; when that is null every row is included, as today.
+
+- [x] **Step 1: Write the failing tests.** Context: returns the configured model; the override inside `using`; nested overrides; restores after a throw; null when nothing is configured. Searchable: a model with rows of two `model_key`s serializes only the configured one; inside `using($other, ...)` only the other; with no configured model and no override all rows are serialized.
+- [x] **Step 2: Run** and see them fail.
+- [x] **Step 3: Implement** the context as a small static holder and filter the rows in the trait.
+- [x] **Step 4: Run** the two files and `Modules/Core/tests/Feature/Search Modules/Core/tests/Integration/Search`; all pass. Pint.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(search): an index document carries the vectors of one embedding model`.
+
+### Task 13: The serving model is Core's `search.vector.model` only (AI)
+
+**Added during execution** (Proposal R17). **On hold** until the proposal is confirmed; Tasks 10 and 11 ran without it. Planned order was right after Task 9. Task 9 is built as planned (activation writes `active` together with the Core settings); this task removes the AI copy.
+
+**Files:**
+- Modify: `Modules/AI/app/Ai/Embeddings/EmbeddingModelRegistry.php` (`activeKey()` reads `config('core.search.vector.model')`, keeping the fallback to the first configured profile, then the first declared one), `Modules/AI/database/seeders/AIDatabaseSeeder.php` (drop the `features.embeddings.active` definition), `Modules/AI/app/Ai/Embeddings/Switching/EmbeddingSwitchOrchestrator.php` (activation no longer writes `features.embeddings.active`), `Modules/AI/config/config.php` (the comment naming `active`), every docblock that names the setting.
+- Test: `Modules/AI/tests/Unit/Embeddings/EmbeddingModelRegistryTest.php`, `Modules/AI/tests/Feature/EmbeddingSettingsSeedTest.php`; replace `config()->set('ai.features.embeddings.active', ...)` with `core.search.vector.model` in every AI test that sets it (`rg "embeddings.active" Modules/AI/tests`), including the `for('features.embeddings.active')` assertion of `EmbeddingModelSettingConfirmationTest`.
+- Docs: `Modules/AI/README.md`, `Modules/AI/docs/SENTENCE_TRANSFORMERS_INSTALLATION.md`, `Modules/AI/docs/SEARCH_AND_TRANSLATION.md` (each line naming `ai.features.embeddings.active`).
+
+**Interfaces:**
+- Consumes: `search.vector.model` (Task 4), the activation phase (Task 9).
+- Produces: no setting `features.embeddings.active`; `EmbeddingModelRegistry::activeKey()` returns `core.search.vector.model` when non-empty.
+
+**Open point to settle in the task:** the Core seeds `search.vector.model` with a fixed `sentence_transformers:intfloat/multilingual-e5-small`, while the AI seeded `active` from the first *configured* profile. Decide how a fresh installation whose first configured profile differs gets a coherent serving model (for example the AI seeder writing `search.vector.model` through `Setting::writeManaged()` when the Core default is not a configured profile), record the choice in the delivery status, and cover it with a seed test. Existing rows of `features.embeddings.active` are not migrated (pre-stable, `migrate:fresh`).
+
+- [ ] **Step 1: Write the failing tests.** The registry returns `core.search.vector.model` when set and falls back to the first configured profile when empty; seeding no longer creates `features.embeddings.active`; a full switch leaves `search.vector.model` on the target and creates no `features.embeddings.active` row; the fresh-install case of the open point.
+- [ ] **Step 2: Run** and see them fail.
+- [ ] **Step 3: Implement** the changes above and update the tests that set the old key.
+- [ ] **Step 4: Run** `Modules/AI/tests/Unit/Embeddings`, `Modules/AI/tests/Feature/Embedding*`, the switch tests of Task 9 and every file touched by the key rename; all pass. Pint on the touched files.
+- [ ] **Step 5: Commit** in `Modules/AI`: `refactor(ai): the serving embedding model is Core's search.vector.model; drop features.embeddings.active`.
