@@ -160,7 +160,9 @@ Module docs of AI (`docs/rag/MODULE.md`, the installation guide for the service)
 - **The Elasticsearch branches are not verified** against a running Elasticsearch: the document count in verify (refresh then `count`), the RAG rebuild with `ai:create-rag-index --force`, the forced `createIndex` when the dimensions differ, the bulk `update` of documents and the `flush` of an index whose dimensions are equal.
 - **Search during the indexes phase.** An index is recreated or emptied before its documents are written again, so keyword search on that model returns fewer results, or none, for the length of the rewrite.
 - **RAG during a switch.** The documentation indexes are rebuilt for the target while questions are still embedded with the serving model, so RAG retrieval is inconsistent until activation. A `filesystem` or `memory` documentation store is not rebuilt by the switch at all.
-- **Queue worker.** `SwitchEmbeddingModelJob` and the command queued by the confirmation go to the connection's default queue. Its worker (the Horizon supervisor) needs a timeout of at least 900 seconds and the connection a `retry_after` above it; the shipped Horizon supervisors watch only `embeddings` and `indexing`.
+- **Queue worker.** *Resolved in the fix wave:* `SwitchEmbeddingModelJob` and the command queued by the confirmation go to the dedicated queue `embeddings-switch` (`SwitchEmbeddingModelJob::QUEUE`), watched by the Horizon supervisor `supervisor-embeddings-switch` (1 process, timeout 960 s). It is not the `embeddings` queue, which the embeddings phase waits on. Still open: the connection's `retry_after` must be at least 1000 s; the shipped `redis` connection defaults to 90 (`REDIS_QUEUE_RETRY_AFTER`) and no dedicated connection is shipped.
+- **The embeddings phase waits on a queue without a heartbeat.** While the `embeddings` queue holds jobs the phase waits and records no failure; with the `embeddings` supervisor down the switch stays `running`, and the operator cannot abandon it until it counts as interrupted (30 minutes without progress) or the supervisor runs again.
+- **A change captured for approval never starts a switch.** A change of `features.embeddings.model` saved by a user who needs approval becomes a pending modification; approving it writes the value but starts no switch. Workaround: select the model again as a user who needs no approval, or run `ai:embeddings:switch <profile>`.
 - **The similarity vocabularies differ** between pgvector and Elasticsearch (section 5); a profile whose similarity the engine in use does not accept fails at index creation or query time.
 
 - The estimate shown in the alert is a rough one; it can be refined with a real run once the procedure exists.
@@ -176,7 +178,10 @@ Recorded while Tasks 1 to 10, 12 and 13 of the plan were built; each is also sta
 - No settings banner: the locked field's helper text carries the state (4.3).
 - `ai:embeddings:switch` gained `--report-failure`, used by the confirmation (4.3).
 - The embeddings phase completes when every embeddable record has a target row with its current content hash for each locale, not when `--stale` finds none; `--stale` was redefined as "embeddings, but no row of the active key" (4.4).
-- A refresh pass opens the verify phase; a failed verify resumes from the indexes phase (4.4).
+- A refresh pass opens the verify phase. A failed `indexes` or `verify` resumes from the embeddings phase (fix wave), so a record edited while the switch was failed, or whose embedding job failed, is embedded again; the phase moves on to the indexes when nothing is missing. An interrupted `verify` resumes from the indexes (4.4).
+- The switch job and the queued command run on the `embeddings-switch` queue with its own Horizon supervisor (fix wave; section 10, queue worker).
+- `--abandon` checks, before it stores the return switch, that the previous profile is declared and that the sentence-transformers service runs its model (fix wave).
+- `EmbeddingsProviderFactory` passes the profile's service model to `openai`, `ollama`, `mistral` and `voyageai` too, not only to the sentence-transformers service (fix wave).
 - Equal-dimension indexes are emptied before reimport (4.4).
 - Activation writes `features.embeddings.model` with a direct update (4.2).
 - `VectorModelContext` (plan Task 12) makes index documents carry one model's vectors (4.5).

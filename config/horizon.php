@@ -195,6 +195,17 @@ return [
             'processes' => 5,
             'tries' => 3,
         ],
+        // The embedding model switch job (Modules\AI SwitchEmbeddingModelJob): one run at a time,
+        // a phase may take up to 900 s. The redis connection's retry_after (REDIS_QUEUE_RETRY_AFTER)
+        // must be at least 1000, above this timeout, or a long phase is handed out a second time.
+        'supervisor-embeddings-switch' => [
+            'connection' => 'redis',
+            'queue' => ['embeddings-switch'],
+            'balance' => 'simple',
+            'processes' => 1,
+            'tries' => 3,
+            'timeout' => 960,
+        ],
     ],
 
     'environments' => [
@@ -215,6 +226,12 @@ return [
                 'balanceCooldown' => 3,
                 'nice' => 0,
             ],
+            'supervisor-embeddings-switch' => [
+                'timeout' => 960,
+                'memory' => 512,
+                'maxProcesses' => 1,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -223,6 +240,9 @@ return [
             ],
             'supervisor-indexing' => [
                 'processes' => 3,
+            ],
+            'supervisor-embeddings-switch' => [
+                'processes' => 1,
             ],
         ],
     ],
