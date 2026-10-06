@@ -196,8 +196,10 @@ return [
             'tries' => 3,
         ],
         // The embedding model switch job (Modules\AI SwitchEmbeddingModelJob): one run at a time,
-        // a phase may take up to 900 s. The redis connection's retry_after (REDIS_QUEUE_RETRY_AFTER)
-        // must be at least 1000, above this timeout, or a long phase is handed out a second time.
+        // a run may take up to 900 s (the step that prepares the indexes phase, which rebuilds the
+        // Elasticsearch documentation indexes when FAQ keeps them there). The redis connection's
+        // retry_after (REDIS_QUEUE_RETRY_AFTER) must be at least 1000, above this timeout, or that
+        // run is handed out a second time.
         'supervisor-embeddings-switch' => [
             'connection' => 'redis',
             'queue' => ['embeddings-switch'],
@@ -205,6 +207,17 @@ return [
             'processes' => 1,
             'tries' => 3,
             'timeout' => 960,
+        ],
+        // The index chunks of an embedding model switch (Modules\AI IndexDocumentsChunkJob): one
+        // model and key range of documents each, up to 240 s. One process, so pgvector index writes
+        // are not parallel; raising it is safe for the switch state.
+        'supervisor-embeddings-index' => [
+            'connection' => 'redis',
+            'queue' => ['embeddings-index'],
+            'balance' => 'simple',
+            'processes' => 1,
+            'tries' => 3,
+            'timeout' => 300,
         ],
     ],
 
@@ -232,6 +245,12 @@ return [
                 'maxProcesses' => 1,
                 'nice' => 0,
             ],
+            'supervisor-embeddings-index' => [
+                'timeout' => 300,
+                'memory' => 512,
+                'maxProcesses' => 1,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -242,6 +261,9 @@ return [
                 'processes' => 3,
             ],
             'supervisor-embeddings-switch' => [
+                'processes' => 1,
+            ],
+            'supervisor-embeddings-index' => [
                 'processes' => 1,
             ],
         ],
