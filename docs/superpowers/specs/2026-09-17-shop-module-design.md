@@ -292,6 +292,14 @@ relies on it ships. These are findings about the current ERP code, not Shop deci
   accepts item-less sales/invoice lines. Only required if a future business goal wants digital/service
   goods to be first-class ERP `Item`s (e.g. per-item revenue reporting); then ERP would add an item
   type plus an availability rule that skips the stock gate for non-stock items.
+  - **Planned refinement over the best-effort reservation (R4):** the item type should also carry
+    **make-to-order vs stocked**. Reservation v1 is uniformly best-effort (reserve up to available,
+    never block — so make-to-order confirms do not break), which needs no item type. When ERP-3 lands a
+    consumer that cares (the Shop storefront, plan #2), the make-to-order flag layers on **without
+    reworking the reservation**: the `SalesOrderConfirmed` listener can skip reservation entirely for a
+    make-to-order item (micro-optimisation), and the storefront reads the type to show "made to order,
+    ships in X" instead of "out of stock". This was option 2 of the 2026-10-06 best-effort decision,
+    deferred into ERP-3 because v1 has no consumer for the distinction (YAGNI).
 - **ERP-4 — native stock reservation / ATP (in design, ERP-owned).** ERP has no reservation concept, so
   a `Confirmed`-but-unevaded sales order does not reduce availability (overselling, even in back-office),
   and MES cannot commit components. This is an ERP-native gap with its own design record,
