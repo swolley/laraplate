@@ -10,6 +10,25 @@
 
 **Spec:** `/srv/http/laraplate-stack/docs/superpowers/specs/2026-10-05-mes-machine-data-acquisition-design.md` (sections 7.4, 7.5, 11.1 to 11.3, 13 and 15 step 2). Foundation it builds on: `docs/superpowers/plans/2026-10-06-mes-machine-data-foundation.md` (shipped); read its `Modules/MES/docs/MACHINE_CONNECTIVITY.md`.
 
+## Delivery status (2026-10-07): shipped, reviewed once on the whole branch
+
+**Documented in:** `Modules/MES/docs/MACHINE_CONNECTIVITY.md`, `Modules/MES/docs/rag/MODULE.md` and `Modules/MES/README.md`.
+
+All 8 tasks are done (MES suite 600 passed, 2 skipped; phpstan clean on the files of this plan). The persistent-session integration test was **not run**: it needs a broker that keeps sessions (Mosquitto, EMQX), and none was available; the live-delivery integration test passed against a local amqtt 0.12.1 broker. Run `MES_MQTT_TEST_BROKER=host:port MES_MQTT_TEST_PERSISTENT_SESSION=1 php artisan test --compact Modules/MES/tests/Integration/Machine` once against Mosquitto before relying on messages queued during a bridge outage.
+
+Divergences from the plan, deliberate:
+
+- A `mapped_json` source on MQTT stores its payload as received (R7 said such sources were dropped, which contradicted the documented Node-RED path).
+- `SparkplugAliasStore` offers `forDevice()` instead of `name()` (no cross-call memo: another worker may have processed the birth) and `remember()` takes the birth time and ignores an older birth than the one stored (`declared_at` on `mes_sparkplug_aliases`).
+- Sparkplug message ids carry `sha1(topic)`, and the inbox shortens any id over 128 characters (`sha1:` + hash) for every normaliser.
+- The adapter takes messages from the client's message-received hook with subscriptions that carry no callback: php-mqtt activates a subscription only at SUBACK, which would drop the messages a persistent session delivers right after CONNACK.
+- A store that fails with a database error is retried for about a minute (php-mqtt acknowledges a QoS 1 message before the handler runs); the bridge depends on a `MqttMessageHandler` interface, implemented by `MqttIngest`.
+- A source's topic filter must be valid MQTT and cannot overlap another source's, in any company, whatever the state (`MachineSource` saving hook).
+- The protobuf reader has no nesting guard: it never descends into nested messages.
+- No `google/protobuf` dependency (D2); fixtures are encoded by `protoc` from the Eclipse Tahu schema, which is not shipped.
+
+Deferred: the `bdSeq` check of an `NDEATH` against the current `NBIRTH` (a stale Will can mark a node offline until its next data); a rejected subscription (an ACL denial) is invisible because the library only logs it; reprocessing old data uses the current alias map.
+
 ## Decisions (approved 2026-10-07: D1 and D2 as recommended)
 
 - **D1. Composer dependency `php-mqtt/client`.** Latest tag `v2.3.2`, MIT, requires PHP `^8.0` and `myclabs/php-enum`; MQTT 3.1.1 and 5, TLS, QoS 0 to 2, persistent sessions. Needed for the bridge (spec 15: "an MQTT client for PHP (step 2)"). Alternative: write an MQTT client ourselves, which is not recommended. Licence check for the spec's rule: MIT is compatible with the AGPL backend.
@@ -80,11 +99,11 @@ All paths under `Modules/MES/`.
   - `FakeMachineMessageSubscriber` (in `tests/Support`): queues messages with `push(MqttMessage)`, a `failNextLoopWith(MqttConnectionLost)`, records `connected`, `subscriptions` history and `disconnects`.
 
 - [x] **Step 0: D1 and D2 approved by the user on 2026-10-07** (add `php-mqtt/client`, no protobuf library).
-- [ ] **Step 1: Write the failing test.** `MqttConfigurationTest`: the six `mes.machine.mqtt.*` defaults above; `MqttConnectionSettings::fromConfig()` reflects `config([...])` overrides (tls true, a username); `MESTables::SparkplugAliases->value` is `mes_sparkplug_aliases`; `interface_exists(MachineMessageSubscriber::class)`; and `class_exists(PhpMqtt\Client\MqttClient::class)`.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MqttConfigurationTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement.** Run `composer require php-mqtt/client:^2.3` from the laraplate root (check the resulting `composer.lock` diff touches only it and `myclabs/php-enum`), mirror the constraint in the module `composer.json`, add the config block (commented like its siblings), the enum case, the contract, the two DTOs and the fake.
-- [ ] **Step 4: Run** the same command. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): MQTT subscriber contract and configuration`.
+- [x] **Step 1: Write the failing test.** `MqttConfigurationTest`: the six `mes.machine.mqtt.*` defaults above; `MqttConnectionSettings::fromConfig()` reflects `config([...])` overrides (tls true, a username); `MESTables::SparkplugAliases->value` is `mes_sparkplug_aliases`; `interface_exists(MachineMessageSubscriber::class)`; and `class_exists(PhpMqtt\Client\MqttClient::class)`.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MqttConfigurationTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement.** Run `composer require php-mqtt/client:^2.3` from the laraplate root (check the resulting `composer.lock` diff touches only it and `myclabs/php-enum`), mirror the constraint in the module `composer.json`, add the config block (commented like its siblings), the enum case, the contract, the two DTOs and the fake.
+- [x] **Step 4: Run** the same command. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): MQTT subscriber contract and configuration`.
 
 ---
 
@@ -103,11 +122,11 @@ All paths under `Modules/MES/`.
   - `MqttPayloadEnvelope::wrap(string $topic, string $payload): string` and `unwrap(string $stored): array{topic: string, payload: string}` (R1).
   - `MqttIngest::handle(MqttMessage $message): ?InboxResult`: routes; null for a dropped message (R7); for a canonical source, decodes and validates the envelope (invalid: `recordOnce` a `message_failed` incident with `{topic, errors}` and return null); for a `sparkplug_b` source wraps the payload (R1); then `MachineMessageInbox::accept($source, $stored, MachineTransport::Mqtt)`. A source whose normaliser is neither is dropped.
 
-- [ ] **Step 1: Write the failing test** (`Queue::fake()`, step 1 helpers): a canonical envelope published on `laraplate/laraplate-machine/1/gw-1` is stored (transport `mqtt`) and queues one job; `a redelivered message is stored once` (the same message twice: one row, one job, the second result `duplicate`); a topic of no source, of an inactive source, and one matched by two sources are dropped (null, nothing stored, no job); `subscriptions()` lists each active mqtt source's topic once and skips http and inactive sources; wildcard matching (`spBv1.0/plant/#` matches `spBv1.0/plant/DDATA/node/dev`, not `spBv1.0/other/NDATA/node`; `+` matches one level); an invalid canonical envelope is dropped with one open `message_failed` incident whose detail names the topic and the errors, a second invalid one does not add an incident; a `sparkplug_b` source stores `{"topic","payload_base64"}` and `unwrap(wrap($t, $p))` returns the original bytes (including non-UTF-8); a `sparkplug_b` mqtt source without `mqtt_topic` fails the model rules.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MqttIngestTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the router (cache nothing: the bridge reloads every 60 s), the envelope helper, the ingest class and the source accessor and rule. Matching is a small function over topic levels.
-- [ ] **Step 4: Run** the same command. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): MQTT topic router and ingest path`.
+- [x] **Step 1: Write the failing test** (`Queue::fake()`, step 1 helpers): a canonical envelope published on `laraplate/laraplate-machine/1/gw-1` is stored (transport `mqtt`) and queues one job; `a redelivered message is stored once` (the same message twice: one row, one job, the second result `duplicate`); a topic of no source, of an inactive source, and one matched by two sources are dropped (null, nothing stored, no job); `subscriptions()` lists each active mqtt source's topic once and skips http and inactive sources; wildcard matching (`spBv1.0/plant/#` matches `spBv1.0/plant/DDATA/node/dev`, not `spBv1.0/other/NDATA/node`; `+` matches one level); an invalid canonical envelope is dropped with one open `message_failed` incident whose detail names the topic and the errors, a second invalid one does not add an incident; a `sparkplug_b` source stores `{"topic","payload_base64"}` and `unwrap(wrap($t, $p))` returns the original bytes (including non-UTF-8); a `sparkplug_b` mqtt source without `mqtt_topic` fails the model rules.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MqttIngestTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the router (cache nothing: the bridge reloads every 60 s), the envelope helper, the ingest class and the source accessor and rule. Matching is a small function over topic levels.
+- [x] **Step 4: Run** the same command. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): MQTT topic router and ingest path`.
 
 ---
 
@@ -126,11 +145,11 @@ All paths under `Modules/MES/`.
   - `MachineBridgeCommand` (`mes:machine-bridge`): builds `MqttConnectionSettings::fromConfig()`, installs `pcntl_signal` handlers for `SIGTERM` and `SIGINT` that call `stop()` (`pcntl_async_signals(true)`), runs the bridge, prints one line on start and one on stop.
   - A handler failure for one message (an exception from `MqttIngest::handle`) is logged without the payload and does not stop the bridge.
 
-- [ ] **Step 1: Write the failing test** with `FakeMachineMessageSubscriber` and `$should_continue` closures that stop after N calls: delivered messages reach `MqttIngest` (two canonical messages, two stored); the heartbeat key is written and moves forward (`Carbon::setTestNow`); subscriptions are set at start from the active mqtt sources and re-subscribed after a source is added (advance time 60 s); `MqttConnectionLost` from the loop triggers a reconnect and a resubscribe, with the backoff sequence recorded by an injected sleeper (`MachineBridge` takes a `callable $sleep` defaulting to `usleep` in seconds; the test captures `[1, 2]` for two consecutive losses and `[1]` after a success resets it); an exception thrown while handling one message is logged and the next message is still handled; `SIGTERM while a message is being handled`: the fake delivers a message whose handler calls `stop()`, the message is stored, and `run()` returns without handling later queued messages; the command is registered (`php artisan list` contains `mes:machine-bridge`) and `--help` exits 0.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineBridgeTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the bridge and the command. Signal handlers are only installed by the command, so tests drive `stop()` directly.
-- [ ] **Step 4: Run** the same command. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): machine bridge loop and mes:machine-bridge command`.
+- [x] **Step 1: Write the failing test** with `FakeMachineMessageSubscriber` and `$should_continue` closures that stop after N calls: delivered messages reach `MqttIngest` (two canonical messages, two stored); the heartbeat key is written and moves forward (`Carbon::setTestNow`); subscriptions are set at start from the active mqtt sources and re-subscribed after a source is added (advance time 60 s); `MqttConnectionLost` from the loop triggers a reconnect and a resubscribe, with the backoff sequence recorded by an injected sleeper (`MachineBridge` takes a `callable $sleep` defaulting to `usleep` in seconds; the test captures `[1, 2]` for two consecutive losses and `[1]` after a success resets it); an exception thrown while handling one message is logged and the next message is still handled; `SIGTERM while a message is being handled`: the fake delivers a message whose handler calls `stop()`, the message is stored, and `run()` returns without handling later queued messages; the command is registered (`php artisan list` contains `mes:machine-bridge`) and `--help` exits 0.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineBridgeTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the bridge and the command. Signal handlers are only installed by the command, so tests drive `stop()` directly.
+- [x] **Step 4: Run** the same command. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): machine bridge loop and mes:machine-bridge command`.
 
 ---
 
@@ -147,11 +166,11 @@ All paths under `Modules/MES/`.
   - `SparkplugTopic::parse(string $topic): ?SparkplugTopic` with `string $group`, `string $type` (`NBIRTH`, `NDEATH`, `DBIRTH`, `DDEATH`, `NDATA`, `DDATA`, `NCMD`, `DCMD`, `STATE`), `string $edge_node`, `?string $device`; null when the topic is not in the `spBv1.0` namespace. `deviceExternalId(): string` per R2.
 - Field numbers come from the Sparkplug B specification (`Payload`: timestamp, metrics, seq; `Metric`: name, alias, timestamp, datatype, is_historical, is_null and the value variants; the datatype enumeration). The implementer reads them from the published specification and the Eclipse Tahu `sparkplug_b.proto` **as a reference, not copied code**, and the fixtures below pin them.
 
-- [ ] **Step 1: Write the failing test and the fixtures.** Fixtures are binary payloads produced by a reference encoder (the Eclipse Tahu Python or Java client, run once on a developer machine, never committed as a dependency): `birth.payload.bin` (named metrics with aliases of types Int32, Double, Boolean, String; a `bdSeq`; a `Node Control/Rebirth`), `data-alias-only.payload.bin` (metrics with an alias and no name), `signed-ints.payload.bin` (Int8 -5, Int16 -300, Int32 -70000, Int64 -5000000000), `unsupported-and-null.payload.bin` (a data set, a null metric, a historical metric). Each has an `.expected.json` listing the decoded fields. Tests: each fixture decodes to its expected structure; a truncated payload (each fixture cut at every prefix length) throws `UnreadableMachinePayload` or decodes a prefix without any other exception type (loop over prefixes; the only allowed outcomes); a payload of random bytes (seeded) never throws anything but `UnreadableMachinePayload`; `ProtobufReader` unit cases (varint boundaries 127, 128, 16384, a 10-byte varint, a truncated one); `SparkplugTopic::parse` for `spBv1.0/plant/DDATA/node1/dev2`, `spBv1.0/plant/NBIRTH/node1`, `spBv1.0/plant/STATE/host` and a non-Sparkplug topic (null); device ids per R2 (`node1` and `node1/dev2`).
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/SparkplugDecoderTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the reader, the decoder and the topic parser. The decoder ignores fields it does not know (skips them by wire type); a metric value is read from whichever value field is present and converted by `datatype` (R6).
-- [ ] **Step 4: Run** the same command. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): Sparkplug B payload decoder`.
+- [x] **Step 1: Write the failing test and the fixtures.** Fixtures are binary payloads produced by a reference encoder (the Eclipse Tahu Python or Java client, run once on a developer machine, never committed as a dependency): `birth.payload.bin` (named metrics with aliases of types Int32, Double, Boolean, String; a `bdSeq`; a `Node Control/Rebirth`), `data-alias-only.payload.bin` (metrics with an alias and no name), `signed-ints.payload.bin` (Int8 -5, Int16 -300, Int32 -70000, Int64 -5000000000), `unsupported-and-null.payload.bin` (a data set, a null metric, a historical metric). Each has an `.expected.json` listing the decoded fields. Tests: each fixture decodes to its expected structure; a truncated payload (each fixture cut at every prefix length) throws `UnreadableMachinePayload` or decodes a prefix without any other exception type (loop over prefixes; the only allowed outcomes); a payload of random bytes (seeded) never throws anything but `UnreadableMachinePayload`; `ProtobufReader` unit cases (varint boundaries 127, 128, 16384, a 10-byte varint, a truncated one); `SparkplugTopic::parse` for `spBv1.0/plant/DDATA/node1/dev2`, `spBv1.0/plant/NBIRTH/node1`, `spBv1.0/plant/STATE/host` and a non-Sparkplug topic (null); device ids per R2 (`node1` and `node1/dev2`).
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/SparkplugDecoderTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the reader, the decoder and the topic parser. The decoder ignores fields it does not know (skips them by wire type); a metric value is read from whichever value field is present and converted by `datatype` (R6).
+- [x] **Step 4: Run** the same command. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): Sparkplug B payload decoder`.
 
 ---
 
@@ -169,11 +188,11 @@ All paths under `Modules/MES/`.
   - `SparkplugAliasStore::remember(MachineSource $source, string $device, array $aliases): void` (`array<int, string>` alias to name; replaces the device's map; one upsert), `name(MachineSource $source, string $device, int $alias): ?string` (loaded once per source and device, memoised in the instance).
   - `SparkplugBNormalizer` (`key()` `sparkplug_b`): `meta()` returns `MessageMeta('sparkplug:{topic}:{seq}:{timestamp}', null, sent_at = payload timestamp)` (R4); `normalize()` unwraps (R1), parses the topic, decodes, and by topic type: `NBIRTH`/`DBIRTH` remember aliases, skip control metrics (R5), return a `birth` `DeviceNotice` (signals: name, `data_type` `number`/`boolean`/`string` by datatype, unit null) and also the birth's metric values as samples; `NDATA`/`DDATA` return samples, resolving an alias without a name through the store and, when unknown, a sample whose signal is `alias#{n}` (R3); `NDEATH` returns death notices for the node and for every `MachineDevice` of the source whose external id starts with `{node}/`; `DDEATH` a death notice for the device; other topic types return an empty message. A malformed wrapper or payload throws `UnreadableMachinePayload`.
 
-- [ ] **Step 1: Write the failing test.** Fixture pairs (wrapper input to expected samples and notices) for: NBIRTH of a node with a device-less metric; DBIRTH with aliases; DDATA by alias after the birth (names resolved); DDATA by name only; NDEATH (with two configured devices of the node, notices for three ids); DDEATH. Then: `data before its birth` (an alias DDATA with no stored aliases) yields one sample `alias#12` and no exception; after the birth is normalised, normalising the same data again yields the named signal; `meta()` of the same topic, seq and timestamp is stable and a different timestamp gives a different id, and `source_seq` is null for every message; a seq of 255 followed by 0 produces no gap (the foundation inbox records none because `source_seq` is null: assert through `MachineMessageInbox::accept` with `Queue::fake()`); control metrics (`bdSeq`, `Node Control/Rebirth`) are not samples; a null metric and an unsupported datatype are skipped; STATE and NCMD yield an empty message; a truncated payload in the wrapper throws `UnreadableMachinePayload` and the stored message ends `failed` when run through `ProcessMachineMessageJob` (fixture of Task 4 cut short); the registry keys contain `sparkplug_b`.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/SparkplugNormalizerTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the migration (named constraints like step 1, `MigrateUtils::timestamps` without soft delete), model, factory, store and normaliser, and register the normaliser in the provider's `NormalizerRegistry` singleton. Birth alias writes happen in `normalize()` through the store, in one statement.
-- [ ] **Step 4: Run** the same command. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): sparkplug_b normaliser with a persisted alias map`.
+- [x] **Step 1: Write the failing test.** Fixture pairs (wrapper input to expected samples and notices) for: NBIRTH of a node with a device-less metric; DBIRTH with aliases; DDATA by alias after the birth (names resolved); DDATA by name only; NDEATH (with two configured devices of the node, notices for three ids); DDEATH. Then: `data before its birth` (an alias DDATA with no stored aliases) yields one sample `alias#12` and no exception; after the birth is normalised, normalising the same data again yields the named signal; `meta()` of the same topic, seq and timestamp is stable and a different timestamp gives a different id, and `source_seq` is null for every message; a seq of 255 followed by 0 produces no gap (the foundation inbox records none because `source_seq` is null: assert through `MachineMessageInbox::accept` with `Queue::fake()`); control metrics (`bdSeq`, `Node Control/Rebirth`) are not samples; a null metric and an unsupported datatype are skipped; STATE and NCMD yield an empty message; a truncated payload in the wrapper throws `UnreadableMachinePayload` and the stored message ends `failed` when run through `ProcessMachineMessageJob` (fixture of Task 4 cut short); the registry keys contain `sparkplug_b`.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/SparkplugNormalizerTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the migration (named constraints like step 1, `MigrateUtils::timestamps` without soft delete), model, factory, store and normaliser, and register the normaliser in the provider's `NormalizerRegistry` singleton. Birth alias writes happen in `normalize()` through the store, in one statement.
+- [x] **Step 4: Run** the same command. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): sparkplug_b normaliser with a persisted alias map`.
 
 ---
 
@@ -187,11 +206,11 @@ All paths under `Modules/MES/`.
 - Consumes: Task 3 heartbeat key `mes:machine:bridge-heartbeat` (a Unix timestamp), step 1 `MachineIncidentRecorder`.
 - Produces: `MachineWatchdog::sweep()` additionally, for each active source with transport `mqtt`: when the heartbeat is absent or older than 60 seconds, `recordOnce(BridgeDown, ['heartbeat_age_seconds' => n or null])`; when it is fresh, `resolve(BridgeDown)`. Nothing for http sources, and nothing at all while no mqtt source is active (R9). The return value still counts only newly opened `device_silent` incidents plus newly opened `bridge_down` incidents.
 
-- [ ] **Step 1: Write the failing test** (`Carbon::setTestNow`, `Cache::put` of the heartbeat): a stale heartbeat opens one `bridge_down` per active mqtt source and a second sweep opens none; an absent heartbeat does the same with `heartbeat_age_seconds` null; a fresh heartbeat resolves them; http sources and inactive mqtt sources get none; with no mqtt source, nothing is recorded and no cache read is needed.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineWatchdogTest.php`. Expected: FAIL on the new cases.
-- [ ] **Step 3: Implement** inside `sweep()`; keep the device logic untouched.
-- [ ] **Step 4: Run** the same file. Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(mes): watchdog records bridge_down from the bridge heartbeat`.
+- [x] **Step 1: Write the failing test** (`Carbon::setTestNow`, `Cache::put` of the heartbeat): a stale heartbeat opens one `bridge_down` per active mqtt source and a second sweep opens none; an absent heartbeat does the same with `heartbeat_age_seconds` null; a fresh heartbeat resolves them; http sources and inactive mqtt sources get none; with no mqtt source, nothing is recorded and no cache read is needed.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineWatchdogTest.php`. Expected: FAIL on the new cases.
+- [x] **Step 3: Implement** inside `sweep()`; keep the device logic untouched.
+- [x] **Step 4: Run** the same file. Expected: PASS.
+- [x] **Step 5: Commit**: `feat(mes): watchdog records bridge_down from the bridge heartbeat`.
 
 ---
 
@@ -207,11 +226,11 @@ All paths under `Modules/MES/`.
 - Produces: `PhpMqttSubscriber` implements `MachineMessageSubscriber` over `MqttClient`: `connect()` uses the settings (host, port, TLS through the client's TLS options, credentials, the stable client id, `clean_session` false, MQTT 3.1.1), `subscribe()` unsubscribes what is no longer wanted and subscribes the rest at QoS 1, `loop()` registers one handler per topic filter and runs the client loop until `$should_continue()` is false (use the client's loop interrupt so the check runs at least once a second), mapping client exceptions to `MqttConnectionLost`, `disconnect()` is safe to call twice.
 - No credentials or payloads in any log line or exception message.
 
-- [ ] **Step 1: Write the tests.** `PhpMqttSubscriberTest` (no broker): the adapter builds connection settings from `MqttConnectionSettings` (assert the values the package's `ConnectionSettings` object carries: client id, TLS flag, credentials, clean session false) through a small seam: a protected factory method the test overrides in a subclass kept in `tests/Support`; `disconnect()` twice does not throw; a client exception becomes `MqttConnectionLost` whose message contains neither the password nor a payload. `MqttBrokerIntegrationTest` is skipped unless `MES_MQTT_TEST_BROKER` (a `host:port`) is set: it publishes a canonical envelope at QoS 1 to a source topic, runs the bridge with the real subscriber until the message is stored (bounded by a 10 second deadline, not a sleep), and asserts one stored message; a second run of the bridge with the same client id receives a message published while no bridge was connected (the persistent session).
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/PhpMqttSubscriberTest.php`. Expected: FAIL. The integration test reports skipped.
-- [ ] **Step 3: Implement** the adapter and the binding.
-- [ ] **Step 4: Run** the same command. Expected: PASS; run the integration test too when a broker is at hand (`MES_MQTT_TEST_BROKER=127.0.0.1:1883 php artisan test --compact Modules/MES/tests/Integration/Machine`) and record the result in the commit message, or say that it was not run.
-- [ ] **Step 5: Commit**: `feat(mes): php-mqtt adapter for the machine bridge`.
+- [x] **Step 1: Write the tests.** `PhpMqttSubscriberTest` (no broker): the adapter builds connection settings from `MqttConnectionSettings` (assert the values the package's `ConnectionSettings` object carries: client id, TLS flag, credentials, clean session false) through a small seam: a protected factory method the test overrides in a subclass kept in `tests/Support`; `disconnect()` twice does not throw; a client exception becomes `MqttConnectionLost` whose message contains neither the password nor a payload. `MqttBrokerIntegrationTest` is skipped unless `MES_MQTT_TEST_BROKER` (a `host:port`) is set: it publishes a canonical envelope at QoS 1 to a source topic, runs the bridge with the real subscriber until the message is stored (bounded by a 10 second deadline, not a sleep), and asserts one stored message; a second run of the bridge with the same client id receives a message published while no bridge was connected (the persistent session).
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/PhpMqttSubscriberTest.php`. Expected: FAIL. The integration test reports skipped.
+- [x] **Step 3: Implement** the adapter and the binding.
+- [x] **Step 4: Run** the same command. Expected: PASS; run the integration test too when a broker is at hand (`MES_MQTT_TEST_BROKER=127.0.0.1:1883 php artisan test --compact Modules/MES/tests/Integration/Machine`) and record the result in the commit message, or say that it was not run.
+- [x] **Step 5: Commit**: `feat(mes): php-mqtt adapter for the machine bridge`.
 
 ---
 
@@ -225,11 +244,11 @@ All paths under `Modules/MES/`.
 - Produces documentation of: the `MES_MACHINE_MQTT_*` variables and `mes.machine.mqtt.*` keys (README); the topic layout and the response of the bridge to bad topics (MACHINE_CONNECTIVITY); a ready Mosquitto setup (listener, password file, an ACL file with one user per agent that may publish only to `{prefix}/laraplate-machine/1/{its source code}` and the bridge user that may read `{prefix}/laraplate-machine/1/#` and `spBv1.0/#`) and the same ACL idea for EMQX; a `systemd` unit and a `supervisor` program for `php artisan mes:machine-bridge` (restart always, `stopsignal` `TERM`, `stopwaitsecs` 30); the Sparkplug mapping (R2 to R6 in plain words, including that aliases need the birth first and how to trigger a rebirth); the `bridge_down` incident; and the guide for operators (Italian): MQTT sources, topic, and what "no data" looks like when the bridge is down.
 - The glossaries gain: MQTT bridge, Sparkplug B, Edge node, Alias.
 
-- [ ] **Step 1: Write the failing test.** The documentation test asserts: the README contains every `MES_MACHINE_MQTT_*` env name defined in `config/config.php` and the six `mes.machine.mqtt.*` keys; `docs/MACHINE_CONNECTIVITY.md` contains `mes:machine-bridge`, `spBv1.0`, `laraplate-machine/1/`, `sparkplug_b`, `bridge_down`, `mosquitto` (case-insensitive) and `SIGTERM`.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineDocumentationTest.php`. Expected: FAIL on the new cases.
-- [ ] **Step 3: Write the documents**, and update the "not built yet" statements of step 1 (the bridge and `sparkplug_b` are now built; the README roadmap loses its first line).
-- [ ] **Step 4: Run** the file, then the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: all green (the broker test skipped without its variable).
-- [ ] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences and whether the broker test ran; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit in `Modules/MES`: `docs(mes): MQTT bridge and Sparkplug B documentation`; commit the plan in the laraplate repo.
+- [x] **Step 1: Write the failing test.** The documentation test asserts: the README contains every `MES_MACHINE_MQTT_*` env name defined in `config/config.php` and the six `mes.machine.mqtt.*` keys; `docs/MACHINE_CONNECTIVITY.md` contains `mes:machine-bridge`, `spBv1.0`, `laraplate-machine/1/`, `sparkplug_b`, `bridge_down`, `mosquitto` (case-insensitive) and `SIGTERM`.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineDocumentationTest.php`. Expected: FAIL on the new cases.
+- [x] **Step 3: Write the documents**, and update the "not built yet" statements of step 1 (the bridge and `sparkplug_b` are now built; the README roadmap loses its first line).
+- [x] **Step 4: Run** the file, then the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: all green (the broker test skipped without its variable).
+- [x] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences and whether the broker test ran; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit in `Modules/MES`: `docs(mes): MQTT bridge and Sparkplug B documentation`; commit the plan in the laraplate repo.
 
 ---
 
