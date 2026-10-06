@@ -178,6 +178,25 @@
 
 ---
 
+### Task 8: Correct the amend reservation lifecycle (follow-up, 2026-10-07)
+
+**Files:**
+- Modify: `Modules/ERP/app/Services/SalesOrders/SalesOrderAmendmentService.php` (stop releasing the source's reservation at draft creation; drop the now-unused `StockReservationService` dependency if it becomes unused)
+- Modify: `Modules/ERP/app/Listeners/ReserveStockForConfirmedSalesOrder.php` (when the confirmed order has `amends_sales_order_id`, release the source order's line reservations BEFORE reserving the amendment's own lines)
+- Test: `Modules/ERP/tests/Feature/SalesOrders/ReservationLifecycleTest.php` (extend)
+
+**Interfaces:** consumes `StockReservationService.release/reserve/reservedQuantity`, `SalesOrderConfirmed`, `SalesOrder.amends_sales_order_id`.
+
+- [x] **Step 1: Write the failing tests** — `amend() does not release the source's reservation`; `an abandoned (never-confirmed) amendment leaves the source's hold intact`; `confirming the amendment releases the source's holds and reserves the amendment's lines`; `the release happens before the amendment reserves` (on_hand == remaining qty → the amendment ends fully reserved, not backordered — the discriminating test).
+- [x] **Step 2: Run them, verify they fail** (3 failed first).
+- [x] **Step 3: Implement** — removed the per-line `release()` from `amend()` (dropped the now-unused `StockReservationService` dep); in `ReserveStockForConfirmedSalesOrder`, when `amends_sales_order_id !== null`, release each source line's reservation first (best-effort, catch Throwable + log), then the normal best-effort reserve of the amendment's lines.
+- [x] **Step 4: Run them, verify they pass** (18 passing, 70 assertions).
+- [x] **Step 5: Commit** — `fix(erp): release the amended source's reservation on amendment confirm, not draft creation` (`e76cbbd`). Review Approved, must-fix empty.
+
+**Out of scope (pre-existing ERP gap, flagged):** nothing marks the source order `Amended`/superseded today, so after an amendment confirms the source stays `Confirmed` and evadable with no reservation. That is an ERP amendment-model concern (mark the source `Amended`, block its further evasion), not reservation — a separate follow-up.
+
+---
+
 ## Notes / deferred (from the spec)
 
 - Incoming-stock ATP (`on_hand + on_order − reservations`), per-warehouse ATP and allocation strategy are **out of scope** (spec §2).
@@ -199,8 +218,7 @@ All seven tasks delivered, executed subagent-driven on `master` of the ERP and M
 - **Queries/transaction** derive from the owning model, not `ConnectionScopedModels::for()` (frozen for new code).
 - Concurrency uses `Cache::lock` **plus** a `lockForUpdate` DB row lock inside `reserve()`'s transaction (the cache lock alone was insufficient under an outer transaction).
 
-**Parked (plan-mandated, for a follow-up ERP decision):**
-- Amend releases the source order's hard hold on amendment-draft creation; an abandoned amendment leaves the source `Confirmed` with no reservation. Plan/spec R4 prescribe "amend-down releases the line's reservation". The source-order lifecycle on abandoned amendments (release on amendment-confirm, cancel/supersede the source, or require re-confirm) is an ERP amendment-semantics decision for the plan owner.
+**Amend lifecycle (resolved 2026-10-07, Task 8):** the earlier parked window is fixed — `amend()` no longer releases at draft creation; the source keeps its hold until the amendment is **confirmed**, at which point the confirm listener releases the source's holds first and then reserves the amendment's lines (remaining qty reserved exactly once; abandoned amendment keeps the source's hold). Spec R4 amended accordingly. **Remaining out-of-scope ERP gap (fast-follow):** nothing marks the source order `Amended`/superseded today, so after the amendment confirms the source stays `Confirmed` and still evadable with no reservation — an ERP amendment-model task (mark the source `Amended`, block its further evasion), not reservation.
 
 **Final whole-branch review (2026-10-07): Approved for merge, must-fix set empty.** Core guarantees verified end to end (oversell impossible at reserve; consistent service contract and lock ordering across all consumers; opaque source with globally-unique ids; idempotent lifecycle). Additional divergences/caveats it surfaced, recorded here so plan and code agree:
 - **R5 lock mechanism**: implemented as `Cache::lock` + a `lockForUpdate` DB row-lock (held to COMMIT), not Core's named advisory-lock policy the decision referenced. The row lock is a stronger guarantee; deliberate divergence.
