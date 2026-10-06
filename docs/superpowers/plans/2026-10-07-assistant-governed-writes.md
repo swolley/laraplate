@@ -46,10 +46,14 @@ The owner approved removal (2026-10-07). It is dead code that duplicates Core ap
 
 **Files (modify):** `app/Enums/AITables.php` (drop `ActionRequests`), `routes/web.php` (drop the `action-requests.*` group), `app/Services/Tools/ToolRegistry.php` (drop `getAllNeuronToolsWithApproval()` and the global `register()`/`getTool()`/`getAllTools()`/`getAllNeuronTools()` that only that path used, keep `getContextualNeuronTools()`, `getNeuronToolsForDefinitions()` and the Neuron tool builders), `app/Http/Controllers/ChatController.php` (the `action_requests` payload key and its comment), `config/config.php` (the `definitions` risk comment block), `app/Services/Assistance/InAppAssistanceService.php` (any import), `tests/Integration/ToolRegistryTest.php` and `tests/Stubs/helpers.php`, `tests/Stubs/Assistance/ScriptedAssistantFixtures.php`, `tests/Unit/Services/Tools/GraphToolProviderTest.php`, `tests/Feature/Assistance/UiProposalsTest.php` (strip references only).
 
-- [ ] **Step 1:** `rg -n "ActionRequest|RiskClassifier|ToolRegistry|action_requests|action-requests" Modules` and list every hit not in the file lists above. Resolve each before deleting: a hit that is live code means the premise is wrong; stop and report.
-- [ ] **Step 2:** Confirm no production caller of the global registry remains (`rg "tool_registry->\(register\|getTool\|getAllTools\)"`), then delete and edit. Do not rename or move anything that is still used.
-- [ ] **Step 3:** The create migration is removed, not replaced: the project has no other installation and the create migrations are the only description of the schema. Note in the commit that a developer database needs `migrate:fresh --seed`.
-- [ ] **Step 4:** Run `php artisan test --compact Modules/AI/tests/Integration/ToolRegistryTest.php Modules/AI/tests/Feature Modules/AI/tests/Unit` (PASS), Pint on the touched PHP files, commit: `refactor(ai): remove the unfed ActionRequest approval path`.
+- [x] **Step 1:** `rg -n "ActionRequest|RiskClassifier|ToolRegistry|action_requests|action-requests" Modules` and list every hit not in the file lists above. Resolve each before deleting: a hit that is live code means the premise is wrong; stop and report.
+- [x] **Step 2:** Confirm no production caller of the global registry remains (`rg "tool_registry->\(register\|getTool\|getAllTools\)"`), then delete and edit. Do not rename or move anything that is still used.
+- [x] **Step 3:** The create migration is removed, not replaced: the project has no other installation and the create migrations are the only description of the schema. Note in the commit that a developer database needs `migrate:fresh --seed`.
+- [x] **Step 4:** Run `php artisan test --compact Modules/AI/tests/Integration/ToolRegistryTest.php Modules/AI/tests/Feature Modules/AI/tests/Unit` (PASS), Pint on the touched PHP files, commit: `refactor(ai): remove the unfed ActionRequest approval path`.
+
+---
+
+Done 2026-10-07: the classes, controller, job, migration and tests were committed inside `d40ef8a` by a concurrent session's commit that swept in the staged removal; routes, config and swagger followed. `ExceptionHierarchyTest` keeps `UnknownToolException` (still a live exception class, now unused: record in Task 10). The seven failures in `HandleModificationApprovedTranslationListenerTest` belong to that other session's uncommitted `TranslationGate` work, not to this plan.
 
 ---
 
