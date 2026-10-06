@@ -89,15 +89,16 @@
 - Consumes: `StockReservationService` (Task 2), `SalesOrderConfirmed` event (`Modules\ERP\Events\SalesOrderConfirmed`), `SalesOrder`/`SalesOrderLine`.
 - Produces: a listener (registered in `EventServiceProvider::$listen` — discovery does not work for the module's `EventServiceProvider` subclass) that, for each confirmed order line with a non-null `item_id`, calls `promoteToHard(...)` then **best-effort** `reserve(..., Hard)` for `min(still-unreserved line quantity, available)` using the order's `company_id`, source `('erp.sales_order_line', $line->id)`. It **pre-clamps to availability so it never triggers `reserve()`'s `InsufficientStockException`** and **never blocks the confirm** — the unreserved remainder is backorder / make-to-order (amended 2026-10-06, spec R4: blocking broke the shipped MES make-to-order flow).
 
-- [ ] **Step 1: Write the failing test** — `ReserveStockOnConfirmTest`:
+- [x] **Step 1: Write the failing test** — `ReserveStockOnConfirmTest`:
   - `confirming a sales order hard-reserves each item-backed line up to availability` (available drops by the reserved quantities).
   - `confirm with no stock reserves nothing and still succeeds` (on_hand 0 → the order confirms, zero reserved, no exception — the make-to-order case; the shipped MES make-to-order confirm must keep planning production).
   - `confirm partially short reserves up to available` (requested 5, on_hand 3 → reserves 3, confirm succeeds, remainder is backorder).
   - item-less lines (`item_id` null, digital) reserve nothing.
-- [ ] **Step 2: Run it, verify it fails.**
-- [ ] **Step 3: Implement the listener** (register it in `EventServiceProvider::$listen`). Best-effort reserve; never throw out of the confirm.
-- [ ] **Step 4: Run it, verify it passes.**
-- [ ] **Step 5: Commit** — `feat(erp): hard-reserve stock when a sales order is confirmed`.
+  - (added in review) multiple lines of the same item split availability without overselling; lock-held → confirms with a WARNING; foreign-company item → confirms with an ERROR, both leaving the order confirmed and unreserved.
+- [x] **Step 2: Run it, verify it fails.**
+- [x] **Step 3: Implement the listener** (register it in `EventServiceProvider::$listen`). Best-effort reserve; never throw out of the confirm — all declared `reserve()` exceptions (`InsufficientStockException` retried, `LockTimeoutException`, `ValidationException`) caught and logged with context.
+- [x] **Step 4: Run it, verify it passes.**
+- [x] **Step 5: Commit** — `feat(erp): hard-reserve stock when a sales order is confirmed` (+ best-effort rework + never-escape fix).
 
 ---
 
@@ -112,14 +113,15 @@
 **Interfaces:**
 - Consumes: `StockReservationService.release/consume/reserve`, source alias `'erp.sales_order_line'`.
 
-- [ ] **Step 1: Write the failing tests** — `ReservationLifecycleTest`:
+- [x] **Step 1: Write the failing tests** — `ReservationLifecycleTest`:
   - `cancelling a confirmed order releases its reservations` (available restored).
   - `evasion consumes the shipped quantity and keeps the remainder reserved` (partial evasion: reserved drops by shipped, remainder stays `hard`).
   - `amend-down below consumed quantity is clamped` (reduce a line below the already-consumed amount → no negative, consumed stock not released).
-- [ ] **Step 2: Run them, verify they fail.**
-- [ ] **Step 3: Implement** the three hook edits, each calling the service with the line source. Keep edits minimal and within the existing transaction boundaries of those services.
-- [ ] **Step 4: Run them, verify they pass.**
-- [ ] **Step 5: Commit** — `feat(erp): release/consume reservations on cancel, amend and evasion`.
+  - (added) evasion of a partially-backordered line consumes only the reserved part (never over-consumes).
+- [x] **Step 2: Run them, verify they fail.**
+- [x] **Step 3: Implement** the hooks: `StockReservationService::reservedQuantity()`; `SalesOrderCancelled` event + `ReleaseStockForCancelledSalesOrder` listener; evasion consumes `min(shipped, reservedQuantity)`; amend releases the source line's hard hold. Task 3 listener swapped onto `reservedQuantity()`. Note (parked ruling): amend releases on draft creation — an abandoned amendment leaves the source unreserved (plan-mandated, ERP amendment-lifecycle follow-up).
+- [x] **Step 4: Run them, verify they pass.**
+- [x] **Step 5: Commit** — `feat(erp): release/consume reservations on cancel, amend and evasion`.
 
 ---
 
@@ -134,11 +136,11 @@
 - Consumes: `StockReservation` (Task 1).
 - Produces: `erp:stock-reservations:expire` that marks `soft` reservations past `expires_at` as `released`. (Availability already ignores them lazily — Task 2 — so the sweep is housekeeping, not correctness.)
 
-- [ ] **Step 1: Write the failing test** — expired `soft` rows become `released`; live `soft` and `hard` are untouched.
-- [ ] **Step 2: Run it, verify it fails.**
-- [ ] **Step 3: Implement the command** and schedule it (daily/hourly per sibling commands). TTL default comes from a config value (`config('erp.stock_reservation.soft_ttl')`), set well above the payment window.
-- [ ] **Step 4: Run it, verify it passes.**
-- [ ] **Step 5: Commit** — `feat(erp): expire stale soft stock reservations`.
+- [x] **Step 1: Write the failing test** — expired `soft` rows become `released`; live `soft` and `hard` are untouched.
+- [x] **Step 2: Run it, verify it fails.**
+- [x] **Step 3: Implement the command** and schedule it (hourly, `onOneServer`+`withoutOverlapping`, sibling pattern). TTL default from `config('erp.stock_reservation.soft_ttl')` (1440 min via `ERP_STOCK_RESERVATION_SOFT_TTL`), read at reservation-creation time, not by this command.
+- [x] **Step 4: Run it, verify it passes.**
+- [x] **Step 5: Commit** — `feat(erp): expire stale soft stock reservations`.
 
 ---
 
@@ -154,11 +156,11 @@
 - Consumes: ERP `StockReservationService` resolved from the container (MES depends on ERP), `ProductionOrderStatus::Released`/`Cancelled`.
 - Produces: `ErpStockReader::availableQuantity(item, warehouse, company)` = `on_hand(item, warehouse) − Σ active reservations pinned to that warehouse`. Company-wide (null-warehouse) reservations are not subtracted per-warehouse (documented limitation).
 
-- [ ] **Step 1: Write the failing tests** — releasing a production order reserves its BOM components; `availableQuantity` for that warehouse drops accordingly; cancelling releases; backflush consumes the reservation and the existing partial-consume + `MaterialShortageDetected` behaviour is preserved when physical stock is short.
-- [ ] **Step 2: Run them, verify they fail.**
-- [ ] **Step 3: Implement** the reader change and the release/cancel/backflush hooks, calling the ERP service by its container binding. MES registers no morph map in ERP; it passes its own `source_type` string.
-- [ ] **Step 4: Run them, verify they pass.**
-- [ ] **Step 5: Commit** — `feat(mes): reserve and consume BOM components through ERP reservations`.
+- [x] **Step 1: Write the failing tests** — releasing a production order reserves its BOM components; `availableQuantity` for that warehouse drops accordingly; cancelling releases; backflush consumes the reservation and the existing partial-consume + `MaterialShortageDetected` behaviour is preserved when physical stock is short. (added in review: two orders sharing one BOM reserve/cancel/backflush in isolation.)
+- [x] **Step 2: Run them, verify they fail.**
+- [x] **Step 3: Implement** the reader change and the release/cancel/backflush hooks, calling the ERP service by its container binding. MES passes its own `source_type` string (`mes.production_order_material`) keyed by a **per-order `material_line_id`** (not the shared template `bom_line_id`) stamped on the frozen BOM snapshot.
+- [x] **Step 4: Run them, verify they pass.**
+- [x] **Step 5: Commit** — `feat(mes): reserve and consume BOM components through ERP reservations` (+ per-order material_line_id fix).
 
 ---
 
@@ -170,9 +172,9 @@
 - Modify: `Modules/ERP/README.md` if the TTL/schedule introduces an env/config worth documenting
 - Test: none (docs).
 
-- [ ] **Step 1: Write the ERP and MES RAG doc sections** describing present behaviour (not the plan).
-- [ ] **Step 2: Add the plan's `## Delivery status` and a `**Documented in:**` line** naming the two module docs (required to close the plan; enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
-- [ ] **Step 3: Commit** — `docs(erp,mes): document stock reservation / ATP`.
+- [x] **Step 1: Write the ERP and MES RAG doc sections** describing present behaviour (not the plan). (ERP `6be4c2a`: MODULE.md + README; MES: MODULE.md, updated in `4b9afb1`.)
+- [x] **Step 2: Add the plan's `## Delivery status` and a `**Documented in:**` line** naming the module docs (required to close the plan; enforced by `tests/Unit/ClosedPlansPointToDocumentationTest.php`).
+- [x] **Step 3: Commit** — `docs(erp,mes): document stock reservation / ATP`.
 
 ---
 
@@ -181,3 +183,35 @@
 - Incoming-stock ATP (`on_hand + on_order − reservations`), per-warehouse ATP and allocation strategy are **out of scope** (spec §2).
 - The not-fulfillable-remainder refund/backorder choice is a **consumer (Shop) policy**, not this plan (spec R7).
 - Shop's own reserve-at-Draft wiring lives in the Shop plan (spec §7, Shop E29); this plan only ships the `StockReservationService` it will call.
+
+---
+
+## Delivery status (2026-10-07)
+
+All seven tasks delivered, executed subagent-driven on `master` of the ERP and MES submodules (per user consent). Tests green per task (ERP reservation service, sales confirm/cancel/amend/evasion, expiry command; MES component reservation + backflush + reader). ERP commits `e1f88a72..a17f15d`; MES commits `091f1af` + `4b9afb1` (on top of concurrent unrelated MES work).
+
+**Documented in:** `Modules/ERP/docs/rag/MODULE.md`, `Modules/ERP/README.md`, `Modules/MES/docs/rag/MODULE.md`.
+
+**Divergences from the plan as written (all deliberate, ruled during execution):**
+- **Confirm reserve is best-effort, not blocking** (spec R4 amended 2026-10-06): hard-reserve at `SalesOrderConfirmed` reserves up to availability and never blocks the confirm — blocking broke MES make-to-order. The remainder is backorder; Shop's paid-but-unfulfillable gate lives in Shop's checkout. All `reserve()` exceptions are caught/logged in the listener.
+- **MES source id**: component reservations are keyed by a per-order `material_line_id` (`order_id*1000 + line_index`) stamped on the frozen BOM snapshot, not the shared template `bom_line_id` (which pooled holds across orders built from the same BOM). Bounds an order to <1000 component lines.
+- **Decimal math** uses `Modules\ERP\Support\Decimal` (BigDecimal), not `StockMovementService`'s float helpers (those use floats).
+- **Queries/transaction** derive from the owning model, not `ConnectionScopedModels::for()` (frozen for new code).
+- Concurrency uses `Cache::lock` **plus** a `lockForUpdate` DB row lock inside `reserve()`'s transaction (the cache lock alone was insufficient under an outer transaction).
+
+**Parked (plan-mandated, for a follow-up ERP decision):**
+- Amend releases the source order's hard hold on amendment-draft creation; an abandoned amendment leaves the source `Confirmed` with no reservation. Plan/spec R4 prescribe "amend-down releases the line's reservation". The source-order lifecycle on abandoned amendments (release on amendment-confirm, cancel/supersede the source, or require re-confirm) is an ERP amendment-semantics decision for the plan owner.
+
+**Final whole-branch review (2026-10-07): Approved for merge, must-fix set empty.** Core guarantees verified end to end (oversell impossible at reserve; consistent service contract and lock ordering across all consumers; opaque source with globally-unique ids; idempotent lifecycle). Additional divergences/caveats it surfaced, recorded here so plan and code agree:
+- **R5 lock mechanism**: implemented as `Cache::lock` + a `lockForUpdate` DB row-lock (held to COMMIT), not Core's named advisory-lock policy the decision referenced. The row lock is a stronger guarantee; deliberate divergence.
+- **R6 early-shortage benefit not delivered**: MES reserves at `Released` but best-effort, with no early shortage event; a component shortage still surfaces at backflush, not at planning. The decision's mechanism shipped; its stated benefit did not.
+- **Important (cross-module, non-blocking for v1): sales↔MES null-warehouse backflush gap.** Sales reservations carry `warehouse_id = null`; `ErpStockReader` subtracts only warehouse-pinned holds, so MES backflush can physically consume stock a sales order hard-reserved. Mitigated because sold finished goods and BOM components are usually distinct items, and per-warehouse ATP is a deferred v1 non-goal (spec §2). To close: have the MES reader also subtract company-wide null-warehouse holds. Documented as a known limitation.
+
+**Recommended fast-follows (not merge blockers):**
+- Stamp MES `material_line_id` in a model `created` boot hook so EVERY production-order creation path gets it (today only `ProductionOrderService::create()` stamps it; orders created elsewhere silently reserve nothing). Reviewer's top follow-up.
+- Add the ≥1000-line guard for `material_line_id` (throw/assert rather than silently collide).
+- Close or document the sales↔MES null-warehouse backflush caveat (above).
+
+**Deferred minors (for later cleanup, none load-bearing):**
+- ERP: `ExpireStockReservationsCommand` singular-count grammar; `(int) env()` non-numeric → 0; availability `availableUnderRowLock()` duplicates `available()`'s predicate and locks O(n) reservation rows; `SalesOrderEvasionService` could be `final readonly`; cancel issues N release UPDATEs; docblock "no exception escapes" covers only `reserve()`'s declared exceptions; `StockReservation` not added to `ModelQuantityValidationTest`/`CrudWriteGuardTest`.
+- MES: reader counts expired soft holds that ERP `available()` ignores (conservative); `material_line_id` has no ≥1000-line guard (silent collision at the bound — **worth the cheap guard before merge**); the `material_line_id` stamp is a second write (not shown to be in one transaction; orders created outside `ProductionOrderService::create()` get none); backflush reservation-close runs outside the stock-out transaction (deferred defect 4).
