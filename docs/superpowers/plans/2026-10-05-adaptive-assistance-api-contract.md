@@ -36,17 +36,17 @@
 - Modify: `Modules/Core/app/Http/Controllers/UserController.php`
 - Modify: `Modules/Core/routes/auth.php`
 - Create: `Modules/Core/app/Rules/PreferencesBag.php`
-- Test: `Modules/Core/tests/Feature/` (follow the sibling layout for user endpoints)
+- Test: `Modules/Core/tests/Feature/Controllers/UserPreferencesTest.php`
 
-- [ ] **Step 1: Write failing tests.** An oversized bag, a bag deeper than the limit, a top-level key that is not a valid namespace, and a non-JSON value are each rejected with 422. A valid namespace is accepted.
+- [x] **Step 1: Write failing tests.** An oversized bag, a bag deeper than the limit, a top-level key that is not a valid namespace, and a non-JSON value are each rejected with 422. A valid namespace is accepted.
 
-- [ ] **Step 2: Implement `PreferencesBag`.** One rule class holding the size, depth and key-pattern limits as constants.
+- [x] **Step 2: Implement `PreferencesBag`.** One rule class holding the size, depth and key-pattern limits as constants.
 
-- [ ] **Step 3: Merge per namespace.** `updatePreferences` replaces each namespace it receives, leaves the others, and removes a namespace sent as `null`. Test that two consecutive writes to different namespaces both survive.
+- [x] **Step 3: Merge per namespace.** `updatePreferences` replaces each namespace it receives, leaves the others, and removes a namespace sent as `null`. Test that two consecutive writes to different namespaces both survive.
 
-- [ ] **Step 4: Delete routes.** `DELETE /user/preferences` clears the bag. `DELETE /user/preferences/{namespace}` clears one namespace. Both write the current session user only, with no target id, like the existing route. Test that a user cannot reach another user's bag.
+- [x] **Step 4: Delete routes.** `DELETE /user/preferences` clears the bag. `DELETE /user/preferences/{namespace}` clears one namespace. Both write the current session user only, with no target id, like the existing route. Test that a user cannot reach another user's bag.
 
-- [ ] **Step 5: Format and run the Core preference tests.**
+- [x] **Step 5: Format and run the Core preference tests.**
 
 ---
 

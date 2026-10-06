@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -14,6 +15,10 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->withoutVite();
+
+        // A test that pretends to run over HTTP (runningInConsole() false) would otherwise be
+        // checked for a CSRF token, which no test request carries.
+        $this->withoutMiddleware(ValidateCsrfToken::class);
     }
 
     /**
