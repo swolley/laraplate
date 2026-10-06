@@ -65,9 +65,9 @@ The write tools are named per entity (`crud_update_cms_content`), so exact names
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyRuleSet.php`, `Modules/AI/app/Services/Tools/ToolRegistry.php` (the two filters)
 - Test: `Modules/AI/tests/Unit/Services/Assistance/AssistantPolicyRuleSetTest.php` (extend if present), `tests/Integration/ToolRegistryTest.php`
 
-- [ ] **Step 1: Test first.** A name matches an allowed entry that is either equal or a pattern ending in `*`; a denied pattern removes matching names even when an allowed pattern would admit them (deny overrides); `intersect` of two sets that both carry `crud_update_*` keeps it; a set carrying it and a set that does not yield nothing; a wildcard anywhere but at the end is rejected at construction.
-- [ ] **Step 2: Implement** one matcher used by both the rule-set subtraction and `ToolRegistry`'s name filters. Patterns are compared as strings in `intersect`/`union` (a pattern survives only if both sides carry the identical pattern); matching against real names happens only at filter time.
-- [ ] **Step 3:** tests PASS, Pint, commit: `feat(ai): trailing-wildcard tool names in assistant policy sets`.
+- [x] **Step 1: Test first.** A name matches an allowed entry that is either equal or a pattern ending in `*`; a denied pattern removes matching names even when an allowed pattern would admit them (deny overrides); `intersect` of two sets that both carry `crud_update_*` keeps it; a set carrying it and a set that does not yield nothing; a wildcard anywhere but at the end is rejected at construction.
+- [x] **Step 2: Implement** one matcher used by both the rule-set subtraction and `ToolRegistry`'s name filters. Patterns are compared as strings in `intersect`/`union` (a pattern survives only if both sides carry the identical pattern); matching against real names happens only at filter time.
+- [x] **Step 3:** tests PASS, Pint, commit: `feat(ai): trailing-wildcard tool names in assistant policy sets`.
 
 ---
 
