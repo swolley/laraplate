@@ -1,54 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			rawMessage: 'Method Modules\AI\Actions\IntelligentSearchAction::cachedResults() should return list<array<string, mixed>>|null but returns list<array<mixed, mixed>>.'
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Method Modules\AI\Actions\IntelligentSearchAction::runSearchPipeline() should return array{results: list<array{id: string, score: float, source: array<string, mixed>}>, meta: array<string, mixed>} but returns Modules\Core\Search\DTOs\AdvancedSearchResult.'
-			identifier: return.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Method Modules\Core\Search\Services\EnsembleSearchService::search() invoked with 5 parameters, 6-9 required.'
-			identifier: arguments.count
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Parameter #1 $model of method Modules\Core\Search\Services\EnsembleSearchService::search() expects Illuminate\Database\Eloquent\Model, array<string, array<int<0, max>|string, string>|null> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Parameter #2 $query of method Modules\Core\Search\Services\EnsembleSearchService::search() expects string, list<float>|null given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Parameter #3 $plan of method Modules\Core\Search\Services\EnsembleSearchService::search() expects array<string, mixed>, string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Parameter #4 $vector of method Modules\Core\Search\Services\EnsembleSearchService::search() expects list<float>|null, array<string, mixed> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
-			rawMessage: 'Parameter #5 $page of method Modules\Core\Search\Services\EnsembleSearchService::search() expects int, string given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Actions/IntelligentSearchAction.php
-
-		-
 			rawMessage: Cannot cast mixed to int.
 			identifier: cast.int
 			count: 1

@@ -139,11 +139,13 @@ meant to work: read `AdvancedSearchService`, not this.
 - Modify: `phpstan.neon` (drop the exclusion those two files needed)
 - Test: `Modules/Core/tests/Unit/Search/SearchRetryTest.php`
 
-- [ ] **Step 1: Salvage before deleting.** Port `evaluateResults()` and `shouldRetry()` out of `IntelligentSearchAction` into `SearchQualityEvaluator` in Core, keeping the behaviour and adding types. Read what the methods do; do not reimplement them from their names. This is the only part of that class worth keeping, and it is the part that makes a retry mean something instead of being a repeated identical query.
+- [x] **Step 1: Salvage before deleting.** Port `evaluateResults()` and `shouldRetry()` out of `IntelligentSearchAction` into `SearchQualityEvaluator` in Core, keeping the behaviour and adding types. Read what the methods do; do not reimplement them from their names. This is the only part of that class worth keeping, and it is the part that makes a retry mean something instead of being a repeated identical query.
+  Done 2026-10-07 by the AI module review (Task 10, Step 3): `SearchQualityEvaluator` with `evaluate()` and `shouldRetry()`, behaviour unchanged, tested in `SearchRetryTest`. `refinePlan()` was not salvaged; Step 2 decides what a re-plan is.
 
 - [ ] **Step 2: Drive retries from the strategy.** When `$strategy->max_retries > 0` and the evaluator judges the results poor, re-plan and search again, up to the cap, recording `retries_used` in the meta. `Fast` has `max_retries: 0`, so the loop is not reachable there.
 
-- [ ] **Step 3: Delete the Action and its test.** Deleting a test file needs approval under AGENTS; it is granted here by the spec, which retires the class. Record in the commit message that `evaluateResults`/`shouldRetry` moved to `SearchQualityEvaluator` rather than being lost, and say why the rest went: pagination is the CRUD layer's, and its cache was keyed on query plus index with no authorization context, which would let two users with different ACL trade results.
+- [x] **Step 3: Delete the Action and its test.** Deleting a test file needs approval under AGENTS; it is granted here by the spec, which retires the class. Record in the commit message that `evaluateResults`/`shouldRetry` moved to `SearchQualityEvaluator` rather than being lost, and say why the rest went: pagination is the CRUD layer's, and its cache was keyed on query plus index with no authorization context, which would let two users with different ACL trade results.
+  Done 2026-10-07: the class, its test, its entries in `phpstan-baseline.neon` and the empty `app/Actions` folder are gone; `evaluateResults`/`shouldRetry` live in `SearchQualityEvaluator`. Pagination is the CRUD layer's, and the cache of the old action was keyed on query plus index with no authorization context.
 
 - [ ] **Step 4:** run the tests (PASS), pint, commit in both submodules separately: `feat(search): quality-driven retries` in Core, `refactor(ai): retire IntelligentSearchAction` in AI.
 
