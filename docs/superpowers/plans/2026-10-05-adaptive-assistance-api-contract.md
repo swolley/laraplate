@@ -163,17 +163,27 @@
 **Files:**
 - Modify: `Modules/AI/app/Services/ContextualSuggestionService.php`
 - Modify: `Modules/AI/app/Models/ContextualSuggestion.php`
-- Test: `Modules/AI/tests/Feature/`
+- Create: `Modules/AI/app/Observers/PurgeAssistantDataOfDeletedUserObserver.php`, `PurgeDeletedConversationObserver.php`
+- Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
+- Test: `Modules/AI/tests/Feature/StoredDataPrivacyTest.php`
 
-- [ ] **Step 1: Decide what `context` keeps.** List the keys the column stores today. Keep only what the suggestion needs to be generated, and drop the rest.
+- [x] **Step 1: Decide what `context` keeps.** List the keys the column stores today. Keep only what the suggestion needs to be generated, and drop the rest.
 
-- [ ] **Step 2: Retention.** Add a scheduled purge of suggestions older than a limit set in code. Test that older rows disappear and recent ones stay.
+- [x] **Step 2: Retention.** Add a scheduled purge of suggestions older than a limit set in code. Test that older rows disappear and recent ones stay.
 
-- [ ] **Step 3: User deletion.** Deleting a user removes their suggestions. Verify the existing cascade, and test it.
+- [x] **Step 3: User deletion.** Deleting a user removes their suggestions. Verify the existing cascade, and test it.
 
-- [ ] **Step 4: Conversation deletion.** Deleting a conversation removes the proposals held in its message metadata. Test it.
+- [x] **Step 4: Conversation deletion.** Deleting a conversation removes the proposals held in its message metadata. Test it.
 
-- [ ] **Step 5: Format and run.**
+- [x] **Step 5: Format and run.**
+
+**Delivered 2026-10-06, divergences from the steps above.**
+- Step 1: the column held what the client sent in `context`: `page` and `action` (text, 255 characters) and `data` (any array, unbounded). It now keeps `page` and `action` only, through `ContextualSuggestion::retainedContext()`. `data` still helps generate the suggestion and is never stored. The API answer for a new suggestion echoes the stored context, so it no longer repeats `data` either.
+- Step 2: no new command. The model is `MassPrunable` with a retention in code, `RETENTION_DAYS = 7` (a suggestion is shown for an hour at most), and the provider schedules `model:prune` for that model every day. Soft deleted rows go too.
+- Step 3: the foreign key `ON DELETE CASCADE` exists, but users are soft deleted by default and a soft delete never reaches a foreign key, so the cascade alone left the suggestions behind. `PurgeAssistantDataOfDeletedUserObserver` removes them on the `deleted` event, soft or hard. Tested both ways, and that another user's suggestions stay.
+- Step 4: conversations and messages are soft deleted too, so deleting a conversation left every message, and the proposals in their metadata, in the table. `PurgeDeletedConversationObserver` calls `Conversation::purgeContent()` on the `deleted` event: it deletes for good the messages and the summary snapshots (`ConversationSummary`), and empties the title, the rolling summary, the system message and the metadata on the conversation row, which stays soft deleted. This removes more than the proposals, by design (spec 4.6, "removed with the conversation"): the text and citations of the messages and what is derived from them are the user's as much as the proposals.
+- Beyond the steps, added after review: a deleted user's conversations go the same way (`PurgeAssistantDataOfDeletedUserObserver` deletes the active ones and purges the ones deleted earlier, which still held their content), and a hard delete of the user cascades them away. The approval requests of the action flow (`ai_action_requests`) are kept: they record who asked for what and who decided, and are not user preferences or conversation text.
+- Not done: conversations deleted before this purge existed keep their content until their user is deleted. A backfill command is not part of this plan.
 
 ---
 
