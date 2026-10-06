@@ -98,11 +98,14 @@
 - Create: `Modules/AI/app/Data/UiProposal.php`
 - Create: `Modules/AI/app/Services/Tools/ProposePreferenceChangeTool.php`
 - Create: `Modules/AI/app/Services/Tools/ProposeViewStateTool.php`
+- Create: `Modules/AI/app/Services/Tools/ProposalToolText.php`
+- Create: `Modules/AI/app/Services/Assistance/Proposals/` (`ProposableTargets`, `ProposableTarget`, `ProposalSchema`, `UiProposalCollector`)
+- Modify: `Modules/AI/app/Services/Assistance/Policies/AssistanceOutputPolicy.php` and `AssistanceGuardrailPipeline.php`
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyCatalog.php`
 - Modify: `Modules/AI/app/Services/Assistance/InAppAssistanceService.php`
-- Test: `Modules/AI/tests/Feature/Assistance/`
+- Test: `Modules/AI/tests/Feature/Assistance/UiProposalsTest.php`, `Modules/AI/tests/Unit/Services/Assistance/Proposals/`
 
-- [ ] **Step 1: Write failing tests.**
+- [x] **Step 1: Write failing tests.**
   - The in-app profile with the capability exposes the two tools. A profile without it does not.
   - A target outside `context.page.proposable` is rejected.
   - A value that fails the declared schema is rejected.
@@ -111,17 +114,27 @@
   - A prompt-injection string inside `proposable` descriptions or `list` hints never changes tool availability or policy.
   - No proposal changes a preference, a record or a permission on the server.
 
-- [ ] **Step 2: Implement `UiProposal`.** An immutable value object with `toArray()` matching spec section 4.4.
+- [x] **Step 2: Implement `UiProposal`.** An immutable value object with `toArray()` matching spec section 4.4.
 
-- [ ] **Step 3: Implement the two tools.** They validate, collect the proposal for the current request, and return text that says the proposal waits for the user.
+- [x] **Step 3: Implement the two tools.** They validate, collect the proposal for the current request, and return text that says the proposal waits for the user.
 
-- [ ] **Step 4: Grant the capability.** Add `ui_proposals` to the in-app profile only, in `AssistantPolicyCatalog`. Add it to the capability list in `respond()`.
+- [x] **Step 4: Grant the capability.** Add `ui_proposals` to the in-app profile only, in `AssistantPolicyCatalog`. Add it to the capability list in `respond()`.
 
-- [ ] **Step 5: Surface proposals.** `respond()` puts the collected proposals in `message.metadata.proposals` of the assistant message.
+- [x] **Step 5: Surface proposals.** `respond()` puts the collected proposals in `message.metadata.proposals` of the assistant message.
 
-- [ ] **Step 6: Output invariant.** Add a test that a message with pending proposals never states that the change was applied. Reuse the evaluation harness if it fits.
+- [x] **Step 6: Output invariant.** Add a test that a message with pending proposals never states that the change was applied. Reuse the evaluation harness if it fits.
 
-- [ ] **Step 7: Format and run.**
+- [x] **Step 7: Format and run.**
+
+**Delivered 2026-10-06, divergences from the steps above.**
+- The wire shape of an entry of `context.page.proposable` is `{kind, target, schema, current?, description?}`: the same `kind` and `target` as the proposal, the JSON Schema the client allows for `proposed`, the current value (it becomes the proposal's `current`) and a short text. Entries that do not pass the bounds are dropped, never repaired: at most 30 entries, a schema of at most 2000 bytes and 4 levels, a current value of at most 500 bytes, a description of at most 120 characters on one line.
+- No JSON Schema package is installed and none was added. `ProposalSchema` validates a fixed subset (`type`, `enum`, `const`, number and length bounds, `items`, `properties`, `required`, `additionalProperties` as a boolean). It fails closed: a schema with any other keyword (`pattern`, `$ref`, `oneOf`, `format`, ...) or one that does not constrain the value cannot be proposed against, so a client regular expression never runs on the server.
+- The model passes `proposed` as JSON text, since its type depends on the target.
+- The proposal tools exist for a request only when the compiled policy allows them **and** the page declared a target of that kind. With no `proposable` list the assistant has no proposal tool.
+- `reason` over 240 characters, with markup, with a link, with a control character or refused by the output guardrails is refused, not cut. A target already proposed in the message, or a fourth proposal, is refused.
+- Step 6 is enforced, not only tested: `AssistanceOutputPolicy::reportPendingProposals()` replaces an answer that claims a change was made (English and Italian patterns) when the message carries a proposal, with a plain statement that the suggestion waits. The capability instruction and the tool answer say the same to the model. The evaluation cases that run it against a real model are Task 5.
+- `features.proposals` of the capabilities endpoint is now true by default, since the catalog grants the capability.
+
 
 ---
 
