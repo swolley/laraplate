@@ -54,12 +54,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 EnsureFrontendRequestsAreStateful::class,
                 'auth.session',
             ],
-            // TODO: temporaneo da rimuovere a termine sviluppo
-            remove: [
-                ValidateCsrfToken::class,
-                EnsureEmailIsVerified::class,
-                AuthenticateSession::class,
-            ],
+            remove: [],
         );
 
         // $middleware->api([
