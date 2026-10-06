@@ -77,16 +77,18 @@
 **Files:**
 - Create: `Modules/AI/app/Http/Controllers/CapabilitiesController.php`
 - Create: `Modules/AI/app/Http/Resources/AiCapabilitiesResource.php`
+- Create: `Modules/AI/app/Services/Assistance/AssistantCapabilities.php` (the four answers, so the controller stays thin)
+- Modify: `Modules/AI/app/Ai/Providers/ProviderFactory.php` (`isConfigured()`)
 - Modify: `Modules/AI/routes/web.php`
-- Test: `Modules/AI/tests/Feature/`
+- Test: `Modules/AI/tests/Feature/Assistance/CapabilitiesEndpointTest.php`
 
-- [ ] **Step 1: Write failing tests.** Module feature off gives `enabled: false`. Provider not configured gives `configured: false`. `features.proposals` follows the compiled policy of `InAppAssistance`. A guest is refused.
+- [x] **Step 1: Write failing tests.** Module feature off gives `enabled: false`. Provider not configured gives `configured: false`. `features.proposals` follows the compiled policy of `InAppAssistance`. A guest is refused (401 not signed in, 403 for the guest account).
 
-- [ ] **Step 2: Implement.** Read the existing feature flags and the model settings. Return the shape of spec section 4.3.
+- [x] **Step 2: Implement.** Read the existing feature flags and the model settings. Return the shape of spec section 4.3. Done: `enabled` is the FAQ/RAG switch `features.faq.enabled` (the assistant answers from the user documentation and no other global switch exists), `configured` is whether the chat provider of Settings builds (`ProviderFactory::isConfigured()`), `proposals` is whether the policy compiled for the in-app profile with `ui_proposals` still allows a tool (false until Task 4 adds the capability) and `streaming` is false until Task 7.
 
-- [ ] **Step 3: Route.** `GET app/ai/capabilities` under the `web` group with authentication.
+- [x] **Step 3: Route.** `GET app/ai/capabilities` under the `web` group with authentication.
 
-- [ ] **Step 4: Format and run.**
+- [x] **Step 4: Format and run.**
 
 ---
 
