@@ -12,6 +12,24 @@
 
 ---
 
+## Delivery status (2026-10-06): shipped, checkboxes reconciled against code
+
+**Documented in:** `Modules/MES/docs/rag/MODULE.md`, `Modules/MES/docs/GLOSSARY.md` and `Modules/MES/README.md`.
+
+Every task is done. The 2026-10-06 session closed what the reconciliation had left open: typed
+events and the order state machine, `open_downtime` as a domain action, planned maintenance in
+capacity, D10 KPI materialisation, the capacity warning channel, the Release/Complete/Cancel
+actions on the production order page, calendar-based capacity with planned operation dates and the
+completion estimate, and the finished-goods receipt with material-cost valuation.
+
+Divergences from the plan, deliberate:
+
+- Operations are planned forward with infinite capacity; there is no finite-capacity scheduler.
+- `checkOverload()` keeps the window signature `(work_center, from, to, ?available)`, a superset of the plan's `(work_center, at)`.
+- `open_downtime` sits on the work center, because Core's domain-action registry is bound to an existing record. The generic downtime insert remains for back-filling history.
+- Finished goods are valued at material cost only; labour and machine time have no cost rate. A backflush still queued at completion is not in the cost.
+- The ISO 22400 OEE branch for work centers with devices belongs to the machine-data acquisition spec; no devices exist yet.
+
 ## Decisioni confermate (2026-07-09)
 
 Dettaglio completo: `docs/superpowers/specs/2026-07-09-mes-module-decisions-design.md`
@@ -54,17 +72,18 @@ Done and ticked after verifying the code (MES suite: 230 tests, 607 assertions; 
 - Task 16: `Feature/Invariants/ProductionOrderInvariantsTest.php` (snapshots, numbering, completion against running operations, OEE bounds, non-negative capacity, lot trace symmetry).
 - Task 17: glossaries, README status/roadmap/scripts, `MES_GUIDA_SEMPLICE.md` ("Dove si vede") and `rag/MODULE.md` aligned with the code.
 
-Awaiting a decision (the plan stays open):
+## Progress (2026-10-06)
 
-- Typed domain events for order and operation transitions (Task 6 Step 4).
-- The order state machine: when an order becomes `in_progress`, and what cancelling does to its operations; beyond the `complete()` guard nothing is enforced.
-- Backoffice transitions on production orders (Task 15 Step 3).
-- Capacity warning on operation start and its channel (Task 7 Step 3).
-- Capacity algorithms (Task 11 Step 2): `estimateCompletionDate()`, operation-level planned dates, calendar-based available minutes; the plan's `checkOverload(work_center, at)` and `rescheduleOperation(..., planned_start_at)` signatures diverge from the code.
-- Whether planned maintenance should reduce capacity available minutes (it mirrors OEE today and does not).
-- Downtime `open` as a domain action rather than the generic insert.
-- D10 KPI materialisation (job + cache) for OEE and capacity, and where they are shown.
-- Finished-goods stock-in and valuation on order completion (Task 16 Step 3).
+Five decisions confirmed and delivered (MES suite green, tests per item):
+
+- Typed events and the order state machine: `ProductionOrderReleased/Started/Completed/Cancelled`, `OperationStarted/Completed/Skipped`. The first operation started on a released order moves it to `in_progress`; `cancel` is allowed from `in_progress` and ends the operations that did not complete as `skipped`. (Task 6 Step 4.)
+- Downtime opening as a domain action: `open_downtime` on `WorkCenter` (the registry is record-bound, so the work center carries it), at most one open downtime per work center, `DowntimeOpened/Closed` events. The generic insert stays for back-filling history.
+- Planned maintenance reduces capacity: `CapacityService::availableMinutes()` subtracts every downtime. OEE availability still excludes it and now clips each downtime to the window.
+- D10: `mes:kpis:materialize` (hourly) queues `MaterializeWorkCenterKpisJob` per active work center; `WorkCenterKpiMaterializer` stores OEE and capacity in the cache, read through `WorkCenterKpiStore` (never recomputed on read) and shown as an OEE column in the work-center list. The ISO 22400 device branch of the machine-data spec is not built here: no devices exist yet.
+- Capacity warning channel: `CapacityOverloadDetected` on operation start (read from the materialised KPIs), queued `NotifyCapacityOverload`, `mes.notifications.capacity_overload` (roles and channels, same shape as the stock shortage). (Task 7 Step 3.)
+
+Nothing is open any more: the plan is closed (see the delivery status at the end).
+
 
 **Downstream dependency (2026-10-06):** the approved stack-root spec
 `docs/superpowers/specs/2026-10-05-mes-machine-data-acquisition-design.md` (section 3, "Prerequisites")
@@ -924,7 +943,7 @@ Regole implementative:
 - `complete()`: verifica operazioni non `in_progress`; aggiorna qty; lot handling in Task 9
 - `cancel()`: solo da `draft|released`
 
-- [ ] **Step 4: Observer transizioni stato** — log/eventi dominio tipizzati (`ProductionOrderReleased`, ecc.) — open, awaits a decision on typed events and the order state machine.
+- [x] **Step 4: Observer transizioni stato** — replaced by typed events dispatched by the services after each transition (`ProductionOrderReleased/Started/Completed/Cancelled`, `OperationStarted/Completed/Skipped`), with the order state machine (first started operation moves a released order to `in_progress`; cancel ends the unfinished operations as skipped).
 
 - [x] **Step 5: SalesOrderConfirmed pipeline** — replaced: ERP `SalesOrderConfirmed` event + MES queued listener `CreateProductionOrdersForSalesOrder` → `SalesOrderProductionPlanner`, no job class.
 
@@ -967,7 +986,7 @@ it('calculates efficiency as actual over standard percent', function (): void {
 
 Formula: `(standard_minutes / actual_minutes) * 100`, clamp 0–999.99.
 
-- [ ] **Step 3: Implementare start/complete con warning capacità non bloccante** — start/complete done; the capacity warning and its channel await a decision.
+- [x] **Step 3: Implementare start/complete con warning capacità non bloccante** — start/complete done; `CapacityOverloadDetected` is emitted on start when the materialised KPIs flag the work center as overloaded, notified through `mes.notifications.capacity_overload`.
 
 - [x] **Step 4: Observer on completed** — dispatch `BackflushMaterialsJob` (Task 8), crea QualityCheck pending se piano (Task 10) — replaced by inline calls in `ProductionOrderOperationService::complete()`.
 
@@ -1070,7 +1089,7 @@ it('forward and backward traces are symmetric', function (): void {
 
 ### Task 11: Scheduling e capacità — T9
 
-> **Open (2026-10-01):** the five capacity methods exist with tests; available minutes now subtract unplanned downtime (Task 12). Step 2 awaits a decision on the algorithms: `estimateCompletionDate` only returns `planned_end_at`, operations carry no planned dates of their own, the work-center calendar is not read, and the signatures diverge from the plan (`checkOverload(work_center, from, to, ?available)` instead of `(work_center, at)`, `rescheduleOperation` without a date).
+> **Done (2026-10-06):** the five capacity methods exist with tests, available minutes read the work center calendar and subtract every downtime, and operations are planned forward on release (Step 2).
 
 **Files:**
 - Create: `Modules/MES/app/Services/CapacityService.php`
@@ -1078,7 +1097,7 @@ it('forward and backward traces are symmetric', function (): void {
 
 - [x] **Step 1: Test CapacityLoad >= 0**
 
-- [ ] **Step 2: Implementare metodi** — open: methods exist, the completion estimate, operation dates and calendar capacity await a decision; signatures diverge (see note).
+- [x] **Step 2: Implementare metodi** — delivered (2026-10-06): `WorkCalendar` reads the weekly calendar (08:00 to 16:00 every day without slots); operations carry `planned_start_at` / `planned_end_at`, written on release by `scheduleOperations()` (forward, infinite-capacity); `estimateCompletionDate()` plans what is left from now; `rescheduleOperation()` takes an optional start date; loads count dated operations in proportion to the window. `checkOverload()` keeps the window signature `(work_center, from, to, ?available)`, a superset of the plan's `(work_center, at)`. The operation columns are folded into the create migration, so an existing database needs it re-run.
 
 ```php
 public function getCapacityLoad(int $work_center_id, \DateTimeInterface $from, \DateTimeInterface $to): float;
@@ -1232,7 +1251,7 @@ Modules/MES/app/Filament/Resources/WorkCenters/
 
 - [x] **Step 2: BomResource** — Select `item_id` da ERP Item, Repeater bom lines — relationship repeater with `orderColumn('sort_order')`; lines edited through the form are versioned (`MesFilamentPagesTest`).
 
-- [ ] **Step 3: ProductionOrderResource** — View page con tabs (RelationManagers: Operations, MaterialConsumptions, QualityChecks, LotNumbers); actions Release/Complete/Cancel che chiamano `ProductionOrderService` — open: the four read-only relation managers exist on the edit page; the transition actions await a decision.
+- [x] **Step 3: ProductionOrderResource** — View page con tabs (RelationManagers: Operations, MaterialConsumptions, QualityChecks, LotNumbers); actions Release/Complete/Cancel che chiamano `ProductionOrderService` — the four read-only relation managers and the Release/Complete/Cancel header actions exist on the edit page (`EditProductionOrder`); they call `ProductionOrderService` and are shown according to `MesModelPolicy` (state guard plus seeded permission), complete asks for the produced quantity and an optional lot code, and a refused transition is reported as a notification (`MesFilamentPagesTest`).
 
 - [x] **Step 4: ProductionDashboardWidget** — 4 stat cards da query aggregate
 
@@ -1268,7 +1287,7 @@ it('keeps bom snapshot immutable after release', function (int $i): void {
 
 Coprire invarianti design.md: snapshot, OEE bounds, order number uniqueness, state coherence, capacity >= 0, lot trace symmetry.
 
-- [ ] **Step 3: E2E ciclo produzione** — open: the cycle runs through complete PO and lot; finished-goods stock-in and valuation await a decision.
+- [x] **Step 3: E2E ciclo produzione** — the cycle runs through complete PO, lot and the finished-goods receipt: completion posts the stock-in valued at the material cost consumed per unit (`FinishedGoodsReceiptService`, `ProductionCostReader`; `FinishedGoodsReceiptTest` runs it against the real ERP stock). Labour and machine time carry no cost rate, so valuation is material-only; a backflush still queued at completion is not in the cost.
 
 Flusso: create PO → release → start/complete operations → backflush → complete PO → stock in.
 
@@ -1283,7 +1302,7 @@ cd Modules/MES && composer test:type-coverage 2>/dev/null || echo "run if script
 cd Modules/MES && composer test:types 2>/dev/null || echo "run if script exists"
 ```
 
-- [ ] **Step 5: Commit** — with Step 3.
+- [x] **Step 5: Commit** — with Step 3.
 
 ---
 
