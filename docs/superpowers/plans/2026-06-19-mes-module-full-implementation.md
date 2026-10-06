@@ -66,6 +66,13 @@ Awaiting a decision (the plan stays open):
 - D10 KPI materialisation (job + cache) for OEE and capacity, and where they are shown.
 - Finished-goods stock-in and valuation on order completion (Task 16 Step 3).
 
+**Downstream dependency (2026-10-06):** the approved stack-root spec
+`docs/superpowers/specs/2026-10-05-mes-machine-data-acquisition-design.md` (section 3, "Prerequisites")
+builds on five of these decisions: typed events and the order state machine, downtime `open` as a
+domain action, planned maintenance and capacity, D10 materialisation, and the capacity warning channel.
+It records the assumption it makes for each. Read it before deciding them; a decision that differs from
+its assumption means amending that spec. Its implementation plans are written after this plan closes.
+
 ## Current Truth (stato codice al 2026-07-09)
 
 | Task piano | Stato reale nel codice | Gap principale |
