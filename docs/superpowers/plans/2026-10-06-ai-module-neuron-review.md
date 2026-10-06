@@ -209,13 +209,13 @@ Finding A3. The guardrail on tool results (A2) is part of Task 11, because it ne
 - Modify: `Modules/AI/app/Services/Tools/CrudToolProvider.php`
 - Test: `Modules/AI/tests/Integration/ToolRegistryTest.php`, `Modules/AI/tests/Feature/Assistance/AgentEndpointTest.php`
 
-- [ ] **Step 1: The failing test.** A model that omits a required argument makes `Tool::execute()` throw `MissingCallbackParameter`; `ToolNode` rethrows it without a handler, and `respond()` turns the whole turn into the canned refusal. Drive it with `ToolCallingFakeProvider` (a call with a missing argument, then a normal answer): the turn must complete.
+- [x] **Step 1: The failing test.** A model that omits a required argument makes `Tool::execute()` throw `MissingCallbackParameter`; `ToolNode` rethrows it without a handler, and `respond()` turns the whole turn into the canned refusal. Drive it with `ToolCallingFakeProvider` (a call with a missing argument, then a normal answer): the turn must complete. Done: `AgentEndpointTest` drives a call to `propose_preference_change` with no arguments through `ToolCallingFakeProvider`; it failed (the second model call never happened) and now the turn completes and the tool result the model sees is the fixed message.
 
-- [ ] **Step 2: `toolErrorHandler`.** `ChatAgent` gives Neuron's `toolErrorHandler()` a handler that answers the model with a fixed message that never echoes the exception text, so the model can try again.
+- [x] **Step 2: `toolErrorHandler`.** `ChatAgent` gives Neuron's `toolErrorHandler()` a handler that answers the model with a fixed message that never echoes the exception text, so the model can try again. Done in `ChatAgent::resolveToolErrorHandler()` (the override point of Neuron's `HandleTools`, so `toolErrorHandler()` stays free for a caller). Two distinct fixed messages (a failure, a tool called too often), the tool name and exception class logged, and `AssistancePolicyViolationException` is rethrown: it is a decision to refuse, not a tool failure.
 
-- [ ] **Step 3: `toolMaxRuns`.** `ToolDefinition` gains an optional `maxRuns`, which `ToolRegistry::buildNeuronToolStructure()` sets with `Tool::setMaxRuns()`; the expensive tools (`graph_*`, `crud_*`) declare a small limit. `ToolRunsExceededException` after the default 10 runs also ends in the canned refusal today.
+- [x] **Step 3: `toolMaxRuns`.** `ToolDefinition` gains an optional `maxRuns`, which `ToolRegistry::buildNeuronToolStructure()` sets with `Tool::setMaxRuns()`; the expensive tools (`graph_*`, `crud_*`) declare a small limit. `ToolRunsExceededException` after the default 10 runs also ends in the canned refusal today. Done: `ToolDefinition::$maxRuns`, `ToolRegistry::register(..., maxRuns:)` and `buildNeuronToolStructure()`; `GraphToolProvider::MAX_RUNS` and `CrudToolProvider::MAX_RUNS` are 3. The default 10 (`ToolRunsExceededException`) now also ends in the fixed message instead of the refusal.
 
-- [ ] **Step 4: Format, run the tool and assistant suites, commit.** `fix(ai): a tool that fails or runs too often does not refuse the whole turn`.
+- [x] **Step 4: Format, run the tool and assistant suites, commit.** `fix(ai): a tool that fails or runs too often does not refuse the whole turn`. Done: 400 tool, assistant and agent tests pass; documented in `docs/rag/MODULE.md` ("Tool failures").
 
 ---
 
