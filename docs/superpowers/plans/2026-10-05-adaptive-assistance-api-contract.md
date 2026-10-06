@@ -56,19 +56,19 @@
 - Create: `Modules/AI/app/Http/Middleware/ResolveAssistantApplicationContext.php`
 - Modify: `Modules/AI/routes/api.php`
 - Modify: `Modules/AI/docs/rag/ASSISTANT_SCOPE.md`
-- Test: `Modules/AI/tests/Feature/Assistance/`
+- Test: `Modules/AI/tests/Feature/Assistance/ResolveAssistantApplicationContextTest.php` and `AssistantScopeRespondTest.php`
 
-- [ ] **Step 1: Locate the lookup.** Find the Core service that resolves a `{module}/{entity}` pair of a CRUD route to a model. Reuse it. Do not write a second registry.
+- [x] **Step 1: Locate the lookup.** Find the Core service that resolves a `{module}/{entity}` pair of a CRUD route to a model. Reuse it. Do not write a second registry.  Reused `DynamicEntity::tryResolveModel($entity, null, $module)`: unlike `DynamicEntity::resolve`, which the CRUD request uses and which falls back to a raw table, it matches registered models only.
 
-- [ ] **Step 2: Write failing tests.** A known `resource` yields `assistant_application_context` with module, entity and record key. An unknown resource, a malformed one, or a resource the user may not read yields no context. A forged `assistant_application_context` key inside `context` never reaches the attribute.
+- [x] **Step 2: Write failing tests.** A known `resource` yields `assistant_application_context` with module, entity and record key. An unknown resource, a malformed one, or a resource the user may not read yields no context. A forged `assistant_application_context` key inside `context` never reaches the attribute.
 
-- [ ] **Step 3: Implement the middleware.** It reads `context.page.resource` and `recordKey`, resolves them, and is the only writer of the attribute. Attach it to the message routes of the assistant.
+- [x] **Step 3: Implement the middleware.** It reads `context.page.resource` and `recordKey`, resolves them, and is the only writer of the attribute. Attach it to the message routes of the assistant.
 
-- [ ] **Step 4: Prove narrowing.** With a resolved module, scope is `Module`. Without one, scope is generic, as today. Extend `AssistantScopeRespondTest` or add a sibling.
+- [x] **Step 4: Prove narrowing.** With a resolved module, scope is `Module`. Without one, scope is generic, as today. Extend `AssistantScopeRespondTest` or add a sibling.
 
-- [ ] **Step 5: Fix the documentation.** `ASSISTANT_SCOPE.md` states which class sets the attribute.
+- [x] **Step 5: Fix the documentation.** `ASSISTANT_SCOPE.md` states which class sets the attribute.
 
-- [ ] **Step 6: Format and run the assistant feature tests.**
+- [x] **Step 6: Format and run the assistant feature tests.**
 
 ---
 
