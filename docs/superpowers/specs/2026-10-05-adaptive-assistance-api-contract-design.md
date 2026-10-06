@@ -44,6 +44,7 @@ Read from the module repositories on 2026-10-05, at depth 1.
 | Message request | `SendMessageRequest` accepts a `context` array and rejects control keys such as `profile`, `tools`, `permissions`. Only `accessibility`, `locale`, `response_format` and `verbosity` are kept, in the metadata of the user message. |
 | Assistant output | `message.metadata` carries `citations` or `refused`. |
 | Writes by the assistant | `CrudToolProvider` offers create, update, delete, bulk and approve, opt-in per entity, under the permissions and ACL of the user. The route `messages-with-tools` answers `action_requests: []`. |
+| Conversation title | `conversations.title` is nullable and set only by the caller at creation. Nothing generates it, so a client that does not send one lists every conversation as untitled. |
 | Suggestions | `ContextualSuggestion` stores a `context` JSON per user and suggestion, with `dismissed_at`. It is off by default and rate limited. |
 
 ## 4. Contract
@@ -126,6 +127,18 @@ A streaming agent endpoint, `/app/ai/agent`, may be built later as a wrapper. It
 
 No new table is added by this contract.
 
+### 4.7 Conversation title
+
+A conversation takes a short title by itself, from its first question and first answer.
+
+- **When.** After the first assistant reply that is not a refusal, if `title` is still null. The reply is returned without waiting: a queued job writes the title, and clients read it the next time they list or load the conversation. A refusal as first reply creates no title until a later reply is not one.
+- **Input.** The first user message and the first assistant message, as stored and already validated. Never retrieved passages, tool output, citations or page context.
+- **Output.** Plain text in the locale of the user: 2 to 5 words, at most 40 characters, no quotes, no trailing punctuation, no markdown. The result passes the same output guardrails as any assistant text. If the generation fails or is rejected, the title falls back to the first words of the question, cut at a word boundary to the same limit.
+- **Policy.** A dedicated capability `conversation_title` in `AssistantPolicyCatalog`, with no tools and no corpora, so the call can read nothing but those two messages. Invariant 1 of `2026-09-16-in-app-assistant-tools-design.md` applies: no caller assembles its own list.
+- **Precedence.** A title sent by the caller at creation wins and is never overwritten. A generated title is set once and never regenerated. Renaming by the user is a separate change.
+- **Contract.** `title` already appears in the conversation list and detail. The client never sends a title for generation and never receives a separate event for it.
+- **Stored data.** The title is user data: removed with the conversation, not logged in raw form, not used for anything but display.
+
 ## 5. Out of scope
 
 - Any collection of usage data, by the project or by an operator.
@@ -140,3 +153,4 @@ No new table is added by this contract.
 2. Register namespace schemas in Core now, or ship with the generic limits only?
 3. Default preferences by role or tenant: in this contract, or a later one?
 4. `view_state` proposals can target saved views. Server-side saved views do not exist. Is a view only ever local to a client?
+5. Title generation: which model and budget serve it, and whether it runs on the configured assistant provider or a smaller one. It must stay a bounded call with a hard output cap.
