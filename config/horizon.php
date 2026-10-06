@@ -196,10 +196,10 @@ return [
             'tries' => 3,
         ],
         // The embedding model switch job (Modules\AI SwitchEmbeddingModelJob): one run at a time,
-        // a run may take up to 900 s (the step that prepares the indexes phase, which rebuilds the
-        // Elasticsearch documentation indexes when FAQ keeps them there). The redis connection's
-        // retry_after (REDIS_QUEUE_RETRY_AFTER) must be at least 1000, above this timeout, or that
-        // run is handed out a second time.
+        // a run may take up to 900 s. It writes no document, but its corpus walks, the pgvector
+        // index build and the activation's row delete grow with the corpus and are not timed. The
+        // redis connection's retry_after (REDIS_QUEUE_RETRY_AFTER) must be at least 1000, above
+        // this timeout, or that run is handed out a second time.
         'supervisor-embeddings-switch' => [
             'connection' => 'redis',
             'queue' => ['embeddings-switch'],
@@ -209,7 +209,7 @@ return [
             'timeout' => 960,
         ],
         // The index chunks of an embedding model switch (Modules\AI IndexDocumentsChunkJob): one
-        // model and key range of documents each, up to 240 s. One process, so pgvector index writes
+        // model and key range of documents, or one range of documentation files, each, up to 240 s. One process, so pgvector index writes
         // are not parallel; raising it is safe for the switch state.
         'supervisor-embeddings-index' => [
             'connection' => 'redis',
