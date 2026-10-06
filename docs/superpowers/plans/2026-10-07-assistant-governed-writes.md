@@ -77,10 +77,10 @@ The write tools are named per entity (`crud_update_cms_content`), so exact names
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyCatalog.php`, `Modules/AI/app/Services/Assistance/AssistantCapabilities.php`
 - Test: `Modules/AI/tests/Feature/Assistance/GovernedWritesCapabilityTest.php`
 
-- [ ] **Step 1: Test first.** A policy compiled with the capability allows `crud_create_*`, `crud_update_*`, `crud_delete_*`, `crud_bulk_update_*`, `crud_bulk_delete_*` and never `crud_approve_*`/`crud_disapprove_*` (denied at the profile). Without the capability none of them is allowed. `DeveloperHelp` cannot receive the capability and its allowed tools stay empty (assert it, do not rely on it being true today). Reads are a separate capability: compiling `governed_writes` alone admits no read tool, and the read capability admits no write tool.
-- [ ] **Step 2: Implement.** Add a read capability (`crud_reads`: `crud_view_*`, `list`, `detail`, `search`, `summarize`, `export`, `pending_approvals`) and `governed_writes` (the write patterns) to `capabilities`, with the instruction of Task 8 (stub it now with the contract: proposals are not actions, never say done). Add the patterns to the in-app profile `allowedTools` and `crud_approve_*`, `crud_disapprove_*` to its `deniedTools`.
-- [ ] **Step 3:** `AssistantCapabilities::toArray()` reports `features.writes` true only when at least one write tool is configured for the entity allowlist; assert both states.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(ai): governed_writes policy capability for the in-app profile`.
+- [x] **Step 1: Test first.** A policy compiled with the capability allows `crud_create_*`, `crud_update_*`, `crud_delete_*`, `crud_bulk_update_*`, `crud_bulk_delete_*` and never `crud_approve_*`/`crud_disapprove_*` (denied at the profile). Without the capability none of them is allowed. `DeveloperHelp` cannot receive the capability and its allowed tools stay empty (assert it, do not rely on it being true today). Reads are a separate capability: compiling `governed_writes` alone admits no read tool, and the read capability admits no write tool.
+- [x] **Step 2: Implement.** Add a read capability (`crud_reads`: `crud_view_*`, `list`, `detail`, `search`, `summarize`, `export`, `pending_approvals`) and `governed_writes` (the write patterns) to `capabilities`, with the instruction of Task 8 (stub it now with the contract: proposals are not actions, never say done). Add the patterns to the in-app profile `allowedTools` and `crud_approve_*`, `crud_disapprove_*` to its `deniedTools`.
+- [x] **Step 3:** `AssistantCapabilities::toArray()` reports `features.writes` true only when at least one write tool is configured for the entity allowlist; assert both states.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(ai): governed_writes policy capability for the in-app profile`.
 
 ---
 
@@ -90,14 +90,14 @@ The write tools are named per entity (`crud_update_cms_content`), so exact names
 - Modify: `Modules/AI/app/Services/Tools/CrudToolProvider.php`, `Modules/AI/config/config.php`
 - Test: `Modules/AI/tests/Feature/Tools/CrudToolProviderTest.php`, `CrudToolProviderApprovalTest.php`
 
-- [ ] **Step 1: Test first.**
+- [x] **Step 1: Test first.**
   - `approve` and `disapprove` are never produced for the assistant even when the entity lists them and the user holds `approve`; `pending_approvals` still is.
   - An entity without `HasApprovals` gets no write tool unless it is under `ai.features.tools.crud.unmoderated_writes`; with the opt-in it does; reads are unaffected.
   - An entity with `HasApprovals` needs no second opt-in.
   - A user without the ability gets no tool (existing behaviour, keep the assertion).
-- [ ] **Step 2: Implement.** Decide moderation by asking whether the resolved model uses `Modules\Core\Models\Concerns\HasApprovals` (the trait Core's design names as the one question; do not test the vendor trait). Remove `approve`/`disapprove` from what the assistant can be offered and drop them from `VALID_OPERATIONS` for this provider (document in the config comment). Add `unmoderated_writes` (default `[]`) to `config.php` with a comment saying it means "applied directly, no vote".
-- [ ] **Step 3:** per-turn write budget: a small collaborator (`AssistantWriteBudget`, request-scoped, in `Services/Assistance/`) the write handlers consult; beyond the cap the call returns a `refused` result with `reason: write_budget_exceeded`. Test the cap and that reads never consume it.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(ai): crud write offer fail-closed, no model votes, per-turn write budget`.
+- [x] **Step 2: Implement.** Decide moderation by asking whether the resolved model uses `Modules\Core\Models\Concerns\HasApprovals` (the trait Core's design names as the one question; do not test the vendor trait). Remove `approve`/`disapprove` from what the assistant can be offered and drop them from `VALID_OPERATIONS` for this provider (document in the config comment). Add `unmoderated_writes` (default `[]`) to `config.php` with a comment saying it means "applied directly, no vote".
+- [x] **Step 3:** per-turn write budget: a small collaborator (`AssistantWriteBudget`, request-scoped, in `Services/Assistance/`) the write handlers consult; beyond the cap the call returns a `refused` result with `reason: write_budget_exceeded`. Test the cap and that reads never consume it. Done: the budget class, its scoped binding and its tests; the handlers consume it in Task 5, where the apply path exists, and that task tests that reads never consume it.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(ai): crud write offer fail-closed, no model votes, per-turn write budget`.
 
 ---
 
