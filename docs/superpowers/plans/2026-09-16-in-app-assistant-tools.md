@@ -30,8 +30,8 @@
 
 The spec leaves one question open on purpose, and it changes the code.
 
-- [ ] **Step 1:** Read what `RiskClassifier` actually classifies today and write the answer in the spec under a *Decision* line: does risk stay a function of the tool name, or does it also read the entity and the operation? Deleting an ERP document and updating a draft note reaching the same risk level is the case that decides it.
-- [ ] **Step 2:** If the answer is "tool name only", record explicitly which tools are `high` and therefore always wait for a person. If it is "entity and operation too", that is its own task and this plan pauses until it exists, because building the capability on a classifier about to change shape means building it twice.
+- [-] **Step 1:** Read what `RiskClassifier` actually classifies today and write the answer in the spec under a *Decision* line: does risk stay a function of the tool name, or does it also read the entity and the operation? Deleting an ERP document and updating a draft note reaching the same risk level is the case that decides it. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 2:** If the answer is "tool name only", record explicitly which tools are `high` and therefore always wait for a person. If it is "entity and operation too", that is its own task and this plan pauses until it exists, because building the capability on a classifier about to change shape means building it twice. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ---
 
@@ -41,11 +41,11 @@ The spec leaves one question open on purpose, and it changes the code.
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyCatalog.php`
 - Test: `Modules/AI/tests/Feature/Assistance/AssistantToolCapabilityTest.php`
 
-- [ ] **Step 1: Test first** — a profile that lists the capability compiles a policy whose `allowedTools` contains the write tools; a profile that does not list it compiles one that does not, and `DeveloperHelp` is that profile. The negative assertion is the valuable one: it is what stops a future tool leaking into a surface nobody reviewed.
+- [-] **Step 1: Test first** — a profile that lists the capability compiles a policy whose `allowedTools` contains the write tools; a profile that does not list it compiles one that does not, and `DeveloperHelp` is that profile. The negative assertion is the valuable one: it is what stops a future tool leaking into a surface nobody reviewed. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
-- [ ] **Step 2: Implement.** Add an `approval_gated_tools` entry to `capabilities`, alongside `in_app_rag`, `read_only_graph` and `application_content`, with the write tool names in `allowedTools` and an `instruction` stating the contract the model must follow: it may propose these actions, they do not take effect until a person approves, and it must not describe a proposed action as completed.
+- [-] **Step 2: Implement.** Add an `approval_gated_tools` entry to `capabilities`, alongside `in_app_rag`, `read_only_graph` and `application_content`, with the write tool names in `allowedTools` and an `instruction` stating the contract the model must follow: it may propose these actions, they do not take effect until a person approves, and it must not describe a proposed action as completed. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
-- [ ] **Step 3:** run the test (PASS), pint, commit: `feat(ai): policy capability for approval-gated tools`.
+- [-] **Step 3:** run the test (PASS), pint, commit: `feat(ai): policy capability for approval-gated tools`. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ---
 
@@ -55,13 +55,13 @@ The spec leaves one question open on purpose, and it changes the code.
 - Modify: `Modules/AI/app/Services/Assistance/InAppAssistanceService.php`
 - Test: `Modules/AI/tests/Feature/Assistance/AssistantApprovalFlowTest.php`
 
-- [ ] **Step 1: Test first** — with the capability enabled and a faked completion that proposes a write, one `ActionRequest` is created for the conversation's user, the assistant message metadata carries `tool_calls` with id, tool, status and risk level, and **no write has been applied to the target record**. Then: approving the request through the existing service executes it. With the capability disabled, the same completion creates nothing. Use the `$completion` closure seam so no live model is needed.
+- [-] **Step 1: Test first** — with the capability enabled and a faked completion that proposes a write, one `ActionRequest` is created for the conversation's user, the assistant message metadata carries `tool_calls` with id, tool, status and risk level, and **no write has been applied to the target record**. Then: approving the request through the existing service executes it. With the capability disabled, the same completion creates nothing. Use the `$completion` closure seam so no live model is needed. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
-- [ ] **Step 2: Implement.** In `contextualTools()`, when the compiled policy allows the write tools, obtain them from `ToolRegistry::getAllNeuronToolsWithApproval()` with the conversation, `ActionRequestService`, `RiskClassifier` and a `$pending` array by reference. In `respond()`, when `$pending` is non-empty, add `tool_calls` to the assistant message metadata. Change nothing about scope resolution, guardrails or the prompt context.
+- [-] **Step 2: Implement.** In `contextualTools()`, when the compiled policy allows the write tools, obtain them from `ToolRegistry::getAllNeuronToolsWithApproval()` with the conversation, `ActionRequestService`, `RiskClassifier` and a `$pending` array by reference. In `respond()`, when `$pending` is non-empty, add `tool_calls` to the assistant message metadata. Change nothing about scope resolution, guardrails or the prompt context. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
-- [ ] **Step 3: Guard the claim.** The output guardrail already validates the text. Add an assertion at the edge of this flow that a response carrying pending requests is stored with them in metadata, so a client can always distinguish proposed from done without parsing prose. The prose itself is governed by the capability `instruction` from Task 2.
+- [-] **Step 3: Guard the claim.** The output guardrail already validates the text. Add an assertion at the edge of this flow that a response carrying pending requests is stored with them in metadata, so a client can always distinguish proposed from done without parsing prose. The prose itself is governed by the capability `instruction` from Task 2. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
-- [ ] **Step 4:** run the tests (PASS), pint, commit: `feat(ai): propose writes through approval-gated tools in the assistant`.
+- [-] **Step 4:** run the tests (PASS), pint, commit: `feat(ai): propose writes through approval-gated tools in the assistant`. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ---
 
@@ -71,9 +71,9 @@ The spec leaves one question open on purpose, and it changes the code.
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyCatalog.php` (profile entries)
 - Test: extend `Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php`
 
-- [ ] **Step 1:** Add the capability to the in-app profile only. `DeveloperHelp` runs from the console with `userId: null` and must not reach it; assert that, rather than relying on it being true today.
-- [ ] **Step 2:** Assert that the acting user's permissions still bound what a tool can do, so the capability narrows and never widens: a user who cannot update an entity gets no successful write through the assistant either.
-- [ ] **Step 3:** run the tests (PASS), pint, commit: `feat(ai): grant approval-gated tools to the in-app profile only`.
+- [-] **Step 1:** Add the capability to the in-app profile only. `DeveloperHelp` runs from the console with `userId: null` and must not reach it; assert that, rather than relying on it being true today. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 2:** Assert that the acting user's permissions still bound what a tool can do, so the capability narrows and never widens: a user who cannot update an entity gets no successful write through the assistant either. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 3:** run the tests (PASS), pint, commit: `feat(ai): grant approval-gated tools to the in-app profile only`. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ---
 
@@ -85,17 +85,17 @@ The spec leaves one question open on purpose, and it changes the code.
 - Modify: `Modules/AI/docs/GLOSSARY.md` and `Modules/AI/docs/rag/GLOSSARY.md` (the `sendMessageWithTools` entry describing the gap)
 - Modify: `Modules/AI/docs/rag/ASSISTANT_DATA_TOOLS_USER.md`
 
-- [ ] **Step 1:** Remove the caveat from *Perimeters*: the producer exists again, and the doc must say how it is reached now, not how it used to be.
-- [ ] **Step 2:** Rewrite the status note on `TOOLS_USAGE_EXAMPLE.md`: the flow is live again, reached through a capability rather than a method. Keep the document, correct the route.
-- [ ] **Step 3:** Update both glossary entries, which currently end with "no code path creates `ActionRequest` rows today".
-- [ ] **Step 4:** Document for the operator what they will see: an assistant that proposes an action, where the approval appears, and that nothing happens until they act.
-- [ ] **Step 5:** Add the `**Documented in:**` line to this plan and a `## Delivery status (date)` section. pint, commit: `docs(ai): approval-gated assistant tools`.
+- [-] **Step 1:** Remove the caveat from *Perimeters*: the producer exists again, and the doc must say how it is reached now, not how it used to be. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 2:** Rewrite the status note on `TOOLS_USAGE_EXAMPLE.md`: the flow is live again, reached through a capability rather than a method. Keep the document, correct the route. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 3:** Update both glossary entries, which currently end with "no code path creates `ActionRequest` rows today". (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 4:** Document for the operator what they will see: an assistant that proposes an action, where the approval appears, and that nothing happens until they act. (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] **Step 5:** Add the `**Documented in:**` line to this plan and a `## Delivery status (date)` section. pint, commit: `docs(ai): approval-gated assistant tools`. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ---
 
 ## Final verification
-- [ ] `php artisan test --compact Modules/AI/tests/Feature/Assistance Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/AI/tests/Integration/ToolRegistryTest.php`
-- [ ] `vendor/bin/pint --dirty --format agent` clean.
+- [-] `php artisan test --compact Modules/AI/tests/Feature/Assistance Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php Modules/AI/tests/Integration/ToolRegistryTest.php` (superseded: see 2026-10-07-assistant-governed-writes.md)
+- [-] `vendor/bin/pint --dirty --format agent` clean. (superseded: see 2026-10-07-assistant-governed-writes.md)
 
 ## Out of scope (per spec)
 Moving the approval mechanism to Core, which belongs to MCP phase 2; MCP write tools; new tools of any kind; extending `RiskClassifier` beyond what Task 1 settles.
@@ -103,3 +103,11 @@ Moving the approval mechanism to Core, which belongs to MCP phase 2; MCP write t
 ## Notes for the executor
 - Nothing in this plan builds approval machinery. All of it exists and is tested; what was missing was a caller. If you are writing an `ActionRequest` by hand, you have gone off the path.
 - When MCP writes are opened, `ActionRequestService` and `RiskClassifier` move to Core behind a contract with `Modules/AI` overlaying the implementation, the way search works with `ISearchPlanner`. Do not pre-emptively generalise them here: the point of reconnecting this path first is to exercise the mechanism with real use before it is shaped into a contract for two consumers.
+
+---
+
+## Delivery status (2026-10-07): superseded, closed unbuilt
+
+No task of this plan was executed. Reading the code showed its premise false: nothing registers tools in the global `ToolRegistry`, so `getAllNeuronToolsWithApproval()` wraps an empty list and `ActionRequestService` cannot run any tool the assistant has; `RiskClassifier` has no live caller; and Core approvals (shipped 2026-09-28) enforce approval at the model for every surface. The owner decided to retire the `ActionRequest` path and to open assistant writes through Core approvals plus a two-step confirmation instead. That work is `2026-10-07-assistant-governed-writes.md`, from the spec `2026-10-07-assistant-governed-writes-design.md`. Task 1 of this plan (the risk question) is answered there: there is no tool-level risk model.
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/TOOLS_USAGE_EXAMPLE.md` (updated by the superseding plan).

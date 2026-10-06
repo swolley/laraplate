@@ -1,6 +1,6 @@
 # In-app assistant tools: reconnecting the approval-gated path
 
-**Status:** draft for review
+**Status:** Superseded 2026-10-07 by `2026-10-07-assistant-governed-writes-design.md`. The premise (a complete approval path lacking only a caller) no longer holds: the global tool registry has no production registration, `RiskClassifier` has no live caller, and Core approvals (2026-09-28) enforce approval at the model. The `ActionRequest` path is retired instead of reconnected.
 
 **Date:** 2026-09-16
 
