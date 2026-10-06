@@ -41,11 +41,11 @@
 **Interfaces:**
 - Produces: `StockReservation` (company-scoped Eloquent model) with columns `company_id`, `item_id`, `warehouse_id` (nullable), `source_type` (string), `source_id`, `quantity` (decimal:4), `state` (`StockReservationState`), `expires_at` (nullable datetime); relations `item()`, `warehouse()`; **no `source()` morphTo**. `StockReservationState` enum cases `Soft='soft'`, `Hard='hard'`, `Consumed='consumed'`, `Released='released'` with a `validationRule()` static (mirror `StockMovementDirection`). Scope `active()` = `whereIn('state', ['soft','hard'])`.
 
-- [ ] **Step 1: Write the failing test** — `StockReservationTest`: creating a reservation persists `state` as an enum and `quantity` as `decimal:4`; `active()` scope returns `soft`+`hard` and excludes `consumed`+`released`; `BelongsToCompany` scopes by current company.
-- [ ] **Step 2: Run it, verify it fails** — `php artisan test --compact Modules/ERP/tests/Feature/Models/StockReservationTest.php` → FAIL (class/table missing).
-- [ ] **Step 3: Add `ERPTables::StockReservations`**, the `StockReservationState` enum, the migration (follow a sibling e.g. `create_stock_movements_table`: `MigrateUtils`, `company_id` FK, `item_id` FK, nullable `warehouse_id` FK, `source_type` string + `source_id`, `quantity` decimal(15,4), `state` string, `expires_at` nullable; indexes `(company_id, item_id, state)` and `(source_type, source_id)`), the `StockReservation` model (mirror `StockMovement`: `BelongsToCompany`, `DeniesGenericCrudWrites`, `RestrictsCrudWrites`, `shouldVersioning(): false`, casts, `#[Scope] active()`), and the factory.
-- [ ] **Step 4: Run it, verify it passes.**
-- [ ] **Step 5: Commit** — `feat(erp): add stock reservation table, state enum and model`.
+- [x] **Step 1: Write the failing test** — `StockReservationTest`: creating a reservation persists `state` as an enum and `quantity` as `decimal:4`; `active()` scope returns `soft`+`hard` and excludes `consumed`+`released`; `BelongsToCompany` scopes by current company.
+- [x] **Step 2: Run it, verify it fails** — `php artisan test --compact Modules/ERP/tests/Feature/Models/StockReservationTest.php` → FAIL (class/table missing).
+- [x] **Step 3: Add `ERPTables::StockReservations`**, the `StockReservationState` enum, the migration (follow a sibling e.g. `create_stock_movements_table`: `MigrateUtils`, `company_id` FK, `item_id` FK, nullable `warehouse_id` FK, `source_type` string + `source_id`, `quantity` decimal(15,4), `state` string, `expires_at` nullable; indexes `(company_id, item_id, state)` and `(source_type, source_id)`), the `StockReservation` model (mirror `StockMovement`: `BelongsToCompany`, `DeniesGenericCrudWrites`, `RestrictsCrudWrites`, `shouldVersioning(): false`, casts, `#[Scope] active()`), and the factory.
+- [x] **Step 4: Run it, verify it passes.**
+- [x] **Step 5: Commit** — `feat(erp): add stock reservation table, state enum and model`.
 
 ---
 
@@ -65,17 +65,17 @@
   - `release(string $sourceType, int $sourceId): void` — set active reservations for the source to `released`; idempotent (no active rows → no-op).
   - `consume(string $sourceType, int $sourceId, string $quantity): void` — reduce the source's active (`hard`) reserved quantity by `quantity` (mark `consumed`, splitting a row if partially consumed); reject `quantity` greater than the source's active reserved total.
 
-- [ ] **Step 1: Write the failing tests** — `StockReservationServiceTest`:
+- [x] **Step 1: Write the failing tests** — `StockReservationServiceTest`:
   - `available equals on_hand minus active reservations` (seed StockLevels summing e.g. 10, a hard reservation of 3 → `available` = `7.0000`).
   - `reserve rejects when requested exceeds available` → throws `InsufficientStockException`.
   - `reserve rejects a second concurrent reservation beyond on_hand` (on_hand 1; two sequential reserves of 1 → first succeeds, second throws).
   - `available ignores expired soft reservations` (a `soft` with `expires_at` in the past does not reduce `available`).
   - `release restores availability and is idempotent` (reserve, release, available back to full; second release no-ops).
   - `consume closes the reserved quantity` and `consume rejects more than reserved`.
-- [ ] **Step 2: Run them, verify they fail.**
-- [ ] **Step 3: Implement `StockReservationService`** and `InsufficientStockException` (extend `\RuntimeException`). Use `ConnectionScopedModels::for()` like sibling inventory services; reuse the string-decimal helpers' approach from `StockMovementService` (duplicate the minimal `addDecimal`/`subtractDecimal`/compare helpers or extract a shared trait if trivial — DRY, but do not refactor `StockMovementService` beyond extraction).
-- [ ] **Step 4: Run them, verify they pass.**
-- [ ] **Step 5: Commit** — `feat(erp): stock reservation service with locked availability`.
+- [x] **Step 2: Run them, verify they fail.**
+- [x] **Step 3: Implement `StockReservationService`** and `InsufficientStockException` (extend `\RuntimeException`). Implemented with a DB row lock (`lockForUpdate` on the item's `StockLevel` + live reservation rows) inside reserve's transaction; decimal math via `Modules\ERP\Support\Decimal` (BigDecimal), not `StockMovementService`'s float helpers; queries/transaction derived from the owning model, not `ConnectionScopedModels::for()` (frozen for new code) — see Task 2 rulings in the ledger.
+- [x] **Step 4: Run them, verify they pass.**
+- [x] **Step 5: Commit** — `feat(erp): stock reservation service with locked availability`.
 
 ---
 
@@ -87,14 +87,15 @@
 
 **Interfaces:**
 - Consumes: `StockReservationService` (Task 2), `SalesOrderConfirmed` event (`Modules\ERP\Events\SalesOrderConfirmed`), `SalesOrder`/`SalesOrderLine`.
-- Produces: a discovered listener (ERP `EventServiceProvider` has `$shouldDiscoverEvents = true`) that, for each confirmed order line with a non-null `item_id`, calls `promoteToHard(...)` then `reserve(..., Hard)` for any still-unreserved quantity, using the order's `company_id`, source `('erp.sales_order_line', $line->id)`. A failed reservation (`InsufficientStockException`) aborts the confirm (bubbles out of the `created`/`updated` transaction).
+- Produces: a listener (registered in `EventServiceProvider::$listen` — discovery does not work for the module's `EventServiceProvider` subclass) that, for each confirmed order line with a non-null `item_id`, calls `promoteToHard(...)` then **best-effort** `reserve(..., Hard)` for `min(still-unreserved line quantity, available)` using the order's `company_id`, source `('erp.sales_order_line', $line->id)`. It **pre-clamps to availability so it never triggers `reserve()`'s `InsufficientStockException`** and **never blocks the confirm** — the unreserved remainder is backorder / make-to-order (amended 2026-10-06, spec R4: blocking broke the shipped MES make-to-order flow).
 
 - [ ] **Step 1: Write the failing test** — `ReserveStockOnConfirmTest`:
-  - `confirming a sales order hard-reserves each item-backed line` (available drops by the line quantities).
-  - `confirm with expired hold and no stock is rejected` (on_hand 0, no live soft → confirming throws `InsufficientStockException`).
+  - `confirming a sales order hard-reserves each item-backed line up to availability` (available drops by the reserved quantities).
+  - `confirm with no stock reserves nothing and still succeeds` (on_hand 0 → the order confirms, zero reserved, no exception — the make-to-order case; the shipped MES make-to-order confirm must keep planning production).
+  - `confirm partially short reserves up to available` (requested 5, on_hand 3 → reserves 3, confirm succeeds, remainder is backorder).
   - item-less lines (`item_id` null, digital) reserve nothing.
 - [ ] **Step 2: Run it, verify it fails.**
-- [ ] **Step 3: Implement the listener.** Confirm it is discovered (or register it in `EventServiceProvider::$listen` if discovery does not pick it up in the suite).
+- [ ] **Step 3: Implement the listener** (register it in `EventServiceProvider::$listen`). Best-effort reserve; never throw out of the confirm.
 - [ ] **Step 4: Run it, verify it passes.**
 - [ ] **Step 5: Commit** — `feat(erp): hard-reserve stock when a sales order is confirmed`.
 
