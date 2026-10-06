@@ -103,7 +103,7 @@ The write tools are named per entity (`crud_update_cms_content`), so exact names
 
 ### Task 5: write proposals and the person's confirmation
 
-*Amended 2026-10-07 with the spec (section 5): the assistant is stateless, so the model cannot carry a confirmation across turns; the person confirms through an authenticated action outside the model.*
+*Done 2026-10-07. Found on the way: the read tool `crud_detail_*` always errors (an unvalidated form request reaches `CrudService::resolveKeyFromRequest`), so the proposal reads the record through `list`; the fix is a separate task spawned for the owner. Amended 2026-10-07 with the spec (section 5): the assistant is stateless, so the model cannot carry a confirmation across turns; the person confirms through an authenticated action outside the model.*
 
 The control that does not depend on the model behaving.
 
@@ -112,16 +112,16 @@ The control that does not depend on the model behaving.
 - Modify: `app/Enums/AITables.php` (`WriteProposals`), `app/Services/Tools/CrudToolProvider.php` (write handlers only propose; a public `applyProposal()` runs the stored payload), `routes/web.php`, `config/config.php` (proposal TTL)
 - Test: `tests/Feature/Tools/GovernedWriteProposalTest.php`, `tests/Feature/Assistance/AssistantWriteConfirmationTest.php`
 
-- [ ] **Step 1: Test first**, with real factories:
+- [x] **Step 1: Test first**, with real factories:
   - A write tool call changes nothing and stores a `proposed` row: operation, entity, exact payload, acting user and conversation, summary (diff, or count and sample for bulk with the matched ids), `requires_approval` from `wouldRequireApproval()`; the tool result names the acting user and says nothing happened.
   - Confirm as the proposing user applies the stored payload through `CrudService`: `applied` for a direct write, `pending_approval` with the modification id for a moderated entity; a bulk apply records applied, captured and failed counts and affects only the stored ids.
   - Refused, with no write: confirm by another user, a guest, a proposal of another conversation, one that is `applied`/`rejected`/`expired`/past its expiry, a second confirm of the same proposal (idempotent: one write, same outcome); a user who lost the permission since the proposal (the apply is refused by Core, status `failed`).
   - Reject marks it `rejected` and writes nothing. A privileged user is asked too.
   - The old `confirm=true` parameter is gone; the model cannot apply anything.
   - The turn's write budget limits proposals; reads never consume it.
-- [ ] **Step 2: Implement.** Propose-only handlers (reuse `modifyData`, `matchedIds`, `wouldRequireApproval()` on a fresh model, no write). Confirm runs in a transaction with `lockForUpdate` on the row and a status transition, then calls `CrudToolProvider::applyProposal()` resolved from the container with the current request, so the acting user is the authenticated one. Routes in the existing style (`ai.assistant-writes.confirm|reject|show`), guest refused, ownership checked.
-- [ ] **Step 3:** assert with a spy that propose performs zero `CrudService` writes; apply is the only path that does.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(ai): assistant writes are proposed and applied only on the person's confirmation`.
+- [x] **Step 2: Implement.** Propose-only handlers (reuse `modifyData`, `matchedIds`, `wouldRequireApproval()` on a fresh model, no write). Confirm runs in a transaction with `lockForUpdate` on the row and a status transition, then calls `CrudToolProvider::applyProposal()` resolved from the container with the current request, so the acting user is the authenticated one. Routes in the existing style (`ai.assistant-writes.confirm|reject|show`), guest refused, ownership checked.
+- [x] **Step 3:** assert with a spy that propose performs zero `CrudService` writes; apply is the only path that does.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(ai): assistant writes are proposed and applied only on the person's confirmation`.
 
 ---
 
@@ -131,10 +131,10 @@ The control that does not depend on the model behaving.
 - Modify: `Modules/AI/app/Services/Assistance/InAppAssistanceService.php`, the guardrail pipeline (match the proposals pattern), `AssistantPolicyCatalog.php` (capability instruction: the person confirms in the interface)
 - Test: `Modules/AI/tests/Feature/Assistance/AssistantGovernedWritesFlowTest.php`
 
-- [ ] **Step 1: Test first.** With the capabilities on and a scripted completion that proposes a write: no record changed, `writes` in the assistant message metadata with `{id, tool, entity, operation, status: proposed, acting_user_id, ...}`, and the stored text does not say done. With the capabilities off, the same completion offers no write tool and creates no proposal. The turn starts with an empty budget.
-- [ ] **Step 2: Implement.** `respond()` requests `crud_reads` and `governed_writes` (opened per profile, not per call), starts the budget turn, collects the proposals created during the turn through a request-scoped collector (the shape `UiProposalCollector` shows), adds `writes` to metadata. Change nothing about scope resolution or the prompt context.
-- [ ] **Step 3: Guard the claim.** Add `reportPendingWrites()` to the guardrail pipeline mirroring `reportPendingProposals()`: when a turn created proposals, the stored text carries the localized notice that nothing has been applied until the person confirms, in every locale the project supports.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(ai): the assistant reports proposed writes as such`.
+- [x] **Step 1: Test first.** With the capabilities on and a scripted completion that proposes a write: no record changed, `writes` in the assistant message metadata with `{id, tool, entity, operation, status: proposed, acting_user_id, ...}`, and the stored text does not say done. With the capabilities off, the same completion offers no write tool and creates no proposal. The turn starts with an empty budget.
+- [x] **Step 2: Implement.** `respond()` requests `crud_reads` and `governed_writes` (opened per profile, not per call), starts the budget turn, collects the proposals created during the turn through a request-scoped collector (the shape `UiProposalCollector` shows), adds `writes` to metadata. Change nothing about scope resolution or the prompt context.
+- [x] **Step 3: Guard the claim.** Add `reportPendingWrites()` to the guardrail pipeline mirroring `reportPendingProposals()`: when a turn created proposals, the stored text carries the localized notice that nothing has been applied until the person confirms, in every locale the project supports.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(ai): the assistant reports proposed writes as such`.
 
 ---
 
