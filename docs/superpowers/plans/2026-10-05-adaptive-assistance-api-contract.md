@@ -1,8 +1,12 @@
+---
+status: completed
+created_on: 2026-10-05
+---
 # Adaptive Assistance API Contract Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Draft. Waits for the owner to settle the open questions of the spec. Tasks 1 to 6 do not depend on them. Task 7 does.
+**Status:** Shipped 2026-10-06. The owner answered the open questions of the spec that the plan waited on (the streaming endpoint is built); the delivery status at the end records what differs from the steps.
 
 **Goal:** A client can store its preferences safely, tell the assistant where the user is, and receive proposals that the user accepts or refuses, with no usage data collected.
 
@@ -189,24 +193,36 @@
 
 ### Task 7: Streaming agent endpoint
 
-Blocked by open question 1 of the spec. Build only if the answer is yes. These steps move here from the commercial UI plan of 2026-06-17.
+Open question 1 of the spec is answered yes (owner, 2026-10-06): build it now. These steps move here from the commercial UI plan of 2026-06-17.
 
 **Files:**
 - Create: `Modules/AI/app/Http/Controllers/AgentController.php`
 - Create: `Modules/AI/app/Services/AssistAgentService.php`
-- Create: `Modules/AI/app/Policies/AssistIntentPolicy.php`
+- No `AssistIntentPolicy` class: step 3 needs none (see the delivery notes)
+- Create: `Modules/AI/app/Http/Requests/AgentRunRequest.php`, `Modules/AI/app/Services/Assistance/Stream/AgentEvent.php`, `Modules/AI/app/Services/Assistance/Stream/RunProgress.php`
+- Modify: `Modules/AI/app/Services/Assistance/InAppAssistanceService.php`, `Modules/AI/app/Services/Assistance/Contracts/InAppAssistanceServiceInterface.php` (a progress callback), `Modules/AI/app/Services/Assistance/AssistantCapabilities.php` (`streaming` is true), `Modules/AI/routes/web.php`
+- Test: `Modules/AI/tests/Feature/Assistance/AgentEndpointTest.php`, stub `Modules/AI/tests/Stubs/Assistance/ToolCallingFakeProvider.php`
 
-- [ ] **Step 1: Pest security boundary.** A destructive prompt gives `POLICY_DENIED`. A forged client `permissions`, an enlarged filter schema, `columns`, a dashboard catalog or `assistKind` never add capabilities or reach the provider as trusted context. Role and permission names and ACL expressions are absent from the model prompt.
+- [x] **Step 1: Pest security boundary.** A destructive prompt gives `POLICY_DENIED`. A forged client `permissions`, an enlarged filter schema, `columns`, a dashboard catalog or `assistKind` never add capabilities or reach the provider as trusted context. Role and permission names and ACL expressions are absent from the model prompt.
 
-- [ ] **Step 2: Reconstruct server context.** The controller accepts the validated public subset of the run input, ignores unknown authorization or system fields, and derives user, tenant, effective permissions, ACL, canonical filter schema, safe field projection, widget catalog and feature flags from the authenticated backend context before any provider call. `assistKind` is a narrowing hint.
+- [x] **Step 2: Reconstruct server context.** The controller accepts the validated public subset of the run input, ignores unknown authorization or system fields, and derives user, tenant, effective permissions, ACL, canonical filter schema, safe field projection, widget catalog and feature flags from the authenticated backend context before any provider call. `assistKind` is a narrowing hint.
 
-- [ ] **Step 3: Compile the workflow policy.** Use only versioned server-owned policy identifiers. Effective capabilities are the server allowlist intersected with tenant, role and user restrictions and with backend authorization, and deny wins. Reject free-form prompt fragments stored on tenants, roles, users, conversations or request metadata.
+- [x] **Step 3: Compile the workflow policy.** Use only versioned server-owned policy identifiers. Effective capabilities are the server allowlist intersected with tenant, role and user restrictions and with backend authorization, and deny wins. Reject free-form prompt fragments stored on tenants, roles, users, conversations or request metadata.
 
-- [ ] **Step 4: Wire the existing agent runtime.** Register only tools that survive the effective capability intersection. Each tool repeats CRUD and field authorization and the safe projection.
+- [x] **Step 4: Wire the existing agent runtime.** Register only tools that survive the effective capability intersection. Each tool repeats CRUD and field authorization and the safe projection.
 
-- [ ] **Step 5: Safe SSE response.** Return a streamed response of AG-UI JSON lines, never raw model tokens. Emit only lifecycle events, server-authored status labels, validated tool previews and interrupts, and complete messages after output validation. Assert that the endpoint cannot select or emulate `InAppAssistance`.
+- [x] **Step 5: Safe SSE response.** Return a streamed response of AG-UI JSON lines, never raw model tokens. Emit only lifecycle events, server-authored status labels, validated tool previews and interrupts, and complete messages after output validation. Assert that the endpoint cannot select or emulate `InAppAssistance`.
 
-- [ ] **Step 6: Interrupt.** End the run with an interrupt outcome when a proposal needs the user.
+- [x] **Step 6: Interrupt.** End the run with an interrupt outcome when a proposal needs the user.
+
+**Delivered 2026-10-06, divergences from the steps above.**
+- The steps were written for the first design of the assistant (filter plans, dashboard catalog, `assistKind`). The endpoint now follows the contract of spec 4.5: `POST /app/ai/agent` is a wrapper of the base transport. It runs `InAppAssistanceService::respond()`, so the protected profile, the compiled policy, the guardrails, the tools and the proposals are exactly those of a message sent to the base transport, and it can neither select nor imitate another profile (a `profile`, `tools`, `permissions`, `roles`, `tenant_id`, `user_id` or `system_prompt` in the input is refused with 422, as on the base transport).
+- Step 2: the public input is `threadId` (the conversation, which must be the user's own), `message` and `context`, validated by `AgentRunRequest`, which extends the request of the base transport. Everything else is derived server side by the same code as for the base transport. A refused input is always answered as JSON, since a client that waits for a stream sends `Accept: text/event-stream` and cannot follow a redirect; the route is authenticated by the controller for the same reason.
+- Step 3: no `AssistIntentPolicy`. The workflow policy is the compiled `InAppAssistance` policy of `respond()`, built from the versioned catalog; nothing stored on a tenant, role, user or conversation, and no request field, reaches the prompt (tested with a conversation `system_message` and with page text that names roles and permissions).
+- Step 5: the stream is Laravel's own `response()->eventStream()`, one event per AG-UI event. `RunStarted`, `StepStarted` and `StepFinished` for the fixed steps `retrieve`, `answer` and `validate`, the answer as one complete `TextMessageStart`/`TextMessageContent`/`TextMessageEnd` after validation, a `StateDelta` with the citations, a `ToolCall` per proposal, and `RunFinished`. A refusal sends its (stored, generic) message and then `RunError` with `POLICY_DENIED` or `PROVIDER_ERROR`, a coarse code that is not stored: the stored refusal still carries only `refused`. `FEATURE_DISABLED` is answered as a 403 before the stream starts. The capability `streaming` is now true.
+- To say where the run is while the model works, `respond()` takes an optional progress callback and `AssistAgentService` runs it in a fiber, so a step is sent when it starts and the wait for the model is not silent. Neuron's token streaming is not used: the protected profile validates the complete output before delivering any of it, and no token is ever sent.
+- Step 6: the interrupt is the AG-UI outcome of `RunFinished`, one for each proposal that waits for the user. Nothing is paused on the server, since the server keeps no record of acceptance, so Neuron's workflow interrupts, which pause and resume a run, are not needed.
+
 
 ---
 
@@ -217,11 +233,14 @@ Spec section 4.7. Independent of the other tasks; the UI shows `title` when it i
 **Files:**
 - Create: `Modules/AI/app/Jobs/GenerateConversationTitleJob.php`
 - Create: `Modules/AI/app/Services/Assistance/ConversationTitleService.php`
+- Create: `Modules/AI/app/Data/GeneratedConversationTitle.php`
 - Modify: `Modules/AI/app/Services/Assistance/Policies/AssistantPolicyCatalog.php`
 - Modify: `Modules/AI/app/Services/Assistance/InAppAssistanceService.php`
+- Modify: `Modules/AI/app/Ai/Providers/ProviderFactory.php`, `Modules/AI/app/Ai/Agents/ChatAgent.php` (an output token cap)
+- Modify: `Modules/AI/tests/TestCase.php` (the title job is faked in AI tests)
 - Test: `Modules/AI/tests/Feature/Assistance/ConversationTitleTest.php`
 
-- [ ] **Step 1: Write failing tests.**
+- [x] **Step 1: Write failing tests.**
   - After the first non-refused assistant reply of a conversation with a null title, the job is dispatched and sets a title. The reply itself is returned without it.
   - A title sent at creation is never overwritten. A generated title is not regenerated by later replies.
   - A refusal as first reply dispatches nothing. A later non-refused reply does.
@@ -230,15 +249,24 @@ Spec section 4.7. Independent of the other tasks; the UI shows `title` when it i
   - The model call receives only the two messages: no citations, no tool output, no page context, no tools, no corpora.
   - The title is not written to the logs in raw form.
 
-- [ ] **Step 2: Add the capability.** `conversation_title` in `AssistantPolicyCatalog`, with empty `allowedTools` and `allowedCorpora`, used only by the service.
+- [x] **Step 2: Add the capability.** `conversation_title` in `AssistantPolicyCatalog`, with empty `allowedTools` and `allowedCorpora`, used only by the service.
 
-- [ ] **Step 3: Implement the service and the job.** Bounded call with a hard output cap, the output passing the same guardrails as assistant text, then sanitisation (trim, strip quotes and markdown, cut to the limits) and the fallback.
+- [x] **Step 3: Implement the service and the job.** Bounded call with a hard output cap, the output passing the same guardrails as assistant text, then sanitisation (trim, strip quotes and markdown, cut to the limits) and the fallback.
 
-- [ ] **Step 4: Dispatch from `respond()`.** After the assistant message is stored, only when the conversation title is null and the reply is not a refusal.
+- [x] **Step 4: Dispatch from `respond()`.** After the assistant message is stored, only when the conversation title is null and the reply is not a refusal.
 
-- [ ] **Step 5: Format and run.** `vendor/bin/pint --dirty --format agent`, then the new test and the existing assistance tests.
+- [x] **Step 5: Format and run.** `vendor/bin/pint --dirty --format agent`, then the new test and the existing assistance tests.
 
-- [ ] **Step 6: Commit.** `feat(ai): automatic conversation title from the first exchange`.
+- [x] **Step 6: Commit.** `feat(ai): automatic conversation title from the first exchange`.
+
+**Delivered 2026-10-06, divergences from the steps above (step 6, the commit, is ticked with it).**
+- Open question 5 of the spec (which model and budget) is answered as follows, to be confirmed by the owner. The model is the one chosen in Settings for the chat summaries (`features.chat.summary.model`, `AiModelFeature::ChatSummary`): a title is background text derived from a chat, so it takes the setting that already exists for that and no new one. The budget is a hard cap of 60 tokens on the call itself, `ConversationTitleService::MAX_OUTPUT_TOKENS`, and one retry. Changing to the assistant's own model or to a smaller one is a change of `defaultAgent()`.
+- The title is a Neuron structured output. `GeneratedConversationTitle` declares the schema (`SchemaProperty`) and the rules (`NotBlank`, `Length`, `WordsCount` of 2 to 5, a `Regex` for plain text with no quote, markdown, line break or ending punctuation) and the framework validates what the model returns and asks again, once, with the list of what was wrong. There is no cleaning code of our own: a title that never keeps to the rules is not used, and the title is taken from the question instead. What survives still passes the project's output guardrails.
+- The token cap needed a parameter the factory did not pass. `ProviderFactory::make()` and `ChatAgent::forFeature()` take an optional `maxOutputTokens` and give it to each provider under the name it uses: `max_completion_tokens` for OpenAI, `max_tokens` for Mistral, `options.num_predict` for Ollama and the `max_tokens` argument for Anthropic. Without it every provider keeps its own limit, as before.
+- The job carries the id of the answer that asked for the title, not text. It uses the user message just before that answer, so a conversation whose first reply was a refusal is titled from the first answer that is not one. The title is written with a query that requires it to be still null, which is how two answers racing for it cannot overwrite each other.
+- A title that no usable model output or question can give (nothing left after the markup is removed) is left null.
+- The AI test case fakes `GenerateConversationTitleJob`. The suite runs the queue in-process and the job calls a model, which would otherwise run behind every test that answers a message; the tests of the title run the job themselves.
+
 
 ---
 
@@ -253,12 +281,24 @@ Spec section 4.7. Independent of the other tasks; the UI shows `title` when it i
 - Modify: `docs/superpowers/specs/INDEX.md`
 - Modify: `docs/superpowers/plans/INDEX.md`
 
-- [ ] **Step 1: User guides.** What the user can store, how to see it, reset it, and what a proposal is and is not.
+- [x] **Step 1: User guides.** What the user can store, how to see it, reset it, and what a proposal is and is not.
 
-- [ ] **Step 2: Developer guides.** The wire contract: preferences, `context.page`, capabilities, proposals. Follow the sibling `rag` documents for front matter and audience.
+- [x] **Step 2: Developer guides.** The wire contract: preferences, `context.page`, capabilities, proposals. Follow the sibling `rag` documents for front matter and audience.
 
-- [ ] **Step 3: State the privacy rule.** The AI README says that no usage data is collected and lists the data the instance stores.
+- [x] **Step 3: State the privacy rule.** The AI README says that no usage data is collected and lists the data the instance stores.
 
-- [ ] **Step 4: Indexes.** Keep both indexes in step with the spec and this plan.
+- [x] **Step 4: Indexes.** Keep both indexes in step with the spec and this plan.
 
-- [ ] **Step 5: Close the plan.** Add the delivery status and the `**Documented in:**` line.
+- [x] **Step 5: Close the plan.** Add the delivery status and the `**Documented in:**` line.
+
+## Delivery status (2026-10-06): shipped
+
+**Documented in:** `Modules/AI/docs/rag/ASSISTANT_PROPOSALS_DEVELOPER.md` (the wire contract, proposals, the stream endpoint, the title, stored data), `Modules/AI/docs/rag/ASSISTANT_PROPOSALS_USER.md`, `Modules/AI/docs/rag/ASSISTANT_SCOPE.md` (the page context resolver), `Modules/AI/docs/rag/ASSISTANT_EVALUATION.md` (the proposals cases and their metrics), `Modules/Core/docs/rag/USER_PREFERENCES_DEVELOPER.md`, `Modules/Core/docs/rag/USER_PREFERENCES_USER.md` and `Modules/AI/README.md` (what the assistant stores).
+
+All nine tasks are done. Each task carries its own divergences; the ones that matter to the next reader:
+
+- The streaming endpoint (Task 7) is the wrapper of spec 4.5, not the first design of the plan: it relays the events of `InAppAssistanceService::respond()` and sends no token. `AssistIntentPolicy` was not needed.
+- The conversation title (Task 8) is a Neuron structured output, with the chat-summary model and a 60 token cap; the model and the budget are the owner's to confirm (open question 5).
+- Users and conversations are soft deleted by default, which no foreign key sees; the purge of what the assistant stores is done by observers (Task 6). Conversations deleted before it existed keep their content until their user is deleted, and `ConversationSummary` rows follow the conversation, not the user.
+- Level 1 of the evaluation scripts the model: whether a real model proposes when it should is a Level-2 measurement, which is not built.
+- Not part of this plan and still open: server-side saved views (open question 4), registered namespace schemas in Core (question 2) and default preferences by role or tenant (question 3).
