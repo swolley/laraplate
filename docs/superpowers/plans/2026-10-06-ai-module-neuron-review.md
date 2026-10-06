@@ -38,7 +38,7 @@ Findings B4, B5, B14, B13(b-c), D7, R7 (path half), and the keys the code reads 
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/README.md`
 - Delete: `Modules/AI/app/Ai/MediaAnalysis/Transcription/NullMediaTranscriber.php`
-- Delete: `Modules/AI/tests/Stubs/TranslatableTestModelA.php`, `Modules/AI/tests/Stubs/TranslatableTestModelB.php`, `Modules/AI/tests/Stubs/TranslatableMissingTestModelA.php`, `Modules/AI/tests/Stubs/TranslatableMissingTestModelB.php`, `Modules/AI/tests/Stubs/TranslatableMissingTestModelTranslation.php`
+- Delete: `Modules/AI/tests/Stubs/TranslatableTestModelA.php`, `Modules/AI/tests/Stubs/TranslatableTestModelB.php`, `Modules/AI/tests/Stubs/TranslatableMissingTestModelA.php`, `Modules/AI/tests/Stubs/TranslatableMissingTestModelB.php`
 - Test: `Modules/AI/tests/Integration/EmbeddingsProviderFactoryTest.php`, `Modules/AI/tests/Integration/DocumentationAgentTest.php`
 
 - [x] **Step 1: Dimensions of OpenAI and Voyage embeddings (B4).** Neuron's `OpenAIEmbeddingsProvider` defaults to 1024 dimensions and sends them on every call, so a profile of 1536 gets vectors of 1024; `VoyageEmbeddingsProvider` takes them as its third argument. Pass the profile's `dimensions` when the provider is built for a profile. Test, with the reflection style the file already uses, that the dimensions reach both providers.
@@ -53,8 +53,9 @@ Findings B4, B5, B14, B13(b-c), D7, R7 (path half), and the keys the code reads 
 - [x] **Step 4: Keys read and never declared.** `ai.features.application_content.timeout_seconds` (`ApplicationContentToolProvider`), `ai.features.embeddings.retry_until_minutes` (`GenerateEmbeddingsJob`, documented in `SEARCH_AND_TRANSLATION.md`), `ai.features.chat.summary_threshold` (`MemoryService`) and `ai.vendor` (`rag_paths()`). Declare each in `config.php` with its present default, or inline the default and drop the read of the key. Fix the comment of `GenerateEmbeddingsJob` that says 180 seconds while the value is 300.
   Done: `application_content.timeout_seconds`, `embeddings.retry_until_minutes` and `chat.summary_threshold` are declared in `config.php` with their present values, as fixed values and not env (two of them are set by tests). `ai.vendor` is removed from `rag_paths()`: nothing declares or documents it and the module's own `composer.json` gives the vendor.
 
-- [x] **Step 5: Dead provider, keys and stubs (D7).** Delete `NullMediaTranscriber` (the provider binds `WhisperTranscriber`, which is already a no-op without its URL), `features.faq.elasticsearch.index` with `AI_FAQ_ES_INDEX` (`.env.example`, README), `providers.openai.api_url` with `OPENAI_API_URL`, `providers.deepl.api_key` (the DeepL service reads `core.deepl_api_key`) and the five unused stubs. For each, run the repo-wide search first; a key that something reads stays.
+- [x] **Step 5: Dead provider, keys and stubs (D7).** Delete `NullMediaTranscriber` (the provider binds `WhisperTranscriber`, which is already a no-op without its URL), `features.faq.elasticsearch.index` with `AI_FAQ_ES_INDEX` (`.env.example`, README), `providers.openai.api_url` with `OPENAI_API_URL`, `providers.deepl.api_key` (the DeepL service reads `core.deepl_api_key`) and the four unused stubs. For each, run the repo-wide search first; a key that something reads stays.
   Done, with two corrections to the review: `AI_FAQ_ES_INDEX` is still read, as the fallback of `AI_FAQ_DEVELOPER_ES_INDEX`, so only the config key `elasticsearch.index`, which nothing reads, is removed; and `Modules/Core/README.md` still lists `OPENAI_API_URL` (deprecated), which is a Core line and is left to Core.
+  Also a correction, found by the suite after the first commit: only four of the five stubs were unused. `TranslatableMissingTestModelTranslation` is the translation class that `HasTranslations` derives from the name of `TranslatableMissingTestModel` (`{Model}Translation`), so no search for its name finds the use; it was restored. A search for the name of a class is not enough to prove a class unused where a trait builds class names by convention.
 
 - [x] **Step 6: Format, run the AI embeddings, documentation and agent tests, commit.** `fix(ai): ...`.
 
@@ -66,18 +67,22 @@ Finding R6.
 
 **Files:**
 - Modify: `Modules/AI/tests/Stubs/Assistance/ScriptedAssistantFixtures.php`
-- Create: `Modules/AI/tests/Stubs/Assistance/NoToolsProvider.php`
+- Modify: `Modules/AI/tests/Unit/Services/ApplicationContent/ApplicationContentToolProviderTest.php`
+- Modify: `Modules/AI/tests/Feature/InAppApplicationContentAssistanceTest.php`
+- Create: `Modules/AI/tests/Stubs/Assistance/StaticToolsProvider.php`
 - Modify: `Modules/AI/tests/Feature/InAppAssistanceSecurityTest.php`
 - Modify: `Modules/AI/tests/Feature/Assistance/ConversationTitleTest.php`
 - Modify: `Modules/AI/tests/Feature/Assistance/AssistantScopeRespondTest.php`
 - Modify: `Modules/AI/tests/Feature/Assistance/UiProposalsTest.php`
 - Modify: `Modules/AI/tests/Feature/Assistance/AgentEndpointTest.php`
 
-- [ ] **Step 1: The helper.** Add `ScriptedAssistantFixtures::inAppService(Request, ?Closure $retrieve, Closure $complete, ?AssistantPolicyCompiler $compiler = null, ?ChatService $chat = null)` building the `InAppAssistanceService` with the real collaborators, and `NoToolsProvider`, a `ContextualToolProviderInterface` that offers no tool. It replaces the six pasted constructions and the `Mockery::mock(ContextualToolProviderInterface::class)` with `shouldReceive('tools')` repeated six times; the anonymous classes of `ApplicationContentToolProviderTest` and `InAppApplicationContentAssistanceTest` become `NoToolsProvider` too when they fit.
+- [x] **Step 1: The helper.** Add `ScriptedAssistantFixtures::inAppService(Request, ?Closure $retrieve, Closure $complete, ?AssistantPolicyCompiler $compiler = null, ?ChatService $chat = null)` building the `InAppAssistanceService` with the real collaborators, and `NoToolsProvider`, a `ContextualToolProviderInterface` that offers no tool. It replaces the six pasted constructions and the `Mockery::mock(ContextualToolProviderInterface::class)` with `shouldReceive('tools')` repeated six times; the anonymous classes of `ApplicationContentToolProviderTest` and `InAppApplicationContentAssistanceTest` become `NoToolsProvider` too when they fit.
+  Done, with one correction: those anonymous classes are not empty, each offers a tool (`graph_search`, `application_content_search`), so the stub is `StaticToolsProvider`, which offers the definitions it is given and none by default. `ScriptedAssistantFixtures::inAppService(Request, ?Closure $complete, ?Closure $retrieve, ?AssistantPolicyCompiler, ?ChatService, ?ContextualToolProviderInterface)` is the helper; no `Mockery::mock(ContextualToolProviderInterface::class)` is left in the module's tests.
 
-- [ ] **Step 2: Move the five test files to it.** Each file keeps a one-line wrapper only where its name is part of the test's vocabulary. Run each file alone, then together, after every file: a helper defined twice in one Pest process is a fatal error.
+- [x] **Step 2: Move the five test files to it.** Each file keeps a one-line wrapper only where its name is part of the test's vocabulary.
+  Done: the five wrappers (`protectedAssistanceService`, `scopedAssistanceService`, `titleAssistance`, `proposalAssistance`, and the container binding of `AgentEndpointTest`) are one line each. Each file passes alone and all of them together (230 tests). Run each file alone, then together, after every file: a helper defined twice in one Pest process is a fatal error.
 
-- [ ] **Step 3: Format, run the assistant suites, commit.** `test(ai): one construction of the in-app service for the assistant tests`.
+- [x] **Step 3: Format, run the assistant suites, commit.** `test(ai): one construction of the in-app service for the assistant tests`.
 
 ---
 
