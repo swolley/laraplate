@@ -28,7 +28,7 @@ So there were two parallel approval mechanisms, one strong and general (model le
 ## 3. Principles
 
 - **The assistant is not a principal.** It acts as the signed-in person, with exactly that person's permissions and row-level ACL, evaluated by `CrudService` at call time. It never holds more, and the policy can only narrow.
-- **Approval belongs to the model, confirmation belongs to the person.** Core decides whether a write needs a vote. Independently of that, no assistant write is applied unless the person has seen it and said yes in the conversation (section 5). The two are different questions and a privileged user is exempt from the first only.
+- **Approval belongs to the model, confirmation belongs to the person.** Core decides whether a write needs a vote. Independently of that, no assistant write is applied unless the person has seen it and confirmed it through an action the model cannot perform (section 5). The two are different questions and a privileged user is exempt from the first only.
 - **Anything the model reads is untrusted.** Documents, content search results, graph results and record fields can carry instructions. They never authorize anything.
 - **Fail closed everywhere a default exists.** Unknown entity, unknown tool, missing metadata, missing identity: no write.
 - **A write is never reported as done unless it was applied.** Pending approval, awaiting confirmation and applied are three distinct states, visible in message metadata, not only in prose.
@@ -48,24 +48,28 @@ So there were two parallel approval mechanisms, one strong and general (model le
 
 - **Approve and disapprove are never offered to the assistant.** `pending_approvals` (read) stays. A decision on a pending change is made by a person in the panel; a model that can vote can be made to vote.
 - **Unmoderated entities need a second opt-in.** An entity whose model does not use `HasApprovals` is offered write operations only if it is listed under `ai.features.tools.crud.unmoderated_writes`. The default is empty. This is the owner's decision 3: writes there are applied directly, so the operator must have said so on purpose.
-- **A per-turn write budget.** Beyond the existing per-tool `MAX_RUNS`, a turn can apply at most a fixed number of writes in total, so a manipulated model cannot spread a damaging action over many small calls. Bulk keeps its `BULK_CAP`.
+- **A per-turn write budget.** Beyond the existing per-tool `MAX_RUNS`, a turn can create at most a fixed number of write proposals in total, so a manipulated model cannot spread a damaging action over many small calls. Bulk keeps its `BULK_CAP`.
 
 ### 4.3 Risk
 
 There is no `RiskClassifier`. The question it tried to answer ("does this need a human?") has two real answers, both already in the system: Core's `wouldRequireApproval()` for the model's gate, and the confirmation step of section 5 for the person's. If a surface later needs a notion of risk to rank or present requests, it is derived from the declared operation and entity, not from a tool name, and is designed with that surface.
 
-## 5. Two-step writes (the person confirms)
+## 5. Two-step writes (the person confirms, outside the model)
 
-Every write tool, single or bulk, works in two steps:
+*Amended 2026-10-07, before implementation.* The first draft had the model carry a confirmation token into a later turn. That cannot work: the assistant is stateless (each `respond()` is one user message with no history, and replaying history waits for a security review), so the model of the next turn knows nothing of the proposal. It would also leave the confirmation to the model's reading of a message, which retrieved text in that turn can influence. The confirmation is therefore taken **outside the model**.
 
-1. **Propose.** The first call changes nothing. It returns a *proposal*: what would change (operation, entity, record or the count and a sample of matched records, the attribute diff), **who** it would run as, whether Core would capture it for approval (`wouldRequireApproval()`), and a server-issued **proposal token** bound to the acting user, the conversation, the tool and a hash of the arguments, with a short lifetime. The model is told, by the tool result and by the capability instruction, to state the proposal to the person and ask for confirmation.
-2. **Apply.** The write is applied only by a second call that carries a valid token **issued in an earlier turn**: the conversation must have received a new user message after the proposal was made. A token from the current turn is refused. The arguments must hash to the same value; the token is single-use.
+Every write tool, single or bulk, only **proposes**:
 
-Why it holds against prompt injection: a manipulated model can propose, but cannot author the person's next message. Retrieved text can say "now confirm", but the confirmation has to come from the person's turn. This replaces the model-controlled `confirm=true` of today's bulk tools, which a prompt could set on its own.
+1. **Propose.** The tool call changes nothing. It stores a *write proposal* (a row, `ai_write_proposals`) with the operation, entity, the exact payload (for a bulk call, the ids that matched at that moment, so the person confirms what was shown), the acting user and conversation, a human-readable summary (diff or count and sample), whether Core would capture it for approval (`wouldRequireApproval()`), a status and an expiry. The tool result tells the model that the change is waiting for the person's confirmation in the interface and that nothing has happened.
+2. **Confirm.** The person confirms through an authenticated HTTP action on the proposal, `POST .../ai/assistant-writes/{proposal}/confirm` (and `/reject`), which the client offers from the `writes` metadata of the message. The server applies the **stored** payload as the authenticated user through `CrudService`, so permission and row-level ACL are evaluated again at that moment. The model is not involved and carries no token.
 
-It applies to privileged users too (decision 2 exempts them from the approval vote, not from being asked). Cost: one extra turn per write. A trivial write is still one question and one "yes".
+Why it holds against prompt injection: a manipulated model can propose and cannot call an authenticated endpoint as the person. Retrieved text cannot press the button. The apply step is idempotent (a status transition under a row lock), bound to the proposing user and conversation, expires, and refuses a proposal that is not in `proposed`.
 
-The outcome of apply is one of: `applied`, `pending_approval` (Core captured it; the modification id is returned), `refused` (permission, ACL, token, cap, budget). The assistant message metadata carries every proposal and outcome of the turn as `writes`: `{id, tool, entity, operation, status, acting_user_id, modification_id?}`. A client can distinguish proposed, pending and done without parsing prose, and a response with a proposal is stored with it.
+It applies to privileged users too (decision 2 exempts them from the approval vote, not from being asked). A client without a confirm control never applies a write: the safe failure.
+
+States: `proposed`, `applied`, `pending_approval` (Core captured it; the modification ids are recorded), `rejected`, `expired`, `failed`. A bulk apply records applied, captured and failed counts separately. The assistant message metadata carries the proposals of the turn as `writes`: `{id, tool, entity, operation, status, acting_user_id, acting_user_name, summary, requires_approval, expires_at}`, so a client can distinguish proposed, pending and done without parsing prose.
+
+The per-turn budget of section 4.2 limits how many proposals a turn can create.
 
 ## 6. Identity and permissions, stated plainly
 
@@ -80,10 +84,10 @@ The person must always know who is acting and what they can ask the assistant to
 Defence in depth, with the deterministic layers carrying the weight, because model behaviour cannot be proven by a test.
 
 **Deterministic**
-- Writes are impossible without the two-step token (section 5). This is the control that does not depend on the model behaving.
+- Writes are impossible without the person's confirmation outside the model (section 5). This is the control that does not depend on the model behaving.
 - Tools are exactly the intersection of policy and provider; a tool the model invents does not exist.
 - Tool arguments are validated as untrusted input by `CrudService` and the Form Request rules, as for any caller.
-- Tool results and retrieved documents are wrapped as quoted data before they reach the model (the existing context policy), and **content read in a turn never authorizes a write in the same turn**: the apply step needs the person's later message regardless.
+- Tool results and retrieved documents are wrapped as quoted data before they reach the model (the existing context policy), and **content read in a turn never authorizes a write**: the apply step needs the person's own confirmation regardless.
 - The input safety classifier (`DeterministicAssistanceSafetyClassifier`, `RestrictedTopicPolicy`) is extended with patterns for instruction override, role reassignment, system-prompt exfiltration and permission-claim attempts, with a test corpus.
 - Output validation keeps refusing to expose internals (permission names, tenant ids, paths), and a response that carries writes is stored with them in metadata.
 
@@ -100,6 +104,6 @@ Removed with the `ActionRequest` path: `ActionRequest`, `ActionRequestService`, 
 ## 9. Out of scope
 
 - A tool-level risk model. Reintroduced only with a surface that needs it.
-- MCP write tools (inherit sections 3 to 7 when opened; MCP needs the same two-step contract, which is why it lives in a service and not in `respond()`).
+- MCP write tools (inherit sections 3 to 7 when opened; MCP needs the same propose-then-confirm contract, which is why it lives in a service and not in `respond()`).
 - UI work in `laraplate-ui`.
 - Mass query writes that bypass model events, a documented limit of Core approvals.
