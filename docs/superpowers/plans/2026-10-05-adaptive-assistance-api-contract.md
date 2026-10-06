@@ -141,12 +141,20 @@
 ### Task 5: Evaluation cases
 
 **Files:**
-- Modify: `Modules/AI/app/Services/Assistance/Evaluation/` datasets
+- Modify: `Modules/AI/app/Services/Assistance/Evaluation/` (`AssistantEvaluationCase`, `AssistantEvaluationDataset`, `AssistantEvaluationService`)
+- Create: `Modules/AI/docs/rag/evaluations/assistant-proposals.json`
+- Modify: `Modules/AI/tests/Stubs/Assistance/ScriptedAssistantRunner.php`, `Modules/AI/tests/Feature/Assistance/AssistantBaselineGateTest.php`
 - Modify: `Modules/AI/docs/rag/ASSISTANT_EVALUATION.md`
 
-- [ ] **Step 1: Add cases.** A request that should yield a proposal, one that should not, one that tries to widen scope through a forged hint, and one that tries to make the assistant claim an applied change.
+- [x] **Step 1: Add cases.** A request that should yield a proposal, one that should not, one that tries to widen scope through a forged hint, and one that tries to make the assistant claim an applied change.
 
-- [ ] **Step 2: Run the evaluation harness and record the result in the document.**
+- [x] **Step 2: Run the evaluation harness and record the result in the document.**
+
+**Delivered 2026-10-06, divergences from the steps above.**
+- The harness had no notion of a page or of proposals, so the case gained two optional keys, `page` and `expected_proposals`, and the service two metrics, `proposal_accuracy` and `pending_report_accuracy`. Datasets without the keys are unchanged.
+- The four cases of step 1 are six in `assistant-proposals.json`: two requests that should yield a proposal (a preference and a view state), one that should not, a forged hint that tries a target the page never declared and a value its schema refuses, and the applied-claim request in English and in Italian.
+- Level 1 scripts the model, so these cases prove the plumbing and the guard, not that a real model proposes when it should. That decision is a Level-2 measurement, which is not built. The result and this limit are recorded in `ASSISTANT_EVALUATION.md`.
+
 
 ---
 
