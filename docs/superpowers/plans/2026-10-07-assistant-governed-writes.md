@@ -190,16 +190,16 @@ Deterministic layers first; the prompt backs them up.
 - Modify: `Modules/AI/docs/rag/MODULE.md` (Perimeters: the `ActionRequest` caveat goes, the governed-writes flow is described), `Modules/AI/docs/ARCHITECTURE.md`, `docs/DESIGN_DECISIONS.md` (the symptom note is resolved: say how), `docs/GLOSSARY.md` and `docs/rag/GLOSSARY.md` (the `sendMessageWithTools` entries), `docs/TOOLS_USAGE_EXAMPLE.md` (rewrite as the propose-then-confirm flow, keep the document), `docs/rag/ASSISTANT_DATA_TOOLS_USER.md` (operator view: the assistant proposes, you confirm in the interface, nothing happens before, and a moderated entity then sends it for approval), the AI module README for the new `unmoderated_writes` key and the removed config, `tests/Integration/AiRagModuleDocumentationTest.php` if it pins removed terms.
 - Modify: `docs/superpowers/plans/2026-09-16-in-app-assistant-tools.md` (delivery status: superseded, closed unbuilt, with the reason and a `**Documented in:**` line), the plans and specs `INDEX.md` entries, this plan's `**Documented in:**` and `## Delivery status`.
 
-- [ ] **Step 1:** write the docs from what the code does after Tasks 1 to 9, not from this plan's names.
-- [ ] **Step 2:** `tests/Unit/ClosedPlansPointToDocumentationTest.php` passes.
-- [ ] **Step 3:** Pint on touched PHP, commit: `docs(ai): governed assistant writes`.
+- [x] **Step 1:** write the docs from what the code does after Tasks 1 to 9, not from this plan's names.
+- [x] **Step 2:** `tests/Unit/ClosedPlansPointToDocumentationTest.php` passes.
+- [x] **Step 3:** Pint on touched PHP, commit: `docs(ai): governed assistant writes`.
 
 ---
 
 ## Final verification
-- [ ] `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit Modules/AI/tests/Integration/ToolRegistryTest.php`
-- [ ] `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
-- [ ] Pint clean on every touched file.
+- [x] `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit Modules/AI/tests/Integration/ToolRegistryTest.php`
+- [x] `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
+- [x] Pint clean on every touched file.
 - [ ] The owner runs the full suite.
 
 ## Out of scope (per spec)
@@ -209,3 +209,22 @@ A tool-level risk model; MCP write tools; UI work in `laraplate-ui`; Core change
 - Nothing here builds approval machinery. Core approvals already decide whether a write needs a vote; this plan decides who may ask, how the person confirms, and what the model is told. If you are writing a vote, a quorum or a status table, you have gone off the path.
 - The person's confirmation outside the model is the control that survives a manipulated model. Do not weaken it for convenience (no model-callable apply, no model-set confirm flag, no privileged-user shortcut).
 - If an assumption in a task's *Files* is wrong, stop and report rather than adapting silently: the spec's premises were checked against the code on 2026-10-07 and this plan's task boundaries depend on them.
+
+---
+
+## Delivery status (2026-10-07): delivered, one open item for the owner
+
+All ten tasks are done, each committed and pushed on its own (`Modules/AI` `master`). Divergences from the plan, and why:
+
+- **The confirmation is not a model-carried token.** The first design had the model apply a stored proposal in a later turn with a token. The assistant is stateless (one message per `respond()`, no history), so that cannot work, and it would leave the confirmation to the model's reading of a message. The spec was amended before Task 5 was built: a write tool only stores a proposal (`ai_write_proposals`) and the person applies it through `AssistantWriteController`, an authenticated action the model cannot perform. A table, a model, a factory, a service and three routes were needed; the plan had said "no new table".
+- **The write budget limits proposals**, not applications (`AssistantWriteBudget`, five per turn), since the model never applies.
+- **Reads of entity tools are reachable.** `respond()` now requests `crud_reads` as well as `governed_writes`: the `crud_*` read tools were wired but filtered out by the policy, so the assistant had no entity tool at all. An operator who lists entities in `ai.features.tools.crud.entities` now gets them.
+- **`crud_detail_*` is broken in `CrudService`** (an unvalidated form request reaches `resolveKeyFromRequest`); the proposal reads the record through `list` instead. The fix is a separate task spawned for the owner.
+- **The audit is a log**, not a mark on the modification: `core_modifications` has no origin field and Core was not changed here.
+- **`ToolResultGuard` covers entity read tools only.** Guardrails on every tool result (Graph, application content) remain the open step 2 of Task 11 of `2026-10-06-ai-module-neuron-review.md`.
+- **`UnknownToolException` stays**, unused since the global registry went (`ExceptionHierarchyTest` still covers it); remove it with the next sweep of dead code.
+- **Pre-existing failures that are not this plan's:** `HandleModificationApprovedTranslationListenerTest` (another session's uncommitted `TranslationGate` work) failed during Task 1 and is not touched here.
+
+Open for the owner: run the full suite (`php artisan test --compact`), and update the `Modules/AI` submodule pointer in `laraplate` when the module is ready to be pinned. The UI of `laraplate-ui` must render `metadata.writes` as confirmation cards and offer confirm and reject; until it does, a proposal is never applied (the safe failure).
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md` (*Writes through the assistant*), `Modules/AI/docs/TOOLS_USAGE_EXAMPLE.md`, `Modules/AI/docs/rag/ASSISTANT_DATA_TOOLS_USER.md`, `Modules/AI/docs/ARCHITECTURE.md`, `Modules/AI/docs/DESIGN_DECISIONS.md`.

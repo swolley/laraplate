@@ -4,7 +4,7 @@
 **Module:** `Modules/AI` (policy, tools, prompt, capabilities), reading `Modules/Core` (`CrudService`, approvals)
 **Supersedes:** `2026-09-16-in-app-assistant-tools-design.md` (its plan `2026-09-16-in-app-assistant-tools.md` is closed unbuilt)
 **Related:** `2026-09-27-core-approvals-subsystem-design.md` (the approval mechanism), `2026-09-12-mcp-server-design.md` (MCP writes inherit this)
-**Status:** Draft, decisions agreed with the owner on 2026-10-07 (see *Decisions*).
+**Status:** Implemented 2026-10-07 by `docs/superpowers/plans/2026-10-07-assistant-governed-writes.md`, whose delivery status lists where the code differs from this design. Decisions agreed with the owner on 2026-10-07 (see *Decisions*); section 5 was amended the same day, before implementation.
 
 ---
 
