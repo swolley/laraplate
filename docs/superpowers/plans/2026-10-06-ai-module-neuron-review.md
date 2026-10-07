@@ -1,12 +1,12 @@
 ---
-status: open
+status: completed
 created_on: 2026-10-06
 ---
 # AI Module: Neuron Usage and Duplication Review — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Open. Tasks 1 to 10, Task 11 Steps 1 to 4 and Task 12 Steps 1 and 3 are delivered. Task 11 Step 5 is done in `2026-10-07-ai-module-review-decisions.md` except one item, `AI_SEARCH_ORCHESTRATION_ENABLED`, which needs a further decision of the owner; Task 12 Step 2 closes the plan after it.
+**Status:** Shipped 2026-10-07. All tasks are delivered; Task 11 was carried out in `2026-10-07-ai-module-review-decisions.md`.
 
 **Goal:** `Modules/AI` uses the Neuron framework for what Neuron provides, repeats no code that can live once, and carries no code that nothing reaches. Behaviour changes only where a finding is a bug.
 
@@ -308,8 +308,8 @@ None of these has an obvious answer from the code. Each step asks for one decisi
 - [x] **Step 4: Env variables for switches and tuning (R11).** `AI_TEXT_GENERATION_*`, `AI_SEARCH_ORCHESTRATION_ENABLED`, `AI_FAQ_VECTOR_STORE`, `AI_FAQ_POLICY_CLASSIFICATION_VERSION`, `AI_MODERATION_QUEUE` are read from env through `config.php`, against the rule that switches and tuning values are seeded settings. The embeddings chunk and lock values already say they are deliberately not settings. Move them to seeded settings, or record the exception.
   **Decided 2026-10-07 by the owner: move them to seeded settings.** All five groups (`AI_TEXT_GENERATION_*`, `AI_SEARCH_ORCHESTRATION_ENABLED`, `AI_FAQ_VECTOR_STORE`, `AI_FAQ_POLICY_CLASSIFICATION_VERSION`, `AI_MODERATION_QUEUE`) become settings in `AIDatabaseSeeder`, read as `config('ai....')`, with the env variable removed from `config.php`, `.env.example` and the docs. The embeddings chunk and lock values keep their stated exception.
 
-- [ ] **Step 5: Do the work that the answers allow,** in a plan of its own. This includes the removal of the superseded chat sections of `ARCHITECTURE.md` and `DESIGN_DECISIONS.md`, `TOOLS_USAGE_EXAMPLE.md` and the env variables that the docs name and nothing reads (`AI_EMBEDDINGS_ENABLED`, `AI_CHAT_ENABLE_SUMMARY`, `AI_MODERATION_*`, `AI_COMMENT_*`, `AI_TOOLS_ENABLED`, `AI_GUARDRAILS_ENABLED`), rewritten as "setting X in Filament".
-  Done in `2026-10-07-ai-module-review-decisions.md` (AI commits `56ac9e5`, `21abf3f`, `eea67eb`; Core `7f9b5ded`): the guardrails path is deleted, the text generation values, the vector store, the policy classification version and the moderation queue are seeded settings, and the docs are rewritten. Two claims of this step were false and were not forced: `TOOLS_USAGE_EXAMPLE.md` is current (the governed-writes plan rewrote it) and is kept with its route corrected, and `AI_MODERATION_QUEUE` with `AI_COMMENT_MOD_QUEUE` were read (now settings). Still open, for the owner: `AI_SEARCH_ORCHESTRATION_ENABLED` is read at boot to choose container bindings, which a setting applied by the HTTP middleware cannot reach; that plan's Task 2 Step 3 states the two ways.
+- [x] **Step 5: Do the work that the answers allow,** in a plan of its own. This includes the removal of the superseded chat sections of `ARCHITECTURE.md` and `DESIGN_DECISIONS.md`, `TOOLS_USAGE_EXAMPLE.md` and the env variables that the docs name and nothing reads (`AI_EMBEDDINGS_ENABLED`, `AI_CHAT_ENABLE_SUMMARY`, `AI_MODERATION_*`, `AI_COMMENT_*`, `AI_TOOLS_ENABLED`, `AI_GUARDRAILS_ENABLED`), rewritten as "setting X in Filament".
+  Done in `2026-10-07-ai-module-review-decisions.md` (AI commits `56ac9e5`, `21abf3f`, `eea67eb`; Core `7f9b5ded`): the guardrails path is deleted, the text generation values, the vector store, the policy classification version and the moderation queue are seeded settings, and the docs are rewritten. Two claims of this step were false and were not forced: `TOOLS_USAGE_EXAMPLE.md` is current (the governed-writes plan rewrote it) and is kept with its route corrected, and `AI_MODERATION_QUEUE` with `AI_COMMENT_MOD_QUEUE` were read (now settings). `AI_SEARCH_ORCHESTRATION_ENABLED` is read at boot to choose container bindings, which a setting applied by the HTTP middleware cannot reach: **decided 2026-10-07 by the owner to stay an env variable** (the documented exception), see that plan's Task 2 Step 3.
 
 ---
 
@@ -317,11 +317,13 @@ None of these has an obvious answer from the code. Each step asks for one decisi
 
 - [x] **Step 1: Run the whole AI suite and the baseline gates,** and the CMS and SAO application-content baselines, from the `laraplate` root. Done 2026-10-07: 1493 passed, 7 skipped, 1 failed: `RouteOverrideTest`, which passed when run alone straight after; it checks the `assistant-writes` routes that the governed-writes plan was adding to `routes/web.php` while the suite ran. The two documentation baseline gates and the CMS and SAO application-content baselines pass (33 tests), and no committed report under `docs/rag/evaluations` changed.
 
-- [ ] **Step 2: Delivery status and documentation.** Add the `## Delivery status (date): ...` section with the divergences and what Task 11 left open, and the `**Documented in:**` line. The module docs named in it describe each changed behaviour: `Modules/AI/docs/rag/MODULE.md` (citations, the retrieval and the prefix, the rebuild of the indexes), `DOCUMENTATION_EVALUATION_DEVELOPER.md` (the shared evaluation code), `ASSISTANT_EVALUATION.md`, `Modules/AI/README.md` (removed env variables). Started: the delivery status below covers Tasks 1 to 10 and the docs of those tasks are updated (`MODULE.md`, `DOCUMENTATION_EVALUATION_DEVELOPER.md`, `ASSISTANT_EVALUATION.md`, the glossaries and the README); the `**Documented in:**` line and the final status wait for Task 11, which still decides what stays of `ARCHITECTURE.md`, `DESIGN_DECISIONS.md` and `TOOLS_USAGE_EXAMPLE.md`.
+- [x] **Step 2: Delivery status and documentation.** Add the `## Delivery status (date): ...` section with the divergences and what Task 11 left open, and the `**Documented in:**` line. The module docs named in it describe each changed behaviour: `Modules/AI/docs/rag/MODULE.md` (citations, the retrieval and the prefix, the rebuild of the indexes), `DOCUMENTATION_EVALUATION_DEVELOPER.md` (the shared evaluation code), `ASSISTANT_EVALUATION.md`, `Modules/AI/README.md` (removed env variables). Done 2026-10-07: the delivery status below covers Tasks 1 to 12 and the docs are updated; `ARCHITECTURE.md` and `DESIGN_DECISIONS.md` lost their superseded chat sections and `TOOLS_USAGE_EXAMPLE.md` was kept (see the delivery status).
 
 - [x] **Step 3: Record what is not measured.** The effect of Task 4 and Task 5 on relevance needs a live Elasticsearch and embeddings service and is measured by hand with `ai:evaluate-documentation`; the plan says so rather than claiming a gain. Done in the delivery status below.
 
-## Delivery status (2026-10-07): Tasks 1 to 10 delivered, Task 11 decided with one item open
+## Delivery status (2026-10-07): shipped
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md`, `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_DEVELOPER.md`, `Modules/AI/docs/rag/ASSISTANT_EVALUATION.md`, `Modules/AI/README.md`, `Modules/AI/docs/ARCHITECTURE.md`, `Modules/AI/docs/DESIGN_DECISIONS.md`, `Modules/AI/docs/TOOLS_USAGE_EXAMPLE.md`.
 
 Divergences from the plan, one line each (the detail is in the step):
 
@@ -334,6 +336,6 @@ Divergences from the plan, one line each (the detail is in the step):
 - Task 10: the salvage into Core's `SearchQualityEvaluator` was done here, and the matching steps are ticked in the search-modes plan; `forDeveloperHelp` went with its tests, so the "console only" check for a developer help context has to be written again if one is ever needed.
 - The Task 8 commit of the AI module (`d40ef8a`) also holds, by an error of mine (`git add -A` on directories while a concurrent session had staged and edited files), that session's removal of the `ActionRequest` path. The content is theirs and was verified by the AI suite run at the time; the commit message does not say it.
 
-Task 11 (2026-10-07): the owner decided all four questions (retire `ActionRequest`, delete the dead guardrails path, keep `MemoryService`, move the env switches to settings), and the work is done in `2026-10-07-ai-module-review-decisions.md` except `AI_SEARCH_ORCHESTRATION_ENABLED`, which is read at boot to choose container bindings and so cannot simply become a setting: open for the owner there.
+Task 11 (2026-10-07): the owner decided all four questions (retire `ActionRequest`, delete the dead guardrails path, keep `MemoryService`, move the env switches to settings), and the work is done in `2026-10-07-ai-module-review-decisions.md`. One exception, decided by the owner: `AI_SEARCH_ORCHESTRATION_ENABLED` is read at boot to choose container bindings and stays an env variable.
 
 Not measured: the effect of Task 4 (the threshold and citations of the documentation answers) and of Task 5 (the passage prefix) on relevance needs a live Elasticsearch and embeddings service, and is measured by hand with `ai:evaluate-documentation` after the documentation indexes are rebuilt (`ai:index-rag-docs --full` per profile). The baseline gates use a stub that strips prefixes and hashes, so they pass whatever the effect is; the plan claims no gain.
