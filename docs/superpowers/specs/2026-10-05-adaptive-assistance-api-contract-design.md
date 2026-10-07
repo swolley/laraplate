@@ -43,7 +43,7 @@ Read from the module repositories on 2026-10-05, at depth 1.
 | Page context | `InAppAssistanceService::serverApplicationContext()` reads the request attribute `assistant_application_context` with `module`, `entity`, `record_key`. `ASSISTANT_SCOPE.md` says it is set server-side before `respond()` runs. No production code sets it. Only tests do. In production the assistant is always generic. |
 | Message request | `SendMessageRequest` accepts a `context` array and rejects control keys such as `profile`, `tools`, `permissions`. Only `accessibility`, `locale`, `response_format` and `verbosity` are kept, in the metadata of the user message. |
 | Assistant output | `message.metadata` carries `citations` or `refused`. |
-| Writes by the assistant | `CrudToolProvider` offers create, update, delete, bulk and approve, opt-in per entity, under the permissions and ACL of the user. The route `messages-with-tools` answers `action_requests: []`. |
+| Writes by the assistant | Amended 2026-10-07: `CrudToolProvider` offers create, update, delete and bulk (never approve), opt-in per entity, under the permissions and ACL of the user. A write is a proposal in `metadata.writes` that the person confirms through `/app/crud/update/ai/assistant-writes/{id}/confirm`; see `2026-10-07-assistant-governed-writes-design.md`. The route `messages-with-tools` no longer answers `action_requests`. |
 | Conversation title | `conversations.title` is nullable and set only by the caller at creation. Nothing generates it, so a client that does not send one lists every conversation as untitled. |
 | Suggestions | `ContextualSuggestion` stores a `context` JSON per user and suggestion, with `dismissed_at`. It is off by default and rate limited. |
 
@@ -84,10 +84,16 @@ Read from the module repositories on 2026-10-05, at depth 1.
 `GET /app/ai/capabilities` answers:
 
 ```json
-{ "enabled": true, "configured": true, "features": { "proposals": true, "streaming": false } }
+{
+  "enabled": true, "configured": true,
+  "features": { "proposals": true, "writes": false, "streaming": false },
+  "actions": [{ "entity": "core.role", "operation": "update", "kind": "write", "requires_approval": false }]
+}
 ```
 
 `proposals` is true only when the compiled policy of the profile holds the capability `ui_proposals`. A client that sees `false` hides the proposal UI and sends no `proposable` hints.
+
+*Amended 2026-10-07.* `writes` is true when the operator opted an entity into a write operation and the policy grants `governed_writes`. `actions` is what the assistant may do for the signed-in person (`kind` is `read` or `write`; `requires_approval` says a confirmed write then goes to a vote); a client shows it. The messages carry the proposed writes in `metadata.writes`, and the person confirms or rejects each through `POST /app/crud/update/ai/assistant-writes/{id}/confirm|reject` (see `Modules/AI/docs/TOOLS_USAGE_EXAMPLE.md`).
 
 ### 4.4 Proposals
 
