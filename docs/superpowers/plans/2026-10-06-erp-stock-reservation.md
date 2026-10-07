@@ -217,7 +217,40 @@
 
 **Deferred (review minors / recommended with the inverse-lifecycle follow-up):** a delivery/invoice **reversal** on an Amended order still runs `syncHeaderStatus`, which recomputes the header from line quantities and can flip it off `Amended` (silently un-superseding) — cheap ~3-line fix: make `syncHeaderStatus` preserve a terminal `Amended`/`Cancelled` status, plus a status assertion in the reversal test. Grammar: "A amended/cancelled" → "An amended". Test-file-scope helper functions could be closures.
 
-**Out of scope (flagged):** cancelling an amendment AFTER it has superseded the source does not revert the source from `Amended` back to `Confirmed` — the remaining work would then sit in a cancelled amendment and a dead source. That inverse-lifecycle case is a further ERP amendment-model follow-up.
+---
+
+### Task 10: Amended-status integrity — reversal preserve + cancel reverts the source (2026-10-07)
+
+Close the inverse-lifecycle holes left by Task 9 so the `Amended` supersede is watertight.
+
+**Files:**
+- Modify: `Modules/ERP/app/Services/SalesOrders/SalesOrderEvasionService.php` (`syncHeaderStatus` must PRESERVE a terminal `Amended`/`Cancelled` status instead of recomputing it from line quantities — so a delivery/invoice **reversal** on an Amended order no longer silently un-supersedes it; also fix the grammar "A amended/cancelled" → "An amended/cancelled")
+- Modify: `Modules/ERP/app/Listeners/ReleaseStockForCancelledSalesOrder.php` (or a dedicated listener) — when the cancelled order is itself an amendment (`amends_sales_order_id` set), **revert the source**: recompute its status from its own line quantities (PartiallyEvased if any delivered, else Confirmed) and re-reserve its lines best-effort (the amendment's own holds are released by the existing cancel handling)
+- Test: `Modules/ERP/tests/Feature/SalesOrders/` (extend)
+
+- [x] **Step 1: Write the failing tests** — reversal keeps Amended + guard still blocks; cancelling an amendment reverts a Confirmed source and re-reserves; cancelling an amendment of a PartiallyEvased source reverts to PartiallyEvased; grammar assertion. (4 new.)
+- [x] **Step 2: Run them, verify they fail.**
+- [x] **Step 3: Implement** — `syncHeaderStatus` preserves terminal Amended/Cancelled (shared `statusFromLineQuantities`); `RevertSourceOrderOnAmendmentCancel` listener (recompute + best-effort re-reserve via extracted `reserveOrderLines`, now `(qty_ordered − qty_delivered) − reserved` — behaviour-preserving at confirm); grammar "An amended"/"A cancelled".
+- [x] **Step 4: Run them, verify they pass** (28 SalesOrders; full ERP suite 718 passing).
+- [x] **Step 5: Commit** — `fix(erp): keep Amended terminal on reversal and revert the source when an amendment is cancelled` (`15705bc`). Review Approved. Minors (deferred): source-with-no-lines stays Amended (unreachable); scope note.
+
+---
+
+### Task 11: MES reservation hardening (2026-10-07)
+
+Close the three MES fast-follows the final review flagged.
+
+**Files:**
+- Modify: `Modules/MES/app/Services/ProductionOrderService.php` → move the `material_line_id` stamping into a `ProductionOrder` model `created` boot hook (or an equivalent covering every creation path), so orders created outside `create()` (factories, imports) also get it; add a **guard** that throws/asserts when a snapshot has `>= 1000` component lines (the `order_id * 1000 + index` stride), so a silent cross-order collision can never happen unnoticed
+- Modify: `Modules/MES/app/Services/ErpStockReader.php` → `availableQuantity(item, warehouse, company)` also subtracts the item's company-wide **null-warehouse** active holds (sales reservations), conservatively, so MES backflush cannot consume stock a sales order reserved (closes the cross-module gap; conservative = may under-report when stock is spread across warehouses, never oversells)
+- Modify: `Modules/MES/app/Models/ProductionOrder.php` (boot hook) if that is where the stamp lands
+- Test: `Modules/MES/tests/Feature/` (extend)
+
+- [ ] **Step 1: Write the failing tests** — `a production order created via the factory still gets a material_line_id` (reserve works for a non-service creation path); `a BOM with >= 1000 lines is rejected` (guard throws); `availableQuantity excludes a sales (null-warehouse) hold on the same item` (seed a null-warehouse hard hold → MES available drops → backflush cannot consume it).
+- [ ] **Step 2: Run them, verify they fail.**
+- [ ] **Step 3: Implement** the boot-hook stamp + stride guard + the reader's null-warehouse subtraction. Keep the own-hold add-back at backflush correct (it adds back the order's OWN warehouse-pinned line hold; sales null-warehouse holds are not the order's own).
+- [ ] **Step 4: Run them, verify they pass.**
+- [ ] **Step 5: Commit** — `fix(mes): stamp material_line_id on every creation path, guard the stride, subtract sales holds in the reader`.
 
 ---
 
