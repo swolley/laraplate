@@ -145,14 +145,14 @@ The control that does not depend on the model behaving.
 - Create: `Modules/AI/app/Services/Assistance/ActingIdentityBlock.php`
 - Test: `Modules/AI/tests/Feature/Assistance/ActingIdentityTest.php`, extend the capabilities controller test
 
-- [ ] **Step 1: Test first.**
+- [x] **Step 1: Test first.**
   - The system prompt contains a server-built block naming the acting user (id, display name) and exactly the entity/operation pairs of the tools offered, and nothing derived from retrieved text or the user's input; a user whose name contains instructions yields a block where the name is quoted data.
   - `GET /app/ai/capabilities` returns `actions`: for the signed-in user, the entities and operations the assistant can perform and which need approval; a user with no write ability gets none; the guest account is still refused.
   - Every write proposal and outcome carries `acting_user_id` and the display name.
   - No permission names, tenant ids or internal paths appear (existing `deniedFields`).
-- [ ] **Step 2: Implement** the block as a pure function of the offered tool definitions and the user, appended after the policy prompt and before retrieved context. Extend the resource's `@return` shape and `AssistantCapabilities::toArray()`; keep the existing keys.
-- [ ] **Step 3:** document in the capabilities contract what the client is expected to show (acting user, per-entity abilities, approval needed). The UI itself is `laraplate-ui` and out of scope here.
-- [ ] **Step 4:** tests PASS, Pint, commit: `feat(ai): state the acting user and what the assistant may do for them`.
+- [x] **Step 2: Implement** the block as a pure function of the offered tool definitions and the user, appended after the policy prompt and before retrieved context. Extend the resource's `@return` shape and `AssistantCapabilities::toArray()`; keep the existing keys.
+- [x] **Step 3:** document in the capabilities contract what the client is expected to show (acting user, per-entity abilities, approval needed). The UI itself is `laraplate-ui` and out of scope here.
+- [x] **Step 4:** tests PASS, Pint, commit: `feat(ai): state the acting user and what the assistant may do for them`.
 
 ---
 
