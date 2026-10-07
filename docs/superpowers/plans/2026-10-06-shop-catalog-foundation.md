@@ -53,11 +53,11 @@ The Shop spec is a whole module; it is built as a sequence of independently ship
 **Interfaces:**
 - Produces: `ShopTables`, `ProductKind`, and `setupShopEntities()` — later tasks call it before creating a `Product`.
 
-- [ ] **Step 1: Write the failing test** — `CatalogSetupTest`: after `setupShopEntities()`, a product content `Entity` and a default `Preset` exist and a `Content` can be created against them; `ShopTables::Products->value === 'shop_products'`; `ProductKind` has the three cases.
-- [ ] **Step 2: Run it, verify it fails.**
-- [ ] **Step 3: Implement** the two enums, the seeder entry (follow how CMS seeds its entities; a product entity is Shop-owned, not a CMS `EntityType` case — E20), and `setupShopEntities()`.
-- [ ] **Step 4: Run it, verify it passes.**
-- [ ] **Step 5: Commit** — `feat(shop): shop table + product-kind enums and product content entity seed`.
+- [x] **Step 1: Write the failing test** — `CatalogSetupTest`: after `setupShopEntities()`, a product content `Entity` and a default `Preset` exist and a `Content` can be created against them; `ShopTables::Products->value === 'shop_products'`; `ProductKind` has the three cases.
+- [x] **Step 2: Run it, verify it fails.**
+- [x] **Step 3: Implement** the two enums, the seeder entry (follow how CMS seeds its entities; a product entity is Shop-owned, not a CMS `EntityType` case — E20), and `setupShopEntities()`.
+- [x] **Step 4: Run it, verify it passes.**
+- [x] **Step 5: Commit** — `feat(shop): shop table + product-kind enums and product content entity seed`.
 
 ---
 
@@ -147,3 +147,10 @@ The Shop spec is a whole module; it is built as a sequence of independently ship
 
 - Stock/availability, cart, checkout, payments, digital fulfilment (`shop_download_grants`), reviews, read models, support — see the decomposition roadmap above. The Shop stock slice depends on the ERP reservation plan (`2026-10-06-erp-stock-reservation.md`, ERP-4).
 - Storefront categories and per-category presets (E20) are plan #2, not here; this plan seeds only the minimal product content-Entity + a default Preset needed to create products.
+
+## Execution notes (2026-10-07)
+
+- **Task 1 shipped** on the Shop submodule: `d421352` (enums + entity seed), `f0e03e0` (phpstan typing), `e017d5e` (field-reuse/class-resolution tests + seeder hardening). 11 Pest tests green. Reviewed (spec ✅, quality ✅ "approved with restore caveat").
+- **Entity layer is deliberate, per E20.** Shop owns `Casts/EntityType` (`Products='products'`), `Models/Entity`, `Models/Preset`, `Models/Pivot/Presettable` — a specialization of Core's abstract Entity/Preset/Presettable, required because `DynamicContentsService`/`PresetVersioningService` resolve a module's concrete classes by its `EntityType` namespace (ERP does the same). This is not a CMS `EntityType` case and not a parallel attribute engine: the product body stays a CMS `Content`, classification stays CMS `Category`.
+- **Constraint for Task 2 (seam):** a CMS `Content` extended by a `Product` does NOT resolve its Shop entity/preset through the CMS `Content` model (`$content->entity` is null; `Content::getEntityType()` returns `Contents`). And `Core\Preset::migrateRelatedModelsToLastVersion()` (final, queries `Content::query()`) skips extended product contents because of the seam's `HidesExtendedContent` global scope. Task 2 must give `Product` its own way to resolve its entity/preset, and any future preset-version migration for products must go through `Content::withExtended()` (or a Core overridable query hook). Dynamic fields themselves still work (they read the presettable snapshot).
+- **Deferred (not Task 1 defects):** (a) phpstan hygiene for Shop — one baselined-pattern `nullsafe.neverNull` in the seeder's `report()` plus the pre-existing 11 unbaselined `ShopController` scaffold errors; handle together in a small Shop phpstan pass, not here. (b) Two accepted negligible seeder nits: `restore()` return value unchecked (only reachable if soft-deletes were disabled after the delete), and the `withTrashed()->first()` lookup has no live-first ordering (only ambiguous if validation were bypassed).
