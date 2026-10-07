@@ -62,11 +62,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `UnattributedMeasurement` (plain Eloquent, `BelongsToCompany`, `$dateFormat = 'Y-m-d H:i:s.v'`): `company_id`, `signal_id`, `device_id`, `work_center_id`, `production_order_operation_id` (nullable), `ts`, `value` (decimal 15,4), `serial` (nullable), `context` (json, nullable), `assigned_at` (nullable); unique `(signal_id, ts)`. Characteristic `required_samples` (unsigned int, default 1). Measurement columns as in the Global Constraints, `measured_at` nullable datetime(3), `source` default `manual`, a plain index on `(machine_signal_id, measured_at)` (R3).
 
-- [ ] **Step 1: Write the failing test.** The unattributed row stores milliseconds and refuses a second row of the same signal at the same moment; a characteristic defaults to one required sample; a measurement defaults to source `manual` and accepts the machine columns; existing measurement rows still insert without them.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/ProbeMeasurementSchemaTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the migrations (folded where the table exists), models, factory, enum case.
-- [ ] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): probe measurement columns and the unattributed measurements table`.
+- [x] **Step 1: Write the failing test.** The unattributed row stores milliseconds and refuses a second row of the same signal at the same moment; a characteristic defaults to one required sample; a measurement defaults to source `manual` and accepts the machine columns; existing measurement rows still insert without them.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/ProbeMeasurementSchemaTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the migrations (folded where the table exists), models, factory, enum case.
+- [x] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): probe measurement columns and the unattributed measurements table`.
 
 ### Task 2: Split of `QualityCheckService`
 
@@ -81,11 +81,11 @@ All paths under `Modules/MES/`.
   - `isComplete(QualityCheck $check): bool`: R4.
   - `execute()` = `record()` then `resolve()` in one transaction, with the same results as today.
 
-- [ ] **Step 1: Write the failing tests.** `execute()` keeps its two existing outcomes (pass, fail with one non-conformance); `record()` alone leaves the check pending; `resolve()` after a record of an out-of-limit row fails the check and opens exactly one non-conformance, and a second `resolve()` opens no second one; a value exactly on a limit is within; `record()` on a resolved check with an out-of-limit row opens a non-conformance and leaves the status; `isComplete()` is false with fewer than `required_samples` of one characteristic, true when all are met, and false for a plan without characteristics.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: FAIL on the new cases.
-- [ ] **Step 3: Implement** the three methods and rewrite `execute()` on top of them.
-- [ ] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Filament`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): split quality check recording from resolution`.
+- [x] **Step 1: Write the failing tests.** `execute()` keeps its two existing outcomes (pass, fail with one non-conformance); `record()` alone leaves the check pending; `resolve()` after a record of an out-of-limit row fails the check and opens exactly one non-conformance, and a second `resolve()` opens no second one; a value exactly on a limit is within; `record()` on a resolved check with an out-of-limit row opens a non-conformance and leaves the status; `isComplete()` is false with fewer than `required_samples` of one characteristic, true when all are met, and false for a plan without characteristics.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: FAIL on the new cases.
+- [x] **Step 3: Implement** the three methods and rewrite `execute()` on top of them.
+- [x] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Filament`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): split quality check recording from resolution`.
 
 ### Task 3: The recorder and the out of tolerance event
 
@@ -98,11 +98,11 @@ All paths under `Modules/MES/`.
 - Produces: `ProbeMeasurementRecorder::handle(ProbeMeasured $event): void` (R1 to R8); `OutOfToleranceMeasured(int $company_id, ?int $quality_check_id, int $signal_id, string $characteristic, float $value, ?float $lower, ?float $upper)`.
 - Consumes: `QualityCheckService::record()/resolve()/isComplete()`, `ResolvedSample` (`production_order_operation_id`, `sample->context['serial']`).
 
-- [ ] **Step 1: Write the failing tests.** A sample on a signal with a characteristic goes to the pending check of its operation with limits copied from the characteristic, `source` machine, `machine_signal_id`, `measured_at`, serial; with `required_samples` 3 the check stays pending after two samples and resolves (passed) on the third; two characteristics resolve only when both are met; an out-of-limit sample dispatches the event at once and the check fails on resolution with one non-conformance; a sample exactly on the limit is within; after resolution an out-of-limit sample opens a non-conformance and keeps the status; no operation, no check, or a signal without characteristic leaves the sample in the unattributed table (with the event when out of limits and a characteristic exists); the same event handled twice stores one measurement, one event, one non-conformance; the whole pipeline (a message through the processing job, reprocessed once) gives the same rows; the notification goes to the configured roles.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** the recorder: one transaction per sample, `lockForUpdate` on the signal row, existence check then insert (R3), event only for newly stored rows (R7), the resolution through `isComplete()` and `resolve()`. Register the listeners; add the config key with the same shape as the others.
-- [ ] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): probe measurements fill quality checks and announce out of tolerance values`.
+- [x] **Step 1: Write the failing tests.** A sample on a signal with a characteristic goes to the pending check of its operation with limits copied from the characteristic, `source` machine, `machine_signal_id`, `measured_at`, serial; with `required_samples` 3 the check stays pending after two samples and resolves (passed) on the third; two characteristics resolve only when both are met; an out-of-limit sample dispatches the event at once and the check fails on resolution with one non-conformance; a sample exactly on the limit is within; after resolution an out-of-limit sample opens a non-conformance and keeps the status; no operation, no check, or a signal without characteristic leaves the sample in the unattributed table (with the event when out of limits and a characteristic exists); the same event handled twice stores one measurement, one event, one non-conformance; the whole pipeline (a message through the processing job, reprocessed once) gives the same rows; the notification goes to the configured roles.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** the recorder: one transaction per sample, `lockForUpdate` on the signal row, existence check then insert (R3), event only for newly stored rows (R7), the resolution through `isComplete()` and `resolve()`. Register the listeners; add the config key with the same shape as the others.
+- [x] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): probe measurements fill quality checks and announce out of tolerance values`.
 
 ### Task 4: Late attachment and manual assignment
 
@@ -114,11 +114,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `UnattributedMeasurementAttacher::attachFor(QualityCheck $check): int` (attaches the unassigned rows of the check's operation whose signal characteristic belongs to the check's plan, sets `assigned_at`, applies R4 to R6, returns how many); `UnattributedMeasurementAssigner::assign(UnattributedMeasurement $row, QualityCheck $check): QualityCheckMeasurement` (R9).
 
-- [ ] **Step 1: Write the failing tests.** Measurements taken before the operation completes (waiting with their operation) attach to the check the planner creates at completion and resolve it when complete; rows of other operations or other plans stay; replaying the completion adds nothing; manual assignment records the row, sets `assigned_at`, resolves a complete check, refuses a check of another company or a plan without the characteristic, and refuses an already assigned row.
-- [ ] **Step 2: Run** the files. Expected: FAIL.
-- [ ] **Step 3: Implement** the two services and the planner hook.
-- [ ] **Step 4: Run** the files and `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): attach waiting probe measurements to the check of their operation`.
+- [x] **Step 1: Write the failing tests.** Measurements taken before the operation completes (waiting with their operation) attach to the check the planner creates at completion and resolve it when complete; rows of other operations or other plans stay; replaying the completion adds nothing; manual assignment records the row, sets `assigned_at`, resolves a complete check, refuses a check of another company or a plan without the characteristic, and refuses an already assigned row.
+- [x] **Step 2: Run** the files. Expected: FAIL.
+- [x] **Step 3: Implement** the two services and the planner hook.
+- [x] **Step 4: Run** the files and `php artisan test --compact Modules/MES/tests/Feature/QualityCheckFlowTest.php`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): attach waiting probe measurements to the check of their operation`.
 
 ### Task 5: Filament, documentation, plan closing
 
@@ -130,11 +130,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: a read-only resource "Unattributed measurements" in the group "Machine connectivity" (slug `mes/unattributed-measurements`) listing the rows with signal, operation, value, serial, time, assigned; an "Assign" row action (check select limited to checks whose plan holds the signal's characteristic, same company) calling `UnattributedMeasurementAssigner`, visible to users allowed to insert machine signals as in the unmapped signals table.
 
-- [ ] **Step 1: Write the failing tests.** Filament: the list shows an unassigned row; the assign action records it on the chosen check and marks it assigned; the action is hidden from a user without permission. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_machine_unattributed_measurements`, `required_samples`, `OutOfToleranceMeasured`, `quality_plan_characteristic_id` and `inclusive`; the README roadmap no longer lists probe measurements.
-- [ ] **Step 2: Run** the two files. Expected: FAIL.
-- [ ] **Step 3: Implement** the resource and write the documents (the "not built yet" statements: probes are built; R1 to R9 in plain words; glossary: Unattributed measurement, Required samples; Italian guide section).
-- [ ] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
-- [ ] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
+- [x] **Step 1: Write the failing tests.** Filament: the list shows an unassigned row; the assign action records it on the chosen check and marks it assigned; the action is hidden from a user without permission. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_machine_unattributed_measurements`, `required_samples`, `OutOfToleranceMeasured`, `quality_plan_characteristic_id` and `inclusive`; the README roadmap no longer lists probe measurements.
+- [x] **Step 2: Run** the two files. Expected: FAIL.
+- [x] **Step 3: Implement** the resource and write the documents (the "not built yet" statements: probes are built; R1 to R9 in plain words; glossary: Unattributed measurement, Required samples; Italian guide section).
+- [x] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
+- [x] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
 
 ---
 
@@ -143,3 +143,18 @@ All paths under `Modules/MES/`.
 - **Spec coverage:** 9.3 first bullet (Tasks 3, R2), second (Task 2), third and fourth (Tasks 2 and 3, R4 to R6), fifth (Task 3, R7), sixth (Tasks 1, 3 and 4), 6.3 columns (Task 1), 11.5 unattributed measurements (Task 5), 13 "Probes" (Tasks 2 and 3: resolution with `required_samples`, immediate event, non-conformance after resolution, `execute()` unchanged).
 - **Spec gaps decided here:** R1 to R9; the heaviest are R1 (checks exist only after completion, so measurements wait and attach), R3 (no unique index on measurements) and R6 (what happens after resolution).
 - **Type consistency:** `QualityCheckService::record()/resolve()/isComplete()`, `ProbeMeasurementRecorder::handle()`, `UnattributedMeasurementAttacher::attachFor()`, `UnattributedMeasurementAssigner::assign()` and `OutOfToleranceMeasured` are named once and used with those names in every task that consumes them.
+
+## Delivery status (2026-10-07): delivered
+
+All five tasks shipped in `Modules/MES`; the whole module suite passes, phpstan reports only files outside this plan.
+
+**Documented in:** `Modules/MES/docs/MACHINE_CONNECTIVITY.md`, `Modules/MES/docs/rag/MODULE.md` and `Modules/MES/README.md`.
+
+Divergences and review outcome:
+
+- `QualityCheckService` gained `resolveWhenComplete()`: it locks the check, reads its status again and resolves it only when it is pending and complete. `record()`, `resolve()` and `execute()` also lock the check, so two writers of one check are serialised and a stale in-memory status is never trusted (a second "Quality check failed" non-conformance is no longer possible).
+- `execute()` also fails a check that already holds an out-of-limit machine measurement (it judges its own batch plus the machine rows of the check; manual rows of earlier executions are not re-judged, as before).
+- `UnattributedMeasurementAttacher` logs and skips a row that cannot be assigned instead of throwing, so completing an operation never fails because of a waiting measurement; the assigner reads the signal without the company scope and compares plan ids as integers.
+- `checked_at` is the resolution time (`now()`), not the time of the resolving measurement as R5 said; a reprocess of an old message stamps the reprocess time.
+- Filament: the Assign action is hidden for rows whose signal has no characteristic, and the table eager loads its relations.
+- Deferred, not fixed: concurrent samples of two signals of one check are serialised by the check lock only on databases that honour `lockForUpdate` (not SQLite, where messages of a source are processed one at a time anyway); a probe sample stored as unattributed in the instant between the check's creation and the attacher's read stays waiting until assigned by hand; delivery of `OutOfToleranceMeasured` is at most once (a queue push failure after the commit is not retried because the sample is already stored); no tests for the option list of the Assign action (other company, other plan, the 100-row limit); `ProcessMachineMessageJobTest` has a snapshot comparison that can flake at a second boundary (`updated_at`), unrelated to this plan.
