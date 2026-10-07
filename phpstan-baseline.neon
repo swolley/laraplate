@@ -79,24 +79,6 @@ parameters:
 			path: Modules/AI/app/Console/TranslateContentCommand.php
 
 		-
-			rawMessage: 'Call to function is_int() with int will always evaluate to true.'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: Modules/AI/app/Http/Controllers/ActionRequestController.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>::orWhere() expects array<int|model property of Modules\AI\Models\ActionRequest, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\AI\Models\ActionRequest, ''status'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Http/Controllers/ActionRequestController.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>::where() expects array<int|model property of Modules\AI\Models\ActionRequest, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\AI\Models\ActionRequest, ''user_id'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Http/Controllers/ActionRequestController.php
-
-		-
 			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\Conversation>::where() expects array<int|model property of Modules\AI\Models\Conversation, mixed>|(Closure(Illuminate\Database\Eloquent\Builder<Modules\AI\Models\Conversation>|Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\AI\Models\Conversation, ''user_id'' given.'
 			identifier: argument.type
 			count: 1
@@ -149,24 +131,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/AI/app/Jobs/ApproveModificationJob.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\AI\Models\ActionRequest, mixed>, array<string, Carbon\CarbonImmutable|string> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Jobs/ExecuteActionRequestJob.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\AI\Models\ActionRequest, mixed>, array<string, array<mixed>|Carbon\CarbonImmutable|string> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Jobs/ExecuteActionRequestJob.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\AI\Models\ActionRequest, mixed>, array<string, string> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Jobs/ExecuteActionRequestJob.php
 
 		-
 			rawMessage: 'Call to an undefined method Illuminate\Database\Eloquent\Model&Modules\Core\Contracts\IEmbeddableModel::prepareDataToEmbedByLocale().'
@@ -223,18 +187,6 @@ parameters:
 			path: Modules/AI/app/Jobs/TranslateModelJob.php
 
 		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>::where() expects array<int|model property of Modules\AI\Models\ActionRequest, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\AI\Models\ActionRequest, ''status'' given.'
-			identifier: argument.type
-			count: 2
-			path: Modules/AI/app/Models/ActionRequest.php
-
-		-
-			rawMessage: 'Parameter #1 $column of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>::where() expects array<int|model property of Modules\AI\Models\ActionRequest, mixed>|(Closure(Illuminate\Database\Query\Builder): mixed)|Illuminate\Contracts\Database\Query\Expression|model property of Modules\AI\Models\ActionRequest, ''user_id'' given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Models/ActionRequest.php
-
-		-
 			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\AI\Models\ContextualSuggestion, mixed>, array<string, Carbon\CarbonImmutable> given.'
 			identifier: argument.type
 			count: 1
@@ -263,18 +215,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/AI/app/Models/Message.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Builder<Modules\AI\Models\ActionRequest>::create() expects array<model property of Modules\AI\Models\ActionRequest, mixed>, array<string, array<string, mixed>|int|string|null> given.'
-			identifier: argument.type
-			count: 1
-			path: Modules/AI/app/Services/ActionRequestService.php
-
-		-
-			rawMessage: 'Parameter #1 $attributes of method Illuminate\Database\Eloquent\Model::update() expects array<model property of Modules\AI\Models\ActionRequest, mixed>, array<string, string> given.'
-			identifier: argument.type
-			count: 4
-			path: Modules/AI/app/Services/ActionRequestService.php
 
 		-
 			rawMessage: 'Parameter #1 $reference of method Modules\AI\Services\ApplicationContent\ApplicationContentCitationMapper::hasReference() expects string, mixed given.'
@@ -5489,12 +5429,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: Modules/Core/app/Http/Requests/DetailRequest.php
-
-		-
-			rawMessage: 'Method Modules\Core\Http\Requests\DomainActionRequest::rules() return type has no value type specified in iterable type array.'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Modules/Core/app/Http/Requests/DomainActionRequest.php
 
 		-
 			rawMessage: 'Argument of an invalid type mixed supplied for foreach, only iterables are supported.'
