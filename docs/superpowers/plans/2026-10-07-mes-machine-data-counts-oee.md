@@ -71,11 +71,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `MachineCount` (plain Eloquent, `$dateFormat = 'Y-m-d H:i:s.v'`, `BelongsToCompany`, relations `signal()`, `device()`, `operation()`); table `mes_machine_counts` as in Global Constraints plus `raw_value` (R1) with indexes `(work_center_id, ts)` and `(production_order_operation_id)`; `OperationQuantityAudit` with `operation_id`, `user_id` (nullable), `field`, `old_value`, `new_value` (decimal 12,4 nullable), `created_at` only (no updates); operation columns `machine_good_quantity`, `machine_scrap_quantity`, `declared_good_quantity`, `declared_scrap_quantity` (decimal 12,4, the machine ones default 0, the declared ones nullable) and `target_reached_at` (nullable datetime).
 
-- [ ] **Step 1: Write the failing test.** A count row stores milliseconds and refuses a second row with the same `(signal_id, ts)`; a row without operation is valid; an operation has the new columns with the stated defaults; an audit row stores old and new values.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineCountSchemaTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the migrations (folding the operation columns into its create migration), models, factory, enum cases.
-- [ ] **Step 4: Run** the file, and `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): machine counts table and the quantity columns of operations`.
+- [x] **Step 1: Write the failing test.** A count row stores milliseconds and refuses a second row with the same `(signal_id, ts)`; a row without operation is valid; an operation has the new columns with the stated defaults; an audit row stores old and new values.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineCountSchemaTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the migrations (folding the operation columns into its create migration), models, factory, enum cases.
+- [x] **Step 4: Run** the file, and `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): machine counts table and the quantity columns of operations`.
 
 ### Task 2: Counter deltas and the recorder
 
@@ -88,11 +88,11 @@ All paths under `Modules/MES/`.
 - Produces: `CounterDelta::between(?float $previous, float $value, string $mode, ?float $rollover_max): float` per R1 and R3 (`$mode` is `cumulative` or `delta`; a null `$previous` is the first sample); `PartsCountRecorder::handle(PartsCounted $event): void`.
 - Consumes: `ResolvedSample` (signal role from `$sample->signal->role`, `config['mode']`, `config['rollover_max']`, `production_order_operation_id`), `IdempotentWriter`.
 
-- [ ] **Step 1: Write the failing tests.** `CounterDelta`: cumulative 100 to 130 gives 30; first cumulative sample gives 0; delta mode first sample gives its value; rollover (`previous` 995, `value` 5, `rollover_max` 1000) gives 10; a reset (`previous` 500, `value` 3, no `rollover_max`) gives 3; a drop below half of `rollover_max` is a reset. Recorder: good, scrap and total signals write rows in their own column; the same message twice leaves the same rows; a late sample between two stored rows is inserted by `ts` and the next row's delta is recomputed; attribution is stored; the full pipeline (processor job on a message with count samples) produces the rows.
-- [ ] **Step 2: Run** both files. Expected: FAIL.
-- [ ] **Step 3: Implement** `CounterDelta` and the recorder. The recorder reads the previous row of the signal by `ts` (`raw_value`), writes through `IdempotentWriter` in a transaction on the device connection, then recomputes the row after the written one. It dispatches nothing yet; it returns the ids of the operations whose rows changed to the tally of Task 3 (a protected hook `afterWrite(array $operation_ids)` left empty here).
-- [ ] **Step 4: Run** the two files and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): machine count deltas with rollover and reset`.
+- [x] **Step 1: Write the failing tests.** `CounterDelta`: cumulative 100 to 130 gives 30; first cumulative sample gives 0; delta mode first sample gives its value; rollover (`previous` 995, `value` 5, `rollover_max` 1000) gives 10; a reset (`previous` 500, `value` 3, no `rollover_max`) gives 3; a drop below half of `rollover_max` is a reset. Recorder: good, scrap and total signals write rows in their own column; the same message twice leaves the same rows; a late sample between two stored rows is inserted by `ts` and the next row's delta is recomputed; attribution is stored; the full pipeline (processor job on a message with count samples) produces the rows.
+- [x] **Step 2: Run** both files. Expected: FAIL.
+- [x] **Step 3: Implement** `CounterDelta` and the recorder. The recorder reads the previous row of the signal by `ts` (`raw_value`), writes through `IdempotentWriter` in a transaction on the device connection, then recomputes the row after the written one. It dispatches nothing yet; it returns the ids of the operations whose rows changed to the tally of Task 3 (a protected hook `afterWrite(array $operation_ids)` left empty here).
+- [x] **Step 4: Run** the two files and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): machine count deltas with rollover and reset`.
 
 ### Task 3: Operation tally and target reached
 
@@ -104,11 +104,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `OperationCountTally::refresh(int $operation_id): void` (sums `good` and `scrap` of its rows into the two machine columns; sets `target_reached_at` and dispatches `OperationTargetReached` on the first time `machine_good_quantity >= quantity_planned`, R6); `OperationTargetReached(int $company_id, int $production_order_id, int $production_order_operation_id, int $work_center_id, float $good, float $planned)`.
 
-- [ ] **Step 1: Write the failing tests.** Rows of two signals attributed to one operation sum into its machine columns; recomputing after a late row changes the sums; reaching the planned quantity dispatches the event once and sets `target_reached_at`; a recount below the target does not clear it and a further row does not dispatch again; the operation is never completed; the notification goes to the configured roles (same assertions as the capacity overload listener test).
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** the tally, event, queued listener, notification and config key; the recorder calls `refresh()` for every operation whose rows changed, including the operation a recomputed row belongs to.
-- [ ] **Step 4: Run** the file and the Machine folder. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): operation machine quantities and the target reached event`.
+- [x] **Step 1: Write the failing tests.** Rows of two signals attributed to one operation sum into its machine columns; recomputing after a late row changes the sums; reaching the planned quantity dispatches the event once and sets `target_reached_at`; a recount below the target does not clear it and a further row does not dispatch again; the operation is never completed; the notification goes to the configured roles (same assertions as the capacity overload listener test).
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** the tally, event, queued listener, notification and config key; the recorder calls `refresh()` for every operation whose rows changed, including the operation a recomputed row belongs to.
+- [x] **Step 4: Run** the file and the Machine folder. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): operation machine quantities and the target reached event`.
 
 ### Task 4: Declared quantities, audit, assignment
 
@@ -120,11 +120,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `OperationQuantityDeclarer::declare(ProductionOrderOperation $operation, ?float $good, ?float $scrap, ?int $user_id = null): ProductionOrderOperation` (R7; writes an audit row per changed field; no row when nothing changes; refuses negative values with a `DomainException`); `MachineCountAssigner::assign(...)` (R9); completion prefill (R8).
 
-- [ ] **Step 1: Write the failing tests.** Completing an operation with machine quantities prefills `declared_*` and leaves them alone when already set, and for an operation with no counts leaves them null; a correction writes one audit row per changed field with old and new values and the user; the same values again write none; a negative value is refused; assignment attributes only unattributed rows of the work center inside `[from, to)`, refreshes the tally, returns the count, and leaves rows of other work centers and already attributed rows alone.
-- [ ] **Step 2: Run** the files. Expected: FAIL.
-- [ ] **Step 3: Implement** the services and the prefill.
-- [ ] **Step 4: Run** the files plus `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderServiceTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): declared quantities with an audit trail and count assignment by time range`.
+- [x] **Step 1: Write the failing tests.** Completing an operation with machine quantities prefills `declared_*` and leaves them alone when already set, and for an operation with no counts leaves them null; a correction writes one audit row per changed field with old and new values and the user; the same values again write none; a negative value is refused; assignment attributes only unattributed rows of the work center inside `[from, to)`, refreshes the tally, returns the count, and leaves rows of other work centers and already attributed rows alone.
+- [x] **Step 2: Run** the files. Expected: FAIL.
+- [x] **Step 3: Implement** the services and the prefill.
+- [x] **Step 4: Run** the files plus `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderServiceTest.php`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): declared quantities with an audit trail and count assignment by time range`.
 
 ### Task 5: ISO 22400 performance and quality
 
@@ -135,11 +135,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `OeeCalculatorService::performance()` and `quality()` use the count formulas (R4, R5) when the work center has count rows inside the window, else today's formulas; run time for performance = availability's busy time minus unplanned downtime (working time), computed once per call; every result clamped to [0, 1].
 
-- [ ] **Step 1: Write the failing tests.** Known values for a connected work center over 480 working minutes with 60 minutes of breakdown (run time 420): an operation with `cycle_time_minutes` 0.5 and 600 total pieces gives performance 300/420; good 570, scrap 30 give quality 0.95; unattributed counts use `60 / capacity_per_hour` and count in quality; counts with run time 0 give performance 1.0 and no division error; no good pieces gives quality 0 when total is above 0; a work center without count rows keeps today's numbers (existing tests untouched); the KPI materialiser stores the new values and a value cached under `mes:kpi:v2:` is not read.
-- [ ] **Step 2: Run** the two files. Expected: FAIL on the new cases.
-- [ ] **Step 3: Implement** the branches; counts are read once per call, in the window by `ts` (`from <= ts < to`, bound through `MachineTime::db()`).
-- [ ] **Step 4: Run** the two files, `CapacityServiceTest.php` and the Filament folder. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): ISO 22400 performance and quality from machine counts`.
+- [x] **Step 1: Write the failing tests.** Known values for a connected work center over 480 working minutes with 60 minutes of breakdown (run time 420): an operation with `cycle_time_minutes` 0.5 and 600 total pieces gives performance 300/420; good 570, scrap 30 give quality 0.95; unattributed counts use `60 / capacity_per_hour` and count in quality; counts with run time 0 give performance 1.0 and no division error; no good pieces gives quality 0 when total is above 0; a work center without count rows keeps today's numbers (existing tests untouched); the KPI materialiser stores the new values and a value cached under `mes:kpi:v2:` is not read.
+- [x] **Step 2: Run** the two files. Expected: FAIL on the new cases.
+- [x] **Step 3: Implement** the branches; counts are read once per call, in the window by `ts` (`from <= ts < to`, bound through `MachineTime::db()`).
+- [x] **Step 4: Run** the two files, `CapacityServiceTest.php` and the Filament folder. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): ISO 22400 performance and quality from machine counts`.
 
 ### Task 6: Filament, documentation, plan closing
 
@@ -150,11 +150,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: the operations table shows machine good and scrap, declared good and scrap, and `target_reached_at`; a "Declare quantities" table action calls `OperationQuantityDeclarer` with the signed-in user; an "Assign machine counts" table action (from, to) calls `MachineCountAssigner`; the Complete action of the order defaults `quantity_produced` to the declared good quantity of the order's last operation (R8).
 
-- [ ] **Step 1: Write the failing tests.** Filament: the declare action saves values and writes the audit row; the assign action attributes the counts of its range; the Complete action's default is the last operation's declared good quantity; the operations table lists the new columns. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_machine_counts`, `rollover`, `OperationTargetReached`, `declared`, `mes:kpi:v3` is not required but `ISO 22400` performance is; the README no longer lists counts in its roadmap.
-- [ ] **Step 2: Run** the two files. Expected: FAIL.
-- [ ] **Step 3: Implement** the Filament changes and write the documents (the "not built yet" statements: counts are built; R1 to R10 in plain words; glossary terms: Machine count, Declared quantity; Italian guide section).
-- [ ] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
-- [ ] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
+- [x] **Step 1: Write the failing tests.** Filament: the declare action saves values and writes the audit row; the assign action attributes the counts of its range; the Complete action's default is the last operation's declared good quantity; the operations table lists the new columns. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_machine_counts`, `rollover`, `OperationTargetReached`, `declared`, `mes:kpi:v3` is not required but `ISO 22400` performance is; the README no longer lists counts in its roadmap.
+- [x] **Step 2: Run** the two files. Expected: FAIL.
+- [x] **Step 3: Implement** the Filament changes and write the documents (the "not built yet" statements: counts are built; R1 to R10 in plain words; glossary terms: Machine count, Declared quantity; Italian guide section).
+- [x] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
+- [x] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
 
 ---
 
@@ -163,3 +163,17 @@ All paths under `Modules/MES/`.
 - **Spec coverage:** 9.2 (Tasks 1 to 4: rows, deltas, rollover and reset, quantities, declared prefill and audit, target reached, assignment), 10 (Task 5), 13 "Counts" (Tasks 2 to 4) and "OEE" (Task 5), 6.3 columns (Task 1). `mes_machine_counts` unique key as in the spec.
 - **Spec gaps decided here:** R1 to R10; the heaviest are R1 (raw value, baseline), R5 (ideal cycle of unattributed counts) and R7 (audit table).
 - **Type consistency:** `CounterDelta::between()`, `PartsCountRecorder::handle()`, `OperationCountTally::refresh()`, `OperationQuantityDeclarer::declare()`, `MachineCountAssigner::assign()` and `OperationTargetReached` are named once and used with those names in every task that consumes them.
+
+## Delivery status (2026-10-07): delivered
+
+All six tasks shipped in `Modules/MES`; the whole module suite passes, phpstan reports only files outside this plan.
+
+**Documented in:** `Modules/MES/docs/MACHINE_CONNECTIVITY.md`, `Modules/MES/docs/rag/MODULE.md` and `Modules/MES/README.md`.
+
+Divergences and review outcome:
+
+- R4 refined after review: the total is decided per device, not per work center. A device with a total counter has its total as sent and, when it sends no good counter, good = total - scrap; a device without a total has good + scrap as its total (`CountTotals::effective()`). The tally and the OEE formulas group by device.
+- The target stamp is a conditional update on a null stamp, in one transaction with the event dispatch: a concurrent refresh announces nothing, and a failed dispatch leaves no stamp.
+- `PartsCountRecorder` re-tallies the operation of a row it had already stored, so a retry or a reprocess repairs a tally that failed.
+- `machine_*`, `declared_*` and `target_reached_at` are not mass assignable: the services write them with `forceFill`, and the generic CRUD cannot bypass the audit.
+- Deferred, not fixed: the audit's old value comes from the model loaded by the caller (a concurrent declaration can leave a stale old value); an operator reset of a counter above half of `rollover_max` reads as a rollover and `rollover_max` is the modulus, not the highest value (documented as a risk to avoid); late samples still change the machine quantities of a completed or cancelled operation; any count row in the window, even all zero, switches the OEE to the count formulas; an attributed operation without a cycle time adds no ideal time; `countsByOperation` runs twice per materialisation; tests missing for the Gate on the Filament actions and for other companies' rows in the assigner.
