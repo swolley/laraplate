@@ -488,6 +488,11 @@ implementations. At phase 8, `module.json` becomes `"requires": ["Core", "AI"]` 
 convention — and AI features use the AI module's existing infrastructure, including `ActionRequest`,
 `GuardrailsService` and `ModerationService`, rather than reinventing guardrails.
 
+*Note 2026-10-07: superseded in part. `ActionRequest` was retired (approval is Core's, at the model; see
+`2026-10-07-assistant-governed-writes.md`) and `GuardrailsService` was removed because nothing called it
+(see `docs/superpowers/plans/2026-10-06-ai-module-neuron-review.md` (Task 11)). The infrastructure phase 8 reuses is `ModerationService`, the in-app assistance guardrails
+(`AssistanceGuardrailPipeline`) and the governed writes.*
+
 Phase 8 gets its own brainstorming, with the experience of phases 0–7 behind it. Nothing about AI
 behaviour is specified here beyond the invariant below, because the useful questions — what is worth
 asking a model, what evidence it needs, where it earns its cost — can only be answered once the

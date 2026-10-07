@@ -6,7 +6,7 @@ created_on: 2026-10-06
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Open. Tasks 1 to 10 and Task 12 Steps 1 and 3 are delivered. Task 11 Step 1 is decided and delivered; its Steps 2 to 4 wait for decisions of the owner, and Step 5 and Task 12 Step 2 wait for them.
+**Status:** Open. Tasks 1 to 10, Task 11 Steps 1 to 4 and Task 12 Steps 1 and 3 are delivered. Task 11 Step 5 is done in `2026-10-07-ai-module-review-decisions.md` except one item, `AI_SEARCH_ORCHESTRATION_ENABLED`, which needs a further decision of the owner; Task 12 Step 2 closes the plan after it.
 
 **Goal:** `Modules/AI` uses the Neuron framework for what Neuron provides, repeats no code that can live once, and carries no code that nothing reaches. Behaviour changes only where a finding is a bug.
 
@@ -242,7 +242,7 @@ Findings A4, A5, B10, R9. After Task 6, the list of services that build an agent
 
 - [x] **Step 4: Overlapping test files.** `GuardrailsServiceTest`/`GuardrailsServiceFullTest`, `MemoryServiceTest`/`MemoryServiceFullTest`, `ConversationModelTest`/`ConversationModelExtendedTest`, `EmbeddingServiceTest`/`EmbeddingServiceFullTest` test the same classes twice; merge the repeated cases. Move the anonymous `new class` declarations that the `AGENTS.md` rule forbids in test files to `tests/Stubs`. Done: the four pairs are merged (`GuardrailsServiceTest`, `MemoryServiceTest`, `ConversationModelTest` and `EmbeddingServiceTest` are gone, their unique cases moved into the `Full`/`Extended` file; their other cases were repeated there). The twelve anonymous classes in test files are now stubs under `tests/Stubs` (users, translatable and searchable models, command resolvers, splitters, a request, a document); the one in `EmbeddingSwitchHarness` is in a stub file already.
 
-- [ ] **Step 5: Format, run the AI suite, commit.** `refactor(ai): agents are built in one place and the tests use Neuron's fakes`.
+- [x] **Step 5: Format, run the AI suite, commit.** `refactor(ai): agents are built in one place and the tests use Neuron's fakes`. Done: AI commit `d40ef8a` (see the delivery status for what else it holds); the whole AI suite ran green in Task 12 Step 1.
 
 ---
 
@@ -309,6 +309,7 @@ None of these has an obvious answer from the code. Each step asks for one decisi
   **Decided 2026-10-07 by the owner: move them to seeded settings.** All five groups (`AI_TEXT_GENERATION_*`, `AI_SEARCH_ORCHESTRATION_ENABLED`, `AI_FAQ_VECTOR_STORE`, `AI_FAQ_POLICY_CLASSIFICATION_VERSION`, `AI_MODERATION_QUEUE`) become settings in `AIDatabaseSeeder`, read as `config('ai....')`, with the env variable removed from `config.php`, `.env.example` and the docs. The embeddings chunk and lock values keep their stated exception.
 
 - [ ] **Step 5: Do the work that the answers allow,** in a plan of its own. This includes the removal of the superseded chat sections of `ARCHITECTURE.md` and `DESIGN_DECISIONS.md`, `TOOLS_USAGE_EXAMPLE.md` and the env variables that the docs name and nothing reads (`AI_EMBEDDINGS_ENABLED`, `AI_CHAT_ENABLE_SUMMARY`, `AI_MODERATION_*`, `AI_COMMENT_*`, `AI_TOOLS_ENABLED`, `AI_GUARDRAILS_ENABLED`), rewritten as "setting X in Filament".
+  Done in `2026-10-07-ai-module-review-decisions.md` (AI commits `56ac9e5`, `21abf3f`, `eea67eb`; Core `7f9b5ded`): the guardrails path is deleted, the text generation values, the vector store, the policy classification version and the moderation queue are seeded settings, and the docs are rewritten. Two claims of this step were false and were not forced: `TOOLS_USAGE_EXAMPLE.md` is current (the governed-writes plan rewrote it) and is kept with its route corrected, and `AI_MODERATION_QUEUE` with `AI_COMMENT_MOD_QUEUE` were read (now settings). Still open, for the owner: `AI_SEARCH_ORCHESTRATION_ENABLED` is read at boot to choose container bindings, which a setting applied by the HTTP middleware cannot reach; that plan's Task 2 Step 3 states the two ways.
 
 ---
 
@@ -320,7 +321,7 @@ None of these has an obvious answer from the code. Each step asks for one decisi
 
 - [x] **Step 3: Record what is not measured.** The effect of Task 4 and Task 5 on relevance needs a live Elasticsearch and embeddings service and is measured by hand with `ai:evaluate-documentation`; the plan says so rather than claiming a gain. Done in the delivery status below.
 
-## Delivery status (2026-10-07): Tasks 1 to 10 delivered, Task 11 open
+## Delivery status (2026-10-07): Tasks 1 to 10 delivered, Task 11 decided with one item open
 
 Divergences from the plan, one line each (the detail is in the step):
 
@@ -333,6 +334,6 @@ Divergences from the plan, one line each (the detail is in the step):
 - Task 10: the salvage into Core's `SearchQualityEvaluator` was done here, and the matching steps are ticked in the search-modes plan; `forDeveloperHelp` went with its tests, so the "console only" check for a developer help context has to be written again if one is ever needed.
 - The Task 8 commit of the AI module (`d40ef8a`) also holds, by an error of mine (`git add -A` on directories while a concurrent session had staged and edited files), that session's removal of the `ActionRequest` path. The content is theirs and was verified by the AI suite run at the time; the commit message does not say it.
 
-Open for the owner (Task 11): the guardrails (implement a classifier and a tool-result check behind a flag, or delete the dead path and its keys), `MemoryService` and the summaries (keep for the persistent-memory plan, or delete), the env variables that should be settings (move them or record the exception), and then the rewrite of the superseded sections of `ARCHITECTURE.md`, `DESIGN_DECISIONS.md` and `TOOLS_USAGE_EXAMPLE.md`.
+Task 11 (2026-10-07): the owner decided all four questions (retire `ActionRequest`, delete the dead guardrails path, keep `MemoryService`, move the env switches to settings), and the work is done in `2026-10-07-ai-module-review-decisions.md` except `AI_SEARCH_ORCHESTRATION_ENABLED`, which is read at boot to choose container bindings and so cannot simply become a setting: open for the owner there.
 
 Not measured: the effect of Task 4 (the threshold and citations of the documentation answers) and of Task 5 (the passage prefix) on relevance needs a live Elasticsearch and embeddings service, and is measured by hand with `ai:evaluate-documentation` after the documentation indexes are rebuilt (`ai:index-rag-docs --full` per profile). The baseline gates use a stub that strips prefixes and hashes, so they pass whatever the effect is; the plan claims no gain.

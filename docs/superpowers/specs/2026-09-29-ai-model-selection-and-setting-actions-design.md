@@ -77,7 +77,7 @@ Seeded by the AI module through the command-managed variant, group `ai`, type `s
 | `features.faq.model` | `ollama:llama3.2:3b` |
 | `features.contextual_suggestions.model` | `ollama:llama3.2:3b` |
 | `features.chat.summary.model` | `ollama:llama3.2:3b` |
-| `features.guardrails.model` | `ollama:llama3.2:3b` |
+| `features.guardrails.model` | `ollama:llama3.2:3b` (removed 2026-10-07, see the note under *Runtime wiring*) |
 | `features.translation.model` | `deepl` |
 | `features.media_analysis.vision.model` | `anthropic:claude-sonnet-5` |
 | `features.media_analysis.transcription.model` | `whisper` |
@@ -177,6 +177,7 @@ DeepL and Whisper have no lister: when configured, their entry is the provider n
 **Runtime wiring.** Every consumer that reads a provider or a model from config reads `AiModelChoice::forFeature()` and calls `ProviderFactory::make($provider, $model)`:
 
 - `ChatService`; the text-generation listener; `ModerationService`; `LlmSearchService`; `DocumentationAgent` (FAQ); `ContextualSuggestionService`; `MemoryService` (chat summary); `GuardrailsService`.
+  *(Note 2026-10-07: `GuardrailsService` and the setting `features.guardrails.model` were removed on 2026-10-07, since nothing called the service; see `docs/superpowers/plans/2026-10-06-ai-module-neuron-review.md` (Task 11).)*
 - `ProviderFactory::make()` called without a provider takes both provider and model from the chat choice, so any caller not listed above keeps following chat as it does today. Called with a provider and no model, it keeps that provider's configured model (`OPENAI_MODEL`, `OLLAMA_MODEL`, `MISTRAL_MODEL`), or the code constant `claude-sonnet-4-20250514` for Anthropic.
 - `MediaAnalysisModelRegistry` builds the vision profile from the choice and returns the `whisper` profile for transcription; the static per-capability lists go.
 - `MediaAnalysisGate::enabled()` reads `ai_config_bool('ai.features.media_analysis.enabled', false)`, like every other AI switch; it no longer depends on `PerModelSettingResolver`.

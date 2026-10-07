@@ -200,6 +200,7 @@ Comments use the existing **`CrudController`** stack (`Modules/Core/routes/crud.
 **Service:** `Modules\AI\Services\CommentModerationService`
 
 - Reuse `GuardrailsService` for prompt-injection / unsafe patterns where applicable
+  *(Note 2026-10-07: superseded. `ModerationService` stopped using `GuardrailsService` when Neuron's structured output replaced its JSON validation, and `GuardrailsService` was removed on 2026-10-07; see `docs/superpowers/plans/2026-10-06-ai-module-neuron-review.md` (Task 11).)*
 - LLM classifier (structured JSON): `{ "verdict": "approve|reject|uncertain", "confidence": 0.0-1.0, "reason": "..." }`
 - Map external API failures → `uncertain` (fail-safe: human moderates)
 

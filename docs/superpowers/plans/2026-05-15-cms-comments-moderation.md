@@ -439,7 +439,7 @@ Comment text:
 
 - [x] **Step 2: Service calls `ChatAgent::make()` with moderation provider from config (default `ai.features.chat.default_provider` or dedicated `comment_moderation.provider` if added)** — done by `Modules/AI/app/Services/ModerationService.php`, `ChatAgent::forFeature(AiModelFeature::Moderation, ...)` (dedicated moderation model setting)
 
-- [x] **Step 3: Parse JSON via `GuardrailsService::validateJsonOutput()` + retry once on invalid JSON** — done in `ModerationService::analyze()` / `retryJson()` (retry gated by `ai.features.guardrails.retry_on_failure`), unparseable output maps to `uncertain`
+- [x] **Step 3: Parse JSON via `GuardrailsService::validateJsonOutput()` + retry once on invalid JSON** — done in `ModerationService::analyze()` / `retryJson()` (retry gated by `ai.features.guardrails.retry_on_failure`), unparseable output maps to `uncertain`. *Note 2026-10-07: superseded. Neuron's structured output (`ModerationVerdictData`) replaced `validateJsonOutput()`, `retryJson()` and `retry_on_failure`, and `GuardrailsService` was removed on 2026-10-07; see `docs/superpowers/plans/2026-10-06-ai-module-neuron-review.md` (Task 11).*
 
 - [x] **Step 4: Unit tests** with mocked agent returning sample JSON for approve, reject, uncertain — done 2026-10-01 in `Modules/AI/tests/Integration/Services/ModerationServiceTest.php`: `analyze()` driven through the `chatAgentFactory` for approve/reject/uncertain, the JSON retry, and the unreachable-model fallback
 
