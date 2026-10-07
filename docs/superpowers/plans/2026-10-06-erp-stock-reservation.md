@@ -246,11 +246,11 @@ Close the three MES fast-follows the final review flagged.
 - Modify: `Modules/MES/app/Models/ProductionOrder.php` (boot hook) if that is where the stamp lands
 - Test: `Modules/MES/tests/Feature/` (extend)
 
-- [ ] **Step 1: Write the failing tests** — `a production order created via the factory still gets a material_line_id` (reserve works for a non-service creation path); `a BOM with >= 1000 lines is rejected` (guard throws); `availableQuantity excludes a sales (null-warehouse) hold on the same item` (seed a null-warehouse hard hold → MES available drops → backflush cannot consume it).
-- [ ] **Step 2: Run them, verify they fail.**
-- [ ] **Step 3: Implement** the boot-hook stamp + stride guard + the reader's null-warehouse subtraction. Keep the own-hold add-back at backflush correct (it adds back the order's OWN warehouse-pinned line hold; sales null-warehouse holds are not the order's own).
-- [ ] **Step 4: Run them, verify they pass.**
-- [ ] **Step 5: Commit** — `fix(mes): stamp material_line_id on every creation path, guard the stride, subtract sales holds in the reader`.
+- [x] **Step 1: Write the failing tests** — `a production order created via the factory still gets a material_line_id` (reserve works for a non-service creation path); `a BOM with >= 1000 lines is rejected` (guard throws); `availableQuantity excludes a sales (null-warehouse) hold on the same item` (seed a null-warehouse hard hold → MES available drops → backflush cannot consume it).
+- [x] **Step 2: Run them, verify they fail.**
+- [x] **Step 3: Implement** the boot-hook stamp + stride guard + the reader's null-warehouse subtraction. Keep the own-hold add-back at backflush correct (it adds back the order's OWN warehouse-pinned line hold; sales null-warehouse holds are not the order's own).
+- [x] **Step 4: Run them, verify they pass.**
+- [x] **Step 5: Commit** — `fix(mes): stamp material_line_id on every creation path, guard the stride, subtract sales holds in the reader`.
 
 ---
 
@@ -286,6 +286,11 @@ All seven tasks delivered, executed subagent-driven on `master` of the ERP and M
 - Stamp MES `material_line_id` in a model `created` boot hook so EVERY production-order creation path gets it (today only `ProductionOrderService::create()` stamps it; orders created elsewhere silently reserve nothing). Reviewer's top follow-up.
 - Add the ≥1000-line guard for `material_line_id` (throw/assert rather than silently collide).
 - Close or document the sales↔MES null-warehouse backflush caveat (above).
+
+**Task 11 (MES reservation hardening, 2026-10-07): the three fast-follows above are CLOSED.** (Landed in MES commit `b48ee0d` — see the note below: a concurrent session's broad `git add` swept Task 11's files into its own machine-states commit instead of an isolated `fix(mes): …` commit. The content is correct and green; the commit is not isolated.)
+- `material_line_id` is now stamped by the `ProductionOrder` `created` boot hook on every creation path (service, factory, import, direct create), not only `ProductionOrderService::create()`. The hook stamps only lines that lack an id (a fixture-supplied id is preserved); the service no longer stamps explicitly.
+- The `creating` boot hook rejects a BOM snapshot with ≥ 1000 component lines (`DomainException`, before insert), so the `order_id * 1000 + index` stride can never silently collide with the next order.
+- `ErpStockReader::availableQuantity()` now also subtracts the item's company-wide null-warehouse (sales) holds, conservatively (off every warehouse), so MES backflush can no longer consume stock a sales order hard-reserved. The backflush own-hold add-back still adds back only the order's OWN warehouse-pinned line hold; a sales null-warehouse hold is never the order's own, so it stays subtracted. **The earlier "sales↔MES null-warehouse backflush gap" caveat above is resolved** (per-warehouse ATP remains a deferred non-goal; the subtraction is conservative across warehouses). Documented in `Modules/MES/docs/rag/MODULE.md`.
 
 **Deferred minors (for later cleanup, none load-bearing):**
 - ERP: `ExpireStockReservationsCommand` singular-count grammar; `(int) env()` non-numeric → 0; availability `availableUnderRowLock()` duplicates `available()`'s predicate and locks O(n) reservation rows; `SalesOrderEvasionService` could be `final readonly`; cancel issues N release UPDATEs; docblock "no exception escapes" covers only `reserve()`'s declared exceptions; `StockReservation` not added to `ModelQuantityValidationTest`/`CrudWriteGuardTest`.
