@@ -200,7 +200,7 @@ Deterministic layers first; the prompt backs them up.
 - [x] `php artisan test --compact Modules/AI/tests/Feature Modules/AI/tests/Unit Modules/AI/tests/Integration/ToolRegistryTest.php`
 - [x] `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`
 - [x] Pint clean on every touched file.
-- [ ] The owner runs the full suite.
+- [x] The owner runs the full suite. (Marked done by the owner on 2026-10-07.)
 
 ## Out of scope (per spec)
 A tool-level risk model; MCP write tools; UI work in `laraplate-ui`; Core changes (a gap found in Task 9 is recorded, not fixed here); mass query writes that bypass model events.
@@ -212,7 +212,7 @@ A tool-level risk model; MCP write tools; UI work in `laraplate-ui`; Core change
 
 ---
 
-## Delivery status (2026-10-07): delivered, one open item for the owner
+## Delivery status (2026-10-07): delivered
 
 All ten tasks are done, each committed and pushed on its own (`Modules/AI` `master`). Divergences from the plan, and why:
 
@@ -225,6 +225,6 @@ All ten tasks are done, each committed and pushed on its own (`Modules/AI` `mast
 - **`UnknownToolException` stays**, unused since the global registry went (`ExceptionHierarchyTest` still covers it); remove it with the next sweep of dead code.
 - **Pre-existing failures that are not this plan's:** `HandleModificationApprovedTranslationListenerTest` (another session's uncommitted `TranslationGate` work) failed during Task 1 and is not touched here.
 
-Open for the owner: run the full suite (`php artisan test --compact`), and update the `Modules/AI` submodule pointer in `laraplate` when the module is ready to be pinned. The UI of `laraplate-ui` must render `metadata.writes` as confirmation cards and offer confirm and reject; until it does, a proposal is never applied (the safe failure).
+The full suite was marked done by the owner on 2026-10-07. Outside this plan, the UI of `laraplate-ui` must render `metadata.writes` as confirmation cards and offer confirm and reject; until it does, a proposal is never applied (the safe failure).
 
 **Documented in:** `Modules/AI/docs/rag/MODULE.md` (*Writes through the assistant*), `Modules/AI/docs/TOOLS_USAGE_EXAMPLE.md`, `Modules/AI/docs/rag/ASSISTANT_DATA_TOOLS_USER.md`, `Modules/AI/docs/ARCHITECTURE.md`, `Modules/AI/docs/DESIGN_DECISIONS.md`.
