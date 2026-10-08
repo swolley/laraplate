@@ -220,11 +220,11 @@ Assert that every chunk has `audience`, `module`, `locale`, `canonical_source`, 
 
 Read optional front matter keys without changing document content semantics. Propagate normalized metadata from the source document to every split chunk. Reject unknown audience values during indexing with a source-specific exception. Never let developer-compatible defaults weaken the user-index deny-by-default rule.
 
-- [ ] **Step 3: Write the failing retrieval factory test**
+- [-] **Step 3: Write the failing retrieval factory test** Cancelled by the owner on 2026-10-08: the retrieval factory has one strategy to choose from (vector); `InAppDocumentationRetrieval` and `DeveloperDocumentationRetrieval` stay wired directly, and a factory is written when a second strategy is built.
 
 Assert that missing configuration and `strategy=vector` both resolve to `VectorDocumentationRetrieval`, and unknown strategies fail during agent construction rather than silently switching behavior.
 
-- [ ] **Step 4: Implement the explicit vector wrapper and factory**
+- [-] **Step 4: Implement the explicit vector wrapper and factory** Cancelled with Step 3.
 
 `VectorDocumentationRetrieval` implements NeuronAI `RetrievalInterface` and delegates to `SimilarityRetrieval`. `DocumentationRetrievalFactory::make()` receives the vector store and embeddings provider explicitly. Override `DocumentationAgent::retrieval()` to call the factory.
 
@@ -238,7 +238,7 @@ The initial config is:
 
 Do not add `graph` as an accepted value.
 
-- [ ] **Step 5: Run regression tests**
+- [-] **Step 5: Run regression tests** Cancelled with Step 3.
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Ai/Rag/Retrieval/DocumentationRetrievalFactoryTest.php Modules/AI/tests/Integration/DocumentationAgentTest.php Modules/AI/tests/Integration/FileDocumentReaderTest.php Modules/AI/tests/Integration/MarkdownAwareSplitterTest.php Modules/AI/tests/Integration/DocumentationServiceTest.php
@@ -246,7 +246,7 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Ai/Rag/Retrieval/Documentat
 
 Expected: PASS and the default strategy remains vector.
 
-- [ ] **Step 6: Re-run the vector evaluation and compare**
+- [-] **Step 6: Re-run the vector evaluation and compare** Cancelled with Step 3.
 
 Expected: no retrieval regression caused by the wrapper or metadata defaults. If hit@5 or MRR changes, explain the exact corpus/indexing cause in the new report before continuing.
 
