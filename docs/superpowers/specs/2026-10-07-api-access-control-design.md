@@ -35,6 +35,11 @@ a role of the `api` guard has not been explicitly granted.
 | The API switch covers only Core routes. | `core.crud.expose_api` (seeded setting `crud.expose_api`, default `false`) gates the Core CRUD and graph routes through `EnsureCrudApiAreEnabled`; module `/api` routes (ERP callbacks, SAO webhooks, MES machine data, Shop) are not gated. |
 | `User` cannot hold tokens. | `HasApiTokens` is absent from `Modules\Core\Models\User`; the only tokenable model is `Modules\MES\Models\MachineSource`. |
 | Existing roles are never realigned. | The role seeder creates missing roles only; `SeedReconciler` reconciles rows, not role-permission pivots, and cannot revoke. |
+| Related records skip the related entity's permission and ACL, in both read paths. | Select/detail eager-load through `QueryBuilder::applyRelations()` / `createRelationCallback()`, which apply only the request's columns, filters and sorts; ACLs are injected on the root query only (`CrudService::list`, `detail`), and on related aggregates only in `list` (`relationCountAclConstraint`). Search adds relations with a raw `with($requestData->relations)`, skipping even the relation black list. A table-level `retrieved` check (`HasValidations`) throws for models extending Core's `Model`, but applies no row ACL and does not cover `Media`, which extends Spatie's model. |
+| Every content embeds a raw media row. | `HasMultimedia` always appends `cover` (a `getFirstMedia('cover')` model), with no permission check. |
+| Responses carry every model column. | `ResponseBuilder` wraps results in a generic `JsonResource` (`toArray()`); there is no per-caller column filtering. Media rows expose `custom_properties` (AI analysis, embedded metadata), `disk` and the original `file_name`, and no URL: URLs are built only by `MediaResource`, used only by `MediaController`. |
+| Media are searchable but have no select ACL. | Search rehydration applies `Media::authorizeSearchRehydration()` (owner visibility, `core.media.search_visibility`, `ContentOwnerAuthorizer` checking published state and the content ACL); the select path has no equivalent. |
+| References are not searchable. | `Content::toSearchableArray()` indexes no reference. |
 
 The exposure is latent while the API switch is off (its default), and real the moment it is turned on.
 
@@ -50,6 +55,9 @@ The exposure is latent while the API switch is off (its default), and real the m
 | A6 | Attributes a model declares hidden from anonymous callers are removed from responses to the `anonymous` user. ACLs filter rows; this filters columns. |
 | A7 | Users may create personal tokens; administrators create service accounts (non-interactive users) and their tokens. A request needs both the permission of an `api` role and the token's ability. Superadmin tokens are refused. |
 | A8 | No migration for existing installations: they are rebuilt with `migrate:fresh --seed`. |
+| A9 | Select and search share one visibility rule; they differ only in how they deliver records. Related records of an entity with its own permission obey that entity's permission (on the request's guard) and ACL, in both paths. A partial relation is declared in the response. Writes sync a relation only within what the writer can see. Parts without a permission of their own inherit the parent's. |
+| A10 | Media are readable through select as well as search. Their visibility is decided by ACLs, which gain a relation filter so a media ACL can reference its owner. `guest` (`api`) gets a default ACL: media of CMS contents that are published, visible and valid by date. `api` responses return media in a safe projection. |
+| A11 | Content references are indexed inside the content's search document. |
 
 ## 4. Permissions per guard
 
@@ -117,8 +125,8 @@ Public list of `guest` (`api`), all `select`:
 |---|---|---|
 | `core_settings` | `is_public` | |
 | `cms_contents` | currently published (existing ACL) | |
-| `cms_contents_references` | owner content currently published | |
-| `vend_media` | owner is a CMS content currently published | |
+| `cms_contents_references` | relation filter: owner content published, visible and valid by date | |
+| `vend_media` | relation filter: owner is a CMS content published, visible and valid by date | returned in the safe media projection (section 7.2) |
 | `cms_tags` | none | |
 | `cms_locations` | none | |
 | `cms_contributors` | none | `user_id`; `shared_components` too unless the plan verifies it holds no personal data |
@@ -128,17 +136,34 @@ Public list of `guest` (`api`), all `select`:
 Every row without a default ACL may still receive one from an installation; "none" means no default, not
 that ACLs are excluded.
 
-The owner conditions on `cms_contents_references` and `vend_media` need an ACL filter on a related record.
+### 6.1 Relation filter in ACLs
+
+The owner conditions on `cms_contents_references` and `vend_media` are ACL filters on a related record.
 ACL filters today are column conditions on the entity's own table (`AuthorizationService::applySingleFilter()`),
-so the plan extends the filter language with a relation filter (a `whereHas` on a named relation, morph
-relations included, with nested filters on the related record). A `vend_media` ACL limited to `model_type`
-alone is not acceptable: the table also holds SAO ticket attachments, and a media of an unpublished content
-would still be public.
+so the filter language gains a relation filter:
+
+- a named relation, morph relations included, with the morph types it accepts (for media: the CMS content
+  type), and nested filters on the related record;
+- nested filters use the same operators and dynamic values as today (`@now` for validity windows), so
+  "published, visible and valid by date" is the existing content condition, reused.
+
+Media visibility is therefore configurable per role: all media, media of some owners only, one collection
+only (`collection_name`, e.g. covers but not attachments), or none. A role that reads contents but holds no
+`vend_media` permission sees contents without their media (paid media, rights limited to some channels,
+privacy, embargo). A `vend_media` ACL limited to `model_type` alone is not acceptable as the default: the
+table also holds SAO ticket attachments, and a media of an unpublished content would still be public.
+
+In search, a relation filter cannot be pushed to the engine (`ScoutSearchConstraintApplier` translates
+column conditions only): it is applied at rehydration, as `Media::authorizeSearchRehydration()` already does
+for owner visibility. The `owner` mode of `core.media.search_visibility` stays, as an extra condition on top of
+the ACL.
 
 A guard test fails when the `guest` (`api`) grant set differs from this list, and when `guest` (`web`) holds
 any permission.
 
-## 7. Hidden attributes for anonymous callers
+## 7. Columns returned
+
+### 7.1 Hidden attributes for anonymous callers
 
 - A model implements a Core contract declaring the attributes never returned to the `anonymous` user
   (`anonymousHiddenAttributes(): list<string>`).
@@ -146,9 +171,50 @@ any permission.
   records (list, detail, search, tree, history) and on relations loaded with them.
 - Authenticated callers, staff UIs and Filament see the attributes as today.
 
-## 8. Tokens
+### 7.2 Safe media projection
 
-### 8.1 Model
+- On the `api` guard, a media record (as an entity or as a relation, `cover` included) is returned in a safe
+  projection: id, collection, mime type, size, dimensions, alternative text, and the URLs of the original and
+  of each generated conversion. Raw `custom_properties`, `disk`, `conversions_disk` and the original
+  `file_name` are not returned.
+- The projection reuses the URL building of `MediaResource`; private disks return temporary signed URLs, as
+  `MediaController` does today.
+- A caller holding `vend_media.update` on the `api` guard (an integration that manages media) receives the full
+  record. The `web` guard (staff UI, Filament) is unchanged.
+
+## 8. Related records
+
+Select and search deliver records differently (structured records with requested relations; ranked hits
+rehydrated from the index) but apply one visibility rule, so switching route never shows what the other
+hides.
+
+### 8.1 Reading
+
+- A relation to an independent entity (users, media, invoices: any model that does not declare itself a part
+  of its parent, see below) is loaded only if the caller holds that entity's `select` permission on the
+  request's guard, and its query receives that entity's ACL filters, exactly as a root query does. This holds for `relations`, dotted
+  `columns`, relation filters and sorts, in select, detail and search (the search path stops using a raw
+  `with()` and goes through the same relation handling and black list).
+- A relation the caller explicitly requested and may not read: 403. A relation the model appends on its own
+  (`cover`) and the caller may not read: omitted.
+- Parts of a parent (translations, BOM lines, quality plan characteristics: records that only exist inside
+  their parent) inherit the parent's visibility and are not checked separately, even though a permission is
+  generated for their table. A model declares itself a part through a Core contract naming its parent
+  relation, so the rule depends neither on table names nor on which permissions happen to exist.
+- A relation filtered by permission or ACL is declared partial in the response: `meta.relations.{name}.hidden`
+  holds the number of related records left out, so a client can warn before editing.
+
+### 8.2 Writing
+
+- Syncing a relation (`CrudService::resolveSyncableRelations()` / `syncModelRelations()`) works only within the
+  related records the writer can read: records the writer cannot see are never detached, deleted or changed,
+  and additions and removals are computed on the visible subset.
+- Attaching a related record the writer cannot read is refused (403), so a relation cannot be pointed at a
+  record by its id alone.
+
+## 9. Tokens
+
+### 9.1 Model
 
 - `HasApiTokens` on `Modules\Core\Models\User`.
 - `personal_access_tokens` gains `allowed_cidrs` (json, nullable), folded into its create migration.
@@ -159,14 +225,14 @@ any permission.
   account tokens may be non-expiring; the backoffice marks them.
 - `last_used_at` is shown wherever tokens are listed.
 
-### 8.2 Personal tokens
+### 9.2 Personal tokens
 
 - Routes under `/app/auth/user/tokens` (session, `auth` group): list, create, revoke the caller's own tokens.
 - On creation the abilities must be a subset of the `api` permissions the user's roles grant; anything else
   is a 422. The plain token is returned once.
 - A superadmin cannot create tokens.
 
-### 8.3 Service accounts
+### 9.3 Service accounts
 
 - `users.is_service_account` (boolean, default false), folded into the users create migration.
 - A service account has no usable password, cannot log in through Fortify (`authenticateUsing` refuses it),
@@ -174,7 +240,7 @@ any permission.
 - Administrators create service accounts, assign their `api` roles and issue and revoke their tokens in the
   Filament user resource.
 
-## 9. Consumers
+## 10. Consumers
 
 - **MCP** (`2026-09-12-mcp-server-design.md`): uses personal tokens and the `api` guard as defined here.
 - **MES machine data**: the machine routes move from tokens owned by `MachineSource` to service accounts.
@@ -185,23 +251,26 @@ any permission.
   (section 7.3) and in the edge agent spec.
 - **ERP, SAO**: their callbacks and webhooks come under the switch (5.2) and run as `anonymous` with
   signature verification (5.3).
+- **CMS**: `Content::toSearchableArray()` adds the content's references (labels and URL domains) to the
+  search document, so a search finds the contents that cite a source; existing indexes are rebuilt. The
+  appended `cover` follows the relation rules of section 8 and the projection of section 7.2.
 - **ERP hardening Task 11** (Sanctum for an external API) is superseded by this spec; Task 2 (per-entity
   exposure) is unchanged.
 
-## 10. Upgrade note
+## 11. Upgrade note
 
 There is no migration of roles or permissions. An existing installation keeps `guest` with its 140 `web`
 `select` permissions until it is rebuilt with `php artisan migrate:fresh --seed`. The Core README states this
 in its upgrade section, next to the rename of the API switch.
 
-## 11. Out of scope
+## 12. Out of scope
 
 - Per-entity API exposure (ERP hardening Task 2).
-- Column-level permissions beyond the anonymous hidden list of section 7.
+- Column-level permissions beyond the anonymous hidden attributes and the media projection of section 7.
 - Mutual TLS (left to the reverse proxy, documented as an option).
 - OAuth or any third-party identity provider.
 
-## 12. Testing
+## 13. Testing
 
 | Area | Proof |
 |---|---|
@@ -210,15 +279,25 @@ in its upgrade section, next to the rename of the API switch.
 | Authentication | Invalid, expired or revoked token: 401, never `anonymous`. Superadmin token: 401. Address outside `allowed_cidrs`: 403. No token: `anonymous` on the `api` guard. |
 | Abilities | Permission without ability: 403. Ability without permission: 403. Both: allowed. |
 | Default roles | Guard test on the exact `guest` (`api`) grant set and on `guest` (`web`) being empty. |
-| Public ACLs | An unpublished content, its references and its media are invisible to `anonymous`; a SAO ticket attachment in `vend_media` is invisible. |
+| Public ACLs | An unpublished, expired or not-yet-valid content, its references and its media are invisible to `anonymous`, through select, detail, search and as relations of other records; a SAO ticket attachment in `vend_media` is invisible. |
+| Relation filter | A media ACL on its owner works in select (query) and in search (rehydration), for morph owners, with `@now` validity. A role with content but no media permission reads contents without media. |
+| Related records | A related entity's permission and ACL apply in select, detail and search; an explicitly requested forbidden relation is a 403; a forbidden appended `cover` is omitted; `meta.relations.{name}.hidden` counts what was left out; inherited parts are not checked separately; the search path honours the relation black list. |
+| Scoped sync | Saving a relation never detaches or changes related records the writer cannot read; attaching an unreadable record is a 403. |
 | Hidden attributes | `user_id` absent for `anonymous` on contributors, comments and ratings, present for staff. |
+| Media projection | On the `api` guard media come with URLs and without `custom_properties`, `disk` and `file_name`; a caller with `vend_media.update` gets the full record; the `web` guard is unchanged. |
+| References in search | A search for a cited source's label or domain returns the citing content. |
 | Personal tokens | Abilities outside the user's `api` permissions: 422; superadmin cannot create; plain token shown once. |
 | Service accounts | Fortify login refused, panel refused, token accepted. |
 | Signed callbacks | A provider callback without a valid signature is refused as `anonymous`. |
 
-## 13. Delivery
+## 14. Delivery
 
 One Core plan, in this order: guard-aware checks and `api` permissions; the middleware, the switch and its
-rename; default roles and public ACLs; hidden attributes; tokens and service accounts; documentation (Core
-README with the upgrade note, `CRUD_SYSTEM.md`, CMS, ERP, SAO and MES notes on the switch). The MES machine
-route migration follows as its own MES plan.
+rename; the relation filter in ACLs; related records in reading and scoped sync in writing; default roles and
+public ACLs; hidden attributes and the media projection; tokens and service accounts; references in the
+content search document (CMS); documentation (Core README with the upgrade note, `CRUD_SYSTEM.md`, CMS, ERP,
+SAO and MES notes on the switch). The MES machine route migration follows as its own MES plan.
+
+Related records (section 8) change behaviour for authenticated users too, not only for anonymous ones: a
+user who could read a relation through its parent without holding the related permission loses it. The plan
+lists the default roles that need a related permission added to keep today's staff screens working.
