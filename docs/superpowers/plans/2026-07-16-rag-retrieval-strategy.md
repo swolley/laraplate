@@ -1,8 +1,8 @@
 ---
 status: in-progress
-verified_on: 2026-09-15
-verified_by: repo audit
-note: Umbrella roadmap, partially delivered. Measurement (Tasks 1-2) shipped under different names — DocumentationEvaluationCase/Dataset/Service and the ai:evaluate-documentation command, plus the stack R3 plans (2026-09-09 baseline, 2026-09-10 per-strategy). NOT built: the explicit retrieval factory (Task 3), documentation-corpus hybrid + reciprocal-rank fusion (Task 4), and reranking (Task 5). Master runs InAppDocumentationRetrieval (vector-only) with no DocumentationRetrievalFactory and no AI_FAQ_RETRIEVAL switch. The hybrid/rerank that did ship belongs to the application-content search path (EnsembleSearchService), a different retriever — see 2026-09-16-search-modes-and-strategy-resolution — so it does not cover this documentation corpus. The graph decision checkpoint (Task 6) stays open and evidence-gated.
+verified_on: 2026-10-08
+verified_by: repo audit, reconciled with the code on 2026-10-08
+note: Umbrella roadmap, partially delivered. Tasks 1 and 2 (measurement) shipped under different names: DocumentationEvaluationCase/Dataset/Service and the ai:evaluate-documentation command, with committed developer baselines. Since 2026-09-17 the documentation retrievers apply the active profile's query prefix and an optional min_similarity floor. NOT built: the explicit retrieval factory (Task 3 Steps 3 to 6), hybrid with reciprocal-rank fusion (Task 4, deferred: not justified on the e5 model), reranking (Task 5, deferred) and the graph decision checkpoint (Task 6, not started). Open for the owner: build the factory or cancel Tasks 3 (Steps 3 to 6) to 6.
 ---
 # RAG Retrieval Strategy Implementation Plan
 
@@ -52,6 +52,8 @@ Application-module data must not be added to this evaluation corpus. Its search 
 
 ### Task 1: Versioned RAG evaluation dataset and loader
 
+> **Built under different names (reconciled 2026-10-08).** Task 1 shipped as `DocumentationEvaluationCase` and `DocumentationEvaluationDataset` (`Modules/AI/app/Services/Documentation/Evaluation/`, with `DocumentationEvaluationCaseTest` and `DocumentationEvaluationDatasetTest`); the fixtures are `Modules/Core/docs/rag/evaluations/2026-08-documentation-user.json` and `Modules/AI/docs/rag/evaluations/2026-09-17-developer-core-baseline.json` and `2026-09-18-developer-retrieval.json`. Task 2 shipped as `DocumentationEvaluationService` (hit@k and MRR through the shared `IrMetrics`), `EvaluateDocumentationCommand` (`ai:evaluate-documentation`, `--index=user|developer`) and `DocumentationEvaluationServiceTest`; the baseline reports are `2026-09-17-developer-core-vector-baseline.json` and `2026-09-18-developer-retrieval-report.json`. The `Rag*` names and file paths in the steps below are the plan's; the ticks map to what the code does.
+
 **Files:**
 
 - Create: `Modules/AI/tests/Fixtures/rag/evaluation.json`
@@ -59,7 +61,7 @@ Application-module data must not be added to this evaluation corpus. Its search 
 - Create: `Modules/AI/app/Services/Documentation/Evaluation/RagEvaluationDataset.php`
 - Create: `Modules/AI/tests/Unit/Services/Documentation/Evaluation/RagEvaluationDatasetTest.php`
 
-- [ ] **Step 1: Write the failing dataset loader test**
+- [x] **Step 1: Write the failing dataset loader test**
 
 Cover valid loading, duplicate IDs, missing expected sources, invalid audience values, and invalid hop classes. The initial fixture must contain at least one `user`, one `developer`, one Italian, one English, one unsupported, and one multi-hop case.
 
@@ -74,7 +76,7 @@ it('loads typed evaluation cases from the versioned fixture', function (): void 
 });
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 Run:
 
@@ -84,7 +86,7 @@ rtk php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Eval
 
 Expected: FAIL because the evaluation DTO and loader do not exist.
 
-- [ ] **Step 3: Implement the DTO and strict loader**
+- [x] **Step 3: Implement the DTO and strict loader**
 
 Use this public shape:
 
@@ -110,15 +112,15 @@ final readonly class RagEvaluationCase
 
 `RagEvaluationDataset::fromJson()` must reject malformed JSON, duplicate IDs, audiences outside `user|developer|shared`, hop classes outside `single|multi`, and answerable cases without expected sources.
 
-- [ ] **Step 4: Populate the initial fixture from canonical RAG documents**
+- [x] **Step 4: Populate the initial fixture from canonical RAG documents**
 
 Use stable questions whose expected source paths exist in `docs/rag/` or `Modules/*/docs/rag/`. Do not invent expected facts not stated by those documents. Start with 30 cases: 20 single-hop, 5 multi-hop, and 5 unsupported; include both supported audiences and locales represented in the corpus.
 
-- [ ] **Step 5: Run the targeted test**
+- [x] **Step 5: Run the targeted test**
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git -C Modules/AI add app/Services/Documentation/Evaluation tests/Fixtures/rag/evaluation.json tests/Unit/Services/Documentation/Evaluation
@@ -137,7 +139,7 @@ rtk git -C Modules/AI commit -m "test(ai): add versioned RAG evaluation dataset"
 - Create after running baseline: `Modules/AI/docs/rag/evaluations/2026-07-vector-baseline.json`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
-- [ ] **Step 1: Write failing metric tests**
+- [x] **Step 1: Write failing metric tests**
 
 Use an injected `RetrievalInterface` fake returning known source orders. Assert hit@K, reciprocal rank, unsupported empty-result accuracy, per-audience slices, and per-hop slices.
 
@@ -147,11 +149,11 @@ expect($result->hitRateAt(5))->toBe(0.5)
     ->and($result->slice('hop_class', 'multi')->caseCount)->toBe(1);
 ```
 
-- [ ] **Step 2: Run the metric tests and verify failure**
+- [x] **Step 2: Run the metric tests and verify failure**
 
 Expected: FAIL because the evaluator does not exist.
 
-- [ ] **Step 3: Implement deterministic retrieval metrics**
+- [x] **Step 3: Implement deterministic retrieval metrics**
 
 `RagEvaluationService` accepts a `RetrievalInterface` and evaluates retrieval without calling the chat provider. Normalize citation/source names before matching, preserve raw ranks for diagnostics, and emit a serializable result containing:
 
@@ -168,15 +170,15 @@ Expected: FAIL because the evaluator does not exist.
 ]
 ```
 
-- [ ] **Step 4: Add the command**
+- [x] **Step 4: Add the command**
 
 Register `ai:evaluate-rag` with `--dataset=`, `--output=`, and `--strategy=vector`. Refuse to overwrite an existing report unless `--force` is passed. The command must never run as part of the default CI suite because it may require configured embeddings and Elasticsearch.
 
-- [ ] **Step 5: Test the command with a fake evaluator**
+- [x] **Step 5: Test the command with a fake evaluator**
 
 Assert successful JSON output, refusal to overwrite, non-zero exit for missing datasets, and no chat-provider call in retrieval-only mode.
 
-- [ ] **Step 6: Run the vector baseline against the configured test corpus**
+- [x] **Step 6: Run the vector baseline against the configured test corpus**
 
 Run:
 
@@ -186,7 +188,7 @@ rtk php artisan ai:evaluate-rag --strategy=vector --dataset=Modules/AI/tests/Fix
 
 Expected: a committed JSON report with aggregate and sliced metrics. Record environment, embeddings model, dimensions, index name, and corpus revision in the report metadata.
 
-- [ ] **Step 7: Run targeted tests and commit**
+- [x] **Step 7: Run targeted tests and commit**
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Unit/Services/Documentation/Evaluation/RagEvaluationServiceTest.php Modules/AI/tests/Feature/EvaluateRagCommandTest.php
@@ -195,6 +197,8 @@ rtk git -C Modules/AI commit -m "feat(ai): measure documentation RAG retrieval q
 ```
 
 ### Task 3: Stable chunk metadata and explicit vector retrieval factory
+
+> **State (2026-10-08).** Steps 1 and 2 are only partly built, by the security plan rather than this one: `FileDocumentReader` parses the front matter, `MarkdownAwareSplitter` carries the metadata to every chunk with a `heading_breadcrumb`, and `DocumentAudiencePolicy` admits to the user corpus only documents with `audience` `user` or `shared` and with `module`, `locale`, `canonical_source`, `safe_source_label` and `version` (tests in `InAppDocumentationRetrievalTest`, `ElasticsearchRagVectorStoreTest`). Not verified: the developer-corpus defaults (`shared`, `app`, `und`, empty breadcrumb, `file`) and the rejection of an unknown audience value at indexing, so those steps stay open. Steps 3 and 4 are **not built**: there is no `DocumentationRetrievalFactory`, `VectorDocumentationRetrieval` or `AI_FAQ_RETRIEVAL`; `InAppDocumentationRetrieval` and `DeveloperDocumentationRetrieval` are wired directly. With hybrid and reranking deferred (below), a factory would have one strategy to choose from; whether to build it, or to cancel Steps 3 to 6 with `- [-]`, is a decision of the owner.
 
 **Files:**
 
@@ -254,6 +258,8 @@ rtk git -C Modules/AI commit -m "refactor(ai): make documentation retrieval stra
 ```
 
 ### Task 4: Feature-flagged Elasticsearch hybrid retrieval
+
+> **State (2026-10-08): deferred, nothing built.** The measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric `query:`/`passage:` prefixes) found hit@5 1.00 and MRR 0.80, so hybrid is not justified; revisit only if a larger corpus shows real misses. The classes below do not exist.
 
 > **Scope:** the documentation retriever only (NeuronAI `RetrievalInterface`, `InAppDocumentationRetrieval`). This is a different path from the application-content ensemble hybrid reworked in `2026-09-16-search-modes-and-strategy-resolution`; that work does not deliver hybrid retrieval to this corpus. See *Relationship to search-modes* above. As of 2026-09-16 none of the classes below exist on master.
 
@@ -318,6 +324,8 @@ rtk git -C Modules/AI commit -m "feat(ai): add measured hybrid documentation ret
 
 ### Task 5: Optional bounded reranking
 
+> **State (2026-10-08): deferred, nothing built.** No documentation reranking was measured; the cross-encoder was evaluated on the application-content path only (reranker seeded off after a run with no gain, see `reranker.model` in the AI docs). The classes below do not exist.
+
 **Files:**
 
 - Create: `Modules/AI/app/Ai/Rag/Retrieval/RerankedDocumentationRetrieval.php`
@@ -358,6 +366,8 @@ rtk git -C Modules/AI commit -m "feat(ai): add optional documentation reranking"
 ```
 
 ### Task 6: Graph retrieval decision checkpoint
+
+> **State (2026-10-08): not started.** `Modules/AI/docs/rag/evaluations/2026-07-retrieval-failure-analysis.md` does not exist and no graph decision is recorded. With vector-only at hit@5 1.00 on the 13- and 20-case developer datasets, the gate in Step 2 (at least 10 unsolved multi-hop cases) is very unlikely to pass, but the failure classification has not been written.
 
 **Files:**
 
