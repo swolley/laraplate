@@ -1,8 +1,8 @@
 ---
-status: in-progress
+status: completed
 verified_on: 2026-10-08
 verified_by: repo audit, reconciled with the code on 2026-10-08
-note: Umbrella roadmap, partially delivered. Tasks 1 and 2 (measurement) shipped under different names: DocumentationEvaluationCase/Dataset/Service and the ai:evaluate-documentation command, with committed developer baselines. Since 2026-09-17 the documentation retrievers apply the active profile's query prefix and an optional min_similarity floor. NOT built: the explicit retrieval factory (Task 3 Steps 3 to 6), hybrid with reciprocal-rank fusion (Task 4, deferred: not justified on the e5 model), reranking (Task 5, deferred) and the graph decision checkpoint (Task 6, not started). Open for the owner: build the factory or cancel Tasks 3 (Steps 3 to 6) to 6.
+note: Closed 2026-10-08. Tasks 1 and 2 (measurement) shipped under different names (DocumentationEvaluationCase/Dataset/Service, ai:evaluate-documentation). Task 3 shipped its chunk metadata steps (developer corpus defaults, stop on an unknown audience); its retrieval factory (Steps 3 to 6) was cancelled. Hybrid (Task 4), reranking (Task 5) and the graph checkpoint (Task 6, except its documentation steps) are deferred with their reopening conditions in the delivery status.
 ---
 # RAG Retrieval Strategy Implementation Plan
 
@@ -19,6 +19,23 @@ note: Umbrella roadmap, partially delivered. Tasks 1 and 2 (measurement) shipped
 **Security prerequisite:** `docs/superpowers/plans/2026-07-16-in-app-ai-assistance-security.md` owns the separate user corpus, permissions/ACL enforcement, mandatory guardrails, and read-only Core Graph tools. Complete that plan before exposing RAG through the in-app assistant.
 
 **Application data extension:** `docs/superpowers/plans/2026-07-17-application-content-retrieval.md` owns the general Core provider contract, authenticated module evidence tool, CMS reference provider, and separately gated public phase. It does not change the documentation retrieval experiments in this plan.
+
+## Delivery status (2026-10-08): shipped with Tasks 3 (factory), 4, 5 and 6 deferred
+
+**Documented in:** `Modules/AI/docs/rag/MODULE.md` (sections "Chunk metadata, the two corpora and a wrong audience" and "Retrieval strategy decision"), `Modules/AI/docs/rag/DOCUMENTATION_EVALUATION_DEVELOPER.md` (the evaluation harness).
+
+What shipped:
+
+- **Tasks 1 and 2, under other names.** The plan's `RagEvaluationCase`, `RagEvaluationDataset`, `RagEvaluationService`, `RagEvaluationResult` and `ai:evaluate-rag` were built as `DocumentationEvaluationCase`, `DocumentationEvaluationDataset`, `DocumentationEvaluationService` (hit@k and MRR through the shared `IrMetrics`) and `EvaluateDocumentationCommand` (`ai:evaluate-documentation --index=user|developer`), in `Modules/AI/app/Services/Documentation/Evaluation/`. The baselines are the developer datasets and reports under `Modules/AI/docs/rag/evaluations/` (2026-09-17 and 2026-09-18), not `2026-07-vector-baseline.json`.
+- **Task 3, Steps 1, 2 and 7 (2026-10-08).** `DocumentationMetadata` (`Modules/AI/app/Services/Documentation/`) gives every developer corpus document the metadata it does not declare (audience `shared`, module `app`, locale `und`, its source name as canonical source, an empty breadcrumb, source type `file`), applied by `DocumentationService` after the audience policy and for the developer profile only, so the user corpus stays deny-by-default. `FileDocumentReader` throws `UnknownDocumentAudienceException` (`Modules/AI/app/Exceptions/`) on an audience outside `user`, `developer`, `shared`, naming the file and the value. The reader was chosen over the service because it holds the physical path and every caller reads all sources before writing: `ai:index-rag-docs` stops with `Indexing failed: ...` and a non-zero exit before a `--full` reset, and `RagIndexRebuilder::prepare()` calls the new `DocumentationService::validateSources()` before recreating the indexes of a model switch. The Elasticsearch mapping types `metadata.source_type` as a keyword. No real document was affected: the corpus declares only `user` (11) and `developer` (1).
+
+Divergences and deferrals:
+
+- **Retrieval factory cancelled (Task 3 Steps 3 to 6).** With one strategy there is nothing to choose: `InAppDocumentationRetrieval` and `DeveloperDocumentationRetrieval` stay wired directly, and there is no `AI_FAQ_RETRIEVAL`. Reopen with the first second strategy.
+- **Hybrid deferred (Task 4).** On the production model (`multilingual-e5-small`, symmetric prefixes) vector-only gives hit@5 1.00 and MRR 0.80. Reopen if a larger corpus shows real misses on the configured model, against the promotion gate of Task 4 Step 6.
+- **Reranking deferred (Task 5).** It depends on Task 4 and was never measured on documentation. Reopen with Task 4.
+- **Graph not authorized (Task 6 Steps 1 to 3).** The gate needs at least 10 unsolved multi-hop cases; the largest developer dataset has 20 cases at hit@5 0.90. The failure analysis was never written, so its planned path below is spelled without the module prefix: it names a file that does not exist. Reopen when a dataset with enough residual failures exists.
+- **Not re-measured.** Task 3 Step 6 (re-run the evaluation) was cancelled with the factory; the metadata defaults change no stored text or embedding, and no Elasticsearch index was rebuilt. The live developer index gains the defaults on its next `ai:index-rag-docs`.
 
 ---
 
@@ -198,7 +215,9 @@ rtk git -C Modules/AI commit -m "feat(ai): measure documentation RAG retrieval q
 
 ### Task 3: Stable chunk metadata and explicit vector retrieval factory
 
-> **State (2026-10-08).** Steps 1 and 2 are only partly built, by the security plan rather than this one: `FileDocumentReader` parses the front matter, `MarkdownAwareSplitter` carries the metadata to every chunk with a `heading_breadcrumb`, and `DocumentAudiencePolicy` admits to the user corpus only documents with `audience` `user` or `shared` and with `module`, `locale`, `canonical_source`, `safe_source_label` and `version` (tests in `InAppDocumentationRetrievalTest`, `ElasticsearchRagVectorStoreTest`). Not verified: the developer-corpus defaults (`shared`, `app`, `und`, empty breadcrumb, `file`) and the rejection of an unknown audience value at indexing, so those steps stay open. Steps 3 and 4 are **not built**: there is no `DocumentationRetrievalFactory`, `VectorDocumentationRetrieval` or `AI_FAQ_RETRIEVAL`; `InAppDocumentationRetrieval` and `DeveloperDocumentationRetrieval` are wired directly. With hybrid and reranking deferred (below), a factory would have one strategy to choose from; whether to build it, or to cancel Steps 3 to 6 with `- [-]`, is a decision of the owner.
+> **Done (2026-10-08).** Steps 1, 2 and 7 shipped; Steps 3 to 6 are cancelled. See the delivery status at the top.
+>
+> **State (2026-10-08, before the work).** Steps 1 and 2 are only partly built, by the security plan rather than this one: `FileDocumentReader` parses the front matter, `MarkdownAwareSplitter` carries the metadata to every chunk with a `heading_breadcrumb`, and `DocumentAudiencePolicy` admits to the user corpus only documents with `audience` `user` or `shared` and with `module`, `locale`, `canonical_source`, `safe_source_label` and `version` (tests in `InAppDocumentationRetrievalTest`, `ElasticsearchRagVectorStoreTest`). Not verified: the developer-corpus defaults (`shared`, `app`, `und`, empty breadcrumb, `file`) and the rejection of an unknown audience value at indexing, so those steps stay open. Steps 3 and 4 are **not built**: there is no `DocumentationRetrievalFactory`, `VectorDocumentationRetrieval` or `AI_FAQ_RETRIEVAL`; `InAppDocumentationRetrieval` and `DeveloperDocumentationRetrieval` are wired directly. With hybrid and reranking deferred (below), a factory would have one strategy to choose from; whether to build it, or to cancel Steps 3 to 6 with `- [-]`, is a decision of the owner.
 
 **Files:**
 
@@ -212,11 +231,11 @@ rtk git -C Modules/AI commit -m "feat(ai): measure documentation RAG retrieval q
 - Modify: `Modules/AI/tests/Integration/FileDocumentReaderTest.php`
 - Modify: `Modules/AI/tests/Integration/MarkdownAwareSplitterTest.php`
 
-- [ ] **Step 1: Write failing metadata tests**
+- [x] **Step 1: Write failing metadata tests** Done 2026-10-08: `FileDocumentReaderTest`, `MarkdownAwareSplitterTest`, `DocumentationMetadataTest`, `DocumentAudiencePolicyTest` (developer defaults never pass the user policy), `DocumentationServiceTest` (developer chunks carry the six keys, user chunks no defaults, an unknown audience stops before the store is touched), `IndexDocumentationCommandTest`, `RagIndexRebuilderTest`, `ElasticsearchRagVectorStoreTest`; they failed before the code.
 
 Assert that every chunk has `audience`, `module`, `locale`, `canonical_source`, `heading_breadcrumb`, and `source_type`. Legacy documents without front matter may receive `shared`, `app`, `und`, the normalized source path, an empty breadcrumb, and `file` only in the developer corpus. They remain ineligible for the user corpus until explicitly classified `user` or `shared` and approved by its policy.
 
-- [ ] **Step 2: Implement metadata normalization**
+- [x] **Step 2: Implement metadata normalization** Done 2026-10-08: `DocumentationMetadata::applyDeveloperDefaults()` in `DocumentationService::profileDocuments()` (developer profile only, after `DocumentAudiencePolicy`), `UnknownDocumentAudienceException` thrown by `FileDocumentReader`, `DocumentationService::validateSources()` called by `RagIndexRebuilder::prepare()`, `source_type` keyword in the Elasticsearch mapping.
 
 Read optional front matter keys without changing document content semantics. Propagate normalized metadata from the source document to every split chunk. Reject unknown audience values during indexing with a source-specific exception. Never let developer-compatible defaults weaken the user-index deny-by-default rule.
 
@@ -250,7 +269,7 @@ Expected: PASS and the default strategy remains vector.
 
 Expected: no retrieval regression caused by the wrapper or metadata defaults. If hit@5 or MRR changes, explain the exact corpus/indexing cause in the new report before continuing.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit** Done 2026-10-08 in `Modules/AI` as `feat(ai): normalize documentation chunk metadata and stop on an unknown audience` (`bf054a4`), with the message the work called for rather than the factory's.
 
 ```bash
 rtk git -C Modules/AI add app/Ai/Rag/Retrieval app/Ai/Agents/DocumentationAgent.php app/Services/Documentation config/config.php tests
@@ -367,11 +386,11 @@ rtk git -C Modules/AI commit -m "feat(ai): add optional documentation reranking"
 
 ### Task 6: Graph retrieval decision checkpoint
 
-> **State (2026-10-08): not started.** `Modules/AI/docs/rag/evaluations/2026-07-retrieval-failure-analysis.md` does not exist and no graph decision is recorded. With vector-only at hit@5 1.00 on the 13- and 20-case developer datasets, the gate in Step 2 (at least 10 unsolved multi-hop cases) is very unlikely to pass, but the failure classification has not been written.
+> **State (2026-10-08): not started.** The failure analysis (`docs/rag/evaluations/2026-07-retrieval-failure-analysis.md` of the AI module) does not exist and no graph decision is recorded. With vector-only at hit@5 1.00 on the 13- and 20-case developer datasets, the gate in Step 2 (at least 10 unsolved multi-hop cases) is very unlikely to pass, but the failure classification has not been written.
 
 **Files:**
 
-- Create: `Modules/AI/docs/rag/evaluations/2026-07-retrieval-failure-analysis.md`
+- Create (not created, Task 6 deferred): `docs/rag/evaluations/2026-07-retrieval-failure-analysis.md` in `Modules/AI`
 - Modify: `Modules/AI/docs/rag/MODULE.md`
 - Modify: `Modules/AI/README.md`
 - Create only if the gate passes: `docs/superpowers/specs/2026-07-16-rag-graph-retrieval-spike-design.md`
