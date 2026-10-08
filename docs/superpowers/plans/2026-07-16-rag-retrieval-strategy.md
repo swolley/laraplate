@@ -274,19 +274,19 @@ rtk git -C Modules/AI commit -m "refactor(ai): make documentation retrieval stra
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/tests/Unit/Ai/Rag/ElasticsearchRagVectorStoreTest.php`
 
-- [ ] **Step 1: Write failing reciprocal-rank-fusion tests**
+- [-] **Step 1: Write failing reciprocal-rank-fusion tests** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Cover documents present in both lists, documents present in only one list, stable tie-breaking, duplicate IDs, and configurable vector/lexical weights. Fusion must use ranks, not raw Elasticsearch scores.
 
-- [ ] **Step 2: Implement deterministic fusion**
+- [-] **Step 2: Implement deterministic fusion** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Use `score += weight / (60 + rank)` with one-based ranks. Break equal fused scores by best individual rank, then stable document ID.
 
-- [ ] **Step 3: Write failing lexical retrieval tests**
+- [-] **Step 3: Write failing lexical retrieval tests** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Assert `multi_match` or `simple_query_string` over `content` and heading metadata, exact filters for audience/module/locale, bounded candidate size, and mapping back to Neuron `Document` objects with canonical provenance.
 
-- [ ] **Step 4: Add lexical search to the Elasticsearch store**
+- [-] **Step 4: Add lexical search to the Elasticsearch store** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Add a documentation-specific method without changing Neuron's `VectorStoreInterface`:
 
@@ -297,7 +297,7 @@ public function lexicalSearch(string $query, int $limit, array $filters = []): a
 
 Keep user input in query values, never interpolate it into field names or raw query JSON.
 
-- [ ] **Step 5: Implement hybrid retrieval and safe fallback**
+- [-] **Step 5: Implement hybrid retrieval and safe fallback** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Run vector and lexical retrieval, fuse candidates, and return the configured limit. If the lexical branch fails, log structured diagnostics and return the vector order. A vector failure remains fail-fast.
 
@@ -309,13 +309,13 @@ Enable only through:
 
 For memory/filesystem stores, requesting `hybrid` must fall back to vector with a configuration warning; do not emulate lexical search in PHP.
 
-- [ ] **Step 6: Run tests and evaluation**
+- [-] **Step 6: Run tests and evaluation** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 Run the targeted retrieval/store tests, then create `Modules/AI/docs/rag/evaluations/2026-07-hybrid-candidate.json` with the same corpus revision and embeddings model as the baseline.
 
 Promotion gate: hybrid may become the recommended Elasticsearch strategy only if hit@5 improves by at least 5 percentage points on the full dataset, no required slice regresses by more than 2 percentage points, and p95 retrieval latency increases by no more than 25%. Otherwise keep `vector` as the documented default.
 
-- [ ] **Step 7: Commit**
+- [-] **Step 7: Commit** Deferred by the owner on 2026-10-08: the measurement of 2026-09-18 on the production model (`multilingual-e5-small`, symmetric prefixes) gives hit@5 1.00 and MRR 0.80, so hybrid retrieval has no problem to solve. Reopen if a larger corpus shows real misses on the configured model.
 
 ```bash
 rtk git -C Modules/AI add app/Ai/Rag config/config.php tests/Unit/Ai/Rag docs/rag/evaluations/2026-07-hybrid-candidate.json
@@ -334,15 +334,15 @@ rtk git -C Modules/AI commit -m "feat(ai): add measured hybrid documentation ret
 - Modify: `Modules/AI/config/config.php`
 - Modify: `Modules/AI/app/Providers/AIServiceProvider.php`
 
-- [ ] **Step 1: Write failing reranker wrapper tests**
+- [-] **Step 1: Write failing reranker wrapper tests** Deferred by the owner on 2026-10-08: it depends on Task 4, and no documentation reranking was measured (the cross-encoder was evaluated on the application-content path only, and is seeded off). Reopen with Task 4.
 
 Use a fake Core `IReranker`. Assert bounded candidate count, query/document pair construction, stable score ordering, preservation of document provenance, fallback on exceptions, and fallback when score count is invalid.
 
-- [ ] **Step 2: Implement the wrapper**
+- [-] **Step 2: Implement the wrapper** Deferred by the owner on 2026-10-08: it depends on Task 4, and no documentation reranking was measured (the cross-encoder was evaluated on the application-content path only, and is seeded off). Reopen with Task 4.
 
 `RerankedDocumentationRetrieval` decorates another Neuron `RetrievalInterface`. It sends at most `candidate_limit` pairs to `IReranker`, sorts by reranker score with original rank as tie-breaker, and returns `result_limit` documents. It catches reranker failures, logs `rag_retrieval_reranker_fallback`, and returns the decorated retriever order.
 
-- [ ] **Step 3: Add configuration and factory wiring**
+- [-] **Step 3: Add configuration and factory wiring** Deferred by the owner on 2026-10-08: it depends on Task 4, and no documentation reranking was measured (the cross-encoder was evaluated on the application-content path only, and is seeded off). Reopen with Task 4.
 
 ```php
 'reranker' => [
@@ -354,11 +354,11 @@ Use a fake Core `IReranker`. Assert bounded candidate count, query/document pair
 
 Reuse the existing Core `IReranker` binding; do not duplicate the cross-encoder client.
 
-- [ ] **Step 4: Run tests and evaluation**
+- [-] **Step 4: Run tests and evaluation** Deferred by the owner on 2026-10-08: it depends on Task 4, and no documentation reranking was measured (the cross-encoder was evaluated on the application-content path only, and is seeded off). Reopen with Task 4.
 
 Create a candidate report using the same dataset and environment metadata. Promotion gate: MRR must improve by at least 5% relative to the selected non-reranked strategy, no required slice may regress by more than 2 percentage points, and p95 must remain within the documented interactive latency budget. If no latency budget has been approved, record results but keep reranking disabled by default.
 
-- [ ] **Step 5: Commit**
+- [-] **Step 5: Commit** Deferred by the owner on 2026-10-08: it depends on Task 4, and no documentation reranking was measured (the cross-encoder was evaluated on the application-content path only, and is seeded off). Reopen with Task 4.
 
 ```bash
 rtk git -C Modules/AI add app/Ai/Rag/Retrieval config/config.php app/Providers/AIServiceProvider.php tests/Unit/Ai/Rag/Retrieval docs/rag/evaluations
@@ -377,23 +377,23 @@ rtk git -C Modules/AI commit -m "feat(ai): add optional documentation reranking"
 - Create only if the gate passes: `docs/superpowers/specs/2026-07-16-rag-graph-retrieval-spike-design.md`
 - Create only after that new spec is approved: `docs/superpowers/plans/2026-07-16-rag-graph-retrieval-spike.md`
 
-- [ ] **Step 1: Classify residual evaluation failures**
+- [-] **Step 1: Classify residual evaluation failures** Deferred by the owner on 2026-10-08: no graph spike is authorized. The gate needs at least 10 unsolved multi-hop cases, and the largest developer dataset has 20 cases with hit@5 0.90 (at most 2 misses), so it cannot be reached on today's evidence. Reopen when a corpus or dataset with enough residual failures exists.
 
 For every failed case in the selected vector/hybrid/reranked report, assign exactly one primary category: missing corpus content, bad chunking, metadata/filter error, lexical miss, semantic miss, ranking error, multi-hop relationship loss, unsupported-answer behavior, or evaluation-fixture defect.
 
-- [ ] **Step 2: Apply the graph authorization gate**
+- [-] **Step 2: Apply the graph authorization gate** Deferred by the owner on 2026-10-08: no graph spike is authorized. The gate needs at least 10 unsolved multi-hop cases, and the largest developer dataset has 20 cases with hit@5 0.90 (at most 2 misses), so it cannot be reached on today's evidence. Reopen when a corpus or dataset with enough residual failures exists.
 
 Authorize a graph spike only if multi-hop relationship loss accounts for at least 10% of valid residual failures and at least 10 representative multi-hop cases remain unsolved by the best non-graph strategy. Otherwise document “graph spike not authorized” and stop.
 
-- [ ] **Step 3: If authorized, write a separate spike spec**
+- [-] **Step 3: If authorized, write a separate spike spec** Deferred by the owner on 2026-10-08: no graph spike is authorized. The gate needs at least 10 unsolved multi-hop cases, and the largest developer dataset has 20 cases with hit@5 0.90 (at most 2 misses), so it cannot be reached on today's evidence. Reopen when a corpus or dataset with enough residual failures exists.
 
 The spike spec must compare at least one no-graph baseline with the candidate graph implementation and define entity extraction, edge provenance, incremental refresh, deletion, tenant isolation, permissions, fallback, citations, latency, indexing cost, storage cost, and teardown. Graphify may be one candidate but must not appear in public application contracts.
 
-- [ ] **Step 4: Update module documentation**
+- [x] **Step 4: Update module documentation** Done 2026-10-08 in `Modules/AI/docs/rag/MODULE.md` ("Retrieval strategy decision"): vector-only is the strategy, hybrid and reranking are deferred, no graph spike is authorized; there is no `AI_FAQ_RETRIEVAL` setting, the factory having been cancelled.
 
 Record the selected default strategy, evaluation report links, and graph decision. Keep `AI_FAQ_RETRIEVAL=vector` as the default unless the relevant promotion gate was passed and explicitly approved.
 
-- [ ] **Step 5: Run documentation tests and commit**
+- [x] **Step 5: Run documentation tests and commit** Done 2026-10-08: `AiRagModuleDocumentationTest` passes; committed in `Modules/AI` and here.
 
 ```bash
 rtk php artisan test --compact Modules/AI/tests/Integration/AiRagModuleDocumentationTest.php
