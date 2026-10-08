@@ -19379,3 +19379,27 @@ parameters:
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: app/Providers/AppServiceProvider.php
+
+		-
+			rawMessage: 'Trait Modules\Core\Database\Factories\Concerns\HasDynamicContentFactory requires using class to extend Illuminate\Database\Eloquent\Model, but Modules\Shop\Database\Factories\ProductFactory does not.'
+			identifier: class.missingExtends
+			count: 1
+			path: Modules/Shop/database/factories/ProductFactory.php
+
+		-
+			rawMessage: 'Trait Modules\Core\Database\Factories\Concerns\HasDynamicContentFactory requires using class to extend Illuminate\Database\Eloquent\Model, but Modules\Shop\Database\Factories\ProductVariantFactory does not.'
+			identifier: class.missingExtends
+			count: 1
+			path: Modules/Shop/database/factories/ProductVariantFactory.php
+
+		-
+			rawMessage: 'Trait Modules\Core\Database\Factories\Concerns\HasDynamicContentFactory requires using class to extend Illuminate\Database\Eloquent\Model, but Modules\Shop\Database\Factories\VariantItemFactory does not.'
+			identifier: class.missingExtends
+			count: 1
+			path: Modules/Shop/database/factories/VariantItemFactory.php
+
+		-
+			rawMessage: Using nullsafe method call on non-nullable type Illuminate\Console\Command. Use -> instead.
+			identifier: nullsafe.neverNull
+			count: 1
+			path: Modules/Shop/database/seeders/ShopDatabaseSeeder.php
