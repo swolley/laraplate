@@ -1,6 +1,6 @@
 # RAG query analytics
 
-**Status:** proposed (draft) — implementation gated on a privacy review
+**Status:** approved — privacy review signed off on 2026-10-08 (see *Decision (2026-10-08)*), implementation not started
 
 **Date:** 2026-09-16
 
@@ -77,6 +77,16 @@ The first task of any implementation plan is a **blocking** privacy review that 
 - an erasure hook: because `user_ref` is a keyed hash, a GDPR erasure request maps to deleting documents by that user's hash — the pruning job and the erasure hook must both be specified in the plan.
 
 The feature stays `enabled=false` and unbuilt until that review signs off.
+
+## Decision (2026-10-08): privacy review signed off, with three amendments
+
+The owner approved the review recorded in `Modules/AI/docs/rag/query-analytics-privacy-review.md`. It amends this spec where the two differ:
+
+- **Query text is `raw` by default, with `off` as the alternative; `hashed` is dropped.** The log exists to show what the documentation does not answer, which a hash cannot show, and a hash of a short question is easy to reverse.
+- **Retention is 30 days**, not 90, because the question is stored as typed.
+- **Settings, not env.** `enabled`, `query_text_mode` and `retention_days` are seeded settings (`features.faq.query_logging.*`, defaults `false`, `raw`, `30`), following the module rule that switches and tuning values are settings. The index name stays in `config.php` like the other RAG indexes.
+
+The HMAC key is `APP_KEY`. It is rotated only on compromise, through `APP_PREVIOUS_KEYS`; the erasure hook matches the hash computed with the current key and with every previous key, so a rotation does not hide a user's older documents from erasure.
 
 ## Non-goals
 
