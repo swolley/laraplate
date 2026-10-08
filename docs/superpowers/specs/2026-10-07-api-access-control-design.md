@@ -1,6 +1,6 @@
 # API access control: guards, default roles and tokens
 
-**Status:** Draft for owner review. Nothing in this document is built.
+**Status:** Approved (2026-10-08). Nothing in this document is built. Plan: `docs/superpowers/plans/2026-10-08-api-access-control.md`.
 
 **Date:** 2026-10-07
 
