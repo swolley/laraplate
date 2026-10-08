@@ -1,6 +1,6 @@
 # RAG query analytics
 
-**Status:** approved — privacy review signed off on 2026-10-08 (see *Decision (2026-10-08)*), implementation not started
+**Status:** implemented (2026-10-08) — privacy review signed off the same day (see *Decision (2026-10-08)*); delivery in the plan's *Delivery status*
 
 **Date:** 2026-09-16
 
