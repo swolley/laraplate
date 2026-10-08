@@ -20,7 +20,7 @@ git pull
 after=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo "no tag")
 [ "$before" != "$after" ] && echo "from $before to $after" || echo""
 
-read -p "Do you want to run the full update? (y/N): " choice
+read -p "Do you want to run the full Laraplate update? (y/N): " choice
 
 if [[ ! "$choice" =~ ^[Yy]$ ]]; then
     # echo "Update aborted."
