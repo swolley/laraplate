@@ -21,6 +21,8 @@ and are not blocked by the API decision. Design:
 
 **Prerequisite:** Phase 2A + Phase 2B completed and green (`Modules/ERP` feature suite).
 
+**Dependency on API access control:** the external `/api/v1` work (Tasks 2 and 11, `4-13`) is governed by [`2026-10-08-api-access-control.md`](2026-10-08-api-access-control.md). Do not start it here. When that plan closes, its Task 10 marks Task 11 `- [-]` (superseded: Sanctum, guards and the `expose_api` switch live there) and this plan is closed with a delivery status; Task 2 stays a later refinement on top of the new switch.
+
 **Current slice:** no active implementation slice. This plan is retained as completed implementation history. A new scope requires explicit approval. ERP external-source importers (`4-09`) remain independent in [`2026-07-22-erp-external-source-importers.md`](2026-07-22-erp-external-source-importers.md) and are outside Point 0.
 
 **Goal:** Close the entire ERP master backlog: production e-invoice, Core domain-action HTTP layer + API governance, Tricount/commercial depth, operational console commands, and long-term architecture (FX, Money VO, dimensions, events).
@@ -201,6 +203,8 @@ php artisan test --compact Modules/ERP/tests/Feature/ErpModelPolicyTest.php
 ---
 
 ### Task 2: Per-model CRUD/API exposure governance (3-03) — deferred
+
+**Dependency:** build only after [`2026-10-08-api-access-control.md`](2026-10-08-api-access-control.md) is closed. Its gate is `expose_api` (config `core.expose_api`, middleware `AuthenticateApiRequest`); `EnsureCrudApiAreEnabled` and `core.expose_crud_api` named below no longer exist after that plan.
 
 **Point 0 decision:** do not implement until an external `/api/v1` consumer and its permitted entity/operation matrix are approved. The unchecked steps below describe the candidate implementation, not active work.
 
@@ -501,6 +505,8 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ### Task 11: Opt-in external API + versioning (3-02) — deferred
 
+**Superseded by [`2026-10-08-api-access-control.md`](2026-10-08-api-access-control.md):** authentication (Sanctum tokens with abilities), the `api` guard, rate limiting and the switch are defined there. Its Task 10 marks this task `- [-]`. Only versioning headers and idempotency remain open design notes.
+
 **Point 0 decision:** do not implement until a concrete external client contract defines authentication, versioning, rate limits, idempotency, and the required domain actions. The unchecked items below are retained design notes.
 
 **Backlog:** `3-02`  
@@ -678,7 +684,7 @@ php artisan test --compact Modules/Core/tests/Feature/Http/DomainActionRouteTest
 
 ### Task 22: Optional Gantt/API mobile; separate ERP importers (4-08, 4-09, 4-13)
 
-**Point 0:** skip `4-08` and `4-13` unless explicitly approved. `4-09` is excluded from this plan's active backlog and remains in its dedicated importer plan.
+**Point 0:** `4-13` builds on Task 11, now superseded: rewrite it on the api-access-control tokens before any approval. Skip `4-08` and `4-13` unless explicitly approved. `4-09` is excluded from this plan's active backlog and remains in its dedicated importer plan.
 
 | ID | Deliverable if approved |
 |----|-------------------------|
