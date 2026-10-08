@@ -67,11 +67,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `ProcessSample(int $company_id, int $signal_id, int $device_id, int $work_center_id, ?int $production_order_operation_id, CarbonImmutable $ts, float $value, SampleQuality $quality)`; `ProcessAggregateRow(int $signal_id, string $resolution, CarbonImmutable $bucket_start, float $min, float $max, float $avg, float $last, int $count)`; `ProcessStatistics(int $signal_id, float $min, float $max, float $avg, int $count, int $out_of_range_count, CarbonImmutable $first_ts, CarbonImmutable $last_ts)`. Tables as in the Global Constraints, `ts` and `bucket_start` with milliseconds precision 3 (the buckets use whole minutes and hours), `value` decimal(18,6), the operation id nullable with a nullable foreign key, `quality` enum of `SampleQuality`; the dirty buckets table as in R3; the summaries unique `(production_order_operation_id, signal_id)`.
 
-- [ ] **Step 1: Write the failing test.** Raw samples store milliseconds and refuse a second row of one signal at the same moment; aggregates refuse a duplicate `(signal, resolution, bucket_start)`; a dirty mark refuses a duplicate bucket of one signal; a summary refuses a second row for one operation and signal; the three configuration keys have the stated defaults; the README names the three variables.
-- [ ] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/ProcessValueSchemaTest.php`. Expected: FAIL.
-- [ ] **Step 3: Implement** the migrations, models, factories, value objects, enum cases, config and README.
-- [ ] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineDocumentationTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): process value tables and configuration`.
+- [x] **Step 1: Write the failing test.** Raw samples store milliseconds and refuse a second row of one signal at the same moment; aggregates refuse a duplicate `(signal, resolution, bucket_start)`; a dirty mark refuses a duplicate bucket of one signal; a summary refuses a second row for one operation and signal; the three configuration keys have the stated defaults; the README names the three variables.
+- [x] **Step 2: Run** `php artisan test --compact Modules/MES/tests/Feature/Machine/ProcessValueSchemaTest.php`. Expected: FAIL.
+- [x] **Step 3: Implement** the migrations, models, factories, value objects, enum cases, config and README.
+- [x] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine/MachineDocumentationTest.php`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): process value tables and configuration`.
 
 ### Task 2: The store contract and the relational driver
 
@@ -89,11 +89,11 @@ All paths under `Modules/MES/`.
   - `operationStatistics(int $operation_id, array $ranges): list<ProcessStatistics>` (`$ranges` is `array<int, array{min: ?float, max: ?float}>` by signal id; bad samples excluded).
   - `IdempotentWriter::insertMany(Connection $connection, string $table, array $rows): int` (rows stored; insert-or-ignore on the four drivers, row by row elsewhere).
 
-- [ ] **Step 1: Write the failing tests.** `write()` stores a batch once and ignores a repeat; `rollup()` builds the minute aggregate (min, max, avg, last, count) of a dirty bucket and removes its mark; a late sample into a closed minute re-marked and rolled up changes the aggregate; a mark set while the rollup runs is kept (simulate by re-marking between read and delete through a second mark with a newer `marked_at`); bad samples are left out and a minute with only bad samples yields no aggregate row (and removes a stale one); the hour aggregate is the count-weighted combination of two minutes with different counts; a dirty minute whose raw samples were pruned keeps its old aggregate (R5); `aggregates()` returns the requested resolution and range; `prune()` and `pruneAggregates()` delete only older rows and keep hour aggregates; `operationStatistics()` returns min, max, avg, count, out-of-range count (bounds inclusive, no range gives 0) and first and last time per signal; an unknown `mes.machine.process_store` throws with the known names.
-- [ ] **Step 2: Run** the files. Expected: FAIL.
-- [ ] **Step 3: Implement** the interface, the driver (set-based SQL through the query builder; the hour rebuild reads the `1m` rows of the hour) and `insertMany()`.
-- [ ] **Step 4: Run** the files. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): process value store with a relational driver and rollup`.
+- [x] **Step 1: Write the failing tests.** `write()` stores a batch once and ignores a repeat; `rollup()` builds the minute aggregate (min, max, avg, last, count) of a dirty bucket and removes its mark; a late sample into a closed minute re-marked and rolled up changes the aggregate; a mark set while the rollup runs is kept (simulate by re-marking between read and delete through a second mark with a newer `marked_at`); bad samples are left out and a minute with only bad samples yields no aggregate row (and removes a stale one); the hour aggregate is the count-weighted combination of two minutes with different counts; a dirty minute whose raw samples were pruned keeps its old aggregate (R5); `aggregates()` returns the requested resolution and range; `prune()` and `pruneAggregates()` delete only older rows and keep hour aggregates; `operationStatistics()` returns min, max, avg, count, out-of-range count (bounds inclusive, no range gives 0) and first and last time per signal; an unknown `mes.machine.process_store` throws with the known names.
+- [x] **Step 2: Run** the files. Expected: FAIL.
+- [x] **Step 3: Implement** the interface, the driver (set-based SQL through the query builder; the hour rebuild reads the `1m` rows of the hour) and `insertMany()`.
+- [x] **Step 4: Run** the files. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): process value store with a relational driver and rollup`.
 
 ### Task 3: Recorder, rollup command and pruning
 
@@ -105,11 +105,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: `ProcessValueRecorder::handle(ProcessValuesSampled $event): void` (R1, R2, R5, R9); commands `mes:machine-rollup` (`ProcessValueStore::rollup()`) and `mes:machine-prune-process-values` (`prune()` with `raw_retention_days`, `pruneAggregates()` with `minute_aggregate_retention_days`). The recorder returns the ids of the completed operations whose samples it stored through a protected hook `afterWrite()` left empty here (Task 4 fills it).
 
-- [ ] **Step 1: Write the failing tests.** A message of process value samples is stored with the attributed operation and quality and its minute buckets are marked; reference-role samples and non-numeric values are ignored; the same message twice (and through the processing job, reprocessed) stores the same rows and marks; a sample older than the raw retention is not stored; a bad sample is stored but does not move an aggregate after the rollup; a 5000-sample message performs a bounded number of queries (assert `DB::getQueryLog()` count stays below a fixed constant that does not grow with the samples, comparing a 500-sample and a 5000-sample message); `mes:machine-rollup` rebuilds the marked buckets and is scheduled every minute with `withoutOverlapping()->onOneServer()`; `mes:machine-prune-process-values` prunes by the two retentions and is scheduled daily.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** the recorder (one transaction per message, chunks of 500), the commands and the registrations.
-- [ ] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): record process values, roll them up and prune them`.
+- [x] **Step 1: Write the failing tests.** A message of process value samples is stored with the attributed operation and quality and its minute buckets are marked; reference-role samples and non-numeric values are ignored; the same message twice (and through the processing job, reprocessed) stores the same rows and marks; a sample older than the raw retention is not stored; a bad sample is stored but does not move an aggregate after the rollup; a 5000-sample message performs a bounded number of queries (assert `DB::getQueryLog()` count stays below a fixed constant that does not grow with the samples, comparing a 500-sample and a 5000-sample message); `mes:machine-rollup` rebuilds the marked buckets and is scheduled every minute with `withoutOverlapping()->onOneServer()`; `mes:machine-prune-process-values` prunes by the two retentions and is scheduled daily.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** the recorder (one transaction per message, chunks of 500), the commands and the registrations.
+- [x] **Step 4: Run** the file and `php artisan test --compact Modules/MES/tests/Feature/Machine`. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): record process values, roll them up and prune them`.
 
 ### Task 4: Operation summaries and lot traceability
 
@@ -122,11 +122,11 @@ All paths under `Modules/MES/`.
 - Produces: `ProcessSummarizer::summarize(int $operation_id): int` (R7); `SummarizeOperationProcessValues::handle(OperationCompleted $event): void`; `LotTracingService::processSummaries(int $lot_id): Collection` (R10).
 - Consumes: `ProcessValueStore::operationStatistics()`, the signals' `config.min` / `config.max`.
 
-- [ ] **Step 1: Write the failing tests.** Completing an operation (through `ProductionOrderOperationService::complete()`) writes one summary per signal with min, max, avg, count, out-of-range count, first and last time; bounds count as within; a signal with no range has 0; bad samples are excluded; samples of other operations are left out; late samples stored after completion update the summary of the completed operation (and the same message reprocessed leaves it unchanged); pruned raw samples never empty an existing summary; an operation without samples has no summaries; `LotTracingService::processSummaries()` returns the summaries of the operations of the lot's order and nothing for another order.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** the summarizer, the listener, the recorder hook (summarize only operations that are already completed) and the tracing method.
-- [ ] **Step 4: Run** the file, `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php` and the Machine folder. Expected: PASS.
-- [ ] **Step 5: Commit and push**: `feat(mes): permanent process summaries per operation and lot traceability`.
+- [x] **Step 1: Write the failing tests.** Completing an operation (through `ProductionOrderOperationService::complete()`) writes one summary per signal with min, max, avg, count, out-of-range count, first and last time; bounds count as within; a signal with no range has 0; bad samples are excluded; samples of other operations are left out; late samples stored after completion update the summary of the completed operation (and the same message reprocessed leaves it unchanged); pruned raw samples never empty an existing summary; an operation without samples has no summaries; `LotTracingService::processSummaries()` returns the summaries of the operations of the lot's order and nothing for another order.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** the summarizer, the listener, the recorder hook (summarize only operations that are already completed) and the tracing method.
+- [x] **Step 4: Run** the file, `php artisan test --compact Modules/MES/tests/Feature/ProductionOrderOperationServiceTest.php` and the Machine folder. Expected: PASS.
+- [x] **Step 5: Commit and push**: `feat(mes): permanent process summaries per operation and lot traceability`.
 
 ### Task 5: Filament, documentation, plan closing
 
@@ -138,11 +138,11 @@ All paths under `Modules/MES/`.
 **Interfaces:**
 - Produces: a read-only resource "Process summaries" in the group "Machine connectivity" (slug `mes/operation-process-summaries`): order number, operation, signal, min, max, avg, count, out-of-range count, first and last time; filters by signal; no create, edit or delete.
 
-- [ ] **Step 1: Write the failing tests.** Filament: the list shows a summary with its columns and filters by signal. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_process_samples`, `mes_process_aggregates`, `mes:machine-rollup`, `ProcessValueStore`, `mes_operation_process_summaries`, `raw_retention_days`, `minute_aggregate_retention_days` and `process_store`; the README no longer lists process values in its roadmap and the roadmap section says every step is built.
-- [ ] **Step 2: Run** the two files. Expected: FAIL.
-- [ ] **Step 3: Implement** the resource and write the documents (the "not built yet" statements: everything is built; R1 to R11 in plain words; glossary: Process sample, Process aggregate, Process summary; Italian guide section).
-- [ ] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
-- [ ] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
+- [x] **Step 1: Write the failing tests.** Filament: the list shows a summary with its columns and filters by signal. Documentation test: `docs/MACHINE_CONNECTIVITY.md` contains `mes_process_samples`, `mes_process_aggregates`, `mes:machine-rollup`, `ProcessValueStore`, `mes_operation_process_summaries`, `raw_retention_days`, `minute_aggregate_retention_days` and `process_store`; the README no longer lists process values in its roadmap and the roadmap section says every step is built.
+- [x] **Step 2: Run** the two files. Expected: FAIL.
+- [x] **Step 3: Implement** the resource and write the documents (the "not built yet" statements: everything is built; R1 to R11 in plain words; glossary: Process sample, Process aggregate, Process summary; Italian guide section).
+- [x] **Step 4: Run** the two files, the whole module suite `php artisan test --compact Modules/MES` and `vendor/bin/phpstan analyse Modules/MES/app --no-progress`. Expected: green (phpstan may still report files outside this plan).
+- [x] **Step 5: Close the plan.** Add `## Delivery status (<date>)` with `**Documented in:** \`Modules/MES/docs/MACHINE_CONNECTIVITY.md\`, \`Modules/MES/docs/rag/MODULE.md\` and \`Modules/MES/README.md\`.`, tick the boxes, record divergences; run `php artisan test --compact tests/Unit/ClosedPlansPointToDocumentationTest.php`; update `docs/superpowers/plans/INDEX.md`. Commit and push in `Modules/MES` and in the laraplate repo.
 
 ---
 
@@ -151,3 +151,19 @@ All paths under `Modules/MES/`.
 - **Spec coverage:** 9.4 contract and relational tables (Tasks 1 and 2), `mes:machine-rollup` on dirty buckets (Tasks 2 and 3), summaries on completion and reprocessing (Task 4), no downsampling on arrival (Task 3), traceability lot to order to operation to parameters (Task 4, R10), 11.6 keys (Task 1), 13 "Volume" (Task 3) and "Process values" (rollup idempotent with late data: Task 2; summary on completion: Task 4; pruning by retention: Task 3), `process_store` selection (Task 2, R11).
 - **Spec gaps decided here:** R1 to R11; the heaviest are R4 (hours from minutes), R5 (nothing stored beyond the raw retention, no empty aggregates), R7 (summaries never emptied) and R9 (batched writes).
 - **Type consistency:** `ProcessValueStore` methods, the three value objects, `IdempotentWriter::insertMany()`, `ProcessValueRecorder::handle()`, `ProcessSummarizer::summarize()` and `LotTracingService::processSummaries()` are named once and used with those names in every task that consumes them.
+
+## Delivery status (2026-10-08): delivered
+
+All five tasks shipped in `Modules/MES`; the whole module suite passes, phpstan reports only files outside this plan. With this step every part of the machine data acquisition design is built.
+
+**Documented in:** `Modules/MES/docs/MACHINE_CONNECTIVITY.md`, `Modules/MES/docs/rag/MODULE.md` and `Modules/MES/README.md`.
+
+Divergences and review outcome:
+
+- `ProcessValueStore::write()` marks the dirty minutes itself (a store detail, so a driver without a rollup need not), not the recorder. The contract gained `hasPendingRollup()`.
+- The value objects keep the plan's names in `Machine\Process` (`ProcessSample`, ...), next to the Eloquent models of the same name in `Models`.
+- Summaries are written by a queued `SummarizeOperationProcessValuesJob`, unique per operation until it starts, dispatched on `OperationCompleted` and when new samples are stored for a completed operation; completing an operation never waits for it and a replay that stores nothing queues nothing. A summary row is replaced only by one that counts at least as many samples (review: pruning could degrade the permanent record).
+- `mes:machine-rollup` runs batches of 500 until nothing waits or 50 seconds have passed (a fixed single batch left a backlog that could grow into permanent holes).
+- Prune deletes a chunk of 2000 rows at a time. Values that are not finite or beyond 12 integer digits are dropped and logged, so one bad value cannot fail the message. The store and the summarizer use the model's connection, not the default one.
+- Deferred, not fixed: a mark set again in the same millisecond as the one a rollup read can be deleted with it (a version counter instead of the timestamp would remove it); the unique `(signal_id, ts)` loses the second of two samples in the repeated hour of a daylight saving change (the machine time convention already requires a timezone without daylight saving); on SQL Server samples go in one row at a time because insert-or-ignore does not exist there (the volume test runs on SQLite only); on PostgreSQL the string comparison at the exact raw-retention boundary may skip one minute.
+- The Filament component and route caches of this machine (from `php artisan optimize`) were stale and hid the new resources; they were cleared with `filament:clear-cached-components` and `route:clear`.
