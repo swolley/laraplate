@@ -113,11 +113,11 @@
 **Interfaces:**
 - Produces: `new RelationFilter(relation: 'model', filters: FiltersGroup, morph_types: [Content::class])`; JSON `{"relation":"model","morph_types":[...],"filters":{...}}`.
 
-- [ ] **Step 1: Write the failing tests:** an ACL with a `RelationFilter` round-trips through the database; on a `list` it keeps only rows whose related record matches, for a `BelongsTo` (`ContentReference` → `content`) and a `MorphTo` (`Media` → `model` with `morph_types`); nested `@now` validity is resolved; in `search` the engine query carries no relation condition and rehydration drops non-matching hits; a role with a content ACL and no `vend_media` permission gets contents and a 403 on `select/core/media`.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** R4.
-- [ ] **Step 4: Run** the file, `Modules/Core/tests/Integration/Services/AclRoleScopedTest.php` and `Modules/Core/tests/Integration/Services/CrudSearchRehydrationAclTest.php`. Expected: PASS.
-- [ ] **Step 5: Commit** in `Modules/Core`: `feat(core): relation filters in ACLs`.
+- [x] **Step 1: Write the failing tests:** an ACL with a `RelationFilter` round-trips through the database; on a `list` it keeps only rows whose related record matches, for a `BelongsTo` (`ContentReference` → `content`) and a `MorphTo` (`Media` → `model` with `morph_types`); nested `@now` validity is resolved; in `search` the engine query carries no relation condition and rehydration drops non-matching hits; a role with a content ACL and no `vend_media` permission gets contents and a 403 on `select/core/media`.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** R4.
+- [x] **Step 4: Run** the file, `Modules/Core/tests/Integration/Services/AclRoleScopedTest.php` and `Modules/Core/tests/Integration/Services/CrudSearchRehydrationAclTest.php`. Expected: PASS.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(core): relation filters in ACLs`.
 
 ### Task 4: Related records in reading
 
