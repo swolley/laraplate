@@ -214,8 +214,8 @@ meant to work: read `AdvancedSearchService`, not this.
 - Modify: `Modules/Core/README.md` and `Modules/AI/README.md` for any new env var
 - Modify: `docs/superpowers/specs/2026-09-12-mcp-server-design.md` (the `search` tool passes `mode=deep`)
 
-- [ ] **Step 1:** Document the modes as a contract for callers: what each of `fast`, `balanced` and `deep` buys, that the default is `fast`, that degradation is normal and reported in `meta.search`, and that a client should read `mode_applied` rather than assume it got what it asked for.
-- [ ] **Step 2:** Update *Perimeters* in the AI module docs: search is still Core's, but AI now overlays exactly one contract instead of four, for `balanced` and `deep`.
+- [ ] **Step 1:** (Partly done 2026-10-09 in `SEARCH_RETRIEVAL_PIPELINE.md`, *Search modes*: the modes, degradation, `meta.search` and retries. Still open: the `mode` and `retry` HTTP parameters, the permission and the rate limit, which Task 5 introduces.) Document the modes as a contract for callers: what each of `fast`, `balanced` and `deep` buys, that the default is `fast`, that degradation is normal and reported in `meta.search`, and that a client should read `mode_applied` rather than assume it got what it asked for.
+- [x] **Step 2:** Update *Perimeters* in the AI module docs: search is still Core's, but AI now overlays exactly one contract instead of four, for `balanced` and `deep`.
 - [ ] **Step 3:** Add the `**Documented in:**` line to this plan naming those documents, per the AGENTS closed-plan rule, and a `## Delivery status (date)` section recording anything deliberately not built, in particular that `balanced` was added on 2026-10-09 and why.
 - [ ] **Step 4:** pint, commit in each submodule that changed.
 
