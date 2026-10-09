@@ -39,7 +39,7 @@ The contract-based overlay is the right mechanism: Core defines `ISearchPlanner`
 
 The caller declares how much it is willing to spend, per request. Configuration stops deciding *whether AI runs* and goes back to deciding *whether the capability exists at all*.
 
-- A `mode` parameter on search: `fast` (default) and `deep`.
+- A `mode` parameter on search: `fast` (default), `balanced` and `deep`.
 - Core resolves a **strategy** for the requested mode through one contract it owns. Its own resolver ignores the mode and always returns the cheap implementations.
 - AI replaces that single resolver, and nothing else. It stops overriding `ISearchPlanner`, `IReranker`, `IQueryIntentParser` and `ITextEmbedder` globally.
 - Anything that prevents the expensive path degrades to the cheap one and **says so in the response**. It never fails the search.
@@ -49,13 +49,14 @@ The caller declares how much it is willing to spend, per request. Configuration 
 | Mode | What the caller is accepting | Default |
 |---|---|---|
 | `fast` | no external call: lexical retrieval with Core's heuristics | yes |
+| `balanced` | one embedding call and nothing else: Core's heuristic planner and intent parser, plus the query vector, so lexical and semantic retrieval are fused; tens to a few hundred milliseconds once the embedding model is warm | no |
 | `deep` | LLM planning and intent parsing, embedding, cross-encoder reranking, optional retries; seconds, not milliseconds, and real money | no |
 
 Three rules about the naming, each of which has bitten somebody before:
 
 1. **The mode names the bargain, not the technology.** Not `mode=ai`. The day the expensive path stops using an LLM, or uses something else, `ai` is a lie and every client is pinned to it. `deep` describes what the caller gets and accepts; the implementation is free to change underneath.
 2. **`fast` is nameable, not just the absence of `deep`.** A client that wants the cheap path must be able to say so explicitly, rather than depending on what the default happens to be this year.
-3. **A string, not a boolean.** Measurement may well show that the two LLM calls dominate while the single embedding is cheap, in which case a middle tier belongs between the two: lexical plus vector, no LLM. A third value is additive and old clients ignore it. A boolean would have to be replaced.
+3. **A string, not a boolean.** Measurement showed that the two LLM calls dominate while the single embedding is cheap (see *Measurements*), so a middle tier sits between the two: lexical plus vector, no LLM. That is `balanced`, decided in this plan on 2026-10-09. A boolean would have had to be replaced; a third value is additive and old clients ignore it.
 
 `advanced` was considered and rejected as a name: in this codebase it already means something else (`AdvancedSearchService` is the service, in both modes), and two meanings for one word inside one perimeter is how documentation starts lying.
 
@@ -172,6 +173,26 @@ Instrument the four stages (intent parse, plan, vector, ensemble and rerank) and
 
 This is a gate on implementation, not on the decision: the strategy resolver is worth doing either way, because a global boolean deciding a per-request trade-off is wrong independently of the numbers.
 
+## Measurements
+
+**2026-10-09.** Search host: 14 logical CPUs, Elasticsearch, 186 CMS contents. Ollama on a separate CPU-only VMware test server with 1 vCPU (Intel Xeon Silver 4110 @ 2.10 GHz, AVX-512) and 3.9 GB of RAM (a throwaway machine, not the intended production host, so the LLM figures are an upper bound on latency, not a forecast), `llama3.2:3b` Q4_K_M (about 2 GB), `OLLAMA_API_URL` set for the process only. Three generic Italian natural-language queries, not derived from the contents. Each stage timed on its own through the AI classes directly, because the Core resolver already serves `fast` with the cheap components (the AI resolver is Task 3).
+
+| Stage | Cheap path (Core) | Deep path (AI) |
+|-------|-------------------|----------------|
+| intent parse | about 0.03 ms | 23 to 60 s per call; the first call of each query hit the client's 60 s timeout and fell back to the raw query |
+| plan | about 0.1 ms | 60 s on every query: a timeout, then the rule-based fallback |
+| query embedding | not run | 6.4 s cold (model load), 307 ms, then 78 ms warm |
+| ensemble, Elasticsearch, 1 strategy | about 30 to 35 ms warm, 40 to 146 ms cold | same engine call, plus 1 or 3 strategies with a vector |
+| reranker | off (`search.reranker.enabled` seeded false) | measured on 2026-10-05: no nDCG gain, about 5 s per search |
+
+Caveat: the queries returned no hits on this dataset, so the ensemble figures are the cost of an empty keyword search. Quality was not measured here; this is a latency measurement.
+
+**Decision.** The two LLM calls dominate by three orders of magnitude, and at 60 s a search is unusable as a synchronous request. The embedding is cheap once the model is loaded. So:
+
+- the design stands as written: the resolver is worth it, and `deep` must degrade on timeout, which today means after 60 s per call;
+- a third mode is justified by the numbers: `balanced`, lexical plus vector, no LLM, around 100 ms on top of `fast`. It keeps semantic matching available at a cost a request can afford, which `fast` gives up because Core has no `ITextEmbedder` default. **Decided on 2026-10-09: it is built in this plan.** Core's resolver cannot serve it (no embedder), so it answers `mode_unavailable`; the AI resolver serves it;
+- the planner should leave the synchronous path for `deep` regardless: a 60 s timeout, twice, before any result is a failure of the endpoint, not a slow search. The client timeout for these two calls needs a much lower cap, or a smaller model, before `deep` is offered to users.
+
 ## Consumers
 
 - **CRUD search** is the first, and gains `fast` as its default.
@@ -182,7 +203,7 @@ This is a gate on implementation, not on the decision: the strategy resolver is 
 
 In scope: the `mode` parameter down to the search path, `ISearchStrategyResolver` and `SearchStrategy` in Core, Core's resolver, AI's decorating resolver, removal of the four global overrides, the degradation contract and its meta, retries bounded by Settings, the rate limiter and permission, retirement of `IntelligentSearchAction` with its quality judgement salvaged.
 
-Out of scope: a third mode (recorded as the likely outcome of measurement, not as a commitment); a cache for deep results; changes to ranking parameters, which belong to `2026-09-15-measured-retrieval-tuning-l1-design.md`; the UI affordance; moving the planner out of the synchronous path, which measurement may justify separately.
+Out of scope: a cache for deep results; changes to ranking parameters, which belong to `2026-09-15-measured-retrieval-tuning-l1-design.md`; the UI affordance; moving the planner out of the synchronous path, which measurement may justify separately.
 
 ## Related
 

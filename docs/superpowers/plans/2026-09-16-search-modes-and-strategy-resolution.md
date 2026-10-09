@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development (or executing-plans). Steps use checkbox (`- [ ]`) tracking.
 
-**Goal:** Make the cost of a search a per-request decision by its caller instead of a global boolean decided at boot. `fast` is the default and executes Core's own cheap path; `deep` buys LLM planning, embedding, reranking and optional retries, and anything that prevents it degrades to `fast` with a stated reason rather than failing.
+**Goal:** Make the cost of a search a per-request decision by its caller instead of a global boolean decided at boot. `fast` is the default and executes Core's own cheap path; `balanced` adds the query embedding and nothing else; `deep` buys LLM planning, embedding, reranking and optional retries. Anything that prevents the requested mode degrades to the next cheaper one that works, with a stated reason, rather than failing.
 
 **Architecture:** Core gains `ISearchStrategyResolver` and a `SearchStrategy` value object, plus a resolver that ignores the mode and always returns its cheap implementations. AI replaces that one resolver and stops overriding `ISearchPlanner`, `IReranker`, `IQueryIntentParser` and `ITextEmbedder` globally. `AdvancedSearchService` takes the resolver rather than the components and asks per call.
 
@@ -42,9 +42,12 @@
     |      |                                        |        |       | on         | warm median of 10 | |   |           |                         |          |
     |      |                                        |        |       | off        | cold |          |         | null      |                         |          |
     |      |                                        |        |       | off        | warm median of 10 | |   | null      |                         |          |
-- [ ] **Step 2:** Run `php artisan perf:crud` for a representative entity with the AI overlay on and off, and `php artisan perf:profile` on a search endpoint. Record the four numbers and the totals in the spec, under a new *Measurements* section with the date and the machine.
-- [ ] **Step 3:** Decide from the numbers and write the decision in the spec:
+- [x] **Step 2:** Run `php artisan perf:crud` for a representative entity with the AI overlay on and off, and `php artisan perf:profile` on a search endpoint. Record the four numbers and the totals in the spec, under a new *Measurements* section with the date and the machine.
+  - **Done 2026-10-09:** measured stage by stage and recorded in the spec, *Measurements*. `perf:crud` was not run: it does not exercise search. The first attempt below ran without an LLM and was discarded.
+  - **First attempt, discarded:** the tinker loop ran, but `OLLAMA_API_URL` is empty here, so planner and intent parser fell back to rules (intent about 6 ms, plan about 7 to 13 ms) and no embedder was bound (`vector_ms` null). Overlay on vs off differed only by about 10 ms warm, which says nothing about the LLM cost. Redo with a reachable Ollama.
+- [x] **Step 3:** Decide from the numbers and write the decision in the spec:
   - if the cross-encoder dominates, evaluate a score cache first; it may recover most of the latency with none of this restructuring, in which case the rest of this plan is still worth doing but stops being urgent;
+  - **Outcome (2026-10-09):** the LLM calls dominate (23 to 60 s each, timeouts at 60 s); the embedding is about 80 ms warm. Continue as planned, and a `balanced` mode is justified. Building it now or later is for the user to decide.
   - if the two LLM calls dominate, continue as planned, and record whether a third `balanced` mode (lexical plus vector, no LLM) should be built now rather than later, since that is what keeps semantic matching on the default path.
 
 ---
@@ -59,19 +62,19 @@
 - Modify: `Modules/Core/app/Providers/SearchServiceProvider.php`
 - Test: `Modules/Core/tests/Unit/Search/CoreSearchStrategyResolverTest.php`
 
-- [ ] **Step 1: `SearchMode`** — a backed string enum, `Fast = 'fast'` and `Deep = 'deep'`, with `tryFrom()` used at the HTTP boundary so an unknown value degrades to `Fast` rather than throwing. An enum rather than a bare string so a third mode is added in one place.
+- [x] **Step 1: `SearchMode`** — a backed string enum, `Fast = 'fast'`, `Balanced = 'balanced'` and `Deep = 'deep'`, with `tryFrom()` used at the HTTP boundary so an unknown value degrades to `Fast` rather than throwing. An enum rather than a bare string so a further mode is added in one place. `Balanced` was added on 2026-10-09 after the Task 0 numbers.
 
-- [ ] **Step 2: `SearchStrategy`** — `final readonly`, holding `applied_mode`, `planner`, `reranker`, `intent_parser`, nullable `embedder`, `max_retries`, nullable `degraded_reason`. One object, so an incoherent mixture cannot be constructed by accident, and so the caller has everything it needs to fill the response meta.
+- [x] **Step 2: `SearchStrategy`** — `final readonly`, holding `applied_mode`, `planner`, `reranker`, `intent_parser`, nullable `embedder`, `max_retries`, nullable `degraded_reason`. One object, so an incoherent mixture cannot be constructed by accident, and so the caller has everything it needs to fill the response meta.
 
-- [ ] **Step 3: `ISearchStrategyResolver`** — one method, `resolve(SearchMode $mode): SearchStrategy`.
+- [x] **Step 3: `ISearchStrategyResolver`** — one method, `resolve(SearchMode $mode): SearchStrategy`.
 
-- [ ] **Step 4: `CoreSearchStrategyResolver`** — takes Core's three implementations, returns them whatever it is asked for, `embedder: null`, `max_retries: 0`, and `degraded_reason: null` for `Fast` or `'mode_unavailable'` for anything else. Add a comment saying the mode is ignored deliberately: the next reader will otherwise assume it is a stub.
+- [x] **Step 4: `CoreSearchStrategyResolver`** — takes Core's three implementations, returns them whatever it is asked for, `embedder: null`, `max_retries: 0`, and `degraded_reason: null` for `Fast` or `'mode_unavailable'` for anything else. Add a comment saying the mode is ignored deliberately: the next reader will otherwise assume it is a stub.
 
-- [ ] **Step 5: Register** with `singletonIf` alongside the existing three, so a module may substitute it.
+- [x] **Step 5: Register** with `singletonIf` alongside the existing three, so a module may substitute it.
 
-- [ ] **Step 6: Test** — asked for `Deep` with no AI installed, it returns Core's implementations, `applied_mode` `fast`, and `mode_unavailable`; asked for `Fast`, the same components and no reason.
+- [x] **Step 6: Test** — asked for `Deep` with no AI installed, it returns Core's implementations, `applied_mode` `fast`, and `mode_unavailable`; asked for `Fast`, the same components and no reason.
 
-- [ ] **Step 7:** run the test (PASS), pint, commit in `Modules/Core`: `feat(search): strategy resolver contract with a cheap default`.
+- [x] **Step 7:** run the test (PASS), pint, commit in `Modules/Core`: `feat(search): strategy resolver contract with a cheap default`.
 
 ---
 
@@ -79,18 +82,19 @@
 
 **Files:**
 - Modify: `Modules/Core/app/Search/Services/AdvancedSearchService.php`
+- Modify: `Modules/Core/app/Search/Services/EnsembleSearchService.php` (`search()` takes the reranker per call; the constructor one stays as default)
 - Modify: `Modules/Core/app/Search/DTOs/AdvancedSearchResult.php` (meta)
 - Test: `Modules/Core/tests/Unit/Search/AdvancedSearchServiceModeTest.php`
 
 **This is the substantive refactor.** The parameter is the easy half: what matters is that the service stops receiving `ISearchPlanner`, `IReranker`, `IQueryIntentParser` and `ITextEmbedder` in its constructor. While it does, the expensive implementations are wired in before any request parameter can be read, and no per-request decision is possible.
 
-- [ ] **Step 1: Test first** — with a resolver double returning a cheap strategy for `Fast` and an expensive one for `Deep`, assert that `search(..., mode: Fast)` never touches the expensive doubles, and that the result meta carries `mode_requested`, `mode_applied`, `degraded_reason` and `retries_used`. The first assertion is the whole point of the task: write it and watch it fail.
+- [x] **Step 1: Test first** — with a resolver double returning a cheap strategy for `Fast` and an expensive one for `Deep`, assert that `search(..., mode: Fast)` never touches the expensive doubles, and that the result meta carries `mode_requested`, `mode_applied`, `degraded_reason` and `retries_used`. The first assertion is the whole point of the task: write it and watch it fail.
 
-- [ ] **Step 2: Implement.** Constructor takes `ISearchStrategyResolver`. `search()` gains `SearchMode $mode = SearchMode::Fast` and `?int $retries = null`, resolves the strategy first, and uses `$strategy->planner`, `$strategy->intent_parser`, `$strategy->reranker` and `$strategy->embedder` from there. When `$strategy->embedder` is null, skip the vector stage entirely rather than passing a null vector down.
+- [x] **Step 2: Implement.** (Done 2026-10-09; `$retries` is deferred to Task 4, where it first has an effect. `meta['search']` is set by `AdvancedSearchService`, `AdvancedSearchResult` is unchanged.) Constructor takes `ISearchStrategyResolver`. `search()` gains `SearchMode $mode = SearchMode::Fast` and `?int $retries = null`, resolves the strategy first, and uses `$strategy->planner`, `$strategy->intent_parser`, `$strategy->reranker` and `$strategy->embedder` from there. When `$strategy->embedder` is null, skip the vector stage entirely rather than passing a null vector down.
 
-- [ ] **Step 3: Meta.** `AdvancedSearchResult` carries a `search` meta block with the four keys from the spec. It is populated on every path, including the unsupported-driver early return, so a client never has to guess.
+- [x] **Step 3: Meta.** `AdvancedSearchResult` carries a `search` meta block with the four keys from the spec. It is populated on every path, including the unsupported-driver early return, so a client never has to guess.
 
-- [ ] **Step 4:** run the tests (PASS), pint, commit in `Modules/Core`: `feat(search): resolve the search strategy per request`.
+- [x] **Step 4:** run the tests (PASS), pint, commit in `Modules/Core`: `feat(search): resolve the search strategy per request`.
 
 ---
 
@@ -102,13 +106,13 @@
 - Modify: `Modules/AI/app/Services/CrossEncoderService.php`, `Modules/AI/app/Services/SearchEmbedder.php`
 - Test: `Modules/AI/tests/Integration/AiSearchStrategyResolverTest.php`
 
-- [ ] **Step 1: The decorator.** `AiSearchStrategyResolver` takes `CoreSearchStrategyResolver` as its fallback and delegates to it for anything that is not `Deep`, and for `Deep` when `ai_config_bool('ai.features.search_orchestration.enabled', true)` is false, with `degraded_reason: 'search_orchestration_disabled'`. Only for an enabled `Deep` does it build the expensive set.
+- [ ] **Step 1: The decorator.** `AiSearchStrategyResolver` takes `CoreSearchStrategyResolver` as its fallback and delegates to it for anything that is not `Deep`, and for `Deep` when `ai_config_bool('ai.features.search_orchestration.enabled', true)` is false, with `degraded_reason: 'search_orchestration_disabled'`. `Balanced` takes Core's planner, intent parser and reranker plus the bound query embedder, `applied_mode: balanced`; if the embedder cannot be built it degrades to `Fast` with `embedder_unavailable`. Only for an enabled `Deep` does it build the expensive set.
 
 - [ ] **Step 2: Remove the four overrides** from `registerSearchBindings()` and register the resolver instead: `singleton(ISearchStrategyResolver::class, AiSearchStrategyResolver::class)`. **This is the line that stops every CRUD search paying for AI.** The expensive classes stay bound by their own names so the resolver can build them; what goes away is their substitution for the Core contracts.
 
 - [ ] **Step 3: Runtime degradation.** `ISearchPlanner::safePlan()` is already named for not exploding. Give the reranker and the embedder the same property: on transport failure, timeout or a non-2xx from the cross-encoder microservice, fall back to the cheap behaviour (identity ordering for the reranker, no vector for the embedder) and surface a reason rather than throwing. `AdvancedSearchService` must not learn that language models exist in order to defend itself against them.
 
-- [ ] **Step 4: Test** — `Fast` with AI installed returns Core's components, and asserts that the AI doubles were never constructed; `Deep` with the switch off degrades with the right reason; `Deep` with a cross-encoder that throws still returns results, with `degraded_reason` set.
+- [ ] **Step 4: Test** — `Balanced` embeds and never calls an LLM; `Balanced` with an embedder that throws degrades to `Fast`; `Fast` with AI installed returns Core's components, and asserts that the AI doubles were never constructed; `Deep` with the switch off degrades with the right reason; `Deep` with a cross-encoder that throws still returns results, with `degraded_reason` set.
 
 - [ ] **Step 5:** run the tests (PASS), pint, commit in `Modules/AI`: `feat(ai): overlay search through one strategy resolver`.
 
@@ -188,11 +192,11 @@ meant to work: read `AdvancedSearchService`, not this.
 - Modify: `Modules/Core/app/Providers/RouteServiceProvider.php` (named rate limiter)
 - Test: `Modules/Core/tests/Feature/Search/SearchModeRequestTest.php`
 
-- [ ] **Step 1: Parameters.** `mode` validated through `SearchMode::tryFrom()`, defaulting to `Fast` when absent or unknown. `retry` an integer, clamped to the maximum held in Settings, `0` when absent. Both travel to `AdvancedSearchService` as **explicit named parameters**, not inside an options bag: a value that changes latency and cost by an order of magnitude should be visible in every signature it passes through.
+- [ ] **Step 1: Parameters.** `mode` validated through `SearchMode::tryFrom()` (`fast`, `balanced`, `deep`), defaulting to `Fast` when absent or unknown. `retry` an integer, clamped to the maximum held in Settings, `0` when absent. Both travel to `AdvancedSearchService` as **explicit named parameters**, not inside an options bag: a value that changes latency and cost by an order of magnitude should be visible in every signature it passes through.
 
 - [ ] **Step 2: The cap in Settings.** A Core setting for the maximum retries, read at request time, so an operator can lower it without a deploy. Config would need a release; this is exactly what the Settings table is for.
 
-- [ ] **Step 3: Permission.** `Deep` requires a permission, following the existing permission conventions and seeded like the others. A caller without it gets `Fast` and `degraded_reason: 'not_authorized'` — **not** a 403. Whether the caller may spend money is not an error condition for the caller to handle, and the degradation path already exists.
+- [ ] **Step 3: Permission.** `Deep` requires a permission; `Balanced` costs no money and needs none, only the rate limiter of Step 4 if it proves necessary. `Deep` requires a permission, following the existing permission conventions and seeded like the others. A caller without it gets `Fast` and `degraded_reason: 'not_authorized'` — **not** a 403. Whether the caller may spend money is not an error condition for the caller to handle, and the degradation path already exists.
 
 - [ ] **Step 4: Rate limiter.** A named limiter keyed on the **user**, applied to deep searches specifically and tighter than ordinary reads. Per user rather than per route, because the cost follows the person. Exceeding it degrades to `Fast` with a reason, on the same path as everything else.
 
@@ -210,9 +214,9 @@ meant to work: read `AdvancedSearchService`, not this.
 - Modify: `Modules/Core/README.md` and `Modules/AI/README.md` for any new env var
 - Modify: `docs/superpowers/specs/2026-09-12-mcp-server-design.md` (the `search` tool passes `mode=deep`)
 
-- [ ] **Step 1:** Document the modes as a contract for callers: what each buys, that the default is `fast`, that degradation is normal and reported in `meta.search`, and that a client should read `mode_applied` rather than assume it got what it asked for.
-- [ ] **Step 2:** Update *Perimeters* in the AI module docs: search is still Core's, but AI now overlays exactly one contract instead of four, and only for `deep`.
-- [ ] **Step 3:** Add the `**Documented in:**` line to this plan naming those documents, per the AGENTS closed-plan rule, and a `## Delivery status (date)` section recording anything deliberately not built, in particular whether a third mode was added.
+- [ ] **Step 1:** Document the modes as a contract for callers: what each of `fast`, `balanced` and `deep` buys, that the default is `fast`, that degradation is normal and reported in `meta.search`, and that a client should read `mode_applied` rather than assume it got what it asked for.
+- [ ] **Step 2:** Update *Perimeters* in the AI module docs: search is still Core's, but AI now overlays exactly one contract instead of four, for `balanced` and `deep`.
+- [ ] **Step 3:** Add the `**Documented in:**` line to this plan naming those documents, per the AGENTS closed-plan rule, and a `## Delivery status (date)` section recording anything deliberately not built, in particular that `balanced` was added on 2026-10-09 and why.
 - [ ] **Step 4:** pint, commit in each submodule that changed.
 
 ---
@@ -223,9 +227,9 @@ meant to work: read `AdvancedSearchService`, not this.
 - [ ] `vendor/bin/pint --dirty --format agent` clean in both submodules.
 
 ## Out of scope (per spec)
-A third `balanced` mode unless Task 0 says to build it now; a cache for deep results; ranking parameter tuning, which belongs to the L1 design; the UI affordance, which is `laraplate-ui`; moving the planner off the synchronous path.
+A cache for deep results; ranking parameter tuning, which belongs to the L1 design; the UI affordance, which is `laraplate-ui`; moving the planner off the synchronous path.
 
 ## Notes for the executor
 - The single most valuable line in this plan is removing the four overrides in `registerSearchBindings()`. Everything else exists to make that removal safe rather than a feature regression.
-- `fast` loses the vector stage, because `ITextEmbedder` has no Core default. That is a relevance regression on ordinary search, not only a latency win, and it is the reason Task 0 exists and the reason `mode` is a string rather than a boolean.
+- `fast` loses the vector stage, because `ITextEmbedder` has no Core default. That is a relevance regression on ordinary search, not only a latency win, and it is the reason Task 0 exists, the reason `mode` is a string rather than a boolean, and the reason `balanced` exists.
 - If you find yourself writing `if ($module_ai_installed)` anywhere in Core, stop: the container already answers that question, and answering it again in Core is the design error this plan removes.
