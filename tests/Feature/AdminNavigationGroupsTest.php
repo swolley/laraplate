@@ -42,14 +42,31 @@ it('declares every navigation group used by the panel', function (): void {
     expect($undeclared)->toBeEmpty();
 });
 
-it('orders the navigation groups with Health, Documentation and Core first', function (): void {
-    $declared = declaredAdminNavigationGroups();
+/**
+ * The module a group belongs to: the part of its label before " - " ("ERP - Sales" is ERP), or the
+ * whole label for a module's own group ("MES").
+ */
+function navigationGroupModule(string $label): string
+{
+    return explode(' - ', $label, 2)[0];
+}
 
-    expect(array_slice($declared, 0, 3))->toBe(['Health', 'Documentation', 'Core']);
+it('puts Health, Documentation and Core first', function (): void {
+    expect(array_slice(declaredAdminNavigationGroups(), 0, 3))->toBe(['Health', 'Documentation', 'Core']);
+});
 
-    $modules = array_slice($declared, 3);
-    $sorted = $modules;
+it('orders the modules alphabetically and keeps the groups of a module together', function (): void {
+    $modules = array_map(navigationGroupModule(...), array_slice(declaredAdminNavigationGroups(), 3));
+
+    // Consecutive groups of one module collapse into one entry; a module listed twice is split.
+    $sequence = array_values(array_filter(
+        $modules,
+        static fn (string $module, int $position): bool => $position === 0 || $module !== $modules[$position - 1],
+        ARRAY_FILTER_USE_BOTH,
+    ));
+    $sorted = array_values(array_unique($sequence));
     usort($sorted, static fn (string $a, string $b): int => strcasecmp($a, $b));
 
-    expect($modules)->toBe($sorted);
+    // Within a module the order is the module's own: its process, not the alphabet.
+    expect($sequence)->toBe($sorted);
 });
