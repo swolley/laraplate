@@ -130,11 +130,11 @@
 - Consumes: Tasks 1 and 3.
 - Produces: `RelationAuthorizer::authorize(Request $request, Relation $relation): void` (throws `AuthorizationException`, applies the related ACL to the relation query, no-op for `IsPartOfParent`); `RelationAuthorizer::hiddenCount(Request $request, Model $parent, string $relation): int`; `ResponseBuilder::setRelationsMeta(array<string, array{hidden: int}> $relations): self`.
 
-- [ ] **Step 1: Write the failing tests:** a user with `cms_contents.select` and no `users.select` asking `relations=contributors.user` → 403, and with `columns[]=user.email` → 403; with `users.select` and an ACL limiting users, the loaded relation holds only the allowed rows, in `list`, `detail` and `search`; a part of the parent (a content translation model) loads without its own permission; search honours the relation black list (`relations=history` is dropped); `detail` returns `meta.relations.media.hidden` equal to the number of filtered media; `cover` is `null` for a caller without `vend_media.select`; an admin of the seeded roles reading a content with media and contributors through `/app` sees them.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement** R5, R6, R7; mark the R5 models.
-- [ ] **Step 4: Run** the file and the Core and CMS `Feature/Api`, `Feature/Controllers` and `Integration/Services` folders. Expected: PASS; a default role that lost a relation gets the related permission in its seeder in this task.
-- [ ] **Step 5: Commit** in `Modules/Core` and each module whose models implement the contract: `feat(core): related records obey their own permission and ACL`.
+- [x] **Step 1: Write the failing tests:** a user with `cms_contents.select` and no `users.select` asking `relations=contributors.user` → 403, and with `columns[]=user.email` → 403; with `users.select` and an ACL limiting users, the loaded relation holds only the allowed rows, in `list`, `detail` and `search`; a part of the parent (a content translation model) loads without its own permission; search honours the relation black list (`relations=history` is dropped); `detail` returns `meta.relations.media.hidden` equal to the number of filtered media; `cover` is `null` for a caller without `vend_media.select`; an admin of the seeded roles reading a content with media and contributors through `/app` sees them.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement** R5, R6, R7; mark the R5 models.
+- [x] **Step 4: Run** the file and the Core and CMS `Feature/Api`, `Feature/Controllers` and `Integration/Services` folders. Expected: PASS; a default role that lost a relation gets the related permission in its seeder in this task.
+- [x] **Step 5: Commit** in `Modules/Core` and each module whose models implement the contract: `feat(core): related records obey their own permission and ACL`.
 
 ### Task 5: Scoped sync in writing
 
