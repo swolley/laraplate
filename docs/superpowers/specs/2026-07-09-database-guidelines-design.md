@@ -1,5 +1,7 @@
 # Database Guidelines
 
+**Plan:** not required (reference document: rules live in `.cursor/rules/09-database-guidelines.mdc`)
+
 Design reference for migrations, queries, and indexes in Laraplate with **multi-database compatibility** as a first-class requirement.
 
 ## Supported databases

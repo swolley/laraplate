@@ -546,12 +546,14 @@ final class SpecScanner
                         continue;
                     }
 
-                    // Three distinct situations, and conflating them hides real work:
-                    // a plan cites the spec; a plan exists for the same subject but
-                    // never names it; no plan exists at all.
+                    // Four distinct situations, and conflating them hides real work:
+                    // the spec declares it needs no plan (a reference document); a plan
+                    // cites the spec; a plan exists for the same subject but never names
+                    // it; no plan exists at all.
                     $cited = str_contains($plan_blob, $name);
                     $sibling = $cited ? null : $this->siblingPlan($name, $plan_names);
                     $state = match (true) {
+                        $this->isReferenceOnly($file) => 'reference',
                         $cited => 'planned',
                         $sibling !== null => 'plan_uncited',
                         default => 'unplanned',
@@ -563,7 +565,7 @@ final class SpecScanner
                         'file' => $name,
                         'path' => $this->workspace->relative($file),
                         'title' => $this->title($file),
-                        'has_plan' => $state !== 'unplanned',
+                        'has_plan' => ! in_array($state, ['unplanned', 'reference'], true),
                         'sibling_plan' => $sibling,
                         'state' => $state,
                     ];
@@ -574,6 +576,41 @@ final class SpecScanner
         usort($specs, static fn (array $a, array $b): int => [$a['repo'], $a['file']] <=> [$b['repo'], $b['file']]);
 
         return $specs;
+    }
+
+    /**
+     * A spec that is a reference document, a decision log or a review ledger has nothing
+     * to implement. It says so in its first lines with `**Plan:** not required` (a
+     * leading bullet and no bold are accepted), which keeps it out of the unplanned list.
+     * A spec deferred or still waiting for a plan must not carry the marker.
+     */
+    private function isReferenceOnly(string $file): bool
+    {
+        $handle = fopen($file, 'r');
+
+        if ($handle === false) {
+            return false;
+        }
+
+        $found = false;
+
+        for ($i = 0; $i < 30; $i++) {
+            $line = fgets($handle);
+
+            if ($line === false) {
+                break;
+            }
+
+            if (preg_match('/^\s*(?:[-*]\s+)?(?:\*\*)?Plan:?(?:\*\*)?:?\s*not required\b/i', $line) === 1) {
+                $found = true;
+
+                break;
+            }
+        }
+
+        fclose($handle);
+
+        return $found;
     }
 
     /**
@@ -780,6 +817,7 @@ final class Renderer
         'planned' => 'PLANNED',
         'unplanned' => 'NO PLAN',
         'plan_uncited' => 'UNCITED',
+        'reference' => 'REFERENCE',
     ];
 
     private const COLOR = [
@@ -792,6 +830,7 @@ final class Renderer
         'planned' => "\033[90m",
         'unplanned' => "\033[35m",
         'plan_uncited' => "\033[33m",
+        'reference' => "\033[90m",
     ];
 
     public function __construct(
@@ -996,7 +1035,7 @@ final class Renderer
         }
 
         foreach ($report['specs'] as $spec) {
-            if (($spec['state'] ?? '') === 'planned') {
+            if (in_array($spec['state'] ?? '', ['planned', 'reference'], true)) {
                 continue;
             }
 
@@ -1435,6 +1474,7 @@ $totals = [
     'stale_tasks' => $stale_tasks,
     'inconsistent_plans' => $inconsistent_plans,
     'specs_unplanned' => count(array_filter($specs, static fn (array $s): bool => $s['state'] === 'unplanned')),
+    'specs_reference' => count(array_filter($specs, static fn (array $s): bool => $s['state'] === 'reference')),
     'specs_plan_uncited' => count(array_filter($specs, static fn (array $s): bool => $s['state'] === 'plan_uncited')),
     'todos' => count($todos),
 ];

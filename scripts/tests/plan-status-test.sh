@@ -162,6 +162,18 @@ test_an_exact_name_wins_over_a_substring_of_another_repository() {
     assert_output_lacks "2026-01-01-extras-plan.md"
 }
 
+test_a_spec_declaring_no_plan_is_not_listed_as_unplanned() {
+    local ws="$WORK_DIR/${FUNCNAME[0]}"
+    make_plan "$ws/docs/superpowers/plans/2026-01-01-some-plan.md" "Some plan"
+    mkdir -p "$ws/docs/superpowers/specs"
+    printf '# Reference spec\n\n**Plan:** not required (reference document)\n' > "$ws/docs/superpowers/specs/2026-01-01-reference-design.md"
+    printf '# Pending spec\n\nNo marker here.\n' > "$ws/docs/superpowers/specs/2026-01-02-pending-design.md"
+    run_plan_status "$ws" --no-evidence
+    assert_status 0
+    assert_output_contains "Pending spec"
+    assert_output_lacks "Reference spec"
+}
+
 test_a_missing_root_is_reported() {
     run_plan_status "$WORK_DIR/does-not-exist" --repos
     assert_status 1
