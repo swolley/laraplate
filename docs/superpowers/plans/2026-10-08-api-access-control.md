@@ -145,11 +145,11 @@
 **Interfaces:**
 - Consumes: `RelationAuthorizer` (Task 4).
 
-- [ ] **Step 1: Write the failing tests:** a record with related ids {1, 2, 3} where the writer's ACL hides 3; updating with {1} detaches 2 and keeps 3; updating with {1, 2, 4} where 4 is hidden → 403 and nothing changes; a `HasMany` relation behaves the same; a part of the parent syncs as today.
-- [ ] **Step 2: Run** the file. Expected: FAIL.
-- [ ] **Step 3: Implement:** compute the visible subset of current related ids with the related ACL, diff the submitted ids against it, refuse submitted ids outside the readable set.
-- [ ] **Step 4: Run** the file and the Core `Feature/Api` folder. Expected: PASS.
-- [ ] **Step 5: Commit** in `Modules/Core`: `feat(core): relation sync works only within what the writer can read`.
+- [x] **Step 1: Write the failing tests:** a record with related ids {1, 2, 3} where the writer's ACL hides 3; updating with {1} detaches 2 and keeps 3; updating with {1, 2, 4} where 4 is hidden → 403 and nothing changes; a `HasMany` relation behaves the same; a part of the parent syncs as today.
+- [x] **Step 2: Run** the file. Expected: FAIL.
+- [x] **Step 3: Implement:** compute the visible subset of current related ids with the related ACL, diff the submitted ids against it, refuse submitted ids outside the readable set.
+- [x] **Step 4: Run** the file and the Core `Feature/Api` folder. Expected: PASS.
+- [x] **Step 5: Commit** in `Modules/Core`: `feat(core): relation sync works only within what the writer can read`.
 
 ### Task 6: Default roles and public ACLs
 
