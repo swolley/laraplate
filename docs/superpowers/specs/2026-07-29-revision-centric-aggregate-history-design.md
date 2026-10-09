@@ -242,7 +242,7 @@ Each version row carries:
 
 Membership entries are version rows, normalized, so reverse lookup and retention reachability use indexed columns. Descriptor-defined stable keys and pivot state stay in the JSON of `subject_key` and `contents`.
 
-Translations are not stored as rows of their own history. The state of an owner's translations is carried by the owner's revision, with the same weight as the owner: a difference when the owner uses `DIFF`, in full when it uses `SNAPSHOT` (D10, D11). The exact representation is design still to produce.
+Translations are not stored as rows of their own history. The state of an owner's translations is carried by the owner's revision, with the same weight as the owner: a difference when the owner uses `DIFF`, in full when it uses `SNAPSHOT` (D10, D11). The state of the translations is carried by one row per changed locale, on the owner, with `relation_path = 'translations'` and `subject_key = {locale}`, in the same set as the owner's own row (see "Translations" under "Capture flows", D28).
 
 The hard-delete snapshot, the compaction rewrite and the forced snapshot at the first save are `SNAPSHOT` rows; a creation row is one too.
 
@@ -299,7 +299,7 @@ A recovery of a hard-deleted record does not bring back comments, ratings or med
 1. Enter an aggregate revision scope before the first supported business query.
 2. Open or join the local database transaction.
 3. Validate the concurrency token relevant to the operation (D23).
-4. Apply scalar, owned-part and relation mutations; the writes of one logical operation join the same scope (design to produce, D10).
+4. Apply scalar, owned-part and relation mutations; the writes of one logical operation join the same scope (D28).
 5. Exit without a revision when no authoritative state changed.
 6. Otherwise allocate one revision and persist the version rows and the membership rows.
 7. Associate them with the active version set when an explicit logical operation exists.
@@ -313,6 +313,16 @@ An observer may still record scalar audit history after an unwrapped Eloquent wr
 
 The paths that lack the scope today are the Filament saves, `CrudService::insert`, and the save of a root together with its translations (`savePendingTranslations` runs on `saved`, after the root).
 
+### Translations (D28)
+
+- **Where they arrive.** `setTranslation()` writes at once with `update()` or `create()`; the attribute setters go to `pending_translations` and `savePendingTranslations()` writes them on the root's `saved` event with the same calls. Both end in events of the translation model.
+- **Representation.** One version row per changed locale, on the owner, with `relation_path = 'translations'` and `subject_key = {locale}`, in the same set as the owner's own row. `change_type` is the event of the translation; `contents` is the difference of the fields, or the complete image for a snapshot. Reconstruction (C08) and compaction run per `(relation_path, subject_key)`; a locale whose last row up to R is `deleted` does not exist in R.
+- **The hook.** An observer on the translation models (`ITranslated`, owner found with `parentRelation()`) writes the row on the owner when a translation is created, updated or deleted, and raises the owner's `lock_version` once per revision. Translation models are not versioned on their own: `getVersionStrategy()` returns `false` for them and the seeder creates no setting for them.
+- **The scope.** `save()` and `delete()` of the base model open the revision scope before `saving` and close it after every `saved` handler, only for versioned roots that have a translation or a registered relation. The root, its pending translations and their rows are one set and one transaction. Without it, `VersionWriter` would open a set per row.
+- **Explicit grouping.** `withinRevision(fn)` groups several writes in one revision (importers, any loop over locales).
+- **Async translation.** `TranslateModelJob` is a revision of its own, with a system actor and `reason = "ai-translation"`.
+- **Cases.** The root and its initial translations share the creation set, so the creation anchor is complete. A hard delete snapshots every locale from the live table before the cascade. A translation-only change gives a set made only of translation rows; whether it must touch the root's `updated_at` for caches and search is not decided.
+
 ### Switching versioning off and on
 
 Switching versioning off for a table deletes its history, after an explicit confirmation that names what is lost. The hard-delete snapshots of that table are kept until their own expiry. Switching it on forces a complete snapshot at each record's first save, taken after that save; until then `currentRevision()` is `null` (D22).
@@ -324,7 +334,7 @@ The recommended approach does not require every application caller to open a tra
 - Core's base model persistence boundary opens or joins a revision scope before SQL for registered aggregate roots;
 - version-aware `BelongsToMany` and `MorphToMany` adapters wrap complete public mutations such as `attach()`, `detach()`, `sync()` and `updateExistingPivot()`;
 - Core Pivot and MorphPivot bases join the descriptor-owned active scope;
-- translation writes join the scope of their owner (design to produce);
+- translation writes join the scope of their owner through an observer on the translation models (D28);
 - a hard-delete coordinator owns every force delete: it writes the full snapshot first, removes the history and the root in one transaction, and handles the draining of links (D17). `ClearExpiredModels` stops deleting at builder level without a snapshot; deleting in chunks is acceptable;
 - query-builder bulk mutations, `saveQuietly()` and uncoordinated cascades are `best_effort` by definition for registered aggregates;
 - Core does not claim to detect arbitrary SQL issued by an operator or an external process with direct database access.
@@ -449,13 +459,15 @@ No existing migration or commit is reverted until this draft is approved and a r
 
 ## Design still to produce
 
-1. **The hook that creates the owner's version when only a translation changes, and the grouping of the writes of one logical operation into one revision** (for example a machine translation of several locales, or a root saved with its translations). Mandatory (D10): without it, translations without a history of their own are not complete.
-2. The aggregate revision scope on the paths that lack it: Filament saves, `CrudService::insert`, the root together with its translations.
+1. Verify with a targeted test that wrapping `save()` and `delete()` of the base model is acceptable for performance and regressions, before adopting it (D28).
+2. The callers that write several locales in a loop (importers, the generic CRUD update) adopt `withinRevision` (D28).
 3. The hard-delete coordinator and the reworked `ClearExpiredModels`.
 4. The epoch fingerprint and its detection at the end of a migration.
 5. The scoped revert context that suppresses automatic translation.
-6. How the state of the translations is represented inside the owner's version rows.
-7. Which pivot attributes are authoritative for each CMS relation.
+6. Which pivot attributes are authoritative for each CMS relation.
+7. Whether a translation-only change must touch the root's `updated_at` (caches, search).
+
+Designed in D28 and no longer open: the hook for translation changes, the grouping of the writes of one operation, and the representation of the translations.
 
 ## Required tests for an approved design
 
@@ -479,6 +491,9 @@ No existing migration or commit is reverted until this draft is approved and a r
 - switching versioning off deletes the history and keeps the hard-delete snapshots; the first save afterwards writes a complete snapshot and `currentRevision()` is `null` before it;
 - a hard delete writes the snapshot, removes the history and the root atomically, leaves no orphan `RecordOrigin` row, and a recovery recreates the aggregate;
 - `lock_version` increments on a translation write and not on a relation change;
+- a root saved with its pending translations gives one set and one transaction, and a translation-only change gives a set of translation rows only;
+- a machine translation of several locales in `TranslateModelJob` is one revision with a system actor, separate from the user's;
+- translation models have no version setting and write no version row of their own;
 - a revert does not trigger automatic translation and does fire indexing and re-embedding;
 - `history` and `revert` are checked, and the history is not reachable without the root's ACL;
 - the sequence-gap check works without `withTrashed()`;
