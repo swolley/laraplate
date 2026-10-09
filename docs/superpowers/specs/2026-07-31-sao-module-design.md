@@ -498,6 +498,24 @@ behaviour is specified here beyond the invariant below, because the useful quest
 asking a model, what evidence it needs, where it earns its cost — can only be answered once the
 deterministic layers exist and have run.
 
+*Note 2026-10-09: input for the phase 8 brainstorming, not a decision. Since Jev (TypeSafe,
+2026-09-15) a family of open "System One" decision models answers typed questions (yes/no, choice,
+ordinal score) over a text state, returning a probability per option and generating no text. That
+output fits the invariant below better than prose: it can be thresholded, audited and shown as a
+proposal. Candidate uses, all proposals on the triage dock: duplicate detection (an embedding
+shortlist, then one choice among the candidates plus "none") and classification of type, priority
+and project labels. Out of scope: closure (§9, D8) and ownership ranking (D14). Most open servers
+speak TypeSafe's `/v1/systemone` request shape, so a generic decision contract in the AI module, not
+in SAO, would keep the backend swappable. First candidate: Laya multilingual (Convai, Apache-2.0 code
+and weights, an encoder of about 320M parameters that runs on CPU, 100+ languages including Italian;
+its README says base checkpoints need domain adaptation). Challenger: AWS Strands Decider 2B
+(Apache-2.0 according to a third-party comparison, to verify). Baseline to beat: a SetFit classifier
+trained on the project's own tickets, which needs no extra service. GPU-bound models (rizzo-flow and
+SemIf at 4B, CLM-8B by Stanford and NVIDIA researchers, kev, Cloudflare Clef) stay optional backends
+for installs that have a GPU. Before any code: an offline spike on a few hundred real tickets,
+measuring accuracy, the share decidable at no more than 5% error, and CPU latency. Every figure here
+is the projects' own claim, unverified, and the projects were weeks old when this note was written.*
+
 AI proposes and drafts; the closure decision belongs to the policy of §9. Generated content is
 always labelled as such.
 
